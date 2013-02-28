@@ -1,0 +1,30 @@
+bin/
+gen/
+.project
+.metadata
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~
+lint.xml
+
+.classpath
+.settings/
+.loadpath
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# built application files
+*.apk
+*.ap_
+
+
+# Java class files
+*.class
+
+local.properties
+project.properties
+notes
