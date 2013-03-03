@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+<<<<<<< HEAD
     <ListView android:layout_width="fill_parent"
                 android:layout_height="0px"
                 android:id="@android:id/list"
@@ -12,6 +13,12 @@
                 android:divider="@color/black"
                 android:dividerHeight="1dip"
                 android:fadingEdge="none">
+=======
+    <ListView
+        android:id="@+id/mylist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+>>>>>>> 6b63a41cd051e7162ed7a1721bb8519a40a9101f
     </ListView>
 
 </LinearLayout> 

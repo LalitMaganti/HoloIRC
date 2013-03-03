@@ -1,6 +1,5 @@
 bin/
 gen/
-.project
 .metadata
 tmp/**
 tmp/**/*
