@@ -2,10 +2,10 @@ package com.fusionx.lightirc.fragments;
 
 import android.support.v4.app.Fragment;
 
-public class IRCFragment extends Fragment {
-	protected String title = "Freenode";
-	
+public abstract class IRCFragment extends Fragment {
+	protected String tabTitle;
+
 	public String getTitle() {
-		return title;
+		return tabTitle;
 	}
 }

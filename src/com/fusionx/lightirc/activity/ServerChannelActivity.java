@@ -1,6 +1,9 @@
-package com.fusionx.lightirc;
+package com.fusionx.lightirc.activity;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ServerFragment;
+import com.fusionx.lightirc.misc.ServerObject;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -12,30 +15,43 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 
-public class ServerChannelArea extends FragmentActivity {
+public class ServerChannelActivity extends FragmentActivity {
 
 	public IRCPagerAdapter mSectionsPagerAdapter;
 	ViewPager mViewPager;
-	
-    @Override
-	protected void onCreate(Bundle savedInstanceState) {
+
+	@Override
+	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_ui);
+		ServerObject s = (ServerObject) getIntent().getExtras()
+				.getSerializable("serverObject");
 
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		mSectionsPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
-		
-		initialisePaging();
-		
+
+		initialisePaging(s);
+
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 			addTab(i);
 		}
 	}
-    
-    private void initialisePaging() {
-    	mSectionsPagerAdapter.addView(new ServerFragment());
+
+	public void updateTabTitle(final ServerFragment fragment,
+			final String newTitle) {
+		final ActionBar actionBar = getActionBar();
+		final int index = mSectionsPagerAdapter.getItemPosition(fragment);
+		actionBar.getTabAt(index).setText(newTitle);
+	}
+
+	private void initialisePaging(final ServerObject s) {
+		final ServerFragment d = new ServerFragment();
+		final Bundle b = new Bundle();
+		b.putSerializable("serverObject", s);
+		d.setArguments(b);
+		mSectionsPagerAdapter.addView(d);
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -46,33 +62,40 @@ public class ServerChannelArea extends FragmentActivity {
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int arg0) {}
+			public void onPageScrollStateChanged(int arg0) {
+			}
 
 			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {}
+			public void onPageScrolled(int arg0, float arg1, int arg2) {
+			}
 		});
 	}
 
-	public void addTab(int i) {
-    	final ActionBar actionBar = getActionBar();
+	public void addTab(final int i) {
+		final ActionBar actionBar = getActionBar();
 		actionBar.addTab(actionBar.newTab()
 				.setText(mSectionsPagerAdapter.getPageTitle(i))
 				.setTabListener(new TabListener() {
 					@Override
-					public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+					public void onTabSelected(final Tab tab,
+							final FragmentTransaction ft) {
 						mViewPager.setCurrentItem(tab.getPosition());
 					}
 
 					@Override
-					public void onTabReselected(Tab tab, FragmentTransaction ft) {}
+					public void onTabReselected(final Tab tab,
+							final FragmentTransaction ft) {
+					}
 
 					@Override
-					public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
-		}));
-    }
+					public void onTabUnselected(final Tab tab,
+							final FragmentTransaction ft) {
+					}
+				}));
+	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.main_ui, menu);
 		return true;
 	}
