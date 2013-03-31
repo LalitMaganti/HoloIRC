@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <EditTextPreference
+        android:key="edit_text_url"
+        android:title="Server URL" />
+
+    <PreferenceScreen
+        android:fragment="com.fusionx.lightirc.fragments.ListViewSettingsFragment"
+        android:key="hardware_keys"
+        android:title="Test URL" />
+
+</PreferenceScreen>

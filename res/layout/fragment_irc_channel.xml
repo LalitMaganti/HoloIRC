@@ -2,23 +2,26 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="16dp"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    android:layout_marginTop="16dp" >
+    android:layout_height="match_parent" >
 
     <ScrollView
         android:id="@+id/scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/editText1" >
+        android:layout_above="@+id/editText1"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="10dip" 
+        android:lineSpacingExtra="3dip" >
 
         <TextView
             android:id="@+id/textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textIsSelectable="true" />
+
+        <requestFocus />
     </ScrollView>
 
     <EditText
@@ -28,11 +31,9 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:hint="Message"
-        android:inputType="text"
-        android:ems="10" >
-
-        <requestFocus />
+        android:ems="10"
+        android:hint="@string/message_text_edit_hint"
+        android:inputType="text" >
     </EditText>
 
 </RelativeLayout>
