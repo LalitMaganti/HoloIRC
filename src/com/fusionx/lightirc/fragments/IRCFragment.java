@@ -14,11 +14,11 @@ public abstract class IRCFragment extends Fragment {
 		return tabTitle;
 	}
 
-	protected void writeToTextView(String text) {
+	protected void writeToTextView(final String text) {
 		writeToTextView(text, getView());
 	}
 
-	protected void writeToTextView(String text, View rootView) {
+	protected void writeToTextView(final String text, final View rootView) {
 		final TextView textView = (TextView) rootView
 				.findViewById(R.id.textview);
 		final ScrollView scrollView = (ScrollView) rootView

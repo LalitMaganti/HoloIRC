@@ -31,8 +31,8 @@ public class IRCService extends Service {
 	private final IRCBinder mBinder = new IRCBinder();
 	public final HashMap<String, LightPircBotX> mServerObjects = new HashMap<String, LightPircBotX>();
 
-	private Handler mHandler = new Handler();
-	public HashMap<String, ChannelCallbacks> mChannelCallbacks = new HashMap<String, ChannelCallbacks>();
+	private final Handler mHandler = new Handler();
+	public final HashMap<String, ChannelCallbacks> mChannelCallbacks = new HashMap<String, ChannelCallbacks>();
 	private ServerCallbacks mServerCallbacks = null;
 
 	public class IRCBinder extends Binder {
@@ -42,12 +42,12 @@ public class IRCService extends Service {
 	}
 
 	@Override
-	public IBinder onBind(Intent arg0) {
+	public IBinder onBind(final Intent arg0) {
 		return mBinder;
 	}
 
 	@Override
-	public boolean onUnbind(Intent arg0) {
+	public boolean onUnbind(final Intent arg0) {
 		if (arg0.getBooleanExtra("server", false)) {
 			mServerCallbacks = null;
 		}
@@ -57,7 +57,7 @@ public class IRCService extends Service {
 
 	@Override
 	public void onCreate() {
-		IntentFilter filter = new IntentFilter(
+		final IntentFilter filter = new IntentFilter(
 				"com.fusionx.lightirc.MESSAGE_TO_CHANNEL");
 		registerReceiver(mScreenStateReceiver, filter);
 	}
@@ -67,12 +67,18 @@ public class IRCService extends Service {
 		unregisterReceiver(mScreenStateReceiver);
 	}
 
-	public LightPircBotX getBot(String serverName) {
+	public LightPircBotX getBot(final String serverName) {
 		return mServerObjects.get(serverName);
 	}
 
-	private void appendToServerBuffer(String message, String serverName) {
-		mServerObjects.get(serverName).mServerBuffer += message + "\n";
+	private void callbackToServerAndAppend(final String message, final String serverName) {
+		mServerObjects.get(serverName).mServerBuffer += message;
+		
+		tryPostServer(new Runnable() {
+			public void run() {
+				mServerCallbacks.onServerWriteNeeded(message);
+			}
+		});
 	}
 
 	AsyncTask<LightPircBotX, Void, Void> mBackgroundConnector = new AsyncTask<LightPircBotX, Void, Void>() {
@@ -191,24 +197,14 @@ public class IRCService extends Service {
 		@Override
 		public void onNotice(final NoticeEvent<LightPircBotX> event)
 				throws Exception {
-			tryPostServer(new Runnable() {
-				public void run() {
-					mServerCallbacks.onServerWriteNeeded(event.getMessage() + "\n");
-				}
-			});
-			appendToServerBuffer(event.getMessage() + "\n", event.getBot().getTitle());
+			callbackToServerAndAppend(event.getMessage() + "\n", event.getBot().getTitle());
 
 		}
 
 		@Override
 		public void onMotd(final MotdEvent<LightPircBotX> event)
 				throws Exception {
-			tryPostServer(new Runnable() {
-				public void run() {
-					mServerCallbacks.onServerWriteNeeded(event.getMotd() + "\n");
-				}
-			});
-			appendToServerBuffer(event.getMotd() + "\n", event.getBot().getTitle());
+			callbackToServerAndAppend(event.getMotd() + "\n", event.getBot().getTitle());
 		}
 	}
 

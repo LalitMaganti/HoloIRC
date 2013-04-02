@@ -39,31 +39,35 @@ import android.view.ViewGroup;
 
 public class ServerFragment extends IRCFragment implements ServerCallbacks {
 	String serverName;
-	
+
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		Bundle b = getArguments();
 		serverName = b.getString("serverName");
-		
+
 		// Hacky way to reset title correctly
-		((ServerChannelActivity) getActivity()).updateTabTitle(this, serverName);
-		
-		Intent service = new Intent(getActivity(), IRCService.class);
+		((ServerChannelActivity) getActivity())
+				.updateTabTitle(this, serverName);
+
+		final Intent service = new Intent(getActivity(), IRCService.class);
 		service.putExtra("server", true);
 		getActivity().startService(service);
 		getActivity().bindService(service, mConnection, 0);
-			
+
 		super.onCreate(savedInstanceState);
 	}
 
-	private ServiceConnection mConnection = new ServiceConnection() {
+	private final ServiceConnection mConnection = new ServiceConnection() {
 		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			LightPircBotX light = ((IRCBinder) service).getService().getBot(serverName);
-			((IRCBinder) service).getService().setServerCallbacks(ServerFragment.this);
-			if(light.mIsStarted) {
+		public void onServiceConnected(final ComponentName className,
+				final IBinder binder) {
+			final IRCService service = ((IRCBinder) binder).getService();
+			final LightPircBotX light = service.getBot(serverName);
+
+			service.setServerCallbacks(ServerFragment.this);
+			if (light.mIsStarted) {
 				writeToTextView(light.mServerBuffer);
-				for(String s : light.mChannelBuffers.keySet()) {
+				for (final String s : light.mChannelBuffers.keySet()) {
 					ChannelFragment channel = new ChannelFragment();
 					Bundle bu = new Bundle();
 					bu.putString("channel", s);
@@ -77,12 +81,12 @@ public class ServerFragment extends IRCFragment implements ServerCallbacks {
 					((ServerChannelActivity) getActivity()).addTab(position);
 				}
 			} else {
-				((IRCBinder) service).getService().connectToServer(serverName);
+				service.connectToServer(serverName);
 			}
 		}
 
 		@Override
-		public void onServiceDisconnected(ComponentName name) {
+		public void onServiceDisconnected(final ComponentName name) {
 		}
 	};
 
@@ -102,22 +106,23 @@ public class ServerFragment extends IRCFragment implements ServerCallbacks {
 	}
 
 	@Override
-	public void onServerWriteNeeded(String message) {
-			writeToTextView(message);
+	public void onServerWriteNeeded(final String message) {
+		writeToTextView(message);
 	}
 
 	@Override
-	public void onNewChannelJoined(String channelName, String nick, String buffer) {
-			ChannelFragment channel = new ChannelFragment();
-			Bundle b = new Bundle();
-			b.putString("channel", channelName);
-			b.putString("nick", nick);
-			b.putString("serverName", serverName);
-			b.putString("buffer", buffer);
-			channel.setArguments(b);
+	public void onNewChannelJoined(final String channelName, final String nick,
+			final String buffer) {
+		final ChannelFragment channel = new ChannelFragment();
+		final Bundle b = new Bundle();
+		b.putString("channel", channelName);
+		b.putString("nick", nick);
+		b.putString("serverName", serverName);
+		b.putString("buffer", buffer);
+		channel.setArguments(b);
 
-			int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
-					.addView(channel);
-			((ServerChannelActivity) getActivity()).addTab(position);
+		final int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
+				.addView(channel);
+		((ServerChannelActivity) getActivity()).addTab(position);
 	}
 }
