@@ -61,11 +61,11 @@ public class MainServerListActivity extends ListActivity {
 	}
 
 	private void getSetServerList() {
-		SharedPreferences settings = getSharedPreferences("main", 0);
-		boolean firstRun = settings.getBoolean("firstrun", true);
-		int noOfServers = settings.getInt("noOfServers", 0);
+		final SharedPreferences settings = getSharedPreferences("main", 0);
+		final boolean firstRun = settings.getBoolean("firstrun", true);
+		final int noOfServers = settings.getInt("noOfServers", 0);
 		LightPircBotX[] values = null;
-		Editor e = settings.edit();
+		final Editor e = settings.edit();
 
 		if (firstRun) {
 			LightPircBotX freenode = new LightPircBotX();
@@ -112,7 +112,7 @@ public class MainServerListActivity extends ListActivity {
 		if(values != null) {
 			serverList = values;
 			
-			Intent service = new Intent(this, IRCService.class);
+			final Intent service = new Intent(this, IRCService.class);
 			startService(service);
 			bindService(service, mConnection, 0);
 			
@@ -120,9 +120,9 @@ public class MainServerListActivity extends ListActivity {
 		}
 	}
 	
-	private ServiceConnection mConnection = new ServiceConnection() {
+	private final ServiceConnection mConnection = new ServiceConnection() {
 		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
+		public void onServiceConnected(final ComponentName className, final IBinder service) {
 			if(((IRCBinder) service).getService().mServerObjects.size() <= 0) {
 				for (LightPircBotX s : serverList) {
 					((IRCBinder) service).getService().mServerObjects.put(s.getTitle(), s);
@@ -137,15 +137,15 @@ public class MainServerListActivity extends ListActivity {
 	};
 
 	@Override
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
+	public void onCreateContextMenu(final ContextMenu menu, final View v,
+			final ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, v, menuInfo);
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.context_server_long_press, menu);
 	}
 
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(final MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
 				.getMenuInfo();
 		switch (item.getItemId()) {
