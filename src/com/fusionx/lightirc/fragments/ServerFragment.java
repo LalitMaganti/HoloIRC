@@ -22,16 +22,14 @@
 package com.fusionx.lightirc.fragments;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.IRCBinder;
 import com.fusionx.lightirc.misc.LightPircBotX;
 import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.services.IRCService.IRCBinder;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.callbacks.ServerCallbacks;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -39,7 +37,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ServerFragment extends IRCFragment {
+public class ServerFragment extends IRCFragment implements ServerCallbacks {
 	String serverName;
 	
 	@Override
@@ -51,6 +49,7 @@ public class ServerFragment extends IRCFragment {
 		((ServerChannelActivity) getActivity()).updateTabTitle(this, serverName);
 		
 		Intent service = new Intent(getActivity(), IRCService.class);
+		service.putExtra("server", true);
 		getActivity().startService(service);
 		getActivity().bindService(service, mConnection, 0);
 			
@@ -61,8 +60,9 @@ public class ServerFragment extends IRCFragment {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			LightPircBotX light = ((IRCBinder) service).getService().getBot(serverName);
+			((IRCBinder) service).getService().setServerCallbacks(ServerFragment.this);
 			if(light.mIsStarted) {
-				writeRawToTextView(light.mServerBuffer);
+				writeToTextView(light.mServerBuffer);
 				for(String s : light.mChannelBuffers.keySet()) {
 					ChannelFragment channel = new ChannelFragment();
 					Bundle bu = new Bundle();
@@ -79,7 +79,6 @@ public class ServerFragment extends IRCFragment {
 			} else {
 				((IRCBinder) service).getService().connectToServer(serverName);
 			}
-			getActivity().unbindService(mConnection);
 		}
 
 		@Override
@@ -89,7 +88,7 @@ public class ServerFragment extends IRCFragment {
 
 	@Override
 	public void onDestroy() {
-		getActivity().unregisterReceiver(mServerReciever);
+		getActivity().unbindService(mConnection);
 		super.onDestroy();
 	}
 
@@ -99,39 +98,26 @@ public class ServerFragment extends IRCFragment {
 		final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
 				container, false);
 
-		IntentFilter filter = new IntentFilter(
-				"com.fusionx.lightirc.JOIN_NEW_CHANNEL");
-		getActivity().registerReceiver(mServerReciever, filter);
-		filter = new IntentFilter("com.fusionx.lightirc.NOTICE_FROM_SERVER");
-		getActivity().registerReceiver(mServerReciever, filter);
-		filter = new IntentFilter("com.fusionx.lightirc.MOTD_FROM_SERVER");
-		getActivity().registerReceiver(mServerReciever, filter);
-
 		return rootView;
 	}
 
-	BroadcastReceiver mServerReciever = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction().equals(
-					"com.fusionx.lightirc.JOIN_NEW_CHANNEL")) {
-				String channelName = intent.getStringExtra("channel");
-				String nick = intent.getStringExtra("nick");
+	@Override
+	public void onServerWriteNeeded(String message) {
+			writeToTextView(message);
+	}
 
-				ChannelFragment channel = new ChannelFragment();
-				Bundle b = new Bundle();
-				b.putString("channel", channelName);
-				b.putString("nick", nick);
-				b.putString("serverName", serverName);
-				channel.setArguments(b);
+	@Override
+	public void onNewChannelJoined(String channelName, String nick, String buffer) {
+			ChannelFragment channel = new ChannelFragment();
+			Bundle b = new Bundle();
+			b.putString("channel", channelName);
+			b.putString("nick", nick);
+			b.putString("serverName", serverName);
+			b.putString("buffer", buffer);
+			channel.setArguments(b);
 
-				int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
-						.addView(channel);
-				((ServerChannelActivity) getActivity()).addTab(position);
-			} else {
-				String stringToWrite = intent.getStringExtra("stringToWrite");
-				writeToTextView(stringToWrite);
-			}
-		}
-	};
+			int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
+					.addView(channel);
+			((ServerChannelActivity) getActivity()).addTab(position);
+	}
 }

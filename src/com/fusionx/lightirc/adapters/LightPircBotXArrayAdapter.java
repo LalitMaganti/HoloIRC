@@ -48,7 +48,7 @@ public class LightPircBotXArrayAdapter extends ArrayAdapter<LightPircBotX> {
 
         View rowView = inflater.inflate(R.layout.listlayout, parent, false);
         TextView textView = (TextView) rowView.findViewById(R.id.text);
-        textView.setText(values[position].mURL);
+        textView.setText(values[position].getTitle());
 
         return rowView;
     }

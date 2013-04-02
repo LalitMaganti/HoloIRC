@@ -21,11 +21,11 @@
 
 package com.fusionx.lightirc.fragments;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +35,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.callbacks.ChannelCallbacks;
+import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.services.IRCService.IRCBinder;
 
-public class ChannelFragment extends IRCFragment implements OnKeyListener {
+public class ChannelFragment extends IRCFragment implements OnKeyListener,
+		ChannelCallbacks {
 	String nick;
 	String serverName;
 
@@ -50,22 +54,30 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener {
 		nick = getArguments().getString("nick");
 		serverName = getArguments().getString("serverName");
 		String buffer = getArguments().getString("buffer");
-
-		if (buffer != null) {
-			writeRawToTextView(buffer, rootView);
-		} else {
-			writeToTextView(nick + " entered the room", rootView);
-		}
+		
+		writeToTextView(buffer, rootView);
 
 		TextView textview = (TextView) rootView.findViewById(R.id.editText1);
 		textview.setOnKeyListener(this);
 
-		IntentFilter filter = new IntentFilter(
-				"com.fusionx.lightirc.MESSAGE_FROM_CHANNEL");
-		getActivity().registerReceiver(mChannelReciever, filter);
+		Intent service = new Intent(getActivity(), IRCService.class);
+		service.putExtra("channel", tabTitle);
+		getActivity().bindService(service, mConnection, 0);
 
 		return rootView;
 	}
+
+	private ServiceConnection mConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			((IRCBinder) service).getService().setChannelCallbacks(
+					ChannelFragment.this, tabTitle);
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+		}
+	};
 
 	@Override
 	public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -83,8 +95,6 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener {
 			intent.putExtra("message", t.getText().toString());
 			getActivity().sendBroadcast(intent);
 
-			writeToTextView(nick + ": " + t.getText().toString());
-
 			// Hacky way to clear but keep the focus on the EditText
 			t.getText().clear();
 			t.setSelection(0);
@@ -97,21 +107,12 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener {
 
 	@Override
 	public void onDestroy() {
-		getActivity().unregisterReceiver(mChannelReciever);
+		getActivity().unbindService(mConnection);
 		super.onDestroy();
 	}
 
-	BroadcastReceiver mChannelReciever = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String channel = intent.getStringExtra("channel");
-			if (channel.equals(tabTitle)) {
-				if (intent.getAction().equals(
-						"com.fusionx.lightirc.MESSAGE_FROM_CHANNEL")) {
-					String message = intent.getStringExtra("message");
-					writeToTextView(message);
-				}
-			}
-		}
-	};
+	@Override
+	public void onChannelWriteNeeded(String message) {
+		writeToTextView(message);
+	}
 }

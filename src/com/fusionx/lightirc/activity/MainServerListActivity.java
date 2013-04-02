@@ -24,9 +24,9 @@ package com.fusionx.lightirc.activity;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
 import com.fusionx.lightirc.adapters.LightPircBotXArrayAdapter;
-import com.fusionx.lightirc.misc.IRCBinder;
 import com.fusionx.lightirc.misc.LightPircBotX;
 import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.services.IRCService.IRCBinder;
 
 import android.os.Bundle;
 import android.os.IBinder;
@@ -56,41 +56,46 @@ public class MainServerListActivity extends ListActivity {
 
 		getListView().setLongClickable(true);
 		registerForContextMenu(getListView());
-
-		setListAdapter(new LightPircBotXArrayAdapter(this, getSetServerList()));
+		
+		getSetServerList();
 	}
 
-	private LightPircBotX[] getSetServerList() {
+	private void getSetServerList() {
 		SharedPreferences settings = getSharedPreferences("main", 0);
 		boolean firstRun = settings.getBoolean("firstrun", true);
 		int noOfServers = settings.getInt("noOfServers", 0);
-		LightPircBotX[] values;
+		LightPircBotX[] values = null;
 		Editor e = settings.edit();
 
-		if (firstRun || noOfServers == 0) {
+		if (firstRun) {
 			LightPircBotX freenode = new LightPircBotX();
 			freenode.mURL = "irc.freenode.net";
 			freenode.mNick = "LightIRCUser";
 			freenode.setTitle("Freenode");
 			freenode.mAutoJoinChannels = new String[] { "#testingircandroid" };
 			values = new LightPircBotX[] { freenode };
-			noOfServers = 1;
+
 			for (String s : freenode.toHashMap().keySet()) {
 				e.putString("server_0_" + s, freenode.toHashMap().get(s));
 			}
-			e.putString("server_0_autoJoin_channel", "#testingircandroid");
+
+			e.putBoolean("firstrun", false);
+			e.putString("server_0_autoJoin_channel_0", "#testingircandroid");
 			e.putInt("server_0_autoJoin_no", 1);
-		} else {
+			e.putInt("noOfServers", 1);
+			e.commit();
+		} else if (noOfServers != 0) {
 			values = new LightPircBotX[noOfServers];
 			for (int i = 0; i < noOfServers; i++) {
-				values[i].mURL = settings.getString("server_" + i + "_url", "");
-				values[i].mUserName = settings.getString("server_" + i
+				LightPircBotX bot = new LightPircBotX();
+				bot.mURL = settings.getString("server_" + i + "_url", "");
+				bot.mUserName = settings.getString("server_" + i
 						+ "_userName", "");
-				values[i].mNick = settings.getString("server_" + i + "_nick",
+				bot.mNick = settings.getString("server_" + i + "_nick",
 						"");
-				values[i].mServerPassword = settings.getString("server_" + i
+				bot.mServerPassword = settings.getString("server_" + i
 						+ "_serverPassword", "");
-				values[i].setTitle(settings.getString(
+				bot.setTitle(settings.getString(
 						"server_" + i + "_title", ""));
 
 				String[] s = new String[settings.getInt("server_" + i
@@ -99,21 +104,20 @@ public class MainServerListActivity extends ListActivity {
 					s[j] = settings.getString("server_" + i
 							+ "_autoJoin_channel_" + j, "");
 				}
-				values[i].mAutoJoinChannels = s;
+				bot.mAutoJoinChannels = s;
+				values[i] = bot;
 			}
 		}
-
-		e.putBoolean("firstrun", true);
-		e.putInt("noOfServers", noOfServers);
-		e.commit();
 		
-		serverList = values;
-		
-		Intent service = new Intent(this, IRCService.class);
-		startService(service);
-		bindService(service, mConnection, 0);
-
-		return values;
+		if(values != null) {
+			serverList = values;
+			
+			Intent service = new Intent(this, IRCService.class);
+			startService(service);
+			bindService(service, mConnection, 0);
+			
+			setListAdapter(new LightPircBotXArrayAdapter(this, values));
+		}
 	}
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
