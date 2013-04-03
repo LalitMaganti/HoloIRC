@@ -48,9 +48,7 @@ public class IRCService extends Service {
 
 	@Override
 	public boolean onUnbind(final Intent arg0) {
-		if (arg0.getBooleanExtra("server", false)) {
-			mServerCallbacks = null;
-		}
+		mServerCallbacks = null;
 		mChannelCallbacks.remove(arg0.getStringExtra("channelName"));
 		return true;
 	}
@@ -71,9 +69,10 @@ public class IRCService extends Service {
 		return mServerObjects.get(serverName);
 	}
 
-	private void callbackToServerAndAppend(final String message, final String serverName) {
+	private void callbackToServerAndAppend(final String message,
+			final String serverName) {
 		mServerObjects.get(serverName).mServerBuffer += message;
-		
+
 		tryPostServer(new Runnable() {
 			public void run() {
 				mServerCallbacks.onServerWriteNeeded(message);
@@ -119,8 +118,8 @@ public class IRCService extends Service {
 		if (mChannelCallbacks.containsKey(channelName)) {
 			mHandler.post(new Runnable() {
 				public void run() {
-					mChannelCallbacks.get(channelName)
-							.onChannelWriteNeeded(message);
+					mChannelCallbacks.get(channelName).onChannelWriteNeeded(
+							message);
 				}
 			});
 		}
@@ -129,7 +128,7 @@ public class IRCService extends Service {
 		final String buffer = buffers.get(channelName) + message;
 		buffers.put(channelName, buffer);
 	}
-	
+
 	final BroadcastReceiver mScreenStateReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
@@ -141,15 +140,17 @@ public class IRCService extends Service {
 				LightPircBotX bot = mServerObjects.get(serverName);
 
 				bot.sendMessage(channelName, message);
-				
+
 				String bufferMessage = bot.getNick() + ": " + message + "\n";
-				
-				callbackToChannelAndAppend(channelName, bufferMessage, serverName);
+
+				callbackToChannelAndAppend(channelName, bufferMessage,
+						serverName);
 			}
 		}
 	};
 
-	public void setChannelCallbacks(final ChannelCallbacks cb, final String channelName) {
+	public void setChannelCallbacks(final ChannelCallbacks cb,
+			final String channelName) {
 		mChannelCallbacks.put(channelName, cb);
 	}
 
@@ -197,14 +198,16 @@ public class IRCService extends Service {
 		@Override
 		public void onNotice(final NoticeEvent<LightPircBotX> event)
 				throws Exception {
-			callbackToServerAndAppend(event.getMessage() + "\n", event.getBot().getTitle());
+			callbackToServerAndAppend(event.getMessage() + "\n", event.getBot()
+					.getTitle());
 
 		}
 
 		@Override
 		public void onMotd(final MotdEvent<LightPircBotX> event)
 				throws Exception {
-			callbackToServerAndAppend(event.getMotd() + "\n", event.getBot().getTitle());
+			callbackToServerAndAppend(event.getMotd() + "\n", event.getBot()
+					.getTitle());
 		}
 	}
 

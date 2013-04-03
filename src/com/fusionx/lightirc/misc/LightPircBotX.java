@@ -25,7 +25,11 @@ import java.util.HashMap;
 
 import org.pircbotx.PircBotX;
 
-public class LightPircBotX extends PircBotX {	
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class LightPircBotX extends PircBotX implements Parcelable {
+	public int noOfAutoJoinChannels;
 	public String[] mAutoJoinChannels;
 	public HashMap<String, String> mChannelBuffers = new HashMap<String, String>();
 	public String mNick = "";
@@ -35,15 +39,15 @@ public class LightPircBotX extends PircBotX {
 	public String mURL = "";
 	public String mUserName = "";
 	public boolean mIsStarted = false;
-	
+
 	public String getServerBuffer() {
 		return mServerBuffer;
 	}
-	
+
 	public HashMap<String, String> getChannelBuffers() {
 		return mChannelBuffers;
 	}
-	
+
 	public String getTitle() {
 		return mTitle;
 	}
@@ -62,4 +66,44 @@ public class LightPircBotX extends PircBotX {
 
 		return nameIcons;
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int arg1) {
+		dest.writeString(mURL);
+		dest.writeString(mUserName);
+		dest.writeString(mNick);
+		dest.writeString(mServerPassword);
+		dest.writeString(mTitle);
+		dest.writeInt(noOfAutoJoinChannels);
+		dest.writeStringArray(mAutoJoinChannels);
+	}
+
+	private void readFromParcel(Parcel in) {
+		mURL = in.readString();
+		mUserName = in.readString();
+		mNick = in.readString();
+		mServerPassword = in.readString();
+		mTitle = in.readString();
+		noOfAutoJoinChannels = in.readInt();
+		mAutoJoinChannels = new String[noOfAutoJoinChannels];
+		in.readStringArray(mAutoJoinChannels);
+	}
+
+	@SuppressWarnings("rawtypes")
+	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+		public LightPircBotX createFromParcel(Parcel in) {
+			LightPircBotX c = new LightPircBotX();
+			c.readFromParcel(in);
+			return c;
+		}
+
+		public LightPircBotX[] newArray(int size) {
+			return new LightPircBotX[size];
+		}
+	};
 }

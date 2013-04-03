@@ -54,7 +54,7 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 		nick = getArguments().getString("nick");
 		serverName = getArguments().getString("serverName");
 		String buffer = getArguments().getString("buffer");
-		
+
 		writeToTextView(buffer, rootView);
 
 		TextView textview = (TextView) rootView.findViewById(R.id.editText1);

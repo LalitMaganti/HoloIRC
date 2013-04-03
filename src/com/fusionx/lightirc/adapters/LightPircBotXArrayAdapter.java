@@ -32,24 +32,24 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.LightPircBotX;
 
 public class LightPircBotXArrayAdapter extends ArrayAdapter<LightPircBotX> {
-    private final Context context;
-    private final LightPircBotX[] values;
+	private final Context context;
+	private final LightPircBotX[] values;
 
-    public LightPircBotXArrayAdapter(Context context, LightPircBotX[] values) {
-        super(context, R.layout.listlayout, values);
-        this.context = context;
-        this.values = values;
-    }
+	public LightPircBotXArrayAdapter(Context context, LightPircBotX[] values) {
+		super(context, R.layout.listlayout, values);
+		this.context = context;
+		this.values = values;
+	}
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LayoutInflater inflater = (LayoutInflater) context
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		LayoutInflater inflater = (LayoutInflater) context
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View rowView = inflater.inflate(R.layout.listlayout, parent, false);
-        TextView textView = (TextView) rowView.findViewById(R.id.text);
-        textView.setText(values[position].getTitle());
+		View rowView = inflater.inflate(R.layout.listlayout, parent, false);
+		TextView textView = (TextView) rowView.findViewById(R.id.text);
+		textView.setText(values[position].getTitle());
 
-        return rowView;
-    }
+		return rowView;
+	}
 }

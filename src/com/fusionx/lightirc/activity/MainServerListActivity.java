@@ -48,7 +48,7 @@ import android.widget.ListView;
 
 public class MainServerListActivity extends ListActivity {
 	LightPircBotX[] serverList;
-	
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,7 +56,7 @@ public class MainServerListActivity extends ListActivity {
 
 		getListView().setLongClickable(true);
 		registerForContextMenu(getListView());
-		
+
 		getSetServerList();
 	}
 
@@ -89,17 +89,16 @@ public class MainServerListActivity extends ListActivity {
 			for (int i = 0; i < noOfServers; i++) {
 				LightPircBotX bot = new LightPircBotX();
 				bot.mURL = settings.getString("server_" + i + "_url", "");
-				bot.mUserName = settings.getString("server_" + i
-						+ "_userName", "");
-				bot.mNick = settings.getString("server_" + i + "_nick",
+				bot.mUserName = settings.getString("server_" + i + "_userName",
 						"");
+				bot.mNick = settings.getString("server_" + i + "_nick", "");
 				bot.mServerPassword = settings.getString("server_" + i
 						+ "_serverPassword", "");
-				bot.setTitle(settings.getString(
-						"server_" + i + "_title", ""));
+				bot.setTitle(settings.getString("server_" + i + "_title", ""));
+				bot.noOfAutoJoinChannels = settings.getInt("server_" + i
+						+ "_autoJoin_no", 0);
 
-				String[] s = new String[settings.getInt("server_" + i
-						+ "_autoJoin_no", 0)];
+				String[] s = new String[bot.noOfAutoJoinChannels];
 				for (int j = 0; j < s.length; j++) {
 					s[j] = settings.getString("server_" + i
 							+ "_autoJoin_channel_" + j, "");
@@ -108,24 +107,26 @@ public class MainServerListActivity extends ListActivity {
 				values[i] = bot;
 			}
 		}
-		
-		if(values != null) {
+
+		if (values != null) {
 			serverList = values;
-			
+
 			final Intent service = new Intent(this, IRCService.class);
 			startService(service);
 			bindService(service, mConnection, 0);
-			
+
 			setListAdapter(new LightPircBotXArrayAdapter(this, values));
 		}
 	}
-	
+
 	private final ServiceConnection mConnection = new ServiceConnection() {
 		@Override
-		public void onServiceConnected(final ComponentName className, final IBinder service) {
-			if(((IRCBinder) service).getService().mServerObjects.size() <= 0) {
+		public void onServiceConnected(final ComponentName className,
+				final IBinder service) {
+			if (((IRCBinder) service).getService().mServerObjects.size() <= 0) {
 				for (LightPircBotX s : serverList) {
-					((IRCBinder) service).getService().mServerObjects.put(s.getTitle(), s);
+					((IRCBinder) service).getService().mServerObjects.put(
+							s.getTitle(), s);
 				}
 			}
 			unbindService(mConnection);
@@ -167,21 +168,25 @@ public class MainServerListActivity extends ListActivity {
 	}
 
 	private void connectToServer(int position) {
-		LightPircBotX server = (LightPircBotX) getListView().getItemAtPosition(
-				position);
+		final LightPircBotX server = (LightPircBotX) getListView()
+				.getItemAtPosition(position);
 
-		Intent intent = new Intent(MainServerListActivity.this,
+		final Intent intent = new Intent(MainServerListActivity.this,
 				ServerChannelActivity.class);
 		intent.putExtra("serverName", server.getTitle());
 		startActivity(intent);
 	}
 
 	private void editServer(int position) {
+		final LightPircBotX server = (LightPircBotX) getListView()
+				.getItemAtPosition(position);
+
 		Intent intent = new Intent(MainServerListActivity.this,
 				ServerSettingsActivity.class);
 		intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
 				BaseServerSettingFragment.class.getName());
 		intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+		intent.putExtra("server", server);
 		startActivity(intent);
 	}
 

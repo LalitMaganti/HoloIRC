@@ -5,7 +5,7 @@
         android:title="Server URL" />
 
     <PreferenceScreen
-        android:fragment="com.fusionx.lightirc.fragments.ListViewSettingsFragment"
+        android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
         android:key="hardware_keys"
         android:title="Test URL" />
 
