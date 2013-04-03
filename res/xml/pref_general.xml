@@ -1,8 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <EditTextPreference
-        android:key="edit_text_name"
-        android:title="Server Name" />
+        android:key="edit_text_title"
+        android:title="Server Title (only for display)" />
 
     <EditTextPreference
         android:key="edit_text_url"

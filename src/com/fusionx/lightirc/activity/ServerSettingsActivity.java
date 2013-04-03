@@ -28,7 +28,9 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.LightPircBotX;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -42,9 +44,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
 public class ServerSettingsActivity extends PreferenceActivity {
@@ -75,6 +77,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 	public static class BaseServerSettingFragment extends PreferenceFragment {
 		public final static String URL = "edit_text_url";
+		public final static String Title = "edit_text_title";
+		public final static String Nick = "edit_text_nick";
 
 		@Override
 		public void onCreate(final Bundle savedInstanceState) {
@@ -91,47 +95,105 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 			mEditTextUrl.setText(s.mURL);
 			mEditTextUrl.setSummary(s.mURL);
+
+			EditTextPreference mEditTextTitle = (EditTextPreference) prefSet
+					.findPreference(Title);
+
+			mEditTextTitle.setText(s.getTitle());
+			mEditTextTitle.setSummary(s.getTitle());
+
+			EditTextPreference mEditTextNick = (EditTextPreference) prefSet
+					.findPreference(Nick);
+
+			mEditTextNick.setText(s.mNick);
+			mEditTextNick.setSummary(s.mNick);
 		}
 	}
 
 	public static class ListViewSettingsFragment extends ListFragment implements
-			OnItemLongClickListener, android.view.ActionMode.Callback {
+			MultiChoiceModeListener, android.view.ActionMode.Callback,
+			DialogInterface.OnClickListener {
 		protected Object mActionMode;
+		EditText inputView;
+		final ArrayList<String> channelList = new ArrayList<String>();
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View v = super
-					.onCreateView(inflater, container, savedInstanceState);
-			final ArrayList<String> personList = new ArrayList<String>();
 
-			final ArrayAdapter<String> ds = new ArrayAdapter<String>(
+			final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 					getActivity().getApplicationContext(),
-					R.layout.layout_simple_list, personList);
+					R.layout.layout_simple_list, channelList);
+
 			for (String k : s.mAutoJoinChannels) {
-				ds.add(k);
+				adapter.add(k);
 			}
 
-			setListAdapter(ds);
-			return v;
+			inputView = new EditText(getActivity());
+
+			setListAdapter(adapter);
+
+			setHasOptionsMenu(true);
+
+			return super.onCreateView(inflater, container, savedInstanceState);
 		}
 
 		@Override
 		public void onActivityCreated(Bundle savedInstanceState) {
 			super.onActivityCreated(savedInstanceState);
-			getListView().setOnItemLongClickListener(this);
+
+			getListView().setMultiChoiceModeListener(this);
+			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		}
 
 		@Override
 		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			switch (item.getItemId()) {
-			case R.id.toast:
-				// Action here
-				mode.finish(); // Action picked, so close the CAB
+			case R.id.item_channel_context_edit:
+				// TODO - edit here
+				mode.finish();
+				return true;
+			case R.id.item_channel_context_delete:
+				// TODO - delete here
+				mode.finish();
 				return true;
 			default:
 				return false;
 			}
+		}
+
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			super.onOptionsItemSelected(item);
+
+			switch (item.getItemId()) {
+			case R.id.item_channel_context_add:
+				inputView.setHint("Channel name (including the starting #)");
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity())
+						.setIcon(android.R.drawable.ic_dialog_alert)
+						.setTitle("Channel Name")
+						.setPositiveButton("OK", ListViewSettingsFragment.this)
+						.setNegativeButton("Cancel",
+								ListViewSettingsFragment.this)
+						.setView(inputView);
+
+				builder.show();
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			// TODO - input validation
+			channelList.add(inputView.getText().toString());
+		}
+
+		@Override
+		public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+			inflater.inflate(R.menu.menu_channel_action_bar, menu);
 		}
 
 		@Override
@@ -144,25 +206,22 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 		@Override
 		public void onDestroyActionMode(ActionMode arg0) {
-			mActionMode = null;
 		}
 
 		@Override
-		public boolean onPrepareActionMode(ActionMode arg0, Menu arg1) {
+		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			return false;
 		}
 
 		@Override
-		public boolean onItemLongClick(AdapterView<?> parent, View arg1,
-				int position, long arg3) {
-			if (mActionMode != null) {
-				return false;
+		public void onItemCheckedStateChanged(ActionMode mode, int position,
+				long id, boolean checked) {
+			if (getListView().getCheckedItemCount() > 1) {
+				mode.getMenu().getItem(0).setVisible(false);
+			} else if (getListView().getCheckedItemCount() == 1) {
+				mode.getMenu().getItem(0).setVisible(true);
 			}
-
-			mActionMode = getActivity().startActionMode(this);
-			((ListView) parent).setItemChecked(position,
-					((ListView) parent).isItemChecked(position));
-			return true;
+			mode.setTitle(getListView().getCheckedItemCount() + " items selected");
 		}
 	}
 }

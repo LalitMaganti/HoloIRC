@@ -72,7 +72,6 @@ public class MainServerListActivity extends ListActivity {
 			freenode.mURL = "irc.freenode.net";
 			freenode.mNick = "LightIRCUser";
 			freenode.setTitle("Freenode");
-			freenode.mAutoJoinChannels = new String[] { "#testingircandroid" };
 			values = new LightPircBotX[] { freenode };
 
 			for (String s : freenode.toHashMap().keySet()) {
@@ -81,7 +80,8 @@ public class MainServerListActivity extends ListActivity {
 
 			e.putBoolean("firstrun", false);
 			e.putString("server_0_autoJoin_channel_0", "#testingircandroid");
-			e.putInt("server_0_autoJoin_no", 1);
+			e.putString("server_0_autoJoin_channel_1", "#huawei-g300");
+			e.putInt("server_0_autoJoin_no", 2);
 			e.putInt("noOfServers", 1);
 			e.commit();
 		} else if (noOfServers != 0) {
@@ -99,7 +99,7 @@ public class MainServerListActivity extends ListActivity {
 						+ "_autoJoin_no", 0);
 
 				String[] s = new String[bot.noOfAutoJoinChannels];
-				for (int j = 0; j < s.length; j++) {
+				for (int j = 0; j < bot.noOfAutoJoinChannels; j++) {
 					s[j] = settings.getString("server_" + i
 							+ "_autoJoin_channel_" + j, "");
 				}

@@ -23,6 +23,7 @@ package com.fusionx.lightirc.activity;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ServerFragment;
 
 import android.app.ActionBar;
@@ -75,7 +76,7 @@ public class ServerChannelActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void updateTabTitle(final ServerFragment fragment,
+	public void updateTabTitle(final IRCFragment fragment,
 			final String newTitle) {
 		final ActionBar actionBar = getActionBar();
 		final int index = mSectionsPagerAdapter.getItemPosition(fragment);

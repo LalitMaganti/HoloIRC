@@ -85,8 +85,9 @@ public class IRCService extends Service {
 		protected Void doInBackground(LightPircBotX... serverDetails) {
 			try {
 				serverDetails[0].connect(serverDetails[0].mURL);
-				serverDetails[0]
-						.joinChannel(serverDetails[0].mAutoJoinChannels[0]);
+				for (String s : serverDetails[0].mAutoJoinChannels) {
+					serverDetails[0].joinChannel(s);
+				}
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}

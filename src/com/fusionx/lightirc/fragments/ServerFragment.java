@@ -124,5 +124,6 @@ public class ServerFragment extends IRCFragment implements ServerCallbacks {
 		final int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
 				.addView(channel);
 		((ServerChannelActivity) getActivity()).addTab(position);
+		((ServerChannelActivity) getActivity()).updateTabTitle(channel, channelName);
 	}
 }
