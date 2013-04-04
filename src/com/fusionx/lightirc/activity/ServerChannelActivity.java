@@ -39,9 +39,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class ServerChannelActivity extends FragmentActivity {
-
 	public IRCPagerAdapter mSectionsPagerAdapter;
-	ViewPager mViewPager;
+	public ViewPager mViewPager;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {

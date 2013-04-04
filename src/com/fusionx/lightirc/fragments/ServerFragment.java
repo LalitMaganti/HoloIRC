@@ -38,16 +38,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ServerFragment extends IRCFragment implements ServerCallbacks {
-	String serverName;
+	String mServerName;
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		Bundle b = getArguments();
-		serverName = b.getString("serverName");
+		mServerName = b.getString("serverName");
 
 		// Hacky way to reset title correctly
-		((ServerChannelActivity) getActivity())
-				.updateTabTitle(this, serverName);
+		((ServerChannelActivity) getActivity()).updateTabTitle(this,
+				mServerName);
 
 		final Intent service = new Intent(getActivity(), IRCService.class);
 		service.putExtra("server", true);
@@ -62,7 +62,7 @@ public class ServerFragment extends IRCFragment implements ServerCallbacks {
 		public void onServiceConnected(final ComponentName className,
 				final IBinder binder) {
 			final IRCService service = ((IRCBinder) binder).getService();
-			final LightPircBotX light = service.getBot(serverName);
+			final LightPircBotX light = service.getBot(mServerName);
 
 			service.setServerCallbacks(ServerFragment.this);
 			if (light.mIsStarted) {
@@ -72,17 +72,18 @@ public class ServerFragment extends IRCFragment implements ServerCallbacks {
 					Bundle bu = new Bundle();
 					bu.putString("channel", s);
 					bu.putString("nick", light.mNick);
-					bu.putString("serverName", serverName);
+					bu.putString("serverName", mServerName);
 					bu.putString("buffer", light.mChannelBuffers.get(s));
 					channel.setArguments(bu);
 
 					int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
 							.addView(channel);
 					((ServerChannelActivity) getActivity()).addTab(position);
-					((ServerChannelActivity) getActivity()).updateTabTitle(channel, s);
+					((ServerChannelActivity) getActivity()).updateTabTitle(
+							channel, s);
 				}
 			} else {
-				service.connectToServer(serverName);
+				service.connectToServer(mServerName);
 			}
 		}
 
@@ -118,13 +119,16 @@ public class ServerFragment extends IRCFragment implements ServerCallbacks {
 		final Bundle b = new Bundle();
 		b.putString("channel", channelName);
 		b.putString("nick", nick);
-		b.putString("serverName", serverName);
+		b.putString("serverName", mServerName);
 		b.putString("buffer", buffer);
 		channel.setArguments(b);
 
-		final int position = ((ServerChannelActivity) getActivity()).mSectionsPagerAdapter
+		final ServerChannelActivity parentActivity = ((ServerChannelActivity) getActivity());
+
+		final int position = parentActivity.mSectionsPagerAdapter
 				.addView(channel);
-		((ServerChannelActivity) getActivity()).addTab(position);
-		((ServerChannelActivity) getActivity()).updateTabTitle(channel, channelName);
+		parentActivity.addTab(position);
+		parentActivity.updateTabTitle(channel, channelName);
+		parentActivity.mViewPager.setOffscreenPageLimit(position);
 	}
 }

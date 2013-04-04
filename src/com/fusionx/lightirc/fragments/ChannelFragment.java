@@ -86,10 +86,10 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 		if ((event.getAction() == KeyEvent.ACTION_DOWN)
 				&& (keyCode == KeyEvent.KEYCODE_ENTER)
 				&& !t.getText().toString().equals("\n")
-				&& !t.getText().toString().equals("")) {
+				&& !t.getText().toString().isEmpty()) {
 			// TODO - need to parse this string
 			Intent intent = new Intent();
-			intent.setAction("com.fusionx.lightirc.MESSAGE_TO_CHANNEL");
+			intent.setAction("com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");
 			intent.putExtra("channel", tabTitle);
 			intent.putExtra("serverName", serverName);
 			intent.putExtra("message", t.getText().toString());

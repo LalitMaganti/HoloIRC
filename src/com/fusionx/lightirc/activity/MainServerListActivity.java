@@ -47,7 +47,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 public class MainServerListActivity extends ListActivity {
-	LightPircBotX[] serverList;
+	LightPircBotX[] mServerList;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -59,7 +59,7 @@ public class MainServerListActivity extends ListActivity {
 
 		getSetServerList();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		getSetServerList();
@@ -98,6 +98,9 @@ public class MainServerListActivity extends ListActivity {
 				bot.mUserName = settings.getString("server_" + i + "_userName",
 						"");
 				bot.mNick = settings.getString("server_" + i + "_nick", "");
+				bot.setName(bot.mNick);
+				//TODO - this isn't strictly correct
+				bot.setLogin(bot.mNick);
 				bot.mServerPassword = settings.getString("server_" + i
 						+ "_serverPassword", "");
 				bot.setTitle(settings.getString("server_" + i + "_title", ""));
@@ -115,7 +118,7 @@ public class MainServerListActivity extends ListActivity {
 		}
 
 		if (values != null) {
-			serverList = values;
+			mServerList = values;
 
 			final Intent service = new Intent(this, IRCService.class);
 			startService(service);
@@ -128,11 +131,11 @@ public class MainServerListActivity extends ListActivity {
 	private final ServiceConnection mConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(final ComponentName className,
-				final IBinder service) {
-			if (((IRCBinder) service).getService().mServerObjects.size() <= 0) {
-				for (LightPircBotX s : serverList) {
-					((IRCBinder) service).getService().mServerObjects.put(
-							s.getTitle(), s);
+				final IBinder binder) {
+			final IRCService service = ((IRCBinder) binder).getService();
+			if (service.mServerObjects.size() <= 0) {
+				for (LightPircBotX s : mServerList) {
+					service.addToServers(s.getTitle(), s);
 				}
 			}
 			unbindService(mConnection);
