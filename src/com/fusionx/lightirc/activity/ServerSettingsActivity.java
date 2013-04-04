@@ -32,8 +32,12 @@ import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
@@ -75,38 +79,55 @@ public class ServerSettingsActivity extends PreferenceActivity {
 		loadHeadersFromResource(R.xml.preference_headers, target);
 	}
 
-	public static class BaseServerSettingFragment extends PreferenceFragment {
+	public static class BaseServerSettingFragment extends PreferenceFragment
+			implements OnPreferenceChangeListener {
 		public final static String URL = "edit_text_url";
 		public final static String Title = "edit_text_title";
 		public final static String Nick = "edit_text_nick";
+		EditTextPreference mEditTextUrl;
+		EditTextPreference mEditTextTitle;
+		EditTextPreference mEditTextNick;
+		int indexOfServer;
 
 		@Override
 		public void onCreate(final Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			Bundle f = getActivity().getIntent().getExtras();
 			s = (LightPircBotX) f.getParcelable("server");
+			indexOfServer = f.getInt("indexOfServer");
 
 			addPreferencesFromResource(R.xml.pref_general);
 
 			PreferenceScreen prefSet = getPreferenceScreen();
 
-			EditTextPreference mEditTextUrl = (EditTextPreference) prefSet
-					.findPreference(URL);
-
+			mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
+			// TODO - pref change
 			mEditTextUrl.setText(s.mURL);
 			mEditTextUrl.setSummary(s.mURL);
 
-			EditTextPreference mEditTextTitle = (EditTextPreference) prefSet
-					.findPreference(Title);
-
+			mEditTextTitle = (EditTextPreference) prefSet.findPreference(Title);
+			// TODO - pref change
 			mEditTextTitle.setText(s.getTitle());
 			mEditTextTitle.setSummary(s.getTitle());
 
-			EditTextPreference mEditTextNick = (EditTextPreference) prefSet
-					.findPreference(Nick);
-
+			mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
+			mEditTextNick.setOnPreferenceChangeListener(this);
 			mEditTextNick.setText(s.mNick);
 			mEditTextNick.setSummary(s.mNick);
+		}
+
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			if (preference == mEditTextNick) {
+				final SharedPreferences settings = getActivity()
+						.getSharedPreferences("main", 0);
+				final Editor e = settings.edit();
+				e.putString("server_" + indexOfServer + "_nick",
+						(String) newValue);
+				e.commit();
+				mEditTextNick.setSummary((CharSequence) newValue);
+			}
+			return true;
 		}
 	}
 
@@ -221,7 +242,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 			} else if (getListView().getCheckedItemCount() == 1) {
 				mode.getMenu().getItem(0).setVisible(true);
 			}
-			mode.setTitle(getListView().getCheckedItemCount() + " items selected");
+			mode.setTitle(getListView().getCheckedItemCount()
+					+ " items selected");
 		}
 	}
 }

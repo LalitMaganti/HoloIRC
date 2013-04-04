@@ -174,13 +174,13 @@ public class IRCService extends Service {
 			if (event.getUser().getNick().equals(event.getBot().getNick())) {
 				String buffer = event.getUser().getNick()
 						+ " entered the room\n";
-				//if (!event.getChannel().getTopic().isEmpty()) {
+				if (!event.getChannel().getTopic().isEmpty()) {
 					buffer += "The topic is: " + event.getChannel().getTopic()
 							+ " as set forth by "
 							+ event.getChannel().getTopicSetter() + "\n";
-				//} else {
-					//buffer += "There is no topic for this channel :(\n";
-				//}
+				} else {
+					buffer += "There is no topic for this channel :(\n";
+				}
 
 				final String finalBuffer = buffer;
 

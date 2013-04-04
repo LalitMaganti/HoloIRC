@@ -59,6 +59,12 @@ public class MainServerListActivity extends ListActivity {
 
 		getSetServerList();
 	}
+	
+	@Override
+	protected void onResume() {
+		getSetServerList();
+		super.onResume();
+	}
 
 	private void getSetServerList() {
 		final SharedPreferences settings = getSharedPreferences("main", 0);
@@ -186,6 +192,7 @@ public class MainServerListActivity extends ListActivity {
 		intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
 				BaseServerSettingFragment.class.getName());
 		intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+		intent.putExtra("indexOfServer", position);
 		intent.putExtra("server", server);
 		startActivity(intent);
 	}
