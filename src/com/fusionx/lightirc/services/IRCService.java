@@ -49,7 +49,8 @@ public class IRCService extends Service {
 	@Override
 	public boolean onUnbind(final Intent arg0) {
 		mServerCallbacks = null;
-		mChannelCallbacks.remove(arg0.getStringExtra("channelName"));
+		//mChannelCallbacks.clear();
+		//mChannelCallbacks.remove(arg0.getStringExtra("channelName"));
 		return true;
 	}
 
@@ -116,7 +117,7 @@ public class IRCService extends Service {
 
 	private void callbackToChannelAndAppend(final String channelName,
 			final String message, final String serverName) {
-		if (mChannelCallbacks.containsKey(channelName)) {
+		if (mServerCallbacks != null) {
 			mHandler.post(new Runnable() {
 				public void run() {
 					mChannelCallbacks.get(channelName).onChannelWriteNeeded(
@@ -173,13 +174,13 @@ public class IRCService extends Service {
 			if (event.getUser().getNick().equals(event.getBot().getNick())) {
 				String buffer = event.getUser().getNick()
 						+ " entered the room\n";
-				if (!event.getChannel().getTopic().isEmpty()) {
+				//if (!event.getChannel().getTopic().isEmpty()) {
 					buffer += "The topic is: " + event.getChannel().getTopic()
 							+ " as set forth by "
 							+ event.getChannel().getTopicSetter() + "\n";
-				} else {
-					buffer += "There is no topic for this channel :(\n";
-				}
+				//} else {
+					//buffer += "There is no topic for this channel :(\n";
+				//}
 
 				final String finalBuffer = buffer;
 
