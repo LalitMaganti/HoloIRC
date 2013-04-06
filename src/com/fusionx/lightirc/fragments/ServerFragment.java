@@ -21,23 +21,26 @@
 
 package com.fusionx.lightirc.fragments;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.LightPircBotX;
-import com.fusionx.lightirc.services.IRCService;
-import com.fusionx.lightirc.services.IRCService.IRCBinder;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
-import com.fusionx.lightirc.callbacks.ServerCallback;
-
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
-public class ServerFragment extends IRCFragment implements ServerCallback {
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.callbacks.ServerCallback;
+import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.services.IRCService.IRCBinder;
+
+public class ServerFragment extends IRCFragment implements OnKeyListener, ServerCallback {
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		Bundle b = getArguments();
@@ -68,7 +71,7 @@ public class ServerFragment extends IRCFragment implements ServerCallback {
 				writeToTextView(light.mServerBuffer);
 				for (final String channelName : light.getChannelBuffers()
 						.keySet()) {
-					onNewChannelJoined(channelName, light.mNick, light
+					onNewChannelJoined(channelName, light.getNick(), light
 							.getChannelBuffers().get(channelName));
 				}
 			} else {
@@ -111,7 +114,7 @@ public class ServerFragment extends IRCFragment implements ServerCallback {
 
 		return rootView;
 	}
-
+	
 	@Override
 	public void onNewChannelJoined(final String channelName, final String nick,
 			final String buffer) {
@@ -130,5 +133,29 @@ public class ServerFragment extends IRCFragment implements ServerCallback {
 	public void disconnect() {
 		final Intent service = new Intent(getActivity(), IRCService.class);
 		getActivity().bindService(service, mDisconnectConnection, 0);
+	}
+
+	@Override
+	public boolean onKey(View view, int keyCode, KeyEvent event) {
+		EditText editText = (EditText) view;
+
+		if ((event.getAction() == KeyEvent.ACTION_DOWN)
+				&& (keyCode == KeyEvent.KEYCODE_ENTER)
+				&& !editText.getText().toString().equals("\n")
+				&& !editText.getText().toString().isEmpty()) {
+			Intent intent = new Intent();
+			intent.setAction("com.fusionx.lightirc.SERVER_MESSAGE_TO_PARSE");
+			intent.putExtra("serverName", getTitle());
+			intent.putExtra("message", editText.getText().toString());
+			getActivity().sendBroadcast(intent);
+
+			// Hacky way to clear but keep the focus on the EditText
+			// Doesn't seem to work anymore :/
+			editText.getText().clear();
+			editText.setSelection(0);
+
+			return true;
+		}
+		return false;
 	}
 }

@@ -59,7 +59,6 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 		textview.setOnKeyListener(this);
 
 		Intent service = new Intent(getActivity(), IRCService.class);
-		service.putExtra("channel", getTitle());
 		getActivity().bindService(service, mConnection, 0);
 
 		return rootView;
@@ -74,6 +73,21 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
+		}
+	};
+
+	private final ServiceConnection mPartConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(final ComponentName className,
+				final IBinder binder) {
+			IRCService service = ((IRCBinder) binder).getService();
+			service.partFromChannel(serverName, getTitle());
+			getActivity().unbindService(this);
+		}
+
+		@Override
+		public void onServiceDisconnected(final ComponentName name) {
+			// This should never happen
 		}
 	};
 
@@ -106,5 +120,10 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 	public void onDestroy() {
 		getActivity().unbindService(mConnection);
 		super.onDestroy();
+	}
+
+	public void part() {
+		Intent service = new Intent(getActivity(), IRCService.class);
+		getActivity().bindService(service, mPartConnection, 0);
 	}
 }

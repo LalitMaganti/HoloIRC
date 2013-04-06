@@ -21,12 +21,6 @@
 
 package com.fusionx.lightirc.activity;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.lightirc.fragments.ChannelFragment;
-import com.fusionx.lightirc.fragments.IRCFragment;
-import com.fusionx.lightirc.fragments.ServerFragment;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -38,6 +32,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.fragments.ChannelFragment;
+import com.fusionx.lightirc.fragments.IRCFragment;
+import com.fusionx.lightirc.fragments.ServerFragment;
 
 public class ServerChannelActivity extends FragmentActivity implements
 		TabListener, OnPageChangeListener {
@@ -72,6 +72,13 @@ public class ServerChannelActivity extends FragmentActivity implements
 			return true;
 		case R.id.item_channel_part:
 			// TODO - part from channel
+			int index = mViewPager.getCurrentItem();
+			((ChannelFragment) mSectionsPagerAdapter.getItem(index)).part();
+			removeTab(index);
+			mViewPager.setOffscreenPageLimit(0);
+			mViewPager.setCurrentItem(index - 1);
+			/*int lastPage = */mSectionsPagerAdapter.removeView(index);
+			//mViewPager.setOffscreenPageLimit(lastPage);
 			return true;
 		case R.id.item_server_disconnect:
 			((ServerFragment) mSectionsPagerAdapter.getItem(0)).disconnect();
@@ -108,6 +115,11 @@ public class ServerChannelActivity extends FragmentActivity implements
 		actionBar.addTab(actionBar.newTab()
 				.setText(mSectionsPagerAdapter.getPageTitle(i))
 				.setTabListener(this));
+	}
+
+	public void removeTab(final int i) {
+		final ActionBar actionBar = getActionBar();
+		actionBar.removeTabAt(i);
 	}
 
 	@Override

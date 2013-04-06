@@ -24,9 +24,6 @@ package com.fusionx.lightirc.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.LightPircBotX;
-
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListFragment;
@@ -52,6 +49,9 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.LightPircBotX;
 
 public class ServerSettingsActivity extends PreferenceActivity {
 	private static LightPircBotX bot;
@@ -112,8 +112,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 			mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
 			mEditTextNick.setOnPreferenceChangeListener(this);
-			mEditTextNick.setText(bot.mNick);
-			mEditTextNick.setSummary(bot.mNick);
+			mEditTextNick.setText(bot.getLogin());
+			mEditTextNick.setSummary(bot.getLogin());
 		}
 
 		@Override

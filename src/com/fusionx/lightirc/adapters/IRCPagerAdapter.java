@@ -23,11 +23,12 @@ package com.fusionx.lightirc.adapters;
 
 import java.util.ArrayList;
 
-import com.fusionx.lightirc.fragments.IRCFragment;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
+
+import com.fusionx.lightirc.fragments.IRCFragment;
 
 public class IRCPagerAdapter extends FragmentPagerAdapter {
 	private ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
@@ -36,8 +37,12 @@ public class IRCPagerAdapter extends FragmentPagerAdapter {
 		super(fm);
 	}
 
-	@Override
-	public int getItemPosition(final Object ircfragment) {
+    @Override
+    public int getItemPosition(final Object object){
+        return PagerAdapter.POSITION_NONE;
+    }
+
+	public int getItemPosition(final IRCFragment ircfragment) {
 		return views.indexOf(ircfragment);
 	}
 
@@ -50,6 +55,12 @@ public class IRCPagerAdapter extends FragmentPagerAdapter {
 		views.add(s);
 		notifyDataSetChanged();
 		return views.indexOf(s);
+	}
+
+	public int removeView(int index) {
+		views.remove(index);
+		notifyDataSetChanged();
+		return views.size() - 1;
 	}
 
 	@Override

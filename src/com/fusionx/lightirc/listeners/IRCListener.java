@@ -10,12 +10,6 @@ public abstract class IRCListener extends ListenerAdapter<LightPircBotX>
 		implements Listener<LightPircBotX> {
 	private IRCService mService;
 
-	protected void tryPostServer(final Runnable run) {
-		if (getService().getServerCallback() != null) {
-			getService().mHandler.post(run);
-		}
-	}
-
 	protected IRCService getService() {
 		return mService;
 	}

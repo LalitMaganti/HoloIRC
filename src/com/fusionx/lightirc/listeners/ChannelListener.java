@@ -104,10 +104,10 @@ public class ChannelListener extends IRCListener {
 					event.getChannel().getName(), newMessage,
 					event.getBot().getTitle());
 		} else {
-			event.getBot().getChannelBuffers()
+			getService().getBot(event.getBot().getTitle()).getChannelBuffers()
 					.put(event.getChannel().getName(), newMessage);
 
-			tryPostServer(new Runnable() {
+			getService().mHandler.post(new Runnable() {
 				@Override
 				public void run() {
 					getService().getServerCallback().onNewChannelJoined(

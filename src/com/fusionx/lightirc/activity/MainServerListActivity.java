@@ -21,22 +21,15 @@
 
 package com.fusionx.lightirc.activity;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
-import com.fusionx.lightirc.adapters.LightPircBotXArrayAdapter;
-import com.fusionx.lightirc.misc.LightPircBotX;
-import com.fusionx.lightirc.services.IRCService;
-import com.fusionx.lightirc.services.IRCService.IRCBinder;
-
-import android.os.Bundle;
-import android.os.IBinder;
-import android.preference.PreferenceActivity;
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.preference.PreferenceActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
@@ -45,6 +38,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
+
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
+import com.fusionx.lightirc.adapters.LightPircBotXArrayAdapter;
+import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.services.IRCService.IRCBinder;
 
 public class MainServerListActivity extends ListActivity {
 	private LightPircBotX[] mServerList;
@@ -76,7 +76,7 @@ public class MainServerListActivity extends ListActivity {
 		if (firstRun) {
 			LightPircBotX freenode = new LightPircBotX();
 			freenode.mURL = "irc.freenode.net";
-			freenode.mNick = "LightIRCUser";
+			freenode.setLogin("LightIRCUser");
 			freenode.setTitle("Freenode");
 			values = new LightPircBotX[] { freenode };
 
@@ -97,11 +97,9 @@ public class MainServerListActivity extends ListActivity {
 				bot.mURL = settings.getString("server_" + i + "_url", "");
 				bot.mUserName = settings.getString("server_" + i + "_userName",
 						"");
-				bot.mNick = settings.getString("server_" + i + "_nick", "");
+				bot.setLogin(settings.getString("server_" + i + "_nick", ""));
 
-				bot.setName(bot.mNick);
-				// TODO - this isn't strictly correct
-				bot.setLogin(bot.mNick);
+				bot.setName(bot.getLogin());
 
 				bot.mServerPassword = settings.getString("server_" + i
 						+ "_serverPassword", "");

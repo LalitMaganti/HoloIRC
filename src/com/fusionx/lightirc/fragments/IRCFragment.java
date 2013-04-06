@@ -1,11 +1,11 @@
 package com.fusionx.lightirc.fragments;
 
-import com.fusionx.lightirc.R;
-
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.fusionx.lightirc.R;
 
 public abstract class IRCFragment extends Fragment {
 	private String tabTitle;
