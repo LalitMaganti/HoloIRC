@@ -24,6 +24,7 @@ package com.fusionx.lightirc.misc;
 import java.util.HashMap;
 
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.events.ActionEvent;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -31,14 +32,15 @@ import android.os.Parcelable;
 public class LightPircBotX extends PircBotX implements Parcelable {
 	public int noOfAutoJoinChannels;
 	public String[] mAutoJoinChannels;
-	public HashMap<String, String> mChannelBuffers = new HashMap<String, String>();
+	private HashMap<String, String> mChannelBuffers = new HashMap<String, String>();
+
 	public String mNick = "";
 	public String mServerBuffer = "";
 	public String mServerPassword = "";
 	private String mTitle;
 	public String mURL = "";
 	public String mUserName = "";
-	public boolean mIsStarted = false;
+	private boolean mIsStarted = false;
 
 	public String getServerBuffer() {
 		return mServerBuffer;
@@ -54,6 +56,16 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 
 	public void setTitle(String mTitle) {
 		this.mTitle = mTitle;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void sendAction(String target, String action) {
+		super.sendAction(target, action);
+		getListenerManager()
+				.dispatchEvent(
+						new ActionEvent(this, getUserBot(), getChannel(target),
+								action));
 	}
 
 	public HashMap<String, String> toHashMap() {
@@ -92,6 +104,14 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 		noOfAutoJoinChannels = in.readInt();
 		mAutoJoinChannels = new String[noOfAutoJoinChannels];
 		in.readStringArray(mAutoJoinChannels);
+	}
+
+	public boolean isStarted() {
+		return mIsStarted;
+	}
+
+	public void setStarted(boolean started) {
+		mIsStarted = started;
 	}
 
 	@SuppressWarnings("rawtypes")

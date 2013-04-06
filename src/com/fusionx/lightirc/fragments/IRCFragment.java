@@ -8,13 +8,17 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 public abstract class IRCFragment extends Fragment {
-	protected String tabTitle;
+	private String tabTitle;
 
 	public String getTitle() {
 		return tabTitle;
 	}
 
-	protected void writeToTextView(final String text) {
+	public void setTitle(String title) {
+		tabTitle = title;
+	}
+
+	public void writeToTextView(final String text) {
 		writeToTextView(text, getView());
 	}
 

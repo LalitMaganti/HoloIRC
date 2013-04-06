@@ -10,7 +10,6 @@ public class ServerListener extends IRCListener {
 	public void onNotice(final NoticeEvent<LightPircBotX> event) {
 		callbackToServerAndAppend(event.getMessage() + "\n", event.getBot()
 				.getTitle());
-
 	}
 
 	@Override
@@ -21,11 +20,11 @@ public class ServerListener extends IRCListener {
 
 	private void callbackToServerAndAppend(final String message,
 			final String serverName) {
-		mServerObjects.get(serverName).mServerBuffer += message;
+		getService().getBot(serverName).mServerBuffer += message;
 
 		tryPostServer(new Runnable() {
 			public void run() {
-				mServerCallbacks.onServerWriteNeeded(message);
+				getService().getServerCallback().writeToTextView(message);
 			}
 		});
 	}

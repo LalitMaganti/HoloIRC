@@ -54,7 +54,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 public class ServerSettingsActivity extends PreferenceActivity {
-	static LightPircBotX s;
+	private static LightPircBotX bot;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -93,7 +93,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 		public void onCreate(final Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			Bundle f = getActivity().getIntent().getExtras();
-			s = (LightPircBotX) f.getParcelable("server");
+			bot = (LightPircBotX) f.getParcelable("server");
 			indexOfServer = f.getInt("indexOfServer");
 
 			addPreferencesFromResource(R.xml.pref_general);
@@ -102,18 +102,18 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 			mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
 			// TODO - pref change
-			mEditTextUrl.setText(s.mURL);
-			mEditTextUrl.setSummary(s.mURL);
+			mEditTextUrl.setText(bot.mURL);
+			mEditTextUrl.setSummary(bot.mURL);
 
 			mEditTextTitle = (EditTextPreference) prefSet.findPreference(Title);
 			// TODO - pref change
-			mEditTextTitle.setText(s.getTitle());
-			mEditTextTitle.setSummary(s.getTitle());
+			mEditTextTitle.setText(bot.getTitle());
+			mEditTextTitle.setSummary(bot.getTitle());
 
 			mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
 			mEditTextNick.setOnPreferenceChangeListener(this);
-			mEditTextNick.setText(s.mNick);
-			mEditTextNick.setSummary(s.mNick);
+			mEditTextNick.setText(bot.mNick);
+			mEditTextNick.setSummary(bot.mNick);
 		}
 
 		@Override
@@ -146,8 +146,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 					getActivity().getApplicationContext(),
 					R.layout.layout_simple_list, channelList);
 
-			for (String k : s.mAutoJoinChannels) {
-				adapter.add(k);
+			for (String channel : bot.mAutoJoinChannels) {
+				adapter.add(channel);
 			}
 
 			inputView = new EditText(getActivity());

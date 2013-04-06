@@ -47,7 +47,7 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 
 public class MainServerListActivity extends ListActivity {
-	LightPircBotX[] mServerList;
+	private LightPircBotX[] mServerList;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -98,9 +98,11 @@ public class MainServerListActivity extends ListActivity {
 				bot.mUserName = settings.getString("server_" + i + "_userName",
 						"");
 				bot.mNick = settings.getString("server_" + i + "_nick", "");
+
 				bot.setName(bot.mNick);
-				//TODO - this isn't strictly correct
+				// TODO - this isn't strictly correct
 				bot.setLogin(bot.mNick);
+
 				bot.mServerPassword = settings.getString("server_" + i
 						+ "_serverPassword", "");
 				bot.setTitle(settings.getString("server_" + i + "_title", ""));
@@ -133,9 +135,9 @@ public class MainServerListActivity extends ListActivity {
 		public void onServiceConnected(final ComponentName className,
 				final IBinder binder) {
 			final IRCService service = ((IRCBinder) binder).getService();
-			if (service.mServerObjects.size() <= 0) {
-				for (LightPircBotX s : mServerList) {
-					service.addToServers(s.getTitle(), s);
+			if (service.getNumberOfServers() <= 0) {
+				for (LightPircBotX bot : mServerList) {
+					service.putBot(bot);
 				}
 			}
 			unbindService(mConnection);

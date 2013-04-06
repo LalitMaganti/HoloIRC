@@ -23,6 +23,7 @@ package com.fusionx.lightirc.activity;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ServerFragment;
 
@@ -38,9 +39,11 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class ServerChannelActivity extends FragmentActivity {
-	public IRCPagerAdapter mSectionsPagerAdapter;
-	public ViewPager mViewPager;
+public class ServerChannelActivity extends FragmentActivity implements
+		TabListener, OnPageChangeListener {
+	private IRCPagerAdapter mSectionsPagerAdapter;
+	private ViewPager mViewPager;
+	private Menu actionBarMenu;
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -56,17 +59,22 @@ public class ServerChannelActivity extends FragmentActivity {
 		mSectionsPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
 
 		initialisePaging(s);
-
-		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-			addTab(i);
-		}
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected(final MenuItem item) {
+		Intent intent = new Intent(this, MainServerListActivity.class);
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			Intent intent = new Intent(this, MainServerListActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			finish();
+			return true;
+		case R.id.item_channel_part:
+			// TODO - part from channel
+			return true;
+		case R.id.item_server_disconnect:
+			((ServerFragment) mSectionsPagerAdapter.getItem(0)).disconnect();
 			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 			finish();
@@ -75,8 +83,7 @@ public class ServerChannelActivity extends FragmentActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void updateTabTitle(final IRCFragment fragment,
-			final String newTitle) {
+	public void updateTabTitle(final IRCFragment fragment, final String newTitle) {
 		final ActionBar actionBar = getActionBar();
 		final int index = mSectionsPagerAdapter.getItemPosition(fragment);
 		actionBar.getTabAt(index).setText(newTitle);
@@ -88,51 +95,60 @@ public class ServerChannelActivity extends FragmentActivity {
 		b.putString("serverName", s);
 		d.setArguments(b);
 		mSectionsPagerAdapter.addView(d);
+
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+		mViewPager.setOnPageChangeListener(this);
 
-		mViewPager.setOnPageChangeListener(new OnPageChangeListener() {
-			@Override
-			public void onPageSelected(int position) {
-				getActionBar().setSelectedNavigationItem(position);
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-			}
-		});
+		addTab(0);
 	}
 
 	public void addTab(final int i) {
 		final ActionBar actionBar = getActionBar();
 		actionBar.addTab(actionBar.newTab()
 				.setText(mSectionsPagerAdapter.getPageTitle(i))
-				.setTabListener(new TabListener() {
-					@Override
-					public void onTabSelected(final Tab tab,
-							final FragmentTransaction ft) {
-						mViewPager.setCurrentItem(tab.getPosition());
-					}
-
-					@Override
-					public void onTabReselected(final Tab tab,
-							final FragmentTransaction ft) {
-					}
-
-					@Override
-					public void onTabUnselected(final Tab tab,
-							final FragmentTransaction ft) {
-					}
-				}));
+				.setTabListener(this));
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
-		getMenuInflater().inflate(R.menu.main_ui, menu);
+		getMenuInflater().inflate(R.menu.server_channel_action_bar, menu);
+		actionBarMenu = menu;
 		return true;
+	}
+
+	public void addChannelFragment(ChannelFragment channel, String channelName) {
+		final int position = mSectionsPagerAdapter.addView(channel);
+		addTab(position);
+		updateTabTitle(channel, channelName);
+		mViewPager.setOffscreenPageLimit(position);
+	}
+
+	@Override
+	public void onTabSelected(final Tab tab, final FragmentTransaction ft) {
+		mViewPager.setCurrentItem(tab.getPosition());
+	}
+
+	@Override
+	public void onTabReselected(final Tab tab, final FragmentTransaction ft) {
+	}
+
+	@Override
+	public void onTabUnselected(final Tab tab, final FragmentTransaction ft) {
+	}
+
+	@Override
+	public void onPageSelected(final int position) {
+		actionBarMenu.findItem(R.id.item_channel_part).setVisible(
+				!(position == 0));
+		getActionBar().setSelectedNavigationItem(position);
+	}
+
+	@Override
+	public void onPageScrollStateChanged(final int arg0) {
+	}
+
+	@Override
+	public void onPageScrolled(final int arg0, final float arg1, final int arg2) {
 	}
 }
