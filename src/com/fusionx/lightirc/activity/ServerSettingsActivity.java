@@ -81,13 +81,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 	public static class BaseServerSettingFragment extends PreferenceFragment
 			implements OnPreferenceChangeListener {
-		public final static String URL = "edit_text_url";
+		private final static String URL = "edit_text_url";
 		public final static String Title = "edit_text_title";
 		public final static String Nick = "edit_text_nick";
-		EditTextPreference mEditTextUrl;
-		EditTextPreference mEditTextTitle;
-		EditTextPreference mEditTextNick;
-		int indexOfServer;
+		private EditTextPreference mEditTextUrl;
+		private EditTextPreference mEditTextTitle;
+		private EditTextPreference mEditTextNick;
+		private static int indexOfServer;
 
 		@Override
 		public void onCreate(final Bundle savedInstanceState) {

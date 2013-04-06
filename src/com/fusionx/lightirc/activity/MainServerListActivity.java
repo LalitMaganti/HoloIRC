@@ -121,11 +121,6 @@ public class MainServerListActivity extends ListActivity {
 
 		if (values != null) {
 			mServerList = values;
-
-			final Intent service = new Intent(this, IRCService.class);
-			startService(service);
-			bindService(service, mConnection, 0);
-
 			setListAdapter(new LightPircBotXArrayAdapter(this, values));
 		}
 	}
@@ -179,6 +174,10 @@ public class MainServerListActivity extends ListActivity {
 	}
 
 	private void connectToServer(int position) {
+		final Intent service = new Intent(this, IRCService.class);
+		startService(service);
+		bindService(service, mConnection, 0);
+
 		final LightPircBotX server = (LightPircBotX) getListView()
 				.getItemAtPosition(position);
 
