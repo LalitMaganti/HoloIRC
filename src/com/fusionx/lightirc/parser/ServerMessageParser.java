@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.parser;
 
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 
 import android.content.Context;
 import android.content.Intent;

@@ -3,7 +3,7 @@ package com.fusionx.lightirc.parser;
 import android.content.Context;
 import android.content.Intent;
 
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 
 public class ChannelMessageParser extends IRCMessageParser {
 	@Override

@@ -16,9 +16,9 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.callbacks.ChannelCallbacks;
 import com.fusionx.lightirc.callbacks.ServerCallback;
+import com.fusionx.lightirc.irc.LightPircBotX;
 import com.fusionx.lightirc.listeners.ChannelListener;
 import com.fusionx.lightirc.listeners.ServerListener;
-import com.fusionx.lightirc.misc.LightPircBotX;
 import com.fusionx.lightirc.parser.ChannelMessageParser;
 import com.fusionx.lightirc.parser.ServerMessageParser;
 
@@ -154,6 +154,7 @@ public class IRCService extends Service {
 
 		if (getServerCallback() != null) {
 			mHandler.post(new Runnable() {
+				@Override
 				public void run() {
 					getServerCallback().writeToTextView(message);
 				}
@@ -191,6 +192,10 @@ public class IRCService extends Service {
 
 	public void putBot(LightPircBotX bot) {
 		mServerObjects.put(bot.getTitle(), bot);
+	}
+	
+	public ChannelCallbacks getChannelCallback(String channelName) {
+		return mChannelCallbacks.get(channelName);
 	}
 
 	public void setChannelCallbacks(final ChannelCallbacks cb,

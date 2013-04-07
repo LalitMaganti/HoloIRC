@@ -29,7 +29,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 
 public class LightPircBotXArrayAdapter extends ArrayAdapter<LightPircBotX> {
 	private final Context context;

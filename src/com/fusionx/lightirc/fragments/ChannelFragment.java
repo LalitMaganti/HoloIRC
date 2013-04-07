@@ -32,7 +32,6 @@ import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.callbacks.ChannelCallbacks;
@@ -42,6 +41,7 @@ import com.fusionx.lightirc.services.IRCService.IRCBinder;
 public class ChannelFragment extends IRCFragment implements OnKeyListener,
 		ChannelCallbacks {
 	private String serverName;
+	public String[] mUserList;
 
 	@Override
 	public View onCreateView(final LayoutInflater inflater,
@@ -55,7 +55,7 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 
 		writeToTextView(buffer, rootView);
 
-		TextView textview = (TextView) rootView.findViewById(R.id.editText1);
+		EditText textview = (EditText) rootView.findViewById(R.id.editText1);
 		textview.setOnKeyListener(this);
 
 		Intent service = new Intent(getActivity(), IRCService.class);
@@ -125,5 +125,10 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 	public void part() {
 		Intent service = new Intent(getActivity(), IRCService.class);
 		getActivity().bindService(service, mPartConnection, 0);
+	}
+
+	@Override
+	public void userListChanged(String newList[]) {
+		mUserList = newList;
 	}
 }

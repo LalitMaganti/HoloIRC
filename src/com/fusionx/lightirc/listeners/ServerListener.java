@@ -3,7 +3,7 @@ package com.fusionx.lightirc.listeners;
 import org.pircbotx.hooks.events.MotdEvent;
 import org.pircbotx.hooks.events.NoticeEvent;
 
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 
 public class ServerListener extends IRCListener {
 	@Override

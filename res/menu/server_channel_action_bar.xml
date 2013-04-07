@@ -7,6 +7,11 @@
         android:title="Part"
         android:visible="false"/>
     <item
+        android:id="@+id/item_channel_users"
+        android:showAsAction="ifRoom|withText"
+        android:title="Users"
+        android:visible="false"/>
+    <item
         android:id="@+id/item_server_disconnect"
         android:showAsAction="ifRoom|withText"
         android:title="Disconnect"/>

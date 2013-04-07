@@ -45,13 +45,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 
 public class ServerSettingsActivity extends PreferenceActivity {
 	private static LightPircBotX bot;
@@ -75,6 +75,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
 	public void onBuildHeaders(List<Header> target) {
 		loadHeadersFromResource(R.xml.preference_headers, target);
 	}
@@ -164,7 +165,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 			super.onActivityCreated(savedInstanceState);
 
 			getListView().setMultiChoiceModeListener(this);
-			getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+			getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
 		}
 
 		@Override
@@ -237,11 +238,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 		@Override
 		public void onItemCheckedStateChanged(ActionMode mode, int position,
 				long id, boolean checked) {
-			if (getListView().getCheckedItemCount() > 1) {
-				mode.getMenu().getItem(0).setVisible(false);
-			} else if (getListView().getCheckedItemCount() == 1) {
-				mode.getMenu().getItem(0).setVisible(true);
-			}
+			mode.getMenu().getItem(0).setVisible(!(getListView().getCheckedItemCount() > 1));
 			mode.setTitle(getListView().getCheckedItemCount()
 					+ " items selected");
 		}

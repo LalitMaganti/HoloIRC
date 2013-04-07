@@ -36,12 +36,12 @@ import android.widget.EditText;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.callbacks.ServerCallback;
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 import com.fusionx.lightirc.services.IRCService;
 import com.fusionx.lightirc.services.IRCService.IRCBinder;
-import android.widget.*;
 
-public class ServerFragment extends IRCFragment implements OnKeyListener, ServerCallback {
+public class ServerFragment extends IRCFragment implements OnKeyListener,
+		ServerCallback {
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		Bundle b = getArguments();
@@ -113,25 +113,10 @@ public class ServerFragment extends IRCFragment implements OnKeyListener, Server
 		final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
 				container, false);
 
-		TextView textview = (TextView) rootView.findViewById(R.id.editText1);
+		EditText textview = (EditText) rootView.findViewById(R.id.editText1);
 		textview.setOnKeyListener(this);
 
 		return rootView;
-	}
-	
-	@Override
-	public void onNewChannelJoined(final String channelName, final String nick,
-			final String buffer) {
-		final ChannelFragment channel = new ChannelFragment();
-		final Bundle b = new Bundle();
-		b.putString("channel", channelName);
-		b.putString("nick", nick);
-		b.putString("serverName", getTitle());
-		b.putString("buffer", buffer);
-		channel.setArguments(b);
-
-		final ServerChannelActivity parentActivity = ((ServerChannelActivity) getActivity());
-		parentActivity.addChannelFragment(channel, channelName);
 	}
 
 	public void disconnect() {
@@ -161,5 +146,20 @@ public class ServerFragment extends IRCFragment implements OnKeyListener, Server
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void onNewChannelJoined(final String channelName, final String nick,
+			final String buffer) {
+		final ChannelFragment channel = new ChannelFragment();
+		final Bundle b = new Bundle();
+		b.putString("channel", channelName);
+		b.putString("nick", nick);
+		b.putString("serverName", getTitle());
+		b.putString("buffer", buffer);
+		channel.setArguments(b);
+
+		final ServerChannelActivity parentActivity = ((ServerChannelActivity) getActivity());
+		parentActivity.addChannelFragment(channel, channelName);
 	}
 }

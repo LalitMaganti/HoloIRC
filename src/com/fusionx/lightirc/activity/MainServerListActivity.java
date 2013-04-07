@@ -42,7 +42,7 @@ import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
 import com.fusionx.lightirc.adapters.LightPircBotXArrayAdapter;
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 import com.fusionx.lightirc.services.IRCService;
 import com.fusionx.lightirc.services.IRCService.IRCBinder;
 

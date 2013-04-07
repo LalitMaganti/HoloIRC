@@ -33,7 +33,7 @@
         android:layout_alignParentRight="true"
         android:ems="10"
         android:hint="@string/message_text_edit_hint"
-        android:inputType="text" >
+        android:inputType="textFilter|textNoSuggestions">
     </EditText>
 
 </RelativeLayout>

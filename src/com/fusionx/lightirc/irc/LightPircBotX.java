@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.misc;
+package com.fusionx.lightirc.irc;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -140,12 +140,14 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 
 	@SuppressWarnings("rawtypes")
 	public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+		@Override
 		public LightPircBotX createFromParcel(Parcel in) {
 			LightPircBotX c = new LightPircBotX();
 			c.readFromParcel(in);
 			return c;
 		}
 
+		@Override
 		public LightPircBotX[] newArray(int size) {
 			return new LightPircBotX[size];
 		}

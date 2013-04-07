@@ -1,6 +1,9 @@
 package com.fusionx.lightirc.listeners;
 
+import java.util.ArrayList;
+
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -8,8 +11,9 @@ import org.pircbotx.hooks.events.NickChangeEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.TopicEvent;
+import org.pircbotx.hooks.events.UserListEvent;
 
-import com.fusionx.lightirc.misc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotX;
 
 public class ChannelListener extends IRCListener {
 
@@ -124,5 +128,23 @@ public class ChannelListener extends IRCListener {
 				+ event.getAction();
 		getService().callbackToChannelAndAppend(event.getChannel().getName(),
 				newMessage, event.getBot().getTitle());
+	}
+
+	@Override
+	public void onUserList(final UserListEvent<LightPircBotX> event) {
+		ArrayList<String> array = new ArrayList<String>();
+		for(User user : event.getChannel().getOps()) {
+			array.add("@" + user.getNick());
+		}
+		for(User user : event.getChannel().getHalfOps()) {
+			array.add("half@" + user.getNick());
+		}
+		for(User user : event.getChannel().getVoices()) {
+			array.add("+" + user.getNick());
+		}
+		for(User user : event.getChannel().getNormalUsers()) {
+			array.add(user.getNick());
+		}
+		getService().getChannelCallback(event.getChannel().getName()).userListChanged(array.toArray(new String[0]));
 	}
 }

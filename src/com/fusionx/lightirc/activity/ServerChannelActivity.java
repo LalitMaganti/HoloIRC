@@ -27,7 +27,6 @@ import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
@@ -38,18 +37,38 @@ import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ServerFragment;
+import com.fusionx.lightirc.fragments.UserFragment;
+import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
-public class ServerChannelActivity extends FragmentActivity implements
+public class ServerChannelActivity extends SlidingFragmentActivity implements
 		TabListener, OnPageChangeListener {
 	private IRCPagerAdapter mSectionsPagerAdapter;
 	private ViewPager mViewPager;
 	private Menu actionBarMenu;
+	private final UserFragment userFragment = new UserFragment();
 
 	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		setBehindContentView(R.layout.menu_frame);
+
+		getFragmentManager().beginTransaction()
+				.replace(R.id.menu_frame, userFragment).commit();
+
 		setContentView(R.layout.activity_main_ui);
+
+		SlidingMenu sm = getSlidingMenu();
+		sm.setMode(SlidingMenu.RIGHT);
+		sm.setShadowWidthRes(R.dimen.shadow_width);
+		sm.setShadowDrawable(R.drawable.shadow);
+		sm.setFadeDegree(0.35f);
+		sm.setBehindWidth(300);
+		sm.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+		sm.setTouchmodeMarginThreshold(0);
+		setSlidingActionBarEnabled(false);
+
 		String s = getIntent().getExtras().getString("serverName");
 
 		final ActionBar actionBar = getActionBar();
@@ -64,27 +83,24 @@ public class ServerChannelActivity extends FragmentActivity implements
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		Intent intent = new Intent(this, MainServerListActivity.class);
+		intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
-			finish();
 			return true;
 		case R.id.item_channel_part:
-			// TODO - part from channel
 			int index = mViewPager.getCurrentItem();
 			((ChannelFragment) mSectionsPagerAdapter.getItem(index)).part();
 			removeTab(index);
-			mViewPager.setOffscreenPageLimit(0);
 			mViewPager.setCurrentItem(index - 1);
-			/*int lastPage = */mSectionsPagerAdapter.removeView(index);
-			//mViewPager.setOffscreenPageLimit(lastPage);
+			mSectionsPagerAdapter.removeView(index);
 			return true;
 		case R.id.item_server_disconnect:
 			((ServerFragment) mSectionsPagerAdapter.getItem(0)).disconnect();
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
-			finish();
+			return true;
+		case R.id.item_channel_users:
+			toggle();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -138,6 +154,9 @@ public class ServerChannelActivity extends FragmentActivity implements
 
 	@Override
 	public void onTabSelected(final Tab tab, final FragmentTransaction ft) {
+		if(getSlidingMenu().isSecondaryMenuShowing()) {
+			getSlidingMenu().toggle();
+		}
 		mViewPager.setCurrentItem(tab.getPosition());
 	}
 
@@ -153,6 +172,21 @@ public class ServerChannelActivity extends FragmentActivity implements
 	public void onPageSelected(final int position) {
 		actionBarMenu.findItem(R.id.item_channel_part).setVisible(
 				!(position == 0));
+		actionBarMenu.findItem(R.id.item_channel_users).setVisible(
+				!(position == 0));
+		if(position == 0) {
+			getSlidingMenu().setTouchmodeMarginThreshold(0);
+		} else {
+			getSlidingMenu().setTouchmodeMarginThreshold(3);
+			userFragment.adapter.clear();
+			String userList[] = ((ChannelFragment)mSectionsPagerAdapter.getItem(position)).mUserList;
+			if(userList == null) {
+				userFragment.adapter.add("Unknown");
+			} else {
+				userFragment.adapter.addAll(userList);
+			}
+			userFragment.adapter.notifyDataSetChanged();
+		}
 		getActionBar().setSelectedNavigationItem(position);
 	}
 
