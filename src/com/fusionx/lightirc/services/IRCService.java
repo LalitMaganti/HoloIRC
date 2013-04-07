@@ -110,6 +110,7 @@ public class IRCService extends Service {
 
 	private void setupListeners(LightPircBotX bot) {
 		mChannelMessageReceiver.setService(this);
+		mServerMessageReciever.setService(this);
 
 		final IntentFilter filter = new IntentFilter(
 				"com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");

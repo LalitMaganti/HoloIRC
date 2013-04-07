@@ -39,6 +39,7 @@ import com.fusionx.lightirc.callbacks.ServerCallback;
 import com.fusionx.lightirc.misc.LightPircBotX;
 import com.fusionx.lightirc.services.IRCService;
 import com.fusionx.lightirc.services.IRCService.IRCBinder;
+import android.widget.*;
 
 public class ServerFragment extends IRCFragment implements OnKeyListener, ServerCallback {
 	@Override
@@ -111,6 +112,9 @@ public class ServerFragment extends IRCFragment implements OnKeyListener, Server
 			final ViewGroup container, final Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
 				container, false);
+
+		TextView textview = (TextView) rootView.findViewById(R.id.editText1);
+		textview.setOnKeyListener(this);
 
 		return rootView;
 	}
