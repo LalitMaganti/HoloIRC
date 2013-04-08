@@ -19,18 +19,21 @@ import android.widget.ArrayAdapter;
 
 public class UserFragment extends ListFragment implements
 		MultiChoiceModeListener, android.view.ActionMode.Callback {
+	public ArrayList<String> lst = new ArrayList<String>();
 	public ArrayAdapter<String> adapter;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 
-		ArrayList<String> lst = new ArrayList<String>();
-
 		adapter = new ArrayAdapter<String>(getActivity(),
 				R.layout.layout_simple_list, lst);
-
 		setListAdapter(adapter);
 
 		return super.onCreateView(inflater, container, savedInstanceState);

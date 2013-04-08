@@ -23,6 +23,9 @@ public class ChannelMessageParser extends IRCMessageParser {
 				String action = message.replace("/me ", "");
 				// TODO - input validation
 				bot.sendAction(channelName, action);
+			} else if (message.startsWith("/nick")) {
+				String newNick = message.replace("/nick ", "");
+				bot.changeNick(newNick);
 			} else {
 				String bufferMessage = "Unknown command";
 				getService().callbackToChannelAndAppend(channelName,

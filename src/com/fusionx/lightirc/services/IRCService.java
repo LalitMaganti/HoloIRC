@@ -20,15 +20,14 @@ import com.fusionx.lightirc.callbacks.ChannelCallbacks;
 import com.fusionx.lightirc.callbacks.ServerCallback;
 import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.irc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightPircBotXManager;
 import com.fusionx.lightirc.listeners.ChannelListener;
 import com.fusionx.lightirc.listeners.ServerListener;
 import com.fusionx.lightirc.parser.ChannelMessageParser;
 import com.fusionx.lightirc.parser.ServerMessageParser;
 
 public class IRCService extends Service {
-	private static int noOfConnections;
-
-	private final HashMap<String, LightPircBotX> manager = new HashMap<String, LightPircBotX>();
+	private final LightPircBotXManager manager = new LightPircBotXManager();
 
 	private final IRCBinder mBinder = new IRCBinder();
 
@@ -102,8 +101,6 @@ public class IRCService extends Service {
 					bot.connectAndAutoJoin();
 				}
 			}.start();
-
-			noOfConnections += 1;
 
 			manager.put(server.getTitle(), bot);
 		}
@@ -180,18 +177,14 @@ public class IRCService extends Service {
 	public void disconnectFromServer(String serverName) {
 		getBot(serverName).disconnect();
 		manager.remove(serverName);
-		noOfConnections -= 1;
-		if (noOfConnections == 0) {
+		if (manager.size() == 0) {
 			stopForeground(true);
 			stopSelf();
 		}
 	}
 
 	private void disconnectAll() {
-		for (LightPircBotX bot : manager.values()) {
-			bot.disconnect();
-		}
-		noOfConnections = 0;
+		manager.disconnectAll();
 		stopForeground(true);
 		stopSelf();
 	}
@@ -220,10 +213,6 @@ public class IRCService extends Service {
 
 	public void setServerCallback(ServerCallback serverCallback) {
 		mServerCallback = serverCallback;
-	}
-
-	public int getNumberOfServers() {
-		return manager.size();
 	}
 
 	// Binder which returns this service

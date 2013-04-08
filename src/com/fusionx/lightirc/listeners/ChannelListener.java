@@ -55,27 +55,34 @@ public class ChannelListener extends IRCListener {
 						+ " quit the room\n";
 
 				getService().callbackToChannelAndAppend(c, newMessage);
+
+				ChannelCallbacks cc = getService().getChannelCallback(
+						c.getName());
+				if (cc != null) {
+					cc.userListChanged(((LightChannel) c).getUserNicks());
+				}
 			}
 		}
 	}
 
 	@Override
 	public void onNickChange(final NickChangeEvent<LightPircBotX> event) {
-		if (!event.getOldNick().equals(event.getBot().getNick())) {
-			for (final Channel c : event.getBot().getChannels()) {
-				if (c.getUsers().contains(event.getUser())) {
-					final String newMessage = event.getOldNick()
-							+ " is now known as " + event.getNewNick() + "\n";
-
-					getService().callbackToChannelAndAppend(c, newMessage);
-				}
-			}
+		String newMessage;
+		if (!event.getUser().equals(event.getBot().getUserBot())) {
+			newMessage = event.getOldNick() + " is now known as "
+					+ event.getNewNick() + "\n";
 		} else {
-			for (final Channel c : event.getBot().getChannels()) {
-				final String newMessage = "You (" + event.getOldNick()
-						+ ") are now known as " + event.getNewNick() + "\n";
-
+			newMessage = "You (" + event.getOldNick() + ") are now known as "
+					+ event.getNewNick() + "\n";
+		}
+		for (final Channel c : event.getUser().getChannels()) {
+			if (event.getBot().getChannels().contains(c)) {
 				getService().callbackToChannelAndAppend(c, newMessage);
+				ChannelCallbacks cc = getService().getChannelCallback(
+						c.getName());
+				if (cc != null) {
+					cc.userListChanged(((LightChannel) c).getUserNicks());
+				}
 			}
 		}
 	}
@@ -88,6 +95,13 @@ public class ChannelListener extends IRCListener {
 
 			getService().callbackToChannelAndAppend(event.getChannel(),
 					newMessage);
+
+			ChannelCallbacks cc = getService().getChannelCallback(
+					event.getChannel().getName());
+			if (cc != null) {
+				cc.userListChanged(((LightChannel) event.getChannel())
+						.getUserNicks());
+			}
 		}
 	}
 
@@ -100,6 +114,13 @@ public class ChannelListener extends IRCListener {
 
 		if (!event.getUser().getNick().equals(event.getBot().getNick())) {
 			getService().callbackToChannelAndAppend(lightchannel, newMessage);
+
+			ChannelCallbacks cc = getService().getChannelCallback(
+					event.getChannel().getName());
+			if (cc != null) {
+				cc.userListChanged(((LightChannel) event.getChannel())
+						.getUserNicks());
+			}
 		} else {
 			lightchannel.setBuffer(newMessage);
 

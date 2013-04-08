@@ -153,8 +153,8 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 	public void addChannelFragment(ChannelFragment channel, String channelName) {
 		final int position = mSectionsPagerAdapter.addView(channel);
 		addTab(position);
-		updateTabTitle(channel, channelName);
 		mViewPager.setOffscreenPageLimit(position);
+		updateTabTitle(channel, channelName);
 	}
 
 	@Override
@@ -179,19 +179,18 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 				!(position == 0));
 		actionBarMenu.findItem(R.id.item_channel_users).setVisible(
 				!(position == 0));
+
 		if (position == 0) {
 			getSlidingMenu().setTouchmodeMarginThreshold(0);
 		} else {
 			getSlidingMenu().setTouchmodeMarginThreshold(3);
-			userFragment.adapter.clear();
-			String userList[] = ((ChannelFragment) mSectionsPagerAdapter
-					.getItem(position)).mUserList;
-			if (userList == null) {
-				userFragment.adapter.add("Unknown");
-			} else {
-				userFragment.adapter.addAll(userList);
+			if(((ChannelFragment) mSectionsPagerAdapter.getItem(position)).mUserList != null) {
+				userFragment.lst.clear();
+				for(String user : ((ChannelFragment) mSectionsPagerAdapter.getItem(position)).mUserList) {
+					userFragment.lst.add(user);
+				}
+				userFragment.adapter.notifyDataSetChanged();
 			}
-			userFragment.adapter.notifyDataSetChanged();
 		}
 		getActionBar().setSelectedNavigationItem(position);
 
@@ -235,5 +234,15 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 
 	@Override
 	public void onPageScrolled(final int arg0, final float arg1, final int arg2) {
+	}
+	
+	public void userListChanged(String newList[], ChannelFragment c) {
+		if(mSectionsPagerAdapter.getItemPosition(c) == mViewPager.getCurrentItem()) {
+			userFragment.lst.clear();
+			for(String user : newList) {
+				userFragment.lst.add(user);
+			}
+			userFragment.adapter.notifyDataSetChanged();
+		}
 	}
 }

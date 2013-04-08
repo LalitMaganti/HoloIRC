@@ -34,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.callbacks.ChannelCallbacks;
 import com.fusionx.lightirc.services.IRCService;
 import com.fusionx.lightirc.services.IRCService.IRCBinder;
@@ -130,5 +131,6 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 	@Override
 	public void userListChanged(String newList[]) {
 		mUserList = newList;
+		((ServerChannelActivity) getActivity()).userListChanged(newList, this);
 	}
 }
