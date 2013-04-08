@@ -12,7 +12,7 @@
         android:layout_marginBottom="10dip"
         android:layout_marginLeft="10dip"
         android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip" 
+        android:layout_marginTop="10dip"
         android:lineSpacingExtra="3dip" >
 
         <TextView
@@ -20,8 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textIsSelectable="true" />
-
-        <requestFocus />
     </ScrollView>
 
     <EditText
@@ -33,7 +31,9 @@
         android:layout_alignParentRight="true"
         android:ems="10"
         android:hint="@string/message_text_edit_hint"
-        android:inputType="textFilter|textNoSuggestions">
+        android:inputType="textFilter|textNoSuggestions" >
+
+        <requestFocus />
     </EditText>
 
 </RelativeLayout>

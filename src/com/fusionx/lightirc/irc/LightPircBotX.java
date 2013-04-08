@@ -23,7 +23,10 @@ package com.fusionx.lightirc.irc;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.exception.NickAlreadyInUseException;
@@ -35,38 +38,56 @@ import android.os.Parcelable;
 public class LightPircBotX extends PircBotX implements Parcelable {
 	public int noOfAutoJoinChannels;
 	public String[] mAutoJoinChannels;
-	private HashMap<String, String> mChannelBuffers = new HashMap<String, String>();
 
-	public String mServerBuffer = "";
+	private String mBuffer = "";
 	public String mServerPassword = "";
 	private String mTitle;
 	public String mURL = "";
 	public String mUserName = "";
-	private boolean mIsStarted = false;
+	private boolean mStarted = false;
 
 	// Getters and setters
-	public String getServerBuffer() {
-		return mServerBuffer;
+	public String getBuffer() {
+		return mBuffer;
 	}
-
-	public HashMap<String, String> getChannelBuffers() {
-		return mChannelBuffers;
+	
+	public void appendToBuffer(String message) {
+		mBuffer += message;
 	}
 
 	public String getTitle() {
 		return mTitle;
 	}
 
-	public void setTitle(String mTitle) {
-		this.mTitle = mTitle;
+	public void setTitle(String title) {
+		this.mTitle = title;
 	}
 
 	public boolean isStarted() {
-		return mIsStarted;
+		return mStarted;
+	}
+	
+	public Set<String> getChannelNames() {
+		HashSet<String> names = new HashSet<String>();
+		for(Channel channel : getChannels()) {
+			names.add(channel.getName());
+		}
+		return names;
 	}
 
-	public void setStarted(boolean started) {
-		mIsStarted = started;
+	// Overriden methods
+	@Override
+	public Channel getChannel(String name) {
+		if (name == null)
+			throw new NullPointerException("Can't get a null channel");
+		for (Channel curChan : userChanInfo.getAValues())
+			if (curChan.getName().equals(name))
+				return curChan;
+
+		//Channel does not exist, create one
+		LightChannel chan = new LightChannel(this, name);
+		userChanInfo.putB(chan);
+		return chan;
 	}
 
 	// Helper/extension methods
@@ -86,6 +107,7 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 
 	public void connectAndAutoJoin() {
 		try {
+			mStarted = true;
 			connect(mURL);
 			for (String channel : mAutoJoinChannels) {
 				joinChannel(channel);
@@ -130,7 +152,11 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 	private void readFromParcel(Parcel in) {
 		mURL = in.readString();
 		mUserName = in.readString();
+
+		// TODO - this isn't correct - fix this
 		setLogin(in.readString());
+		setName(getLogin());
+
 		mServerPassword = in.readString();
 		mTitle = in.readString();
 		noOfAutoJoinChannels = in.readInt();

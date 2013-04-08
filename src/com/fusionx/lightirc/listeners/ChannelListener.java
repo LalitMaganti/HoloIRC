@@ -1,9 +1,6 @@
 package com.fusionx.lightirc.listeners;
 
-import java.util.ArrayList;
-
 import org.pircbotx.Channel;
-import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -13,6 +10,8 @@ import org.pircbotx.hooks.events.QuitEvent;
 import org.pircbotx.hooks.events.TopicEvent;
 import org.pircbotx.hooks.events.UserListEvent;
 
+import com.fusionx.lightirc.callbacks.ChannelCallbacks;
+import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.irc.LightPircBotX;
 
 public class ChannelListener extends IRCListener {
@@ -22,8 +21,8 @@ public class ChannelListener extends IRCListener {
 		final String newMessage = event.getUser().getNick() + ": "
 				+ event.getMessage() + "\n";
 
-		getService().callbackToChannelAndAppend(event.getChannel().getName(),
-				newMessage, event.getBot().getTitle());
+		getService().callbackToChannelAndAppend(
+				event.getChannel(), newMessage);
 	}
 
 	@Override
@@ -34,8 +33,7 @@ public class ChannelListener extends IRCListener {
 					+ " by "
 					+ event.getChannel().getTopicSetter() + "\n";
 			getService().callbackToChannelAndAppend(
-					event.getChannel().getName(), newMessage,
-					event.getBot().getTitle());
+					event.getChannel(), newMessage);
 		} else {
 			getService().mHandler.postDelayed(new Runnable() {
 				@Override
@@ -44,8 +42,7 @@ public class ChannelListener extends IRCListener {
 							+ event.getTopic() + " as set forth by "
 							+ event.getChannel().getTopicSetter() + "\n";
 					getService().callbackToChannelAndAppend(
-							event.getChannel().getName(), newMessage,
-							event.getBot().getTitle());
+							event.getChannel(), newMessage);
 				}
 			}, 1500);
 		}
@@ -58,8 +55,8 @@ public class ChannelListener extends IRCListener {
 				final String newMessage = event.getUser().getNick()
 						+ " quit the room\n";
 
-				getService().callbackToChannelAndAppend(c.getName(),
-						newMessage, event.getBot().getTitle());
+				getService().callbackToChannelAndAppend(c,
+						newMessage);
 			}
 		}
 	}
@@ -72,8 +69,8 @@ public class ChannelListener extends IRCListener {
 					final String newMessage = event.getOldNick()
 							+ " is now known as " + event.getNewNick() + "\n";
 
-					getService().callbackToChannelAndAppend(c.getName(),
-							newMessage, event.getBot().getTitle());
+					getService().callbackToChannelAndAppend(c,
+							newMessage);
 				}
 			}
 		} else {
@@ -81,8 +78,8 @@ public class ChannelListener extends IRCListener {
 				final String newMessage = "You (" + event.getOldNick()
 						+ ") are now known as " + event.getNewNick() + "\n";
 
-				getService().callbackToChannelAndAppend(c.getName(),
-						newMessage, event.getBot().getTitle());
+				getService().callbackToChannelAndAppend(c,
+						newMessage);
 			}
 		}
 	}
@@ -94,8 +91,7 @@ public class ChannelListener extends IRCListener {
 					+ " parted from the room\n";
 
 			getService().callbackToChannelAndAppend(
-					event.getChannel().getName(), newMessage,
-					event.getBot().getTitle());
+					event.getChannel(), newMessage);
 		}
 	}
 
@@ -103,13 +99,13 @@ public class ChannelListener extends IRCListener {
 	public void onJoin(final JoinEvent<LightPircBotX> event) {
 		final String newMessage = event.getUser().getNick()
 				+ " entered the room\n";
+
+		LightChannel lightchannel = (LightChannel) (event.getChannel());
+
 		if (!event.getUser().getNick().equals(event.getBot().getNick())) {
-			getService().callbackToChannelAndAppend(
-					event.getChannel().getName(), newMessage,
-					event.getBot().getTitle());
+			getService().callbackToChannelAndAppend(lightchannel, newMessage);
 		} else {
-			getService().getBot(event.getBot().getTitle()).getChannelBuffers()
-					.put(event.getChannel().getName(), newMessage);
+			lightchannel.setBuffer(newMessage);
 
 			getService().mHandler.post(new Runnable() {
 				@Override
@@ -126,25 +122,18 @@ public class ChannelListener extends IRCListener {
 	public void onAction(final ActionEvent<LightPircBotX> event) {
 		final String newMessage = event.getUser().getNick() + " "
 				+ event.getAction();
-		getService().callbackToChannelAndAppend(event.getChannel().getName(),
-				newMessage, event.getBot().getTitle());
+		getService().callbackToChannelAndAppend(
+				event.getChannel(), newMessage);
 	}
 
 	@Override
 	public void onUserList(final UserListEvent<LightPircBotX> event) {
-		ArrayList<String> array = new ArrayList<String>();
-		for(User user : event.getChannel().getOps()) {
-			array.add("@" + user.getNick());
+		LightChannel channel = (LightChannel) event.getChannel();
+
+		ChannelCallbacks cc = getService().getChannelCallback(
+				event.getChannel().getName());
+		if (cc != null) {
+			cc.userListChanged(channel.getUserNicks());
 		}
-		for(User user : event.getChannel().getHalfOps()) {
-			array.add("half@" + user.getNick());
-		}
-		for(User user : event.getChannel().getVoices()) {
-			array.add("+" + user.getNick());
-		}
-		for(User user : event.getChannel().getNormalUsers()) {
-			array.add(user.getNick());
-		}
-		getService().getChannelCallback(event.getChannel().getName()).userListChanged(array.toArray(new String[0]));
 	}
 }

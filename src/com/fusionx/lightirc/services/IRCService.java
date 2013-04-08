@@ -2,6 +2,8 @@ package com.fusionx.lightirc.services;
 
 import java.util.HashMap;
 
+import org.pircbotx.Channel;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -16,6 +18,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.callbacks.ChannelCallbacks;
 import com.fusionx.lightirc.callbacks.ServerCallback;
+import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.irc.LightPircBotX;
 import com.fusionx.lightirc.listeners.ChannelListener;
 import com.fusionx.lightirc.listeners.ServerListener;
@@ -25,12 +28,11 @@ import com.fusionx.lightirc.parser.ServerMessageParser;
 public class IRCService extends Service {
 	private static int noOfConnections;
 
+	private final HashMap<String, LightPircBotX> manager = new HashMap<String, LightPircBotX>();
+
 	private final IRCBinder mBinder = new IRCBinder();
 
-	private final HashMap<String, LightPircBotX> mServerObjects = new HashMap<String, LightPircBotX>();
-
 	private ServerCallback mServerCallback = null;
-	private boolean mSendCallback = true;
 	private final HashMap<String, ChannelCallbacks> mChannelCallbacks = new HashMap<String, ChannelCallbacks>();
 
 	private final ChannelMessageParser mChannelMessageReceiver = new ChannelMessageParser();
@@ -57,7 +59,6 @@ public class IRCService extends Service {
 	@Override
 	public boolean onUnbind(final Intent intent) {
 		mServerCallback = null;
-		mSendCallback = false;
 		return true;
 	}
 
@@ -68,15 +69,13 @@ public class IRCService extends Service {
 	}
 
 	@SuppressLint("NewApi")
-	public void connectToServer(final String serverName) {
-		final LightPircBotX bot = getBot(serverName);
+	public void connectToServer(final LightPircBotX server) {
+		final LightPircBotX bot = server;
 		if (!bot.isStarted()) {
 			// TODO - setup option for this
 			bot.setAutoNickChange(true);
 
 			setupListeners(bot);
-
-			bot.setStarted(true);
 
 			final Intent intent = new Intent(this, MainServerListActivity.class);
 			final Intent intent2 = new Intent(this, IRCService.class);
@@ -105,6 +104,8 @@ public class IRCService extends Service {
 			}.start();
 
 			noOfConnections += 1;
+
+			manager.put(server.getTitle(), bot);
 		}
 	}
 
@@ -130,28 +131,30 @@ public class IRCService extends Service {
 		bot.getListenerManager().addListener(mChannelListener);
 	}
 
-	public void callbackToChannelAndAppend(final String channelName,
-			final String message, final String serverName) {
-		final HashMap<String, String> buffers = getBot(serverName)
-				.getChannelBuffers();
+	public void callbackToChannelAndAppend(final Channel channel,
+			final String message) {
 
-		if (mChannelCallbacks.get(channelName) != null && mSendCallback) {
+		if (mChannelCallbacks.get(channel.getName()) != null
+				&& mServerCallback != null) {
 			mHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mChannelCallbacks.get(channelName).writeToTextView(message);
+					mChannelCallbacks.get(channel.getName()).writeToTextView(
+							message);
 				}
 			});
 		}
 
-		final String buffer = buffers.get(channelName) + message;
-		buffers.put(channelName, buffer);
+		((LightChannel) channel).appendToBuffer(message);
+	}
+	
+	public void callbackToChannelAndAppend(final String channel,
+			final String message, String botTitle) {
+		callbackToChannelAndAppend(getBot(botTitle).getChannel(channel), message);
 	}
 
-	public void callbackToServerAndAppend(final String message,
-			final String serverName) {
-		getBot(serverName).mServerBuffer += message;
-
+	public void callbackToServerAndAppend(final LightPircBotX bot,
+			final String message) {
 		if (getServerCallback() != null) {
 			mHandler.post(new Runnable() {
 				@Override
@@ -160,16 +163,23 @@ public class IRCService extends Service {
 				}
 			});
 		}
+
+		bot.appendToBuffer(message);
+	}
+	
+	public void callbackToServerAndAppend(final String bot,
+			final String message) {
+		callbackToServerAndAppend(getBot(bot), message);
 	}
 
 	public void partFromChannel(String serverName, String channelName) {
 		getBot(serverName).partChannel(channelName);
 		mChannelCallbacks.remove(channelName);
-		mServerObjects.get(serverName).getChannelBuffers().remove(channelName);
 	}
 
 	public void disconnectFromServer(String serverName) {
 		getBot(serverName).disconnect();
+		manager.remove(serverName);
 		noOfConnections -= 1;
 		if (noOfConnections == 0) {
 			stopForeground(true);
@@ -178,29 +188,30 @@ public class IRCService extends Service {
 	}
 
 	private void disconnectAll() {
-		for (LightPircBotX bot : mServerObjects.values()) {
+		for (LightPircBotX bot : manager.values()) {
 			bot.disconnect();
 		}
+		noOfConnections = 0;
 		stopForeground(true);
 		stopSelf();
 	}
 
 	// Getters and setters
+
+	// public only for parsers - should not be used elsewhere
 	public LightPircBotX getBot(final String serverName) {
-		return mServerObjects.get(serverName);
+		return manager.get(serverName);
 	}
 
-	public void putBot(LightPircBotX bot) {
-		mServerObjects.put(bot.getTitle(), bot);
-	}
-	
 	public ChannelCallbacks getChannelCallback(String channelName) {
 		return mChannelCallbacks.get(channelName);
 	}
 
 	public void setChannelCallbacks(final ChannelCallbacks cb,
-			final String channelName) {
+			final String channelName, final String serverName) {
 		mChannelCallbacks.put(channelName, cb);
+		cb.userListChanged(((LightChannel) getBot(serverName).getChannel(
+				channelName)).getUserNicks());
 	}
 
 	public ServerCallback getServerCallback() {
@@ -209,11 +220,10 @@ public class IRCService extends Service {
 
 	public void setServerCallback(ServerCallback serverCallback) {
 		mServerCallback = serverCallback;
-		mSendCallback = true;
 	}
 
 	public int getNumberOfServers() {
-		return mServerObjects.size();
+		return manager.size();
 	}
 
 	// Binder which returns this service

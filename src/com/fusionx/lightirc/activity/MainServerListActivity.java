@@ -22,13 +22,10 @@
 package com.fusionx.lightirc.activity;
 
 import android.app.ListActivity;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.preference.PreferenceActivity;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -43,12 +40,8 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
 import com.fusionx.lightirc.adapters.LightPircBotXArrayAdapter;
 import com.fusionx.lightirc.irc.LightPircBotX;
-import com.fusionx.lightirc.services.IRCService;
-import com.fusionx.lightirc.services.IRCService.IRCBinder;
 
 public class MainServerListActivity extends ListActivity {
-	private LightPircBotX[] mServerList;
-
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -71,10 +64,10 @@ public class MainServerListActivity extends ListActivity {
 		final boolean firstRun = settings.getBoolean("firstrun", true);
 		final int noOfServers = settings.getInt("noOfServers", 0);
 		LightPircBotX[] values = null;
-		final Editor e = settings.edit();
 
 		if (firstRun) {
-			LightPircBotX freenode = new LightPircBotX();
+			final Editor e = settings.edit();
+			final LightPircBotX freenode = new LightPircBotX();
 			freenode.mURL = "irc.freenode.net";
 			freenode.setLogin("LightIRCUser");
 			freenode.setTitle("Freenode");
@@ -118,28 +111,9 @@ public class MainServerListActivity extends ListActivity {
 		}
 
 		if (values != null) {
-			mServerList = values;
 			setListAdapter(new LightPircBotXArrayAdapter(this, values));
 		}
 	}
-
-	private final ServiceConnection mConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(final ComponentName className,
-				final IBinder binder) {
-			final IRCService service = ((IRCBinder) binder).getService();
-			if (service.getNumberOfServers() <= 0) {
-				for (LightPircBotX bot : mServerList) {
-					service.putBot(bot);
-				}
-			}
-			unbindService(mConnection);
-		}
-
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-		}
-	};
 
 	@Override
 	public void onCreateContextMenu(final ContextMenu menu, final View v,
@@ -172,16 +146,12 @@ public class MainServerListActivity extends ListActivity {
 	}
 
 	private void connectToServer(int position) {
-		final Intent service = new Intent(this, IRCService.class);
-		startService(service);
-		bindService(service, mConnection, 0);
-
 		final LightPircBotX server = (LightPircBotX) getListView()
 				.getItemAtPosition(position);
 
 		final Intent intent = new Intent(MainServerListActivity.this,
 				ServerChannelActivity.class);
-		intent.putExtra("serverName", server.getTitle());
+		intent.putExtra("server", server);
 		startActivity(intent);
 	}
 

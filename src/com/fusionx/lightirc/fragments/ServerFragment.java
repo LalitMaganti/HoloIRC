@@ -36,16 +36,20 @@ import android.widget.EditText;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.callbacks.ServerCallback;
+import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.irc.LightPircBotX;
 import com.fusionx.lightirc.services.IRCService;
 import com.fusionx.lightirc.services.IRCService.IRCBinder;
 
 public class ServerFragment extends IRCFragment implements OnKeyListener,
 		ServerCallback {
+	LightPircBotX bot;
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		Bundle b = getArguments();
-		setTitle(b.getString("serverName"));
+		bot = b.getParcelable("server");
+
+		setTitle(bot.getTitle());
 
 		// TODO - Hacky way to reset title correctly
 		((ServerChannelActivity) getActivity())
@@ -64,19 +68,19 @@ public class ServerFragment extends IRCFragment implements OnKeyListener,
 		public void onServiceConnected(final ComponentName className,
 				final IBinder binder) {
 			final IRCService service = ((IRCBinder) binder).getService();
-			final LightPircBotX light = service.getBot(getTitle());
-
 			service.setServerCallback(ServerFragment.this);
 
-			if (light.isStarted()) {
-				writeToTextView(light.mServerBuffer);
-				for (final String channelName : light.getChannelBuffers()
-						.keySet()) {
-					onNewChannelJoined(channelName, light.getNick(), light
-							.getChannelBuffers().get(channelName));
+			if(service.getBot(getTitle()) != null) {
+				bot = service.getBot(getTitle());
+			}
+			if (bot.isStarted()) {
+				writeToTextView(bot.getBuffer());
+				for (final String channelName : bot.getChannelNames()) {
+					onNewChannelJoined(channelName, bot.getNick(),
+							((LightChannel) bot.getChannel(channelName)).getBuffer());
 				}
 			} else {
-				service.connectToServer(getTitle());
+				service.connectToServer(bot);
 			}
 		}
 

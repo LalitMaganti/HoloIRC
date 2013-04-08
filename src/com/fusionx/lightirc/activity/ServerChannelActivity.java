@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.activity;
 
+import java.lang.reflect.Field;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
@@ -31,6 +33,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Spinner;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
@@ -38,6 +42,7 @@ import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ServerFragment;
 import com.fusionx.lightirc.fragments.UserFragment;
+import com.fusionx.lightirc.irc.LightPircBotX;
 import com.slidingmenu.lib.SlidingMenu;
 import com.slidingmenu.lib.app.SlidingFragmentActivity;
 
@@ -69,7 +74,7 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 		sm.setTouchmodeMarginThreshold(0);
 		setSlidingActionBarEnabled(false);
 
-		String s = getIntent().getExtras().getString("serverName");
+		LightPircBotX s = getIntent().getExtras().getParcelable("server");
 
 		final ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -112,10 +117,10 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 		actionBar.getTabAt(index).setText(newTitle);
 	}
 
-	private void initialisePaging(String s) {
+	private void initialisePaging(LightPircBotX s) {
 		final ServerFragment d = new ServerFragment();
 		final Bundle b = new Bundle();
-		b.putString("serverName", s);
+		b.putParcelable("server", s);
 		d.setArguments(b);
 		mSectionsPagerAdapter.addView(d);
 
@@ -154,7 +159,7 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 
 	@Override
 	public void onTabSelected(final Tab tab, final FragmentTransaction ft) {
-		if(getSlidingMenu().isSecondaryMenuShowing()) {
+		if (getSlidingMenu().isSecondaryMenuShowing()) {
 			getSlidingMenu().toggle();
 		}
 		mViewPager.setCurrentItem(tab.getPosition());
@@ -174,13 +179,14 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 				!(position == 0));
 		actionBarMenu.findItem(R.id.item_channel_users).setVisible(
 				!(position == 0));
-		if(position == 0) {
+		if (position == 0) {
 			getSlidingMenu().setTouchmodeMarginThreshold(0);
 		} else {
 			getSlidingMenu().setTouchmodeMarginThreshold(3);
 			userFragment.adapter.clear();
-			String userList[] = ((ChannelFragment)mSectionsPagerAdapter.getItem(position)).mUserList;
-			if(userList == null) {
+			String userList[] = ((ChannelFragment) mSectionsPagerAdapter
+					.getItem(position)).mUserList;
+			if (userList == null) {
 				userFragment.adapter.add("Unknown");
 			} else {
 				userFragment.adapter.addAll(userList);
@@ -188,6 +194,39 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 			userFragment.adapter.notifyDataSetChanged();
 		}
 		getActionBar().setSelectedNavigationItem(position);
+
+		// Hack for http://code.google.com/p/android/issues/detail?id=38500
+		setSpinnerSelectedNavigationItem(position);
+	}
+
+	// Hack for http://code.google.com/p/android/issues/detail?id=38500
+	private void setSpinnerSelectedNavigationItem(int position) {
+		try {
+			int id = getResources()
+					.getIdentifier("action_bar", "id", "android");
+			View actionBarView = findViewById(id);
+
+			Class<?> actionBarViewClass = actionBarView.getClass();
+			Field mTabScrollViewField = actionBarViewClass
+					.getDeclaredField("mTabScrollView");
+			mTabScrollViewField.setAccessible(true);
+
+			Object mTabScrollView = mTabScrollViewField.get(actionBarView);
+			if (mTabScrollView == null) {
+				return;
+			}
+
+			Field mTabSpinnerField = mTabScrollView.getClass()
+					.getDeclaredField("mTabSpinner");
+			mTabSpinnerField.setAccessible(true);
+
+			Object mTabSpinner = mTabSpinnerField.get(mTabScrollView);
+			if (mTabSpinner != null) {
+				((Spinner) mTabSpinner).setSelection(position);
+			}
+		} catch (Exception e) {
+			return;
+		}
 	}
 
 	@Override

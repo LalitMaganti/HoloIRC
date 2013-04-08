@@ -68,7 +68,7 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			((IRCBinder) service).getService().setChannelCallbacks(
-					ChannelFragment.this, getTitle());
+					ChannelFragment.this, getTitle(), serverName);
 		}
 
 		@Override
