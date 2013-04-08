@@ -50,7 +50,7 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 	public String getBuffer() {
 		return mBuffer;
 	}
-	
+
 	public void appendToBuffer(String message) {
 		mBuffer += message;
 	}
@@ -66,10 +66,10 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 	public boolean isStarted() {
 		return mStarted;
 	}
-	
+
 	public Set<String> getChannelNames() {
 		HashSet<String> names = new HashSet<String>();
-		for(Channel channel : getChannels()) {
+		for (Channel channel : getChannels()) {
 			names.add(channel.getName());
 		}
 		return names;
@@ -84,7 +84,7 @@ public class LightPircBotX extends PircBotX implements Parcelable {
 			if (curChan.getName().equals(name))
 				return curChan;
 
-		//Channel does not exist, create one
+		// Channel does not exist, create one
 		LightChannel chan = new LightChannel(this, name);
 		userChanInfo.putB(chan);
 		return chan;

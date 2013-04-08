@@ -147,10 +147,11 @@ public class IRCService extends Service {
 
 		((LightChannel) channel).appendToBuffer(message);
 	}
-	
+
 	public void callbackToChannelAndAppend(final String channel,
 			final String message, String botTitle) {
-		callbackToChannelAndAppend(getBot(botTitle).getChannel(channel), message);
+		callbackToChannelAndAppend(getBot(botTitle).getChannel(channel),
+				message);
 	}
 
 	public void callbackToServerAndAppend(final LightPircBotX bot,
@@ -166,9 +167,8 @@ public class IRCService extends Service {
 
 		bot.appendToBuffer(message);
 	}
-	
-	public void callbackToServerAndAppend(final String bot,
-			final String message) {
+
+	public void callbackToServerAndAppend(final String bot, final String message) {
 		callbackToServerAndAppend(getBot(bot), message);
 	}
 

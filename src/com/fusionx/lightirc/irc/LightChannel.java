@@ -38,7 +38,7 @@ public class LightChannel extends Channel {
 	public void setBuffer(String buffer) {
 		mBuffer = buffer;
 	}
-	
+
 	public void appendToBuffer(String newMessage) {
 		mBuffer += newMessage;
 	}

@@ -238,7 +238,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 		@Override
 		public void onItemCheckedStateChanged(ActionMode mode, int position,
 				long id, boolean checked) {
-			mode.getMenu().getItem(0).setVisible(!(getListView().getCheckedItemCount() > 1));
+			mode.getMenu().getItem(0)
+					.setVisible(!(getListView().getCheckedItemCount() > 1));
 			mode.setTitle(getListView().getCheckedItemCount()
 					+ " items selected");
 		}

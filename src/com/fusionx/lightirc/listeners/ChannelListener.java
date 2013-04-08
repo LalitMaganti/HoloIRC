@@ -21,8 +21,7 @@ public class ChannelListener extends IRCListener {
 		final String newMessage = event.getUser().getNick() + ": "
 				+ event.getMessage() + "\n";
 
-		getService().callbackToChannelAndAppend(
-				event.getChannel(), newMessage);
+		getService().callbackToChannelAndAppend(event.getChannel(), newMessage);
 	}
 
 	@Override
@@ -32,8 +31,8 @@ public class ChannelListener extends IRCListener {
 					+ event.getTopic()
 					+ " by "
 					+ event.getChannel().getTopicSetter() + "\n";
-			getService().callbackToChannelAndAppend(
-					event.getChannel(), newMessage);
+			getService().callbackToChannelAndAppend(event.getChannel(),
+					newMessage);
 		} else {
 			getService().mHandler.postDelayed(new Runnable() {
 				@Override
@@ -41,8 +40,8 @@ public class ChannelListener extends IRCListener {
 					final String newMessage = "The topic is: "
 							+ event.getTopic() + " as set forth by "
 							+ event.getChannel().getTopicSetter() + "\n";
-					getService().callbackToChannelAndAppend(
-							event.getChannel(), newMessage);
+					getService().callbackToChannelAndAppend(event.getChannel(),
+							newMessage);
 				}
 			}, 1500);
 		}
@@ -55,8 +54,7 @@ public class ChannelListener extends IRCListener {
 				final String newMessage = event.getUser().getNick()
 						+ " quit the room\n";
 
-				getService().callbackToChannelAndAppend(c,
-						newMessage);
+				getService().callbackToChannelAndAppend(c, newMessage);
 			}
 		}
 	}
@@ -69,8 +67,7 @@ public class ChannelListener extends IRCListener {
 					final String newMessage = event.getOldNick()
 							+ " is now known as " + event.getNewNick() + "\n";
 
-					getService().callbackToChannelAndAppend(c,
-							newMessage);
+					getService().callbackToChannelAndAppend(c, newMessage);
 				}
 			}
 		} else {
@@ -78,8 +75,7 @@ public class ChannelListener extends IRCListener {
 				final String newMessage = "You (" + event.getOldNick()
 						+ ") are now known as " + event.getNewNick() + "\n";
 
-				getService().callbackToChannelAndAppend(c,
-						newMessage);
+				getService().callbackToChannelAndAppend(c, newMessage);
 			}
 		}
 	}
@@ -90,8 +86,8 @@ public class ChannelListener extends IRCListener {
 			final String newMessage = event.getUser().getNick()
 					+ " parted from the room\n";
 
-			getService().callbackToChannelAndAppend(
-					event.getChannel(), newMessage);
+			getService().callbackToChannelAndAppend(event.getChannel(),
+					newMessage);
 		}
 	}
 
@@ -122,8 +118,7 @@ public class ChannelListener extends IRCListener {
 	public void onAction(final ActionEvent<LightPircBotX> event) {
 		final String newMessage = event.getUser().getNick() + " "
 				+ event.getAction();
-		getService().callbackToChannelAndAppend(
-				event.getChannel(), newMessage);
+		getService().callbackToChannelAndAppend(event.getChannel(), newMessage);
 	}
 
 	@Override

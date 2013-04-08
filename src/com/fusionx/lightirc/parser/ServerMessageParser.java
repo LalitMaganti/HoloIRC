@@ -20,13 +20,12 @@ public class ServerMessageParser extends IRCMessageParser {
 				bot.joinChannel(channel);
 			} else {
 				String bufferMessage = "Unknown command";
-				getService().callbackToServerAndAppend(
-						bufferMessage, serverName);
+				getService().callbackToServerAndAppend(bufferMessage,
+						serverName);
 			}
 		} else {
 			String bufferMessage = "Invalid message";
-			getService().callbackToServerAndAppend(
-					bufferMessage, serverName);
+			getService().callbackToServerAndAppend(bufferMessage, serverName);
 		}
 	}
 }

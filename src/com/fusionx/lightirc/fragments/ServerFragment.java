@@ -44,6 +44,7 @@ import com.fusionx.lightirc.services.IRCService.IRCBinder;
 public class ServerFragment extends IRCFragment implements OnKeyListener,
 		ServerCallback {
 	LightPircBotX bot;
+
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		Bundle b = getArguments();
@@ -70,14 +71,15 @@ public class ServerFragment extends IRCFragment implements OnKeyListener,
 			final IRCService service = ((IRCBinder) binder).getService();
 			service.setServerCallback(ServerFragment.this);
 
-			if(service.getBot(getTitle()) != null) {
+			if (service.getBot(getTitle()) != null) {
 				bot = service.getBot(getTitle());
 			}
 			if (bot.isStarted()) {
 				writeToTextView(bot.getBuffer());
 				for (final String channelName : bot.getChannelNames()) {
 					onNewChannelJoined(channelName, bot.getNick(),
-							((LightChannel) bot.getChannel(channelName)).getBuffer());
+							((LightChannel) bot.getChannel(channelName))
+									.getBuffer());
 				}
 			} else {
 				service.connectToServer(bot);

@@ -37,10 +37,10 @@ public class IRCPagerAdapter extends FragmentPagerAdapter {
 		super(fm);
 	}
 
-    @Override
-    public int getItemPosition(final Object object){
-        return PagerAdapter.POSITION_NONE;
-    }
+	@Override
+	public int getItemPosition(final Object object) {
+		return PagerAdapter.POSITION_NONE;
+	}
 
 	public int getItemPosition(final IRCFragment ircfragment) {
 		return views.indexOf(ircfragment);

@@ -6,7 +6,7 @@ import android.content.BroadcastReceiver;
 
 public abstract class IRCMessageParser extends BroadcastReceiver {
 	private IRCService mService;
-	
+
 	public IRCService getService() {
 		return mService;
 	}
