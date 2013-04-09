@@ -21,41 +21,47 @@
 
 package com.fusionx.lightirc.activity;
 
-import android.app.ListActivity;
+import java.util.ArrayList;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView.AdapterContextMenuInfo;
-import android.widget.ListView;
+import android.view.View.OnClickListener;
 
+import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
-import com.fusionx.lightirc.adapters.LightPircBotXArrayAdapter;
 import com.fusionx.lightirc.irc.LightPircBotX;
+import com.fusionx.lightirc.misc.ServerCard;
 
-public class MainServerListActivity extends ListActivity {
+public class MainServerListActivity extends Activity implements
+		OnClickListener, ActionMode.Callback {
+	private ArrayList<LightPircBotX> values = null;
+	public boolean actionModeStarted = false;
+	public ArrayList<LightPircBotX> actionModeItems = new ArrayList<LightPircBotX>();
+	public ActionMode mMode;
+
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_server);
-
-		getListView().setLongClickable(true);
-		registerForContextMenu(getListView());
 
 		getSetServerList();
 	}
 
 	@Override
 	protected void onResume() {
-		getSetServerList();
+		if (values == null) {
+			getSetServerList();
+		}
 		super.onResume();
 	}
 
@@ -63,15 +69,15 @@ public class MainServerListActivity extends ListActivity {
 		final SharedPreferences settings = getSharedPreferences("main", 0);
 		final boolean firstRun = settings.getBoolean("firstrun", true);
 		final int noOfServers = settings.getInt("noOfServers", 0);
-		LightPircBotX[] values = null;
+		values = new ArrayList<LightPircBotX>();
 
 		if (firstRun) {
 			final Editor e = settings.edit();
 			final LightPircBotX freenode = new LightPircBotX();
 			freenode.mURL = "irc.freenode.net";
 			freenode.setLogin("LightIRCUser");
-			freenode.setTitle("Freenode");
-			values = new LightPircBotX[] { freenode };
+			freenode.setTitle("Freenode"); 
+			values.add(freenode);
 
 			for (String s : freenode.toHashMap().keySet()) {
 				e.putString("server_0_" + s, freenode.toHashMap().get(s));
@@ -84,7 +90,6 @@ public class MainServerListActivity extends ListActivity {
 			e.putInt("noOfServers", 1);
 			e.commit();
 		} else if (noOfServers != 0) {
-			values = new LightPircBotX[noOfServers];
 			for (int i = 0; i < noOfServers; i++) {
 				LightPircBotX bot = new LightPircBotX();
 				bot.mURL = settings.getString("server_" + i + "_url", "");
@@ -106,58 +111,33 @@ public class MainServerListActivity extends ListActivity {
 							+ "_autoJoin_channel_" + j, "");
 				}
 				bot.mAutoJoinChannels = s;
-				values[i] = bot;
+				values.add(bot);
 			}
 		}
 
 		if (values != null) {
-			setListAdapter(new LightPircBotXArrayAdapter(this, values));
+			CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
+			mCardView.setSwipeable(false);
+			for (LightPircBotX bot : values) {
+				ServerCard server = new ServerCard(bot.getTitle(),
+						"Not connected", bot);
+				server.setOnClickListener(this);
+				mCardView.addCard(server);
+			}
+
+			mCardView.refresh();
 		}
 	}
 
-	@Override
-	public void onCreateContextMenu(final ContextMenu menu, final View v,
-			final ContextMenuInfo menuInfo) {
-		super.onCreateContextMenu(menu, v, menuInfo);
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.context_server_long_press, menu);
-	}
-
-	@Override
-	public boolean onContextItemSelected(final MenuItem item) {
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
-				.getMenuInfo();
-		switch (item.getItemId()) {
-		case R.id.edit:
-			editServer(info.position);
-			return true;
-		case R.id.connect:
-			connectToServer(info.position);
-			return true;
-		default:
-			return super.onContextItemSelected(item);
-		}
-	}
-
-	@Override
-	protected void onListItemClick(final ListView l, final View v,
-			final int position, final long id) {
-		connectToServer(position);
-	}
-
-	private void connectToServer(int position) {
-		final LightPircBotX server = (LightPircBotX) getListView()
-				.getItemAtPosition(position);
-
+	private void connectToServer(LightPircBotX bot) {
 		final Intent intent = new Intent(MainServerListActivity.this,
 				ServerChannelActivity.class);
-		intent.putExtra("server", server);
+		intent.putExtra("server", bot);
 		startActivity(intent);
 	}
 
 	private void editServer(int position) {
-		final LightPircBotX server = (LightPircBotX) getListView()
-				.getItemAtPosition(position);
+		final LightPircBotX server = actionModeItems.get(position);
 
 		Intent intent = new Intent(MainServerListActivity.this,
 				ServerSettingsActivity.class);
@@ -170,8 +150,52 @@ public class MainServerListActivity extends ListActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(final Menu menu) {
-		getMenuInflater().inflate(R.menu.main_server_list, menu);
+	public void onClick(View v) {
+		connectToServer((LightPircBotX) v.getTag());
+	}
+
+	@Override
+	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		MenuInflater inflater = mode.getMenuInflater();
+		inflater.inflate(R.menu.context_server_long_press, menu);
 		return true;
+	}
+
+	@Override
+	public void onDestroyActionMode(ActionMode arg0) {
+		actionModeStarted = false;
+		mMode = null;
+	}
+
+	@Override
+	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		mode.setTitle("Selected 1 server");
+		actionModeStarted = true;
+		mMode = mode;
+		return false;
+	}
+
+	@Override
+	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.edit:
+			editServer(0);
+			actionModeItems.clear();
+			mode.finish();
+			return true;
+		case R.id.connect:
+			connectToServer(actionModeItems.get(0));
+			actionModeItems.clear();
+			mode.finish();
+			return true;
+		default:
+			return super.onContextItemSelected(item);
+		}
+	}
+
+	public void updateActionMode() {
+		mMode.setTitle("Selected " + actionModeItems.size() + " servers");
+		mMode.getMenu().getItem(0).setVisible(actionModeItems.size() == 1);
+		mMode.getMenu().getItem(1).setVisible(actionModeItems.size() == 1);
 	}
 }

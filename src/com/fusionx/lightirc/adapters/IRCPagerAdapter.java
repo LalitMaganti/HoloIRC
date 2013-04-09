@@ -38,7 +38,7 @@ public class IRCPagerAdapter extends LightFragmentStatePagerAdapter {
 
 	@Override
 	public int getItemPosition(final Object object) {
-		if(views.contains(object)) {
+		if (views.contains(object)) {
 			return POSITION_UNCHANGED;
 		} else {
 			return POSITION_NONE;
