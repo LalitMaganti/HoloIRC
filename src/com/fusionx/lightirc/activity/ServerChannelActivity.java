@@ -95,10 +95,9 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 			return true;
 		case R.id.item_channel_part:
 			int index = mViewPager.getCurrentItem();
-			((ChannelFragment) mSectionsPagerAdapter.getItem(index)).part();
-			removeTab(index);
 			mViewPager.setCurrentItem(index - 1);
-			mSectionsPagerAdapter.removeView(index);
+
+			((ChannelFragment) mSectionsPagerAdapter.getItem(index)).part();
 			return true;
 		case R.id.item_server_disconnect:
 			((ServerFragment) mSectionsPagerAdapter.getItem(0)).disconnect();
@@ -113,7 +112,7 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 
 	public void updateTabTitle(final IRCFragment fragment, final String newTitle) {
 		final ActionBar actionBar = getActionBar();
-		final int index = mSectionsPagerAdapter.getItemPosition(fragment);
+		final int index = mSectionsPagerAdapter.getFragmentPosition(fragment);
 		actionBar.getTabAt(index).setText(newTitle);
 	}
 
@@ -184,9 +183,10 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 			getSlidingMenu().setTouchmodeMarginThreshold(0);
 		} else {
 			getSlidingMenu().setTouchmodeMarginThreshold(3);
-			if(((ChannelFragment) mSectionsPagerAdapter.getItem(position)).mUserList != null) {
+			if (((ChannelFragment) mSectionsPagerAdapter.getItem(position)).mUserList != null) {
 				userFragment.lst.clear();
-				for(String user : ((ChannelFragment) mSectionsPagerAdapter.getItem(position)).mUserList) {
+				for (String user : ((ChannelFragment) mSectionsPagerAdapter
+						.getItem(position)).mUserList) {
 					userFragment.lst.add(user);
 				}
 				userFragment.adapter.notifyDataSetChanged();
@@ -235,14 +235,21 @@ public class ServerChannelActivity extends SlidingFragmentActivity implements
 	@Override
 	public void onPageScrolled(final int arg0, final float arg1, final int arg2) {
 	}
-	
+
 	public void userListChanged(String newList[], ChannelFragment c) {
-		if(mSectionsPagerAdapter.getItemPosition(c) == mViewPager.getCurrentItem()) {
+		if (mSectionsPagerAdapter.getFragmentPosition(c) == mViewPager
+				.getCurrentItem()) {
 			userFragment.lst.clear();
-			for(String user : newList) {
+			for (String user : newList) {
 				userFragment.lst.add(user);
 			}
 			userFragment.adapter.notifyDataSetChanged();
 		}
+	}
+
+	public void partFromChannelFinish(ChannelFragment chan) {
+		int index = mSectionsPagerAdapter.getFragmentPosition(chan);
+		removeTab(index);
+		mSectionsPagerAdapter.removeView(index);
 	}
 }

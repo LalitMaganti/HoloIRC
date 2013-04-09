@@ -84,6 +84,7 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener,
 			IRCService service = ((IRCBinder) binder).getService();
 			service.partFromChannel(serverName, getTitle());
 			getActivity().unbindService(this);
+			((ServerChannelActivity) getActivity()).partFromChannelFinish(ChannelFragment.this);
 		}
 
 		@Override
