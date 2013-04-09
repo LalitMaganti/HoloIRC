@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package android.support.v4.app;
+package com.fusionx.lightirc.adapters;
 
 import java.util.ArrayList;
 
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;

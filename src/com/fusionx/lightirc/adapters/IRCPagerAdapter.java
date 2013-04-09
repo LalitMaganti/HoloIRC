@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.LightFragmentStatePagerAdapter;
 
 import com.fusionx.lightirc.fragments.IRCFragment;
 
