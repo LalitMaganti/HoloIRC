@@ -76,6 +76,7 @@ public class MainServerListActivity extends Activity implements
 			final LightPircBotX freenode = new LightPircBotX();
 			freenode.mURL = "irc.freenode.net";
 			freenode.setLogin("LightIRCUser");
+			freenode.setName("LightIRCUser");
 			freenode.setTitle("Freenode"); 
 			values.add(freenode);
 
@@ -96,7 +97,6 @@ public class MainServerListActivity extends Activity implements
 				bot.mUserName = settings.getString("server_" + i + "_userName",
 						"");
 				bot.setLogin(settings.getString("server_" + i + "_nick", ""));
-
 				bot.setName(bot.getLogin());
 
 				bot.mServerPassword = settings.getString("server_" + i
