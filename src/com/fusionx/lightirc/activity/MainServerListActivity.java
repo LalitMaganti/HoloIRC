@@ -77,7 +77,7 @@ public class MainServerListActivity extends Activity implements
 			freenode.mURL = "irc.freenode.net";
 			freenode.setLogin("LightIRCUser");
 			freenode.setName("LightIRCUser");
-			freenode.setTitle("Freenode"); 
+			freenode.setTitle("Freenode");
 			values.add(freenode);
 
 			for (String s : freenode.toHashMap().keySet()) {

@@ -17,7 +17,8 @@ public class ServerCard extends Card {
 	protected final String mStatus;
 	private final LightPircBotX mBot;
 
-	public ServerCard(final String title, final String status, final LightPircBotX bot) {
+	public ServerCard(final String title, final String status,
+			final LightPircBotX bot) {
 		super(title);
 		mStatus = status;
 		mBot = bot;
@@ -40,11 +41,12 @@ public class ServerCard extends Card {
 		OnLongClickListener listener = new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				if(!((MainServerListActivity)context).actionModeStarted) {
-					((Activity) context).startActionMode((MainServerListActivity)context);
+				if (!((MainServerListActivity) context).actionModeStarted) {
+					((Activity) context)
+							.startActionMode((MainServerListActivity) context);
 				}
-				((MainServerListActivity)context).actionModeItems.add(mBot);
-				((MainServerListActivity)context).updateActionMode();
+				((MainServerListActivity) context).actionModeItems.add(mBot);
+				((MainServerListActivity) context).updateActionMode();
 				return true;
 			}
 		};
@@ -60,11 +62,12 @@ public class ServerCard extends Card {
 		OnLongClickListener listener = new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				if(!((MainServerListActivity)context).actionModeStarted) {
-					((Activity) context).startActionMode((MainServerListActivity)context);
+				if (!((MainServerListActivity) context).actionModeStarted) {
+					((Activity) context)
+							.startActionMode((MainServerListActivity) context);
 				}
-				((MainServerListActivity)context).actionModeItems.add(mBot);
-				((MainServerListActivity)context).updateActionMode();
+				((MainServerListActivity) context).actionModeItems.add(mBot);
+				((MainServerListActivity) context).updateActionMode();
 				return true;
 			}
 		};
@@ -80,11 +83,12 @@ public class ServerCard extends Card {
 		OnLongClickListener listener = new OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
-				if(!((MainServerListActivity)context).actionModeStarted) {
-					((Activity) context).startActionMode((MainServerListActivity)context);
+				if (!((MainServerListActivity) context).actionModeStarted) {
+					((Activity) context)
+							.startActionMode((MainServerListActivity) context);
 				}
-				((MainServerListActivity)context).actionModeItems.add(mBot);
-				((MainServerListActivity)context).updateActionMode();
+				((MainServerListActivity) context).actionModeItems.add(mBot);
+				((MainServerListActivity) context).updateActionMode();
 				return true;
 			}
 		};
