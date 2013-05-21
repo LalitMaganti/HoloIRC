@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="cardsuilib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../cardsui-for-android/CardsUILib/bin/cardsuilib.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,45 +1,58 @@
 package com.fusionx.lightirc.irc;
 
-import java.util.ArrayList;
-
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import org.pircbotx.UserChannelDao;
+
+import java.util.ArrayList;
 
 public class LightChannel extends Channel {
-	public LightChannel(PircBotX bot, String name) {
-		super(bot, name);
-	}
+    private String mBuffer = "";
 
-	private String mBuffer;
+    protected LightChannel(PircBotX bot, UserChannelDao dao, String name) {
+        super(bot, dao, name);
+    }
 
-	public String[] getUserNicks() {
-		ArrayList<String> array = new ArrayList<String>();
-		for (User user : getOps()) {
-			array.add("@" + user.getNick());
-		}
-		for (User user : getHalfOps()) {
-			array.add("half@" + user.getNick());
-		}
-		for (User user : getVoices()) {
-			array.add("+" + user.getNick());
-		}
-		for (User user : getNormalUsers()) {
-			array.add(user.getNick());
-		}
-		String user[] = array.toArray(new String[0]);
-		return user;
-	}
+    public ArrayList<String> getUserNicks() {
+        ArrayList<String> array = new ArrayList<String>();
+        for (User user : getOps()) {
+            array.add("@" + user.getNick());
+        }
+        for (User user : getHalfOps()) {
+            array.add("half@" + user.getNick());
+        }
+        for (User user : getVoices()) {
+            array.add("+" + user.getNick());
+        }
+        for (User user : getNormalUsers()) {
+            array.add(user.getNick());
+        }
+        return array;
+    }
 
-	public String getBuffer() {
-		return mBuffer;
-	}
+    public ArrayList<String> getCleanUserNicks() {
+        ArrayList<String> array = new ArrayList<String>();
+        for (User user : getOps()) {
+            array.add(user.getNick());
+        }
+        for (User user : getHalfOps()) {
+            array.add(user.getNick());
+        }
+        for (User user : getVoices()) {
+            array.add(user.getNick());
+        }
+        for (User user : getNormalUsers()) {
+            array.add(user.getNick());
+        }
+        return array;
+    }
 
-	public void setBuffer(String buffer) {
-		mBuffer = buffer;
-	}
+    public void appendToBuffer(String message) {
+        mBuffer += message;
+    }
 
-	public void appendToBuffer(String newMessage) {
-		mBuffer += newMessage;
-	}
+    public String getBuffer() {
+        return mBuffer;
+    }
 }

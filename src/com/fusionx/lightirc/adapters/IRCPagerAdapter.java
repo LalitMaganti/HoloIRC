@@ -21,57 +21,65 @@
 
 package com.fusionx.lightirc.adapters;
 
-import java.util.ArrayList;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-
 import com.fusionx.lightirc.fragments.IRCFragment;
 
+import java.util.ArrayList;
+
 public class IRCPagerAdapter extends LightFragmentStatePagerAdapter {
-	private ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
+    private ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
 
-	public IRCPagerAdapter(final FragmentManager fm) {
-		super(fm);
-	}
+    public IRCPagerAdapter(final FragmentManager fm) {
+        super(fm);
+    }
 
-	@Override
-	public int getItemPosition(final Object object) {
-		if (views.contains(object)) {
-			return POSITION_UNCHANGED;
-		} else {
-			return POSITION_NONE;
-		}
-	}
+    public int addView(final IRCFragment s) {
+        views.add(s);
+        notifyDataSetChanged();
+        return views.indexOf(s);
+    }
 
-	public int getFragmentPosition(final IRCFragment ircfragment) {
-		return views.indexOf(ircfragment);
-	}
+    @Override
+    public int getCount() {
+        return views.size();
+    }
 
-	@Override
-	public Fragment getItem(final int position) {
-		return views.get(position);
-	}
+    public int getFragmentPosition(final IRCFragment ircfragment) {
+        return views.indexOf(ircfragment);
+    }
 
-	public int addView(final IRCFragment s) {
-		views.add(s);
-		notifyDataSetChanged();
-		return views.indexOf(s);
-	}
+    @Override
+    public Fragment getItem(final int position) {
+        return views.get(position);
+    }
 
-	public int removeView(int index) {
-		views.remove(index);
-		notifyDataSetChanged();
-		return views.size() - 1;
-	}
+    @Override
+    public int getItemPosition(final Object object) {
+        if (views.contains(object)) {
+            return POSITION_UNCHANGED;
+        } else {
+            return POSITION_NONE;
+        }
+    }
 
-	@Override
-	public int getCount() {
-		return views.size();
-	}
+    @Override
+    public CharSequence getPageTitle(final int position) {
+        return views.get(position).getTitle();
+    }
 
-	@Override
-	public CharSequence getPageTitle(final int position) {
-		return views.get(position).getTitle();
-	}
+    public int removeView(int index) {
+        views.remove(index);
+        notifyDataSetChanged();
+        return views.size() - 1;
+    }
+
+    public IRCFragment getTab(String title) {
+        for (IRCFragment i : views) {
+            if (i.getTitle().equals(title)) {
+                return i;
+            }
+        }
+        return null;
+    }
 }

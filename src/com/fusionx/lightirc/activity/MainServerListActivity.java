@@ -21,181 +21,177 @@
 
 package com.fusionx.lightirc.activity;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
-
 import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
-import com.fusionx.lightirc.irc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.misc.ServerCard;
 
+import java.util.ArrayList;
+
 public class MainServerListActivity extends Activity implements
-		OnClickListener, ActionMode.Callback {
-	private ArrayList<LightPircBotX> values = null;
-	public boolean actionModeStarted = false;
-	public ArrayList<LightPircBotX> actionModeItems = new ArrayList<LightPircBotX>();
-	public ActionMode mMode;
+        OnClickListener, ActionMode.Callback {
+    public ArrayList<LightBuilder> actionModeItems = new ArrayList<LightBuilder>();
+    public boolean actionModeStarted = false;
+    public ActionMode mMode;
+    private ArrayList<LightBuilder> values = null;
 
-	@Override
-	protected void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main_server);
+    private void connectToServer(LightBuilder builder) {
+        final Intent intent = new Intent(MainServerListActivity.this,
+                ServerChannelActivity.class);
+        intent.putExtra("server", builder);
+        startActivity(intent);
+    }
 
-		getSetServerList();
-	}
+    private void editServer(int position) {
+        final LightBuilder server = actionModeItems.get(position);
 
-	@Override
-	protected void onResume() {
-		if (values == null) {
-			getSetServerList();
-		}
-		super.onResume();
-	}
+        Intent intent = new Intent(MainServerListActivity.this,
+                ServerSettingsActivity.class);
+        intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                BaseServerSettingFragment.class.getName());
+        intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+        intent.putExtra("indexOfServer", position);
+        intent.putExtra("server", server);
+        startActivity(intent);
+    }
 
-	private void getSetServerList() {
-		final SharedPreferences settings = getSharedPreferences("main", 0);
-		final boolean firstRun = settings.getBoolean("firstrun", true);
-		final int noOfServers = settings.getInt("noOfServers", 0);
-		values = new ArrayList<LightPircBotX>();
+    private void getSetServerList() {
+        final SharedPreferences settings = getSharedPreferences("main", 0);
+        final boolean firstRun = settings.getBoolean("firstrun", true);
+        final int noOfServers = settings.getInt("noOfServers", 0);
+        values = new ArrayList<LightBuilder>();
 
-		if (firstRun) {
-			final Editor e = settings.edit();
-			final LightPircBotX freenode = new LightPircBotX();
-			freenode.mURL = "irc.freenode.net";
-			freenode.setLogin("LightIRCUser");
-			freenode.setName("LightIRCUser");
-			freenode.setTitle("Freenode");
-			values.add(freenode);
+        if (firstRun) {
+            final Editor e = settings.edit();
+            LightBuilder freenode = new LightBuilder();
 
-			for (String s : freenode.toHashMap().keySet()) {
-				e.putString("server_0_" + s, freenode.toHashMap().get(s));
-			}
+            freenode.setLogin("LightIRCUser");
+            freenode.setName("LightIRCUser");
+            freenode.setServerHostname("irc.freenode.net");
+            freenode.setTitle("Freenode");
+            freenode.addAutoJoinChannel("#testingircandroid");
+            freenode.addAutoJoinChannel("#huawei-g300");
+            values.add(freenode);
 
-			e.putBoolean("firstrun", false);
-			e.putString("server_0_autoJoin_channel_0", "#testingircandroid");
-			e.putString("server_0_autoJoin_channel_1", "#huawei-g300");
-			e.putInt("server_0_autoJoin_no", 2);
-			e.putInt("noOfServers", 1);
-			e.commit();
-		} else if (noOfServers != 0) {
-			for (int i = 0; i < noOfServers; i++) {
-				LightPircBotX bot = new LightPircBotX();
-				bot.mURL = settings.getString("server_" + i + "_url", "");
-				bot.mUserName = settings.getString("server_" + i + "_userName",
-						"");
-				bot.setLogin(settings.getString("server_" + i + "_nick", ""));
-				bot.setName(bot.getLogin());
+            for (String s : freenode.toHashMap().keySet()) {
+                e.putString("server_0_" + s, freenode.toHashMap().get(s));
+            }
 
-				bot.mServerPassword = settings.getString("server_" + i
-						+ "_serverPassword", "");
-				bot.setTitle(settings.getString("server_" + i + "_title", ""));
-				bot.noOfAutoJoinChannels = settings.getInt("server_" + i
-						+ "_autoJoin_no", 0);
+            e.putBoolean("firstrun", false);
+            e.putString("server_0_autoJoin_channel_0", "#testingircandroid");
+            e.putString("server_0_autoJoin_channel_1", "#huawei-g300");
+            e.putInt("server_0_autoJoin_no", 2);
+            e.putInt("noOfServers", 1);
+            e.commit();
+        } else if (noOfServers != 0) {
+            for (int i = 0; i < noOfServers; i++) {
+                LightBuilder bot = new LightBuilder();
+                bot.setServerHostname(settings.getString(
+                        "server_" + i + "_url", ""));
+                bot.setLogin(settings
+                        .getString("server_" + i + "_userName", ""));
+                bot.setName(settings.getString("server_" + i + "_nick", ""));
 
-				String[] s = new String[bot.noOfAutoJoinChannels];
-				for (int j = 0; j < bot.noOfAutoJoinChannels; j++) {
-					s[j] = settings.getString("server_" + i
-							+ "_autoJoin_channel_" + j, "");
-				}
-				bot.mAutoJoinChannels = s;
-				values.add(bot);
-			}
-		}
+                bot.setServerPassword(settings.getString("server_" + i
+                        + "_serverPassword", ""));
+                bot.setTitle(settings.getString("server_" + i + "_title", ""));
+                int noOfAutoJoinChannels = settings.getInt("server_" + i
+                        + "_autoJoin_no", 0);
 
-		if (values != null) {
-			CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
-			mCardView.setSwipeable(false);
-			for (LightPircBotX bot : values) {
-				ServerCard server = new ServerCard(bot.getTitle(),
-						"Not connected", bot);
-				server.setOnClickListener(this);
-				mCardView.addCard(server);
-			}
+                for (int j = 0; j < noOfAutoJoinChannels; j++) {
+                    String channel = settings.getString("server_" + i
+                            + "_autoJoin_channel_" + j, "");
+                    bot.addAutoJoinChannel(channel);
+                }
+                values.add(bot);
+            }
+        }
 
-			mCardView.refresh();
-		}
-	}
+        if (!values.isEmpty()) {
+            CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
+            mCardView.setSwipeable(false);
+            for (LightBuilder bot : values) {
+                ServerCard server = new ServerCard(bot.getTitle(),
+                        "Not connected", bot);
+                server.setOnClickListener(this);
+                mCardView.addCard(server);
+            }
 
-	private void connectToServer(LightPircBotX bot) {
-		final Intent intent = new Intent(MainServerListActivity.this,
-				ServerChannelActivity.class);
-		intent.putExtra("server", bot);
-		startActivity(intent);
-	}
+            mCardView.refresh();
+        }
+    }
 
-	private void editServer(int position) {
-		final LightPircBotX server = actionModeItems.get(position);
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit:
+                editServer(0);
+                mode.finish();
+                return true;
+            case R.id.connect:
+                connectToServer(actionModeItems.get(0));
+                mode.finish();
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
 
-		Intent intent = new Intent(MainServerListActivity.this,
-				ServerSettingsActivity.class);
-		intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-				BaseServerSettingFragment.class.getName());
-		intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-		intent.putExtra("indexOfServer", position);
-		intent.putExtra("server", server);
-		startActivity(intent);
-	}
+    @Override
+    public void onClick(View v) {
+        connectToServer((LightBuilder) v.getTag());
+    }
 
-	@Override
-	public void onClick(View v) {
-		connectToServer((LightPircBotX) v.getTag());
-	}
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main_server);
 
-	@Override
-	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		MenuInflater inflater = mode.getMenuInflater();
-		inflater.inflate(R.menu.context_server_long_press, menu);
-		return true;
-	}
+        getSetServerList();
+    }
 
-	@Override
-	public void onDestroyActionMode(ActionMode arg0) {
-		actionModeStarted = false;
-		mMode = null;
-	}
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.context_server_long_press, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		mode.setTitle("Selected 1 server");
-		actionModeStarted = true;
-		mMode = mode;
-		return false;
-	}
+    @Override
+    public void onDestroyActionMode(ActionMode arg0) {
+        actionModeItems.clear();
+        actionModeStarted = false;
+        mMode = null;
+    }
 
-	@Override
-	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.edit:
-			editServer(0);
-			actionModeItems.clear();
-			mode.finish();
-			return true;
-		case R.id.connect:
-			connectToServer(actionModeItems.get(0));
-			actionModeItems.clear();
-			mode.finish();
-			return true;
-		default:
-			return super.onContextItemSelected(item);
-		}
-	}
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        mode.setTitle("Selected 1 server");
+        actionModeStarted = true;
+        mMode = mode;
+        return false;
+    }
 
-	public void updateActionMode() {
-		mMode.setTitle("Selected " + actionModeItems.size() + " servers");
-		mMode.getMenu().getItem(0).setVisible(actionModeItems.size() == 1);
-		mMode.getMenu().getItem(1).setVisible(actionModeItems.size() == 1);
-	}
+    @Override
+    protected void onResume() {
+        if (values == null) {
+            getSetServerList();
+        }
+        super.onResume();
+    }
+
+    public void updateActionMode() {
+        mMode.setTitle("Selected " + actionModeItems.size() + " servers");
+        mMode.getMenu().getItem(0).setVisible(actionModeItems.size() == 1);
+        mMode.getMenu().getItem(1).setVisible(actionModeItems.size() == 1);
+    }
 }

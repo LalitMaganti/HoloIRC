@@ -1,9 +1,5 @@
 package com.fusionx.lightirc.services;
 
-import java.util.HashMap;
-
-import org.pircbotx.Channel;
-
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -11,214 +7,172 @@ import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.callbacks.ChannelCallbacks;
-import com.fusionx.lightirc.callbacks.ServerCallback;
-import com.fusionx.lightirc.irc.LightChannel;
-import com.fusionx.lightirc.irc.LightPircBotX;
+import com.fusionx.lightirc.irc.LightBot;
+import com.fusionx.lightirc.irc.LightBotFactory;
+import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.irc.LightPircBotXManager;
 import com.fusionx.lightirc.listeners.ChannelListener;
 import com.fusionx.lightirc.listeners.ServerListener;
 import com.fusionx.lightirc.parser.ChannelMessageParser;
 import com.fusionx.lightirc.parser.ServerMessageParser;
+import org.pircbotx.Channel;
+import org.pircbotx.Configuration;
+import org.pircbotx.UserChannelDao;
+import org.pircbotx.exception.IrcException;
+import org.pircbotx.exception.NickAlreadyInUseException;
+import org.pircbotx.output.OutputChannel;
+
+import java.io.IOException;
 
 public class IRCService extends Service {
-	private final LightPircBotXManager manager = new LightPircBotXManager();
+    // Binder which returns this service
+    public class IRCBinder extends Binder {
+        public IRCService getService() {
+            return IRCService.this;
+        }
+    }
 
-	private final IRCBinder mBinder = new IRCBinder();
+    private final LightPircBotXManager manager = new LightPircBotXManager();
+    private final IRCBinder mBinder = new IRCBinder();
+    private final ChannelMessageParser mChannelMessageReceiver = new ChannelMessageParser();
+    private final ServerMessageParser mServerMessageReceiver = new ServerMessageParser();
 
-	private ServerCallback mServerCallback = null;
-	private final HashMap<String, ChannelCallbacks> mChannelCallbacks = new HashMap<String, ChannelCallbacks>();
+    private void appendToServer(final LightBot bot,
+                                final String message) {
+        bot.appendToBuffer(message);
+    }
 
-	private final ChannelMessageParser mChannelMessageReceiver = new ChannelMessageParser();
-	private final ServerMessageParser mServerMessageReciever = new ServerMessageParser();
+    public void callbackToServerAndAppend(final String bot, final String message) {
+        appendToServer(getBot(bot), message);
+    }
 
-	// Handler is common across listeners and parser
-	public final Handler mHandler = new Handler();
+    @SuppressLint("NewApi")
+    public void connectToServer(final LightBuilder server) {
+        final LightBuilder bot = server;
+        if (manager.get(server) == null || !manager.get(server).isConnected()) {
+            // TODO - setup option for this
+            bot.setAutoNickChange(true);
+            bot.setBotFactory(new LightBotFactory());
 
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		if (intent.getBooleanExtra("stop", false)) {
-			disconnectAll();
-			return 0;
-		} else {
-			return START_STICKY;
-		}
-	}
+            setupListeners(bot);
 
-	@Override
-	public IBinder onBind(final Intent intent) {
-		return mBinder;
-	}
+            final Intent intent = new Intent(this, MainServerListActivity.class);
+            final Intent intent2 = new Intent(this, IRCService.class);
+            intent2.putExtra("stop", true);
+            final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
+                    intent, 0);
+            final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
+                    intent2, 0);
 
-	@Override
-	public boolean onUnbind(final Intent intent) {
-		mServerCallback = null;
-		return true;
-	}
+            final Notification noti = new Notification.Builder(this)
+                    .setContentTitle("LightIRC")
+                    .setContentText("At least one server is joined")
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentIntent(pIntent)
+                    .addAction(android.R.drawable.ic_menu_close_clear_cancel,
+                            "Disconnect all", pIntent2).build();
+            // Just a random number
+            // TODO - maybe static int this?
+            startForeground(1337, noti);
 
-	@Override
-	public void onDestroy() {
-		unregisterReceiver(mChannelMessageReceiver);
-		unregisterReceiver(mServerMessageReciever);
-	}
+            Configuration d = bot.buildConfiguration();
 
-	@SuppressLint("NewApi")
-	public void connectToServer(final LightPircBotX server) {
-		final LightPircBotX bot = server;
-		if (!bot.isStarted()) {
-			// TODO - setup option for this
-			bot.setAutoNickChange(true);
+            final LightBot bo = new LightBot(d, bot.getTitle());
 
-			setupListeners(bot);
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        bo.connect();
+                    } catch (NickAlreadyInUseException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (IrcException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
 
-			final Intent intent = new Intent(this, MainServerListActivity.class);
-			final Intent intent2 = new Intent(this, IRCService.class);
-			intent2.putExtra("stop", true);
-			final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
-					intent, 0);
-			final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
-					intent2, 0);
+            manager.put(server.getTitle(), bo);
+        }
+    }
 
-			final Notification noti = new Notification.Builder(this)
-					.setContentTitle("LightIRC")
-					.setContentText("At least one server is joined")
-					.setSmallIcon(R.drawable.ic_launcher)
-					.setContentIntent(pIntent)
-					.addAction(android.R.drawable.ic_menu_close_clear_cancel,
-							"Disconnect all", pIntent2).build();
-			// Just a random number
-			// TODO - maybe static int this?
-			startForeground(1337, noti);
+    private void disconnectAll() {
+        manager.disconnectAll();
+        stopForeground(true);
+        stopSelf();
+    }
 
-			new Thread() {
-				@Override
-				public void run() {
-					bot.connectAndAutoJoin();
-				}
-			}.start();
+    public void disconnectFromServer(String serverName) {
+        getBot(serverName).shutdown();
+        manager.remove(serverName);
+        if (manager.size() == 0) {
+            stopForeground(true);
+            stopSelf();
+        }
+    }
 
-			manager.put(server.getTitle(), bot);
-		}
-	}
+    // public only for parsers - should not be used elsewhere
+    public LightBot getBot(final String serverName) {
+        return manager.get(serverName);
+    }
 
-	private void setupListeners(LightPircBotX bot) {
-		mChannelMessageReceiver.setService(this);
-		mServerMessageReciever.setService(this);
+    @Override
+    public IBinder onBind(final Intent intent) {
+        return mBinder;
+    }
 
-		final IntentFilter filter = new IntentFilter(
-				"com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");
-		registerReceiver(mChannelMessageReceiver, filter);
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(mChannelMessageReceiver);
+        unregisterReceiver(mServerMessageReceiver);
+    }
 
-		final IntentFilter serverFilter = new IntentFilter(
-				"com.fusionx.lightirc.SERVER_MESSAGE_TO_PARSE");
-		registerReceiver(mServerMessageReciever, serverFilter);
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        //if (intent.getBooleanExtra("stop", false)) {
+        //    disconnectAll();
+        //    return 0;
+        //} else {
+        return START_STICKY;
+        //}
+    }
 
-		final ChannelListener mChannelListener = new ChannelListener();
-		final ServerListener mServerListener = new ServerListener();
+    @Override
+    public boolean onUnbind(final Intent intent) {
+        return true;
+    }
 
-		mChannelListener.setService(this);
-		mServerListener.setService(this);
+    public void partFromChannel(String serverName, String channelName) {
+        UserChannelDao d = getBot(serverName).getUserChannelDao();
+        Channel c = d.getChannel(channelName);
+        OutputChannel f = c.send();
+        f.part();
+    }
 
-		bot.getListenerManager().addListener(mServerListener);
-		bot.getListenerManager().addListener(mChannelListener);
-	}
+    private void setupListeners(LightBuilder bot) {
+        mChannelMessageReceiver.setService(this);
+        mServerMessageReceiver.setService(this);
 
-	public void callbackToChannelAndAppend(final Channel channel,
-			final String message) {
+        final IntentFilter filter = new IntentFilter(
+                "com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");
+        registerReceiver(mChannelMessageReceiver, filter);
 
-		if (mChannelCallbacks.get(channel.getName()) != null
-				&& mServerCallback != null) {
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mChannelCallbacks.get(channel.getName()).writeToTextView(
-							message);
-				}
-			});
-		}
+        final IntentFilter serverFilter = new IntentFilter(
+                "com.fusionx.lightirc.SERVER_MESSAGE_TO_PARSE");
+        registerReceiver(mServerMessageReceiver, serverFilter);
 
-		((LightChannel) channel).appendToBuffer(message);
-	}
+        final ChannelListener mChannelListener = new ChannelListener();
+        final ServerListener mServerListener = new ServerListener();
 
-	public void callbackToChannelAndAppend(final String channel,
-			final String message, String botTitle) {
-		callbackToChannelAndAppend(getBot(botTitle).getChannel(channel),
-				message);
-	}
+        mChannelListener.setService(this);
+        mServerListener.setService(this);
 
-	public void callbackToServerAndAppend(final LightPircBotX bot,
-			final String message) {
-		if (getServerCallback() != null) {
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					getServerCallback().writeToTextView(message);
-				}
-			});
-		}
-
-		bot.appendToBuffer(message);
-	}
-
-	public void callbackToServerAndAppend(final String bot, final String message) {
-		callbackToServerAndAppend(getBot(bot), message);
-	}
-
-	public void partFromChannel(String serverName, String channelName) {
-		getBot(serverName).partChannel(channelName);
-		mChannelCallbacks.remove(channelName);
-	}
-
-	public void disconnectFromServer(String serverName) {
-		getBot(serverName).disconnect();
-		manager.remove(serverName);
-		if (manager.size() == 0) {
-			stopForeground(true);
-			stopSelf();
-		}
-	}
-
-	private void disconnectAll() {
-		manager.disconnectAll();
-		stopForeground(true);
-		stopSelf();
-	}
-
-	// Getters and setters
-
-	// public only for parsers - should not be used elsewhere
-	public LightPircBotX getBot(final String serverName) {
-		return manager.get(serverName);
-	}
-
-	public ChannelCallbacks getChannelCallback(String channelName) {
-		return mChannelCallbacks.get(channelName);
-	}
-
-	public void setChannelCallbacks(final ChannelCallbacks cb,
-			final String channelName, final String serverName) {
-		mChannelCallbacks.put(channelName, cb);
-		cb.userListChanged(((LightChannel) getBot(serverName).getChannel(
-				channelName)).getUserNicks());
-	}
-
-	public ServerCallback getServerCallback() {
-		return mServerCallback;
-	}
-
-	public void setServerCallback(ServerCallback serverCallback) {
-		mServerCallback = serverCallback;
-	}
-
-	// Binder which returns this service
-	public class IRCBinder extends Binder {
-		public IRCService getService() {
-			return IRCService.this;
-		}
-	}
+        bot.getListenerManager().addListener(mServerListener);
+        bot.getListenerManager().addListener(mChannelListener);
+    }
 }

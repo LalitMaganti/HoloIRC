@@ -21,118 +21,55 @@
 
 package com.fusionx.lightirc.fragments;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
-import com.fusionx.lightirc.callbacks.ChannelCallbacks;
-import com.fusionx.lightirc.services.IRCService;
-import com.fusionx.lightirc.services.IRCService.IRCBinder;
 
-public class ChannelFragment extends IRCFragment implements OnKeyListener,
-		ChannelCallbacks {
-	private String serverName;
-	public String[] mUserList;
+public class ChannelFragment extends IRCFragment implements OnKeyListener {
 
-	@Override
-	public View onCreateView(final LayoutInflater inflater,
-			final ViewGroup container, final Bundle savedInstanceState) {
-		final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
-				container, false);
+    @Override
+    public View onCreateView(final LayoutInflater inflater,
+                             final ViewGroup container, final Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
+                container, false);
 
-		setTitle(getArguments().getString("channel"));
-		serverName = getArguments().getString("serverName");
-		String buffer = getArguments().getString("buffer");
+        setTitle(getArguments().getString("channel"));
 
-		writeToTextView(buffer, rootView);
+        String buffer = getArguments().getString("buffer");
+        if (buffer != null) {
+            writeToTextView(buffer, rootView);
+        }
 
-		EditText textview = (EditText) rootView.findViewById(R.id.editText1);
-		textview.setOnKeyListener(this);
+        EditText textview = (EditText) rootView.findViewById(R.id.editText1);
+        textview.setOnKeyListener(this);
 
-		Intent service = new Intent(getActivity(), IRCService.class);
-		getActivity().bindService(service, mConnection, 0);
+        return rootView;
+    }
 
-		return rootView;
-	}
+    @Override
+    public boolean onKey(View view, int keyCode, KeyEvent event) {
+        EditText editText = (EditText) view;
 
-	private ServiceConnection mConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(ComponentName className, IBinder service) {
-			((IRCBinder) service).getService().setChannelCallbacks(
-					ChannelFragment.this, getTitle(), serverName);
-		}
+        if ((event.getAction() == KeyEvent.ACTION_DOWN)
+                && (keyCode == KeyEvent.KEYCODE_ENTER)
+                && !editText.getText().toString().equals("\n")
+                && !editText.getText().toString().isEmpty()) {
 
-		@Override
-		public void onServiceDisconnected(ComponentName name) {
-		}
-	};
+            ((ServerChannelActivity) getActivity()).channelMessage(getTitle(), editText.getText().toString());
 
-	private final ServiceConnection mPartConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(final ComponentName className,
-				final IBinder binder) {
-			IRCService service = ((IRCBinder) binder).getService();
-			service.partFromChannel(serverName, getTitle());
-			getActivity().unbindService(this);
-			((ServerChannelActivity) getActivity())
-					.partFromChannelFinish(ChannelFragment.this);
-		}
+            // Hacky way to clear but keep the focus on the EditText
+            // Doesn't seem to work anymore :/
+            editText.getText().clear();
+            editText.setSelection(0);
 
-		@Override
-		public void onServiceDisconnected(final ComponentName name) {
-			// This should never happen
-		}
-	};
-
-	@Override
-	public boolean onKey(View view, int keyCode, KeyEvent event) {
-		EditText editText = (EditText) view;
-
-		if ((event.getAction() == KeyEvent.ACTION_DOWN)
-				&& (keyCode == KeyEvent.KEYCODE_ENTER)
-				&& !editText.getText().toString().equals("\n")
-				&& !editText.getText().toString().isEmpty()) {
-			Intent intent = new Intent();
-			intent.setAction("com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");
-			intent.putExtra("channel", getTitle());
-			intent.putExtra("serverName", serverName);
-			intent.putExtra("message", editText.getText().toString());
-			getActivity().sendBroadcast(intent);
-
-			// Hacky way to clear but keep the focus on the EditText
-			// Doesn't seem to work anymore :/
-			editText.getText().clear();
-			editText.setSelection(0);
-
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void onDestroy() {
-		getActivity().unbindService(mConnection);
-		super.onDestroy();
-	}
-
-	public void part() {
-		Intent service = new Intent(getActivity(), IRCService.class);
-		getActivity().bindService(service, mPartConnection, 0);
-	}
-
-	@Override
-	public void userListChanged(String newList[]) {
-		mUserList = newList;
-		((ServerChannelActivity) getActivity()).userListChanged(newList, this);
-	}
+            return true;
+        }
+        return false;
+    }
 }

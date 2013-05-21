@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../cardsui-for-android/CardsUILib/CardsUILib.iml" filepath="$PROJECT_DIR$/../cardsui-for-android/CardsUILib/CardsUILib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LightIRC.iml" filepath="$PROJECT_DIR$/LightIRC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SlidingMenu/library/library.iml" filepath="$PROJECT_DIR$/../SlidingMenu/library/library.iml" />
+    </modules>
+  </component>
+</project>
+

@@ -1,17 +1,16 @@
 package com.fusionx.lightirc.parser;
 
+import android.content.BroadcastReceiver;
 import com.fusionx.lightirc.services.IRCService;
 
-import android.content.BroadcastReceiver;
-
 public abstract class IRCMessageParser extends BroadcastReceiver {
-	private IRCService mService;
+    private IRCService mService;
 
-	public IRCService getService() {
-		return mService;
-	}
+    public IRCService getService() {
+        return mService;
+    }
 
-	public void setService(IRCService service) {
-		mService = service;
-	}
+    public void setService(IRCService service) {
+        mService = service;
+    }
 }

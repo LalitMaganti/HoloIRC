@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/selectable_background_cardbank"
-    android:paddingBottom="16dp" >
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/selectable_background_cardbank"
+              android:orientation="vertical"
+              android:paddingBottom="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingLeft="8dp"
-        android:paddingRight="8dp" >
+        android:paddingRight="8dp">
 
         <TextView
             android:id="@+id/title"
@@ -19,15 +19,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Title" />
-
+            android:text="Title"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:padding="4dp" >
+        android:padding="4dp">
 
         <TextView
             android:id="@+id/description"
@@ -37,7 +36,7 @@
             android:layout_marginLeft="8dp"
             android:ellipsize="end"
             android:maxLines="4"
-            android:text="Status" />
+            android:text="Status"/>
     </LinearLayout>
 
 </LinearLayout>

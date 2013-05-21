@@ -1,20 +1,20 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
 
     <EditTextPreference
         android:key="edit_text_title"
-        android:title="Server Title (only for display)" />
-
+        android:title="Server Title (only for display)"/>
     <EditTextPreference
         android:key="edit_text_url"
-        android:title="Server URL" />
-
+        android:title="Server URL"/>
     <EditTextPreference
         android:key="edit_text_nick"
-        android:title="Nickname" />
+        android:title="Nickname"/>
 
     <PreferenceScreen
         android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
         android:key="pref_autojoin"
-        android:title="Auto-joined channels" />
+        android:title="Auto-joined channels"/>
 
 </PreferenceScreen>
