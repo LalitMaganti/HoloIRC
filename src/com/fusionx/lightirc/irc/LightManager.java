@@ -21,32 +21,14 @@
 
 package com.fusionx.lightirc.irc;
 
-import org.pircbotx.PircBotX;
-import org.pircbotx.User;
-import org.pircbotx.UserChannelDao;
+import java.util.HashMap;
 
-public class LightUser extends User {
-    private String trueNick;
+public class LightManager extends HashMap<String, LightBot> {
+    private static final long serialVersionUID = 2426166268063489300L;
 
-    LightUser(PircBotX bot, UserChannelDao dao, String nick) {
-        super(bot, dao, nick);
-    }
-
-    @Override
-    public String getNick() {
-        if(trueNick == null) {
-            trueNick = super.getNick();
+    public void disconnectAll() {
+        for (LightBot bot : values()) {
+            bot.shutdown();
         }
-        return trueNick;
-    }
-
-    public void setTrueNick(String trueNick) {
-        this.trueNick = trueNick;
-    }
-
-    @Override
-    public void setNick(String newNick) {
-        super.setNick(newNick);
-        trueNick = newNick;
     }
 }

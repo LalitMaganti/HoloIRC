@@ -1,3 +1,24 @@
+/*
+    LightIRC - an IRC client for Android
+
+    Copyright 2013 Lalit Maganti
+
+    This file is part of LightIRC.
+
+    LightIRC is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    LightIRC is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.fusionx.lightirc.listeners;
 
 import android.os.Handler;
@@ -6,14 +27,16 @@ import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.irc.LightChannel;
-import com.fusionx.lightirc.misc.EventOutput;
+import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.Channel;
 import org.pircbotx.hooks.Event;
+import org.pircbotx.hooks.Listener;
+import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.*;
 
 import java.util.ArrayList;
 
-public class ActivityListener extends IRCListener {
+public class ActivityListener extends ListenerAdapter<LightBot> implements Listener<LightBot> {
     private final ServerChannelActivity activity;
     private final IRCPagerAdapter mIRCPagerAdapter;
 
@@ -30,7 +53,7 @@ public class ActivityListener extends IRCListener {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    server.writeToTextView(EventOutput.getOutputForEvent(event));
+                    server.writeToTextView(Utils.getOutputForEvent(event));
                 }
             });
         }
@@ -82,7 +105,7 @@ public class ActivityListener extends IRCListener {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    activity.onNewChannelJoined(((JoinEvent) event).getChannel().getName(), ((JoinEvent) event).getUser().getNick(), EventOutput.getOutputForEvent(event));
+                    activity.onNewChannelJoined(((JoinEvent) event).getChannel().getName(), ((JoinEvent) event).getUser().getNick(), Utils.getOutputForEvent(event));
                 }
             });
         }
@@ -98,19 +121,19 @@ public class ActivityListener extends IRCListener {
                     @Override
                     public void run() {
                         final IRCFragment channel = mIRCPagerAdapter.getTab(((TopicEvent) event).getChannel().getName());
-                        channel.writeToTextView(EventOutput.getOutputForEvent(event));
+                        channel.writeToTextView(Utils.getOutputForEvent(event));
                     }
                 }, 1500);
             }
         });
     }
 
-    public void sendMessage(final String title, final Event event) {
+    private void sendMessage(final String title, final Event event) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);
-                channel.writeToTextView(EventOutput.getOutputForEvent(event));
+                channel.writeToTextView(Utils.getOutputForEvent(event));
             }
         });
     }

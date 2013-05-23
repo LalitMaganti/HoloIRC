@@ -1,3 +1,24 @@
+/*
+    LightIRC - an IRC client for Android
+
+    Copyright 2013 Lalit Maganti
+
+    This file is part of LightIRC.
+
+    LightIRC is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    LightIRC is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.fusionx.lightirc.irc;
 
 import android.os.Parcel;
@@ -5,10 +26,9 @@ import android.os.Parcelable;
 import org.pircbotx.Configuration.Builder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class LightBuilder extends Builder implements Parcelable {
-    public String mTitle;
+    private String mTitle;
 
     public String getTitle() {
         return mTitle;
@@ -16,17 +36,6 @@ public class LightBuilder extends Builder implements Parcelable {
 
     public void setTitle(String title) {
         mTitle = title;
-    }
-
-    public HashMap<String, String> toHashMap() {
-        HashMap<String, String> nameIcons = new HashMap<String, String>();
-        nameIcons.put("url", getServerHostname());
-        nameIcons.put("userName", getLogin());
-        nameIcons.put("nick", getName());
-        nameIcons.put("serverPassword", getServerPassword());
-        nameIcons.put("title", getTitle());
-
-        return nameIcons;
     }
 
     // Parcelable stuff
@@ -37,23 +46,18 @@ public class LightBuilder extends Builder implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int arg1) {
-        dest.writeString(getServerHostname());
-        dest.writeString(getLogin());
-        dest.writeString(getName());
-        dest.writeString(getServerPassword());
         dest.writeString(getTitle());
-
+        dest.writeString(getServerHostname());
+        dest.writeString(getName());
         ArrayList<String> list = new ArrayList<String>(getAutoJoinChannels()
                 .keySet());
         dest.writeStringList(list);
     }
 
     private void readFromParcel(Parcel in) {
-        setServerHostname(in.readString());
-        setLogin(in.readString());
-        setName(in.readString());
-        setServerPassword(in.readString());
         setTitle(in.readString());
+        setServerHostname(in.readString());
+        setName(in.readString());
 
         ArrayList<String> list = new ArrayList<String>();
         in.readStringList(list);

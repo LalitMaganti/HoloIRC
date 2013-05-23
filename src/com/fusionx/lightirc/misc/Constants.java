@@ -19,34 +19,11 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc;
+package com.fusionx.lightirc.misc;
 
-import org.pircbotx.PircBotX;
-import org.pircbotx.User;
-import org.pircbotx.UserChannelDao;
-
-public class LightUser extends User {
-    private String trueNick;
-
-    LightUser(PircBotX bot, UserChannelDao dao, String nick) {
-        super(bot, dao, nick);
-    }
-
-    @Override
-    public String getNick() {
-        if(trueNick == null) {
-            trueNick = super.getNick();
-        }
-        return trueNick;
-    }
-
-    public void setTrueNick(String trueNick) {
-        this.trueNick = trueNick;
-    }
-
-    @Override
-    public void setNick(String newNick) {
-        super.setNick(newNick);
-        trueNick = newNick;
-    }
+public class Constants {
+    public final static String titlePrefPrefix = "server_title_";
+    public final static String urlPrefPrefix = "server_url_";
+    public final static String nickPrefPrefix = "server_nick_";
+    public final static String autoJoinPrefPrefix = "server_autoJoin_";
 }

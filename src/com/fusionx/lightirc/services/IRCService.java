@@ -1,31 +1,51 @@
+/*
+    LightIRC - an IRC client for Android
+
+    Copyright 2013 Lalit Maganti
+
+    This file is part of LightIRC.
+
+    LightIRC is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    LightIRC is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.fusionx.lightirc.services;
 
-import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightBuilder;
-import com.fusionx.lightirc.irc.LightPircBotXManager;
+import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ChannelListener;
 import com.fusionx.lightirc.listeners.ServerListener;
-import com.fusionx.lightirc.parser.ChannelMessageParser;
-import com.fusionx.lightirc.parser.ServerMessageParser;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.UserChannelDao;
 import org.pircbotx.exception.IrcException;
-import org.pircbotx.exception.NickAlreadyInUseException;
 import org.pircbotx.output.OutputChannel;
 
 import java.io.IOException;
+
+import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -35,70 +55,64 @@ public class IRCService extends Service {
         }
     }
 
-    private final LightPircBotXManager manager = new LightPircBotXManager();
+    private final LightManager manager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
-    private final ChannelMessageParser mChannelMessageReceiver = new ChannelMessageParser();
-    private final ServerMessageParser mServerMessageReceiver = new ServerMessageParser();
 
-    private void appendToServer(final LightBot bot,
-                                final String message) {
-        bot.appendToBuffer(message);
-    }
-
-    public void callbackToServerAndAppend(final String bot, final String message) {
-        appendToServer(getBot(bot), message);
-    }
-
-    @SuppressLint("NewApi")
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void connectToServer(final LightBuilder server) {
-        final LightBuilder bot = server;
-        if (manager.get(server) == null || !manager.get(server).isConnected()) {
-            // TODO - setup option for this
-            bot.setAutoNickChange(true);
-            bot.setBotFactory(new LightBotFactory());
+        // TODO - setup option for this
+        server.setAutoNickChange(true);
+        server.setBotFactory(new LightBotFactory());
 
-            setupListeners(bot);
+        setupListeners(server);
+        setupNotification();
 
-            final Intent intent = new Intent(this, MainServerListActivity.class);
-            final Intent intent2 = new Intent(this, IRCService.class);
-            intent2.putExtra("stop", true);
-            final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
-                    intent, 0);
-            final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
-                    intent2, 0);
+        Configuration d = server.buildConfiguration();
 
-            final Notification noti = new Notification.Builder(this)
-                    .setContentTitle("LightIRC")
-                    .setContentText("At least one server is joined")
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentIntent(pIntent)
-                    .addAction(android.R.drawable.ic_menu_close_clear_cancel,
-                            "Disconnect all", pIntent2).build();
-            // Just a random number
-            // TODO - maybe static int this?
-            startForeground(1337, noti);
+        final LightBot bo = new LightBot(d);
 
-            Configuration d = bot.buildConfiguration();
-
-            final LightBot bo = new LightBot(d, bot.getTitle());
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        bo.connect();
-                    } catch (NickAlreadyInUseException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (IrcException e) {
-                        e.printStackTrace();
-                    }
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bo.connect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (IrcException e) {
+                    e.printStackTrace();
                 }
-            }.start();
+            }
+        }.start();
 
-            manager.put(server.getTitle(), bo);
+        manager.put(server.getTitle(), bo);
+    }
+
+    private void setupNotification() {
+        final Intent intent = new Intent(this, MainServerListActivity.class);
+        final Intent intent2 = new Intent(this, IRCService.class);
+        intent2.putExtra("stop", true);
+        final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
+                intent, 0);
+        final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
+                intent2, 0);
+        int currentAPIVersion = Build.VERSION.SDK_INT;
+        Notification n;
+        final Notification.Builder builder = new Notification.Builder(this)
+                .setContentTitle("LightIRC")
+                .setContentText("At least one server is joined")
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pIntent);
+        if (currentAPIVersion >= JELLY_BEAN) {
+            n = builder.addAction(android.R.drawable.ic_menu_close_clear_cancel,
+                    "Disconnect all", pIntent2).build();
+        } else {
+            //noinspection deprecation
+            n = builder.getNotification();
         }
+
+        // Just a random number
+        // TODO - maybe static int this?
+        startForeground(1337, n);
     }
 
     private void disconnectAll() {
@@ -116,7 +130,6 @@ public class IRCService extends Service {
         }
     }
 
-    // public only for parsers - should not be used elsewhere
     public LightBot getBot(final String serverName) {
         return manager.get(serverName);
     }
@@ -127,19 +140,13 @@ public class IRCService extends Service {
     }
 
     @Override
-    public void onDestroy() {
-        unregisterReceiver(mChannelMessageReceiver);
-        unregisterReceiver(mServerMessageReceiver);
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //if (intent.getBooleanExtra("stop", false)) {
-        //    disconnectAll();
-        //    return 0;
-        //} else {
-        return START_STICKY;
-        //}
+        if (intent != null && intent.getBooleanExtra("stop", false)) {
+            disconnectAll();
+            return 0;
+        } else {
+            return START_STICKY;
+        }
     }
 
     @Override
@@ -155,22 +162,8 @@ public class IRCService extends Service {
     }
 
     private void setupListeners(LightBuilder bot) {
-        mChannelMessageReceiver.setService(this);
-        mServerMessageReceiver.setService(this);
-
-        final IntentFilter filter = new IntentFilter(
-                "com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");
-        registerReceiver(mChannelMessageReceiver, filter);
-
-        final IntentFilter serverFilter = new IntentFilter(
-                "com.fusionx.lightirc.SERVER_MESSAGE_TO_PARSE");
-        registerReceiver(mServerMessageReceiver, serverFilter);
-
         final ChannelListener mChannelListener = new ChannelListener();
         final ServerListener mServerListener = new ServerListener();
-
-        mChannelListener.setService(this);
-        mServerListener.setService(this);
 
         bot.getListenerManager().addListener(mServerListener);
         bot.getListenerManager().addListener(mChannelListener);

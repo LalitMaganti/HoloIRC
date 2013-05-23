@@ -32,22 +32,22 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 
 public class ChannelFragment extends IRCFragment implements OnKeyListener {
+    private String serverName;
 
     @Override
-    public View onCreateView(final LayoutInflater inflater,
-                             final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
-                container, false);
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
 
         setTitle(getArguments().getString("channel"));
+        serverName = getArguments().getString("serverName");
 
         String buffer = getArguments().getString("buffer");
         if (buffer != null) {
             writeToTextView(buffer, rootView);
         }
 
-        EditText textview = (EditText) rootView.findViewById(R.id.editText1);
-        textview.setOnKeyListener(this);
+        EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
+        edittext.setOnKeyListener(this);
 
         return rootView;
     }
@@ -61,12 +61,13 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener {
                 && !editText.getText().toString().equals("\n")
                 && !editText.getText().toString().isEmpty()) {
 
-            ((ServerChannelActivity) getActivity()).channelMessage(getTitle(), editText.getText().toString());
+            ((ServerChannelActivity) getActivity())
+                    .channelMessageToParse(serverName, getTitle(), editText.getText().toString());
 
             // Hacky way to clear but keep the focus on the EditText
             // Doesn't seem to work anymore :/
-            editText.getText().clear();
-            editText.setSelection(0);
+            //editText.getText().clear();
+            //editText.setSelection(0);
 
             return true;
         }

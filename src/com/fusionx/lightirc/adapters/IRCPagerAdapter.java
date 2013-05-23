@@ -28,7 +28,7 @@ import com.fusionx.lightirc.fragments.IRCFragment;
 import java.util.ArrayList;
 
 public class IRCPagerAdapter extends LightFragmentStatePagerAdapter {
-    private ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
+    private final ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
 
     public IRCPagerAdapter(final FragmentManager fm) {
         super(fm);
@@ -43,10 +43,6 @@ public class IRCPagerAdapter extends LightFragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return views.size();
-    }
-
-    public int getFragmentPosition(final IRCFragment ircfragment) {
-        return views.indexOf(ircfragment);
     }
 
     @Override
@@ -68,10 +64,9 @@ public class IRCPagerAdapter extends LightFragmentStatePagerAdapter {
         return views.get(position).getTitle();
     }
 
-    public int removeView(int index) {
+    public void removeView(int index) {
         views.remove(index);
         notifyDataSetChanged();
-        return views.size() - 1;
     }
 
     public IRCFragment getTab(String title) {

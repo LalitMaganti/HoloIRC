@@ -32,96 +32,64 @@ import android.view.View.OnClickListener;
 import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
+import com.fusionx.lightirc.cardsui.ServerCard;
 import com.fusionx.lightirc.irc.LightBuilder;
-import com.fusionx.lightirc.misc.ServerCard;
+import com.fusionx.lightirc.misc.Constants;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class MainServerListActivity extends Activity implements
-        OnClickListener, ActionMode.Callback {
-    public ArrayList<LightBuilder> actionModeItems = new ArrayList<LightBuilder>();
-    public boolean actionModeStarted = false;
-    public ActionMode mMode;
-    private ArrayList<LightBuilder> values = null;
+        OnClickListener, ActionMode.Callback, View.OnLongClickListener {
+    private final ArrayList<LightBuilder> mListOfBuilders = new ArrayList<LightBuilder>();
+    private boolean actionModeStarted = false;
+    private ActionMode mMode;
 
-    private void connectToServer(LightBuilder builder) {
+    private void connectToServer(final LightBuilder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerChannelActivity.class);
         intent.putExtra("server", builder);
         startActivity(intent);
     }
 
-    private void editServer(int position) {
-        final LightBuilder server = actionModeItems.get(position);
-
+    private void editServer(final LightBuilder builder) {
         Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
         intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
                 BaseServerSettingFragment.class.getName());
         intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-        intent.putExtra("indexOfServer", position);
-        intent.putExtra("server", server);
+        //TODO - not always 0
+        intent.putExtra("indexOfServer", 0);
+        intent.putExtra("server", builder);
         startActivity(intent);
     }
 
     private void getSetServerList() {
         final SharedPreferences settings = getSharedPreferences("main", 0);
         final boolean firstRun = settings.getBoolean("firstrun", true);
-        final int noOfServers = settings.getInt("noOfServers", 0);
-        values = new ArrayList<LightBuilder>();
+        int noOfServers = settings.getInt("noOfServers", 0);
+        final ArrayList<LightBuilder> values = new ArrayList<LightBuilder>();
 
         if (firstRun) {
-            final Editor e = settings.edit();
-            LightBuilder freenode = new LightBuilder();
+            noOfServers = firstRunAdditions(settings);
+        }
 
-            freenode.setLogin("LightIRCUser");
-            freenode.setName("LightIRCUser");
-            freenode.setServerHostname("irc.freenode.net");
-            freenode.setTitle("Freenode");
-            freenode.addAutoJoinChannel("#testingircandroid");
-            freenode.addAutoJoinChannel("#huawei-g300");
-            values.add(freenode);
-
-            for (String s : freenode.toHashMap().keySet()) {
-                e.putString("server_0_" + s, freenode.toHashMap().get(s));
-            }
-
-            e.putBoolean("firstrun", false);
-            e.putString("server_0_autoJoin_channel_0", "#testingircandroid");
-            e.putString("server_0_autoJoin_channel_1", "#huawei-g300");
-            e.putInt("server_0_autoJoin_no", 2);
-            e.putInt("noOfServers", 1);
-            e.commit();
-        } else if (noOfServers != 0) {
-            for (int i = 0; i < noOfServers; i++) {
-                LightBuilder bot = new LightBuilder();
-                bot.setServerHostname(settings.getString(
-                        "server_" + i + "_url", ""));
-                bot.setLogin(settings
-                        .getString("server_" + i + "_userName", ""));
-                bot.setName(settings.getString("server_" + i + "_nick", ""));
-
-                bot.setServerPassword(settings.getString("server_" + i
-                        + "_serverPassword", ""));
-                bot.setTitle(settings.getString("server_" + i + "_title", ""));
-                int noOfAutoJoinChannels = settings.getInt("server_" + i
-                        + "_autoJoin_no", 0);
-
-                for (int j = 0; j < noOfAutoJoinChannels; j++) {
-                    String channel = settings.getString("server_" + i
-                            + "_autoJoin_channel_" + j, "");
-                    bot.addAutoJoinChannel(channel);
-                }
-                values.add(bot);
-            }
+        for (int i = 0; i < noOfServers; i++) {
+            LightBuilder bot = new LightBuilder();
+            bot.setTitle(settings.getString(Constants.titlePrefPrefix + i, ""));
+            bot.setServerHostname(settings.getString(Constants.urlPrefPrefix + i, ""));
+            bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
+            HashSet<String> auto = new HashSet<String>();
+            settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
+            values.add(bot);
         }
 
         if (!values.isEmpty()) {
             CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
+            mCardView.clearCards();
             mCardView.setSwipeable(false);
             for (LightBuilder bot : values) {
-                ServerCard server = new ServerCard(bot.getTitle(),
-                        "Not connected", bot);
+                ServerCard server = new ServerCard(bot.getTitle(), "Not connected", bot);
                 server.setOnClickListener(this);
                 mCardView.addCard(server);
             }
@@ -130,15 +98,35 @@ public class MainServerListActivity extends Activity implements
         }
     }
 
+    private int firstRunAdditions(SharedPreferences settings) {
+        int noOfServers;
+        final Editor e = settings.edit();
+        e.putBoolean("firstrun", false);
+        e.putInt("noOfServers", 1);
+        noOfServers = 1;
+
+        e.putString(Constants.titlePrefPrefix + "0" , "Freenode");
+        e.putString(Constants.urlPrefPrefix + "0", "irc.freenode.net");
+        e.putString(Constants.nickPrefPrefix + "0", "LightIRCUser");
+
+        HashSet<String> auto = new HashSet<String>();
+        auto.add("#huawei-g300");
+        auto.add("#testingircandroid");
+        e.putStringSet(Constants.autoJoinPrefPrefix + "0", auto);
+        e.commit();
+
+        return noOfServers;
+    }
+
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.edit:
-                editServer(0);
+            case R.id.activity_server_list_cab_edit:
+                editServer(mListOfBuilders.get(0));
                 mode.finish();
                 return true;
-            case R.id.connect:
-                connectToServer(actionModeItems.get(0));
+            case R.id.activity_server_list_cab_connect:
+                connectToServer(mListOfBuilders.get(0));
                 mode.finish();
                 return true;
             default:
@@ -154,21 +142,19 @@ public class MainServerListActivity extends Activity implements
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_server);
-
-        getSetServerList();
+        setContentView(R.layout.activity_server_list);
     }
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.context_server_long_press, menu);
+        inflater.inflate(R.menu.activity_server_list_cab, menu);
         return true;
     }
 
     @Override
-    public void onDestroyActionMode(ActionMode arg0) {
-        actionModeItems.clear();
+    public void onDestroyActionMode(ActionMode mode) {
+        mListOfBuilders.clear();
         actionModeStarted = false;
         mMode = null;
     }
@@ -183,15 +169,23 @@ public class MainServerListActivity extends Activity implements
 
     @Override
     protected void onResume() {
-        if (values == null) {
-            getSetServerList();
-        }
+        getSetServerList();
         super.onResume();
     }
 
-    public void updateActionMode() {
-        mMode.setTitle("Selected " + actionModeItems.size() + " servers");
-        mMode.getMenu().getItem(0).setVisible(actionModeItems.size() == 1);
-        mMode.getMenu().getItem(1).setVisible(actionModeItems.size() == 1);
+    void updateActionMode() {
+        mMode.setTitle("Selected " + mListOfBuilders.size() + " servers");
+        mMode.getMenu().getItem(0).setVisible(mListOfBuilders.size() == 1);
+        mMode.getMenu().getItem(1).setVisible(mListOfBuilders.size() == 1);
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        if (!actionModeStarted) {
+            startActionMode(this);
+        }
+        mListOfBuilders.add((LightBuilder) view.getTag());
+        updateActionMode();
+        return true;
     }
 }

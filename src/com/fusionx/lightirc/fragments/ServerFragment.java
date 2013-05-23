@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,14 +29,14 @@ import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.ServerChannelActivity;
 
 public class ServerFragment extends IRCFragment implements OnKeyListener {
 
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_irc_channel,
-                container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
 
         setTitle(getArguments().getString("title"));
 
@@ -46,8 +45,8 @@ public class ServerFragment extends IRCFragment implements OnKeyListener {
             writeToTextView(buffer, rootView);
         }
 
-        EditText textview = (EditText) rootView.findViewById(R.id.editText1);
-        textview.setOnKeyListener(this);
+        EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
+        edittext.setOnKeyListener(this);
 
         return rootView;
     }
@@ -60,16 +59,14 @@ public class ServerFragment extends IRCFragment implements OnKeyListener {
                 && (keyCode == KeyEvent.KEYCODE_ENTER)
                 && !editText.getText().toString().equals("\n")
                 && !editText.getText().toString().isEmpty()) {
-            Intent intent = new Intent();
-            intent.setAction("com.fusionx.lightirc.SERVER_MESSAGE_TO_PARSE");
-            intent.putExtra("serverName", getTitle());
-            intent.putExtra("message", editText.getText().toString());
-            getActivity().sendBroadcast(intent);
+
+            ((ServerChannelActivity) getActivity())
+                    .serverMessageToParse(getTitle(), editText.getText().toString());
 
             // Hacky way to clear but keep the focus on the EditText
             // Doesn't seem to work anymore :/
-            editText.getText().clear();
-            editText.setSelection(0);
+            //editText.getText().clear();
+            //editText.setSelection(0);
 
             return true;
         }

@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/item_channel_part"
+        android:id="@+id/activity_server_channel_ab_part"
         android:showAsAction="ifRoom|withText"
-        android:title="Part"
+        android:title="@string/part"
         android:visible="false"/>
     <item
-        android:id="@+id/item_channel_users"
+        android:id="@+id/activity_server_channel_ab_users"
         android:showAsAction="ifRoom|withText"
-        android:title="Users"
+        android:title="@string/users"
         android:visible="false"/>
     <item
-        android:id="@+id/item_server_disconnect"
+        android:id="@+id/activity_server_channel_ab_disconnect"
         android:showAsAction="ifRoom|withText"
-        android:title="Disconnect"/>
+        android:title="@string/disconnect"/>
 
 </menu>

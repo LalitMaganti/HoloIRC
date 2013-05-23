@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * pages, working more like a list view. When pages are not visible to the user,
  * their entire fragment may be destroyed, only keeping the saved state of that
  * fragment. This allows the pager to hold on to much less memory associated
- * with each visited page as compared to {@link FragmentPagerAdapter} at the
+ * with each visited page as compared to {@link android.support.v4.app.FragmentPagerAdapter} at the
  * cost of potentially more overhead when switching between pages.
  * <p/>
  * <p>
@@ -71,7 +71,7 @@ import java.util.ArrayList;
  * development/samples/Support13Demos/res/layout/fragment_pager_list.xml
  * complete}
  */
-public abstract class LightFragmentStatePagerAdapter extends PagerAdapter {
+abstract class LightFragmentStatePagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;
     private static final String TAG = "FragmentStatePagerAdapter";
 
@@ -79,10 +79,10 @@ public abstract class LightFragmentStatePagerAdapter extends PagerAdapter {
     private FragmentTransaction mCurTransaction = null;
 
     private final FragmentManager mFragmentManager;
-    private ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
-    private ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
+    private final ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
+    private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
 
-    public LightFragmentStatePagerAdapter(FragmentManager fm) {
+    LightFragmentStatePagerAdapter(FragmentManager fm) {
         mFragmentManager = fm;
     }
 
@@ -114,7 +114,7 @@ public abstract class LightFragmentStatePagerAdapter extends PagerAdapter {
     /**
      * Return the Fragment associated with a specified position.
      */
-    public abstract Fragment getItem(int position);
+    protected abstract Fragment getItem(int position);
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {

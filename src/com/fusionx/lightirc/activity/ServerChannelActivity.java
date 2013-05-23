@@ -45,21 +45,21 @@ import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.listeners.ActivityListener;
+import com.fusionx.lightirc.parser.MessageParser;
 import com.fusionx.lightirc.services.IRCService;
 import org.pircbotx.Channel;
 
 import java.lang.reflect.Field;
 
-public class ServerChannelActivity extends FragmentActivity implements
-        TabListener, OnPageChangeListener {
-    private Menu actionBarMenu;
+public class ServerChannelActivity extends FragmentActivity implements TabListener, OnPageChangeListener {
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
     private LightBuilder builder;
     private ActivityListener listener;
     private IRCService service;
+    private final MessageParser parser = new MessageParser();
 
-    public void addTab(final int i) {
+    private void addTab(final int i) {
         final ActionBar actionBar = getActionBar();
         actionBar.addTab(actionBar.newTab()
                 .setText(mIRCPagerAdapter.getPageTitle(i))
@@ -71,11 +71,12 @@ public class ServerChannelActivity extends FragmentActivity implements
         public void onServiceConnected(final ComponentName className,
                                        final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
+            parser.setService(service);
             final ServerFragment d = new ServerFragment();
             Bundle b = new Bundle();
             b.putString("title", builder.getTitle());
 
-            if (service.getBot(builder.getTitle()) != null && service.getBot(builder.getTitle()).isConnected()) {
+            if (service.getBot(builder.getTitle()) != null) {
                 LightBot bot = service.getBot(builder.getTitle());
                 bot.getConfiguration().getListenerManager().addListener(listener);
                 b.putString("buffer", bot.getBuffer());
@@ -84,8 +85,7 @@ public class ServerChannelActivity extends FragmentActivity implements
                 addTab(0);
 
                 for (final Channel channelName : bot.getUserBot().getChannels()) {
-                    onNewChannelJoined(channelName.getName(), bot.getNick(),
-                            ((LightChannel) channelName).getBuffer());
+                    onNewChannelJoined(channelName.getName(), bot.getNick(), ((LightChannel) channelName).getBuffer());
                 }
             } else {
                 builder.getListenerManager().addListener(listener);
@@ -105,7 +105,9 @@ public class ServerChannelActivity extends FragmentActivity implements
     @Override
     public void onDestroy() {
         unbindService(mConnection);
-        service.getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(listener);
+        if(service.getBot(builder.getTitle()) != null) {
+            service.getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(listener);
+        }
         super.onDestroy();
     }
 
@@ -113,13 +115,12 @@ public class ServerChannelActivity extends FragmentActivity implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main_ui);
+        setContentView(R.layout.activity_server_channel);
 
         mIRCPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
         listener = new ActivityListener(this, mIRCPagerAdapter);
 
-        builder = getIntent().getExtras().getParcelable(
-                "server");
+        builder = getIntent().getExtras().getParcelable("server");
 
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -138,8 +139,7 @@ public class ServerChannelActivity extends FragmentActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.server_channel_action_bar, menu);
-        actionBarMenu = menu;
+        getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
         return true;
     }
 
@@ -151,14 +151,14 @@ public class ServerChannelActivity extends FragmentActivity implements
             case android.R.id.home:
                 startActivity(intent);
                 return true;
-            case R.id.item_channel_part:
+            case R.id.activity_server_channel_ab_part:
                 partFromChannel();
                 return true;
-            case R.id.item_server_disconnect:
+            case R.id.activity_server_channel_ab_disconnect:
                 disconnect();
                 startActivity(intent);
                 return true;
-            case R.id.item_channel_users:
+            case R.id.activity_server_channel_ab_users:
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -174,12 +174,8 @@ public class ServerChannelActivity extends FragmentActivity implements
 
     @Override
     public void onPageSelected(final int position) {
-        actionBarMenu.findItem(R.id.item_channel_part).setVisible(
-                !(position == 0));
-        actionBarMenu.findItem(R.id.item_channel_users).setVisible(
-                !(position == 0));
+        invalidateOptionsMenu();
         getActionBar().setSelectedNavigationItem(position);
-
         // Hack for http://code.google.com/p/android/issues/detail?id=38500
         setSpinnerSelectedNavigationItem(position);
     }
@@ -197,7 +193,7 @@ public class ServerChannelActivity extends FragmentActivity implements
     public void onTabUnselected(final Tab tab, final FragmentTransaction ft) {
     }
 
-    public void partFromChannel() {
+    private void partFromChannel() {
         int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1);
         service.partFromChannel(builder.getTitle(), ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
@@ -205,7 +201,7 @@ public class ServerChannelActivity extends FragmentActivity implements
         mIRCPagerAdapter.removeView(index);
     }
 
-    public void removeTab(final int i) {
+    private void removeTab(final int i) {
         final ActionBar actionBar = getActionBar();
         actionBar.removeTabAt(i);
     }
@@ -236,11 +232,11 @@ public class ServerChannelActivity extends FragmentActivity implements
                 ((Spinner) mTabSpinner).setSelection(position);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void onNewChannelJoined(final String channelName, final String nick,
-                                   final String buffer) {
+    public void onNewChannelJoined(final String channelName, final String nick, final String buffer) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle b = new Bundle();
         b.putString("channel", channelName);
@@ -255,16 +251,23 @@ public class ServerChannelActivity extends FragmentActivity implements
         mViewPager.setOffscreenPageLimit(position);
     }
 
-    public void disconnect() {
+    private void disconnect() {
         service.disconnectFromServer((String) mIRCPagerAdapter.getPageTitle(0));
     }
 
-    public void channelMessage(String channelName, String message) {
-        Intent intent = new Intent();
-        intent.setAction("com.fusionx.lightirc.CHANNEL_MESSAGE_TO_PARSE");
-        intent.putExtra("channel", channelName);
-        intent.putExtra("serverName", builder.getTitle());
-        intent.putExtra("message", message);
-        sendBroadcast(intent);
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean server = (mViewPager.getCurrentItem() == 0);
+        menu.findItem(R.id.activity_server_channel_ab_part).setVisible(!server);
+        menu.findItem(R.id.activity_server_channel_ab_users).setVisible(!server);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    public void channelMessageToParse(String serverName, String channelName, String message) {
+        parser.channelMessageToParse(serverName, channelName, message);
+    }
+
+    public void serverMessageToParse(String serverName, String message) {
+        parser.serverMessageToParse(serverName, message);
     }
 }

@@ -38,6 +38,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.LightBuilder;
+import com.fusionx.lightirc.misc.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +47,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
     public static class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
         private static int indexOfServer;
-        public final static String Nick = "edit_text_nick";
-        public final static String Title = "edit_text_title";
-        private final static String URL = "edit_text_url";
+        private final static String Title = "pref_title";
+        private final static String URL = "pref_url";
+        private final static String Nick = "pref_nick";
         private EditTextPreference mEditTextNick;
         private EditTextPreference mEditTextTitle;
         private EditTextPreference mEditTextUrl;
@@ -57,22 +58,22 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             Bundle f = getActivity().getIntent().getExtras();
-            bot = (LightBuilder) f.getSerializable("server");
+            bot = f.getParcelable("server");
             indexOfServer = f.getInt("indexOfServer");
 
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.activty_settings_prefs);
 
             PreferenceScreen prefSet = getPreferenceScreen();
 
-            mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
-            // TODO - pref change
-            mEditTextUrl.setText(bot.getServerHostname());
-            mEditTextUrl.setSummary(bot.getServerHostname());
-
             mEditTextTitle = (EditTextPreference) prefSet.findPreference(Title);
-            // TODO - pref change
+            mEditTextTitle.setOnPreferenceChangeListener(this);
             mEditTextTitle.setText(bot.getTitle());
             mEditTextTitle.setSummary(bot.getTitle());
+
+            mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
+            mEditTextUrl.setOnPreferenceChangeListener(this);
+            mEditTextUrl.setText(bot.getServerHostname());
+            mEditTextUrl.setSummary(bot.getServerHostname());
 
             mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
             mEditTextNick.setOnPreferenceChangeListener(this);
@@ -82,15 +83,20 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
+            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+            final Editor e = settings.edit();
             if (preference == mEditTextNick) {
-                final SharedPreferences settings = getActivity()
-                        .getSharedPreferences("main", 0);
-                final Editor e = settings.edit();
-                e.putString("server_" + indexOfServer + "_nick",
+                e.putString(Constants.nickPrefPrefix + indexOfServer,
                         (String) newValue);
-                e.commit();
-                mEditTextNick.setSummary((CharSequence) newValue);
+            } else if (preference == mEditTextTitle) {
+                e.putString(Constants.titlePrefPrefix + indexOfServer,
+                        (String) newValue);
+            } else if (preference == mEditTextUrl) {
+                e.putString(Constants.urlPrefPrefix + indexOfServer,
+                        (String) newValue);
             }
+            e.commit();
+            preference.setSummary((String) newValue);
             return true;
         }
     }
@@ -100,16 +106,15 @@ public class ServerSettingsActivity extends PreferenceActivity {
             DialogInterface.OnClickListener {
         final ArrayList<String> channelList = new ArrayList<String>();
         EditText inputView;
-        protected Object mActionMode;
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.item_channel_context_edit:
+                case R.id.activity_server_settings_cab_edit:
                     // TODO - edit here
                     mode.finish();
                     return true;
-                case R.id.item_channel_context_delete:
+                case R.id.activity_server_settings_cab_delete:
                     // TODO - delete here
                     mode.finish();
                     return true;
@@ -136,13 +141,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             // Inflate a menu resource providing context menu items
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.contex, menu);
+            inflater.inflate(R.menu.activty_server_settings_cab, menu);
             return true;
         }
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            inflater.inflate(R.menu.menu_channel_action_bar, menu);
+            inflater.inflate(R.menu.activity_server_settings_ab, menu);
         }
 
         @Override
@@ -150,9 +155,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
                                  Bundle savedInstanceState) {
             final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                     getActivity().getApplicationContext(),
-                    R.layout.layout_simple_list, channelList);
+                    R.layout.layout_text_list, channelList);
 
-            for (String channel : bot.getAutoJoinChannels().values()) {
+            for (String channel : bot.getAutoJoinChannels().keySet()) {
                 adapter.add(channel);
             }
 
@@ -183,7 +188,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             super.onOptionsItemSelected(item);
 
             switch (item.getItemId()) {
-                case R.id.item_channel_context_add:
+                case R.id.activity_server_settings_ab_add:
                     inputView.setHint("Channel name (including the starting #)");
                     AlertDialog.Builder builder = new AlertDialog.Builder(
                             getActivity())
@@ -232,4 +237,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }
