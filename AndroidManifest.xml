@@ -27,6 +27,7 @@
         <activity
             android:name="com.fusionx.lightirc.activity.ServerChannelActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustResize"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

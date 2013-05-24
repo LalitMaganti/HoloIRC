@@ -55,8 +55,7 @@ public class ServerFragment extends IRCFragment implements OnKeyListener {
     public boolean onKey(View view, int keyCode, KeyEvent event) {
         EditText editText = (EditText) view;
 
-        if ((event.getAction() == KeyEvent.ACTION_DOWN)
-                && (keyCode == KeyEvent.KEYCODE_ENTER)
+        if ((event.getKeyCode() == KeyEvent.FLAG_EDITOR_ACTION)
                 && !editText.getText().toString().equals("\n")
                 && !editText.getText().toString().isEmpty()) {
 
@@ -65,7 +64,7 @@ public class ServerFragment extends IRCFragment implements OnKeyListener {
 
             // Hacky way to clear but keep the focus on the EditText
             // Doesn't seem to work anymore :/
-            //editText.getText().clear();
+            editText.getText().clear();
             //editText.setSelection(0);
 
             return true;

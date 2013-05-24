@@ -77,8 +77,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
             mEditTextNick.setOnPreferenceChangeListener(this);
-            mEditTextNick.setText(bot.getLogin());
-            mEditTextNick.setSummary(bot.getLogin());
+            mEditTextNick.setText(bot.getName());
+            mEditTextNick.setSummary(bot.getName());
         }
 
         @Override
@@ -154,7 +154,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-                    getActivity().getApplicationContext(),
+                    getActivity(),
                     R.layout.layout_text_list, channelList);
 
             for (String channel : bot.getAutoJoinChannels().keySet()) {

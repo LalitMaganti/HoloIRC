@@ -25,14 +25,27 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 
-public class ChannelFragment extends IRCFragment implements OnKeyListener {
+import java.util.ArrayList;
+
+public class ChannelFragment extends IRCFragment {
     private String serverName;
+
+    public ArrayList<String> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(ArrayList<String> userList) {
+        this.userList = userList;
+    }
+
+    private ArrayList<String> userList;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -41,36 +54,28 @@ public class ChannelFragment extends IRCFragment implements OnKeyListener {
         setTitle(getArguments().getString("channel"));
         serverName = getArguments().getString("serverName");
 
-        String buffer = getArguments().getString("buffer");
+        final String buffer = getArguments().getString("buffer");
         if (buffer != null) {
             writeToTextView(buffer, rootView);
         }
 
-        EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
-        edittext.setOnKeyListener(this);
+        final EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
+
+        edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                final EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    ((ServerChannelActivity) getActivity())
+                            .channelMessageToParse(serverName, getTitle(), edittext.getText().toString());
+
+                    edittext.getText().clear();
+                }
+                return false;
+            }
+        });
+
 
         return rootView;
-    }
-
-    @Override
-    public boolean onKey(View view, int keyCode, KeyEvent event) {
-        EditText editText = (EditText) view;
-
-        if ((event.getAction() == KeyEvent.ACTION_DOWN)
-                && (keyCode == KeyEvent.KEYCODE_ENTER)
-                && !editText.getText().toString().equals("\n")
-                && !editText.getText().toString().isEmpty()) {
-
-            ((ServerChannelActivity) getActivity())
-                    .channelMessageToParse(serverName, getTitle(), editText.getText().toString());
-
-            // Hacky way to clear but keep the focus on the EditText
-            // Doesn't seem to work anymore :/
-            //editText.getText().clear();
-            //editText.setSelection(0);
-
-            return true;
-        }
-        return false;
     }
 }

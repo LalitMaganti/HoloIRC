@@ -21,32 +21,34 @@
 
 package com.fusionx.lightirc.irc;
 
+import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.UserChannelDao;
 
 public class LightUser extends User {
     private String trueNick;
+    private final int color;
 
     LightUser(PircBotX bot, UserChannelDao dao, String nick) {
         super(bot, dao, nick);
+        color = Utils.generateRandomColor();
     }
 
-    @Override
-    public String getNick() {
+    public String getPrettyNick() {
+        String htmlOpen = "<font color=\"" + color + "\">";
+        String htmlClose = "</font>";
+        return htmlOpen + getTrueNick() + htmlClose;
+    }
+
+    public String getTrueNick() {
         if(trueNick == null) {
-            trueNick = super.getNick();
+            trueNick = getNick();
         }
         return trueNick;
     }
 
     public void setTrueNick(String trueNick) {
         this.trueNick = trueNick;
-    }
-
-    @Override
-    public void setNick(String newNick) {
-        super.setNick(newNick);
-        trueNick = newNick;
     }
 }

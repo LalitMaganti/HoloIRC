@@ -21,9 +21,12 @@
 
 package com.fusionx.lightirc.misc;
 
+import android.graphics.Color;
 import com.fusionx.lightirc.irc.LightUser;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
+
+import java.util.Random;
 
 public class Utils {
     public static String getOutputForEvent(Event e) {
@@ -35,10 +38,12 @@ public class Utils {
             return event.getNotice() + "\n";
         } else if (e instanceof ActionEvent) {
             ActionEvent event = (ActionEvent) e;
-            return "* " + event.getUser().getNick() + " " + event.getAction() + "\n";
+            LightUser user = (LightUser) event.getUser();
+            return "* " + user.getPrettyNick() + " " + event.getAction() + "\n";
         } else if (e instanceof JoinEvent) {
             JoinEvent event = (JoinEvent) e;
-            return event.getUser().getNick() + " entered the room\n";
+            LightUser user = (LightUser) event.getUser();
+            return user.getPrettyNick() + " entered the room\n";
         } else if (e instanceof TopicEvent) {
             TopicEvent event = (TopicEvent) e;
             String newMessage;
@@ -55,7 +60,8 @@ public class Utils {
             return newMessage;
         } else if (e instanceof MessageEvent) {
             MessageEvent event = (MessageEvent) e;
-            return event.getUser().getNick() + ": " + event.getMessage() + "\n";
+            LightUser user = (LightUser) event.getUser();
+            return user.getPrettyNick() + ": " + event.getMessage() + "\n";
         } else if (e instanceof QuitEvent) {
             QuitEvent event = (QuitEvent) e;
             return event.getUser().getNick() + " quit the room\n";
@@ -79,4 +85,20 @@ public class Utils {
             return "";
         }
     }
+
+    public static int generateRandomColor() {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        // mix the color
+        red = (red) / 2;
+        green = (green) / 2;
+        blue = (blue) / 2;
+
+        int color = Color.rgb(red, green, blue);
+        return color;
+    }
+
 }

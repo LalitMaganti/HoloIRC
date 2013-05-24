@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
 
-    <ScrollView
-        android:id="@+id/scrollview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/editText1"
-        android:layout_marginBottom="10dip"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
-        android:lineSpacingExtra="3dip">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/textview"
+        <ScrollView
+            android:id="@+id/scrollview"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/editText1"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:lineSpacingExtra="3dip">
+
+            <TextView
+                android:id="@+id/textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textIsSelectable="true"/>
+        </ScrollView>
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textIsSelectable="true"/>
-    </ScrollView>
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:inputType="textCapSentences|textAutoCorrect"
+            android:ems="10"
+            android:hint="@string/message_text_edit_hint"
+            android:imeOptions="actionDone" >
 
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:ems="10"
-        android:hint="@string/message_text_edit_hint"
-        android:inputType="textFilter|textNoSuggestions">
+            <requestFocus/>
+        </EditText>
 
-        <requestFocus/>
-    </EditText>
-
-</RelativeLayout>
+    </RelativeLayout>

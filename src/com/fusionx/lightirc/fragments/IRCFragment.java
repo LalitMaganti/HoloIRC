@@ -22,8 +22,8 @@
 package com.fusionx.lightirc.fragments;
 
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
 
@@ -34,7 +34,7 @@ public abstract class IRCFragment extends Fragment {
         return tabTitle;
     }
 
-    void setTitle(String title) {
+    protected void setTitle(String title) {
         tabTitle = title;
     }
 
@@ -42,12 +42,8 @@ public abstract class IRCFragment extends Fragment {
         writeToTextView(text, getView());
     }
 
-    void writeToTextView(final String text, final View rootView) {
-        final TextView textView = (TextView) rootView
-                .findViewById(R.id.textview);
-        final ScrollView scrollView = (ScrollView) rootView
-                .findViewById(R.id.scrollview);
-        textView.append(text);
-        scrollView.fullScroll(View.FOCUS_DOWN);
+    protected void writeToTextView(final String text, final View rootView) {
+        final TextView textView = (TextView) rootView.findViewById(R.id.textview);
+        textView.append(Html.fromHtml(text.replace("\n", "<br/>")));
     }
 }

@@ -22,13 +22,17 @@
 package com.fusionx.lightirc.listeners;
 
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
+import android.widget.ArrayAdapter;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.Channel;
+import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
@@ -39,10 +43,17 @@ import java.util.ArrayList;
 public class ActivityListener extends ListenerAdapter<LightBot> implements Listener<LightBot> {
     private final ServerChannelActivity activity;
     private final IRCPagerAdapter mIRCPagerAdapter;
+    private final ViewPager mViewPager;
+    private ArrayAdapter<String> adapter;
 
-    public ActivityListener(ServerChannelActivity a, IRCPagerAdapter d) {
+    public ActivityListener(ServerChannelActivity a, IRCPagerAdapter d, ViewPager pager) {
         activity = a;
         mIRCPagerAdapter = d;
+        mViewPager = pager;
+    }
+
+    public void setArrayAdapter(ArrayAdapter<String> adapter) {
+        this.adapter = adapter;
     }
 
     @Override
@@ -73,7 +84,7 @@ public class ActivityListener extends ListenerAdapter<LightBot> implements Liste
     public void onQuit(final QuitEvent<LightBot> event) {
         // Keep this code up to date with ChannelListener
         for (final Channel c : event.getUser().getChannels()) {
-            if (event.getBot().getUserBot().getChannels().contains(c)) {
+            if (event.getDaoSnapshot().getChannel(c.getName()).getUsers().contains(event.getBot().getUserBot())) {
                 sendMessage(c.getName(), event);
             }
         }
@@ -90,9 +101,23 @@ public class ActivityListener extends ListenerAdapter<LightBot> implements Liste
     public void onNickChange(final NickChangeEvent<LightBot> event) {
         // Keep this code up to date with ChannelListener
         for (final Channel c : event.getBot().getUserBot().getChannels()) {
-            ArrayList<String> set = ((LightChannel) c).getCleanUserNicks();
+            final ArrayList<String> set = ((LightChannel) c).getCleanUserNicks();
             if (set.contains(event.getOldNick()) || set.contains(event.getNewNick())) {
                 sendMessage(c.getName(), event);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        int position = mViewPager.getCurrentItem();
+                        IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
+                        if (frag.getTitle().equals(c.getName())) {
+                            adapter.remove(event.getOldNick());
+                            adapter.add(event.getNewNick());
+                            adapter.notifyDataSetChanged();
+                            ((ChannelFragment) frag).getUserList().remove(event.getOldNick());
+                            ((ChannelFragment) frag).getUserList().add(event.getNewNick());
+                        }
+                    }
+                });
             }
         }
     }
@@ -105,10 +130,25 @@ public class ActivityListener extends ListenerAdapter<LightBot> implements Liste
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    activity.onNewChannelJoined(((JoinEvent) event).getChannel().getName(), ((JoinEvent) event).getUser().getNick(), Utils.getOutputForEvent(event));
+                    activity.onNewChannelJoined(((JoinEvent) event).getChannel().getName(), ((JoinEvent) event)
+                            .getUser().getNick(), Utils.getOutputForEvent(event));
                 }
             });
         }
+    }
+
+    @Override
+    public void onUserList(final UserListEvent<LightBot> event) {
+        final ArrayList<String> users = new ArrayList<String>();
+        for(User u : event.getUsers()) {
+            users.add(u.getNick());
+        }
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ChannelFragment) mIRCPagerAdapter.getTab(event.getChannel().getName())).setUserList(users);
+            }
+        });
     }
 
     @Override

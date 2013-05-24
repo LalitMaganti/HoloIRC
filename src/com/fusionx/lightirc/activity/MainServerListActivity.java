@@ -38,6 +38,7 @@ import com.fusionx.lightirc.misc.Constants;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 public class MainServerListActivity extends Activity implements
         OnClickListener, ActionMode.Callback, View.OnLongClickListener {
@@ -79,8 +80,11 @@ public class MainServerListActivity extends Activity implements
             bot.setTitle(settings.getString(Constants.titlePrefPrefix + i, ""));
             bot.setServerHostname(settings.getString(Constants.urlPrefPrefix + i, ""));
             bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
-            HashSet<String> auto = new HashSet<String>();
-            settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
+            Set<String> auto = new HashSet<String>();
+            auto = settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
+            for(String channel : auto) {
+                bot.addAutoJoinChannel(channel);
+            }
             values.add(bot);
         }
 

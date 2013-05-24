@@ -67,8 +67,9 @@ public class ChannelListener extends ListenerAdapter<LightBot> implements Listen
 
     @Override
     public void onQuit(final QuitEvent<LightBot> event) {
+        // TODO - Not correct - need to fix up - look at DaoSnapshot?
         for (final Channel c : event.getUser().getChannels()) {
-            if (event.getBot().getUserBot().getChannels().contains(c)) {
+            if (event.getDaoSnapshot().getChannel(c.getName()).getUsers().contains(event.getBot().getUserBot())) {
                 ((LightChannel) c).appendToBuffer(Utils.getOutputForEvent(event));
             }
         }

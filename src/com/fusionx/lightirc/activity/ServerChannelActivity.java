@@ -36,11 +36,13 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ServerFragment;
+import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.irc.LightChannel;
@@ -52,20 +54,7 @@ import org.pircbotx.Channel;
 import java.lang.reflect.Field;
 
 public class ServerChannelActivity extends FragmentActivity implements TabListener, OnPageChangeListener {
-    private IRCPagerAdapter mIRCPagerAdapter;
-    private ViewPager mViewPager;
-    private LightBuilder builder;
-    private ActivityListener listener;
-    private IRCService service;
     private final MessageParser parser = new MessageParser();
-
-    private void addTab(final int i) {
-        final ActionBar actionBar = getActionBar();
-        actionBar.addTab(actionBar.newTab()
-                .setText(mIRCPagerAdapter.getPageTitle(i))
-                .setTabListener(this));
-    }
-
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className,
@@ -83,6 +72,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                 d.setArguments(b);
                 mIRCPagerAdapter.addView(d);
                 addTab(0);
+                listener.setArrayAdapter((ArrayAdapter<String>) testFragment.getListAdapter());
 
                 for (final Channel channelName : bot.getUserBot().getChannels()) {
                     onNewChannelJoined(channelName.getName(), bot.getNick(), ((LightChannel) channelName).getBuffer());
@@ -101,11 +91,24 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
             // This should never happen
         }
     };
+    private IRCPagerAdapter mIRCPagerAdapter;
+    private ViewPager mViewPager;
+    private LightBuilder builder;
+    private ActivityListener listener;
+    private IRCService service;
+    private UserListFragment testFragment;
+
+    private void addTab(final int i) {
+        final ActionBar actionBar = getActionBar();
+        actionBar.addTab(actionBar.newTab()
+                .setText(mIRCPagerAdapter.getPageTitle(i))
+                .setTabListener(this));
+    }
 
     @Override
     public void onDestroy() {
         unbindService(mConnection);
-        if(service.getBot(builder.getTitle()) != null) {
+        if (service.getBot(builder.getTitle()) != null) {
             service.getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(listener);
         }
         super.onDestroy();
@@ -118,7 +121,12 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         setContentView(R.layout.activity_server_channel);
 
         mIRCPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
-        listener = new ActivityListener(this, mIRCPagerAdapter);
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mIRCPagerAdapter);
+        mViewPager.setOnPageChangeListener(this);
+
+        listener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
 
         builder = getIntent().getExtras().getParcelable("server");
 
@@ -126,9 +134,12 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mIRCPagerAdapter);
-        mViewPager.setOnPageChangeListener(this);
+        testFragment = new UserListFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment_firstpane, testFragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+        ft.addToBackStack(null);
+        ft.commit();
 
         final Intent service = new Intent(this, IRCService.class);
         service.putExtra("server", true);
@@ -176,8 +187,21 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     public void onPageSelected(final int position) {
         invalidateOptionsMenu();
         getActionBar().setSelectedNavigationItem(position);
+        userListUpdate(position);
         // Hack for http://code.google.com/p/android/issues/detail?id=38500
         setSpinnerSelectedNavigationItem(position);
+    }
+
+    private void userListUpdate(int position) {
+        ArrayAdapter<String> adapter = ((ArrayAdapter<String>) testFragment.getListAdapter());
+        adapter.clear();
+        if (position != 0) {
+            ChannelFragment c = (ChannelFragment) mIRCPagerAdapter.getItem(position);
+            adapter.addAll(c.getUserList());
+        } else {
+            adapter.add("A server user list is not possible :(");
+        }
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -204,36 +228,6 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     private void removeTab(final int i) {
         final ActionBar actionBar = getActionBar();
         actionBar.removeTabAt(i);
-    }
-
-    // Hack for http://code.google.com/p/android/issues/detail?id=38500
-    private void setSpinnerSelectedNavigationItem(int position) {
-        try {
-            int id = getResources()
-                    .getIdentifier("action_bar", "id", "android");
-            View actionBarView = findViewById(id);
-
-            Class<?> actionBarViewClass = actionBarView.getClass();
-            Field mTabScrollViewField = actionBarViewClass
-                    .getDeclaredField("mTabScrollView");
-            mTabScrollViewField.setAccessible(true);
-
-            Object mTabScrollView = mTabScrollViewField.get(actionBarView);
-            if (mTabScrollView == null) {
-                return;
-            }
-
-            Field mTabSpinnerField = mTabScrollView.getClass()
-                    .getDeclaredField("mTabSpinner");
-            mTabSpinnerField.setAccessible(true);
-
-            Object mTabSpinner = mTabSpinnerField.get(mTabScrollView);
-            if (mTabSpinner != null) {
-                ((Spinner) mTabSpinner).setSelection(position);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public void onNewChannelJoined(final String channelName, final String nick, final String buffer) {
@@ -269,5 +263,35 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     public void serverMessageToParse(String serverName, String message) {
         parser.serverMessageToParse(serverName, message);
+    }
+
+    // Hack for http://code.google.com/p/android/issues/detail?id=38500
+    private void setSpinnerSelectedNavigationItem(int position) {
+        try {
+            int id = getResources()
+                    .getIdentifier("action_bar", "id", "android");
+            View actionBarView = findViewById(id);
+
+            Class<?> actionBarViewClass = actionBarView.getClass();
+            Field mTabScrollViewField = actionBarViewClass
+                    .getDeclaredField("mTabScrollView");
+            mTabScrollViewField.setAccessible(true);
+
+            Object mTabScrollView = mTabScrollViewField.get(actionBarView);
+            if (mTabScrollView == null) {
+                return;
+            }
+
+            Field mTabSpinnerField = mTabScrollView.getClass()
+                    .getDeclaredField("mTabSpinner");
+            mTabSpinnerField.setAccessible(true);
+
+            Object mTabSpinner = mTabSpinnerField.get(mTabScrollView);
+            if (mTabSpinner != null) {
+                ((Spinner) mTabSpinner).setSelection(position);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
