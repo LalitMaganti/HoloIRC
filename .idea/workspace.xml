@@ -16,38 +16,69 @@
     </shared>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" name="Default" comment="" />
+    <list default="true" id="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/GenericListener.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ServiceListener.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/androidsupportlib.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/crittercism_v3_0_3_sdkonly.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/layout/slding_menu_fragment_user.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/libs/pircbotx-2.0.jar" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ChannelListener.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ServerListener.java" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/.idea/libraries/libs.xml" afterPath="$PROJECT_DIR$/.idea/libraries/lightirc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ActivityListener.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ActivityListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ChannelFragment.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ChannelFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Constants.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Constants.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/services/IRCService.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/services/IRCService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBuilder.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBuilder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightChannel.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightChannel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/LightIRC.iml" afterPath="$PROJECT_DIR$/LightIRC.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightUser.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightUser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/MainServerListActivity.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/MainServerListActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/parser/MessageParser.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/parser/MessageParser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerChannelActivity.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerChannelActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ServerFragment.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ServerFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/UserListFragment.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/UserListFragment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Utils.java" afterPath="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Utils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/layout/activity_server_channel.xml" afterPath="$PROJECT_DIR$/res/layout/activity_server_channel.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/layout/fragment_irc.xml" afterPath="$PROJECT_DIR$/res/layout/fragment_irc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/libs.xml" afterPath="$PROJECT_DIR$/.idea/libraries/libs.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    </list>
     <ignored path="LightIRC.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369397218882" ignored="false" />
-    <file path="/fragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369316852764" ignored="false" />
-    <file path="/ServerChannelActivity.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369393951578" ignored="false" />
+    <file path="/Dummy.txt" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369859347051" ignored="false" />
+    <file path="/fragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369862207066" ignored="false" />
+    <file path="/ServerChannelActivity.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369861503469" ignored="false" />
     <file path="/a.groovy" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1368912919161" ignored="false" />
     <file path="/a.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1368912920148" ignored="false" />
     <file path="/ServerFragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369349646235" ignored="false" />
     <file path="/ServerListener.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1368915984160" ignored="false" />
-    <file path="/ActivityListener.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369397899805" ignored="false" />
+    <file path="/ActivityListener.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369865051899" ignored="false" />
     <file path="/IRCService.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369304235627" ignored="false" />
     <file path="/EventOutput.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369257838560" ignored="false" />
-    <file path="/ChannelListener.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369397719547" ignored="false" />
-    <file path="/ChannelFragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369386056366" ignored="false" />
+    <file path="/ChannelListener.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369864458601" ignored="false" />
+    <file path="/ChannelFragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369777118257" ignored="false" />
     <file path="/ChannelMessageParser.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369303038188" ignored="false" />
-    <file path="/ServerSettingsActivity.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369348392319" ignored="false" />
+    <file path="/ServerSettingsActivity.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369866857420" ignored="false" />
     <file path="/LightBot.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369136246203" ignored="false" />
     <file path="/IRCFragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369349744358" ignored="false" />
     <file path="/IRCMessageParser.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369136144679" ignored="false" />
-    <file path="/LightBuilder.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369317877773" ignored="false" />
-    <file path="/LightChannel.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369136177219" ignored="false" />
+    <file path="/LightBuilder.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369866098455" ignored="false" />
+    <file path="/LightChannel.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369435848595" ignored="false" />
     <file path="/LightFragmentStatePagerAdapter.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369299304367" ignored="false" />
-    <file path="/MainServerListActivity.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369348166586" ignored="false" />
+    <file path="/MainServerListActivity.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369865939718" ignored="false" />
     <file path="/ServerCard.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369139547231" ignored="false" />
     <file path="/IRCPagerAdapter.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369136342458" ignored="false" />
     <file path="/LightPircBotXManager.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369140903945" ignored="false" />
     <file path="/LightUser.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369316432737" ignored="false" />
-    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369259515526" ignored="false" />
     <file path="/pref_general.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369297140521" ignored="false" />
     <file path="/a.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369261631284" ignored="false" />
-    <file path="/Constants.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369313079994" ignored="false" />
+    <file path="/Constants.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369865954087" ignored="false" />
     <file path="/strings.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369299118369" ignored="false" />
     <file path="/activty_server_settings_cab.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369303859766" ignored="false" />
     <file path="/activity_server_list_cab.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369303796273" ignored="false" />
@@ -56,11 +87,24 @@
     <file path="/activty_settings_prefs.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369303599984" ignored="false" />
     <file path="/activity_server_channel_ab.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369303780816" ignored="false" />
     <file path="/activity_server_settings_ab.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369303829590" ignored="false" />
-    <file path="/Utils.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369316619853" ignored="false" />
+    <file path="/Utils.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369862634602" ignored="false" />
     <file path="/fragment_irc.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369382839924" ignored="false" />
     <file path="/AndroidManifest.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369349375847" ignored="false" />
     <file path="/UserListFragment.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369386475588" ignored="false" />
-    <file path="/activity_server_channel.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369387078109" ignored="false" />
+    <file path="/activity_server_channel.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369521145555" ignored="false" />
+    <file path="/GenericListener.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369438012242" ignored="false" />
+    <file path="/LightSlidingPaneLayout.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369520406320" ignored="false" />
+    <file path="/SASLCapHandler.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369517218388" ignored="false" />
+    <file path="/slding_menu_fragment_user.xml" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369521665198" ignored="false" />
+    <file path="/SlidingMenu.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369522004397" ignored="false" />
+    <file path="/Channel.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369525252491" ignored="false" />
+    <file path="/MessageParser.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369777578417" ignored="false" />
+    <file path="/InputParser.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369862614363" ignored="false" />
+    <file path="/NickChangeEventPerChannel.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369779065441" ignored="false" />
+    <file path="/ListenerAdapter.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369862461627" ignored="false" />
+    <file path="/UserListAdapter.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369863319399" ignored="false" />
+    <file path="/QuitEventPerChannel.java" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369862599937" ignored="false" />
+    <file path="$APPLICATION_HOME_DIR$/plugins/android/lib/android.jar!/org/jetbrains/android/android.xsd" changelist="4f5aa884-fe70-4d77-87a4-8c8e5d5d51b3" time="1369865575811" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,6 +124,7 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -117,7 +162,6 @@
       </breakpoint>
     </breakpoint_any>
     <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -127,49 +171,78 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ChannelFragment.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ChannelFragment.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="43" column="27" selection-start="1353" selection-end="1364" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ActivityListener.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ActivityListener.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ActivityListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="104" column="21" selection-start="3780" selection-end="3780" vertical-scroll-proportion="-0.7943925">
+            <state line="187" column="75" selection-start="7010" selection-end="7010" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="e#3935#4687#0" expanded="true" />
-                <element signature="e#4668#4669#0" expanded="true" />
+                <element signature="e#2243#2429#0" expanded="true" />
+                <element signature="e#2414#2415#0" expanded="true" />
+                <element signature="e#3102#3527#0" expanded="true" />
+                <element signature="e#3512#3513#0" expanded="true" />
+                <element signature="e#3652#3933#0" expanded="true" />
+                <element signature="e#3922#3923#0" expanded="true" />
+                <element signature="e#4111#4592#0" expanded="true" />
+                <element signature="e#4581#4582#0" expanded="true" />
+                <element signature="e#4761#5245#0" expanded="true" />
+                <element signature="e#5234#5235#0" expanded="true" />
+                <element signature="e#5551#5758#0" expanded="true" />
+                <element signature="e#5747#5748#0" expanded="true" />
+                <element signature="e#5873#6395#0" expanded="true" />
+                <element signature="e#6035#6364#0" expanded="true" />
+                <element signature="e#6345#6346#0" expanded="true" />
+                <element signature="e#6384#6385#0" expanded="true" />
+                <element signature="e#6719#7125#0" expanded="true" />
+                <element signature="e#7114#7115#0" expanded="true" />
+                <element signature="e#7316#7800#0" expanded="true" />
+                <element signature="e#7789#7790#0" expanded="true" />
+                <element signature="e#7911#8154#0" expanded="true" />
+                <element signature="e#8143#8144#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ChannelListener.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ChannelListener.java">
+      <file leaf-file-name="ServiceListener.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ServiceListener.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="70" column="63" selection-start="2700" selection-end="2815" vertical-scroll-proportion="0.0">
+            <state line="20" column="0" selection-start="757" selection-end="757" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ServerChannelActivity.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerChannelActivity.java">
+      <file leaf-file-name="ServerSettingsActivity.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="75" column="0" selection-start="3138" selection-end="3138" vertical-scroll-proportion="0.0">
+            <state line="132" column="13" selection-start="5598" selection-end="5598" vertical-scroll-proportion="0.66292137">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UserListFragment.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/UserListFragment.java">
+      <file leaf-file-name="LightBuilder.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBuilder.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="32" selection-start="659" selection-end="659" vertical-scroll-proportion="0.0">
+            <state line="64" column="0" selection-start="1909" selection-end="1909" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Constants.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Constants.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="55" selection-start="1192" selection-end="1216" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="activty_settings_prefs.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/res/xml/activty_settings_prefs.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="38" column="25" selection-start="1580" selection-end="1599" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -181,6 +254,10 @@
     <FindUsagesManager>
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
+  </component>
+  <component name="GenerateSignedApkSettings">
+    <option name="KEY_STORE_PATH" value="$PROJECT_DIR$/../keystore" />
+    <option name="KEY_ALIAS" value="firstkey" />
   </component>
   <component name="Git.Settings">
     <option name="SYNC_SETTING" value="DONT" />
@@ -194,30 +271,30 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightUser.java" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Constants.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerChannelActivity.java" />
+        <option value="$PROJECT_DIR$/../pircbotx/src/main/java/org/pircbotx/hooks/ListenerAdapter.java" />
+        <option value="$PROJECT_DIR$/../pircbotx/src/main/java/org/pircbotx/hooks/events/QuitEventPerChannel.java" />
+        <option value="$PROJECT_DIR$/../pircbotx/src/main/java/org/pircbotx/InputParser.java" />
         <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Utils.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ServerFragment.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/adapters/UserListAdapter.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ServerListener.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ChannelListener.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/services/IRCService.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ServiceListener.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ActivityListener.java" />
+        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Constants.java" />
         <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBuilder.java" />
         <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/MainServerListActivity.java" />
-        <option value="$PROJECT_DIR$/AndroidManifest.xml" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ServerFragment.java" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/IRCFragment.java" />
-        <option value="$PROJECT_DIR$/res/layout/fragment_irc.xml" />
         <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ChannelFragment.java" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/UserListFragment.java" />
-        <option value="$PROJECT_DIR$/res/layout/activity_server_channel.xml" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerChannelActivity.java" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ChannelListener.java" />
-        <option value="$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ActivityListener.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1296" />
-    <option name="height" value="1000" />
+    <option name="x" value="-1" />
+    <option name="y" value="27" />
+    <option name="width" value="1282" />
+    <option name="height" value="742" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -264,8 +341,8 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -299,6 +376,54 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="lightirc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lightirc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="parser" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lightirc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="misc" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -342,7 +467,69 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="irc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lightirc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="fragments" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lightirc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lightirc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="adapters" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -365,6 +552,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="activity" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="LightIRC" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="res" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="xml" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -410,15 +615,17 @@
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="options.lastSelected" value="vcs.Git" />
+    <property name="ExportedApkPath" value="$USER_HOME$/Downloads/LightIRC.apk" />
+    <property name="options.lastSelected" value="reference.projectsettings.compiler.annotationProcessors" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="recentsLimit" value="5" />
-    <property name="last_opened_file_path" value="$USER_HOME$/AppData/Local/GitHub/PortableGit_ca477551eeb4aea0e4ae9fcd3358bd96720bb5c8/bin/git.exe" />
+    <property name="ExportedModule" value="LightIRC" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../keystore" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="" />
+    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_SERIALS" value="CB5121ZVQ8" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
-    <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Test" />
+    <property name="AndroidRunProguardForReleaseBuild" value="false" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="FullScreen" value="false" />
@@ -427,6 +634,9 @@
     <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.pircbotx.hooks.events" />
+    </key>
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.fusionx.lightirc.services" />
     </key>
@@ -562,6 +772,11 @@
     </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SliceManager">
+    <option name="analysisUIOptions">
+      <AnalysisUIOptions />
+    </option>
+  </component>
   <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
     <option name="USER" value="" />
     <option name="PASSWORD" value="" />
@@ -610,11 +825,17 @@
       <workItem from="1369381946579" duration="6062000" />
       <workItem from="1369393315313" duration="631000" />
       <workItem from="1369397189916" duration="1810000" />
+      <workItem from="1369433721644" duration="4221000" />
+      <workItem from="1369515443249" duration="1089000" />
+      <workItem from="1369516838932" duration="308000" />
+      <workItem from="1369517162488" duration="8370000" />
+      <workItem from="1369775369669" duration="5123000" />
+      <workItem from="1369859342566" duration="7875000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="52641000" />
+    <option name="totallyTimeSpent" value="79627000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -637,57 +858,57 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1296" height="1000" extended-state="0" />
+    <frame x="-1" y="27" width="1282" height="742" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977462" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39534885" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33451957" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32881355" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5237288" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3322034" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3743922" sideWeight="0.28644067" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32544377" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38671413" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3220339" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="1.0" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32858837" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.6661017" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2504052" sideWeight="0.66548043" order="4" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33451957" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.60465115" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3743922" sideWeight="0.38135594" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33050847" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6779661" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.60465115" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6779661" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6702254" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289941" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998326" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39881656" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
-      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6779661" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977462" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39700997" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3322034" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32858837" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2504052" sideWeight="0.60465115" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3743922" sideWeight="0.6779661" order="4" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33617747" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3338983" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6779661" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298217" sideWeight="0.6702254" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289941" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39534885" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32881355" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2881356" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3265306" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38790035" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3220339" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="1.0" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.6661017" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998326" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
@@ -755,120 +976,138 @@
     <breakpoint-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBuilder.java">
+    <entry file="file://$PROJECT_DIR$/../pircbotx/src/main/java/org/pircbotx/InputParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="66" column="5" selection-start="1919" selection-end="1919" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBot.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="13" selection-start="872" selection-end="872" vertical-scroll-proportion="0.112426035">
+        <state line="351" column="39" selection-start="14673" selection-end="14673" vertical-scroll-proportion="0.6533575">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/GenericListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="37" selection-start="1216" selection-end="1216" vertical-scroll-proportion="0.0">
+        <state line="29" column="9" selection-start="994" selection-end="994" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/adapters/LightFragmentStatePagerAdapter.java">
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Utils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="0" selection-start="1012" selection-end="1012" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ServerFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="1353" selection-end="1353" vertical-scroll-proportion="0.33197555">
+        <state line="64" column="54" selection-start="2675" selection-end="2675" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar://$APPLICATION_HOME_DIR$/sdk/platforms/android-17/android.jar!/android/view/LayoutInflater.class">
+    <entry file="file://$PROJECT_DIR$/../pircbotx/src/main/java/org/pircbotx/hooks/events/QuitEventPerChannel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="0" selection-start="2845" selection-end="2845" vertical-scroll-proportion="0.7866109" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/layout/fragment_irc.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="39" column="21" selection-start="1494" selection-end="1494" vertical-scroll-proportion="1.4227468">
-          <folding>
-            <element signature="e#1344#1376#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/IRCFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="7" selection-start="806" selection-end="806" vertical-scroll-proportion="0.13849287">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="158" column="0" selection-start="6340" selection-end="6340" vertical-scroll-proportion="2.96334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/MainServerListActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="84" column="0" selection-start="3442" selection-end="3442" vertical-scroll-proportion="-1.9389002">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/layout/activity_server_channel.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="52" selection-start="319" selection-end="319" vertical-scroll-proportion="0.21888413">
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ChannelFragment.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="27" selection-start="1353" selection-end="1364" vertical-scroll-proportion="0.0">
+        <state line="43" column="7" selection-start="1621" selection-end="1621" vertical-scroll-proportion="0.5319149">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/UserListFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="32" selection-start="659" selection-end="659" vertical-scroll-proportion="0.0">
+        <state line="9" column="13" selection-start="272" selection-end="272" vertical-scroll-proportion="0.108892925">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerChannelActivity.java">
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/fragments/ServerFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="75" column="0" selection-start="3138" selection-end="3138" vertical-scroll-proportion="0.0">
+        <state line="63" column="0" selection-start="2253" selection-end="2253" vertical-scroll-proportion="0.9574468">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ChannelListener.java">
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/services/IRCService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="70" column="63" selection-start="2700" selection-end="2815" vertical-scroll-proportion="0.0">
+        <state line="106" column="48" selection-start="3803" selection-end="3803" vertical-scroll-proportion="-0.032432433">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightUser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="21" selection-start="1014" selection-end="1014" vertical-scroll-proportion="-0.17567568">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/adapters/UserListAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="55" selection-start="443" selection-end="443" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ActivityListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="21" selection-start="3780" selection-end="3780" vertical-scroll-proportion="-0.7943925">
+        <state line="187" column="75" selection-start="7010" selection-end="7010" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#3935#4687#0" expanded="true" />
-            <element signature="e#4668#4669#0" expanded="true" />
+            <element signature="e#2243#2429#0" expanded="true" />
+            <element signature="e#2414#2415#0" expanded="true" />
+            <element signature="e#3102#3527#0" expanded="true" />
+            <element signature="e#3512#3513#0" expanded="true" />
+            <element signature="e#3652#3933#0" expanded="true" />
+            <element signature="e#3922#3923#0" expanded="true" />
+            <element signature="e#4111#4592#0" expanded="true" />
+            <element signature="e#4581#4582#0" expanded="true" />
+            <element signature="e#4761#5245#0" expanded="true" />
+            <element signature="e#5234#5235#0" expanded="true" />
+            <element signature="e#5551#5758#0" expanded="true" />
+            <element signature="e#5747#5748#0" expanded="true" />
+            <element signature="e#5873#6395#0" expanded="true" />
+            <element signature="e#6035#6364#0" expanded="true" />
+            <element signature="e#6345#6346#0" expanded="true" />
+            <element signature="e#6384#6385#0" expanded="true" />
+            <element signature="e#6719#7125#0" expanded="true" />
+            <element signature="e#7114#7115#0" expanded="true" />
+            <element signature="e#7316#7800#0" expanded="true" />
+            <element signature="e#7789#7790#0" expanded="true" />
+            <element signature="e#7911#8154#0" expanded="true" />
+            <element signature="e#8143#8144#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/xml/activty_settings_prefs.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="25" selection-start="1580" selection-end="1599" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/misc/Constants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="55" selection-start="1192" selection-end="1216" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/irc/LightBuilder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="0" selection-start="1909" selection-end="1909" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/listeners/ServiceListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="0" selection-start="757" selection-end="757" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/MainServerListActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="84" column="53" selection-start="3556" selection-end="3556" vertical-scroll-proportion="0.6320225">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="132" column="13" selection-start="5598" selection-end="5598" vertical-scroll-proportion="0.66292137">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -889,7 +1128,7 @@
       </state>
       <state key="FacetStructureConfigurable.UI">
         <settings>
-          <last-edited>Android</last-edited>
+          <last-edited>Android (LightIRC)|Android</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -924,7 +1163,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>LightIRC</last-edited>
+          <last-edited>example</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -948,7 +1187,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>libs</last-edited>
+          <last-edited>androidsupportlib</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

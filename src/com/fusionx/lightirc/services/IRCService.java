@@ -35,8 +35,7 @@ import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.irc.LightManager;
-import com.fusionx.lightirc.listeners.ChannelListener;
-import com.fusionx.lightirc.listeners.ServerListener;
+import com.fusionx.lightirc.listeners.ServiceListener;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.UserChannelDao;
@@ -87,6 +86,7 @@ public class IRCService extends Service {
         manager.put(server.getTitle(), bo);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void setupNotification() {
         final Intent intent = new Intent(this, MainServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
@@ -162,10 +162,8 @@ public class IRCService extends Service {
     }
 
     private void setupListeners(LightBuilder bot) {
-        final ChannelListener mChannelListener = new ChannelListener();
-        final ServerListener mServerListener = new ServerListener();
+        final ServiceListener mChannelListener = new ServiceListener();
 
-        bot.getListenerManager().addListener(mServerListener);
         bot.getListenerManager().addListener(mChannelListener);
     }
 }

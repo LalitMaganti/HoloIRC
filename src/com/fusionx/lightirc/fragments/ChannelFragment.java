@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -34,8 +35,9 @@ import com.fusionx.lightirc.activity.ServerChannelActivity;
 
 import java.util.ArrayList;
 
-public class ChannelFragment extends IRCFragment {
+public class ChannelFragment extends IRCFragment implements TextView.OnEditorActionListener {
     private String serverName;
+    EditText edittext;
 
     public ArrayList<String> getUserList() {
         return userList;
@@ -59,23 +61,36 @@ public class ChannelFragment extends IRCFragment {
             writeToTextView(buffer, rootView);
         }
 
-        final EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
+        edittext = (EditText) rootView.findViewById(R.id.editText1);
 
-        edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                final EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    ((ServerChannelActivity) getActivity())
-                            .channelMessageToParse(serverName, getTitle(), edittext.getText().toString());
-
-                    edittext.getText().clear();
-                }
-                return false;
-            }
-        });
-
+        edittext.setOnEditorActionListener(this);
 
         return rootView;
+    }
+
+    @Override
+    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        if (i == EditorInfo.IME_ACTION_DONE) {
+            final String message = edittext.getText().toString();
+            edittext.setText("");
+
+            final ParserTask task = new ParserTask();
+            String[] strings = {serverName, getTitle(), message};
+            task.doInBackground(strings);
+        }
+        return false;
+    }
+
+    private class ParserTask extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(final String... strings) {
+            if (strings != null) {
+                final String server = strings[0];
+                final String channelName = strings[1];
+                final String message = strings[2];
+                ((ServerChannelActivity) getActivity())
+                        .parser.channelMessageToParse(server, channelName, message);
+            }
+            return null;
+        }
     }
 }

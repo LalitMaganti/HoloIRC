@@ -50,9 +50,21 @@ public class ServerSettingsActivity extends PreferenceActivity {
         private final static String Title = "pref_title";
         private final static String URL = "pref_url";
         private final static String Nick = "pref_nick";
+        private final static String Login = "pref_login";
+        private final static String ServerUserName = "pref_login_username";
+        private final static String ServerPassword = "pref_login_password";
+
+        // EditText preferences
         private EditTextPreference mEditTextNick;
         private EditTextPreference mEditTextTitle;
         private EditTextPreference mEditTextUrl;
+
+        private EditTextPreference mServerUserName;
+        private EditTextPreference mServerPassword;
+
+        // Checkboxes
+        private CheckBoxPreference mLoginPref;
+
 
         @Override
         public void onCreate(final Bundle savedInstanceState) {
@@ -79,6 +91,48 @@ public class ServerSettingsActivity extends PreferenceActivity {
             mEditTextNick.setOnPreferenceChangeListener(this);
             mEditTextNick.setText(bot.getName());
             mEditTextNick.setSummary(bot.getName());
+
+
+            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+
+            mLoginPref = (CheckBoxPreference) prefSet.findPreference(Login);
+            mLoginPref.setChecked(settings.getBoolean("loginenabled", false));
+
+            mServerUserName = (EditTextPreference) prefSet.findPreference(ServerUserName);
+            mServerUserName.setOnPreferenceChangeListener(this);
+
+            mServerPassword = (EditTextPreference) prefSet.findPreference(ServerPassword);
+            mServerPassword.setOnPreferenceChangeListener(this);
+
+            if(settings.getBoolean("loginenabled", false)) {
+                mServerUserName.setText(bot.getLogin());
+                mServerUserName.setSummary(bot.getLogin());
+                mServerPassword.setText(bot.getServerPassword());
+                mServerPassword.setSummary(bot.getServerPassword());
+            }
+        }
+
+
+        @Override
+        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+            final Editor e = settings.edit();
+            if (preference == mLoginPref) {
+                boolean check = ((CheckBoxPreference) preference).isChecked();
+                e.putBoolean("loginenabled", check);
+                if(!check) {
+                    mServerUserName.setEnabled(check);
+                    mServerPassword.setEnabled(check);
+                    mServerUserName.setText("");
+                    mServerPassword.setText("");
+                    mServerUserName.setSummary("");
+                    mServerPassword.setSummary("");
+                    e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, "lightirc");
+                    e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, "");
+                }
+            }
+            e.commit();
+            return true;
         }
 
         @Override
@@ -86,14 +140,15 @@ public class ServerSettingsActivity extends PreferenceActivity {
             final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
             final Editor e = settings.edit();
             if (preference == mEditTextNick) {
-                e.putString(Constants.nickPrefPrefix + indexOfServer,
-                        (String) newValue);
+                e.putString(Constants.nickPrefPrefix + indexOfServer, (String) newValue);
             } else if (preference == mEditTextTitle) {
-                e.putString(Constants.titlePrefPrefix + indexOfServer,
-                        (String) newValue);
+                e.putString(Constants.titlePrefPrefix + indexOfServer, (String) newValue);
             } else if (preference == mEditTextUrl) {
-                e.putString(Constants.urlPrefPrefix + indexOfServer,
-                        (String) newValue);
+                e.putString(Constants.urlPrefPrefix + indexOfServer, (String) newValue);
+            } else if (preference == mServerUserName) {
+                e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, (String) newValue);
+            } else if (preference == mServerPassword) {
+                e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, (String) newValue);
             }
             e.commit();
             preference.setSummary((String) newValue);

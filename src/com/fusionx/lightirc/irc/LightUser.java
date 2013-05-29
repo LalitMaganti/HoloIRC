@@ -42,7 +42,7 @@ public class LightUser extends User {
     }
 
     public String getTrueNick() {
-        if(trueNick == null) {
+        if (trueNick == null) {
             trueNick = getNick();
         }
         return trueNick;

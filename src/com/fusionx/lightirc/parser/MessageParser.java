@@ -38,7 +38,7 @@ public class MessageParser {
     }
 
     public void channelMessageToParse(String serverName, String channelName, String message) {
-        LightBot bot = getService().getBot(serverName);
+        final LightBot bot = getService().getBot(serverName);
         if (message != null && message.startsWith("/")) {
             // TODO parse this string fully
             if (message.startsWith("/join")) {
@@ -63,7 +63,7 @@ public class MessageParser {
     }
 
     public void serverMessageToParse(String serverName, String message) {
-        LightBot bot = getService().getBot(serverName);
+        final LightBot bot = getService().getBot(serverName);
 
         if (message.startsWith("/")) {
             // TODO parse this string fully

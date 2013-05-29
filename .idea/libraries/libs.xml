@@ -1,13 +1,10 @@
 <component name="libraryTable">
   <library name="libs">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/android-support-v4.jar!/" />
-      <root url="jar://$PROJECT_DIR$/libs/guava.jar!/" />
-      <root url="jar://$PROJECT_DIR$/libs/slf4j-api-1.7.5.jar!/" />
-      <root url="jar://$PROJECT_DIR$/libs/commons-lang3-3.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/libs/pircbotx-2.0.jar!/" />
+      <root url="file://$PROJECT_DIR$/../pircbotx/src/main/libs" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/../pircbotx/src/main/libs" recursive="false" />
   </library>
 </component>

@@ -20,8 +20,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="libs" level="project" />
+    <orderEntry type="library" name="androidsupportlib" level="project" />
     <orderEntry type="module" module-name="CardsUILib" />
+    <orderEntry type="module" module-name="pircbotx" />
+    <orderEntry type="library" name="lightirc" level="project" />
+    <orderEntry type="module" module-name="library1" />
   </component>
 </module>
 

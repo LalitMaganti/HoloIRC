@@ -62,8 +62,8 @@ public class Utils {
             MessageEvent event = (MessageEvent) e;
             LightUser user = (LightUser) event.getUser();
             return user.getPrettyNick() + ": " + event.getMessage() + "\n";
-        } else if (e instanceof QuitEvent) {
-            QuitEvent event = (QuitEvent) e;
+        } else if (e instanceof QuitEventPerChannel) {
+            QuitEventPerChannel event = (QuitEventPerChannel) e;
             return event.getUser().getNick() + " quit the room\n";
         } else if (e instanceof PartEvent) {
             PartEvent event = (PartEvent) e;
@@ -71,13 +71,15 @@ public class Utils {
         } else if (e instanceof NickChangeEvent) {
             NickChangeEvent event = (NickChangeEvent) e;
             String newMessage;
-            if (!event.getUser().equals(event.getBot().getUserBot())) {
-                newMessage = event.getOldNick() + " is now known as "
-                        + event.getNewNick() + "\n";
-            } else {
-                newMessage = "You (" + event.getOldNick() + ") are now known as "
-                        + event.getNewNick() + "\n";
-            }
+            newMessage = "You (" + event.getOldNick() + ") are now known as "
+                    + event.getNewNick() + "\n";
+            ((LightUser) (event.getUser())).setTrueNick(event.getNewNick());
+            return newMessage;
+        } else if (e instanceof NickChangeEventPerChannel) {
+            NickChangeEventPerChannel event = (NickChangeEventPerChannel) e;
+            String newMessage;
+            newMessage = event.getOldNick() + " is now known as "
+                    + event.getNewNick() + "\n";
             ((LightUser) (event.getUser())).setTrueNick(event.getNewNick());
             return newMessage;
         } else {

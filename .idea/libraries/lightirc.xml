@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="lightirc">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/slf4j-api-1.7.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/guava.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/commons-lang3-3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

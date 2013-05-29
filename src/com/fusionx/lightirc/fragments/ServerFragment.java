@@ -62,10 +62,7 @@ public class ServerFragment extends IRCFragment implements OnKeyListener {
             ((ServerChannelActivity) getActivity())
                     .serverMessageToParse(getTitle(), editText.getText().toString());
 
-            // Hacky way to clear but keep the focus on the EditText
-            // Doesn't seem to work anymore :/
             editText.getText().clear();
-            //editText.setSelection(0);
 
             return true;
         }

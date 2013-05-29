@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/../cardsui-for-android/CardsUILib/CardsUILib.iml" filepath="$PROJECT_DIR$/../cardsui-for-android/CardsUILib/CardsUILib.iml" />
       <module fileurl="file://$PROJECT_DIR$/LightIRC.iml" filepath="$PROJECT_DIR$/LightIRC.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SlidingMenu/example/example.iml" filepath="$PROJECT_DIR$/../SlidingMenu/example/example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../SlidingMenu/library/library1.iml" filepath="$PROJECT_DIR$/../SlidingMenu/library/library1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../pircbotx/src/main/pircbotx.iml" filepath="$PROJECT_DIR$/../pircbotx/src/main/pircbotx.iml" />
     </modules>
   </component>
 </project>
