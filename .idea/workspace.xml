@@ -161,7 +161,23 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint url="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java" line="119" class="com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment" package="com.fusionx.lightirc.activity">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -215,7 +231,7 @@
       <file leaf-file-name="ServerSettingsActivity.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="132" column="13" selection-start="5598" selection-end="5598" vertical-scroll-proportion="0.66292137">
+            <state line="129" column="63" selection-start="5413" selection-end="5413" vertical-scroll-proportion="0.6207865">
               <folding />
             </state>
           </provider>
@@ -830,12 +846,12 @@
       <workItem from="1369516838932" duration="308000" />
       <workItem from="1369517162488" duration="8370000" />
       <workItem from="1369775369669" duration="5123000" />
-      <workItem from="1369859342566" duration="7875000" />
+      <workItem from="1369859342566" duration="8228000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="79627000" />
+    <option name="totallyTimeSpent" value="79980000" />
   </component>
   <component name="TodoView" selected-index="0">
     <todo-panel id="selected-file">
@@ -1106,7 +1122,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/fusionx/lightirc/activity/ServerSettingsActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="132" column="13" selection-start="5598" selection-end="5598" vertical-scroll-proportion="0.66292137">
+        <state line="129" column="63" selection-start="5413" selection-end="5413" vertical-scroll-proportion="0.6207865">
           <folding />
         </state>
       </provider>

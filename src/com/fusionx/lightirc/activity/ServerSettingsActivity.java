@@ -118,11 +118,11 @@ public class ServerSettingsActivity extends PreferenceActivity {
             final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
             final Editor e = settings.edit();
             if (preference == mLoginPref) {
-                boolean check = ((CheckBoxPreference) preference).isChecked();
+                boolean check = mLoginPref.isChecked();
                 e.putBoolean("loginenabled", check);
+                mServerUserName.setEnabled(check);
+                mServerPassword.setEnabled(check);
                 if(!check) {
-                    mServerUserName.setEnabled(check);
-                    mServerPassword.setEnabled(check);
                     mServerUserName.setText("");
                     mServerPassword.setText("");
                     mServerUserName.setSummary("");
