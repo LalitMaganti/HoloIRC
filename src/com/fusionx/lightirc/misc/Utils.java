@@ -25,6 +25,8 @@ import android.graphics.Color;
 import com.fusionx.lightirc.irc.LightUser;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 import java.util.Random;
 

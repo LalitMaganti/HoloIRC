@@ -29,12 +29,14 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.irc.LightBot;
-import com.fusionx.lightirc.irc.LightChannel;
 import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.PartEvent;
+import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 import java.util.ArrayList;
 
@@ -50,15 +52,17 @@ public class ActivityListener extends GenericListener {
         mViewPager = pager;
     }
 
-    public void setArrayAdapter(UserListAdapter adapter) {
+    public void setArrayAdapter(final UserListAdapter adapter) {
         this.adapter = adapter;
     }
 
     @Override
     public void onEvent(final Event<LightBot> event) throws Exception {
         super.onEvent(event);
+
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
             final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -83,14 +87,13 @@ public class ActivityListener extends GenericListener {
         for (final Channel c : event.getBot().getUserBot().getChannels()) {
             final String oldFormattedNick = event.getOldNick();
             final String newFormattedNick = event.getNewNick();
+
             sendMessage(c.getName(), event);
 
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    int position = mViewPager.getCurrentItem();
-                    IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
-                    if (frag.getTitle().equals(c.getName())) {
+                    if (checkChannelFragment(c.getName())) {
                         adapter.replace(oldFormattedNick, newFormattedNick);
                     }
                 }
@@ -100,10 +103,11 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void userJoin(final JoinEvent<LightBot> event) {
+        final JoinEvent joinevent = (JoinEvent) event;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                activity.onNewChannelJoined(((JoinEvent) event).getChannel().getName(), ((JoinEvent) event)
+                activity.onNewChannelJoined(joinevent.getChannel().getName(), joinevent
                         .getUser().getNick(), Utils.getOutputForEvent(event));
             }
         });
@@ -112,12 +116,11 @@ public class ActivityListener extends GenericListener {
     @Override
     public void otherUserJoin(final JoinEvent<LightBot> event) {
         sendMessage(event.getChannel().getName(), event);
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int position = mViewPager.getCurrentItem();
-                IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
-                if (frag.getTitle().equals(event.getChannel().getName())) {
+                if (checkChannelFragment(event.getChannel().getName())) {
                     adapter.add(event.getUser().getNick());
                     adapter.sort();
                     adapter.notifyDataSetChanged();
@@ -129,12 +132,11 @@ public class ActivityListener extends GenericListener {
     @Override
     public void part(final PartEvent<LightBot> event) {
         sendMessage(event.getChannel().getName(), event);
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int position = mViewPager.getCurrentItem();
-                IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
-                if (frag.getTitle().equals(event.getChannel().getName())) {
+                if (checkChannelFragment(event.getChannel().getName())) {
                     adapter.remove(event.getUser().getNick());
                     adapter.sort();
                     adapter.notifyDataSetChanged();
@@ -145,20 +147,25 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onUserList(final UserListEvent<LightBot> event) {
-        final ArrayList<String> userList = ((LightChannel) event.getChannel()).getUserList();
-        for (User u : event.getUsers()) {
+        final ArrayList<String> userList = event.getChannel().getUserList();
+        final String channelName = event.getChannel().getName();
+
+        for (final User u : event.getUsers()) {
             userList.add(u.getNick());
         }
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((ChannelFragment) mIRCPagerAdapter.getTab(event.getChannel().getName())).setUserList(userList);
+                ((ChannelFragment) mIRCPagerAdapter.getTab(channelName)).setUserList(userList);
             }
         });
     }
 
     @Override
     public void onTopic(final TopicEvent<LightBot> event) {
+        final String channelName = ((TopicEvent) event).getChannel().getName();
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -166,7 +173,7 @@ public class ActivityListener extends GenericListener {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        final IRCFragment channel = mIRCPagerAdapter.getTab(((TopicEvent) event).getChannel().getName());
+                        final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
                         channel.writeToTextView(Utils.getOutputForEvent(event));
                     }
                 }, 750);
@@ -178,14 +185,13 @@ public class ActivityListener extends GenericListener {
     public void onNickChangePerChannel(final NickChangeEventPerChannel<LightBot> event) {
         final String oldFormattedNick = event.getOldNick();
         final String newFormattedNick = event.getNewNick();
+
         sendMessage(event.getChannel().getName(), event);
 
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int position = mViewPager.getCurrentItem();
-                IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
-                if (frag.getTitle().equals(event.getChannel().getName())) {
+                if (checkChannelFragment(event.getChannel().getName())) {
                     adapter.replace(oldFormattedNick, newFormattedNick);
                 }
             }
@@ -195,12 +201,11 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onQuitPerChannel(final QuitEventPerChannel<LightBot> event) {
         sendMessage(event.getChannel().getName(), event);
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int position = mViewPager.getCurrentItem();
-                IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
-                if (frag.getTitle().equals(event.getChannel().getName())) {
+                if (checkChannelFragment(event.getChannel().getName())) {
                     adapter.remove(event.getUser().getNick());
                     adapter.sort();
                     adapter.notifyDataSetChanged();
@@ -217,5 +222,11 @@ public class ActivityListener extends GenericListener {
                 channel.writeToTextView(Utils.getOutputForEvent(event));
             }
         });
+    }
+
+    private boolean checkChannelFragment(String keyName) {
+        int position = mViewPager.getCurrentItem();
+        IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
+        return frag.getTitle().equals(keyName);
     }
 }

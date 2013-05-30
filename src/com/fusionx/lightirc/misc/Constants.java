@@ -28,4 +28,5 @@ public class Constants {
     public final static String autoJoinPrefPrefix = "server_autoJoin_";
     public final static String serverUsernamePrefPrefix = "server_username_";
     public final static String serverPasswordPrefPrefix = "server_password_";
+    public final static String serverNickServPasswordPrefPrefix = "server_nickserv_password_";
 }

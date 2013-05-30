@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="lightirc">
+  <library name="pircbotxexports">
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/libs/slf4j-api-1.7.5.jar!/" />
       <root url="jar://$PROJECT_DIR$/libs/guava.jar!/" />

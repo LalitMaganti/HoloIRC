@@ -4,7 +4,7 @@ import com.fusionx.lightirc.irc.LightBot;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.PartEvent;
+import org.pircbotx.hooks.events.lightirc.PartEvent;
 
 public abstract class GenericListener extends ListenerAdapter<LightBot> implements Listener<LightBot> {
 

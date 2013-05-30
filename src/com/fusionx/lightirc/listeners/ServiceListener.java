@@ -22,11 +22,14 @@
 package com.fusionx.lightirc.listeners;
 
 import com.fusionx.lightirc.irc.LightBot;
-import com.fusionx.lightirc.irc.LightChannel;
+import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.Channel;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.PartEvent;
+import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,10 +38,11 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onEvent(final Event<LightBot> event) throws Exception {
+        super.onEvent(event);
+
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
             event.getBot().appendToBuffer(Utils.getOutputForEvent(event));
         }
-        super.onEvent(event);
     }
 
     @Override
@@ -53,18 +57,20 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void otherUserJoin(final JoinEvent<LightBot> event) {
-        ArrayList<String> set = ((LightChannel) event.getChannel()).getUserList();
-        set.add(event.getUser().getNick());
-        Collections.sort(set);
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final ArrayList<String> set = event.getChannel().getUserList();
+        set.add(event.getUser().getNick());
+        Collections.sort(set, new UserComparator());
     }
 
     @Override
     public void part(final PartEvent<LightBot> event) {
-        ArrayList<String> set = ((LightChannel) event.getBot().getUserChannelDao().getChannel(event.getChannel().getName())).getUserList();
-        event.getBot().getUserChannelDao().getChannel(event.getChannel().getName())
-                .appendToBuffer(Utils.getOutputForEvent(event));
+        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final ArrayList<String> set = event.getChannel().getUserList();
         set.remove(event.getUser().getNick());
+        Collections.sort(set, new UserComparator());
     }
 
     @Override
@@ -74,35 +80,35 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onQuitPerChannel(final QuitEventPerChannel<LightBot> event) {
-        ArrayList<String> set = ((LightChannel) event.getBot().getUserChannelDao().getChannel(event.getChannel().getName())).getUserList();
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final ArrayList<String> set = event.getChannel().getUserList();
         set.remove(event.getUser().getNick());
+        Collections.sort(set, new UserComparator());
     }
 
     @Override
     public void onNickChange(final NickChangeEvent<LightBot> event) {
         for (final Channel c : event.getBot().getUserBot().getChannels()) {
-            ArrayList<String> set = ((LightChannel) c).getUserList();
-            for (String string : set) {
-                if (string.contains(event.getOldNick())) {
-                    c.appendToBuffer(Utils.getOutputForEvent(event));
-                    set.set(set.indexOf(string), event.getNewNick());
-                    Collections.sort(set);
-                }
-            }
+            final ArrayList<String> set = c.getUserList();
+            final String oldFormattedNick = event.getOldNick();
+            final String newFormattedNick = event.getNewNick();
+
+            c.appendToBuffer(Utils.getOutputForEvent(event));
+            set.set(set.indexOf(oldFormattedNick), newFormattedNick);
+            Collections.sort(set, new UserComparator());
         }
     }
 
     @Override
     public void onNickChangePerChannel(final NickChangeEventPerChannel<LightBot> event) {
-        ArrayList<String> set = ((LightChannel) event.getChannel()).getUserList();
-        for (String string : set) {
-            if (string.contains(event.getOldNick())) {
-                event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
-                set.set(set.indexOf(string), event.getNewNick());
-                Collections.sort(set);
-            }
-        }
+        final ArrayList<String> set = event.getChannel().getUserList();
+        final String oldFormattedNick = event.getOldNick();
+        final String newFormattedNick = event.getNewNick();
+
+        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+        set.set(set.indexOf(oldFormattedNick), newFormattedNick);
+        Collections.sort(set, new UserComparator());
     }
 
     @Override

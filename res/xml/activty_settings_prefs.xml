@@ -49,10 +49,6 @@
             android:summary="If server uses NickServ and you have registered" />
         <EditTextPreference
             android:enabled="false"
-            android:key="pref_nickserv_usernam"
-            android:title="NickServ username" />
-        <EditTextPreference
-            android:enabled="false"
             android:key="pref_nickserv_password"
             android:title="NickServ password"
             android:inputType="textPassword" />

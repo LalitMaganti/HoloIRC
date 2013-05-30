@@ -51,6 +51,8 @@ public class LightBuilder extends Builder implements Parcelable {
         dest.writeString(getName());
         dest.writeString(getLogin());
         dest.writeString(getServerPassword());
+        dest.writeString(getNickservPassword());
+
         ArrayList<String> list = new ArrayList<String>(getAutoJoinChannels()
                 .keySet());
         dest.writeStringList(list);
@@ -62,6 +64,7 @@ public class LightBuilder extends Builder implements Parcelable {
         setName(in.readString());
         setLogin(in.readString());
         setServerPassword(in.readString());
+        setNickservPassword(in.readString());
 
         ArrayList<String> list = new ArrayList<String>();
         in.readStringList(list);

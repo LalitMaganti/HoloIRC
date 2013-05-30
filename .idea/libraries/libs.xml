@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="libs">
     <CLASSES>
-      <root url="file://$PROJECT_DIR$/../pircbotx/src/main/libs" />
+      <root url="file://$PROJECT_DIR$/../PircBotX/src/main/libs" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

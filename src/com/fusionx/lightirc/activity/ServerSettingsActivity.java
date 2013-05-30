@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.activity;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ListFragment;
@@ -28,6 +29,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.*;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -47,29 +49,41 @@ public class ServerSettingsActivity extends PreferenceActivity {
     public static class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
         private static int indexOfServer;
+
+        // Preference keys
         private final static String Title = "pref_title";
         private final static String URL = "pref_url";
         private final static String Nick = "pref_nick";
+
         private final static String Login = "pref_login";
         private final static String ServerUserName = "pref_login_username";
         private final static String ServerPassword = "pref_login_password";
 
-        // EditText preferences
+        private final static String NickServ = "pref_nickserv";
+        private final static String NickServPassword = "pref_nickserv_password";
+
+        // Generic
         private EditTextPreference mEditTextNick;
         private EditTextPreference mEditTextTitle;
         private EditTextPreference mEditTextUrl;
 
+        // Server login
+        private CheckBoxPreference mLoginPref;
         private EditTextPreference mServerUserName;
         private EditTextPreference mServerPassword;
 
-        // Checkboxes
-        private CheckBoxPreference mLoginPref;
+        // NickServ
+        private CheckBoxPreference mNickServPref;
+        private EditTextPreference mNickServPassword;
 
-
+        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            Bundle f = getActivity().getIntent().getExtras();
+
+            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+
+            final Bundle f = getActivity().getIntent().getExtras();
             bot = f.getParcelable("server");
             indexOfServer = f.getInt("indexOfServer");
 
@@ -77,38 +91,59 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             PreferenceScreen prefSet = getPreferenceScreen();
 
+            // Title of server
             mEditTextTitle = (EditTextPreference) prefSet.findPreference(Title);
             mEditTextTitle.setOnPreferenceChangeListener(this);
             mEditTextTitle.setText(bot.getTitle());
             mEditTextTitle.setSummary(bot.getTitle());
 
+            // URL of server
             mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
             mEditTextUrl.setOnPreferenceChangeListener(this);
             mEditTextUrl.setText(bot.getServerHostname());
             mEditTextUrl.setSummary(bot.getServerHostname());
 
+            // Nick of User
             mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
             mEditTextNick.setOnPreferenceChangeListener(this);
             mEditTextNick.setText(bot.getName());
             mEditTextNick.setSummary(bot.getName());
 
-
-            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+            // Server login details
+            final boolean loginEnabled = settings.getBoolean("loginenabled", false);
 
             mLoginPref = (CheckBoxPreference) prefSet.findPreference(Login);
-            mLoginPref.setChecked(settings.getBoolean("loginenabled", false));
+            mLoginPref.setChecked(loginEnabled);
 
             mServerUserName = (EditTextPreference) prefSet.findPreference(ServerUserName);
             mServerUserName.setOnPreferenceChangeListener(this);
+            mServerUserName.setEnabled(loginEnabled);
 
             mServerPassword = (EditTextPreference) prefSet.findPreference(ServerPassword);
             mServerPassword.setOnPreferenceChangeListener(this);
+            mServerPassword.setEnabled(loginEnabled);
 
-            if(settings.getBoolean("loginenabled", false)) {
+            if (loginEnabled) {
                 mServerUserName.setText(bot.getLogin());
                 mServerUserName.setSummary(bot.getLogin());
+
                 mServerPassword.setText(bot.getServerPassword());
                 mServerPassword.setSummary(bot.getServerPassword());
+            }
+
+            // Nickserv details
+            final boolean nickServEnabled = settings.getBoolean("nickservenabled", false);
+
+            mNickServPref = (CheckBoxPreference) prefSet.findPreference(NickServ);
+            mNickServPref.setChecked(nickServEnabled);
+
+            mNickServPassword = (EditTextPreference) prefSet.findPreference(NickServPassword);
+            mNickServPassword.setOnPreferenceChangeListener(this);
+            mNickServPassword.setEnabled(loginEnabled);
+
+            if (loginEnabled) {
+                mNickServPassword.setText(bot.getServerPassword());
+                mNickServPassword.setSummary(bot.getServerPassword());
             }
         }
 
@@ -120,15 +155,29 @@ public class ServerSettingsActivity extends PreferenceActivity {
             if (preference == mLoginPref) {
                 boolean check = mLoginPref.isChecked();
                 e.putBoolean("loginenabled", check);
+
                 mServerUserName.setEnabled(check);
                 mServerPassword.setEnabled(check);
-                if(!check) {
+                if (!check) {
                     mServerUserName.setText("");
-                    mServerPassword.setText("");
                     mServerUserName.setSummary("");
+
+                    mServerPassword.setText("");
                     mServerPassword.setSummary("");
+
                     e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, "lightirc");
                     e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, "");
+                }
+            } else if (preference == mNickServPref) {
+                boolean check = mNickServPref.isChecked();
+                e.putBoolean("nickservenabled", check);
+
+                mNickServPassword.setEnabled(check);
+                if (!check) {
+                    mNickServPassword.setText("");
+                    mNickServPassword.setSummary("");
+
+                    e.putString(Constants.serverNickServPasswordPrefPrefix + indexOfServer, "");
                 }
             }
             e.commit();
@@ -137,21 +186,29 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
-            final Editor e = settings.edit();
-            if (preference == mEditTextNick) {
-                e.putString(Constants.nickPrefPrefix + indexOfServer, (String) newValue);
-            } else if (preference == mEditTextTitle) {
-                e.putString(Constants.titlePrefPrefix + indexOfServer, (String) newValue);
-            } else if (preference == mEditTextUrl) {
-                e.putString(Constants.urlPrefPrefix + indexOfServer, (String) newValue);
-            } else if (preference == mServerUserName) {
-                e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, (String) newValue);
-            } else if (preference == mServerPassword) {
-                e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, (String) newValue);
+            if(newValue instanceof String) {
+                final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+                final Editor e = settings.edit();
+
+                final String newString = (String) newValue;
+
+                if (preference == mEditTextNick) {
+                    e.putString(Constants.nickPrefPrefix + indexOfServer, newString);
+                } else if (preference == mEditTextTitle) {
+                    e.putString(Constants.titlePrefPrefix + indexOfServer, newString);
+                } else if (preference == mEditTextUrl) {
+                    e.putString(Constants.urlPrefPrefix + indexOfServer, newString);
+                } else if (preference == mServerUserName) {
+                    e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, newString);
+                } else if (preference == mServerPassword) {
+                    e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, newString);
+                } else if (preference == mNickServPassword) {
+                    e.putString(Constants.serverNickServPasswordPrefPrefix + indexOfServer, newString);
+                }
+
+                e.commit();
+                preference.setSummary((String) newValue);
             }
-            e.commit();
-            preference.setSummary((String) newValue);
             return true;
         }
     }
@@ -219,7 +276,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
             inputView = new EditText(getActivity());
 
             setListAdapter(adapter);
-
             setHasOptionsMenu(true);
 
             return super.onCreateView(inflater, container, savedInstanceState);

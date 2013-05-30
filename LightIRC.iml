@@ -23,8 +23,8 @@
     <orderEntry type="library" name="androidsupportlib" level="project" />
     <orderEntry type="module" module-name="CardsUILib" />
     <orderEntry type="module" module-name="pircbotx" />
-    <orderEntry type="library" name="lightirc" level="project" />
-    <orderEntry type="module" module-name="library1" />
+    <orderEntry type="library" name="pircbotxexports" level="project" />
+    <orderEntry type="module" module-name="library" />
   </component>
 </module>
 
