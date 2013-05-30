@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="lombok">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../PircBotX/src/main/libs/lombok.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
