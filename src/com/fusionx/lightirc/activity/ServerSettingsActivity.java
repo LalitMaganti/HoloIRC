@@ -182,28 +182,28 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if(newValue instanceof String) {
+            if (newValue instanceof String) {
                 final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
                 final Editor e = settings.edit();
 
                 final String newString = (String) newValue;
-
-                if (preference == mEditTextNick) {
-                    e.putString(Constants.nickPrefPrefix + indexOfServer, newString);
-                } else if (preference == mEditTextTitle) {
-                    e.putString(Constants.titlePrefPrefix + indexOfServer, newString);
-                } else if (preference == mEditTextUrl) {
-                    e.putString(Constants.urlPrefPrefix + indexOfServer, newString);
-                } else if (preference == mServerUserName) {
-                    e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, newString);
+                if (preference != mNickServPassword && preference != mServerPassword) {
+                    if (preference == mEditTextNick) {
+                        e.putString(Constants.nickPrefPrefix + indexOfServer, newString);
+                    } else if (preference == mEditTextTitle) {
+                        e.putString(Constants.titlePrefPrefix + indexOfServer, newString);
+                    } else if (preference == mEditTextUrl) {
+                        e.putString(Constants.urlPrefPrefix + indexOfServer, newString);
+                    } else if (preference == mServerUserName) {
+                        e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, newString);
+                    }
+                    preference.setSummary((String) newValue);
                 } else if (preference == mServerPassword) {
                     e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, newString);
-                } else if (preference == mNickServPassword) {
+                } else {
                     e.putString(Constants.serverNickServPasswordPrefPrefix + indexOfServer, newString);
                 }
-
                 e.commit();
-                preference.setSummary((String) newValue);
             }
             return true;
         }

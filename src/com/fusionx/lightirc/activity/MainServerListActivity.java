@@ -82,7 +82,7 @@ public class MainServerListActivity extends Activity implements
             bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
             bot.setLogin(settings.getString(Constants.serverUsernamePrefPrefix + i, "lightirc"));
             bot.setServerPassword(settings.getString(Constants.serverPasswordPrefPrefix + i, ""));
-            bot.setNickservPassword(settings.getString(Constants.serverNickServPasswordPrefPrefix + i, ""));
+            //bot.setNickservPassword(settings.getString(Constants.serverNickServPasswordPrefPrefix + i, null));
 
             Set<String> auto = new HashSet<String>();
             auto = settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
