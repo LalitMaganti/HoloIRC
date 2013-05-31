@@ -52,7 +52,7 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void userJoin(final JoinEvent<LightBot> event) {
-        // Invalid
+        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.add(event.getUser().getNick());
+        set.add(event.getUser().getPrettyNick());
         Collections.sort(set, new UserComparator());
     }
 
@@ -69,7 +69,7 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getNick());
+        set.remove(event.getUser().getPrettyNick());
         Collections.sort(set, new UserComparator());
     }
 
@@ -83,7 +83,7 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getNick());
+        set.remove(event.getUser().getPrettyNick());
         Collections.sort(set, new UserComparator());
     }
 

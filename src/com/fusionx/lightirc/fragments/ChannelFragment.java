@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 public class ChannelFragment extends IRCFragment implements TextView.OnEditorActionListener {
     private String serverName;
-    EditText edittext;
+    private EditText edittext;
 
     public ArrayList<String> getUserList() {
         return userList;
@@ -59,6 +59,11 @@ public class ChannelFragment extends IRCFragment implements TextView.OnEditorAct
         final String buffer = getArguments().getString("buffer");
         if (buffer != null) {
             writeToTextView(buffer, rootView);
+        }
+
+        final ArrayList<String> userLi = getArguments().getStringArrayList("userLi");
+        if (userLi != null) {
+            userList = userLi;
         }
 
         edittext = (EditText) rootView.findViewById(R.id.editText1);

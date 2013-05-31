@@ -36,9 +36,9 @@
             android:title="Username" />
         <EditTextPreference
             android:enabled="false"
+            android:inputType="textPassword"
             android:key="pref_login_password"
-            android:title="Password"
-            android:inputType="textPassword" />
+            android:title="Password" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="NickServ Info">

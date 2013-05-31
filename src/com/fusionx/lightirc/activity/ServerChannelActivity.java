@@ -78,7 +78,8 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                 addTab(0);
 
                 for (final Channel channelName : bot.getUserBot().getChannels()) {
-                    onNewChannelJoined(channelName.getName(), bot.getNick(), channelName.getBuffer());
+                    onNewChannelJoined(channelName.getName(), bot.getUserBot().getPrettyNick(), channelName.getBuffer(),
+                            channelName.getUserList());
                 }
             } else {
                 builder.getListenerManager().addListener(listener);
@@ -244,13 +245,15 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         actionBar.removeTabAt(i);
     }
 
-    public void onNewChannelJoined(final String channelName, final String nick, final String buffer) {
+    public void onNewChannelJoined(final String channelName, final String nick, final String buffer,
+                                   final ArrayList<String> userList) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle b = new Bundle();
         b.putString("channel", channelName);
         b.putString("nick", nick);
         b.putString("serverName", builder.getTitle());
         b.putString("buffer", buffer);
+        b.putStringArrayList("userList", userList);
         channel.setArguments(b);
 
         final int position = mIRCPagerAdapter.addView(channel);

@@ -29,6 +29,7 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.irc.LightBot;
+import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.Channel;
 import org.pircbotx.User;
@@ -39,6 +40,7 @@ import org.pircbotx.hooks.events.lightirc.PartEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class ActivityListener extends GenericListener {
     private final ServerChannelActivity activity;
@@ -108,7 +110,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 activity.onNewChannelJoined(joinevent.getChannel().getName(), joinevent
-                        .getUser().getNick(), Utils.getOutputForEvent(event));
+                        .getUser().getPrettyNick(), Utils.getOutputForEvent(event), null);
             }
         });
     }
@@ -121,7 +123,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.add(event.getUser().getNick());
+                    adapter.add(event.getUser().getPrettyNick());
                     adapter.sort();
                     adapter.notifyDataSetChanged();
                 }
@@ -137,7 +139,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getNick());
+                    adapter.remove(event.getUser().getPrettyNick());
                     adapter.sort();
                     adapter.notifyDataSetChanged();
                 }
@@ -151,8 +153,10 @@ public class ActivityListener extends GenericListener {
         final String channelName = event.getChannel().getName();
 
         for (final User u : event.getUsers()) {
-            userList.add(u.getNick());
+            userList.add(u.getPrettyNick());
         }
+
+        Collections.sort(userList, new UserComparator());
 
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -206,7 +210,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getNick());
+                    adapter.remove(event.getUser().getPrettyNick());
                     adapter.sort();
                     adapter.notifyDataSetChanged();
                 }

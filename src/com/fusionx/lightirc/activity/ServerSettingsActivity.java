@@ -128,7 +128,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 mServerUserName.setSummary(bot.getLogin());
 
                 mServerPassword.setText(bot.getServerPassword());
-                mServerPassword.setSummary(bot.getServerPassword());
             }
 
             // Nickserv details
@@ -143,7 +142,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             if (loginEnabled) {
                 mNickServPassword.setText(bot.getServerPassword());
-                mNickServPassword.setSummary(bot.getServerPassword());
             }
         }
 
@@ -163,7 +161,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     mServerUserName.setSummary("");
 
                     mServerPassword.setText("");
-                    mServerPassword.setSummary("");
 
                     e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, "lightirc");
                     e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, "");
@@ -175,7 +172,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 mNickServPassword.setEnabled(check);
                 if (!check) {
                     mNickServPassword.setText("");
-                    mNickServPassword.setSummary("");
 
                     e.putString(Constants.serverNickServPasswordPrefPrefix + indexOfServer, "");
                 }

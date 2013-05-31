@@ -32,7 +32,6 @@ import android.os.IBinder;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.irc.LightBot;
-import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
@@ -61,7 +60,6 @@ public class IRCService extends Service {
     public void connectToServer(final LightBuilder server) {
         // TODO - setup option for this
         server.setAutoNickChange(true);
-        server.setBotFactory(new LightBotFactory());
 
         setupListeners(server);
         setupNotification();
