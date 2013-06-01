@@ -54,8 +54,6 @@ public class IRCService extends Service {
         }
     }
 
-    private String boundServer = null;
-
     private final LightManager manager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
 
@@ -132,7 +130,6 @@ public class IRCService extends Service {
 
     @Override
     public IBinder onBind(final Intent intent) {
-        boundServer = intent.getStringExtra("serverName");
         return mBinder;
     }
 
@@ -148,7 +145,6 @@ public class IRCService extends Service {
 
     @Override
     public boolean onUnbind(final Intent intent) {
-        boundServer = null;
         return true;
     }
 

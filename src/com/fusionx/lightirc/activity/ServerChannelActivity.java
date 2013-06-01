@@ -302,35 +302,8 @@ public class ServerChannelActivity extends FragmentActivity
     }
 
     @Override
-    public void onPause() {
-        unbindService(mConnection);
-
-        super.onPause();
-    }
-
-
-    @Override
-    public void onResume() {
-        final Intent service = new Intent(this, IRCService.class);
-        service.putExtra("server", true);
-        service.putExtra("serverName", builder.getTitle());
-        service.putExtra("stop", false);
-        bindService(service, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                // Nothing to be done
-            }
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-                // Should never happen
-            }
-        }, 0);
-
-        super.onResume();
-    }
-
-    @Override
     public void onDestroy() {
+        unbindService(mConnection);
         if (service.getBot(builder.getTitle()) != null) {
             service.getBot(builder.getTitle()).getConfiguration()
                     .getListenerManager().removeListener(listener);
