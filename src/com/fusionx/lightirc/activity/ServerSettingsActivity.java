@@ -39,9 +39,9 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.PromptDialog;
+import org.pircbotx.Configuration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -344,7 +344,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
     }
 
-    private static LightBuilder bot;
+    private static Configuration.Builder bot;
 
     @Override
     public void onBuildHeaders(List<Header> target) {

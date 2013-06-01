@@ -42,13 +42,13 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.*;
-import com.fusionx.lightirc.irc.LightBot;
-import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.listeners.ActivityListener;
 import com.fusionx.lightirc.parser.MessageParser;
 import com.fusionx.lightirc.services.IRCService;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import org.pircbotx.Channel;
+import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 
 import java.lang.reflect.Field;
@@ -60,9 +60,42 @@ public class ServerChannelActivity extends FragmentActivity
     private UserListFragment users;
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
-    private LightBuilder builder;
+    private Configuration.Builder builder;
     private ActivityListener listener;
     private IRCService service;
+    private SlidingMenu menu;
+    private String mention;
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mention = getIntent().getExtras().getString("mention", "");
+
+        setContentView(R.layout.activity_server_channel);
+        setUpSlidingMenu();
+
+        mIRCPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mIRCPagerAdapter);
+        mViewPager.setOnPageChangeListener(this);
+
+        listener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
+
+        builder = getIntent().getExtras().getParcelable("server");
+
+        final ActionBar actionBar = getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        final Intent service = new Intent(this, IRCService.class);
+        service.putExtra("server", true);
+        service.putExtra("serverName", builder.getTitle());
+        service.putExtra("stop", false);
+        startService(service);
+        bindService(service, mConnection, 0);
+    }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
@@ -76,7 +109,7 @@ public class ServerChannelActivity extends FragmentActivity
             listener.setArrayAdapter((UserListAdapter) users.getListAdapter());
 
             if (service.getBot(builder.getTitle()) != null) {
-                LightBot bot = service.getBot(builder.getTitle());
+                PircBotX bot = service.getBot(builder.getTitle());
                 bot.getConfiguration().getListenerManager().addListener(listener);
                 b.putString("buffer", bot.getBuffer());
                 d.setArguments(b);
@@ -105,53 +138,6 @@ public class ServerChannelActivity extends FragmentActivity
         }
     };
 
-    private void addTab(String title) {
-        final ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.addTab(actionBar.newTab().setText(title).setTabListener(this));
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        unbindService(mConnection);
-        if (service.getBot(builder.getTitle()) != null) {
-            service.getBot(builder.getTitle()).getConfiguration()
-                    .getListenerManager().removeListener(listener);
-        }
-
-        super.onDestroy();
-    }
-
-    @Override
-    public void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_server_channel);
-        setUpSlidingMenu();
-
-        mIRCPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
-
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mIRCPagerAdapter);
-        mViewPager.setOnPageChangeListener(this);
-
-        listener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
-
-        builder = getIntent().getExtras().getParcelable("server");
-
-        final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        final Intent service = new Intent(this, IRCService.class);
-        service.putExtra("server", true);
-        service.putExtra("stop", false);
-        startService(service);
-        bindService(service, mConnection, 0);
-    }
-
-    private SlidingMenu menu;
 
     private void setUpSlidingMenu() {
         menu = new SlidingMenu(this);
@@ -165,37 +151,7 @@ public class ServerChannelActivity extends FragmentActivity
                 .findFragmentById(R.id.user_fragment);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(final MenuItem item) {
-        Intent intent = new Intent(this, MainServerListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                startActivity(intent);
-                return true;
-            case R.id.activity_server_channel_ab_part:
-                partFromChannel();
-                return true;
-            case R.id.activity_server_channel_ab_disconnect:
-                disconnect();
-                startActivity(intent);
-                return true;
-            case R.id.activity_server_channel_ab_users:
-                menu.toggle();
-                return true;
-            case R.id.activity_server_channel_ab_close:
-                closePMConversation();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
+    // Page change stuff
     @Override
     public void onPageScrolled(final int arg0, final float arg1, final int arg2) {
     }
@@ -211,13 +167,15 @@ public class ServerChannelActivity extends FragmentActivity
 
         userListUpdate(position);
 
-        final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
-                .getItem(position).getView().findViewById(R.id.scrollview);
-        scrollView.post(new Runnable() {
-            public void run() {
-                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
+        if (mIRCPagerAdapter.getItem(position).getView() != null) {
+            final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
+                    .getItem(position).getView().findViewById(R.id.scrollview);
+            scrollView.post(new Runnable() {
+                public void run() {
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            });
+        }
 
         final ActionBar bar = getActionBar();
         if (bar != null) {
@@ -247,6 +205,7 @@ public class ServerChannelActivity extends FragmentActivity
         }
     }
 
+    // Tab change listeners
     @Override
     public void onTabReselected(final Tab tab, final FragmentTransaction ft) {
     }
@@ -260,20 +219,12 @@ public class ServerChannelActivity extends FragmentActivity
     public void onTabUnselected(final Tab tab, final FragmentTransaction ft) {
     }
 
-    private void partFromChannel() {
-        int index = mViewPager.getCurrentItem();
-        mViewPager.setCurrentItem(index - 1);
-
-        mIRCPagerAdapter.removeView(index);
-        removeTab(index);
-
-        service.partFromChannel(builder.getTitle(),
-                ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
-    }
-
-    private void removeTab(final int i) {
+    // New stuff
+    private void addTab(String title) {
         final ActionBar actionBar = getActionBar();
-        actionBar.removeTabAt(i);
+        if (actionBar != null) {
+            actionBar.addTab(actionBar.newTab().setText(title).setTabListener(this));
+        }
     }
 
     public void onNewChannelJoined(final String channelName,
@@ -289,21 +240,38 @@ public class ServerChannelActivity extends FragmentActivity
         final int position = mIRCPagerAdapter.addView(channel);
         addTab(channelName);
         getActionBar().getTabAt(position).setText(channelName);
+
+        if (mention.equals(channelName)) {
+            mViewPager.setCurrentItem(position);
+        }
+
         mViewPager.setOffscreenPageLimit(position);
     }
 
     public void onNewPrivateMessage(final String userNick, final String buffer) {
-        final PMFragment channel = new PMFragment();
+        final PMFragment pmFragment = new PMFragment();
         final Bundle b = new Bundle();
         b.putString("serverName", builder.getTitle());
         b.putString("buffer", buffer);
         b.putString("nick", userNick);
-        channel.setArguments(b);
+        pmFragment.setArguments(b);
 
-        final int position = mIRCPagerAdapter.addView(channel);
+        final int position = mIRCPagerAdapter.addView(pmFragment);
         addTab(userNick);
         getActionBar().getTabAt(position).setText(userNick);
+
+        if (mention.equals(userNick)) {
+            mViewPager.setCurrentItem(position);
+        }
+
         mViewPager.setOffscreenPageLimit(position);
+    }
+
+
+    // Removal stuff
+    private void removeTab(final int i) {
+        final ActionBar actionBar = getActionBar();
+        actionBar.removeTabAt(i);
     }
 
     private void disconnect() {
@@ -320,8 +288,62 @@ public class ServerChannelActivity extends FragmentActivity
 
         mIRCPagerAdapter.removeView(index);
         removeTab(index);
+    }
+
+    private void partFromChannel() {
+        int index = mViewPager.getCurrentItem();
+        mViewPager.setCurrentItem(index - 1);
+
+        mIRCPagerAdapter.removeView(index);
+        removeTab(index);
+
+        service.partFromChannel(builder.getTitle(),
+                ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
+    }
+
+    @Override
+    public void onPause() {
+        unbindService(mConnection);
+
+        super.onPause();
+    }
 
 
+    @Override
+    public void onResume() {
+        final Intent service = new Intent(this, IRCService.class);
+        service.putExtra("server", true);
+        service.putExtra("serverName", builder.getTitle());
+        service.putExtra("stop", false);
+        bindService(service, new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                // Nothing to be done
+            }
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+                // Should never happen
+            }
+        }, 0);
+
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (service.getBot(builder.getTitle()) != null) {
+            service.getBot(builder.getTitle()).getConfiguration()
+                    .getListenerManager().removeListener(listener);
+        }
+
+        super.onDestroy();
+    }
+
+    // Options menu stuff
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
+        return true;
     }
 
     @Override
@@ -338,6 +360,31 @@ public class ServerChannelActivity extends FragmentActivity
         }
 
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        Intent intent = new Intent(this, MainServerListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                startActivity(intent);
+                return true;
+            case R.id.activity_server_channel_ab_part:
+                partFromChannel();
+                return true;
+            case R.id.activity_server_channel_ab_disconnect:
+                disconnect();
+                startActivity(intent);
+                return true;
+            case R.id.activity_server_channel_ab_users:
+                menu.toggle();
+                return true;
+            case R.id.activity_server_channel_ab_close:
+                closePMConversation();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     // Hack for http://code.google.com/p/android/issues/detail?id=38500

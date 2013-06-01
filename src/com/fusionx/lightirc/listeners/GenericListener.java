@@ -1,32 +1,32 @@
 package com.fusionx.lightirc.listeners;
 
-import com.fusionx.lightirc.irc.LightBot;
+import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.JoinEvent;
 import org.pircbotx.hooks.events.lightirc.PartEvent;
 
-public abstract class GenericListener extends ListenerAdapter<LightBot> implements Listener<LightBot> {
+public abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
 
-    protected abstract void userJoin(JoinEvent<LightBot> event);
+    protected abstract void onBotJoin(JoinEvent<PircBotX> event);
 
-    protected abstract void otherUserJoin(JoinEvent<LightBot> event);
+    protected abstract void onOtherUserJoin(JoinEvent<PircBotX> event);
 
-    protected abstract void part(PartEvent<LightBot> event);
+    protected abstract void onOtherUserPart(PartEvent<PircBotX> event);
 
     @Override
-    public void onJoin(final JoinEvent<LightBot> event) {
+    public void onJoin(final JoinEvent<PircBotX> event) {
         if (!((JoinEvent) event).getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
-            otherUserJoin(event);
+            onOtherUserJoin(event);
         } else {
-            userJoin(event);
+            onBotJoin(event);
         }
     }
 
     @Override
-    public void onPart(final PartEvent<LightBot> event) {
+    public void onPart(final PartEvent<PircBotX> event) {
         if (!event.getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
-            part(event);
+            onOtherUserPart(event);
         }
     }
 }

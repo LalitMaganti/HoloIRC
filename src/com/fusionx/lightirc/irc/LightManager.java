@@ -21,13 +21,15 @@
 
 package com.fusionx.lightirc.irc;
 
+import org.pircbotx.PircBotX;
+
 import java.util.HashMap;
 
-public class LightManager extends HashMap<String, LightBot> {
+public class LightManager extends HashMap<String, PircBotX> {
     private static final long serialVersionUID = 2426166268063489300L;
 
     public void disconnectAll() {
-        for (LightBot bot : values()) {
+        for (PircBotX bot : values()) {
             bot.shutdown();
         }
     }

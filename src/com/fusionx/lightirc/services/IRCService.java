@@ -23,8 +23,10 @@ package com.fusionx.lightirc.services;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
@@ -32,12 +34,12 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.irc.LightBot;
-import com.fusionx.lightirc.irc.LightBuilder;
+import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
 import org.pircbotx.UserChannelDao;
 import org.pircbotx.exception.IrcException;
 import org.pircbotx.output.OutputChannel;
@@ -52,11 +54,13 @@ public class IRCService extends Service {
         }
     }
 
+    private String boundServer = null;
+
     private final LightManager manager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public void connectToServer(final LightBuilder server) {
+    public void connectToServer(final Configuration.Builder server) {
         // TODO - setup option for this
         server.setAutoNickChange(true);
 
@@ -65,7 +69,7 @@ public class IRCService extends Service {
 
         final Configuration d = server.buildConfiguration();
 
-        final LightBot bo = new LightBot(d);
+        final PircBotX bo = new PircBotX(d);
 
         new Thread() {
             @Override
@@ -122,12 +126,13 @@ public class IRCService extends Service {
         }
     }
 
-    public LightBot getBot(final String serverName) {
+    public PircBotX getBot(final String serverName) {
         return manager.get(serverName);
     }
 
     @Override
     public IBinder onBind(final Intent intent) {
+        boundServer = intent.getStringExtra("serverName");
         return mBinder;
     }
 
@@ -143,25 +148,46 @@ public class IRCService extends Service {
 
     @Override
     public boolean onUnbind(final Intent intent) {
+        boundServer = null;
         return true;
     }
 
     public void partFromChannel(String serverName, String channelName) {
-        UserChannelDao d = getBot(serverName).getUserChannelDao();
-        Channel c = d.getChannel(channelName);
+        final UserChannelDao d = getBot(serverName).getUserChannelDao();
+        final Channel c = d.getChannel(channelName);
         OutputChannel f = c.send();
         f.part();
     }
 
     public void removePrivateMessage(String serverName, String nick) {
-        UserChannelDao d = getBot(serverName).getUserChannelDao();
+        final UserChannelDao d = getBot(serverName).getUserChannelDao();
         d.removePrivateMessage(nick);
         d.getUser(nick).setBuffer("");
     }
 
-    private void setupListeners(LightBuilder bot) {
-        final ServiceListener mChannelListener = new ServiceListener();
+    private void setupListeners(Configuration.Builder bot) {
+        final ServiceListener mServiceListener = new ServiceListener();
+        mServiceListener.setService(this);
 
-        bot.getListenerManager().addListener(mChannelListener);
+        bot.getListenerManager().addListener(mServiceListener);
+    }
+
+    public void mention(String serverName, String messageDest) {
+        final Intent mIntent = new Intent(this, ServerChannelActivity.class);
+        mIntent.putExtra("server", new Configuration
+                .Builder(getBot(serverName).getConfiguration()));
+        mIntent.putExtra("mention", messageDest);
+        final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
+                mIntent, 0);
+        final Notification notification = new NotificationCompat.Builder(this)
+                .setContentTitle("LightIRC")
+                .setContentText("You have been mentioned")
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pIntent).build();
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+        final NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(345, notification);
     }
 }

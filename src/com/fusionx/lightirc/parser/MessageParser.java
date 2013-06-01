@@ -21,10 +21,12 @@
 
 package com.fusionx.lightirc.parser;
 
-import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.services.IRCService;
+import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 
 public class MessageParser {
@@ -38,37 +40,53 @@ public class MessageParser {
         mService = service;
     }
 
-    public void channelMessageToParse(String serverName, String channelName, String message) {
-        final LightBot bot = getService().getBot(serverName);
-        if (message != null && message.startsWith("/")) {
-            // TODO parse this string fully
-            if (message.startsWith("/join")) {
-                String channel = message.replace("/join ", "");
-                // TODO - input validation
-                bot.sendIRC().joinChannel(channel);
-            } else if (message.startsWith("/me")) {
-                String action = message.replace("/me ", "");
-                // TODO - input validation
-                bot.sendIRC().action(channelName, action);
-                bot.getConfiguration().getListenerManager()
-                        .dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
-                                bot.getUserChannelDao().getChannel(channelName), action));
-            } else if (message.startsWith("/nick")) {
-                String newNick = message.replace("/nick ", "");
-                bot.sendIRC().changeNick(newNick);
+    public void channelMessageToParse(final String serverName, final String channelName,
+                                      final String message) {
+        final PircBotX bot = getService().getBot(serverName);
+        if(message != null) {
+            final String parsedArray[] = message.split("\\s+");
+
+            if (parsedArray[0].startsWith("/")) {
+                // TODO parse this string fully
+                if (parsedArray[0].startsWith("/join")) {
+                    final String channel = parsedArray[1];
+                    // TODO - input validation
+                    bot.sendIRC().joinChannel(channel);
+                } else if (parsedArray[0].startsWith("/me")) {
+                    final String action = parsedArray[1];
+                    // TODO - input validation
+                    bot.sendIRC().action(channelName, action);
+                    bot.getConfiguration().getListenerManager()
+                            .dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
+                                    bot.getUserChannelDao().getChannel(channelName), action));
+                } else if (message.startsWith("/nick")) {
+                    final String newNick = parsedArray[1];
+                    bot.sendIRC().changeNick(newNick);
+                } else if (message.startsWith("/msg")) {
+                    final String newNick = parsedArray[1];
+                    String pm = parsedArray[2];
+                    if(pm == null) {
+                        pm = "";
+                    } else {
+                        bot.sendIRC().message(newNick, pm);
+                    }
+                    bot.getConfiguration().getListenerManager().dispatchEvent
+                            (new PrivateActionEvent(bot, bot.getUserChannelDao()
+                                    .getUser(newNick), pm));
+                } else {
+                    //Dispatch event here
+                }
             } else {
-                //Dispatch event here
+                bot.sendIRC().message(channelName, message);
+                bot.getConfiguration().getListenerManager().dispatchEvent
+                        (new MessageEvent(bot, bot.getUserChannelDao().getChannel(channelName),
+                                bot.getUserBot(), message));
             }
-        } else {
-            bot.sendIRC().message(channelName, message);
-            bot.getConfiguration().getListenerManager().dispatchEvent
-                    (new MessageEvent(bot, bot.getUserChannelDao().getChannel(channelName),
-                            bot.getUserBot(), message));
         }
     }
 
     public void serverMessageToParse(String serverName, String message) {
-        final LightBot bot = getService().getBot(serverName);
+        final PircBotX bot = getService().getBot(serverName);
 
         if (message.startsWith("/")) {
             // TODO parse this string fully
@@ -87,21 +105,24 @@ public class MessageParser {
     }
 
     public void userMessageToParse(String serverName, String userNick, String message) {
-        final LightBot bot = getService().getBot(serverName);
+        final PircBotX bot = getService().getBot(serverName);
 
         if (message.startsWith("/")) {
             // TODO parse this string fully
             if (message.startsWith("/me")) {
+                final User user = bot.getUserChannelDao().getUser(userNick);
                 String action = message.replace("/me ", "");
                 // TODO - input validation
-                bot.getUserChannelDao().getUser(userNick).send().action(action);
-
+                user.send().action(action);
+                bot.getConfiguration().getListenerManager().dispatchEvent
+                        (new PrivateActionEvent(bot, user, message));
             } else {
             }
         } else {
-            bot.getUserChannelDao().getUser(userNick).send().message(message);
+            final User user = bot.getUserChannelDao().getUser(userNick);
+            user.send().message(message);
             bot.getConfiguration().getListenerManager().dispatchEvent
-                    (new PrivateActionEvent(bot, bot.getUserBot(), message));
+                    (new PrivateMessageEvent(bot, user, message));
         }
     }
 }

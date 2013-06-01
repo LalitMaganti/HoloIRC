@@ -30,44 +30,46 @@ import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 public class Utils {
     public static String getOutputForEvent(Event e) {
         if (e instanceof MotdEvent) {
-            MotdEvent event = (MotdEvent) e;
+            final MotdEvent event = (MotdEvent) e;
             return event.getMotd() + "\n";
         } else if (e instanceof NoticeEvent) {
-            NoticeEvent event = (NoticeEvent) e;
+            final NoticeEvent event = (NoticeEvent) e;
             return event.getNotice() + "\n";
         } else if (e instanceof ActionEvent) {
-            ActionEvent event = (ActionEvent) e;
+            final ActionEvent event = (ActionEvent) e;
             return "* " + event.getUser().getPrettyNick(event.getChannel())
                     + " " + event.getAction() + "\n";
         } else if (e instanceof JoinEvent) {
             JoinEvent event = (JoinEvent) e;
             return event.getUser().getPrettyNick(event.getChannel()) + " entered the room\n";
         } else if (e instanceof TopicEvent) {
-            TopicEvent event = (TopicEvent) e;
+            final TopicEvent event = (TopicEvent) e;
             String newMessage;
             if (event.isChanged()) {
-                newMessage = "The topic for this channel has been changed to: "
-                        + event.getTopic()
-                        + " by "
-                        + event.getChannel().getTopicSetter() + "\n";
+                newMessage = "The topic for this channel has been changed to: " + event.getTopic()
+                        + " by " + event.getChannel().getTopicSetter() + "\n";
             } else {
-                newMessage = "The topic is: "
-                        + event.getTopic() + " as set forth by "
+                newMessage = "The topic is: " + event.getTopic() + " as set forth by "
                         + event.getChannel().getTopicSetter() + "\n";
             }
             return newMessage;
         } else if (e instanceof MessageEvent) {
-            MessageEvent event = (MessageEvent) e;
-            return event.getUser().getPrettyNick(event.getChannel())
+            final MessageEvent event = (MessageEvent) e;
+            String baseMessage = event.getUser().getPrettyNick(event.getChannel())
                     + ": " + event.getMessage() + "\n";
+            if (event.getMessage().contains(event.getBot().getNick()) &&
+                    !event.getUser().getNick().equals(event.getBot().getNick())) {
+                baseMessage = "<b>" + baseMessage + "</b>";
+            }
+            return baseMessage;
         } else if (e instanceof QuitEventPerChannel) {
-            QuitEventPerChannel event = (QuitEventPerChannel) e;
+            final QuitEventPerChannel event = (QuitEventPerChannel) e;
             return event.getUser().getPrettyNick(event.getChannel()) + " quit the room\n";
         } else if (e instanceof PartEvent) {
-            PartEvent event = (PartEvent) e;
+            final PartEvent event = (PartEvent) e;
             return event.getUser().getPrettyNick(event.getChannel()) + " parted from the room\n";
         } else if (e instanceof NickChangeEventPerChannel) {
-            NickChangeEventPerChannel event = (NickChangeEventPerChannel) e;
+            final NickChangeEventPerChannel event = (NickChangeEventPerChannel) e;
             String newMessage;
             if (event.getUser().getNick().equals(event.getBot().getNick())) {
                 newMessage = "You (" + event.getOldNick() + ") are now known as "
@@ -78,10 +80,10 @@ public class Utils {
             }
             return newMessage;
         } else if (e instanceof PrivateMessageEvent) {
-            PrivateMessageEvent event = (PrivateMessageEvent) e;
+            final PrivateMessageEvent event = (PrivateMessageEvent) e;
             return event.getUser().getColourfulNick() + ": " + event.getMessage() + "\n";
         } else if (e instanceof PrivateActionEvent) {
-            PrivateActionEvent event = (PrivateActionEvent) e;
+            final PrivateActionEvent event = (PrivateActionEvent) e;
             return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";
         } else {
             // Invalid event

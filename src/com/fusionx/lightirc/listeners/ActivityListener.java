@@ -29,9 +29,9 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.PMFragment;
-import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
+import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
@@ -59,8 +59,9 @@ public class ActivityListener extends GenericListener {
         this.adapter = adapter;
     }
 
+    // Server events
     @Override
-    public void onEvent(final Event<LightBot> event) throws Exception {
+    public void onEvent(final Event<PircBotX> event) throws Exception {
         super.onEvent(event);
 
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
@@ -75,18 +76,9 @@ public class ActivityListener extends GenericListener {
         }
     }
 
+    // Channel events
     @Override
-    public void onMessage(final MessageEvent<LightBot> event) {
-        sendMessage(event.getChannel().getName(), event);
-    }
-
-    @Override
-    public void onAction(final ActionEvent<LightBot> event) {
-        sendMessage(event.getChannel().getName(), event);
-    }
-
-    @Override
-    public void userJoin(final JoinEvent<LightBot> event) {
+    public void onBotJoin(final JoinEvent<PircBotX> event) {
         final JoinEvent joinevent = (JoinEvent) event;
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -98,58 +90,7 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void otherUserJoin(final JoinEvent<LightBot> event) {
-        sendMessage(event.getChannel().getName(), event);
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.add(event.getUser().getPrettyNick(event.getChannel()));
-                    adapter.sort();
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void part(final PartEvent<LightBot> event) {
-        sendMessage(event.getChannel().getName(), event);
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getPrettyNick(event.getChannel()));
-                    adapter.sort();
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onUserList(final UserListEvent<LightBot> event) {
-        final ArrayList<String> userList = event.getChannel().getUserList();
-        final String channelName = event.getChannel().getName();
-
-        for (final User u : event.getUsers()) {
-            userList.add(u.getPrettyNick(event.getChannel()));
-        }
-
-        Collections.sort(userList, new UserComparator());
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                ((ChannelFragment) mIRCPagerAdapter.getTab(channelName)).setUserList(userList);
-            }
-        });
-    }
-
-    @Override
-    public void onTopic(final TopicEvent<LightBot> event) {
+    public void onTopic(final TopicEvent<PircBotX> event) {
         final String channelName = ((TopicEvent) event).getChannel().getName();
 
         activity.runOnUiThread(new Runnable() {
@@ -168,7 +109,36 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onNickChangePerChannel(final NickChangeEventPerChannel<LightBot> event) {
+    public void onUserList(final UserListEvent<PircBotX> event) {
+        final ArrayList<String> userList = event.getChannel().getUserList();
+        final String channelName = event.getChannel().getName();
+
+        for (final User u : event.getUsers()) {
+            userList.add(u.getPrettyNick(event.getChannel()));
+        }
+
+        Collections.sort(userList, new UserComparator());
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ((ChannelFragment) mIRCPagerAdapter.getTab(channelName)).setUserList(userList);
+            }
+        });
+    }
+
+    @Override
+    public void onMessage(final MessageEvent<PircBotX> event) {
+        sendMessage(event.getChannel().getName(), event);
+    }
+
+    @Override
+    public void onAction(final ActionEvent<PircBotX> event) {
+        sendMessage(event.getChannel().getName(), event);
+    }
+
+    @Override
+    public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
         final String oldFormattedNick = event.getOldNick();
         final String newFormattedNick = event.getNewNick();
 
@@ -185,7 +155,23 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onQuitPerChannel(final QuitEventPerChannel<LightBot> event) {
+    public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
+        sendMessage(event.getChannel().getName(), event);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (checkChannelFragment(event.getChannel().getName())) {
+                    adapter.add(event.getUser().getPrettyNick(event.getChannel()));
+                    adapter.sort();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onOtherUserPart(final PartEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
         activity.runOnUiThread(new Runnable() {
@@ -200,16 +186,35 @@ public class ActivityListener extends GenericListener {
         });
     }
 
+    @Override
+    public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
+        sendMessage(event.getChannel().getName(), event);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (checkChannelFragment(event.getChannel().getName())) {
+                    adapter.remove(event.getUser().getPrettyNick(event.getChannel()));
+                    adapter.sort();
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    // Private message events
     // TODO - standardise this and private actions
     @Override
-    public void onPrivateMessage(final PrivateMessageEvent<LightBot> event) {
+    public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
                 if (fragment != null) {
                     PMFragment pm = (PMFragment) fragment;
-                    pm.writeToTextView(Utils.getOutputForEvent(event));
+                    if(!event.getMessage().equals("")) {
+                        pm.writeToTextView(Utils.getOutputForEvent(event));
+                    }
                 } else {
                     activity.onNewPrivateMessage(event.getUser().getNick(),
                             Utils.getOutputForEvent(event));
@@ -219,7 +224,7 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onPrivateAction(final PrivateActionEvent<LightBot> event) {
+    public void onPrivateAction(final PrivateActionEvent<PircBotX> event) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -235,6 +240,7 @@ public class ActivityListener extends GenericListener {
         });
     }
 
+    // Misc stuff
     private void sendMessage(final String title, final Event event) {
         activity.runOnUiThread(new Runnable() {
             @Override

@@ -21,9 +21,11 @@
 
 package com.fusionx.lightirc.listeners;
 
-import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
+import com.fusionx.lightirc.services.IRCService;
+import lombok.*;
+import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
@@ -34,10 +36,16 @@ import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class ServiceListener extends GenericListener {
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PUBLIC)
+    private IRCService service;
 
+    // Server stuff
     @Override
-    public void onEvent(final Event<LightBot> event) throws Exception {
+    public void onEvent(final Event<PircBotX> event) throws Exception {
         super.onEvent(event);
 
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
@@ -45,50 +53,39 @@ public class ServiceListener extends GenericListener {
         }
     }
 
+    // Channel stuff
     @Override
-    public void onAction(final ActionEvent<LightBot> event) {
+    public void onBotJoin(final JoinEvent<PircBotX> event) {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
     }
 
     @Override
-    public void userJoin(final JoinEvent<LightBot> event) {
+    public void onTopic(final TopicEvent<PircBotX> event) {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
     }
 
     @Override
-    public void otherUserJoin(final JoinEvent<LightBot> event) {
-        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+    public void onMessage(final MessageEvent<PircBotX> event) {
+        if (event.getMessage().contains(event.getBot().getNick())) {
+            final String title = event.getBot().getConfiguration().getTitle();
+            getService().mention(title, event.getChannel().getName());
+        }
 
-        final ArrayList<String> set = event.getChannel().getUserList();
-        set.add(event.getUser().getPrettyNick(event.getChannel()));
-        Collections.sort(set, new UserComparator());
-    }
-
-    @Override
-    public void part(final PartEvent<LightBot> event) {
-        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
-
-        final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getPrettyNick(event.getChannel()));
-        Collections.sort(set, new UserComparator());
-    }
-
-    @Override
-    public void onMessage(final MessageEvent<LightBot> event) {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
     }
 
     @Override
-    public void onQuitPerChannel(final QuitEventPerChannel<LightBot> event) {
-        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+    public void onAction(final ActionEvent<PircBotX> event) {
+        if (event.getMessage().contains(event.getBot().getNick())) {
+            final String title = event.getBot().getConfiguration().getTitle();
+            getService().mention(title, event.getChannel().getName());
+        }
 
-        final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getPrettyNick(event.getChannel()));
-        Collections.sort(set, new UserComparator());
+        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
     }
 
     @Override
-    public void onNickChangePerChannel(final NickChangeEventPerChannel<LightBot> event) {
+    public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
         final ArrayList<String> set = event.getChannel().getUserList();
         final String oldFormattedNick = event.getOldNick();
         final String newFormattedNick = event.getNewNick();
@@ -100,17 +97,46 @@ public class ServiceListener extends GenericListener {
     }
 
     @Override
-    public void onTopic(final TopicEvent<LightBot> event) {
+    public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final ArrayList<String> set = event.getChannel().getUserList();
+        set.add(event.getUser().getPrettyNick(event.getChannel()));
+        Collections.sort(set, new UserComparator());
     }
 
     @Override
-    public void onPrivateMessage(final PrivateMessageEvent<LightBot> event) {
-        event.getUser().appendToBuffer(Utils.getOutputForEvent(event));
+    public void onOtherUserPart(final PartEvent<PircBotX> event) {
+        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final ArrayList<String> set = event.getChannel().getUserList();
+        set.remove(event.getUser().getPrettyNick(event.getChannel()));
+        Collections.sort(set, new UserComparator());
     }
 
     @Override
-    public void onPrivateAction(final PrivateActionEvent<LightBot> event) {
+    public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
+        event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final ArrayList<String> set = event.getChannel().getUserList();
+        set.remove(event.getUser().getPrettyNick(event.getChannel()));
+        Collections.sort(set, new UserComparator());
+    }
+
+    // Private message stuff
+    @Override
+    public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
         event.getUser().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final String title = event.getBot().getConfiguration().getTitle();
+        getService().mention(title, event.getUser().getNick());
+    }
+
+    @Override
+    public void onPrivateAction(final PrivateActionEvent<PircBotX> event) {
+        event.getUser().appendToBuffer(Utils.getOutputForEvent(event));
+
+        final String title = event.getBot().getConfiguration().getTitle();
+        getService().mention(title, event.getUser().getNick());
     }
 }

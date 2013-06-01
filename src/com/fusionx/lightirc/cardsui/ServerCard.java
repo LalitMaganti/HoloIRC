@@ -28,14 +28,14 @@ import android.widget.TextView;
 import com.fima.cardsui.objects.Card;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.irc.LightBuilder;
+import org.pircbotx.Configuration;
 
 public class ServerCard extends Card {
-    private final LightBuilder mBuilder;
+    private final Configuration.Builder mBuilder;
     private final String mStatus;
 
     public ServerCard(final String title, final String status,
-                      final LightBuilder builder) {
+                      final Configuration.Builder builder) {
         super(title);
         mStatus = status;
         mBuilder = builder;

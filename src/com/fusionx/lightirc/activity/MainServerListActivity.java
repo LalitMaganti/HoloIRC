@@ -33,8 +33,8 @@ import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
 import com.fusionx.lightirc.cardsui.ServerCard;
-import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.misc.Constants;
+import org.pircbotx.Configuration;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -42,18 +42,19 @@ import java.util.Set;
 
 public class MainServerListActivity extends Activity implements
         OnClickListener, ActionMode.Callback, View.OnLongClickListener {
-    private final ArrayList<LightBuilder> mListOfBuilders = new ArrayList<LightBuilder>();
+    private final ArrayList<Configuration.Builder>
+            mListOfBuilders = new ArrayList<Configuration.Builder>();
     private boolean actionModeStarted = false;
     private ActionMode mMode;
 
-    private void connectToServer(final LightBuilder builder) {
+    private void connectToServer(final Configuration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerChannelActivity.class);
         intent.putExtra("server", builder);
         startActivity(intent);
     }
 
-    private void editServer(final LightBuilder builder) {
+    private void editServer(final Configuration.Builder builder) {
         Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
         intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
@@ -69,14 +70,14 @@ public class MainServerListActivity extends Activity implements
         final SharedPreferences settings = getSharedPreferences("main", 0);
         final boolean firstRun = settings.getBoolean("firstrun", true);
         int noOfServers = settings.getInt("noOfServers", 0);
-        final ArrayList<LightBuilder> values = new ArrayList<LightBuilder>();
+        final ArrayList<Configuration.Builder> values = new ArrayList<Configuration.Builder>();
 
         if (firstRun) {
             noOfServers = firstRunAdditions(settings);
         }
 
         for (int i = 0; i < noOfServers; i++) {
-            LightBuilder bot = new LightBuilder();
+            Configuration.Builder bot = new Configuration.Builder();
             bot.setTitle(settings.getString(Constants.titlePrefPrefix + i, ""));
             bot.setServerHostname(settings.getString(Constants.urlPrefPrefix + i, ""));
             bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
@@ -103,7 +104,7 @@ public class MainServerListActivity extends Activity implements
             CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
             mCardView.clearCards();
             mCardView.setSwipeable(false);
-            for (LightBuilder bot : values) {
+            for (Configuration.Builder bot : values) {
                 ServerCard server = new ServerCard(bot
                         .getTitle(), bot.getServerHostname(), bot);
                 server.setOnClickListener(this);
@@ -152,7 +153,7 @@ public class MainServerListActivity extends Activity implements
 
     @Override
     public void onClick(View v) {
-        connectToServer((LightBuilder) v.getTag());
+        connectToServer((Configuration.Builder) v.getTag());
     }
 
     @Override
@@ -200,7 +201,7 @@ public class MainServerListActivity extends Activity implements
         if (!actionModeStarted) {
             startActionMode(this);
         }
-        mListOfBuilders.add((LightBuilder) view.getTag());
+        mListOfBuilders.add((Configuration.Builder) view.getTag());
         updateActionMode();
         return true;
     }
