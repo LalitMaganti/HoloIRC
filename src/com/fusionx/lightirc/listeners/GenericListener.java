@@ -16,7 +16,7 @@ public abstract class GenericListener extends ListenerAdapter<LightBot> implemen
 
     @Override
     public void onJoin(final JoinEvent<LightBot> event) {
-        if (!((JoinEvent) event).getUser().getPrettyNick().equals(event.getBot().getUserBot().getPrettyNick())) {
+        if (!((JoinEvent) event).getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
             otherUserJoin(event);
         } else {
             userJoin(event);
@@ -25,7 +25,7 @@ public abstract class GenericListener extends ListenerAdapter<LightBot> implemen
 
     @Override
     public void onPart(final PartEvent<LightBot> event) {
-        if (!event.getUser().getPrettyNick().equals(event.getBot().getUserBot().getPrettyNick())) {
+        if (!event.getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
             part(event);
         }
     }

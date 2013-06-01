@@ -28,15 +28,16 @@ import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
+import com.fusionx.lightirc.fragments.PMFragment;
 import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
-import org.pircbotx.Channel;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.PartEvent;
+import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 import java.util.ArrayList;
@@ -85,32 +86,13 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onNickChange(final NickChangeEvent<LightBot> event) {
-        for (final Channel c : event.getBot().getUserBot().getChannels()) {
-            final String oldFormattedNick = event.getOldNick();
-            final String newFormattedNick = event.getNewNick();
-
-            sendMessage(c.getName(), event);
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (checkChannelFragment(c.getName())) {
-                        adapter.replace(oldFormattedNick, newFormattedNick);
-                    }
-                }
-            });
-        }
-    }
-
-    @Override
     public void userJoin(final JoinEvent<LightBot> event) {
         final JoinEvent joinevent = (JoinEvent) event;
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                activity.onNewChannelJoined(joinevent.getChannel().getName(), joinevent
-                        .getUser().getPrettyNick(), Utils.getOutputForEvent(event), null);
+                activity.onNewChannelJoined(joinevent.getChannel().getName(),
+                        Utils.getOutputForEvent(event), null);
             }
         });
     }
@@ -123,7 +105,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.add(event.getUser().getPrettyNick());
+                    adapter.add(event.getUser().getPrettyNick(event.getChannel()));
                     adapter.sort();
                     adapter.notifyDataSetChanged();
                 }
@@ -139,7 +121,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getPrettyNick());
+                    adapter.remove(event.getUser().getPrettyNick(event.getChannel()));
                     adapter.sort();
                     adapter.notifyDataSetChanged();
                 }
@@ -153,7 +135,7 @@ public class ActivityListener extends GenericListener {
         final String channelName = event.getChannel().getName();
 
         for (final User u : event.getUsers()) {
-            userList.add(u.getPrettyNick());
+            userList.add(u.getPrettyNick(event.getChannel()));
         }
 
         Collections.sort(userList, new UserComparator());
@@ -210,9 +192,44 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getPrettyNick());
+                    adapter.remove(event.getUser().getPrettyNick(event.getChannel()));
                     adapter.sort();
                     adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+    // TODO - standardise this and private actions
+    @Override
+    public void onPrivateMessage(final PrivateMessageEvent<LightBot> event) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
+                if (fragment != null) {
+                    PMFragment pm = (PMFragment) fragment;
+                    pm.writeToTextView(Utils.getOutputForEvent(event));
+                } else {
+                    activity.onNewPrivateMessage(event.getUser().getNick(),
+                            Utils.getOutputForEvent(event));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onPrivateAction(final PrivateActionEvent<LightBot> event) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
+                if (fragment != null) {
+                    PMFragment pm = (PMFragment) fragment;
+                    pm.writeToTextView(Utils.getOutputForEvent(event));
+                } else {
+                    activity.onNewPrivateMessage(event.getUser().getNick(),
+                            Utils.getOutputForEvent(event));
                 }
             }
         });
@@ -232,5 +249,9 @@ public class ActivityListener extends GenericListener {
         int position = mViewPager.getCurrentItem();
         IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
         return frag.getTitle().equals(keyName);
+    }
+
+    private IRCFragment privateMessageCheck(String userNick) {
+        return mIRCPagerAdapter.getTab(userNick);
     }
 }

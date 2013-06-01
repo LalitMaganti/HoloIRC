@@ -24,11 +24,11 @@ package com.fusionx.lightirc.listeners;
 import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
-import org.pircbotx.Channel;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.PartEvent;
+import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.add(event.getUser().getPrettyNick());
+        set.add(event.getUser().getPrettyNick(event.getChannel()));
         Collections.sort(set, new UserComparator());
     }
 
@@ -69,7 +69,7 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getPrettyNick());
+        set.remove(event.getUser().getPrettyNick(event.getChannel()));
         Collections.sort(set, new UserComparator());
     }
 
@@ -83,21 +83,8 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getPrettyNick());
+        set.remove(event.getUser().getPrettyNick(event.getChannel()));
         Collections.sort(set, new UserComparator());
-    }
-
-    @Override
-    public void onNickChange(final NickChangeEvent<LightBot> event) {
-        for (final Channel c : event.getBot().getUserBot().getChannels()) {
-            final ArrayList<String> set = c.getUserList();
-            final String oldFormattedNick = event.getOldNick();
-            final String newFormattedNick = event.getNewNick();
-
-            c.appendToBuffer(Utils.getOutputForEvent(event));
-            set.set(set.indexOf(oldFormattedNick), newFormattedNick);
-            Collections.sort(set, new UserComparator());
-        }
     }
 
     @Override
@@ -107,6 +94,7 @@ public class ServiceListener extends GenericListener {
         final String newFormattedNick = event.getNewNick();
 
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+
         set.set(set.indexOf(oldFormattedNick), newFormattedNick);
         Collections.sort(set, new UserComparator());
     }
@@ -114,5 +102,15 @@ public class ServiceListener extends GenericListener {
     @Override
     public void onTopic(final TopicEvent<LightBot> event) {
         event.getChannel().appendToBuffer(Utils.getOutputForEvent(event));
+    }
+
+    @Override
+    public void onPrivateMessage(final PrivateMessageEvent<LightBot> event) {
+        event.getUser().appendToBuffer(Utils.getOutputForEvent(event));
+    }
+
+    @Override
+    public void onPrivateAction(final PrivateActionEvent<LightBot> event) {
+        event.getUser().appendToBuffer(Utils.getOutputForEvent(event));
     }
 }

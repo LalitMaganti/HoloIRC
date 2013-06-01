@@ -33,27 +33,14 @@ import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 
-import java.util.ArrayList;
-
-public class ChannelFragment extends IRCFragment implements TextView.OnEditorActionListener {
+public class PMFragment extends IRCFragment implements TextView.OnEditorActionListener {
     private String serverName;
     private EditText edittext;
-
-    public ArrayList<String> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(ArrayList<String> userList) {
-        this.userList = userList;
-    }
-
-    private ArrayList<String> userList;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
 
-        setTitle(getArguments().getString("channel"));
         serverName = getArguments().getString("serverName");
 
         final String buffer = getArguments().getString("buffer");
@@ -61,10 +48,7 @@ public class ChannelFragment extends IRCFragment implements TextView.OnEditorAct
             writeToTextView(buffer, rootView);
         }
 
-        final ArrayList<String> userLi = getArguments().getStringArrayList("userList");
-        if (userLi != null) {
-            userList = userLi;
-        }
+        setTitle(getArguments().getString("nick"));
 
         edittext = (EditText) rootView.findViewById(R.id.editText1);
 
@@ -90,10 +74,10 @@ public class ChannelFragment extends IRCFragment implements TextView.OnEditorAct
         protected Void doInBackground(final String... strings) {
             if (strings != null) {
                 final String server = strings[0];
-                final String channelName = strings[1];
+                final String userNick = strings[1];
                 final String message = strings[2];
                 ((ServerChannelActivity) getActivity())
-                        .parser.channelMessageToParse(server, channelName, message);
+                        .parser.userMessageToParse(server, userNick, message);
             }
             return null;
         }

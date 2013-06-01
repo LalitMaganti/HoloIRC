@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.irc.LightBot;
@@ -42,8 +43,6 @@ import org.pircbotx.exception.IrcException;
 import org.pircbotx.output.OutputChannel;
 
 import java.io.IOException;
-
-import static android.os.Build.VERSION_CODES.JELLY_BEAN;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -64,7 +63,7 @@ public class IRCService extends Service {
         setupListeners(server);
         setupNotification();
 
-        Configuration d = server.buildConfiguration();
+        final Configuration d = server.buildConfiguration();
 
         final LightBot bo = new LightBot(d);
 
@@ -93,24 +92,19 @@ public class IRCService extends Service {
                 intent, 0);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
                 intent2, 0);
-        int currentAPIVersion = Build.VERSION.SDK_INT;
-        Notification n;
-        final Notification.Builder builder = new Notification.Builder(this)
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle("LightIRC")
                 .setContentText("At least one server is joined")
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
-        if (currentAPIVersion >= JELLY_BEAN) {
-            n = builder.addAction(android.R.drawable.ic_menu_close_clear_cancel,
-                    "Disconnect all", pIntent2).build();
-        } else {
-            //noinspection deprecation
-            n = builder.getNotification();
-        }
+
+        Notification notification = builder
+                .addAction(android.R.drawable.ic_menu_close_clear_cancel,
+                        "Disconnect all", pIntent2).build();
 
         // Just a random number
         // TODO - maybe static int this?
-        startForeground(1337, n);
+        startForeground(1337, notification);
     }
 
     private void disconnectAll() {
@@ -157,6 +151,12 @@ public class IRCService extends Service {
         Channel c = d.getChannel(channelName);
         OutputChannel f = c.send();
         f.part();
+    }
+
+    public void removePrivateMessage(String serverName, String nick) {
+        UserChannelDao d = getBot(serverName).getUserChannelDao();
+        d.removePrivateMessage(nick);
+        d.getUser(nick).setBuffer("");
     }
 
     private void setupListeners(LightBuilder bot) {

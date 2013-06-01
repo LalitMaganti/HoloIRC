@@ -33,8 +33,6 @@
         android:ems="10"
         android:hint="@string/message_text_edit_hint"
         android:imeOptions="actionDone">
-
-        <requestFocus/>
     </EditText>
 
 </RelativeLayout>

@@ -13,6 +13,7 @@
     <string name="delete">Delete</string>
     <string name="part">Part</string>
     <string name="users">Users</string>
+    <string name="close">Close</string>
     <string name="disconnect">Disconnect</string>
 
 </resources>

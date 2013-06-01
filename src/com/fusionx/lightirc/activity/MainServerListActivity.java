@@ -80,9 +80,16 @@ public class MainServerListActivity extends Activity implements
             bot.setTitle(settings.getString(Constants.titlePrefPrefix + i, ""));
             bot.setServerHostname(settings.getString(Constants.urlPrefPrefix + i, ""));
             bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
-            bot.setLogin(settings.getString(Constants.serverUsernamePrefPrefix + i, "lightirc"));
-            bot.setServerPassword(settings.getString(Constants.serverPasswordPrefPrefix + i, ""));
-            //bot.setNickservPassword(settings.getString(Constants.serverNickServPasswordPrefPrefix + i, null));
+            bot.setLogin(settings.getString(Constants
+                    .serverUsernamePrefPrefix + i, "lightirc"));
+            bot.setServerPassword(settings.getString(Constants
+                    .serverPasswordPrefPrefix + i, ""));
+
+            final String nickServPassword = settings.getString(Constants
+                    .serverNickServPasswordPrefPrefix + i, null);
+            if (nickServPassword != null && !nickServPassword.equals("")) {
+                bot.setNickservPassword(nickServPassword);
+            }
 
             Set<String> auto = new HashSet<String>();
             auto = settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
@@ -97,7 +104,8 @@ public class MainServerListActivity extends Activity implements
             mCardView.clearCards();
             mCardView.setSwipeable(false);
             for (LightBuilder bot : values) {
-                ServerCard server = new ServerCard(bot.getTitle(), "Not connected", bot);
+                ServerCard server = new ServerCard(bot
+                        .getTitle(), bot.getServerHostname(), bot);
                 server.setOnClickListener(this);
                 mCardView.addCard(server);
             }
@@ -107,11 +115,11 @@ public class MainServerListActivity extends Activity implements
     }
 
     private int firstRunAdditions(SharedPreferences settings) {
-        int noOfServers;
+        final int noOfServers = 1;
         final Editor e = settings.edit();
+
         e.putBoolean("firstrun", false);
-        e.putInt("noOfServers", 1);
-        noOfServers = 1;
+        e.putInt("noOfServers", noOfServers);
 
         e.putString(Constants.titlePrefPrefix + "0", "Freenode");
         e.putString(Constants.urlPrefPrefix + "0", "irc.freenode.net");

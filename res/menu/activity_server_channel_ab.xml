@@ -12,6 +12,11 @@
         android:title="@string/users"
         android:visible="false"/>
     <item
+        android:id="@+id/activity_server_channel_ab_close"
+        android:showAsAction="ifRoom|withText"
+        android:title="@string/close"
+        android:visible="false"/>
+    <item
         android:id="@+id/activity_server_channel_ab_disconnect"
         android:showAsAction="ifRoom|withText"
         android:title="@string/disconnect"/>

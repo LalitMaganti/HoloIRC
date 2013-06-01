@@ -23,12 +23,12 @@ package com.fusionx.lightirc.activity;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.AlertDialog;
 import android.app.ListFragment;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.*;
@@ -37,13 +37,16 @@ import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
+import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.LightBuilder;
 import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.misc.PromptDialog;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     public static class BaseServerSettingFragment extends PreferenceFragment
@@ -147,7 +150,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 
         @Override
-        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
+        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
+                                             Preference preference) {
+            super.onPreferenceTreeClick(preferenceScreen, preference);
+
             final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
             final Editor e = settings.edit();
             if (preference == mLoginPref) {
@@ -189,19 +195,25 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 final String newString = (String) newValue;
                 if (preference != mNickServPassword && preference != mServerPassword) {
                     if (preference == mEditTextNick) {
-                        e.putString(Constants.nickPrefPrefix + indexOfServer, newString);
+                        e.putString(Constants.nickPrefPrefix
+                                + indexOfServer, newString);
                     } else if (preference == mEditTextTitle) {
-                        e.putString(Constants.titlePrefPrefix + indexOfServer, newString);
+                        e.putString(Constants.titlePrefPrefix
+                                + indexOfServer, newString);
                     } else if (preference == mEditTextUrl) {
-                        e.putString(Constants.urlPrefPrefix + indexOfServer, newString);
+                        e.putString(Constants.urlPrefPrefix
+                                + indexOfServer, newString);
                     } else if (preference == mServerUserName) {
-                        e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, newString);
+                        e.putString(Constants.serverUsernamePrefPrefix
+                                + indexOfServer, newString);
                     }
                     preference.setSummary((String) newValue);
                 } else if (preference == mServerPassword) {
-                    e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, newString);
+                    e.putString(Constants.serverPasswordPrefPrefix
+                            + indexOfServer, newString);
                 } else {
-                    e.putString(Constants.serverNickServPasswordPrefPrefix + indexOfServer, newString);
+                    e.putString(Constants.serverNickServPasswordPrefPrefix
+                            + indexOfServer, newString);
                 }
                 e.commit();
             }
@@ -210,20 +222,30 @@ public class ServerSettingsActivity extends PreferenceActivity {
     }
 
     public static class ListViewSettingsFragment extends ListFragment implements
-            MultiChoiceModeListener, android.view.ActionMode.Callback,
-            DialogInterface.OnClickListener {
-        final ArrayList<String> channelList = new ArrayList<String>();
-        EditText inputView;
+            MultiChoiceModeListener, android.view.ActionMode.Callback {
+        SelectionAdapter adapter;
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            Set<Integer> positions = adapter.getCurrentCheckedPosition();
+
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
-                    // TODO - edit here
+                    PromptDialog dialog = new PromptDialog(getActivity(), "Channel Name"
+                            , "", adapter.getItem((Integer) positions.toArray()[0])) {
+                        @Override
+                        public boolean onOkClicked(String input) {
+                            return false;
+                        }
+                    };
+                    dialog.show();
+
                     mode.finish();
                     return true;
                 case R.id.activity_server_settings_cab_delete:
-                    // TODO - delete here
+                    for (Integer i : positions) {
+                        adapter.removeSelection(i);
+                    }
                     mode.finish();
                     return true;
                 default:
@@ -237,12 +259,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             getListView().setMultiChoiceModeListener(this);
             getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            // TODO - input validation
-            channelList.add(inputView.getText().toString());
         }
 
         @Override
@@ -261,15 +277,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+            adapter = new SelectionAdapter(
                     getActivity(),
-                    R.layout.layout_text_list, channelList);
+                    R.layout.layout_text_list, R.id.text1);
 
             for (String channel : bot.getAutoJoinChannels().keySet()) {
                 adapter.add(channel);
             }
-
-            inputView = new EditText(getActivity());
 
             setListAdapter(adapter);
             setHasOptionsMenu(true);
@@ -278,7 +292,14 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
 
         @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
+            super.onListItemClick(l, v, position, id);
+            l.setItemChecked(position, !adapter.isPositionChecked(position));
+        }
+
+        @Override
         public void onDestroyActionMode(ActionMode arg0) {
+            adapter.clearSelection();
         }
 
         @Override
@@ -286,8 +307,14 @@ public class ServerSettingsActivity extends PreferenceActivity {
                                               long id, boolean checked) {
             mode.getMenu().getItem(0)
                     .setVisible(!(getListView().getCheckedItemCount() > 1));
-            mode.setTitle(getListView().getCheckedItemCount()
-                    + " items selected");
+            mode.setTitle(getListView().getCheckedItemCount() + " items selected");
+
+
+            if (checked) {
+                adapter.setNewSelection(position, checked);
+            } else {
+                adapter.removeSelection(position);
+            }
         }
 
         @Override
@@ -296,17 +323,15 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_ab_add:
-                    inputView.setHint("Channel name (including the starting #)");
-                    AlertDialog.Builder builder = new AlertDialog.Builder(
-                            getActivity())
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .setTitle("Channel Name")
-                            .setPositiveButton("OK", ListViewSettingsFragment.this)
-                            .setNegativeButton("Cancel",
-                                    ListViewSettingsFragment.this)
-                            .setView(inputView);
-
-                    builder.show();
+                    PromptDialog dialog = new PromptDialog(getActivity(), "Channel Name",
+                            "Channel name (including the starting #") {
+                        @Override
+                        public boolean onOkClicked(String input) {
+                            adapter.add(input);
+                            return false;
+                        }
+                    };
+                    dialog.show();
                     return true;
                 default:
                     return false;
@@ -345,5 +370,46 @@ public class ServerSettingsActivity extends PreferenceActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private static class SelectionAdapter extends ArrayAdapter<String> {
 
+        private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
+
+        public SelectionAdapter(Context context, int resource, int textViewResourceId) {
+            super(context, resource, textViewResourceId, new ArrayList<String>());
+        }
+
+        public void setNewSelection(int position, boolean value) {
+            mSelection.put(position, value);
+            notifyDataSetChanged();
+        }
+
+        public boolean isPositionChecked(int position) {
+            Boolean result = mSelection.get(position);
+            return result == null ? false : result;
+        }
+
+        public Set<Integer> getCurrentCheckedPosition() {
+            return mSelection.keySet();
+        }
+
+        public void removeSelection(int position) {
+            mSelection.remove(position);
+            notifyDataSetChanged();
+        }
+
+        public void clearSelection() {
+            mSelection = new HashMap<Integer, Boolean>();
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View v = super.getView(position, convertView, parent);
+            v.setBackgroundColor(Color.WHITE);
+            if (mSelection.get(position) != null) {
+                v.setBackgroundColor(Color.parseColor("#33b5e5"));
+            }
+            return v;
+        }
+    }
 }

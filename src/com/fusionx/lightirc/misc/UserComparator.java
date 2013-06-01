@@ -1,23 +1,32 @@
 package com.fusionx.lightirc.misc;
 
 
+import android.text.Html;
+
 import java.util.Comparator;
 
 public class UserComparator implements Comparator<String> {
     @Override
-    public int compare(String s, String s2) {
-        if (s.startsWith(s2.substring(0, 1)) && (s.substring(0, 1).equals("@")
-                || s.substring(0, 1).equals("+"))) {
-            return 0;
-        } else if (s.startsWith("@")) {
-            return 1;
-        } else if (s2.startsWith("@")) {
+    public int compare(final String s, final String s2) {
+        final String firstStripped = Html.fromHtml(s).toString();
+        final String secondStripped = Html.fromHtml(s2).toString();
+
+        if (firstStripped.startsWith(secondStripped.substring(0, 1)) &&
+                (firstStripped.substring(0, 1).equals("@")
+                        || firstStripped.substring(0, 1).equals("+"))) {
+            final String firstRemoved = firstStripped.substring(1);
+            final String secondRemoved = secondStripped.substring(1);
+            return firstRemoved.compareToIgnoreCase(secondRemoved);
+        } else if (firstStripped.startsWith("@")) {
             return -1;
-        } else if (s.startsWith("+")) {
+        } else if (secondStripped.startsWith("@")) {
             return 1;
-        } else if (s2.startsWith("+")) {
+        } else if (firstStripped.startsWith("+")) {
             return -1;
+        } else if (secondStripped.startsWith("+")) {
+            return 1;
         }
-        return s.compareTo(s2);
+
+        return firstStripped.compareToIgnoreCase(secondStripped);
     }
 }

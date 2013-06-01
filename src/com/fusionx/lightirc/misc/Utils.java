@@ -24,6 +24,7 @@ package com.fusionx.lightirc.misc;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 public class Utils {
@@ -36,10 +37,11 @@ public class Utils {
             return event.getNotice() + "\n";
         } else if (e instanceof ActionEvent) {
             ActionEvent event = (ActionEvent) e;
-            return "* " + event.getUser().getPrettyNick() + " " + event.getAction() + "\n";
+            return "* " + event.getUser().getPrettyNick(event.getChannel())
+                    + " " + event.getAction() + "\n";
         } else if (e instanceof JoinEvent) {
             JoinEvent event = (JoinEvent) e;
-            return event.getUser().getPrettyNick() + " entered the room\n";
+            return event.getUser().getPrettyNick(event.getChannel()) + " entered the room\n";
         } else if (e instanceof TopicEvent) {
             TopicEvent event = (TopicEvent) e;
             String newMessage;
@@ -56,25 +58,31 @@ public class Utils {
             return newMessage;
         } else if (e instanceof MessageEvent) {
             MessageEvent event = (MessageEvent) e;
-            return event.getUser().getPrettyNick() + ": " + event.getMessage() + "\n";
+            return event.getUser().getPrettyNick(event.getChannel())
+                    + ": " + event.getMessage() + "\n";
         } else if (e instanceof QuitEventPerChannel) {
             QuitEventPerChannel event = (QuitEventPerChannel) e;
-            return event.getUser().getPrettyNick() + " quit the room\n";
+            return event.getUser().getPrettyNick(event.getChannel()) + " quit the room\n";
         } else if (e instanceof PartEvent) {
             PartEvent event = (PartEvent) e;
-            return event.getUser().getPrettyNick() + " parted from the room\n";
-        } else if (e instanceof NickChangeEvent) {
-            NickChangeEvent event = (NickChangeEvent) e;
-            String newMessage;
-            newMessage = "You (" + event.getOldNick() + ") are now known as "
-                    + event.getNewNick() + "\n";
-            return newMessage;
+            return event.getUser().getPrettyNick(event.getChannel()) + " parted from the room\n";
         } else if (e instanceof NickChangeEventPerChannel) {
             NickChangeEventPerChannel event = (NickChangeEventPerChannel) e;
             String newMessage;
-            newMessage = event.getOldNick() + " is now known as "
-                    + event.getNewNick() + "\n";
+            if (event.getUser().getNick().equals(event.getBot().getNick())) {
+                newMessage = "You (" + event.getOldNick() + ") are now known as "
+                        + event.getNewNick() + "\n";
+            } else {
+                newMessage = event.getOldNick() + " is now known as "
+                        + event.getNewNick() + "\n";
+            }
             return newMessage;
+        } else if (e instanceof PrivateMessageEvent) {
+            PrivateMessageEvent event = (PrivateMessageEvent) e;
+            return event.getUser().getColourfulNick() + ": " + event.getMessage() + "\n";
+        } else if (e instanceof PrivateActionEvent) {
+            PrivateActionEvent event = (PrivateActionEvent) e;
+            return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";
         } else {
             // Invalid event
             return "";

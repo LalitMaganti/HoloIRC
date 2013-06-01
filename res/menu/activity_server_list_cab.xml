@@ -3,9 +3,9 @@
 
     <item
         android:id="@+id/activity_server_list_cab_connect"
-        android:title="@string/connect" />
+        android:title="@string/connect"/>
     <item
         android:id="@+id/activity_server_list_cab_edit"
-        android:title="@string/edit" />
+        android:title="@string/edit"/>
 
 </menu>

@@ -32,7 +32,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 
 public class ServerFragment extends IRCFragment implements OnKeyListener {
-
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
@@ -60,9 +59,9 @@ public class ServerFragment extends IRCFragment implements OnKeyListener {
                 && !editText.getText().toString().isEmpty()) {
 
             ((ServerChannelActivity) getActivity())
-                    .serverMessageToParse(getTitle(), editText.getText().toString());
+                    .parser.serverMessageToParse(getTitle(), editText.getText().toString());
 
-            editText.getText().clear();
+            editText.setText("");
 
             return true;
         }

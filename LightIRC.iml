@@ -18,13 +18,13 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Android SDK" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="androidsupportlib" level="project" />
-    <orderEntry type="module" module-name="CardsUILib" />
     <orderEntry type="module" module-name="pircbotx" />
-    <orderEntry type="library" name="pircbotxexports" level="project" />
-    <orderEntry type="module" module-name="library" />
+    <orderEntry type="library" name="lightirc-libs" level="project" />
+    <orderEntry type="module" module-name="slidingmenu" />
+    <orderEntry type="module" module-name="cardsui" />
   </component>
 </module>
 

@@ -25,11 +25,12 @@ import com.fusionx.lightirc.irc.LightBot;
 import com.fusionx.lightirc.services.IRCService;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 
 public class MessageParser {
     private IRCService mService;
 
-    IRCService getService() {
+    private IRCService getService() {
         return mService;
     }
 
@@ -49,7 +50,9 @@ public class MessageParser {
                 String action = message.replace("/me ", "");
                 // TODO - input validation
                 bot.sendIRC().action(channelName, action);
-                bot.getConfiguration().getListenerManager().dispatchEvent(new ActionEvent(bot, bot.getUserBot(), bot.getUserChannelDao().getChannel(channelName), action));
+                bot.getConfiguration().getListenerManager()
+                        .dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
+                                bot.getUserChannelDao().getChannel(channelName), action));
             } else if (message.startsWith("/nick")) {
                 String newNick = message.replace("/nick ", "");
                 bot.sendIRC().changeNick(newNick);
@@ -58,7 +61,9 @@ public class MessageParser {
             }
         } else {
             bot.sendIRC().message(channelName, message);
-            bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent(bot, bot.getUserChannelDao().getChannel(channelName), bot.getUserBot(), message));
+            bot.getConfiguration().getListenerManager().dispatchEvent
+                    (new MessageEvent(bot, bot.getUserChannelDao().getChannel(channelName),
+                            bot.getUserBot(), message));
         }
     }
 
@@ -72,12 +77,31 @@ public class MessageParser {
                 // TODO - input validation
                 bot.sendIRC().joinChannel(channel);
             } else {
-                String bufferMessage = "Unknown command";
-                bot.appendToBuffer(bufferMessage);
+                //String bufferMessage = "Unknown command";
+                //bot.appendToBuffer(bufferMessage);
             }
         } else {
-            String bufferMessage = "Invalid message";
-            bot.appendToBuffer(bufferMessage);
+            //String bufferMessage = "Invalid message";
+            //bot.appendToBuffer(bufferMessage);
+        }
+    }
+
+    public void userMessageToParse(String serverName, String userNick, String message) {
+        final LightBot bot = getService().getBot(serverName);
+
+        if (message.startsWith("/")) {
+            // TODO parse this string fully
+            if (message.startsWith("/me")) {
+                String action = message.replace("/me ", "");
+                // TODO - input validation
+                bot.getUserChannelDao().getUser(userNick).send().action(action);
+
+            } else {
+            }
+        } else {
+            bot.getUserChannelDao().getUser(userNick).send().message(message);
+            bot.getConfiguration().getListenerManager().dispatchEvent
+                    (new PrivateActionEvent(bot, bot.getUserBot(), message));
         }
     }
 }

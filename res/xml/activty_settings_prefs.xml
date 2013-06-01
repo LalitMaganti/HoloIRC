@@ -1,27 +1,26 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
 
     <PreferenceCategory android:title="Server info">
         <EditTextPreference
             android:key="pref_title"
-            android:title="Server title" />
+            android:title="Server title"/>
         <EditTextPreference
             android:key="pref_url"
-            android:title="Server URL" />
+            android:title="Server URL"/>
         <EditTextPreference
             android:key="pref_nick"
-            android:title="Nick name" />
+            android:title="Nick name"/>
         <PreferenceScreen
             android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
-            android:title="Auto-join channels" />
-        <CheckBoxPreference
+            android:title="Auto-join channels"/>
+        <!--<CheckBoxPreference
             android:key="pref_auto_nick"
             android:defaultValue="false"
             android:title="Auto-change nick name"
-            android:summary="If someone else is using your preferred nick another will automatically be used" />
+            android:summary="If someone else is using your preferred nick another will automatically be used" />-->
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Login info">
@@ -29,16 +28,16 @@
             android:key="pref_login"
             android:defaultValue="false"
             android:title="Login required?"
-            android:summary="For access to server - usually the answer is no" />
+            android:summary="For access to server - usually the answer is no"/>
         <EditTextPreference
             android:enabled="false"
             android:key="pref_login_username"
-            android:title="Username" />
+            android:title="Username"/>
         <EditTextPreference
             android:enabled="false"
             android:inputType="textPassword"
             android:key="pref_login_password"
-            android:title="Password" />
+            android:title="Password"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="NickServ Info">
@@ -46,12 +45,12 @@
             android:key="pref_nickserv"
             android:defaultValue="false"
             android:title="Use NickServ?"
-            android:summary="If server uses NickServ and you have registered" />
+            android:summary="If server uses NickServ and you have registered"/>
         <EditTextPreference
             android:enabled="false"
             android:key="pref_nickserv_password"
             android:title="NickServ password"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"/>
     </PreferenceCategory>
 
 </PreferenceScreen>
