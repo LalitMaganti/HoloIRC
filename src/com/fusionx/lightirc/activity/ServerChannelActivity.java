@@ -294,11 +294,11 @@ public class ServerChannelActivity extends FragmentActivity
         int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1);
 
-        mIRCPagerAdapter.removeView(index);
-        removeTab(index);
-
         service.partFromChannel(builder.getTitle(),
                 ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
+
+        mIRCPagerAdapter.removeView(index);
+        removeTab(index);
     }
 
     @Override

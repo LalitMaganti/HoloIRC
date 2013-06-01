@@ -28,6 +28,7 @@ import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
+import org.pircbotx.hooks.managers.ListenerManager;
 
 public class MessageParser {
     private IRCService mService;
@@ -44,6 +45,7 @@ public class MessageParser {
                                       final String message) {
         final PircBotX bot = getService().getBot(serverName);
         if(message != null) {
+            final ListenerManager manager = bot.getConfiguration().getListenerManager();
             final String parsedArray[] = message.split("\\s+");
 
             if (parsedArray[0].startsWith("/")) {
@@ -56,8 +58,7 @@ public class MessageParser {
                     final String action = parsedArray[1];
                     // TODO - input validation
                     bot.sendIRC().action(channelName, action);
-                    bot.getConfiguration().getListenerManager()
-                            .dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
+                    manager.dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
                                     bot.getUserChannelDao().getChannel(channelName), action));
                 } else if (message.startsWith("/nick")) {
                     final String newNick = parsedArray[1];
@@ -70,16 +71,15 @@ public class MessageParser {
                     } else {
                         bot.sendIRC().message(newNick, pm);
                     }
-                    bot.getConfiguration().getListenerManager().dispatchEvent
-                            (new PrivateActionEvent(bot, bot.getUserChannelDao()
+                    manager.dispatchEvent(new PrivateMessageEvent(bot, bot.getUserChannelDao()
                                     .getUser(newNick), pm));
                 } else {
                     //Dispatch event here
                 }
             } else {
                 bot.sendIRC().message(channelName, message);
-                bot.getConfiguration().getListenerManager().dispatchEvent
-                        (new MessageEvent(bot, bot.getUserChannelDao().getChannel(channelName),
+                manager.dispatchEvent(new MessageEvent(bot,
+                        bot.getUserChannelDao().getChannel(channelName),
                                 bot.getUserBot(), message));
             }
         }
@@ -106,6 +106,7 @@ public class MessageParser {
 
     public void userMessageToParse(String serverName, String userNick, String message) {
         final PircBotX bot = getService().getBot(serverName);
+        final ListenerManager manager = bot.getConfiguration().getListenerManager();
 
         if (message.startsWith("/")) {
             // TODO parse this string fully
@@ -114,15 +115,24 @@ public class MessageParser {
                 String action = message.replace("/me ", "");
                 // TODO - input validation
                 user.send().action(action);
-                bot.getConfiguration().getListenerManager().dispatchEvent
-                        (new PrivateActionEvent(bot, user, message));
+                manager.dispatchEvent(new PrivateActionEvent(bot, user, message));
+            } else if (message.startsWith("/msg")){
+                final String parsedArray[] = message.split("\\s+");
+                final String newNick = parsedArray[1];
+                String pm = parsedArray[2];
+                if(pm == null) {
+                    pm = "";
+                } else {
+                    bot.sendIRC().message(newNick, pm);
+                }
+                manager.dispatchEvent(new PrivateMessageEvent(bot,
+                        bot.getUserChannelDao().getUser(newNick), pm));
             } else {
             }
         } else {
             final User user = bot.getUserChannelDao().getUser(userNick);
             user.send().message(message);
-            bot.getConfiguration().getListenerManager().dispatchEvent
-                    (new PrivateMessageEvent(bot, user, message));
+            manager.dispatchEvent(new PrivateMessageEvent(bot, user, message));
         }
     }
 }
