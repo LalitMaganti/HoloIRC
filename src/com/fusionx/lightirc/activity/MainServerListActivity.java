@@ -127,8 +127,6 @@ public class MainServerListActivity extends Activity implements
         e.putString(Constants.nickPrefPrefix + "0", "LightIRCUser");
 
         HashSet<String> auto = new HashSet<String>();
-        auto.add("#huawei-g300");
-        auto.add("#testingircandroid");
         e.putStringSet(Constants.autoJoinPrefPrefix + "0", auto);
         e.commit();
 

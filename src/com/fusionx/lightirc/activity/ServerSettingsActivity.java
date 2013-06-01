@@ -37,16 +37,12 @@ import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.PromptDialog;
 import org.pircbotx.Configuration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     public static class BaseServerSettingFragment extends PreferenceFragment
@@ -223,18 +219,20 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
     public static class ListViewSettingsFragment extends ListFragment implements
             MultiChoiceModeListener, android.view.ActionMode.Callback {
-        SelectionAdapter adapter;
+        private SelectionAdapter adapter;
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            Set<Integer> positions = adapter.getCurrentCheckedPosition();
+            final Set<String> positions = adapter.getSelectedItems();
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
                     PromptDialog dialog = new PromptDialog(getActivity(), "Channel Name"
-                            , "", adapter.getItem((Integer) positions.toArray()[0])) {
+                            , "", (String) positions.toArray()[0]) {
                         @Override
-                        public boolean onOkClicked(String input) {
+                        public boolean onOkClicked(final String input) {
+                            adapter.remove((String) positions.toArray()[0]);
+                            adapter.add(input);
                             return false;
                         }
                     };
@@ -243,8 +241,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     mode.finish();
                     return true;
                 case R.id.activity_server_settings_cab_delete:
-                    for (Integer i : positions) {
-                        adapter.removeSelection(i);
+                    for (String selected : positions) {
+                        adapter.remove(selected);
                     }
                     mode.finish();
                     return true;
@@ -277,9 +275,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            adapter = new SelectionAdapter(
-                    getActivity(),
-                    R.layout.layout_text_list, R.id.text1);
+            adapter = new SelectionAdapter(getActivity(), new ArrayList<String>());
 
             for (String channel : bot.getAutoJoinChannels().keySet()) {
                 adapter.add(channel);
@@ -289,12 +285,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
             setHasOptionsMenu(true);
 
             return super.onCreateView(inflater, container, savedInstanceState);
-        }
-
-        @Override
-        public void onListItemClick(ListView l, View v, int position, long id) {
-            super.onListItemClick(l, v, position, id);
-            l.setItemChecked(position, !adapter.isPositionChecked(position));
         }
 
         @Override
@@ -311,7 +301,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
 
             if (checked) {
-                adapter.setNewSelection(position, checked);
+                adapter.addSelection(position);
             } else {
                 adapter.removeSelection(position);
             }
@@ -342,6 +332,16 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             return false;
         }
+
+        @Override
+        public void onPause() {
+            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+            final Editor e = settings.edit();
+            e.putStringSet(Constants.autoJoinPrefPrefix + "0", adapter.getItems());
+            e.commit();
+
+            super.onDestroy();
+        }
     }
 
     private static Configuration.Builder bot;
@@ -371,45 +371,47 @@ public class ServerSettingsActivity extends PreferenceActivity {
     }
 
     private static class SelectionAdapter extends ArrayAdapter<String> {
+        private HashMap<String, Boolean> selectedItems = new HashMap<String, Boolean>();
+        private final ArrayList<String> arrayList;
 
-        private HashMap<Integer, Boolean> mSelection = new HashMap<Integer, Boolean>();
-
-        public SelectionAdapter(Context context, int resource, int textViewResourceId) {
-            super(context, resource, textViewResourceId, new ArrayList<String>());
+        public SelectionAdapter(Context context, ArrayList<String> arrayList) {
+            super(context, R.layout.layout_text_list, R.id.text1, arrayList);
+            this.arrayList = arrayList;
         }
 
-        public void setNewSelection(int position, boolean value) {
-            mSelection.put(position, value);
-            notifyDataSetChanged();
-        }
-
-        public boolean isPositionChecked(int position) {
-            Boolean result = mSelection.get(position);
-            return result == null ? false : result;
-        }
-
-        public Set<Integer> getCurrentCheckedPosition() {
-            return mSelection.keySet();
-        }
-
-        public void removeSelection(int position) {
-            mSelection.remove(position);
-            notifyDataSetChanged();
-        }
-
-        public void clearSelection() {
-            mSelection = new HashMap<Integer, Boolean>();
-            notifyDataSetChanged();
+        public HashSet<String> getItems() {
+            HashSet<String> d = new HashSet<String>(arrayList);
+            return d;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = super.getView(position, convertView, parent);
             v.setBackgroundColor(Color.WHITE);
-            if (mSelection.get(position) != null) {
+
+            if (selectedItems.get(arrayList.get(position)) != null) {
                 v.setBackgroundColor(Color.parseColor("#33b5e5"));
             }
             return v;
+        }
+
+        public void addSelection(int position) {
+            selectedItems.put(arrayList.get(position), true);
+            notifyDataSetChanged();
+        }
+
+        public void removeSelection(int position) {
+            selectedItems.remove(arrayList.get(position));
+            notifyDataSetChanged();
+        }
+
+        public void clearSelection() {
+            selectedItems.clear();
+            notifyDataSetChanged();
+        }
+
+        public Set<String> getSelectedItems() {
+            return selectedItems.keySet();
         }
     }
 }
