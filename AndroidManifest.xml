@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.fusionx.lightirc"
           android:versionCode="1"
-          android:versionName="0.1">
+          android:versionName="0.6.2">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -27,8 +27,7 @@
         <activity
             android:name="com.fusionx.lightirc.activity.ServerChannelActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="adjustResize"
-            android:noHistory="true">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>

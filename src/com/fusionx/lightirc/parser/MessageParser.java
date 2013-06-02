@@ -87,11 +87,12 @@ public class MessageParser {
 
     public void serverMessageToParse(String serverName, String message) {
         final PircBotX bot = getService().getBot(serverName);
+        final String parsedArray[] = message.split("\\s+");
 
         if (message.startsWith("/")) {
             // TODO parse this string fully
             if (message.startsWith("/join")) {
-                String channel = message.replace("/join ", "");
+                final String channel = parsedArray[1];
                 // TODO - input validation
                 bot.sendIRC().joinChannel(channel);
             } else {
@@ -134,5 +135,9 @@ public class MessageParser {
             manager.dispatchEvent(new PrivateMessageEvent(bot, user, message));
             user.send().message(message);
         }
+    }
+
+    private void commandParse() {
+
     }
 }

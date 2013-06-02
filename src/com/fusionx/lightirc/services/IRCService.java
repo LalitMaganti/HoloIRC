@@ -32,6 +32,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
@@ -113,6 +114,8 @@ public class IRCService extends Service {
         manager.disconnectAll();
         stopForeground(true);
         stopSelf();
+        Intent intent = new Intent("serviceStopped");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void disconnectFromServer(String serverName) {

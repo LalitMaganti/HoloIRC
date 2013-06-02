@@ -25,12 +25,11 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
@@ -99,6 +98,13 @@ public class ServerChannelActivity extends FragmentActivity
         bindService(service, mConnection, 0);
     }
 
+    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            finish();
+        }
+    };
+
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className,
@@ -109,6 +115,9 @@ public class ServerChannelActivity extends FragmentActivity
             final Bundle b = new Bundle();
             b.putString("title", builder.getTitle());
             listener.setArrayAdapter((UserListAdapter) users.getListAdapter());
+
+            LocalBroadcastManager.getInstance(ServerChannelActivity.this)
+                    .registerReceiver(mMessageReceiver, new IntentFilter("serviceStopped"));
 
             if (service.getBot(builder.getTitle()) != null) {
                 PircBotX bot = service.getBot(builder.getTitle());
@@ -136,6 +145,11 @@ public class ServerChannelActivity extends FragmentActivity
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             // This should never happen
         }
     };
@@ -323,6 +337,8 @@ public class ServerChannelActivity extends FragmentActivity
             service.getBot(builder.getTitle()).getConfiguration()
                     .getListenerManager().removeListener(listener);
         }
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
 
         super.onDestroy();
     }

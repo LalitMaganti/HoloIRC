@@ -213,8 +213,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
                         e.putString(Constants.urlPrefPrefix
                                 + indexOfServer, newString);
                     } else if (preference == mEditTextPort) {
-                        e.putString(Constants.serverPortPrefPrefix
-                                + indexOfServer, newString);
+                        e.putInt(Constants.serverPortPrefPrefix
+                                + indexOfServer, Integer.parseInt(newString));
                     } else if (preference == mServerUserName) {
                         e.putString(Constants.serverUsernamePrefPrefix
                                 + indexOfServer, newString);

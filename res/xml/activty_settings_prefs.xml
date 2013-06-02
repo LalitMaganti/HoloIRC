@@ -11,7 +11,9 @@
             android:title="Server URL"/>
         <EditTextPreference
             android:key="pref_port"
-            android:title="Server Port"/>
+            android:title="Server Port"
+            android:inputType="number"
+            android:singleLine="true"/>
         <EditTextPreference
             android:key="pref_nick"
             android:title="Nick name"/>

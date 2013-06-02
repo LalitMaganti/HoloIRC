@@ -102,7 +102,8 @@ public class MainServerListActivity extends Activity implements
             mCardView.clearCards();
             mCardView.setSwipeable(false);
             for (Configuration.Builder bot : values) {
-                ServerCard server = new ServerCard(bot.getTitle(), bot.getServerHostname(), bot);
+                ServerCard server = new ServerCard(bot.getTitle(),
+                        bot.getServerHostname(), bot);
                 mCardView.addCard(server);
             }
 
@@ -173,7 +174,7 @@ public class MainServerListActivity extends Activity implements
 
     @Override
     protected void onResume() {
-        getSetServerList();
         super.onResume();
+        getSetServerList();
     }
 }
