@@ -29,7 +29,6 @@ import android.content.*;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.text.Html;
@@ -98,13 +97,6 @@ public class ServerChannelActivity extends FragmentActivity
         bindService(service, mConnection, 0);
     }
 
-    private final BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            finish();
-        }
-    };
-
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className,
@@ -115,9 +107,6 @@ public class ServerChannelActivity extends FragmentActivity
             final Bundle b = new Bundle();
             b.putString("title", builder.getTitle());
             listener.setArrayAdapter((UserListAdapter) users.getListAdapter());
-
-            LocalBroadcastManager.getInstance(ServerChannelActivity.this)
-                    .registerReceiver(mMessageReceiver, new IntentFilter("serviceStopped"));
 
             if (service.getBot(builder.getTitle()) != null) {
                 PircBotX bot = service.getBot(builder.getTitle());
@@ -145,12 +134,7 @@ public class ServerChannelActivity extends FragmentActivity
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            // This should never happen
+            finish();
         }
     };
 
@@ -332,15 +316,13 @@ public class ServerChannelActivity extends FragmentActivity
 
     @Override
     public void onDestroy() {
-        unbindService(mConnection);
+        super.onDestroy();
+
         if (service.getBot(builder.getTitle()) != null) {
             service.getBot(builder.getTitle()).getConfiguration()
                     .getListenerManager().removeListener(listener);
         }
-
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
-
-        super.onDestroy();
+        unbindService(mConnection);
     }
 
     // Options menu stuff
