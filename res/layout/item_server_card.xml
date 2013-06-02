@@ -1,42 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:background="@drawable/selectable_background_cardbank"
-              android:orientation="vertical"
-              android:paddingBottom="16dp">
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:weightSum="100"
+    android:paddingBottom="10dp"
+    android:baselineAligned="false">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/contentLayout"
+        android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp">
+        android:background="@drawable/selectable_background_cardbank"
+        android:layout_marginLeft="8dip"
+        android:layout_weight="90"
+        android:onClick="onCardClick"
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/title"
-            style="@style/CardTitle"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Title"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:padding="4dp">
+            android:layout_marginLeft="8dip"
+            android:fontFamily="sans-serif-thin"
+            android:text="@string/title"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/description"
-            style="@style/CardText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dip"
+            android:layout_marginRight="48dip"
+            android:layout_marginTop="10dip"
             android:ellipsize="end"
-            android:maxLines="4"
-            android:text="Status"/>
+            android:fontFamily="sans-serif-light"
+            android:maxLines="3"
+            android:text="@string/description"
+            android:textSize="16sp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="10"
+        android:orientation="vertical"
+        android:onClick="showPopup"
+        android:id="@+id/overflow_menu">
+
+        <ImageView
+            android:id="@+id/overflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selectable_background_cardbank"
+            android:contentDescription="@string/overflow"
+            android:padding="2dip"
+            android:src="@drawable/ic_menu_moreoverflow_normal_holo_light" />
+    </LinearLayout>
 </LinearLayout>

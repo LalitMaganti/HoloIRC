@@ -31,6 +31,8 @@ import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.PMFragment;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
+import lombok.AccessLevel;
+import lombok.Setter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
@@ -47,16 +49,14 @@ public class ActivityListener extends GenericListener {
     private final ServerChannelActivity activity;
     private final IRCPagerAdapter mIRCPagerAdapter;
     private final ViewPager mViewPager;
-    private UserListAdapter adapter;
+
+    @Setter(AccessLevel.PUBLIC)
+    private UserListAdapter arrayAdapter;
 
     public ActivityListener(ServerChannelActivity a, IRCPagerAdapter d, ViewPager pager) {
         activity = a;
         mIRCPagerAdapter = d;
         mViewPager = pager;
-    }
-
-    public void setArrayAdapter(final UserListAdapter adapter) {
-        this.adapter = adapter;
     }
 
     // Server events
@@ -101,7 +101,9 @@ public class ActivityListener extends GenericListener {
                     @Override
                     public void run() {
                         final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
-                        channel.writeToTextView(Utils.getOutputForEvent(event));
+                        if(channel != null) {
+                            channel.writeToTextView(Utils.getOutputForEvent(event));
+                        }
                     }
                 }, 750);
             }
@@ -122,7 +124,11 @@ public class ActivityListener extends GenericListener {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ((ChannelFragment) mIRCPagerAdapter.getTab(channelName)).setUserList(userList);
+                final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
+                        .getTab(channelName);
+                if(channel != null) {
+                    channel.setUserList(userList);
+                }
             }
         });
     }
@@ -148,7 +154,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.replace(oldFormattedNick, newFormattedNick);
+                    arrayAdapter.replace(oldFormattedNick, newFormattedNick);
                 }
             }
         });
@@ -162,9 +168,9 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.add(event.getUser().getPrettyNick(event.getChannel()));
-                    adapter.sort();
-                    adapter.notifyDataSetChanged();
+                    arrayAdapter.add(event.getUser().getPrettyNick(event.getChannel()));
+                    arrayAdapter.sort();
+                    arrayAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -178,9 +184,9 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getPrettyNick(event.getChannel()));
-                    adapter.sort();
-                    adapter.notifyDataSetChanged();
+                    arrayAdapter.remove(event.getUser().getPrettyNick(event.getChannel()));
+                    arrayAdapter.sort();
+                    arrayAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -194,9 +200,9 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
-                    adapter.remove(event.getUser().getPrettyNick(event.getChannel()));
-                    adapter.sort();
-                    adapter.notifyDataSetChanged();
+                    arrayAdapter.remove(event.getUser().getPrettyNick(event.getChannel()));
+                    arrayAdapter.sort();
+                    arrayAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -246,7 +252,9 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);
-                channel.writeToTextView(Utils.getOutputForEvent(event));
+                if(channel != null) {
+                    channel.writeToTextView(Utils.getOutputForEvent(event));
+                }
             }
         });
     }

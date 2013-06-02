@@ -27,8 +27,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.view.*;
-import android.view.View.OnClickListener;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
 import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
@@ -41,12 +42,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MainServerListActivity extends Activity implements
-        OnClickListener, ActionMode.Callback, View.OnLongClickListener {
-    private final ArrayList<Configuration.Builder>
-            mListOfBuilders = new ArrayList<Configuration.Builder>();
-    private boolean actionModeStarted = false;
-    private ActionMode mMode;
-
+        PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener {
     private void connectToServer(final Configuration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerChannelActivity.class);
@@ -80,6 +76,7 @@ public class MainServerListActivity extends Activity implements
             Configuration.Builder bot = new Configuration.Builder();
             bot.setTitle(settings.getString(Constants.titlePrefPrefix + i, ""));
             bot.setServerHostname(settings.getString(Constants.urlPrefPrefix + i, ""));
+            bot.setServerPort(settings.getInt(Constants.serverPortPrefPrefix + i, 6667));
             bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
             bot.setLogin(settings.getString(Constants
                     .serverUsernamePrefPrefix + i, "lightirc"));
@@ -94,7 +91,7 @@ public class MainServerListActivity extends Activity implements
 
             Set<String> auto = new HashSet<String>();
             auto = settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
-            for (String channel : auto) {
+            for (final String channel : auto) {
                 bot.addAutoJoinChannel(channel);
             }
             values.add(bot);
@@ -105,9 +102,7 @@ public class MainServerListActivity extends Activity implements
             mCardView.clearCards();
             mCardView.setSwipeable(false);
             for (Configuration.Builder bot : values) {
-                ServerCard server = new ServerCard(bot
-                        .getTitle(), bot.getServerHostname(), bot);
-                server.setOnClickListener(this);
+                ServerCard server = new ServerCard(bot.getTitle(), bot.getServerHostname(), bot);
                 mCardView.addCard(server);
             }
 
@@ -115,7 +110,7 @@ public class MainServerListActivity extends Activity implements
         }
     }
 
-    private int firstRunAdditions(SharedPreferences settings) {
+    private int firstRunAdditions(final SharedPreferences settings) {
         final int noOfServers = 1;
         final Editor e = settings.edit();
 
@@ -133,25 +128,41 @@ public class MainServerListActivity extends Activity implements
         return noOfServers;
     }
 
+    public void onCardClick(final View v) {
+        connectToServer((Configuration.Builder) v.getTag());
+    }
+
+
+    private Configuration.Builder builder;
+    public void showPopup(final View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        builder = (Configuration.Builder) v.getTag();
+        popup.inflate(R.menu.activity_server_list_cab);
+        popup.setOnMenuItemClickListener(this);
+        popup.setOnDismissListener(this);
+        popup.show();
+    }
+
+
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.activity_server_list_cab_edit:
-                editServer(mListOfBuilders.get(0));
-                mode.finish();
-                return true;
-            case R.id.activity_server_list_cab_connect:
-                connectToServer(mListOfBuilders.get(0));
-                mode.finish();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
+    public void onDismiss(PopupMenu popupMenu) {
+        builder = null;
     }
 
     @Override
-    public void onClick(View v) {
-        connectToServer((Configuration.Builder) v.getTag());
+    public boolean onMenuItemClick(final MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.activity_server_list_cab_edit:
+                editServer(builder);
+                builder = null;
+                return true;
+            case R.id.activity_server_list_cab_connect:
+                connectToServer(builder);
+                builder = null;
+                return true;
+            default:
+                return false;
+        }
     }
 
     @Override
@@ -161,46 +172,8 @@ public class MainServerListActivity extends Activity implements
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.activity_server_list_cab, menu);
-        return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mListOfBuilders.clear();
-        actionModeStarted = false;
-        mMode = null;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        mode.setTitle("Selected 1 server");
-        actionModeStarted = true;
-        mMode = mode;
-        return false;
-    }
-
-    @Override
     protected void onResume() {
         getSetServerList();
         super.onResume();
-    }
-
-    void updateActionMode() {
-        mMode.setTitle("Selected " + mListOfBuilders.size() + " servers");
-        mMode.getMenu().getItem(0).setVisible(mListOfBuilders.size() == 1);
-        mMode.getMenu().getItem(1).setVisible(mListOfBuilders.size() == 1);
-    }
-
-    @Override
-    public boolean onLongClick(View view) {
-        if (!actionModeStarted) {
-            startActionMode(this);
-        }
-        mListOfBuilders.add((Configuration.Builder) view.getTag());
-        updateActionMode();
-        return true;
     }
 }

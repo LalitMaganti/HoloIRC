@@ -57,9 +57,9 @@ public class MessageParser {
                 } else if (parsedArray[0].startsWith("/me")) {
                     final String action = parsedArray[1];
                     // TODO - input validation
-                    bot.sendIRC().action(channelName, action);
                     manager.dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
-                                    bot.getUserChannelDao().getChannel(channelName), action));
+                            bot.getUserChannelDao().getChannel(channelName), action));
+                    bot.sendIRC().action(channelName, action);
                 } else if (message.startsWith("/nick")) {
                     final String newNick = parsedArray[1];
                     bot.sendIRC().changeNick(newNick);
@@ -72,15 +72,15 @@ public class MessageParser {
                         bot.sendIRC().message(newNick, pm);
                     }
                     manager.dispatchEvent(new PrivateMessageEvent(bot, bot.getUserChannelDao()
-                                    .getUser(newNick), pm));
+                            .getUser(newNick), pm));
                 } else {
                     //Dispatch event here
                 }
             } else {
-                bot.sendIRC().message(channelName, message);
                 manager.dispatchEvent(new MessageEvent(bot,
                         bot.getUserChannelDao().getChannel(channelName),
-                                bot.getUserBot(), message));
+                        bot.getUserBot(), message));
+                bot.sendIRC().message(channelName, message);
             }
         }
     }
@@ -114,8 +114,8 @@ public class MessageParser {
                 final User user = bot.getUserChannelDao().getUser(userNick);
                 String action = message.replace("/me ", "");
                 // TODO - input validation
-                user.send().action(action);
                 manager.dispatchEvent(new PrivateActionEvent(bot, user, message));
+                user.send().action(action);
             } else if (message.startsWith("/msg")){
                 final String parsedArray[] = message.split("\\s+");
                 final String newNick = parsedArray[1];
@@ -131,8 +131,8 @@ public class MessageParser {
             }
         } else {
             final User user = bot.getUserChannelDao().getUser(userNick);
-            user.send().message(message);
             manager.dispatchEvent(new PrivateMessageEvent(bot, user, message));
+            user.send().message(message);
         }
     }
 }

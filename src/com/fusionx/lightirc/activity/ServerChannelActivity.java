@@ -33,6 +33,7 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,6 +54,7 @@ import org.pircbotx.User;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Set;
 
 public class ServerChannelActivity extends FragmentActivity
         implements TabListener, OnPageChangeListener {
@@ -205,6 +207,19 @@ public class ServerChannelActivity extends FragmentActivity
         }
     }
 
+    public void userListMention(Set<String> users) {
+        for(String userNick : users) {
+            ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
+                    .getItem(mViewPager.getCurrentItem());
+            String edit = channel.getEditText().getText().toString();
+            edit = Html.fromHtml(userNick) + ": " + edit;
+            channel.getEditText().setText("");
+            channel.getEditText().append(edit);
+            channel.getEditText().requestFocus();
+        }
+        menu.toggle();
+    }
+
     // Tab change listeners
     @Override
     public void onTabReselected(final Tab tab, final FragmentTransaction ft) {
@@ -212,7 +227,7 @@ public class ServerChannelActivity extends FragmentActivity
 
     @Override
     public void onTabSelected(final Tab tab, final FragmentTransaction ft) {
-        mViewPager.setCurrentItem(tab.getPosition());
+        mViewPager.setCurrentItem(tab.getPosition(), true);
     }
 
     @Override
@@ -242,7 +257,7 @@ public class ServerChannelActivity extends FragmentActivity
         getActionBar().getTabAt(position).setText(channelName);
 
         if (mention.equals(channelName)) {
-            mViewPager.setCurrentItem(position);
+            mViewPager.setCurrentItem(position, true);
         }
 
         mViewPager.setOffscreenPageLimit(position);
@@ -261,7 +276,7 @@ public class ServerChannelActivity extends FragmentActivity
         getActionBar().getTabAt(position).setText(userNick);
 
         if (mention.equals(userNick)) {
-            mViewPager.setCurrentItem(position);
+            mViewPager.setCurrentItem(position, true);
         }
 
         mViewPager.setOffscreenPageLimit(position);
@@ -281,7 +296,7 @@ public class ServerChannelActivity extends FragmentActivity
     private void closePMConversation() {
         int index = mViewPager.getCurrentItem();
 
-        mViewPager.setCurrentItem(index - 1);
+        mViewPager.setCurrentItem(index - 1, true);
 
         service.removePrivateMessage(builder.getTitle(),
                 ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
@@ -292,7 +307,7 @@ public class ServerChannelActivity extends FragmentActivity
 
     private void partFromChannel() {
         int index = mViewPager.getCurrentItem();
-        mViewPager.setCurrentItem(index - 1);
+        mViewPager.setCurrentItem(index - 1, true);
 
         service.partFromChannel(builder.getTitle(),
                 ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());

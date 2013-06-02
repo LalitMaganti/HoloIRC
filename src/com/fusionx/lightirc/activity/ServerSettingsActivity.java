@@ -22,13 +22,9 @@
 package com.fusionx.lightirc.activity;
 
 import android.annotation.TargetApi;
-import android.app.ActionBar;
 import android.app.ListFragment;
-import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.*;
@@ -36,15 +32,24 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.ArrayAdapter;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.PromptDialog;
 import org.pircbotx.Configuration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class ServerSettingsActivity extends PreferenceActivity {
+    private static Configuration.Builder bot;
+
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.preference_headers, target);
+    }
+
     public static class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
         private static int indexOfServer;
@@ -52,6 +57,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         // Preference keys
         private final static String Title = "pref_title";
         private final static String URL = "pref_url";
+        private final static String Port = "pref_port";
         private final static String Nick = "pref_nick";
 
         private final static String Login = "pref_login";
@@ -63,8 +69,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         // Generic
         private EditTextPreference mEditTextNick;
-        private EditTextPreference mEditTextTitle;
         private EditTextPreference mEditTextUrl;
+        private EditTextPreference mEditTextPort;
+        private EditTextPreference mEditTextTitle;
 
         // Server login
         private CheckBoxPreference mLoginPref;
@@ -101,6 +108,12 @@ public class ServerSettingsActivity extends PreferenceActivity {
             mEditTextUrl.setOnPreferenceChangeListener(this);
             mEditTextUrl.setText(bot.getServerHostname());
             mEditTextUrl.setSummary(bot.getServerHostname());
+
+            // Port of server
+            mEditTextPort = (EditTextPreference) prefSet.findPreference(Port);
+            mEditTextPort.setOnPreferenceChangeListener(this);
+            mEditTextPort.setText(String.valueOf(bot.getServerPort()));
+            mEditTextPort.setSummary(String.valueOf(bot.getServerPort()));
 
             // Nick of User
             mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
@@ -199,6 +212,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     } else if (preference == mEditTextUrl) {
                         e.putString(Constants.urlPrefPrefix
                                 + indexOfServer, newString);
+                    } else if (preference == mEditTextPort) {
+                        e.putString(Constants.serverPortPrefPrefix
+                                + indexOfServer, newString);
                     } else if (preference == mServerUserName) {
                         e.putString(Constants.serverUsernamePrefPrefix
                                 + indexOfServer, newString);
@@ -220,6 +236,19 @@ public class ServerSettingsActivity extends PreferenceActivity {
     public static class ListViewSettingsFragment extends ListFragment implements
             MultiChoiceModeListener, android.view.ActionMode.Callback {
         private SelectionAdapter adapter;
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.activty_server_settings_cab, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            menu.getItem(0).setVisible(!(getListView().getCheckedItemCount() > 1));
+            return false;
+        }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -252,19 +281,28 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
 
         @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position,
+                                              long id, boolean checked) {
+            mode.invalidate();
+            mode.setTitle(getListView().getCheckedItemCount() + " items selected");
+            if (checked) {
+                adapter.addSelection(position);
+            } else {
+                adapter.removeSelection(position);
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode arg0) {
+            adapter.clearSelection();
+        }
+
+        @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
 
             getListView().setMultiChoiceModeListener(this);
             getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            // Inflate a menu resource providing context menu items
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.activty_server_settings_cab, menu);
-            return true;
         }
 
         @Override
@@ -285,26 +323,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
             setHasOptionsMenu(true);
 
             return super.onCreateView(inflater, container, savedInstanceState);
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode arg0) {
-            adapter.clearSelection();
-        }
-
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                              long id, boolean checked) {
-            mode.getMenu().getItem(0)
-                    .setVisible(!(getListView().getCheckedItemCount() > 1));
-            mode.setTitle(getListView().getCheckedItemCount() + " items selected");
-
-
-            if (checked) {
-                adapter.addSelection(position);
-            } else {
-                adapter.removeSelection(position);
-            }
         }
 
         @Override
@@ -329,11 +347,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
 
         @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-
-        @Override
         public void onPause() {
             final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
             final Editor e = settings.edit();
@@ -341,77 +354,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
             e.commit();
 
             super.onDestroy();
-        }
-    }
-
-    private static Configuration.Builder bot;
-
-    @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.preference_headers, target);
-    }
-
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent(this, MainServerListActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private static class SelectionAdapter extends ArrayAdapter<String> {
-        private HashMap<String, Boolean> selectedItems = new HashMap<String, Boolean>();
-        private final ArrayList<String> arrayList;
-
-        public SelectionAdapter(Context context, ArrayList<String> arrayList) {
-            super(context, R.layout.layout_text_list, R.id.text1, arrayList);
-            this.arrayList = arrayList;
-        }
-
-        public HashSet<String> getItems() {
-            HashSet<String> d = new HashSet<String>(arrayList);
-            return d;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View v = super.getView(position, convertView, parent);
-            v.setBackgroundColor(Color.WHITE);
-
-            if (selectedItems.get(arrayList.get(position)) != null) {
-                v.setBackgroundColor(Color.parseColor("#33b5e5"));
-            }
-            return v;
-        }
-
-        public void addSelection(int position) {
-            selectedItems.put(arrayList.get(position), true);
-            notifyDataSetChanged();
-        }
-
-        public void removeSelection(int position) {
-            selectedItems.remove(arrayList.get(position));
-            notifyDataSetChanged();
-        }
-
-        public void clearSelection() {
-            selectedItems.clear();
-            notifyDataSetChanged();
-        }
-
-        public Set<String> getSelectedItems() {
-            return selectedItems.keySet();
         }
     }
 }

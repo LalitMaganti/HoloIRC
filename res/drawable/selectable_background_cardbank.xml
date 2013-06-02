@@ -19,6 +19,7 @@
 
     <item android:drawable="@android:color/transparent" android:state_focused="true" android:state_pressed="false"/>
     <item android:drawable="@android:color/holo_blue_light" android:state_pressed="true"/>
+    <item android:drawable="@android:color/holo_blue_light" android:state_checked="true"/>
     <item android:drawable="@android:color/transparent"/>
 
 </selector>

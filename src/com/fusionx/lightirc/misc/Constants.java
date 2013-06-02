@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.misc;
 
+import android.graphics.Color;
+
 public class Constants {
     public final static String titlePrefPrefix = "server_title_";
     public final static String urlPrefPrefix = "server_url_";
@@ -29,4 +31,6 @@ public class Constants {
     public final static String serverUsernamePrefPrefix = "server_username_";
     public final static String serverPasswordPrefPrefix = "server_password_";
     public final static String serverNickServPasswordPrefPrefix = "server_nickserv_password_";
+    public final static String serverPortPrefPrefix = "server_port_";
+    public final static int Holo = Color.parseColor("#33b5e5");
 }

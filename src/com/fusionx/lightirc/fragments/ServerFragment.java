@@ -21,50 +21,63 @@
 
 package com.fusionx.lightirc.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import com.fusionx.lightirc.R;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 
-public class ServerFragment extends IRCFragment implements OnKeyListener {
+public class ServerFragment extends IRCFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
+        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
         setTitle(getArguments().getString("title"));
-
-        String buffer = getArguments().getString("buffer");
-        if (buffer != null) {
-            writeToTextView(buffer, rootView);
-        }
-
-        EditText edittext = (EditText) rootView.findViewById(R.id.editText1);
-        edittext.setOnKeyListener(this);
 
         return rootView;
     }
 
     @Override
-    public boolean onKey(View view, int keyCode, KeyEvent event) {
-        EditText editText = (EditText) view;
+    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+        if (i == EditorInfo.IME_ACTION_DONE && getEditText().getText() != null) {
+            final String message = getEditText().getText().toString();
+            getEditText().post(new Runnable() {
+                @Override
+                public void run() {
+                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_FORCED);
+                }
+            });
+            getEditText().setText("");
+            getEditText().post(new Runnable() {
+                @Override
+                public void run() {
+                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_IMPLICIT);
+                }
+            });
 
-        if ((event.getKeyCode() == KeyEvent.FLAG_EDITOR_ACTION)
-                && !editText.getText().toString().equals("\n")
-                && !editText.getText().toString().isEmpty()) {
 
-            ((ServerChannelActivity) getActivity())
-                    .parser.serverMessageToParse(getTitle(), editText.getText().toString());
-
-            editText.setText("");
-
-            return true;
+            final ParserTask task = new ParserTask();
+            String[] strings = {getTitle(), message};
+            task.execute(strings);
         }
         return false;
+    }
+
+    private class ParserTask extends AsyncTask<String, Void, Void> {
+        protected Void doInBackground(final String... strings) {
+            if (strings != null) {
+                final String server = strings[0];
+                final String message = strings[1];
+                ((ServerChannelActivity) getActivity())
+                        .parser.serverMessageToParse(server, message);
+            }
+            return null;
+        }
     }
 }

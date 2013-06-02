@@ -4,16 +4,15 @@ import android.content.Context;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.UserComparator;
 
 import java.util.ArrayList;
 
-public class UserListAdapter extends ArrayAdapter<String> {
-    public UserListAdapter(Context context) {
-        super(context, R.layout.layout_text_list, new ArrayList<String>());
+public class UserListAdapter extends SelectionAdapter {
+    public UserListAdapter(Context context, ArrayList<String> array) {
+        super(context, array);
     }
 
     public void replace(String old, String newString) {

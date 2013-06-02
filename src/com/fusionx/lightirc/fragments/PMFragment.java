@@ -28,31 +28,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 
-public class PMFragment extends IRCFragment implements TextView.OnEditorActionListener {
+public class PMFragment extends IRCFragment {
     private String serverName;
-    private EditText edittext;
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
-
-        serverName = getArguments().getString("serverName");
-
-        final String buffer = getArguments().getString("buffer");
-        if (buffer != null) {
-            writeToTextView(buffer, rootView);
-        }
+    public View onCreateView(final LayoutInflater inflater,
+                             final ViewGroup container, final Bundle savedInstanceState) {
+        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
         setTitle(getArguments().getString("nick"));
 
-        edittext = (EditText) rootView.findViewById(R.id.editText1);
-
-        edittext.setOnEditorActionListener(this);
+        serverName = getArguments().getString("serverName");
 
         return rootView;
     }
@@ -60,12 +50,24 @@ public class PMFragment extends IRCFragment implements TextView.OnEditorActionLi
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_DONE) {
-            final String message = edittext.getText().toString();
-            edittext.setText("");
+            final String message = getEditText().getText().toString();
+            getEditText().post(new Runnable() {
+                @Override
+                public void run() {
+                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_FORCED);
+                }
+            });
+            getEditText().setText("");
+            getEditText().post(new Runnable() {
+                @Override
+                public void run() {
+                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_IMPLICIT);
+                }
+            });
 
             final ParserTask task = new ParserTask();
             String[] strings = {serverName, getTitle(), message};
-            task.doInBackground(strings);
+            task.execute(strings);
         }
         return false;
     }

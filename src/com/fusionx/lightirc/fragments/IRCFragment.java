@@ -21,29 +21,82 @@
 
 package com.fusionx.lightirc.fragments;
 
+import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
-public abstract class IRCFragment extends Fragment {
-    private String tabTitle;
+public abstract class IRCFragment extends Fragment  implements TextView.OnEditorActionListener,
+        View.OnFocusChangeListener {
+    @Getter(AccessLevel.PUBLIC)
+    @Setter(AccessLevel.PROTECTED)
+    private String title;
 
-    public String getTitle() {
-        return tabTitle;
+    @Getter(AccessLevel.PUBLIC)
+    @Setter(AccessLevel.PROTECTED)
+    private TextView textView;
+
+    @Getter(AccessLevel.PUBLIC)
+    @Setter(AccessLevel.PROTECTED)
+    private TextView editText;
+
+    protected InputMethodManager imm;
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater,
+                             final ViewGroup container, final Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
+
+        imm = (InputMethodManager) getActivity().
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        setTextView((TextView) rootView.findViewById(R.id.textview));
+        setEditText((EditText) rootView.findViewById(R.id.editText1));
+
+        getEditText().setOnEditorActionListener(this);
+
+        String buffer = getArguments().getString("buffer");
+        if (buffer != null) {
+            writeToTextView(buffer);
+        }
+
+        editText.setOnFocusChangeListener(this);
+        return rootView;
     }
 
-    protected void setTitle(String title) {
-        tabTitle = title;
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if(v.equals(editText)) {
+
+            if(hasFocus) {
+                editText.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                });
+            } else {
+                editText.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+                    }
+                });
+            }
+        }
     }
 
     public void writeToTextView(final String text) {
-        writeToTextView(text, getView());
-    }
-
-    protected void writeToTextView(final String text, final View rootView) {
-        final TextView textView = (TextView) rootView.findViewById(R.id.textview);
         textView.append(Html.fromHtml(text.replace("\n", "<br/>")));
     }
 }

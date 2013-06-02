@@ -28,60 +28,59 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 
-public class ChannelFragment extends IRCFragment implements TextView.OnEditorActionListener {
+public class ChannelFragment extends IRCFragment {
     private String serverName;
-    private EditText edittext;
 
-    public ArrayList<String> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(ArrayList<String> userList) {
-        this.userList = userList;
-    }
-
+    @Getter(AccessLevel.PUBLIC)
+    @Setter(AccessLevel.PUBLIC)
     private ArrayList<String> userList;
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
+    public View onCreateView(final LayoutInflater inflater,
+                             final ViewGroup container, final Bundle savedInstanceState) {
+        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
         setTitle(getArguments().getString("channel"));
         serverName = getArguments().getString("serverName");
-
-        final String buffer = getArguments().getString("buffer");
-        if (buffer != null) {
-            writeToTextView(buffer, rootView);
-        }
 
         final ArrayList<String> userLi = getArguments().getStringArrayList("userList");
         if (userLi != null) {
             userList = userLi;
         }
 
-        edittext = (EditText) rootView.findViewById(R.id.editText1);
-
-        edittext.setOnEditorActionListener(this);
-
         return rootView;
     }
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-        if (i == EditorInfo.IME_ACTION_DONE) {
-            final String message = edittext.getText().toString();
-            edittext.setText("");
+        if (i == EditorInfo.IME_ACTION_DONE && getEditText().getText() != null) {
+            final String message = getEditText().getText().toString();
+            getEditText().post(new Runnable() {
+                @Override
+                public void run() {
+                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_FORCED);
+                }
+            });
+            getEditText().setText("");
+            getEditText().post(new Runnable() {
+                @Override
+                public void run() {
+                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_IMPLICIT);
+                }
+            });
 
             final ParserTask task = new ParserTask();
             String[] strings = {serverName, getTitle(), message};
-            task.doInBackground(strings);
+            task.execute(strings);
         }
         return false;
     }

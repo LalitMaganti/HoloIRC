@@ -27,53 +27,59 @@ import android.view.View;
 import android.widget.TextView;
 import com.fima.cardsui.objects.Card;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.MainServerListActivity;
 import org.pircbotx.Configuration;
 
 public class ServerCard extends Card {
     private final Configuration.Builder mBuilder;
     private final String mStatus;
 
-    public ServerCard(final String title, final String status,
-                      final Configuration.Builder builder) {
-        super(title);
-        mStatus = status;
+    public ServerCard(String titlePlay, String description, final Configuration.Builder builder) {
+        super(titlePlay, description, "#fffffff", "#000000", true, true);
+        mStatus = description;
         mBuilder = builder;
     }
 
     @Override
     public View getCardContent(Context context) {
-        View view = LayoutInflater.from(context).inflate(
-                R.layout.item_server_card, null);
-        ((TextView) view.findViewById(R.id.title)).setText(title);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_server_card, null);
+        ((TextView) view.findViewById(R.id.title)).setText(titlePlay);
         ((TextView) view.findViewById(R.id.description)).setText(mStatus);
         return view;
     }
 
     @Override
     public View getView(final Context context) {
-        View view = super.getView(context);
-        view.findViewById(R.id.cardContent).setTag(mBuilder);
-        view.setLongClickable(true);
-        view.setOnLongClickListener((MainServerListActivity) context);
-        return view;
+        View v = super.getView(context);
+        View view = v.findViewById(R.id.contentLayout);
+        view.setTag(mBuilder);
+        View view2 = v.findViewById(R.id.overflow_menu);
+        view2.setTag(mBuilder);
+        //view.setLongClickable(true);
+        //view.setOnLongClickListener((MainServerListActivity) context);
+        return v;
     }
 
     @Override
     public View getViewFirst(final Context context) {
-        View view = super.getViewFirst(context);
-        view.findViewById(R.id.cardContent).setTag(mBuilder);
-        view.setLongClickable(true);
-        view.setOnLongClickListener((MainServerListActivity) context);
-        return view;
+        View v = super.getView(context);
+        View view = v.findViewById(R.id.contentLayout);
+        view.setTag(mBuilder);
+        View view2 = v.findViewById(R.id.overflow_menu);
+        view2.setTag(mBuilder);
+        //view.setLongClickable(true);
+        //view.setOnLongClickListener((MainServerListActivity) context);
+        return v;
     }
 
     @Override
     public View getViewLast(final Context context) {
-        View view = super.getViewLast(context);
-        view.findViewById(R.id.cardContent).setTag(mBuilder);
-        view.setLongClickable(true);
-        view.setOnLongClickListener((MainServerListActivity) context);
-        return view;
+        View v = super.getView(context);
+        View view = v.findViewById(R.id.contentLayout);
+        view.setTag(mBuilder);
+        View view2 = v.findViewById(R.id.overflow_menu);
+        view2.setTag(mBuilder);
+        //view.setLongClickable(true);
+        //view.setOnLongClickListener((MainServerListActivity) context);
+        return v;
     }
 }

@@ -10,6 +10,9 @@
             android:key="pref_url"
             android:title="Server URL"/>
         <EditTextPreference
+            android:key="pref_port"
+            android:title="Server Port"/>
+        <EditTextPreference
             android:key="pref_nick"
             android:title="Nick name"/>
         <PreferenceScreen
