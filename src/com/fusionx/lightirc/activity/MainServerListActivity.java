@@ -27,6 +27,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
@@ -43,6 +45,7 @@ import java.util.Set;
 
 public class MainServerListActivity extends Activity implements
         PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener {
+    ArrayList<Configuration.Builder> values;
     private void connectToServer(final Configuration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerChannelActivity.class);
@@ -56,8 +59,7 @@ public class MainServerListActivity extends Activity implements
         intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
                 BaseServerSettingFragment.class.getName());
         intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-        //TODO - not always 0
-        intent.putExtra("indexOfServer", 0);
+        intent.putExtra("indexOfServer", values.indexOf(builder));
         intent.putExtra("server", builder);
         startActivity(intent);
     }
@@ -66,7 +68,7 @@ public class MainServerListActivity extends Activity implements
         final SharedPreferences settings = getSharedPreferences("main", 0);
         final boolean firstRun = settings.getBoolean("firstrun", true);
         int noOfServers = settings.getInt("noOfServers", 0);
-        final ArrayList<Configuration.Builder> values = new ArrayList<Configuration.Builder>();
+        values = new ArrayList<Configuration.Builder>();
 
         if (firstRun) {
             noOfServers = firstRunAdditions(settings);
@@ -103,7 +105,7 @@ public class MainServerListActivity extends Activity implements
             mCardView.setSwipeable(false);
             for (Configuration.Builder bot : values) {
                 ServerCard server = new ServerCard(bot.getTitle(),
-                        bot.getServerHostname(), bot);
+                        bot.getServerHostname(), values.indexOf(bot));
                 mCardView.addCard(server);
             }
 
@@ -130,14 +132,13 @@ public class MainServerListActivity extends Activity implements
     }
 
     public void onCardClick(final View v) {
-        connectToServer((Configuration.Builder) v.getTag());
+        connectToServer(values.get((Integer) v.getTag()));
     }
-
 
     private Configuration.Builder builder;
     public void showPopup(final View v) {
         PopupMenu popup = new PopupMenu(this, v);
-        builder = (Configuration.Builder) v.getTag();
+        builder = values.get((Integer) v.getTag());
         popup.inflate(R.menu.activity_server_list_cab);
         popup.setOnMenuItemClickListener(this);
         popup.setOnDismissListener(this);
@@ -170,6 +171,35 @@ public class MainServerListActivity extends Activity implements
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_list);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_server_list_ab, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.activity_server_list_ab_add:
+                addNewServer();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void addNewServer() {
+        Intent intent = new Intent(MainServerListActivity.this,
+                ServerSettingsActivity.class);
+        intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                BaseServerSettingFragment.class.getName());
+        intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+        intent.putExtra("new", true);
+        intent.putExtra("noOfServers", values.size());
+        startActivity(intent);
     }
 
     @Override

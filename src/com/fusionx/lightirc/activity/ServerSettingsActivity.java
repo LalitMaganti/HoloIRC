@@ -22,7 +22,9 @@
 package com.fusionx.lightirc.activity;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.app.ListFragment;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
@@ -44,10 +46,38 @@ import java.util.Set;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     private static Configuration.Builder bot;
+    private static boolean canExit;
+    private static int noOfServers;
 
     @Override
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.xml.preference_headers, target);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(canExit) {
+            final SharedPreferences settings = getSharedPreferences("main", 0);
+            Editor e = settings.edit();
+            e.putInt("noOfServers", noOfServers + 1);
+            e.commit();
+            finish();
+        } else {
+            AlertDialog.Builder build = new AlertDialog.Builder(this);
+            build.setTitle("Are you sure you want to exit?")
+                    .setMessage("Changes have been made - discard?").setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    // do nothing
+                }
+            });
+            build.show();
+        }
     }
 
     public static class BaseServerSettingFragment extends PreferenceFragment
@@ -82,81 +112,140 @@ public class ServerSettingsActivity extends PreferenceActivity {
         private CheckBoxPreference mNickServPref;
         private EditTextPreference mNickServPassword;
 
+        private boolean newServer;
+
+        private List<EditTextPreference> alltheedittexts = new ArrayList<EditTextPreference>();
+
         @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         @Override
         public void onCreate(final Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+            setHasOptionsMenu(true);
 
             final Bundle f = getActivity().getIntent().getExtras();
-            bot = f.getParcelable("server");
-            indexOfServer = f.getInt("indexOfServer");
+            newServer = f.getBoolean("new", false);
 
             addPreferencesFromResource(R.xml.activty_settings_prefs);
+            final PreferenceScreen prefSet = getPreferenceScreen();
 
-            PreferenceScreen prefSet = getPreferenceScreen();
-
-            // Title of server
             mEditTextTitle = (EditTextPreference) prefSet.findPreference(Title);
             mEditTextTitle.setOnPreferenceChangeListener(this);
-            mEditTextTitle.setText(bot.getTitle());
-            mEditTextTitle.setSummary(bot.getTitle());
+            alltheedittexts.add(mEditTextTitle);
 
             // URL of server
             mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
             mEditTextUrl.setOnPreferenceChangeListener(this);
-            mEditTextUrl.setText(bot.getServerHostname());
-            mEditTextUrl.setSummary(bot.getServerHostname());
+            alltheedittexts.add(mEditTextUrl);
 
             // Port of server
             mEditTextPort = (EditTextPreference) prefSet.findPreference(Port);
             mEditTextPort.setOnPreferenceChangeListener(this);
-            mEditTextPort.setText(String.valueOf(bot.getServerPort()));
-            mEditTextPort.setSummary(String.valueOf(bot.getServerPort()));
+            alltheedittexts.add(mEditTextPort);
 
             // Nick of User
             mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
             mEditTextNick.setOnPreferenceChangeListener(this);
-            mEditTextNick.setText(bot.getName());
-            mEditTextNick.setSummary(bot.getName());
+            alltheedittexts.add(mEditTextNick);
 
             // Server login details
-            final boolean loginEnabled = settings.getBoolean("loginenabled", false);
-
             mLoginPref = (CheckBoxPreference) prefSet.findPreference(Login);
-            mLoginPref.setChecked(loginEnabled);
 
             mServerUserName = (EditTextPreference) prefSet.findPreference(ServerUserName);
             mServerUserName.setOnPreferenceChangeListener(this);
-            mServerUserName.setEnabled(loginEnabled);
 
             mServerPassword = (EditTextPreference) prefSet.findPreference(ServerPassword);
             mServerPassword.setOnPreferenceChangeListener(this);
-            mServerPassword.setEnabled(loginEnabled);
-
-            if (loginEnabled) {
-                mServerUserName.setText(bot.getLogin());
-                mServerUserName.setSummary(bot.getLogin());
-
-                mServerPassword.setText(bot.getServerPassword());
-            }
 
             // Nickserv details
-            final boolean nickServEnabled = settings.getBoolean("nickservenabled", false);
-
             mNickServPref = (CheckBoxPreference) prefSet.findPreference(NickServ);
-            mNickServPref.setChecked(nickServEnabled);
 
             mNickServPassword = (EditTextPreference) prefSet.findPreference(NickServPassword);
             mNickServPassword.setOnPreferenceChangeListener(this);
-            mNickServPassword.setEnabled(loginEnabled);
 
-            if (loginEnabled) {
-                mNickServPassword.setText(bot.getServerPassword());
+            canExit = !newServer;
+
+            // TODO - consolidate this
+            if (newServer) {
+                noOfServers = f.getInt("noOfServers");
+                indexOfServer = noOfServers;
+
+                // Title of server
+                mEditTextTitle.setText("");
+                mEditTextTitle.setSummary("Usually 6667 - This field should NOT be empty!");
+
+                // URL of server
+                mEditTextUrl.setText("");
+                mEditTextUrl.setSummary("Usually 6667 - This field should NOT be empty!");
+
+                // Port of server
+                mEditTextPort.setText("");
+                mEditTextPort.setSummary("Usually 6667 - This field should NOT be empty!");
+
+                // Nick of User
+                mEditTextNick.setText("");
+                mEditTextNick.setSummary("Usually 6667 - This field should NOT be empty!");
+
+                // Server login details
+                mLoginPref.setChecked(false);
+                mServerUserName.setEnabled(false);
+                mServerPassword.setEnabled(false);
+
+                mServerUserName.setText("");
+                mServerPassword.setText("");
+
+                // Nickserv details
+                mNickServPref.setChecked(false);
+
+                mNickServPassword.setEnabled(false);
+                mNickServPassword.setText("");
+            } else {
+                final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
+
+                bot = f.getParcelable("server");
+                indexOfServer = f.getInt("indexOfServer");
+
+                // Title of server
+                mEditTextTitle.setText(bot.getTitle());
+                mEditTextTitle.setSummary(bot.getTitle());
+
+                // URL of server
+                mEditTextUrl.setText(bot.getServerHostname());
+                mEditTextUrl.setSummary(bot.getServerHostname());
+
+                // Port of server
+                mEditTextPort.setText(String.valueOf(bot.getServerPort()));
+                mEditTextPort.setSummary(String.valueOf(bot.getServerPort()));
+
+                // Nick of User
+                mEditTextNick.setText(bot.getName());
+                mEditTextNick.setSummary(bot.getName());
+
+                // Server login details
+                final boolean loginEnabled = settings.getBoolean("loginenabled", false);
+
+                mLoginPref.setChecked(loginEnabled);
+                mServerUserName.setEnabled(loginEnabled);
+                mServerPassword.setEnabled(loginEnabled);
+
+                if (loginEnabled) {
+                    mServerUserName.setText(bot.getLogin());
+                    mServerUserName.setSummary(bot.getLogin());
+
+                    mServerPassword.setText(bot.getServerPassword());
+                }
+
+                // Nickserv details
+                final boolean nickServEnabled = settings.getBoolean("nickservenabled", false);
+
+                mNickServPref.setChecked(nickServEnabled);
+                mNickServPassword.setEnabled(nickServEnabled);
+
+                if (nickServEnabled) {
+                    mNickServPassword.setText(bot.getServerPassword());
+                }
             }
         }
-
 
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
@@ -176,9 +265,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     mServerUserName.setSummary("");
 
                     mServerPassword.setText("");
+                    mServerPassword.setSummary("");
 
                     e.putString(Constants.serverUsernamePrefPrefix + indexOfServer, "lightirc");
                     e.putString(Constants.serverPasswordPrefPrefix + indexOfServer, "");
+                } else {
+                    mServerUserName.setSummary("This field should NOT be empty!");
+                    mServerPassword.setSummary("This field should NOT be empty!");
                 }
             } else if (preference == mNickServPref) {
                 boolean check = mNickServPref.isChecked();
@@ -187,13 +280,17 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 mNickServPassword.setEnabled(check);
                 if (!check) {
                     mNickServPassword.setText("");
+                    mNickServPassword.setSummary("");
 
                     e.putString(Constants.serverNickServPasswordPrefPrefix + indexOfServer, "");
+                } else {
+                    mNickServPassword.setSummary("This field should NOT be empty!");
                 }
             }
             e.commit();
             return true;
         }
+
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -223,12 +320,22 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 } else if (preference == mServerPassword) {
                     e.putString(Constants.serverPasswordPrefPrefix
                             + indexOfServer, newString);
+                    preference.setSummary("");
                 } else {
                     e.putString(Constants.serverNickServPasswordPrefPrefix
                             + indexOfServer, newString);
+                    preference.setSummary("");
                 }
                 e.commit();
             }
+            if(newServer) {
+                for(EditTextPreference edit : alltheedittexts) {
+                    if(edit.getText() != null) {
+                        canExit = true;
+                    }
+                }
+            }
+
             return true;
         }
     }
@@ -307,7 +414,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            inflater.inflate(R.menu.activity_server_settings_ab, menu);
+            inflater.inflate(R.menu.activity_server_settings_channellist_ab, menu);
+            super.onCreateOptionsMenu(menu, inflater);
         }
 
         @Override

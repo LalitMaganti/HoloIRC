@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.fragments;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.*;
@@ -42,7 +43,11 @@ public class UserListFragment extends ListFragment
                                           long id, boolean checked) {
         mode.invalidate();
 
-        mode.setTitle(getListView().getCheckedItemCount() + " items selected");
+        final Resources res = getResources();
+        final String quantityString = res.getQuantityString(R.plurals.user_selectioon,
+                getListView().getCheckedItemCount());
+
+        mode.setTitle(quantityString);
         if (checked) {
             adapter.addSelection(position);
         } else {
@@ -81,7 +86,6 @@ public class UserListFragment extends ListFragment
 
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        //menu.getItem(0).setVisible(!(getListView().getCheckedItemCount() > 1));
         return false;
     }
 

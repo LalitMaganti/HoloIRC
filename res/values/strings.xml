@@ -19,5 +19,6 @@
     <string name="overflow">Overflow</string>
     <string name="title">Title</string>
     <string name="mention">Mention</string>
+    <string name="discard">Discard</string>
 
 </resources>

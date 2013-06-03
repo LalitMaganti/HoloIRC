@@ -1,12 +1,33 @@
 package com.fusionx.lightirc.listeners;
 
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.lightirc.PartEvent;
+import org.pircbotx.hooks.events.PartEvent;
+import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
+import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 public abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
+    @Override
+    public void onEvent(Event event) throws Exception {
+        if (event instanceof NickChangeEventPerChannel)
+            onNickChangePerChannel((NickChangeEventPerChannel) event);
+        else if (event instanceof QuitEventPerChannel)
+            onQuitPerChannel((QuitEventPerChannel) event);
+        else if (event instanceof PrivateActionEvent)
+            onPrivateAction((PrivateActionEvent) event);
+        else
+            super.onEvent(event);
+    }
+
+    public abstract void onNickChangePerChannel(NickChangeEventPerChannel<PircBotX> event) throws Exception;
+
+    public abstract void onQuitPerChannel(QuitEventPerChannel<PircBotX> event) throws Exception;
+
+    public abstract void onPrivateAction(PrivateActionEvent<PircBotX> event) throws Exception;
 
     protected abstract void onBotJoin(JoinEvent<PircBotX> event);
 

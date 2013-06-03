@@ -138,7 +138,6 @@ public class ServerChannelActivity extends FragmentActivity
         }
     };
 
-
     private void setUpSlidingMenu() {
         menu = new SlidingMenu(this);
         menu.setMode(SlidingMenu.RIGHT);
@@ -316,13 +315,13 @@ public class ServerChannelActivity extends FragmentActivity
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         if (service.getBot(builder.getTitle()) != null) {
             service.getBot(builder.getTitle()).getConfiguration()
                     .getListenerManager().removeListener(listener);
         }
         unbindService(mConnection);
+
+        super.onDestroy();
     }
 
     // Options menu stuff

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.fusionx.lightirc"
           android:versionCode="1"
-          android:versionName="0.6.2">
+          android:versionName="0.6.99">
 
     <uses-sdk
         android:minSdkVersion="14"

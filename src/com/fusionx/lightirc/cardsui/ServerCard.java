@@ -27,16 +27,15 @@ import android.view.View;
 import android.widget.TextView;
 import com.fima.cardsui.objects.Card;
 import com.fusionx.lightirc.R;
-import org.pircbotx.Configuration;
 
 public class ServerCard extends Card {
-    private final Configuration.Builder mBuilder;
+    private final int mIndex;
     private final String mStatus;
 
-    public ServerCard(String titlePlay, String description, final Configuration.Builder builder) {
+    public ServerCard(String titlePlay, String description, final int index) {
         super(titlePlay, description, "#fffffff", "#000000", true, true);
         mStatus = description;
-        mBuilder = builder;
+        mIndex = index;
     }
 
     @Override
@@ -51,11 +50,9 @@ public class ServerCard extends Card {
     public View getView(final Context context) {
         View v = super.getView(context);
         View view = v.findViewById(R.id.contentLayout);
-        view.setTag(mBuilder);
+        view.setTag(mIndex);
         View view2 = v.findViewById(R.id.overflow_menu);
-        view2.setTag(mBuilder);
-        //view.setLongClickable(true);
-        //view.setOnLongClickListener((MainServerListActivity) context);
+        view2.setTag(mIndex);
         return v;
     }
 
@@ -63,11 +60,9 @@ public class ServerCard extends Card {
     public View getViewFirst(final Context context) {
         View v = super.getView(context);
         View view = v.findViewById(R.id.contentLayout);
-        view.setTag(mBuilder);
+        view.setTag(mIndex);
         View view2 = v.findViewById(R.id.overflow_menu);
-        view2.setTag(mBuilder);
-        //view.setLongClickable(true);
-        //view.setOnLongClickListener((MainServerListActivity) context);
+        view2.setTag(mIndex);
         return v;
     }
 
@@ -75,11 +70,9 @@ public class ServerCard extends Card {
     public View getViewLast(final Context context) {
         View v = super.getView(context);
         View view = v.findViewById(R.id.contentLayout);
-        view.setTag(mBuilder);
+        view.setTag(mIndex);
         View view2 = v.findViewById(R.id.overflow_menu);
-        view2.setTag(mBuilder);
-        //view.setLongClickable(true);
-        //view.setOnLongClickListener((MainServerListActivity) context);
+        view2.setTag(mIndex);
         return v;
     }
 }

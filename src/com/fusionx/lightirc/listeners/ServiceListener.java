@@ -29,7 +29,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
-import org.pircbotx.hooks.events.lightirc.PartEvent;
+import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
@@ -45,7 +45,7 @@ public class ServiceListener extends GenericListener {
 
     // Server stuff
     @Override
-    public void onEvent(final Event<PircBotX> event) throws Exception {
+    public void onEvent(final Event event) throws Exception {
         super.onEvent(event);
 
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
