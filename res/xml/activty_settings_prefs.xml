@@ -5,18 +5,29 @@
     <PreferenceCategory android:title="Server info">
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
             android:key="pref_title"
+            android:defaultValue=""
+            android:singleLine="true"
+            android:lines="1"
             android:title="Server title"/>
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
             android:key="pref_url"
+            android:defaultValue=""
+            android:singleLine="true"
+            android:lines="1"
             android:title="Server URL"/>
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
             android:key="pref_port"
             android:title="Server Port"
             android:inputType="number"
-            android:singleLine="true"/>
+            android:defaultValue=""
+            android:singleLine="true"
+            android:lines="1"/>
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
             android:key="pref_nick"
-            android:title="Nick name"/>
+            android:defaultValue=""
+            android:title="Nick name"
+            android:singleLine="true"
+            android:lines="1"/>
         <PreferenceScreen
             android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
@@ -28,34 +39,30 @@
             android:summary="If someone else is using your preferred nick another will automatically be used" />-->
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Login info">
-        <CheckBoxPreference
-            android:key="pref_login"
-            android:checked="false"
-            android:title="Login required?"
-            android:summary="For access to server - usually the answer is no"/>
+    <PreferenceCategory android:title="Login info - normally no need to edit this section">
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
-            android:enabled="false"
+            android:defaultValue="lightirc"
             android:key="pref_login_username"
-            android:title="Username"/>
-        <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
-            android:enabled="false"
+            android:title="Username"
+            android:singleLine="true"
+            android:lines="1"/>
+        <EditTextPreference
+            android:defaultValue=""
             android:inputType="textPassword"
             android:key="pref_login_password"
-            android:title="Password"/>
+            android:title="Password"
+            android:singleLine="true"
+            android:lines="1"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="NickServ Info">
-        <CheckBoxPreference
-            android:key="pref_nickserv"
-            android:checked="false"
-            android:title="Use NickServ?"
-            android:summary="If server uses NickServ and you have registered"/>
         <EditTextPreference
-            android:enabled="false"
+            android:defaultValue=""
             android:key="pref_nickserv_password"
             android:title="NickServ password"
-            android:inputType="textPassword"/>
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:lines="1"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

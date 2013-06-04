@@ -116,12 +116,14 @@ public class ServerChannelActivity extends FragmentActivity
                 mIRCPagerAdapter.addView(d);
                 addTab(builder.getTitle());
 
-                for (final Channel channelName : bot.getUserBot().getChannels()) {
-                    onNewChannelJoined(channelName.getName(),
-                            channelName.getBuffer(), channelName.getUserList());
-                }
-                for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
-                    onNewPrivateMessage(user.getNick(), user.getBuffer());
+                if(service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
+                    for (final Channel channelName : bot.getUserBot().getChannels()) {
+                        onNewChannelJoined(channelName.getName(),
+                                channelName.getBuffer(), channelName.getUserList());
+                    }
+                    for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
+                        onNewPrivateMessage(user.getNick(), user.getBuffer());
+                    }
                 }
             } else {
                 builder.getListenerManager().addListener(listener);
@@ -287,7 +289,7 @@ public class ServerChannelActivity extends FragmentActivity
     }
 
     private void disconnect() {
-        service.disconnectFromServer((String) mIRCPagerAdapter.getPageTitle(0));
+        service.disconnectFromServer(builder.getTitle());
     }
 
     private void closePMConversation() {

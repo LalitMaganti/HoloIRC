@@ -21,16 +21,17 @@
 
 package com.fusionx.lightirc.misc;
 
-import android.graphics.Color;
-
 public class Constants {
-    public final static String titlePrefPrefix = "server_title_";
-    public final static String urlPrefPrefix = "server_url_";
-    public final static String nickPrefPrefix = "server_nick_";
-    public final static String autoJoinPrefPrefix = "server_autoJoin_";
-    public final static String serverUsernamePrefPrefix = "server_username_";
-    public final static String serverPasswordPrefPrefix = "server_password_";
-    public final static String serverNickServPasswordPrefPrefix = "server_nickserv_password_";
-    public final static String serverPortPrefPrefix = "server_port_";
-    public final static int Holo = Color.parseColor("#33b5e5");
+    // Preference keys
+    public final static String Title = "pref_title";
+    public final static String URL = "pref_url";
+    public final static String Port = "pref_port";
+    public final static String Nick = "pref_nick";
+
+    public final static String ServerUserName = "pref_login_username";
+    public final static String ServerPassword = "pref_login_password";
+
+    public final static String NickServPassword = "pref_nickserv_password";
+
+    public final static String AutoJoin = "pref_autojoin";
 }

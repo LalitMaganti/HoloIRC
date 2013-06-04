@@ -28,7 +28,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 import lombok.AccessLevel;
@@ -64,19 +63,7 @@ public class ChannelFragment extends IRCFragment {
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_DONE && getEditText().getText() != null) {
             final String message = getEditText().getText().toString();
-            getEditText().post(new Runnable() {
-                @Override
-                public void run() {
-                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_FORCED);
-                }
-            });
             getEditText().setText("");
-            getEditText().post(new Runnable() {
-                @Override
-                public void run() {
-                    imm.showSoftInput(getEditText(), InputMethodManager.SHOW_IMPLICIT);
-                }
-            });
 
             final ParserTask task = new ParserTask();
             String[] strings = {serverName, getTitle(), message};

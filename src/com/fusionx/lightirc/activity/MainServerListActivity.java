@@ -22,10 +22,13 @@
 package com.fusionx.lightirc.activity;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.PreferenceActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +40,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
 import com.fusionx.lightirc.cardsui.ServerCard;
 import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.services.IRCService;
 import org.pircbotx.Configuration;
 
 import java.util.ArrayList;
@@ -45,12 +49,84 @@ import java.util.Set;
 
 public class MainServerListActivity extends Activity implements
         PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener {
-    ArrayList<Configuration.Builder> values;
+    private ArrayList<Configuration.Builder> values;
+    private IRCService service;
     private void connectToServer(final Configuration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerChannelActivity.class);
         intent.putExtra("server", builder);
         startActivity(intent);
+    }
+
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(final ComponentName className, final IBinder binder) {
+            service = ((IRCService.IRCBinder) binder).getService();
+            setUpServerList();
+        }
+        @Override
+        public void onServiceDisconnected(final ComponentName name) {
+            service = null;
+        }
+    };
+
+    private void setUpServerList() {
+        final SharedPreferences settings = getSharedPreferences("main", MODE_PRIVATE);
+        final boolean firstRun = settings.getBoolean("firstrun", true);
+        int noOfServers = settings.getInt("noOfServers", 0);
+        values = new ArrayList<Configuration.Builder>();
+
+        if (firstRun) {
+            noOfServers = firstRunAdditions();
+            Editor e = settings.edit();
+            e.putBoolean("firstrun", false);
+            e.putInt("noOfServers", noOfServers);
+            e.commit();
+        }
+
+        for (int i = 0; i < noOfServers; i++) {
+            final SharedPreferences serverSettings = getSharedPreferences("server_" + i
+                    , MODE_PRIVATE);
+            Configuration.Builder bot = new Configuration.Builder();
+            bot.setTitle(serverSettings.getString(Constants.Title, ""));
+            bot.setServerHostname(serverSettings.getString(Constants.URL, ""));
+            bot.setServerPort(Integer.parseInt(serverSettings.getString(Constants.Port, "6667")));
+            bot.setName(serverSettings.getString(Constants.Nick, ""));
+            bot.setLogin(serverSettings.getString(Constants.ServerUserName, "lightirc"));
+            bot.setServerPassword(serverSettings.getString(Constants.ServerPassword, ""));
+
+            final String nickServPassword = settings.getString(Constants
+                    .NickServPassword, null);
+            if (nickServPassword != null && !nickServPassword.equals("")) {
+                bot.setNickservPassword(nickServPassword);
+            }
+
+            Set<String> auto = new HashSet<String>();
+            auto = settings.getStringSet(Constants.AutoJoin, auto);
+            for (final String channel : auto) {
+                bot.addAutoJoinChannel(channel);
+            }
+            values.add(bot);
+        }
+
+        if (!values.isEmpty()) {
+            CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
+            mCardView.clearCards();
+            mCardView.setSwipeable(false);
+            for (Configuration.Builder bot : values) {
+                ServerCard server;
+                if(service.getBot(bot.getTitle()) != null) {
+                    server = new ServerCard(bot.getTitle(),
+                            service.getBot(bot.getTitle()).getStatus(), values.indexOf(bot));
+                } else {
+                    server = new ServerCard(bot.getTitle(),
+                            "Disconnected", values.indexOf(bot));
+                }
+                mCardView.addCard(server);
+            }
+
+            mCardView.refresh();
+        }
     }
 
     private void editServer(final Configuration.Builder builder) {
@@ -64,68 +140,19 @@ public class MainServerListActivity extends Activity implements
         startActivity(intent);
     }
 
-    private void getSetServerList() {
-        final SharedPreferences settings = getSharedPreferences("main", 0);
-        final boolean firstRun = settings.getBoolean("firstrun", true);
-        int noOfServers = settings.getInt("noOfServers", 0);
-        values = new ArrayList<Configuration.Builder>();
-
-        if (firstRun) {
-            noOfServers = firstRunAdditions(settings);
-        }
-
-        for (int i = 0; i < noOfServers; i++) {
-            Configuration.Builder bot = new Configuration.Builder();
-            bot.setTitle(settings.getString(Constants.titlePrefPrefix + i, ""));
-            bot.setServerHostname(settings.getString(Constants.urlPrefPrefix + i, ""));
-            bot.setServerPort(settings.getInt(Constants.serverPortPrefPrefix + i, 6667));
-            bot.setName(settings.getString(Constants.nickPrefPrefix + i, ""));
-            bot.setLogin(settings.getString(Constants
-                    .serverUsernamePrefPrefix + i, "lightirc"));
-            bot.setServerPassword(settings.getString(Constants
-                    .serverPasswordPrefPrefix + i, ""));
-
-            final String nickServPassword = settings.getString(Constants
-                    .serverNickServPasswordPrefPrefix + i, null);
-            if (nickServPassword != null && !nickServPassword.equals("")) {
-                bot.setNickservPassword(nickServPassword);
-            }
-
-            Set<String> auto = new HashSet<String>();
-            auto = settings.getStringSet(Constants.autoJoinPrefPrefix + i, auto);
-            for (final String channel : auto) {
-                bot.addAutoJoinChannel(channel);
-            }
-            values.add(bot);
-        }
-
-        if (!values.isEmpty()) {
-            CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
-            mCardView.clearCards();
-            mCardView.setSwipeable(false);
-            for (Configuration.Builder bot : values) {
-                ServerCard server = new ServerCard(bot.getTitle(),
-                        bot.getServerHostname(), values.indexOf(bot));
-                mCardView.addCard(server);
-            }
-
-            mCardView.refresh();
-        }
-    }
-
-    private int firstRunAdditions(final SharedPreferences settings) {
+    private int firstRunAdditions() {
         final int noOfServers = 1;
+        SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
         final Editor e = settings.edit();
 
-        e.putBoolean("firstrun", false);
-        e.putInt("noOfServers", noOfServers);
-
-        e.putString(Constants.titlePrefPrefix + "0", "Freenode");
-        e.putString(Constants.urlPrefPrefix + "0", "irc.freenode.net");
-        e.putString(Constants.nickPrefPrefix + "0", "LightIRCUser");
+        e.putString(Constants.Title, "Freenode");
+        e.putString(Constants.URL, "irc.freenode.net");
+        e.putString(Constants.Port, "6667");
+        e.putString(Constants.Nick, "LightIRCUser");
+        e.putString(Constants.ServerUserName, "lightirc");
 
         HashSet<String> auto = new HashSet<String>();
-        e.putStringSet(Constants.autoJoinPrefPrefix + "0", auto);
+        e.putStringSet(Constants.AutoJoin, auto);
         e.commit();
 
         return noOfServers;
@@ -139,7 +166,15 @@ public class MainServerListActivity extends Activity implements
     public void showPopup(final View v) {
         PopupMenu popup = new PopupMenu(this, v);
         builder = values.get((Integer) v.getTag());
-        popup.inflate(R.menu.activity_server_list_cab);
+        popup.inflate(R.menu.activity_server_list_popup);
+
+        if(service.getBot(builder.getTitle()) != null &&
+                service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
+            popup.getMenu().getItem(1).setEnabled(false);
+        } else {
+            popup.getMenu().getItem(0).setEnabled(false);
+        }
+
         popup.setOnMenuItemClickListener(this);
         popup.setOnDismissListener(this);
         popup.show();
@@ -154,17 +189,22 @@ public class MainServerListActivity extends Activity implements
     @Override
     public boolean onMenuItemClick(final MenuItem menuItem) {
         switch (menuItem.getItemId()) {
-            case R.id.activity_server_list_cab_edit:
+            case R.id.activity_server_list_popup_edit:
                 editServer(builder);
                 builder = null;
                 return true;
-            case R.id.activity_server_list_cab_connect:
-                connectToServer(builder);
+            case R.id.activity_server_list_popup_disconnect:
+                disconnectFromServer(builder);
                 builder = null;
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void disconnectFromServer(Configuration.Builder builder) {
+        service.disconnectFromServer(builder.getTitle());
+        setUpServerList();
     }
 
     @Override
@@ -205,6 +245,13 @@ public class MainServerListActivity extends Activity implements
     @Override
     protected void onResume() {
         super.onResume();
-        getSetServerList();
+        if(service == null) {
+            final Intent servic = new Intent(this, IRCService.class);
+            servic.putExtra("stop", false);
+            startService(servic);
+            bindService(servic, mConnection, 0);
+        } else {
+            setUpServerList();
+        }
     }
 }

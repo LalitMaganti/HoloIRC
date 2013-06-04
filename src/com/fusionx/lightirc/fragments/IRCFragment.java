@@ -77,7 +77,6 @@ public abstract class IRCFragment extends Fragment  implements TextView.OnEditor
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if(v.equals(editText)) {
-
             if(hasFocus) {
                 editText.post(new Runnable() {
                     @Override

@@ -16,12 +16,13 @@ lint.xml
 # Locally stored "Eclipse launch configurations"
 *.launch
 
+# Idea files
 .idea
+out
 
 # built application files
 *.apk
 *.ap_
-
 
 # Java class files
 *.class

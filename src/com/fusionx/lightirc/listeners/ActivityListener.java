@@ -29,8 +29,10 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.PMFragment;
+import com.fusionx.lightirc.irc.IOExceptionEvent;
+import com.fusionx.lightirc.irc.IrcExceptionEvent;
+import com.fusionx.lightirc.misc.EventParser;
 import com.fusionx.lightirc.misc.UserComparator;
-import com.fusionx.lightirc.misc.Utils;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.pircbotx.PircBotX;
@@ -58,6 +60,30 @@ public class ActivityListener extends GenericListener {
         mViewPager = pager;
     }
 
+    @Override
+    protected void onIrcException(final IrcExceptionEvent event) {
+        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                server.writeToTextView(event.getException().getMessage());
+            }
+        });
+    }
+
+    @Override
+    protected void onIOException(final IOExceptionEvent<PircBotX> event) {
+        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                server.writeToTextView(EventParser.getOutputForEvent(event));
+            }
+        });
+    }
+
     // Server events
     @Override
     public void onEvent(final Event event) throws Exception {
@@ -69,7 +95,7 @@ public class ActivityListener extends GenericListener {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    server.writeToTextView(Utils.getOutputForEvent(event));
+                    server.writeToTextView(EventParser.getOutputForEvent(event));
                 }
             });
         }
@@ -83,7 +109,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 activity.onNewChannelJoined(joinevent.getChannel().getName(),
-                        Utils.getOutputForEvent(event), null);
+                        EventParser.getOutputForEvent(event), null);
             }
         });
     }
@@ -101,7 +127,7 @@ public class ActivityListener extends GenericListener {
                     public void run() {
                         final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
                         if(channel != null) {
-                            channel.writeToTextView(Utils.getOutputForEvent(event));
+                            channel.writeToTextView(EventParser.getOutputForEvent(event));
                         }
                     }
                 }, 750);
@@ -218,11 +244,11 @@ public class ActivityListener extends GenericListener {
                 if (fragment != null) {
                     PMFragment pm = (PMFragment) fragment;
                     if(!event.getMessage().equals("")) {
-                        pm.writeToTextView(Utils.getOutputForEvent(event));
+                        pm.writeToTextView(EventParser.getOutputForEvent(event));
                     }
                 } else {
                     activity.onNewPrivateMessage(event.getUser().getNick(),
-                            Utils.getOutputForEvent(event));
+                            EventParser.getOutputForEvent(event));
                 }
             }
         });
@@ -236,10 +262,10 @@ public class ActivityListener extends GenericListener {
                 IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
                 if (fragment != null) {
                     PMFragment pm = (PMFragment) fragment;
-                    pm.writeToTextView(Utils.getOutputForEvent(event));
+                    pm.writeToTextView(EventParser.getOutputForEvent(event));
                 } else {
                     activity.onNewPrivateMessage(event.getUser().getNick(),
-                            Utils.getOutputForEvent(event));
+                            EventParser.getOutputForEvent(event));
                 }
             }
         });
@@ -252,7 +278,7 @@ public class ActivityListener extends GenericListener {
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);
                 if(channel != null) {
-                    channel.writeToTextView(Utils.getOutputForEvent(event));
+                    channel.writeToTextView(EventParser.getOutputForEvent(event));
                 }
             }
         });

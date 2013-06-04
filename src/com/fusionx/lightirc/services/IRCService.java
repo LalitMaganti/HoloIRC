@@ -36,6 +36,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.irc.IOExceptionEvent;
+import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
 import org.pircbotx.Channel;
@@ -76,13 +78,14 @@ public class IRCService extends Service {
                 try {
                     bo.connect();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    bo.getConfiguration().getListenerManager()
+                            .dispatchEvent(new IOExceptionEvent(bo, e));
                 } catch (IrcException e) {
-                    e.printStackTrace();
+                    bo.getConfiguration().getListenerManager()
+                            .dispatchEvent(new IrcExceptionEvent(bo, e));
                 }
             }
         }.start();
-
         manager.put(server.getTitle(), bo);
     }
 
@@ -119,7 +122,9 @@ public class IRCService extends Service {
     }
 
     public void disconnectFromServer(String serverName) {
-        getBot(serverName).shutdown();
+        if(!getBot(serverName).isShutdownCalled())  {
+            getBot(serverName).shutdown();
+        }
         manager.remove(serverName);
         if (manager.size() == 0) {
             stopForeground(true);

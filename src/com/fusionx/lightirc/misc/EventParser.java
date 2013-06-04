@@ -21,13 +21,14 @@
 
 package com.fusionx.lightirc.misc;
 
+import com.fusionx.lightirc.irc.IOExceptionEvent;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
-public class Utils {
+public class EventParser {
     public static String getOutputForEvent(Event e) {
         if (e instanceof MotdEvent) {
             final MotdEvent event = (MotdEvent) e;
@@ -85,6 +86,10 @@ public class Utils {
         } else if (e instanceof PrivateActionEvent) {
             final PrivateActionEvent event = (PrivateActionEvent) e;
             return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";
+        } else if (e instanceof IOExceptionEvent) {
+            final IOExceptionEvent event = (IOExceptionEvent) e;
+            final String message = event.getException().getMessage() + "\nTrying to reconnect in 5 seconds\n";
+            return message;
         } else {
             // Invalid event
             return "";
