@@ -88,8 +88,7 @@ public class EventParser {
             return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";
         } else if (e instanceof IOExceptionEvent) {
             final IOExceptionEvent event = (IOExceptionEvent) e;
-            final String message = event.getException().getMessage() + "\nTrying to reconnect in 5 seconds\n";
-            return message;
+            return event.getException().getMessage() + "\nTrying to reconnect in 5 seconds\n";
         } else {
             // Invalid event
             return "";

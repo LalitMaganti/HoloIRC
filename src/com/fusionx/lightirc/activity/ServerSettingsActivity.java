@@ -98,7 +98,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         // NickServ
         private EditTextPreference mNickServPassword;
 
-        private List<EditTextPreference> alltheedittexts = new ArrayList<EditTextPreference>();
+        private final List<EditTextPreference> alltheedittexts = new ArrayList<EditTextPreference>();
 
         @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         @Override
@@ -234,8 +234,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
-                    PromptDialog dialog = new PromptDialog(getActivity(), "Channel Name"
-                            , "", (String) positions.toArray()[0]) {
+                    PromptDialog dialog = new PromptDialog(getActivity(),
+                            (String) positions.toArray()[0]) {
                         @Override
                         public boolean onOkClicked(final String input) {
                             adapter.remove((String) positions.toArray()[0]);
@@ -313,8 +313,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_ab_add:
-                    PromptDialog dialog = new PromptDialog(getActivity(), "Channel Name",
-                            "Channel name (including the starting #") {
+                    PromptDialog dialog = new PromptDialog(getActivity()
+                    ) {
                         @Override
                         public boolean onOkClicked(String input) {
                             adapter.add(input);

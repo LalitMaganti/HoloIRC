@@ -50,7 +50,7 @@ public abstract class IRCFragment extends Fragment  implements TextView.OnEditor
     @Setter(AccessLevel.PROTECTED)
     private TextView editText;
 
-    protected InputMethodManager imm;
+    private InputMethodManager imm;
 
     @Override
     public View onCreateView(final LayoutInflater inflater,

@@ -12,7 +12,7 @@ import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
-public abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
+abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
     @Override
     public void onEvent(Event event) throws Exception {
         if (event instanceof NickChangeEventPerChannel)
@@ -33,11 +33,11 @@ public abstract class GenericListener extends ListenerAdapter<PircBotX> implemen
 
     protected abstract void onIrcException(IrcExceptionEvent<PircBotX> event);
 
-    protected abstract void onNickChangePerChannel(NickChangeEventPerChannel<PircBotX> event) throws Exception;
+    protected abstract void onNickChangePerChannel(NickChangeEventPerChannel<PircBotX> event);
 
-    protected abstract void onQuitPerChannel(QuitEventPerChannel<PircBotX> event) throws Exception;
+    protected abstract void onQuitPerChannel(QuitEventPerChannel<PircBotX> event);
 
-    protected abstract void onPrivateAction(PrivateActionEvent<PircBotX> event) throws Exception;
+    protected abstract void onPrivateAction(PrivateActionEvent<PircBotX> event);
 
     protected abstract void onBotJoin(JoinEvent<PircBotX> event);
 

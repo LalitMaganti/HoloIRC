@@ -28,12 +28,8 @@ public class LightEditTextPreference extends EditTextPreference implements TextW
         onEditTextChanged();
     }
 
-    protected boolean onCheckValue(String value) {
-        return !value.isEmpty();
-    }
-
-    protected void onEditTextChanged() {
-        boolean enable = onCheckValue(getEditText().getText().toString());
+    void onEditTextChanged() {
+        boolean enable = !getEditText().getText().toString().isEmpty();
         Dialog dlg = getDialog();
         if (dlg instanceof AlertDialog) {
             AlertDialog alertDlg = (AlertDialog) dlg;

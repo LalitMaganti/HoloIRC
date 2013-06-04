@@ -137,7 +137,4 @@ public class MessageParser {
         }
     }
 
-    private void commandParse() {
-
-    }
 }

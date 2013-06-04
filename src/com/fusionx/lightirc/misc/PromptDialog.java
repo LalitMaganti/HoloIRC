@@ -9,21 +9,21 @@ import android.widget.EditText;
 public abstract class PromptDialog extends AlertDialog.Builder implements OnClickListener {
     private final EditText input;
 
-    public PromptDialog(Context context, String title, String hint) {
+    public PromptDialog(Context context) {
         super(context);
-        setTitle(title);
+        setTitle("Channel Name");
 
         input = new EditText(context);
-        input.setHint(hint);
+        input.setHint("Channel name (including the starting #");
         setView(input);
 
         setPositiveButton("OK", this);
         setNegativeButton("Cancel", this);
     }
 
-    public PromptDialog(Context context, String title, String hint, String message) {
+    public PromptDialog(Context context, String message) {
         super(context);
-        setTitle(title);
+        setTitle("Channel Name");
 
         input = new EditText(context);
         input.setText(message);
@@ -33,7 +33,7 @@ public abstract class PromptDialog extends AlertDialog.Builder implements OnClic
         setNegativeButton("Cancel", this);
     }
 
-    public void onCancelClicked(DialogInterface dialog) {
+    void onCancelClicked(DialogInterface dialog) {
         dialog.dismiss();
     }
 

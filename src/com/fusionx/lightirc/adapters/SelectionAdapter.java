@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SelectionAdapter extends ArrayAdapter<String> {
-    protected HashMap<String, Boolean> selectedItems = new HashMap<String, Boolean>();
-    protected final ArrayList<String> arrayList;
+    private final HashMap<String, Boolean> selectedItems = new HashMap<String, Boolean>();
+    private final ArrayList<String> arrayList;
 
     public SelectionAdapter(Context context, ArrayList<String> arrayList) {
         super(context, R.layout.layout_text_list, R.id.text1, arrayList);
@@ -32,8 +32,7 @@ public class SelectionAdapter extends ArrayAdapter<String> {
     }
 
     public HashSet<String> getItems() {
-        HashSet<String> d = new HashSet<String>(arrayList);
-        return d;
+        return new HashSet<String>(arrayList);
     }
 
     public void addSelection(int position) {
