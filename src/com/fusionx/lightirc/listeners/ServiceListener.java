@@ -23,11 +23,12 @@ package com.fusionx.lightirc.listeners;
 
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
-import com.fusionx.lightirc.misc.EventParser;
 import com.fusionx.lightirc.misc.UserComparator;
-import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.parser.EventParser;
+import com.fusionx.lightirc.service.IRCService;
 import lombok.*;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
@@ -66,20 +67,7 @@ public class ServiceListener extends GenericListener {
 
     @Override
     protected void onIOException(IOExceptionEvent<PircBotX> event) {
-        //PircBotX bot = event.getBot();
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event));
-        /*try {
-            Thread.sleep(5000);
-            event.getBot().reconnect();
-        } catch (IOException e) {
-            bot.getConfiguration().getListenerManager()
-                    .dispatchEvent(new IOExceptionEvent(bot, e));
-        } catch (IrcException e) {
-            bot.getConfiguration().getListenerManager()
-                    .dispatchEvent(new IrcExceptionEvent(bot, e));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
@@ -106,6 +94,19 @@ public class ServiceListener extends GenericListener {
         }
 
         event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event));
+    }
+
+    @Override
+    public void onUserList(final UserListEvent<PircBotX> event) {
+        final ArrayList<String> userList = event.getChannel().getUserList();
+
+        if(userList.isEmpty()) {
+            for (final User u : event.getUsers()) {
+                userList.add(u.getPrettyNick(event.getChannel()));
+            }
+
+            Collections.sort(userList, new UserComparator());
+        }
     }
 
     @Override
@@ -160,17 +161,23 @@ public class ServiceListener extends GenericListener {
     // Private message stuff
     @Override
     public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
-        event.getUser().appendToBuffer(EventParser.getOutputForEvent(event));
+        if (!event.getMessage().equals("")) {
+            event.getUser().appendToBuffer(EventParser.getOutputForEvent(event));
+        }
 
-        final String title = event.getBot().getConfiguration().getTitle();
-        getService().mention(title, event.getUser().getNick());
+        if (!event.getUser().equals(event.getBot().getUserBot())) {
+            final String title = event.getBot().getConfiguration().getTitle();
+            getService().mention(title, event.getUser().getNick());
+        }
     }
 
     @Override
     public void onPrivateAction(final PrivateActionEvent<PircBotX> event) {
         event.getUser().appendToBuffer(EventParser.getOutputForEvent(event));
 
-        final String title = event.getBot().getConfiguration().getTitle();
-        getService().mention(title, event.getUser().getNick());
+        if (!event.getUser().equals(event.getBot().getUserBot())) {
+            final String title = event.getBot().getConfiguration().getTitle();
+            getService().mention(title, event.getUser().getNick());
+        }
     }
 }

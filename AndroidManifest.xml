@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.fusionx.lightirc"
           android:versionCode="1"
-          android:versionName="0.6.100">
+          android:versionName="0.7.0">
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -39,8 +39,9 @@
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activity.SettingsActivity"/>
 
-        <service android:name="com.fusionx.lightirc.services.IRCService"/>
+        <service android:name="com.fusionx.lightirc.service.IRCService"/>
     </application>
 
 </manifest>

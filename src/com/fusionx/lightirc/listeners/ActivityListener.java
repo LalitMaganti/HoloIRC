@@ -31,7 +31,7 @@ import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.PMFragment;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
-import com.fusionx.lightirc.misc.EventParser;
+import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.misc.UserComparator;
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -138,14 +138,16 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onUserList(final UserListEvent<PircBotX> event) {
         final ArrayList<String> userList = event.getChannel().getUserList();
-        final String channelName = event.getChannel().getName();
 
-        for (final User u : event.getUsers()) {
-            userList.add(u.getPrettyNick(event.getChannel()));
+        if(userList.isEmpty()) {
+            for (final User u : event.getUsers()) {
+                userList.add(u.getPrettyNick(event.getChannel()));
+            }
+
+            Collections.sort(userList, new UserComparator());
         }
 
-        Collections.sort(userList, new UserComparator());
-
+        final String channelName = event.getChannel().getName();
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

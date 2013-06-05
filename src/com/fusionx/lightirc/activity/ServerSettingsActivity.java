@@ -34,11 +34,13 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.Toast;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.Constants;
-import com.fusionx.lightirc.misc.PromptDialog;
+import com.fusionx.lightirc.uisubclasses.PromptDialog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,9 +48,8 @@ import java.util.Set;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     private static boolean canExit;
-    private static int noOfServers;
-    private static int indexOfServer;
     private static boolean newServer;
+    private static String fileName;
 
     @Override
     public void onBuildHeaders(List<Header> target) {
@@ -60,25 +61,24 @@ public class ServerSettingsActivity extends PreferenceActivity {
         if(!canExit && newServer) {
             AlertDialog.Builder build = new AlertDialog.Builder(this);
             build.setTitle("Are you sure you want to exit?")
-                    .setMessage("Changes have been made - discard?").setNegativeButton("Discard", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    finish();
-                }
-            }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    .setMessage("Changes have been made - discard?")
+                    .setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            File folder = new File(getFilesDir().getAbsolutePath()
+                                    .replace("files", "shared_prefs/") + fileName + ".xml");
+                            folder.delete();
+                            finish();
+                        }
+                    }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     // do nothing
                 }
             });
             build.show();
-        } else if (newServer) {
-            final SharedPreferences settings = getSharedPreferences("main", 0);
-            Editor e = settings.edit();
-            e.putInt("noOfServers", noOfServers + 1);
-            e.commit();
-            finish();
         } else {
+            Toast.makeText(this, "Changes have been saved", Toast.LENGTH_SHORT);
             finish();
         }
     }
@@ -110,14 +110,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
             final Bundle f = getActivity().getIntent().getExtras();
             newServer = f.getBoolean("new", false);
 
-            noOfServers = f.getInt("noOfServers");
-            if(newServer) {
-                indexOfServer = noOfServers;
-                getPreferenceManager().setSharedPreferencesName("server_" + indexOfServer);
-            } else {
-                indexOfServer = f.getInt("indexOfServer");
-                getPreferenceManager().setSharedPreferencesName("server_" + indexOfServer);
-            }
+            fileName = f.getString("file");
+
+            getPreferenceManager().setSharedPreferencesName(fileName);
+
             addPreferencesFromResource(R.xml.activty_settings_prefs);
 
             final PreferenceScreen prefSet = getPreferenceScreen();
@@ -167,17 +163,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 // Nick of User
                 mEditTextNick.setSummary("This field should NOT be empty!");
             } else {
-                // Title of server
-                mEditTextTitle.setSummary(mEditTextTitle.getText());
-
-                // URL of server
-                mEditTextUrl.setSummary(mEditTextUrl.getText());
-
-                // Port of server
-                mEditTextPort.setSummary(mEditTextPort.getText());
-
-                // Nick of User
-                mEditTextNick.setSummary(mEditTextNick.getText());
+                for(EditTextPreference edit : alltheedittexts) {
+                    edit.setSummary(edit.getText());
+                }
             }
 
             // Server username
@@ -187,26 +175,20 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             if (newValue instanceof String) {
-                final SharedPreferences settings = getActivity().getSharedPreferences("main", 0);
-                final Editor e = settings.edit();
-
                 final String newString = (String) newValue;
                 if (preference != mNickServPassword && preference != mServerPassword) {
                     preference.setSummary(newString);
                 }
-                e.commit();
             }
             if(newServer) {
+                canExit = true;
                 for(EditTextPreference edit : alltheedittexts) {
                     if(edit.getText() == null) {
                         canExit = false;
                         break;
-                    } else {
-                        canExit = true;
                     }
                 }
             }
-
             return true;
         }
     }
@@ -295,7 +277,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             adapter = new SelectionAdapter(getActivity(), new ArrayList<String>());
 
             SharedPreferences settings = getActivity()
-                    .getSharedPreferences("server_" + indexOfServer, MODE_PRIVATE);
+                    .getSharedPreferences(fileName, MODE_PRIVATE);
             Set<String> set = settings.getStringSet(Constants.AutoJoin, new HashSet<String>());
             for (String channel : set) {
                 adapter.add(channel);
@@ -331,12 +313,12 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public void onPause() {
             SharedPreferences settings = getActivity()
-                    .getSharedPreferences("server_0", MODE_PRIVATE);
+                    .getSharedPreferences(fileName, MODE_PRIVATE);
             final Editor e = settings.edit();
             e.putStringSet(Constants.AutoJoin, adapter.getItems());
             e.commit();
 
-            super.onDestroy();
+            super.onPause();
         }
     }
 }

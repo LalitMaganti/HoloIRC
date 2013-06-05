@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.services;
+package com.fusionx.lightirc.service;
 
 import android.annotation.TargetApi;
 import android.app.Notification;

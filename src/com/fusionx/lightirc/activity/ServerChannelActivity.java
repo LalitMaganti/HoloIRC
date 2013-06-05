@@ -43,7 +43,7 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.*;
 import com.fusionx.lightirc.listeners.ActivityListener;
 import com.fusionx.lightirc.parser.MessageParser;
-import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.service.IRCService;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;

@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.cardsui;
+package com.fusionx.lightirc.uisubclasses;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -41,8 +41,10 @@ public class ServerCard extends Card {
     @Override
     public View getCardContent(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_server_card, null);
-        ((TextView) view.findViewById(R.id.title)).setText(titlePlay);
-        ((TextView) view.findViewById(R.id.description)).setText(mStatus);
+        if(view != null) {
+            ((TextView) view.findViewById(R.id.title)).setText(titlePlay);
+            ((TextView) view.findViewById(R.id.description)).setText(mStatus);
+        }
         return view;
     }
 

@@ -4,6 +4,4 @@
           class="com.fusionx.lightirc.fragments.UserListFragment"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          android:id="@+id/user_fragment">
-
-</fragment>
+          android:id="@+id/user_fragment"/>

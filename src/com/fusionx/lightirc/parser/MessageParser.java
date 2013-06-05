@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.parser;
 
-import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.service.IRCService;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
@@ -44,44 +44,25 @@ public class MessageParser {
     public void channelMessageToParse(final String serverName, final String channelName,
                                       final String message) {
         final PircBotX bot = getService().getBot(serverName);
-        if(message != null) {
-            final ListenerManager manager = bot.getConfiguration().getListenerManager();
-            final String parsedArray[] = message.split("\\s+");
+        final ListenerManager manager = bot.getConfiguration().getListenerManager();
+        final String parsedArray[] = message.split("\\s+");
 
-            if (parsedArray[0].startsWith("/")) {
-                // TODO parse this string fully
-                if (parsedArray[0].startsWith("/join")) {
-                    final String channel = parsedArray[1];
-                    // TODO - input validation
-                    bot.sendIRC().joinChannel(channel);
-                } else if (parsedArray[0].startsWith("/me")) {
-                    final String action = parsedArray[1];
-                    // TODO - input validation
-                    manager.dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
-                            bot.getUserChannelDao().getChannel(channelName), action));
-                    bot.sendIRC().action(channelName, action);
-                } else if (message.startsWith("/nick")) {
-                    final String newNick = parsedArray[1];
-                    bot.sendIRC().changeNick(newNick);
-                } else if (message.startsWith("/msg")) {
-                    final String newNick = parsedArray[1];
-                    String pm = parsedArray[2];
-                    if(pm == null) {
-                        pm = "";
-                    } else {
-                        bot.sendIRC().message(newNick, pm);
-                    }
-                    manager.dispatchEvent(new PrivateMessageEvent(bot, bot.getUserChannelDao()
-                            .getUser(newNick), pm));
-                } else {
-                    //Dispatch event here
-                }
+        if (parsedArray[0].startsWith("/")) {
+            // TODO parse this string fully
+            if (parsedArray[0].startsWith("/me")) {
+                final String action = parsedArray[1];
+                // TODO - input validation
+                manager.dispatchEvent(new ActionEvent(bot, bot.getUserBot(),
+                        bot.getUserChannelDao().getChannel(channelName), action));
+                bot.sendIRC().action(channelName, action);
             } else {
-                manager.dispatchEvent(new MessageEvent(bot,
-                        bot.getUserChannelDao().getChannel(channelName),
-                        bot.getUserBot(), message));
-                bot.sendIRC().message(channelName, message);
+                serverCommandToParse(parsedArray, bot);
             }
+        } else {
+            manager.dispatchEvent(new MessageEvent(bot,
+                    bot.getUserChannelDao().getChannel(channelName),
+                    bot.getUserBot(), message));
+            bot.sendIRC().message(channelName, message);
         }
     }
 
@@ -89,46 +70,26 @@ public class MessageParser {
         final PircBotX bot = getService().getBot(serverName);
         final String parsedArray[] = message.split("\\s+");
 
-        if (message.startsWith("/")) {
-            // TODO parse this string fully
-            if (message.startsWith("/join")) {
-                final String channel = parsedArray[1];
-                // TODO - input validation
-                bot.sendIRC().joinChannel(channel);
-            } else {
-                //String bufferMessage = "Unknown command";
-                //bot.appendToBuffer(bufferMessage);
-            }
-        } else {
-            //String bufferMessage = "Invalid message";
-            //bot.appendToBuffer(bufferMessage);
+        if (parsedArray[0].startsWith("/")) {
+            serverCommandToParse(parsedArray, bot);
         }
     }
 
     public void userMessageToParse(String serverName, String userNick, String message) {
         final PircBotX bot = getService().getBot(serverName);
         final ListenerManager manager = bot.getConfiguration().getListenerManager();
+        final String parsedArray[] = message.split("\\s+");
 
-        if (message.startsWith("/")) {
-            // TODO parse this string fully
-            if (message.startsWith("/me")) {
+        // TODO parse this string fully
+        // TODO - input validation
+        if (parsedArray[0].startsWith("/")) {
+            if (parsedArray[0].startsWith("/me")) {
                 final User user = bot.getUserChannelDao().getUser(userNick);
                 String action = message.replace("/me ", "");
-                // TODO - input validation
                 manager.dispatchEvent(new PrivateActionEvent(bot, user, message));
                 user.send().action(action);
-            } else if (message.startsWith("/msg")){
-                final String parsedArray[] = message.split("\\s+");
-                final String newNick = parsedArray[1];
-                String pm = parsedArray[2];
-                if(pm == null) {
-                    pm = "";
-                } else {
-                    bot.sendIRC().message(newNick, pm);
-                }
-                manager.dispatchEvent(new PrivateMessageEvent(bot,
-                        bot.getUserChannelDao().getUser(newNick), pm));
             } else {
+                serverCommandToParse(parsedArray, bot);
             }
         } else {
             final User user = bot.getUserChannelDao().getUser(userNick);
@@ -137,4 +98,27 @@ public class MessageParser {
         }
     }
 
+    private void serverCommandToParse(String[] parsedArray, PircBotX bot) {
+        // TODO parse this string fully
+        // TODO - input validation
+        final ListenerManager manager = bot.getConfiguration().getListenerManager();
+        final String command = parsedArray[0];
+
+        if (command.equals("/join")) {
+            final String channel = parsedArray[1];
+            bot.sendIRC().joinChannel(channel);
+        } else if (command.equals("/msg")) {
+            final String nick = parsedArray[1];
+
+            String pm = ((parsedArray[2] == null) ? "" : parsedArray[2]);
+
+            bot.sendIRC().message(nick, pm);
+
+            manager.dispatchEvent(new PrivateMessageEvent(bot, bot.getUserChannelDao()
+                    .getUser(nick), pm));
+        } else if (parsedArray[0].startsWith("/nick")) {
+            final String newNick = parsedArray[1];
+            bot.sendIRC().changeNick(newNick);
+        }
+    }
 }

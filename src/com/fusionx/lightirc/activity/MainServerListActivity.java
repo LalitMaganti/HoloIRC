@@ -38,24 +38,40 @@ import android.widget.PopupMenu;
 import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
-import com.fusionx.lightirc.cardsui.ServerCard;
 import com.fusionx.lightirc.misc.Constants;
-import com.fusionx.lightirc.services.IRCService;
+import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.uisubclasses.ServerCard;
 import org.pircbotx.Configuration;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MainServerListActivity extends Activity implements
-        PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener {
+public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
+        PopupMenu.OnDismissListener {
     private ArrayList<Configuration.Builder> values;
     private IRCService service;
-    private void connectToServer(final Configuration.Builder builder) {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                ServerChannelActivity.class);
-        intent.putExtra("server", builder);
-        startActivity(intent);
+    private Configuration.Builder builder;
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_server_list);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(service == null) {
+            final Intent servic = new Intent(this, IRCService.class);
+            servic.putExtra("stop", false);
+            startService(servic);
+            bindService(servic, mConnection, 0);
+        } else {
+            setUpServerList();
+        }
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -70,149 +86,7 @@ public class MainServerListActivity extends Activity implements
         }
     };
 
-    private void setUpServerList() {
-        final SharedPreferences settings = getSharedPreferences("main", MODE_PRIVATE);
-        final boolean firstRun = settings.getBoolean("firstrun", true);
-        int noOfServers = settings.getInt("noOfServers", 0);
-        values = new ArrayList<Configuration.Builder>();
-
-        if (firstRun) {
-            noOfServers = firstRunAdditions();
-            Editor e = settings.edit();
-            e.putBoolean("firstrun", false);
-            e.putInt("noOfServers", noOfServers);
-            e.commit();
-        }
-
-        for (int i = 0; i < noOfServers; i++) {
-            final SharedPreferences serverSettings = getSharedPreferences("server_" + i
-                    , MODE_PRIVATE);
-            Configuration.Builder bot = new Configuration.Builder();
-            bot.setTitle(serverSettings.getString(Constants.Title, ""));
-            bot.setServerHostname(serverSettings.getString(Constants.URL, ""));
-            bot.setServerPort(Integer.parseInt(serverSettings.getString(Constants.Port, "6667")));
-            bot.setName(serverSettings.getString(Constants.Nick, ""));
-            bot.setLogin(serverSettings.getString(Constants.ServerUserName, "lightirc"));
-            bot.setServerPassword(serverSettings.getString(Constants.ServerPassword, ""));
-
-            final String nickServPassword = settings.getString(Constants
-                    .NickServPassword, null);
-            if (nickServPassword != null && !nickServPassword.equals("")) {
-                bot.setNickservPassword(nickServPassword);
-            }
-
-            Set<String> auto = new HashSet<String>();
-            auto = settings.getStringSet(Constants.AutoJoin, auto);
-            for (final String channel : auto) {
-                bot.addAutoJoinChannel(channel);
-            }
-            values.add(bot);
-        }
-
-        if (!values.isEmpty()) {
-            CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
-            mCardView.clearCards();
-            mCardView.setSwipeable(false);
-            for (Configuration.Builder bot : values) {
-                ServerCard server;
-                if(service.getBot(bot.getTitle()) != null) {
-                    server = new ServerCard(bot.getTitle(),
-                            service.getBot(bot.getTitle()).getStatus(), values.indexOf(bot));
-                } else {
-                    server = new ServerCard(bot.getTitle(),
-                            "Disconnected", values.indexOf(bot));
-                }
-                mCardView.addCard(server);
-            }
-
-            mCardView.refresh();
-        }
-    }
-
-    private void editServer(final Configuration.Builder builder) {
-        Intent intent = new Intent(MainServerListActivity.this,
-                ServerSettingsActivity.class);
-        intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                BaseServerSettingFragment.class.getName());
-        intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-        intent.putExtra("indexOfServer", values.indexOf(builder));
-        intent.putExtra("server", builder);
-        startActivity(intent);
-    }
-
-    private int firstRunAdditions() {
-        final int noOfServers = 1;
-        SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
-        final Editor e = settings.edit();
-
-        e.putString(Constants.Title, "Freenode");
-        e.putString(Constants.URL, "irc.freenode.net");
-        e.putString(Constants.Port, "6667");
-        e.putString(Constants.Nick, "LightIRCUser");
-        e.putString(Constants.ServerUserName, "lightirc");
-
-        HashSet<String> auto = new HashSet<String>();
-        e.putStringSet(Constants.AutoJoin, auto);
-        e.commit();
-
-        return noOfServers;
-    }
-
-    public void onCardClick(final View v) {
-        connectToServer(values.get((Integer) v.getTag()));
-    }
-
-    private Configuration.Builder builder;
-    public void showPopup(final View v) {
-        PopupMenu popup = new PopupMenu(this, v);
-        builder = values.get((Integer) v.getTag());
-        popup.inflate(R.menu.activity_server_list_popup);
-
-        if(service.getBot(builder.getTitle()) != null &&
-                service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
-            popup.getMenu().getItem(1).setEnabled(false);
-        } else {
-            popup.getMenu().getItem(0).setEnabled(false);
-        }
-
-        popup.setOnMenuItemClickListener(this);
-        popup.setOnDismissListener(this);
-        popup.show();
-    }
-
-
-    @Override
-    public void onDismiss(PopupMenu popupMenu) {
-        builder = null;
-    }
-
-    @Override
-    public boolean onMenuItemClick(final MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.activity_server_list_popup_edit:
-                editServer(builder);
-                builder = null;
-                return true;
-            case R.id.activity_server_list_popup_disconnect:
-                disconnectFromServer(builder);
-                builder = null;
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private void disconnectFromServer(Configuration.Builder builder) {
-        service.disconnectFromServer(builder.getTitle());
-        setUpServerList();
-    }
-
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_server_list);
-    }
-
+    // Action bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -238,20 +112,189 @@ public class MainServerListActivity extends Activity implements
                 BaseServerSettingFragment.class.getName());
         intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
         intent.putExtra("new", true);
-        intent.putExtra("noOfServers", values.size());
+
+        final ArrayList<String> array = getListOfServersFormPrefsFiles();
+        Integer in;
+        if(!array.isEmpty()) {
+            in = Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
+        } else {
+            in = 0;
+        }
+
+        intent.putExtra("file", "server_" + in);
         startActivity(intent);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(service == null) {
-            final Intent servic = new Intent(this, IRCService.class);
-            servic.putExtra("stop", false);
-            startService(servic);
-            bindService(servic, mConnection, 0);
-        } else {
-            setUpServerList();
+    private void setUpServerList() {
+        final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
+        final boolean firstRun = globalSettings.getBoolean("firstrun", true);
+        values = new ArrayList<Configuration.Builder>();
+
+        if (firstRun) {
+            firstRunAdditions();
+            final Editor e = globalSettings.edit();
+            e.putBoolean("firstrun", false);
+
+            e.commit();
         }
+
+        setUpServers(getListOfServersFormPrefsFiles());
+        setUpCards();
+    }
+
+    private void setUpServers(ArrayList<String> servers) {
+        values.clear();
+        for (final String server : servers) {
+            final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
+            final Configuration.Builder bot = new Configuration.Builder();
+            bot.setTitle(serverSettings.getString(Constants.Title, ""));
+            bot.setServerHostname(serverSettings.getString(Constants.URL, ""));
+            bot.setServerPort(Integer.parseInt(serverSettings.getString(Constants.Port, "6667")));
+            bot.setName(serverSettings.getString(Constants.Nick, ""));
+            bot.setLogin(serverSettings.getString(Constants.ServerUserName, "lightirc"));
+            bot.setServerPassword(serverSettings.getString(Constants.ServerPassword, ""));
+
+            final String nickServPassword = serverSettings.getString(Constants
+                    .NickServPassword, null);
+            if (nickServPassword != null && !nickServPassword.equals("")) {
+                bot.setNickservPassword(nickServPassword);
+            }
+
+            Set<String> auto = new HashSet<String>();
+            auto = serverSettings.getStringSet(Constants.AutoJoin, auto);
+            for (final String channel : auto) {
+                bot.addAutoJoinChannel(channel);
+            }
+
+            bot.setFile(server);
+            values.add(bot);
+        }
+    }
+
+    private void setUpCards() {
+        CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
+        mCardView.clearCards();
+        if (!values.isEmpty()) {
+            mCardView.setSwipeable(false);
+            for (Configuration.Builder bot : values) {
+                ServerCard server;
+                if(service.getBot(bot.getTitle()) != null) {
+                    server = new ServerCard(bot.getTitle(),
+                            service.getBot(bot.getTitle()).getStatus(), values.indexOf(bot));
+                } else {
+                    server = new ServerCard(bot.getTitle(),
+                            "Disconnected", values.indexOf(bot));
+                }
+                mCardView.addCard(server);
+            }
+
+            mCardView.refresh();
+        }
+    }
+
+    private void firstRunAdditions() {
+        SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
+        final Editor e = settings.edit();
+
+        e.putString(Constants.Title, "Freenode");
+        e.putString(Constants.URL, "irc.freenode.net");
+        e.putString(Constants.Port, "6667");
+        e.putString(Constants.Nick, "LightIRCUser");
+        e.putString(Constants.ServerUserName, "lightirc");
+
+        HashSet<String> auto = new HashSet<String>();
+        e.putStringSet(Constants.AutoJoin, auto);
+        e.commit();
+    }
+
+    private ArrayList<String> getListOfServersFormPrefsFiles() {
+        ArrayList<String> array = new ArrayList<String>();
+        File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs"));
+        for(String file : folder.list()) {
+            if(file.startsWith("server_")) {
+                array.add(file.replace(".xml", ""));
+            }
+        }
+        Collections.sort(array);
+        return array;
+    }
+
+    // Connect to server
+    public void onCardClick(final View v) {
+        final Intent intent = new Intent(MainServerListActivity.this,
+                ServerChannelActivity.class);
+        intent.putExtra("server", values.get((Integer) v.getTag()));
+        startActivity(intent);
+    }
+
+    // Popup menu
+    public void showPopup(final View v) {
+        PopupMenu popup = new PopupMenu(this, v);
+        builder = values.get((Integer) v.getTag());
+        popup.inflate(R.menu.activity_server_list_popup);
+
+        if(service.getBot(builder.getTitle()) != null &&
+                service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
+            popup.getMenu().getItem(1).setEnabled(false);
+            popup.getMenu().getItem(2).setEnabled(false);
+        } else {
+            popup.getMenu().getItem(0).setEnabled(false);
+        }
+
+        popup.setOnMenuItemClickListener(this);
+        popup.setOnDismissListener(this);
+        popup.show();
+    }
+
+
+    @Override
+    public void onDismiss(PopupMenu popupMenu) {
+        builder = null;
+    }
+
+    @Override
+    public boolean onMenuItemClick(final MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.activity_server_list_popup_edit:
+                editServer(builder);
+                builder = null;
+                return true;
+            case R.id.activity_server_list_popup_disconnect:
+                disconnectFromServer(builder);
+                builder = null;
+                return true;            
+            case R.id.activity_server_list_popup_delete:
+                deleteServer(builder.getFile());
+                builder = null;
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void deleteServer(String fileName) {
+        final ArrayList<String> servers = getListOfServersFormPrefsFiles();
+        servers.remove(fileName);
+        File folder = new File(getFilesDir().getAbsolutePath()
+                .replace("files", "shared_prefs/") + fileName + ".xml");
+        folder.delete();
+        setUpServers(servers);
+        setUpCards();
+    }
+
+    private void disconnectFromServer(Configuration.Builder builder) {
+        service.disconnectFromServer(builder.getTitle());
+        setUpServerList();
+    }
+
+    private void editServer(final Configuration.Builder builder) {
+        Intent intent = new Intent(MainServerListActivity.this,
+                ServerSettingsActivity.class);
+        intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
+                BaseServerSettingFragment.class.getName());
+        intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
+        intent.putExtra("file", builder.getFile());
+        intent.putExtra("server", builder);
+        startActivity(intent);
     }
 }

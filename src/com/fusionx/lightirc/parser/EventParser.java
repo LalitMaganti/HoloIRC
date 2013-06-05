@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.misc;
+package com.fusionx.lightirc.parser;
 
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import org.pircbotx.hooks.Event;
@@ -65,10 +65,12 @@ public class EventParser {
             return baseMessage;
         } else if (e instanceof QuitEventPerChannel) {
             final QuitEventPerChannel event = (QuitEventPerChannel) e;
-            return event.getUser().getPrettyNick(event.getChannel()) + " quit the room\n";
+            return event.getUser().getPrettyNick(event.getChannel()) + " quit the server (Reason: "
+                    + event.getReason() + ")\n";
         } else if (e instanceof PartEvent) {
             final PartEvent event = (PartEvent) e;
-            return event.getUser().getPrettyNick(event.getChannel()) + " parted from the room\n";
+            return event.getUser().getPrettyNick(event.getChannel()) + " parted from the room (Reason: "
+                    + event.getReason() + ")\n";
         } else if (e instanceof NickChangeEventPerChannel) {
             final NickChangeEventPerChannel event = (NickChangeEventPerChannel) e;
             String newMessage;
