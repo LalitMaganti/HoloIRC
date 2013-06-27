@@ -25,9 +25,13 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.ActionBar.TabListener;
 import android.app.FragmentTransaction;
-import android.content.*;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -54,13 +58,12 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class ServerChannelActivity extends FragmentActivity
-        implements TabListener, OnPageChangeListener {
+public class ServerChannelActivity extends FragmentActivity implements TabListener, OnPageChangeListener {
     public final MessageParser parser = new MessageParser();
     private UserListFragment users;
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
-    private Configuration.Builder builder;
+    private Configuration.Builder<PircBotX> builder;
     private ActivityListener listener;
     private IRCService service;
     private SlidingMenu menu;
@@ -68,6 +71,10 @@ public class ServerChannelActivity extends FragmentActivity
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        setTheme(Integer.parseInt(prefs.getString("fragment_settings_theme", "16974105")));
+
         super.onCreate(savedInstanceState);
 
         mention = getIntent().getExtras().getString("mention", "");
@@ -116,7 +123,7 @@ public class ServerChannelActivity extends FragmentActivity
                 mIRCPagerAdapter.addView(d);
                 addTab(builder.getTitle());
 
-                if(service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
+                if (service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
                     for (final Channel channelName : bot.getUserBot().getChannels()) {
                         onNewChannelJoined(channelName.getName(),
                                 channelName.getBuffer(), channelName.getUserList());
@@ -166,8 +173,6 @@ public class ServerChannelActivity extends FragmentActivity
         invalidateOptionsMenu();
         menu.showContent();
 
-        userListUpdate(position);
-
         if (mIRCPagerAdapter.getItem(position).getView() != null) {
             final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
                     .getItem(position).getView().findViewById(R.id.scrollview);
@@ -187,28 +192,26 @@ public class ServerChannelActivity extends FragmentActivity
         setSpinnerSelectedNavigationItem(position);
     }
 
-    private void userListUpdate(int position) {
-        final IRCFragment fragment = (IRCFragment) mIRCPagerAdapter.getItem(position);
-        boolean channel = fragment instanceof ChannelFragment;
+    private void userListUpdate() {
+        final IRCFragment fragment = (IRCFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
+        final boolean channel = fragment instanceof ChannelFragment;
 
         if (channel) {
-            UserListAdapter adapter = ((UserListAdapter) users.getListAdapter());
+            final UserListAdapter adapter = ((UserListAdapter) users.getListAdapter());
             adapter.clear();
 
             final ChannelFragment c = (ChannelFragment) fragment;
-            final ArrayList<String> userlist = c.getUserList();
-            if (userlist != null) {
-                adapter.addAll(userlist);
+            final ArrayList<String> userList = c.getUserList();
+            if (userList != null) {
+                adapter.addAll(userList);
                 adapter.sort();
             }
-
-            adapter.notifyDataSetChanged();
         }
     }
 
-    public void userListMention(Set<String> users) {
-        for(String userNick : users) {
-            ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
+    public void userListMention(final Set<String> users) {
+        for (String userNick : users) {
+            final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
                     .getItem(mViewPager.getCurrentItem());
             String edit = channel.getEditText().getText().toString();
             edit = Html.fromHtml(userNick) + ": " + edit;
@@ -280,7 +283,6 @@ public class ServerChannelActivity extends FragmentActivity
 
         mViewPager.setOffscreenPageLimit(position);
     }
-
 
     // Removal stuff
     private void removeTab(final int i) {
@@ -365,6 +367,9 @@ public class ServerChannelActivity extends FragmentActivity
                 startActivity(intent);
                 return true;
             case R.id.activity_server_channel_ab_users:
+                if(!menu.isMenuShowing()) {
+                    userListUpdate();
+                }
                 menu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_close:

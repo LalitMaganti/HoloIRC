@@ -229,7 +229,7 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     public IRCFragment getTab(String title) {
         for (IRCFragment i : views) {
-            if(i != null) {
+            if (i.getTitle() != null) {
                 if (i.getTitle().equals(title)) {
                     return i;
                 }

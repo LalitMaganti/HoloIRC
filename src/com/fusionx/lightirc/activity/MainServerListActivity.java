@@ -29,19 +29,22 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.PopupMenu;
-import com.fima.cardsui.views.CardUI;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.ServerSettingsActivity.BaseServerSettingFragment;
+import com.fusionx.lightirc.adapters.ServerCardsAdapter;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.uisubclasses.ServerCard;
+import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
+import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,13 +53,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener {
-    private ArrayList<Configuration.Builder> values;
+        PopupMenu.OnDismissListener, OnDismissCallback {
+    private ArrayList<Configuration.Builder<PircBotX>> values;
     private IRCService service;
     private Configuration.Builder builder;
 
+    private ServerCardsAdapter mServerCardsAdapter;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        setTheme(Integer.parseInt(prefs.getString("fragment_settings_theme", "16974105")));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_list);
     }
@@ -64,12 +73,13 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     protected void onResume() {
         super.onResume();
-        if(service == null) {
+        if (service == null) {
             final Intent servic = new Intent(this, IRCService.class);
             servic.putExtra("stop", false);
             startService(servic);
             bindService(servic, mConnection, 0);
         } else {
+            setUpListView();
             setUpServerList();
         }
     }
@@ -78,13 +88,27 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
+            setUpListView();
             setUpServerList();
         }
+
         @Override
         public void onServiceDisconnected(final ComponentName name) {
             service = null;
         }
     };
+
+    private void setUpListView() {
+        ListView listView = (ListView) findViewById(R.id.server_list);
+
+        mServerCardsAdapter = new ServerCardsAdapter(service, this);
+        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
+                = new SwingBottomInAnimationAdapter(new SwipeDismissAdapter(mServerCardsAdapter,
+                MainServerListActivity.this));
+        swingBottomInAnimationAdapter.setListView(listView);
+
+        listView.setAdapter(swingBottomInAnimationAdapter);
+    }
 
     // Action bar
     @Override
@@ -97,6 +121,9 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.activity_server_list_ab_settings:
+                displaySettings();
+                return true;
             case R.id.activity_server_list_ab_add:
                 addNewServer();
                 return true;
@@ -105,17 +132,20 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         }
     }
 
+    private void displaySettings() {
+        Intent intent = new Intent(MainServerListActivity.this,
+                SettingsActivity.class);
+        startActivity(intent);
+    }
+
     private void addNewServer() {
         Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
-        intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                BaseServerSettingFragment.class.getName());
-        intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
         intent.putExtra("new", true);
 
         final ArrayList<String> array = getListOfServersFormPrefsFiles();
         Integer in;
-        if(!array.isEmpty()) {
+        if (!array.isEmpty()) {
             in = Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
         } else {
             in = 0;
@@ -128,7 +158,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpServerList() {
         final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-        values = new ArrayList<Configuration.Builder>();
+        values = new ArrayList<Configuration.Builder<PircBotX>>();
 
         if (firstRun) {
             firstRunAdditions();
@@ -146,7 +176,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         values.clear();
         for (final String server : servers) {
             final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
-            final Configuration.Builder bot = new Configuration.Builder();
+            final Configuration.Builder<PircBotX> bot = new Configuration.Builder<PircBotX>();
             bot.setTitle(serverSettings.getString(Constants.Title, ""));
             bot.setServerHostname(serverSettings.getString(Constants.URL, ""));
             bot.setServerPort(Integer.parseInt(serverSettings.getString(Constants.Port, "6667")));
@@ -172,23 +202,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void setUpCards() {
-        CardUI mCardView = (CardUI) findViewById(R.id.cardsview);
-        mCardView.clearCards();
+        mServerCardsAdapter.clear();
         if (!values.isEmpty()) {
-            mCardView.setSwipeable(false);
-            for (Configuration.Builder bot : values) {
-                ServerCard server;
-                if(service.getBot(bot.getTitle()) != null) {
-                    server = new ServerCard(bot.getTitle(),
-                            service.getBot(bot.getTitle()).getStatus(), values.indexOf(bot));
-                } else {
-                    server = new ServerCard(bot.getTitle(),
-                            "Disconnected", values.indexOf(bot));
-                }
-                mCardView.addCard(server);
+            for (Configuration.Builder<PircBotX> bot : values) {
+                mServerCardsAdapter.add(bot);
             }
-
-            mCardView.refresh();
         }
     }
 
@@ -210,8 +228,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private ArrayList<String> getListOfServersFormPrefsFiles() {
         ArrayList<String> array = new ArrayList<String>();
         File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs"));
-        for(String file : folder.list()) {
-            if(file.startsWith("server_")) {
+        for (String file : folder.list()) {
+            if (file.startsWith("server_")) {
                 array.add(file.replace(".xml", ""));
             }
         }
@@ -223,17 +241,17 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     public void onCardClick(final View v) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerChannelActivity.class);
-        intent.putExtra("server", values.get((Integer) v.getTag()));
+        intent.putExtra("server", (Configuration.Builder<PircBotX>) v.getTag());
         startActivity(intent);
     }
 
     // Popup menu
     public void showPopup(final View v) {
         PopupMenu popup = new PopupMenu(this, v);
-        builder = values.get((Integer) v.getTag());
+        builder = (Configuration.Builder<PircBotX>) v.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
-        if(service.getBot(builder.getTitle()) != null &&
+        if (service.getBot(builder.getTitle()) != null &&
                 service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
@@ -262,7 +280,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             case R.id.activity_server_list_popup_disconnect:
                 disconnectFromServer(builder);
                 builder = null;
-                return true;            
+                return true;
             case R.id.activity_server_list_popup_delete:
                 deleteServer(builder.getFile());
                 builder = null;
@@ -282,19 +300,21 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpCards();
     }
 
-    private void disconnectFromServer(Configuration.Builder builder) {
+    private void disconnectFromServer(Configuration.Builder<PircBotX> builder) {
         service.disconnectFromServer(builder.getTitle());
         setUpServerList();
     }
 
-    private void editServer(final Configuration.Builder builder) {
+    private void editServer(final Configuration.Builder<PircBotX> builder) {
         Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
-        intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT,
-                BaseServerSettingFragment.class.getName());
-        intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
         intent.putExtra("file", builder.getFile());
         intent.putExtra("server", builder);
         startActivity(intent);
+    }
+
+    @Override
+    public void onDismiss(ListView listView, int[] reverseSortedPositions) {
+
     }
 }

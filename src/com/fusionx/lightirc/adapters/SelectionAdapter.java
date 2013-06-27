@@ -23,7 +23,7 @@ public class SelectionAdapter extends ArrayAdapter<String> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = super.getView(position, convertView, parent);
-        if(selectedItems.containsKey(arrayList.get(position))) {
+        if (selectedItems.containsKey(arrayList.get(position))) {
             v.setBackgroundResource(android.R.color.holo_blue_light);
         } else {
             v.setBackgroundResource(R.drawable.selectable_background_cardbank);

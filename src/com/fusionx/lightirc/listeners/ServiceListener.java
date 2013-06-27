@@ -98,13 +98,14 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onUserList(final UserListEvent<PircBotX> event) {
-        final ArrayList<String> userList = event.getChannel().getUserList();
+        final ArrayList<String> userList = new ArrayList<String>();
 
-        if(userList.isEmpty()) {
+        if (userList.isEmpty()) {
             for (final User u : event.getUsers()) {
                 userList.add(u.getPrettyNick(event.getChannel()));
             }
 
+            event.getChannel().initialUserList(userList);
             Collections.sort(userList, new UserComparator());
         }
     }

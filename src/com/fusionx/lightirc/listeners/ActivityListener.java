@@ -31,8 +31,8 @@ import com.fusionx.lightirc.fragments.IRCFragment;
 import com.fusionx.lightirc.fragments.PMFragment;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
-import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.misc.UserComparator;
+import com.fusionx.lightirc.parser.EventParser;
 import lombok.AccessLevel;
 import lombok.Setter;
 import org.pircbotx.PircBotX;
@@ -126,7 +126,7 @@ public class ActivityListener extends GenericListener {
                     @Override
                     public void run() {
                         final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
-                        if(channel != null) {
+                        if (channel != null) {
                             channel.writeToTextView(EventParser.getOutputForEvent(event));
                         }
                     }
@@ -137,13 +137,14 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onUserList(final UserListEvent<PircBotX> event) {
-        final ArrayList<String> userList = event.getChannel().getUserList();
+        final ArrayList<String> userList = new ArrayList<String>();
 
-        if(userList.isEmpty()) {
+        if (userList.isEmpty()) {
             for (final User u : event.getUsers()) {
                 userList.add(u.getPrettyNick(event.getChannel()));
             }
 
+            event.getChannel().initialUserList(userList);
             Collections.sort(userList, new UserComparator());
         }
 
@@ -153,7 +154,7 @@ public class ActivityListener extends GenericListener {
             public void run() {
                 final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
                         .getTab(channelName);
-                if(channel != null) {
+                if (channel != null) {
                     channel.setUserList(userList);
                 }
             }
@@ -245,7 +246,7 @@ public class ActivityListener extends GenericListener {
                 IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
                 if (fragment != null) {
                     PMFragment pm = (PMFragment) fragment;
-                    if(!event.getMessage().equals("")) {
+                    if (!event.getMessage().equals("")) {
                         pm.writeToTextView(EventParser.getOutputForEvent(event));
                     }
                 } else {
@@ -279,7 +280,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);
-                if(channel != null) {
+                if (channel != null) {
                     channel.writeToTextView(EventParser.getOutputForEvent(event));
                 }
             }

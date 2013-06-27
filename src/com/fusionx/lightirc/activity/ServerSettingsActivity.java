@@ -52,13 +52,23 @@ public class ServerSettingsActivity extends PreferenceActivity {
     private static String fileName;
 
     @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.preference_headers, target);
+    protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences prefs =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        setTheme(Integer.parseInt(prefs.getString("fragment_settings_theme", "16974105")));
+
+        super.onCreate(savedInstanceState);
+
+        // Display the fragment as the main content.
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new BaseServerSettingFragment())
+                .commit();
     }
+
 
     @Override
     public void onBackPressed() {
-        if(!canExit && newServer) {
+        if (!canExit && newServer) {
             AlertDialog.Builder build = new AlertDialog.Builder(this);
             build.setTitle("Are you sure you want to exit?")
                     .setMessage("Changes have been made - discard?")
@@ -83,7 +93,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
     }
 
-    public static class BaseServerSettingFragment extends PreferenceFragment
+    public class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
         // Generic
         private EditTextPreference mEditTextNick;
@@ -163,7 +173,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 // Nick of User
                 mEditTextNick.setSummary("This field should NOT be empty!");
             } else {
-                for(EditTextPreference edit : alltheedittexts) {
+                for (EditTextPreference edit : alltheedittexts) {
                     edit.setSummary(edit.getText());
                 }
             }
@@ -180,10 +190,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     preference.setSummary(newString);
                 }
             }
-            if(newServer) {
+            if (newServer) {
                 canExit = true;
-                for(EditTextPreference edit : alltheedittexts) {
-                    if(edit.getText() == null) {
+                for (EditTextPreference edit : alltheedittexts) {
+                    if (edit.getText() == null) {
                         canExit = false;
                         break;
                     }

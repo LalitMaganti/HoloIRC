@@ -24,7 +24,7 @@
     <orderEntry type="module" module-name="pircbotx" />
     <orderEntry type="library" name="lightirc-libs" level="project" />
     <orderEntry type="module" module-name="slidingmenu" />
-    <orderEntry type="module" module-name="cardsui" />
+    <orderEntry type="module" module-name="library" />
   </component>
 </module>
 

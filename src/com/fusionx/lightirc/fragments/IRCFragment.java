@@ -36,8 +36,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class IRCFragment extends Fragment  implements TextView.OnEditorActionListener,
-        View.OnFocusChangeListener {
+public abstract class IRCFragment extends Fragment implements TextView.OnEditorActionListener {
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PROTECTED)
     private String title;
@@ -70,29 +69,7 @@ public abstract class IRCFragment extends Fragment  implements TextView.OnEditor
             writeToTextView(buffer);
         }
 
-        editText.setOnFocusChangeListener(this);
         return rootView;
-    }
-
-    @Override
-    public void onFocusChange(View v, boolean hasFocus) {
-        if(v.equals(editText)) {
-            if(hasFocus) {
-                editText.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
-                    }
-                });
-            } else {
-                editText.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-                    }
-                });
-            }
-        }
     }
 
     public void writeToTextView(final String text) {

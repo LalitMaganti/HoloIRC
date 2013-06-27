@@ -91,7 +91,7 @@ public class UserListFragment extends ListFragment
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        if(!modeStarted) {
+        if (!modeStarted) {
             getActivity().startActionMode(this);
         }
         boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));

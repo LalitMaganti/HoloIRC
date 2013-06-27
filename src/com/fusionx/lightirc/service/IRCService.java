@@ -28,6 +28,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -36,18 +37,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
-import com.fusionx.lightirc.irc.IOExceptionEvent;
-import com.fusionx.lightirc.irc.IrcExceptionEvent;
+import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
+import com.fusionx.lightirc.misc.LightThread;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 import org.pircbotx.UserChannelDao;
-import org.pircbotx.exception.IrcException;
 import org.pircbotx.output.OutputChannel;
-
-import java.io.IOException;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -64,6 +62,7 @@ public class IRCService extends Service {
     public void connectToServer(final Configuration.Builder server) {
         // TODO - setup option for this
         server.setAutoNickChange(true);
+        server.setBotFactory(new LightBotFactory(this));
 
         setupListeners(server);
         setupNotification();
@@ -72,21 +71,9 @@ public class IRCService extends Service {
 
         final PircBotX bo = new PircBotX(d);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    bo.connect();
-                } catch (IOException e) {
-                    bo.getConfiguration().getListenerManager()
-                            .dispatchEvent(new IOExceptionEvent(bo, e));
-                } catch (IrcException e) {
-                    bo.getConfiguration().getListenerManager()
-                            .dispatchEvent(new IrcExceptionEvent(bo, e));
-                }
-            }
-        }.start();
-        manager.put(server.getTitle(), bo);
+        final LightThread thread = new LightThread(bo);
+        thread.start();
+        manager.put(server.getTitle(), thread);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -101,6 +88,7 @@ public class IRCService extends Service {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle("LightIRC")
                 .setContentText("At least one server is joined")
+                // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
 
@@ -122,18 +110,36 @@ public class IRCService extends Service {
     }
 
     public void disconnectFromServer(String serverName) {
-        if(!getBot(serverName).isShutdownCalled())  {
-            getBot(serverName).shutdown();
+        DisconnectTask disconnectTask = new DisconnectTask();
+        disconnectTask.execute(serverName);
+    }
+
+    private class DisconnectTask extends AsyncTask<String, Void, String> {
+        protected String doInBackground(final String... strings) {
+            if(getBot(strings[0]).getStatus().equals("Connected")) {
+                getBot(strings[0]).shutdown();
+            } else {
+                manager.get(strings[0]).interrupt();
+            }
+            return strings[0];
         }
-        manager.remove(serverName);
-        if (manager.size() == 0) {
-            stopForeground(true);
-            stopSelf();
+
+        @Override
+        protected void onPostExecute(String strings) {
+            manager.remove(strings);
+            if (manager.size() == 0) {
+                stopForeground(true);
+                stopSelf();
+            }
         }
     }
 
     public PircBotX getBot(final String serverName) {
-        return manager.get(serverName);
+        if(manager.get(serverName) != null) {
+            return manager.get(serverName).getBot();
+        } else {
+            return null;
+        }
     }
 
     @Override

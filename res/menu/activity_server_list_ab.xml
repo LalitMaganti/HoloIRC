@@ -5,4 +5,8 @@
         android:id="@+id/activity_server_list_ab_add"
         android:showAsAction="ifRoom|withText"
         android:title="@string/add"/>
+    <item
+        android:id="@+id/activity_server_list_ab_settings"
+        android:showAsAction="never"
+        android:title="@string/settings"/>
 </menu>

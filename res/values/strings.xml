@@ -17,5 +17,8 @@
     <string name="overflow">Overflow</string>
     <string name="title">Title</string>
     <string name="mention">Mention</string>
+    <string name="appearance">Appearance</string>
+    <string name="settings">Settings</string>
+    <string name="theme">Theme</string>
 
 </resources>
