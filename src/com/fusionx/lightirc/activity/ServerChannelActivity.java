@@ -63,7 +63,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     private UserListFragment users;
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
-    private Configuration.Builder<PircBotX> builder;
+    private Configuration.Builder builder;
     private ActivityListener listener;
     private IRCService service;
     private SlidingMenu menu;
@@ -367,7 +367,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                 startActivity(intent);
                 return true;
             case R.id.activity_server_channel_ab_users:
-                if(!menu.isMenuShowing()) {
+                if (!menu.isMenuShowing()) {
                     userListUpdate();
                 }
                 menu.toggle();
