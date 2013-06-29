@@ -101,6 +101,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mServerCardsAdapter = new BuilderAdapter(service, this);
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
                 = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
+        swingBottomInAnimationAdapter.setAbsListView(listView);
 
         listView.setAdapter(swingBottomInAnimationAdapter);
     }
