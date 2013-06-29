@@ -59,10 +59,11 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         super.onCreate(savedInstanceState);
 
-        // Display the fragment as the main content.
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new BaseServerSettingFragment())
-                .commit();
+        if(getIntent().getExtras().getBoolean("main") == true) {
+            getFragmentManager().beginTransaction()
+                    .replace(android.R.id.content, new BaseServerSettingFragment())
+                    .commit();
+        }
     }
 
 

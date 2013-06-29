@@ -34,15 +34,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.adapters.ServerCardsAdapter;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.service.IRCService;
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.haarman.listviewanimations.itemmanipulation.SwipeDismissAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import org.pircbotx.Configuration;
 
@@ -53,12 +51,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener, OnDismissCallback {
+        PopupMenu.OnDismissListener {
     private ArrayList<Configuration.Builder> values;
     private IRCService service;
     private Configuration.Builder builder;
 
-    private ServerCardsAdapter mServerCardsAdapter;
+    private BuilderAdapter mServerCardsAdapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -100,12 +98,9 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     private void setUpListView() {
         ListView listView = (ListView) findViewById(R.id.server_list);
-
-        mServerCardsAdapter = new ServerCardsAdapter(service, this);
+        mServerCardsAdapter = new BuilderAdapter(service, this);
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
-                = new SwingBottomInAnimationAdapter(new SwipeDismissAdapter(mServerCardsAdapter,
-                MainServerListActivity.this));
-        swingBottomInAnimationAdapter.setListView(listView);
+                = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
 
         listView.setAdapter(swingBottomInAnimationAdapter);
     }
@@ -310,11 +305,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
                 ServerSettingsActivity.class);
         intent.putExtra("file", builder.getFile());
         intent.putExtra("server", builder);
+        intent.putExtra("main", true);
         startActivity(intent);
-    }
-
-    @Override
-    public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
-
     }
 }

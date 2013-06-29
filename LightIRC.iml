@@ -23,8 +23,8 @@
     <orderEntry type="library" name="lightirc-libs" level="project" />
     <orderEntry type="module" module-name="listviewanimations" />
     <orderEntry type="module" module-name="slidingmenu" />
-    <orderEntry type="module" module-name="pircbotx" />
     <orderEntry type="library" name="android-support-lib" level="project" />
+    <orderEntry type="module" module-name="pircbotx" />
   </component>
 </module>
 

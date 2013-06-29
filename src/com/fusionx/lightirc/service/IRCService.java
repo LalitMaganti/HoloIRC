@@ -37,6 +37,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
 import com.fusionx.lightirc.misc.LightThread;
@@ -61,7 +62,7 @@ public class IRCService extends Service {
     public void connectToServer(final Configuration.Builder server) {
         // TODO - setup option for this
         server.setAutoNickChange(true);
-        //server.setBotFactory(new LightBotFactory(this));
+        server.setBotFactory(new LightBotFactory());
 
         setupListeners(server);
         setupNotification();
