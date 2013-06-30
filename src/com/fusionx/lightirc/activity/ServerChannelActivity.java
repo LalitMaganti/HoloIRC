@@ -321,7 +321,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         super.onDestroy();
     }
 
-    // Options mSlidingMenu stuff
+    // OptionsMenu stuff
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
@@ -330,11 +330,11 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        int server = mViewPager.getCurrentItem();
+        final int server = mViewPager.getCurrentItem();
         if (server != 0) {
             final IRCFragment fragment = (IRCFragment) mIRCPagerAdapter.getItem(server);
-            boolean channel = fragment instanceof ChannelFragment;
-            boolean userPM = fragment instanceof PMFragment;
+            final boolean channel = fragment instanceof ChannelFragment;
+            final boolean userPM = fragment instanceof PMFragment;
 
             menu.findItem(R.id.activity_server_channel_ab_part).setVisible(channel);
             menu.findItem(R.id.activity_server_channel_ab_users).setVisible(channel);
@@ -346,7 +346,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        Intent intent = new Intent(this, MainServerListActivity.class);
+        final Intent intent = new Intent(this, MainServerListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         switch (item.getItemId()) {
             case R.id.activity_server_channel_ab_part:
@@ -370,31 +370,31 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     }
 
     // Hack for http://code.google.com/p/android/issues/detail?id=38500
-    private void setSpinnerSelectedNavigationItem(int position) {
+    private void setSpinnerSelectedNavigationItem(final int position) {
         try {
-            int id = getResources()
+            final int id = getResources()
                     .getIdentifier("action_bar", "id", "android");
-            View actionBarView = findViewById(id);
+            final View actionBarView = findViewById(id);
 
-            Class<?> actionBarViewClass = actionBarView.getClass();
-            Field mTabScrollViewField = actionBarViewClass
+            final Class<?> actionBarViewClass = actionBarView.getClass();
+            final Field mTabScrollViewField = actionBarViewClass
                     .getDeclaredField("mTabScrollView");
             mTabScrollViewField.setAccessible(true);
 
-            Object mTabScrollView = mTabScrollViewField.get(actionBarView);
+            final Object mTabScrollView = mTabScrollViewField.get(actionBarView);
             if (mTabScrollView == null) {
                 return;
             }
 
-            Field mTabSpinnerField = mTabScrollView.getClass()
+            final Field mTabSpinnerField = mTabScrollView.getClass()
                     .getDeclaredField("mTabSpinner");
             mTabSpinnerField.setAccessible(true);
 
-            Object mTabSpinner = mTabSpinnerField.get(mTabScrollView);
+            final Object mTabSpinner = mTabSpinnerField.get(mTabScrollView);
             if (mTabSpinner != null) {
                 ((Spinner) mTabSpinner).setSelection(position);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }

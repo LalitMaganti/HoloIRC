@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
-import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.Utils;
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -18,7 +18,7 @@ public class LightBotFactory extends Configuration.BotFactory {
 
     @Override
     public User createUser(final PircBotX bot, String nick) {
-        if (Utils.getThemeInt(applicationContext) == Constants.HoloLight) {
+        if (Utils.getThemeInt(applicationContext) == R.style.Light) {
             return new User(bot, bot.getUserChannelDao(), nick, 0);
         } else {
             return new User(bot, bot.getUserChannelDao(), nick, 255);

@@ -69,10 +69,10 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     protected void onResume() {
         super.onResume();
         if (mService == null) {
-            final Intent servic = new Intent(this, IRCService.class);
-            servic.putExtra("stop", false);
-            startService(servic);
-            bindService(servic, mConnection, 0);
+            final Intent service = new Intent(this, IRCService.class);
+            service.putExtra("stop", false);
+            startService(service);
+            bindService(service, mConnection, 0);
         } else {
             setUpListView();
             setUpServerList();
@@ -94,7 +94,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     };
 
     private void setUpListView() {
-        ListView listView = (ListView) findViewById(R.id.server_list);
+        final ListView listView = (ListView) findViewById(R.id.server_list);
         mServerCardsAdapter = new BuilderAdapter(mService, this);
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
                 = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
@@ -105,8 +105,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     // Action bar
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.activity_server_list_ab, menu);
         return true;
     }
@@ -136,7 +136,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
                 ServerSettingsActivity.class);
         intent.putExtra("new", true);
 
-        final ArrayList<String> array = getListOfServersFormPrefsFiles();
+        final ArrayList<String> array = getListOfServersFromPrefsFiles();
         Integer in;
         if (!array.isEmpty()) {
             in = Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
@@ -162,7 +162,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             e.commit();
         }
 
-        setUpServers(getListOfServersFormPrefsFiles());
+        setUpServers(getListOfServersFromPrefsFiles());
         setUpCards();
     }
 
@@ -219,7 +219,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         e.commit();
     }
 
-    private ArrayList<String> getListOfServersFormPrefsFiles() {
+    private ArrayList<String> getListOfServersFromPrefsFiles() {
         ArrayList<String> array = new ArrayList<String>();
         File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs"));
         for (String file : folder.list()) {
@@ -285,9 +285,10 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void deleteServer(String fileName) {
-        final ArrayList<String> servers = getListOfServersFormPrefsFiles();
+        final ArrayList<String> servers = getListOfServersFromPrefsFiles();
         servers.remove(fileName);
-        File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs/") + fileName + ".xml");
+        final File folder = new File(getFilesDir().getAbsolutePath().
+                replace("files", "shared_prefs/") + fileName + ".xml");
         folder.delete();
         setUpServers(servers);
         setUpCards();
@@ -299,7 +300,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void editServer(final Configuration.Builder builder) {
-        Intent intent = new Intent(MainServerListActivity.this,
+        final Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
         intent.putExtra("file", builder.getFile());
         intent.putExtra("server", builder);

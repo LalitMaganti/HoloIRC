@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.fragments;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.*;
@@ -18,9 +17,9 @@ public class UserListFragment extends ListFragment
     private UserListAdapter adapter;
     private boolean modeStarted;
 
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
+    public View onCreateView(final LayoutInflater inflater,
+                             final ViewGroup container, final Bundle savedInstanceState) {
+        final View view = super.onCreateView(inflater, container, savedInstanceState);
 
         adapter = new UserListAdapter(inflater.getContext(),
                 new ArrayList<String>());
@@ -39,23 +38,26 @@ public class UserListFragment extends ListFragment
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+    public void onItemCheckedStateChanged(final ActionMode mode, final int position,
+                                          final long id, final boolean checked) {
         mode.invalidate();
-
-        final Resources res = getResources();
-        final String quantityString = res.getQuantityString(R.plurals.user_selectioon,
-                getListView().getCheckedItemCount());
-
-        mode.setTitle(quantityString);
         if (checked) {
             adapter.addSelection(position);
         } else {
             adapter.removeSelection(position);
         }
+        int selectedItemCount = adapter.getSelectedItems().size();
+
+        if(selectedItemCount != 0) {
+            final String quantityString = getResources().getQuantityString(R.plurals.user_selectioon,
+                    selectedItemCount, selectedItemCount);
+
+            mode.setTitle(quantityString);
+        }
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         final Set<String> positions = adapter.getSelectedItems();
 
         switch (item.getItemId()) {
@@ -68,7 +70,7 @@ public class UserListFragment extends ListFragment
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.fragment_userlist_cab, menu);
 
@@ -78,18 +80,18 @@ public class UserListFragment extends ListFragment
     }
 
     @Override
-    public void onDestroyActionMode(ActionMode mode) {
+    public void onDestroyActionMode(final ActionMode mode) {
         adapter.clearSelection();
         modeStarted = false;
     }
 
     @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
         return false;
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
         if (!modeStarted) {
             getActivity().startActionMode(this);
         }
