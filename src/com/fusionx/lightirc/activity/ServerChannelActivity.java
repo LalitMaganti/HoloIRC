@@ -60,14 +60,14 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class ServerChannelActivity extends FragmentActivity implements TabListener, OnPageChangeListener {
-    private UserListFragment users;
+    private UserListFragment mUserFragment;
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
-    private Configuration.Builder builder;
-    private ActivityListener listener;
-    private IRCService service;
-    private SlidingMenu menu;
-    private String mention;
+    private Configuration.Builder mBuilder;
+    private ActivityListener mListener;
+    private IRCService mService;
+    private SlidingMenu mSlidingMenu;
+    private String mentionString;
 
     @Getter(AccessLevel.PUBLIC)
     private final MessageParser parser = new MessageParser();
@@ -80,7 +80,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         setContentView(R.layout.activity_server_channel);
         setUpSlidingMenu();
 
-        mention = getIntent().getExtras().getString("mention", "");
+        mentionString = getIntent().getExtras().getString("mention", "");
 
         mIRCPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
 
@@ -88,16 +88,16 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         mViewPager.setAdapter(mIRCPagerAdapter);
         mViewPager.setOnPageChangeListener(this);
 
-        listener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
+        mListener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
 
-        builder = getIntent().getExtras().getParcelable("server");
+        mBuilder = getIntent().getExtras().getParcelable("server");
 
         final ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         final Intent service = new Intent(this, IRCService.class);
         service.putExtra("server", true);
-        service.putExtra("serverName", builder.getTitle());
+        service.putExtra("serverName", mBuilder.getTitle());
         service.putExtra("stop", false);
         startService(service);
         bindService(service, mConnection, 0);
@@ -106,26 +106,26 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            service = ((IRCService.IRCBinder) binder).getService();
+            mService = ((IRCService.IRCBinder) binder).getService();
 
-            parser.setService(service);
+            parser.setService(mService);
 
             final Bundle bundle = new Bundle();
-            bundle.putString("title", builder.getTitle());
+            bundle.putString("title", mBuilder.getTitle());
 
-            listener.setArrayAdapter((UserListAdapter) users.getListAdapter());
+            mListener.setArrayAdapter((UserListAdapter) mUserFragment.getListAdapter());
 
             final ServerFragment fragment = new ServerFragment();
 
-            if (service.getBot(builder.getTitle()) != null) {
-                PircBotX bot = service.getBot(builder.getTitle());
-                bot.getConfiguration().getListenerManager().addListener(listener);
+            if (mService.getBot(mBuilder.getTitle()) != null) {
+                PircBotX bot = mService.getBot(mBuilder.getTitle());
+                bot.getConfiguration().getListenerManager().addListener(mListener);
                 bundle.putString("buffer", bot.getBuffer());
                 fragment.setArguments(bundle);
                 mIRCPagerAdapter.addView(fragment);
-                addTab(builder.getTitle());
+                addTab(mBuilder.getTitle());
 
-                if (service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
+                if (mService.getBot(mBuilder.getTitle()).getStatus().equals("Connected")) {
                     for (final Channel channelName : bot.getUserBot().getChannels()) {
                         onNewChannelJoined(channelName.getName(), channelName.getBuffer(), channelName.getUserList());
                     }
@@ -134,11 +134,11 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                     }
                 }
             } else {
-                builder.getListenerManager().addListener(listener);
-                service.connectToServer(builder);
+                mBuilder.getListenerManager().addListener(mListener);
+                mService.connectToServer(mBuilder);
                 fragment.setArguments(bundle);
                 mIRCPagerAdapter.addView(fragment);
-                addTab(builder.getTitle());
+                addTab(mBuilder.getTitle());
             }
         }
 
@@ -149,14 +149,14 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     };
 
     private void setUpSlidingMenu() {
-        menu = new SlidingMenu(this);
-        menu.setMode(SlidingMenu.RIGHT);
-        menu.setShadowDrawable(R.drawable.shadow);
-        menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-        menu.setMenu(R.layout.slding_menu_fragment_user);
+        mSlidingMenu = new SlidingMenu(this);
+        mSlidingMenu.setMode(SlidingMenu.RIGHT);
+        mSlidingMenu.setShadowDrawable(R.drawable.shadow);
+        mSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+        mSlidingMenu.setMenu(R.layout.slding_menu_fragment_user);
 
-        users = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
+        mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
     }
 
     // Page change stuff
@@ -171,7 +171,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     @Override
     public void onPageSelected(final int position) {
         invalidateOptionsMenu();
-        menu.showContent();
+        mSlidingMenu.showContent();
 
         if (mIRCPagerAdapter.getItem(position).getView() != null) {
             final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
@@ -194,14 +194,14 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     private void userListUpdate() {
         final ChannelFragment fragment = (ChannelFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
-            final UserListAdapter adapter = ((UserListAdapter) users.getListAdapter());
-            adapter.clear();
+        final UserListAdapter adapter = ((UserListAdapter) mUserFragment.getListAdapter());
+        adapter.clear();
 
-            final ArrayList<String> userList = fragment.getUserList();
-            if (userList != null) {
-                adapter.addAll(userList);
-                adapter.sort();
-            }
+        final ArrayList<String> userList = fragment.getUserList();
+        if (userList != null) {
+            adapter.addAll(userList);
+            adapter.sort();
+        }
     }
 
     public void userListMention(final Set<String> users) {
@@ -214,7 +214,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
             channel.getEditText().requestFocus();
         }
 
-        menu.showContent();
+        mSlidingMenu.showContent();
     }
 
     // Tab change listeners
@@ -244,7 +244,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("channel", channelName);
-        bundle.putString("serverName", builder.getTitle());
+        bundle.putString("serverName", mBuilder.getTitle());
         bundle.putString("buffer", buffer);
         bundle.putStringArrayList("userList", userList);
         channel.setArguments(bundle);
@@ -253,7 +253,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         addTab(channelName);
         getActionBar().getTabAt(position).setText(channelName);
 
-        if (mention.equals(channelName)) {
+        if (mentionString.equals(channelName)) {
             mViewPager.setCurrentItem(position, true);
         }
 
@@ -263,7 +263,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     public void onNewPrivateMessage(final String userNick, final String buffer) {
         final PMFragment pmFragment = new PMFragment();
         final Bundle b = new Bundle();
-        b.putString("serverName", builder.getTitle());
+        b.putString("serverName", mBuilder.getTitle());
         b.putString("buffer", buffer);
         b.putString("nick", userNick);
         pmFragment.setArguments(b);
@@ -272,7 +272,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         addTab(userNick);
         getActionBar().getTabAt(position).setText(userNick);
 
-        if (mention.equals(userNick)) {
+        if (mentionString.equals(userNick)) {
             mViewPager.setCurrentItem(position, true);
         }
 
@@ -286,7 +286,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     }
 
     private void disconnect() {
-        service.disconnectFromServer(builder.getTitle());
+        mService.disconnectFromServer(mBuilder.getTitle());
     }
 
     private void closePMConversation() {
@@ -294,7 +294,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
         mViewPager.setCurrentItem(index - 1, true);
 
-        service.removePrivateMessage(builder.getTitle(), ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
+        mService.removePrivateMessage(mBuilder.getTitle(), ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
 
         mIRCPagerAdapter.removeView(index);
         removeTab(index);
@@ -304,7 +304,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1, true);
 
-        service.partFromChannel(builder.getTitle(),
+        mService.partFromChannel(mBuilder.getTitle(),
                 ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
 
         mIRCPagerAdapter.removeView(index);
@@ -313,15 +313,15 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     @Override
     public void onDestroy() {
-        if (service.getBot(builder.getTitle()) != null) {
-            service.getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(listener);
+        if (mService.getBot(mBuilder.getTitle()) != null) {
+            mService.getBot(mBuilder.getTitle()).getConfiguration().getListenerManager().removeListener(mListener);
         }
         unbindService(mConnection);
 
         super.onDestroy();
     }
 
-    // Options menu stuff
+    // Options mSlidingMenu stuff
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
@@ -357,10 +357,10 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                 startActivity(intent);
                 return true;
             case R.id.activity_server_channel_ab_users:
-                if (!menu.isMenuShowing()) {
+                if (!mSlidingMenu.isMenuShowing()) {
                     userListUpdate();
                 }
-                menu.toggle();
+                mSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_close:
                 closePMConversation();

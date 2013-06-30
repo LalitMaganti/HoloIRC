@@ -52,9 +52,9 @@ import java.util.Set;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
         PopupMenu.OnDismissListener {
-    private ArrayList<Configuration.Builder> values;
-    private IRCService service;
-    private Configuration.Builder builder;
+    private ArrayList<Configuration.Builder> mBuilderList;
+    private IRCService mService;
+    private Configuration.Builder mBuilder;
     private BuilderAdapter mServerCardsAdapter;
 
     @Override
@@ -68,7 +68,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     protected void onResume() {
         super.onResume();
-        if (service == null) {
+        if (mService == null) {
             final Intent servic = new Intent(this, IRCService.class);
             servic.putExtra("stop", false);
             startService(servic);
@@ -82,20 +82,20 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            service = ((IRCService.IRCBinder) binder).getService();
+            mService = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
         }
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            service = null;
+            mService = null;
         }
     };
 
     private void setUpListView() {
         ListView listView = (ListView) findViewById(R.id.server_list);
-        mServerCardsAdapter = new BuilderAdapter(service, this);
+        mServerCardsAdapter = new BuilderAdapter(mService, this);
         SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
                 = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
         swingBottomInAnimationAdapter.setAbsListView(listView);
@@ -152,7 +152,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpServerList() {
         final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-        values = new ArrayList<Configuration.Builder>();
+        mBuilderList = new ArrayList<Configuration.Builder>();
 
         if (firstRun) {
             firstRunAdditions();
@@ -167,7 +167,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void setUpServers(ArrayList<String> servers) {
-        values.clear();
+        mBuilderList.clear();
         for (final String server : servers) {
             final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
             final Configuration.Builder bot = new Configuration.Builder();
@@ -191,14 +191,14 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             }
 
             bot.setFile(server);
-            values.add(bot);
+            mBuilderList.add(bot);
         }
     }
 
     private void setUpCards() {
         mServerCardsAdapter.clear();
-        if (!values.isEmpty()) {
-            for (Configuration.Builder bot : values) {
+        if (!mBuilderList.isEmpty()) {
+            for (Configuration.Builder bot : mBuilderList) {
                 mServerCardsAdapter.add(bot);
             }
         }
@@ -242,11 +242,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     // Popup menu
     public void showPopup(final View v) {
         PopupMenu popup = new PopupMenu(this, v);
-        builder = (Configuration.Builder) v.getTag();
+        mBuilder = (Configuration.Builder) v.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
-        if (service.getBot(builder.getTitle()) != null &&
-                service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
+        if (mService.getBot(mBuilder.getTitle()) != null &&
+                mService.getBot(mBuilder.getTitle()).getStatus().equals("Connected")) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
         } else {
@@ -261,23 +261,23 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     @Override
     public void onDismiss(PopupMenu popupMenu) {
-        builder = null;
+        mBuilder = null;
     }
 
     @Override
     public boolean onMenuItemClick(final MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.activity_server_list_popup_edit:
-                editServer(builder);
-                builder = null;
+                editServer(mBuilder);
+                mBuilder = null;
                 return true;
             case R.id.activity_server_list_popup_disconnect:
-                disconnectFromServer(builder);
-                builder = null;
+                disconnectFromServer(mBuilder);
+                mBuilder = null;
                 return true;
             case R.id.activity_server_list_popup_delete:
-                deleteServer(builder.getFile());
-                builder = null;
+                deleteServer(mBuilder.getFile());
+                mBuilder = null;
                 return true;
             default:
                 return false;
@@ -294,7 +294,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void disconnectFromServer(Configuration.Builder builder) {
-        service.disconnectFromServer(builder.getTitle());
+        mService.disconnectFromServer(builder.getTitle());
         setUpServerList();
     }
 

@@ -34,6 +34,7 @@ import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.parser.EventParser;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.Setter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -47,15 +48,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class ActivityListener extends GenericListener {
-    private final ServerChannelActivity activity;
+    @Getter(AccessLevel.PRIVATE)
+    private final ServerChannelActivity mActivity;
     private final IRCPagerAdapter mIRCPagerAdapter;
     private final ViewPager mViewPager;
 
     @Setter(AccessLevel.PUBLIC)
     private UserListAdapter arrayAdapter;
 
-    public ActivityListener(ServerChannelActivity a, IRCPagerAdapter d, ViewPager pager) {
-        activity = a;
+    public ActivityListener(ServerChannelActivity activity, IRCPagerAdapter d, ViewPager pager) {
+        mActivity = activity;
         mIRCPagerAdapter = d;
         mViewPager = pager;
     }
@@ -64,7 +66,7 @@ public class ActivityListener extends GenericListener {
     protected void onIrcException(final IrcExceptionEvent event) {
         final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 server.writeToTextView(event.getException().getMessage());
@@ -76,7 +78,7 @@ public class ActivityListener extends GenericListener {
     protected void onIOException(final IOExceptionEvent<PircBotX> event) {
         final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 server.writeToTextView(EventParser.getOutputForEvent(event));
@@ -92,7 +94,7 @@ public class ActivityListener extends GenericListener {
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
             final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
 
-            activity.runOnUiThread(new Runnable() {
+            mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     server.writeToTextView(EventParser.getOutputForEvent(event));
@@ -105,10 +107,10 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onBotJoin(final JoinEvent<PircBotX> event) {
         final JoinEvent joinevent = (JoinEvent) event;
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                activity.onNewChannelJoined(joinevent.getChannel().getName(),
+                mActivity.onNewChannelJoined(joinevent.getChannel().getName(),
                         EventParser.getOutputForEvent(event), null);
             }
         });
@@ -118,7 +120,7 @@ public class ActivityListener extends GenericListener {
     public void onTopic(final TopicEvent<PircBotX> event) {
         final String channelName = ((TopicEvent) event).getChannel().getName();
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 final Handler handler = new Handler();
@@ -149,7 +151,7 @@ public class ActivityListener extends GenericListener {
         }
 
         final String channelName = event.getChannel().getName();
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
@@ -178,7 +180,7 @@ public class ActivityListener extends GenericListener {
 
         sendMessage(event.getChannel().getName(), event);
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
@@ -192,7 +194,7 @@ public class ActivityListener extends GenericListener {
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
@@ -208,7 +210,7 @@ public class ActivityListener extends GenericListener {
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
@@ -224,7 +226,7 @@ public class ActivityListener extends GenericListener {
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (checkChannelFragment(event.getChannel().getName())) {
@@ -240,7 +242,7 @@ public class ActivityListener extends GenericListener {
     // TODO - standardise this and private actions
     @Override
     public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
@@ -250,7 +252,7 @@ public class ActivityListener extends GenericListener {
                         pm.writeToTextView(EventParser.getOutputForEvent(event));
                     }
                 } else {
-                    activity.onNewPrivateMessage(event.getUser().getNick(),
+                    mActivity.onNewPrivateMessage(event.getUser().getNick(),
                             EventParser.getOutputForEvent(event));
                 }
             }
@@ -259,7 +261,7 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onPrivateAction(final PrivateActionEvent<PircBotX> event) {
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
@@ -267,7 +269,7 @@ public class ActivityListener extends GenericListener {
                     PMFragment pm = (PMFragment) fragment;
                     pm.writeToTextView(EventParser.getOutputForEvent(event));
                 } else {
-                    activity.onNewPrivateMessage(event.getUser().getNick(),
+                    mActivity.onNewPrivateMessage(event.getUser().getNick(),
                             EventParser.getOutputForEvent(event));
                 }
             }
@@ -276,7 +278,7 @@ public class ActivityListener extends GenericListener {
 
     // Misc stuff
     private void sendMessage(final String title, final Event event) {
-        activity.runOnUiThread(new Runnable() {
+        mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);

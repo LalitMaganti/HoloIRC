@@ -58,7 +58,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         setTheme(Utils.getThemeInt(getApplicationContext()));
 
-        if(getIntent().getExtras().getBoolean("main") == true) {
+        if (getIntent().getExtras().getBoolean("main") == true) {
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, new BaseServerSettingFragment())
                     .commit();
