@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.uisubclasses.PromptDialog;
 
 import java.io.File;
@@ -53,11 +54,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        setTheme(Integer.parseInt(prefs.getString("fragment_settings_theme", "16974105")));
-
         super.onCreate(savedInstanceState);
+
+        setTheme(Utils.getThemeInt(getApplicationContext()));
 
         if(getIntent().getExtras().getBoolean("main") == true) {
             getFragmentManager().beginTransaction()

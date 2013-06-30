@@ -62,7 +62,7 @@ public class ServerFragment extends IRCFragment {
                 final String server = strings[0];
                 final String message = strings[1];
                 ((ServerChannelActivity) getActivity())
-                        .parser.serverMessageToParse(server, message);
+                        .getParser().serverMessageToParse(server, message);
             }
             return null;
         }

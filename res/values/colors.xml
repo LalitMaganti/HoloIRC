@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="black">#000000</color>
+    <color name="server_card_background_light">#ffffffff</color>
+    <color name="server_card_background_dark">#202122</color>
 
 </resources>

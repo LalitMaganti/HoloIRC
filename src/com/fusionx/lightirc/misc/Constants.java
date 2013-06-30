@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.misc;
 
+import com.fusionx.lightirc.R;
+
 public class Constants {
     // Preference keys
     public final static String Title = "pref_title";
@@ -34,4 +36,8 @@ public class Constants {
     public final static String NickServPassword = "pref_nickserv_password";
 
     public final static String AutoJoin = "pref_autojoin";
+
+    // Theme constants
+    public final static int HoloDark = R.style.Dark;
+    public final static int HoloLight = R.style.Light;
 }

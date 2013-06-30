@@ -79,7 +79,7 @@ public class ChannelFragment extends IRCFragment {
                 final String channelName = strings[1];
                 final String message = strings[2];
                 ((ServerChannelActivity) getActivity())
-                        .parser.channelMessageToParse(server, channelName, message);
+                        .getParser().channelMessageToParse(server, channelName, message);
             }
             return null;
         }

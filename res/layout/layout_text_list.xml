@@ -9,5 +9,5 @@
           android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
           android:paddingRight="?android:attr/listPreferredItemPaddingRight"
           android:textAppearance="?android:attr/textAppearanceListItemSmall"
-          android:textColor="@color/black"
+          android:textColor="@android:color/black"
           android:textIsSelectable="false"/>

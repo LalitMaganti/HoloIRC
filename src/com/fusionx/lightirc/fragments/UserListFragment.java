@@ -39,8 +39,7 @@ public class UserListFragment extends ListFragment
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                          long id, boolean checked) {
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         mode.invalidate();
 
         final Resources res = getResources();

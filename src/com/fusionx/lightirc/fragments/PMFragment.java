@@ -66,7 +66,7 @@ public class PMFragment extends IRCFragment {
                 final String userNick = strings[1];
                 final String message = strings[2];
                 ((ServerChannelActivity) getActivity())
-                        .parser.userMessageToParse(server, userNick, message);
+                        .getParser().userMessageToParse(server, userNick, message);
             }
             return null;
         }

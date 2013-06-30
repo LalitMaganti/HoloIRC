@@ -14,4 +14,4 @@
     This project depends on several libraries each of which have their own license and deserve sincere thanks:
     * SlidingMenu by Jeremy Feinstein - the project can be found at https://github.com/jfeinstein10/SlidingMenu and is licensed under the Apache License v2
     * PircBotX by Leon Blakey - the project can be found at http://code.google.com/p/pircbotx/ and is licensed under the GPL v3 or later
-    * CardsUi by Nadav Fima - the project can be found at http://nadavfima.com/cardsui-view-library/ and is licensed under an unknown license
+    * ListViewAnimations by Niek Haarman - the project can be found at https://github.com/nhaarman/ListViewAnimations/ and is licensed under the Apache License v2

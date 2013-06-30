@@ -6,8 +6,6 @@
     <ListPreference
         android:title="@string/theme"
         android:key="fragment_settings_theme"
-        android:entries="@array/themes"
-        android:entryValues="@array/themes_entries"
-        android:defaultValue="1"/>
+        android:entries="@array/themes"/>
 </PreferenceCategory>
 </PreferenceScreen>

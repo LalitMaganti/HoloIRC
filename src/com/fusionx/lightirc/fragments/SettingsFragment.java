@@ -10,27 +10,22 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import com.fusionx.lightirc.R;
 
-import java.util.HashMap;
-
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
     private ListPreference mChooseTheme;
-    private HashMap<Integer, String> themesMap = new HashMap<Integer, String>();
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.fragment_settings);
 
-        String[] mTempArray = getResources().getStringArray(R.array.themes_entries);
-        String[] mTempThemes = getResources().getStringArray(R.array.themes);
-        for (int i = 0; i < mTempArray.length; i++) {
-            themesMap.put(Integer.parseInt(mTempArray[i]), mTempThemes[i]);
-        }
+        final String[] themes_entries = {String.valueOf(R.style.Dark), String.valueOf(R.style.Light)};
 
         final PreferenceScreen prefSet = getPreferenceScreen();
         mChooseTheme = (ListPreference) prefSet.findPreference("fragment_settings_theme");
+        mChooseTheme.setEntryValues(themes_entries);
         mChooseTheme.setOnPreferenceChangeListener(this);
         mChooseTheme.setSummary(mChooseTheme.getEntry());
+        mChooseTheme.setDefaultValue(R.style.Light);
     }
 
     @Override

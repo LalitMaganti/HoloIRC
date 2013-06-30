@@ -29,7 +29,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,6 +39,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.adapters.ServerCardsAdapter;
 import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import org.pircbotx.Configuration;
@@ -55,16 +55,13 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private ArrayList<Configuration.Builder> values;
     private IRCService service;
     private Configuration.Builder builder;
-
     private BuilderAdapter mServerCardsAdapter;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        setTheme(Integer.parseInt(prefs.getString("fragment_settings_theme", "16974105")));
-
         super.onCreate(savedInstanceState);
+        setTheme(Utils.getThemeInt(getApplicationContext()));
+
         setContentView(R.layout.activity_server_list);
     }
 
@@ -148,6 +145,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         }
 
         intent.putExtra("file", "server_" + in);
+        intent.putExtra("main", true);
         startActivity(intent);
     }
 
@@ -289,8 +287,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void deleteServer(String fileName) {
         final ArrayList<String> servers = getListOfServersFormPrefsFiles();
         servers.remove(fileName);
-        File folder = new File(getFilesDir().getAbsolutePath()
-                .replace("files", "shared_prefs/") + fileName + ".xml");
+        File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs/") + fileName + ".xml");
         folder.delete();
         setUpServers(servers);
         setUpCards();

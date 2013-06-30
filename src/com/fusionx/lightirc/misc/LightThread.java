@@ -22,11 +22,9 @@ public class LightThread extends Thread {
         try {
             bot.startBot();
         } catch (IOException e) {
-            bot.getConfiguration().getListenerManager()
-                    .dispatchEvent(new IOExceptionEvent<PircBotX>(bot, e));
+            bot.getConfiguration().getListenerManager().dispatchEvent(new IOExceptionEvent<PircBotX>(bot, e));
         } catch (IrcException e) {
-            bot.getConfiguration().getListenerManager()
-                    .dispatchEvent(new IrcExceptionEvent<PircBotX>(bot, e));
+            bot.getConfiguration().getListenerManager().dispatchEvent(new IrcExceptionEvent<PircBotX>(bot, e));
         }
     }
 }

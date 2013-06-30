@@ -12,10 +12,10 @@ public class UserComparator implements Comparator<String> {
         final String secondStripped = Html.fromHtml(s2).toString();
 
         if (firstStripped.startsWith(secondStripped.substring(0, 1)) &&
-                (firstStripped.substring(0, 1).equals("@")
-                        || firstStripped.substring(0, 1).equals("+"))) {
+                (firstStripped.substring(0, 1).equals("@") || firstStripped.substring(0, 1).equals("+"))) {
             final String firstRemoved = firstStripped.substring(1);
             final String secondRemoved = secondStripped.substring(1);
+
             return firstRemoved.compareToIgnoreCase(secondRemoved);
         } else if (firstStripped.startsWith("@")) {
             return -1;

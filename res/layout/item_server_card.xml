@@ -7,9 +7,10 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:weightSum="100"
-    android:background="@android:color/white"
     android:padding="16dp"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:background="?attr/server_card_background"
+    android:cacheColorHint="?server_card_background">
 
     <LinearLayout
         android:id="@+id/contentLayout"

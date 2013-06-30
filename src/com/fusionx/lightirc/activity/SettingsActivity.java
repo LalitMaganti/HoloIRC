@@ -1,17 +1,13 @@
 package com.fusionx.lightirc.activity;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
 import com.fusionx.lightirc.fragments.SettingsFragment;
+import com.fusionx.lightirc.misc.Utils;
 
 public class SettingsActivity extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
-        SharedPreferences prefs =
-                PreferenceManager.getDefaultSharedPreferences(this);
-        setTheme(Integer.parseInt(prefs.getString("fragment_settings_theme", "16974105")));
-
+        setTheme(Utils.getThemeInt(getApplicationContext()));
         super.onCreate(savedInstanceState);
 
         getFragmentManager().beginTransaction()

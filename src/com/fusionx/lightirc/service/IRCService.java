@@ -58,20 +58,22 @@ public class IRCService extends Service {
     private final LightManager manager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void connectToServer(final Configuration.Builder server) {
         // TODO - setup option for this
         server.setAutoNickChange(true);
-        server.setBotFactory(new LightBotFactory());
+
+        final LightBotFactory factory = new LightBotFactory();
+        factory.setApplicationContext(getApplicationContext());
+        server.setBotFactory(factory);
 
         setupListeners(server);
         setupNotification();
 
-        final Configuration d = server.buildConfiguration();
+        final Configuration configuration = server.buildConfiguration();
 
-        final PircBotX bo = new PircBotX(d);
+        final PircBotX bot = new PircBotX(configuration);
 
-        final LightThread thread = new LightThread(bo);
+        final LightThread thread = new LightThread(bot);
         thread.start();
         manager.put(server.getTitle(), thread);
     }
@@ -92,9 +94,8 @@ public class IRCService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
 
-        Notification notification = builder
-                .addAction(android.R.drawable.ic_menu_close_clear_cancel,
-                        "Disconnect all", pIntent2).build();
+        Notification notification = builder.addAction(android.R.drawable.ic_menu_close_clear_cancel,
+                "Disconnect all", pIntent2).build();
 
         // Just a random number
         // TODO - maybe static int this?
@@ -163,16 +164,16 @@ public class IRCService extends Service {
     }
 
     public void partFromChannel(String serverName, String channelName) {
-        final UserChannelDao d = getBot(serverName).getUserChannelDao();
-        final Channel c = d.getChannel(channelName);
-        OutputChannel f = c.send();
-        f.part();
+        final UserChannelDao dao = getBot(serverName).getUserChannelDao();
+        final Channel channel = dao.getChannel(channelName);
+        final OutputChannel outputChannel = channel.send();
+        outputChannel.part();
     }
 
     public void removePrivateMessage(String serverName, String nick) {
-        final UserChannelDao d = getBot(serverName).getUserChannelDao();
-        d.removePrivateMessage(nick);
-        d.getUser(nick).setBuffer("");
+        final UserChannelDao dao = getBot(serverName).getUserChannelDao();
+        dao.removePrivateMessage(nick);
+        dao.getUser(nick).setBuffer("");
     }
 
     private void setupListeners(Configuration.Builder bot) {
@@ -184,11 +185,9 @@ public class IRCService extends Service {
 
     public void mention(String serverName, String messageDest) {
         final Intent mIntent = new Intent(this, ServerChannelActivity.class);
-        mIntent.putExtra("server", new Configuration
-                .Builder(getBot(serverName).getConfiguration()));
+        mIntent.putExtra("server", new Configuration.Builder(getBot(serverName).getConfiguration()));
         mIntent.putExtra("mention", messageDest);
-        final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
-                mIntent, 0);
+        final PendingIntent pIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
         final Notification notification = new NotificationCompat.Builder(this)
                 .setContentTitle("LightIRC")
                 .setContentText("You have been mentioned")
