@@ -33,7 +33,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
                     @Override
                     public void onOkClicked(final String input) {
                         bot.sendIRC().joinChannel(input);
-                        ((ServerChannelActivity) getActivity()).getActionsSlidingMenu().toggle();
+                        ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
                     }
                 };
                 dialog.show();
@@ -43,7 +43,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
                     @Override
                     public void onOkClicked(final String input) {
                         bot.sendIRC().changeNick(input);
-                        ((ServerChannelActivity) getActivity()).getActionsSlidingMenu().toggle();
+                        ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
                     }
                 };
                 nickDialog.show();

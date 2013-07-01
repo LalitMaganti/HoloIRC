@@ -2,12 +2,14 @@ package com.fusionx.lightirc.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.Html;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -20,7 +22,7 @@ public class UserListFragment extends ListFragment
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
+        final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
                 new ArrayList<String>());
         setListAdapter(adapter);
 
@@ -52,6 +54,8 @@ public class UserListFragment extends ListFragment
                     selectedItemCount, selectedItemCount);
 
             mode.setTitle(quantityString);
+
+            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
         }
     }
 
@@ -63,6 +67,14 @@ public class UserListFragment extends ListFragment
             case R.id.fragment_userlist_cab_mention:
                 ((ServerChannelActivity) getActivity()).userListMention(positions);
                 mode.finish();
+                ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
+                return true;
+            case R.id.fragment_userlist_cab_pm:
+                final String nick = Utils.stripPrefixFromNick(String.valueOf(Html.fromHtml((String) positions.toArray()[0])));
+                ((ServerChannelActivity) getActivity()).onNewPrivateMessage(nick, "");
+                mode.finish();
+                ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
+                return true;
             default:
                 return false;
         }

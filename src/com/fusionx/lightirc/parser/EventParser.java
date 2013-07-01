@@ -84,7 +84,11 @@ public class EventParser {
             return newMessage;
         } else if (e instanceof PrivateMessageEvent) {
             final PrivateMessageEvent event = (PrivateMessageEvent) e;
-            return event.getUser().getColourfulNick() + ": " + event.getMessage() + "\n";
+            if(event.isBotMessage()) {
+                return event.getBot().getUserBot().getColourfulNick() + ": " + event.getMessage() + "\n";
+            } else {
+                return event.getUser().getColourfulNick() + ": " + event.getMessage() + "\n";
+            }
         } else if (e instanceof PrivateActionEvent) {
             final PrivateActionEvent event = (PrivateActionEvent) e;
             return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";

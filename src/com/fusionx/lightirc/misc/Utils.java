@@ -10,4 +10,12 @@ public class Utils {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
         return Integer.parseInt(prefs.getString("fragment_settings_theme", String.valueOf(R.style.Light)));
     }
+
+    public static String stripPrefixFromNick(final String nick) {
+        if(nick.startsWith("@") || nick.startsWith("+")) {
+            return nick.substring(1);
+        } else {
+            return nick;
+        }
+    }
 }

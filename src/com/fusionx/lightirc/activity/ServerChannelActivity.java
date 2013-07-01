@@ -66,8 +66,9 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
     private ActivityListener mListener;
-    private SlidingMenu mUserSlidingMenu;
     private String mentionString;
+    private SlidingMenu mUserSlidingMenu;
+    private SlidingMenu mActionsSlidingMenu;
 
     @Getter(AccessLevel.PUBLIC)
     private Configuration.Builder builder;
@@ -77,9 +78,6 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     @Getter(AccessLevel.PUBLIC)
     private IRCService service;
-
-    @Getter(AccessLevel.PUBLIC)
-    private SlidingMenu actionsSlidingMenu;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -168,15 +166,15 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
         mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
 
-        actionsSlidingMenu = new SlidingMenu(this);
-        actionsSlidingMenu.setMode(SlidingMenu.LEFT);
-        actionsSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        actionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        actionsSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        actionsSlidingMenu.setTouchmodeMarginThreshold(3);
-        actionsSlidingMenu.setMenu(R.layout.sliding_menu_fragment_actions);
-        actionsSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
-        actionsSlidingMenu.setOnOpenListener(this);
+        mActionsSlidingMenu = new SlidingMenu(this);
+        mActionsSlidingMenu.setMode(SlidingMenu.LEFT);
+        mActionsSlidingMenu.setShadowDrawable(R.drawable.shadow);
+        mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        mActionsSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+        mActionsSlidingMenu.setTouchmodeMarginThreshold(3);
+        mActionsSlidingMenu.setMenu(R.layout.sliding_menu_fragment_actions);
+        mActionsSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
+        mActionsSlidingMenu.setOnOpenListener(this);
     }
 
     // Page change stuff
@@ -192,7 +190,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     public void onPageSelected(final int position) {
         invalidateOptionsMenu();
         mUserSlidingMenu.showContent();
-        actionsSlidingMenu.showContent();
+        mActionsSlidingMenu.showContent();
 
         if (mIRCPagerAdapter.getItem(position).getView() != null) {
             final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
@@ -253,6 +251,10 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     }
 
     // New stuff
+    private void sendPrivateMessage(final String nick) {
+        getService().getBot(nick).sendIRC().message(nick, "");
+    }
+
     private void addTab(final String title) {
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
@@ -374,7 +376,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         switch (item.getItemId()) {
             case android.R.id.home:
-                actionsSlidingMenu.toggle();
+                mActionsSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_part:
                 partFromChannel();
@@ -424,10 +426,15 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     @Override
     public void onOpen() {
-            final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.actions_fragment);
-            ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-            arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
-            arrayAdapter.notifyDataSetChanged();
+        final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.actions_fragment);
+        ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
+        arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    public void closeAllSlidingMenus() {
+        mActionsSlidingMenu.showContent();
+        mUserSlidingMenu.showContent();
     }
 }

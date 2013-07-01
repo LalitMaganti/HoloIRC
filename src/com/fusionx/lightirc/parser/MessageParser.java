@@ -93,7 +93,7 @@ public class MessageParser {
             }
         } else {
             final User user = bot.getUserChannelDao().getUser(userNick);
-            manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message));
+            manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message, true));
             user.send().message(message);
         }
     }
@@ -109,13 +109,11 @@ public class MessageParser {
             bot.sendIRC().joinChannel(channel);
         } else if (command.equals("/msg")) {
             final String nick = parsedArray[1];
+            final String message = ((parsedArray[2] == null) ? "" : parsedArray[2]);
 
-            String pm = ((parsedArray[2] == null) ? "" : parsedArray[2]);
-
-            bot.sendIRC().message(nick, pm);
-
-            manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, bot.getUserChannelDao()
-                    .getUser(nick), pm));
+            final User user = bot.getUserChannelDao().getUser(nick);
+            manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message, true));
+            user.send().message(message);
         } else if (parsedArray[0].startsWith("/nick")) {
             final String newNick = parsedArray[1];
             bot.sendIRC().changeNick(newNick);

@@ -24,7 +24,7 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
         }
         row.setText(getItem(position));
 
-        if(!isEnabled(position)) {
+        if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
         } else {
             row.setTextColor(Color.BLACK);
