@@ -17,7 +17,7 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
     private final MainServerListActivity mActivity;
     private final IRCService mService;
 
-    public BuilderAdapter(IRCService service, MainServerListActivity activity) {
+    public BuilderAdapter(final IRCService service, final MainServerListActivity activity) {
         super(activity, android.R.layout.simple_list_item_1);
         mService = service;
         mActivity = activity;
@@ -41,7 +41,7 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
             if (bot != null) {
                 bt.setText(bot.getStatus());
             } else {
-                bt.setText("Not connected");
+                bt.setText("Disconnected");
             }
         }
 

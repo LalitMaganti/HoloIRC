@@ -21,14 +21,12 @@
 
 package com.fusionx.lightirc.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
@@ -49,15 +47,10 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     @Setter(AccessLevel.PROTECTED)
     private TextView editText;
 
-    private InputMethodManager imm;
-
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
-
-        imm = (InputMethodManager) getActivity().
-                getSystemService(Context.INPUT_METHOD_SERVICE);
 
         setTextView((TextView) rootView.findViewById(R.id.textview));
         setEditText((EditText) rootView.findViewById(R.id.editText1));

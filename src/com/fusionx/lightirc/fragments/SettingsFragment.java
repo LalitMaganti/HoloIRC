@@ -23,9 +23,11 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         final PreferenceScreen prefSet = getPreferenceScreen();
         mChooseTheme = (ListPreference) prefSet.findPreference("fragment_settings_theme");
         mChooseTheme.setEntryValues(themes_entries);
+        if (mChooseTheme.getEntry() == null) {
+            mChooseTheme.setValue(String.valueOf(R.style.Light));
+        }
         mChooseTheme.setOnPreferenceChangeListener(this);
         mChooseTheme.setSummary(mChooseTheme.getEntry());
-        mChooseTheme.setDefaultValue(R.style.Light);
     }
 
     @Override

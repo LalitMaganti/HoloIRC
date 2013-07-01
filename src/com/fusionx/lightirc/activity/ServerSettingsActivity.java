@@ -39,7 +39,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.Utils;
-import com.fusionx.lightirc.uisubclasses.PromptDialog;
+import com.fusionx.lightirc.uisubclasses.ChannelNamePromptDialog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         setTheme(Utils.getThemeInt(getApplicationContext()));
 
-        if (getIntent().getExtras().getBoolean("main") == true) {
+        if (getIntent().getExtras().getBoolean("main")) {
             getFragmentManager().beginTransaction()
                     .replace(android.R.id.content, new BaseServerSettingFragment())
                     .commit();
@@ -88,7 +88,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             });
             build.show();
         } else {
-            Toast.makeText(this, "Changes have been saved", Toast.LENGTH_SHORT);
+            Toast.makeText(this, "Changes have been saved", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -108,7 +108,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         // NickServ
         private EditTextPreference mNickServPassword;
 
-        private final List<EditTextPreference> alltheedittexts = new ArrayList<EditTextPreference>();
+        private final List<EditTextPreference> mEditTexts = new ArrayList<EditTextPreference>();
 
         @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         @Override
@@ -117,10 +117,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             setHasOptionsMenu(true);
 
-            final Bundle f = getActivity().getIntent().getExtras();
-            newServer = f.getBoolean("new", false);
+            final Bundle bundle = getActivity().getIntent().getExtras();
+            newServer = bundle.getBoolean("new", false);
 
-            fileName = f.getString("file");
+            fileName = bundle.getString("file");
 
             getPreferenceManager().setSharedPreferencesName(fileName);
 
@@ -130,29 +130,28 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             mEditTextTitle = (EditTextPreference) prefSet.findPreference(Constants.Title);
             mEditTextTitle.setOnPreferenceChangeListener(this);
-            alltheedittexts.add(mEditTextTitle);
+            mEditTexts.add(mEditTextTitle);
 
             // URL of server
             mEditTextUrl = (EditTextPreference) prefSet.findPreference(Constants.URL);
             mEditTextUrl.setOnPreferenceChangeListener(this);
-            alltheedittexts.add(mEditTextUrl);
+            mEditTexts.add(mEditTextUrl);
 
             // Port of server
             mEditTextPort = (EditTextPreference) prefSet.findPreference(Constants.Port);
             mEditTextPort.setOnPreferenceChangeListener(this);
-            alltheedittexts.add(mEditTextPort);
+            mEditTexts.add(mEditTextPort);
 
             // Nick of User
             mEditTextNick = (EditTextPreference) prefSet.findPreference(Constants.Nick);
             mEditTextNick.setOnPreferenceChangeListener(this);
-            alltheedittexts.add(mEditTextNick);
+            mEditTexts.add(mEditTextNick);
 
             mServerUserName = (EditTextPreference) prefSet.findPreference(Constants.ServerUserName);
             mServerUserName.setOnPreferenceChangeListener(this);
 
             mServerPassword = (EditTextPreference) prefSet.findPreference(Constants.ServerPassword);
             mServerPassword.setOnPreferenceChangeListener(this);
-
 
             mNickServPassword = (EditTextPreference) prefSet.findPreference(Constants.NickServPassword);
             mNickServPassword.setOnPreferenceChangeListener(this);
@@ -173,7 +172,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 // Nick of User
                 mEditTextNick.setSummary("This field should NOT be empty!");
             } else {
-                for (EditTextPreference edit : alltheedittexts) {
+                for (EditTextPreference edit : mEditTexts) {
                     edit.setSummary(edit.getText());
                 }
             }
@@ -192,7 +191,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             }
             if (newServer) {
                 canExit = true;
-                for (EditTextPreference edit : alltheedittexts) {
+                for (EditTextPreference edit : mEditTexts) {
                     if (edit.getText() == null) {
                         canExit = false;
                         break;
@@ -226,13 +225,12 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
-                    PromptDialog dialog = new PromptDialog(getActivity(),
+                    final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity(),
                             (String) positions.toArray()[0]) {
                         @Override
-                        public boolean onOkClicked(final String input) {
+                        public void onOkClicked(final DialogInterface dialog, final String input) {
                             adapter.remove((String) positions.toArray()[0]);
                             adapter.add(input);
-                            return false;
                         }
                     };
                     dialog.show();
@@ -254,7 +252,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public void onItemCheckedStateChanged(ActionMode mode, int position,
                                               long id, boolean checked) {
             mode.invalidate();
-            mode.setTitle(getListView().getCheckedItemCount() + " items selected");
+            mode.setTitle(getListView().getCheckedItemCount() + " channels selected");
             if (checked) {
                 adapter.addSelection(position);
             } else {
@@ -282,8 +280,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                                 final Bundle savedInstanceState) {
             adapter = new SelectionAdapter(getActivity(), new ArrayList<String>());
 
             SharedPreferences settings = getActivity()
@@ -305,12 +303,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_ab_add:
-                    PromptDialog dialog = new PromptDialog(getActivity()
-                    ) {
+                    final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
                         @Override
-                        public boolean onOkClicked(String input) {
+                        public void onOkClicked(final DialogInterface dialog, String input) {
                             adapter.add(input);
-                            return false;
                         }
                     };
                     dialog.show();

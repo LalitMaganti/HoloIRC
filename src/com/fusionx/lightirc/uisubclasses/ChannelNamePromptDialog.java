@@ -6,10 +6,10 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.widget.EditText;
 
-public abstract class PromptDialog extends AlertDialog.Builder implements OnClickListener {
+public abstract class ChannelNamePromptDialog extends AlertDialog.Builder implements OnClickListener {
     private final EditText input;
 
-    public PromptDialog(Context context) {
+    public ChannelNamePromptDialog(final Context context) {
         super(context);
         setTitle("Channel Name");
 
@@ -21,7 +21,7 @@ public abstract class PromptDialog extends AlertDialog.Builder implements OnClic
         setNegativeButton("Cancel", this);
     }
 
-    public PromptDialog(Context context, String message) {
+    public ChannelNamePromptDialog(final Context context, final String message) {
         super(context);
         setTitle("Channel Name");
 
@@ -33,20 +33,19 @@ public abstract class PromptDialog extends AlertDialog.Builder implements OnClic
         setNegativeButton("Cancel", this);
     }
 
-    void onCancelClicked(DialogInterface dialog) {
+    void onCancelClicked(final DialogInterface dialog) {
         dialog.dismiss();
     }
 
     @Override
-    public void onClick(DialogInterface dialog, int which) {
+    public void onClick(final DialogInterface dialog, final int which) {
         if (which == DialogInterface.BUTTON_POSITIVE) {
-            if (onOkClicked(input.getText().toString())) {
-                dialog.dismiss();
-            }
+            onOkClicked(dialog, input.getText().toString());
+            //dialog.dismiss();
         } else {
             onCancelClicked(dialog);
         }
     }
 
-    abstract public boolean onOkClicked(String input);
+    abstract public void onOkClicked(DialogInterface dialog, String input);
 }

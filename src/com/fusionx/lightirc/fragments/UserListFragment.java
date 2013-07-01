@@ -14,14 +14,13 @@ import java.util.Set;
 
 public class UserListFragment extends ListFragment
         implements AbsListView.MultiChoiceModeListener, AdapterView.OnItemClickListener {
-    private UserListAdapter adapter;
     private boolean modeStarted;
 
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        adapter = new UserListAdapter(inflater.getContext(),
+        UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
                 new ArrayList<String>());
         setListAdapter(adapter);
 
@@ -42,13 +41,13 @@ public class UserListFragment extends ListFragment
                                           final long id, final boolean checked) {
         mode.invalidate();
         if (checked) {
-            adapter.addSelection(position);
+            ((UserListAdapter) getListView().getAdapter()).addSelection(position);
         } else {
-            adapter.removeSelection(position);
+            ((UserListAdapter) getListView().getAdapter()).removeSelection(position);
         }
-        int selectedItemCount = adapter.getSelectedItems().size();
+        int selectedItemCount = ((UserListAdapter) getListView().getAdapter()).getSelectedItems().size();
 
-        if(selectedItemCount != 0) {
+        if (selectedItemCount != 0) {
             final String quantityString = getResources().getQuantityString(R.plurals.user_selectioon,
                     selectedItemCount, selectedItemCount);
 
@@ -58,7 +57,7 @@ public class UserListFragment extends ListFragment
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final Set<String> positions = adapter.getSelectedItems();
+        final Set<String> positions = ((UserListAdapter) getListView().getAdapter()).getSelectedItems();
 
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
@@ -81,7 +80,7 @@ public class UserListFragment extends ListFragment
 
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
-        adapter.clearSelection();
+        ((UserListAdapter) getListView().getAdapter()).clearSelection();
         modeStarted = false;
     }
 
@@ -95,7 +94,8 @@ public class UserListFragment extends ListFragment
         if (!modeStarted) {
             getActivity().startActionMode(this);
         }
-        boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
+        boolean checked = ((UserListAdapter) getListView().getAdapter()).getSelectedItems()
+                .contains(((UserListAdapter) getListView().getAdapter()).getItem(i));
         getListView().setItemChecked(i, !checked);
     }
 }

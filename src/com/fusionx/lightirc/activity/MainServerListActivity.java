@@ -126,14 +126,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void displaySettings() {
-        Intent intent = new Intent(MainServerListActivity.this,
-                SettingsActivity.class);
+        Intent intent = new Intent(MainServerListActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
 
     private void addNewServer() {
-        Intent intent = new Intent(MainServerListActivity.this,
-                ServerSettingsActivity.class);
+        Intent intent = new Intent(MainServerListActivity.this, ServerSettingsActivity.class);
         intent.putExtra("new", true);
 
         final ArrayList<String> array = getListOfServersFromPrefsFiles();
@@ -198,7 +196,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpCards() {
         mServerCardsAdapter.clear();
         if (!mBuilderList.isEmpty()) {
-            for (Configuration.Builder bot : mBuilderList) {
+            for (final Configuration.Builder bot : mBuilderList) {
                 mServerCardsAdapter.add(bot);
             }
         }
@@ -245,8 +243,9 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mBuilder = (Configuration.Builder) v.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
-        if (mService.getBot(mBuilder.getTitle()) != null &&
-                mService.getBot(mBuilder.getTitle()).getStatus().equals("Connected")) {
+        if (mService != null && mService.getBot(mBuilder.getTitle()) != null &&
+                (mService.getBot(mBuilder.getTitle()).getStatus().equals("Connected") ||
+                        mService.getBot(mBuilder.getTitle()).getStatus().equals("Connecting"))) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
         } else {
@@ -296,7 +295,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     private void disconnectFromServer(Configuration.Builder builder) {
         mService.disconnectFromServer(builder.getTitle());
-        setUpServerList();
+        setUpCards();
     }
 
     private void editServer(final Configuration.Builder builder) {

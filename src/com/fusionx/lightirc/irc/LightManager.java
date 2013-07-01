@@ -29,7 +29,7 @@ public class LightManager extends HashMap<String, LightThread> {
     private static final long serialVersionUID = 2426166268063489300L;
 
     public void disconnectAll() {
-        for (LightThread bot : values()) {
+        for (final LightThread bot : values()) {
             bot.getBot().shutdown();
         }
     }

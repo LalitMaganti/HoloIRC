@@ -47,13 +47,13 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     private final ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
 
-    public IRCPagerAdapter(FragmentManager fm) {
+    public IRCPagerAdapter(final FragmentManager fm) {
         mFragmentManager = fm;
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        Fragment fragment = (Fragment) object;
+    public void destroyItem(final ViewGroup container, final int position, final Object object) {
+        final Fragment fragment = (Fragment) object;
 
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
@@ -68,7 +68,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void finishUpdate(ViewGroup container) {
+    public void finishUpdate(final ViewGroup container) {
         if (mCurTransaction != null) {
             mCurTransaction.commitAllowingStateLoss();
             mCurTransaction = null;
@@ -79,12 +79,12 @@ public class IRCPagerAdapter extends PagerAdapter {
     /**
      * Return the Fragment associated with a specified position.
      */
-    public Fragment getItem(int position) {
+    public Fragment getItem(final int position) {
         return views.get(position);
     }
 
     @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    public Object instantiateItem(final ViewGroup container, final int position) {
         // If we already have this item instantiated, there is nothing
         // to do. This can happen when we are restoring the entire pager
         // from its saved state, where the fragment manager has already
@@ -120,16 +120,16 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
+    public boolean isViewFromObject(final View view, final Object object) {
         return ((Fragment) object).getView() == view;
     }
 
     @Override
-    public void restoreState(Parcelable state, ClassLoader loader) {
+    public void restoreState(final Parcelable state, final ClassLoader loader) {
         if (state != null) {
-            Bundle bundle = (Bundle) state;
+            final Bundle bundle = (Bundle) state;
             bundle.setClassLoader(loader);
-            Parcelable[] fss = bundle.getParcelableArray("states");
+            final Parcelable[] fss = bundle.getParcelableArray("states");
             mSavedState.clear();
             mFragments.clear();
             if (fss != null) {

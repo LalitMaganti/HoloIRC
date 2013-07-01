@@ -72,6 +72,7 @@ public class IRCService extends Service {
         final Configuration configuration = server.buildConfiguration();
 
         final PircBotX bot = new PircBotX(configuration);
+        bot.setStatus("Connecting");
 
         final LightThread thread = new LightThread(bot);
         thread.start();
@@ -104,14 +105,13 @@ public class IRCService extends Service {
 
     private void disconnectAll() {
         manager.disconnectAll();
-        stopForeground(true);
-        stopSelf();
         Intent intent = new Intent("serviceStopped");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
-    public void disconnectFromServer(String serverName) {
-        DisconnectTask disconnectTask = new DisconnectTask();
+    public void disconnectFromServer(final String serverName) {
+        getBot(serverName).setStatus("Disconnected");
+        final DisconnectTask disconnectTask = new DisconnectTask();
         disconnectTask.execute(serverName);
     }
 
@@ -126,12 +126,8 @@ public class IRCService extends Service {
         }
 
         @Override
-        protected void onPostExecute(String strings) {
+        protected void onPostExecute(final String strings) {
             manager.remove(strings);
-            if (manager.size() == 0) {
-                stopForeground(true);
-                stopSelf();
-            }
         }
     }
 
@@ -149,7 +145,7 @@ public class IRCService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (intent != null && intent.getBooleanExtra("stop", false)) {
             disconnectAll();
             return 0;
@@ -163,29 +159,29 @@ public class IRCService extends Service {
         return true;
     }
 
-    public void partFromChannel(String serverName, String channelName) {
+    public void partFromChannel(final String serverName, final String channelName) {
         final UserChannelDao dao = getBot(serverName).getUserChannelDao();
         final Channel channel = dao.getChannel(channelName);
         final OutputChannel outputChannel = channel.send();
         outputChannel.part();
     }
 
-    public void removePrivateMessage(String serverName, String nick) {
+    public void removePrivateMessage(final String serverName, final String nick) {
         final UserChannelDao dao = getBot(serverName).getUserChannelDao();
         dao.removePrivateMessage(nick);
         dao.getUser(nick).setBuffer("");
     }
 
-    private void setupListeners(Configuration.Builder bot) {
+    private void setupListeners(final Configuration.Builder bot) {
         final ServiceListener mServiceListener = new ServiceListener();
         mServiceListener.setService(this);
 
         bot.getListenerManager().addListener(mServiceListener);
     }
 
-    public void mention(String serverName, String messageDest) {
+    public void mention(final String serverName, final String messageDest) {
         final Intent mIntent = new Intent(this, ServerChannelActivity.class);
-        mIntent.putExtra("server", new Configuration.Builder(getBot(serverName).getConfiguration()));
+        mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
         mIntent.putExtra("mention", messageDest);
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
         final Notification notification = new NotificationCompat.Builder(this)
