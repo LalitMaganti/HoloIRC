@@ -1,22 +1,22 @@
 package com.fusionx.lightirc.fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
+import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialog;
+import com.fusionx.lightirc.promptdialogs.NickPromptDialog;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.uisubclasses.ChannelNamePromptDialog;
 import org.pircbotx.PircBotX;
 
 public class ServerChannelActionsFragment extends ListFragment implements AdapterView.OnItemClickListener {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final String[] values = new String[]{"Join new channel", "Disconnect"};
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        final String[] values = new String[]{"Join new channel", "Change nick", "Disconnect"};
+        final ActionsArrayAdapter adapter = new ActionsArrayAdapter(getActivity(),
                 android.R.layout.simple_list_item_1, values);
         setListAdapter(adapter);
 
@@ -31,13 +31,24 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
             case 0:
                 final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
                     @Override
-                    public void onOkClicked(final DialogInterface dialog, String input) {
+                    public void onOkClicked(final String input) {
                         bot.sendIRC().joinChannel(input);
+                        ((ServerChannelActivity) getActivity()).getActionsSlidingMenu().toggle();
                     }
                 };
                 dialog.show();
                 break;
             case 1:
+                final NickPromptDialog nickDialog = new NickPromptDialog(getActivity(), bot.getNick()) {
+                    @Override
+                    public void onOkClicked(final String input) {
+                        bot.sendIRC().changeNick(input);
+                        ((ServerChannelActivity) getActivity()).getActionsSlidingMenu().toggle();
+                    }
+                };
+                nickDialog.show();
+                break;
+            case 2:
                 ((ServerChannelActivity) getActivity()).disconnect();
                 break;
         }

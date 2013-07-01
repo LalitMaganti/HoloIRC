@@ -39,7 +39,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.Utils;
-import com.fusionx.lightirc.uisubclasses.ChannelNamePromptDialog;
+import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialog;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -228,7 +228,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity(),
                             (String) positions.toArray()[0]) {
                         @Override
-                        public void onOkClicked(final DialogInterface dialog, final String input) {
+                        public void onOkClicked(final String input) {
                             adapter.remove((String) positions.toArray()[0]);
                             adapter.add(input);
                         }
@@ -305,7 +305,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 case R.id.activity_server_settings_ab_add:
                     final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
                         @Override
-                        public void onOkClicked(final DialogInterface dialog, String input) {
+                        public void onOkClicked(final String input) {
                             adapter.add(input);
                         }
                     };

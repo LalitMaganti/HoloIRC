@@ -105,6 +105,8 @@ public class IRCService extends Service {
 
     private void disconnectAll() {
         manager.disconnectAll();
+        stopForeground(true);
+        stopSelf();
         Intent intent = new Intent("serviceStopped");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
@@ -128,6 +130,8 @@ public class IRCService extends Service {
         @Override
         protected void onPostExecute(final String strings) {
             manager.remove(strings);
+            stopForeground(true);
+            stopSelf();
         }
     }
 
