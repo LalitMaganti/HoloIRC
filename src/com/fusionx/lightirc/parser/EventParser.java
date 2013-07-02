@@ -49,7 +49,7 @@ public class EventParser {
         } else if (e instanceof JoinEvent) {
             JoinEvent event = (JoinEvent) e;
             returnMessage = event.getUser().getPrettyNick(event.getChannel())
-                    + context.getString(R.string.output_event_entered_room);
+                    + " " + context.getString(R.string.output_event_entered_room);
         } else if (e instanceof TopicEvent) {
             returnMessage = topicEventOutput((TopicEvent) e, context);
         } else if (e instanceof MessageEvent) {
@@ -57,11 +57,11 @@ public class EventParser {
         } else if (e instanceof QuitEventPerChannel) {
             final QuitEventPerChannel event = (QuitEventPerChannel) e;
             returnMessage = event.getUser().getPrettyNick(event.getChannel())
-                    + context.getString(R.string.output_event_quit_server) + event.getReason() + ")";
+                    + " " + context.getString(R.string.output_event_quit_server) + " " + event.getReason() + ")";
         } else if (e instanceof PartEvent) {
             final PartEvent event = (PartEvent) e;
             returnMessage = event.getUser().getPrettyNick(event.getChannel())
-                    + context.getString(R.string.output_event_part_channel) + event.getReason() + ")";
+                    + " " + context.getString(R.string.output_event_part_channel) + " " + event.getReason() + ")";
         } else if (e instanceof NickChangeEventPerChannel) {
             returnMessage = nickChangeEventOutput((NickChangeEventPerChannel) e, context);
         } else if (e instanceof PrivateMessageEvent) {
@@ -79,11 +79,11 @@ public class EventParser {
     private static String topicEventOutput(final TopicEvent event, final Context context) {
         String newMessage;
         if (event.isChanged()) {
-            newMessage = context.getString(R.string.output_event_topic_changed_to) + event.getTopic()
-                    + context.getString(R.string.output_event_by) + event.getChannel().getTopicSetter();
+            newMessage = context.getString(R.string.output_event_topic_changed_to) + " " + event.getTopic()
+                    + " " + context.getString(R.string.output_event_by) + " " + event.getChannel().getTopicSetter();
         } else {
-            newMessage = context.getString(R.string.output_event_topic_is) + event.getTopic() +
-                    context.getString(R.string.output_event_topic_set_forth) + event.getChannel().getTopicSetter();
+            newMessage = context.getString(R.string.output_event_topic_is) + " " + event.getTopic() + " " +
+                    context.getString(R.string.output_event_topic_set_forth) + " " + event.getChannel().getTopicSetter();
         }
         return newMessage;
     }
@@ -102,10 +102,9 @@ public class EventParser {
         String newMessage;
         if (event.getUser().getNick().equals(event.getBot().getNick())) {
             newMessage = context.getString(R.string.output_event_you) + event.getOldNick() +
-                    context.getString(R.string.output_event_you_known_as) + event.getNewNick();
+                    context.getString(R.string.output_event_you_known_as) + " " + event.getNewNick();
         } else {
-            newMessage = event.getOldNick() + context.getString(R.string.output_event_known_as)
-                    + event.getNewNick();
+            newMessage = event.getOldNick() + " " + context.getString(R.string.output_event_known_as) + " " + event.getNewNick();
         }
         return newMessage;
     }

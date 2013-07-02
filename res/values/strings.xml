@@ -41,7 +41,7 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="settings_requires_restart">This requires a full restart of the app</string>
 
     <!-- Output for events -->
-    <string name="output_event_entered_room">entered the room</string>
+    <string name="output_event_entered_room">joined the channel</string>
     <string name="output_event_quit_server">quit the server (Reason:</string>
     <string name="output_event_part_channel">parted from the channel (Reason:</string>
     <string name="output_event_trying_reconnect">\nTrying to reconnect in 5 seconds</string>
