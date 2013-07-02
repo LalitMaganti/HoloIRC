@@ -37,11 +37,12 @@ public abstract class PromptDialog extends AlertDialog.Builder implements Dialog
 
         input = new EditText(context);
         input.setHint(hint);
-        input.setText(edittextdefaulttext);
+        input.append(edittextdefaulttext);
         input.setSingleLine(true);
         setView(input);
 
         setPositiveButton(context.getString(R.string.ok), this);
+
         setNegativeButton(context.getString(R.string.cancel), this);
     }
 
