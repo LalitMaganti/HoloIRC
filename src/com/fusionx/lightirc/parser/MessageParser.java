@@ -37,7 +37,7 @@ public class MessageParser {
         return mService;
     }
 
-    public void setService(IRCService service) {
+    public void setService(final IRCService service) {
         mService = service;
     }
 
@@ -66,7 +66,7 @@ public class MessageParser {
         }
     }
 
-    public void serverMessageToParse(String serverName, String message) {
+    public void serverMessageToParse(final String serverName, final String message) {
         final PircBotX bot = getService().getBot(serverName);
         final String parsedArray[] = message.split("\\s+");
 
@@ -75,7 +75,7 @@ public class MessageParser {
         }
     }
 
-    public void userMessageToParse(String serverName, String userNick, String message) {
+    public void userMessageToParse(final String serverName, final String userNick, final String message) {
         final PircBotX bot = getService().getBot(serverName);
         final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();
         final String parsedArray[] = message.split("\\s+");
@@ -98,7 +98,7 @@ public class MessageParser {
         }
     }
 
-    private void serverCommandToParse(String[] parsedArray, PircBotX bot) {
+    private void serverCommandToParse(final String[] parsedArray, final PircBotX bot) {
         // TODO parse this string fully
         // TODO - input validation
         final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();

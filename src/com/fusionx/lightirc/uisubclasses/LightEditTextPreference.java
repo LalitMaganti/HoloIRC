@@ -11,35 +11,35 @@ import android.util.AttributeSet;
 import android.widget.Button;
 
 public class LightEditTextPreference extends EditTextPreference implements TextWatcher {
-    public LightEditTextPreference(Context context, AttributeSet attrs) {
+    public LightEditTextPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
     }
 
     @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    public void onTextChanged(final CharSequence s, final int start, final int before, final int count) {
     }
 
     @Override
-    public void beforeTextChanged(CharSequence s, int start, int before, int count) {
+    public void beforeTextChanged(final CharSequence s, final int start, final int before, final int count) {
     }
 
     @Override
-    public void afterTextChanged(Editable s) {
+    public void afterTextChanged(final Editable s) {
         onEditTextChanged();
     }
 
     void onEditTextChanged() {
-        boolean enable = !getEditText().getText().toString().isEmpty();
-        Dialog dlg = getDialog();
+        final boolean enable = !getEditText().getText().toString().isEmpty();
+        final Dialog dlg = getDialog();
         if (dlg instanceof AlertDialog) {
-            AlertDialog alertDlg = (AlertDialog) dlg;
-            Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
+            final AlertDialog alertDlg = (AlertDialog) dlg;
+            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
             btn.setEnabled(enable);
         }
     }
 
     @Override
-    protected void showDialog(Bundle state) {
+    protected void showDialog(final Bundle state) {
         super.showDialog(state);
 
         getEditText().removeTextChangedListener(this);

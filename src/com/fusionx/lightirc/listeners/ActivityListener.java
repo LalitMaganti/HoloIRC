@@ -266,13 +266,13 @@ public class ActivityListener extends GenericListener {
         });
     }
 
-    private boolean checkChannelFragment(String keyName) {
+    private boolean checkChannelFragment(final String keyName) {
         final int position = mViewPager.getCurrentItem();
         final IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
         return frag.getTitle().equals(keyName);
     }
 
-    private IRCFragment privateMessageCheck(String userNick) {
+    private IRCFragment privateMessageCheck(final String userNick) {
         return mIRCPagerAdapter.getTab(userNick);
     }
 }

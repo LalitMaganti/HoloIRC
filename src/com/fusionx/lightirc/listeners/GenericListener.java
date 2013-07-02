@@ -14,7 +14,7 @@ import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
     @Override
-    public void onEvent(Event event) throws Exception {
+    public void onEvent(final Event event) throws Exception {
         if (event instanceof NickChangeEventPerChannel)
             onNickChangePerChannel((NickChangeEventPerChannel) event);
         else if (event instanceof QuitEventPerChannel)
@@ -29,21 +29,21 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
             super.onEvent(event);
     }
 
-    protected abstract void onIOException(IOExceptionEvent<PircBotX> event);
+    protected abstract void onIOException(final IOExceptionEvent<PircBotX> event);
 
-    protected abstract void onIrcException(IrcExceptionEvent<PircBotX> event);
+    protected abstract void onIrcException(final IrcExceptionEvent<PircBotX> event);
 
-    protected abstract void onNickChangePerChannel(NickChangeEventPerChannel<PircBotX> event);
+    protected abstract void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event);
 
-    protected abstract void onQuitPerChannel(QuitEventPerChannel<PircBotX> event);
+    protected abstract void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event);
 
-    protected abstract void onPrivateAction(PrivateActionEvent<PircBotX> event);
+    protected abstract void onPrivateAction(final PrivateActionEvent<PircBotX> event);
 
-    protected abstract void onBotJoin(JoinEvent<PircBotX> event);
+    protected abstract void onBotJoin(final JoinEvent<PircBotX> event);
 
-    protected abstract void onOtherUserJoin(JoinEvent<PircBotX> event);
+    protected abstract void onOtherUserJoin(final JoinEvent<PircBotX> event);
 
-    protected abstract void onOtherUserPart(PartEvent<PircBotX> event);
+    protected abstract void onOtherUserPart(final PartEvent<PircBotX> event);
 
     @Override
     public void onJoin(final JoinEvent<PircBotX> event) {

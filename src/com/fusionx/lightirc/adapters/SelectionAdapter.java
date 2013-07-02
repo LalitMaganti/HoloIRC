@@ -15,13 +15,13 @@ public class SelectionAdapter extends ArrayAdapter<String> {
     private final HashMap<String, Boolean> selectedItems = new HashMap<String, Boolean>();
     private final ArrayList<String> arrayList;
 
-    public SelectionAdapter(Context context, ArrayList<String> arrayList) {
+    public SelectionAdapter(final Context context, final ArrayList<String> arrayList) {
         super(context, R.layout.layout_text_list, R.id.text1, arrayList);
         this.arrayList = arrayList;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, final View convertView, final ViewGroup parent) {
         View v = super.getView(position, convertView, parent);
         if (selectedItems.containsKey(arrayList.get(position))) {
             v.setBackgroundResource(android.R.color.holo_blue_light);
@@ -35,12 +35,12 @@ public class SelectionAdapter extends ArrayAdapter<String> {
         return new HashSet<String>(arrayList);
     }
 
-    public void addSelection(int position) {
+    public void addSelection(final int position) {
         selectedItems.put(arrayList.get(position), true);
         notifyDataSetChanged();
     }
 
-    public void removeSelection(int position) {
+    public void removeSelection(final int position) {
         selectedItems.remove(arrayList.get(position));
         notifyDataSetChanged();
     }

@@ -17,7 +17,7 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
     private LayoutInflater inflater;
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, final View convertView, final ViewGroup parent) {
         TextView row = (TextView) convertView;
         if (row == null) {
             row = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
@@ -33,7 +33,7 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
         return row;
     }
 
-    public ActionsArrayAdapter(Context context, int textViewResourceId, CharSequence[] objects) {
+    public ActionsArrayAdapter(final Context context, final int textViewResourceId, final CharSequence[] objects) {
         super(context, textViewResourceId, (String[]) objects);
         inflater = LayoutInflater.from(context);
     }

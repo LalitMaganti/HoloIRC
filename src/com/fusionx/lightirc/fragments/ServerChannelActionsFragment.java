@@ -13,7 +13,7 @@ import org.pircbotx.PircBotX;
 
 public class ServerChannelActionsFragment extends ListFragment implements AdapterView.OnItemClickListener {
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         final String[] values = new String[]{"Join new channel", "Change nick", "Disconnect"};
         final ActionsArrayAdapter adapter = new ActionsArrayAdapter(getActivity(),

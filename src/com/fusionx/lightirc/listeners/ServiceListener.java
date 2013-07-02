@@ -71,12 +71,12 @@ public class ServiceListener extends GenericListener {
     }
 
     @Override
-    protected void onIOException(IOExceptionEvent<PircBotX> event) {
+    protected void onIOException(final IOExceptionEvent<PircBotX> event) {
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event));
     }
 
     @Override
-    protected void onIrcException(IrcExceptionEvent event) {
+    protected void onIrcException(final IrcExceptionEvent event) {
         event.getBot().appendToBuffer(event.getException().getMessage());
     }
 

@@ -8,7 +8,7 @@ import android.widget.EditText;
 public abstract class PromptDialog extends AlertDialog.Builder implements DialogInterface.OnClickListener {
     private final EditText input;
 
-    public PromptDialog(Context context, String title, String hint, String edittextdefaulttext) {
+    public PromptDialog(final Context context, final String title, final String hint, final String edittextdefaulttext) {
         super(context);
 
         setTitle(title);
