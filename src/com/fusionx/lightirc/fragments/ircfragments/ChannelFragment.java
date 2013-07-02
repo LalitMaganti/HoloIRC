@@ -33,6 +33,7 @@ import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.pircbotx.Channel;
 
 import java.util.ArrayList;
 
@@ -84,8 +85,9 @@ public class ChannelFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName)
-                .getUserChannelDao().getChannel(getTitle()).getBuffer();
-        writeToTextView(buffer);
+        final Channel channel = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName)
+                .getUserChannelDao().getChannel(getTitle());
+        writeToTextView(channel.getBuffer());
+        setUserList(channel.getUserList());
     }
 }

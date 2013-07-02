@@ -28,6 +28,7 @@ import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
@@ -280,7 +281,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     }
 
     // Removal stuff
-    private void removeTab(final int i) {
+    public void removeTab(final int i) {
         final ActionBar actionBar = getActionBar();
         actionBar.removeTabAt(i);
     }
@@ -296,14 +297,21 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         final int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1, true);
 
-        if (channel) {
-            service.partFromChannel(builder.getTitle(), ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
-        } else {
-            service.removePrivateMessage(builder.getTitle(), ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
-        }
-
-        mIRCPagerAdapter.removeView(index);
-        removeTab(index);
+        final Object[] objects = {channel, index};
+        final AsyncTask<Object, Void, Void> closeFragment = new AsyncTask<Object, Void, Void>() {
+            @Override
+            protected Void doInBackground(Object... booleans) {
+                if ((Boolean) booleans[0]) {
+                    service.partFromChannel(builder.getTitle(),
+                            ((ChannelFragment) mIRCPagerAdapter.getItem((Integer) booleans[1])).getTitle());
+                } else {
+                    service.removePrivateMessage(builder.getTitle(),
+                            ((IRCFragment) mIRCPagerAdapter.getItem((Integer) booleans[1])).getTitle());
+                }
+                return null;
+            }
+        };
+        closeFragment.execute(objects);
     }
 
     @Override

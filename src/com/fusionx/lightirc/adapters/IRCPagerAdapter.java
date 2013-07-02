@@ -97,7 +97,7 @@ public class IRCPagerAdapter extends PagerAdapter {
         // from its saved state, where the fragment manager has already
         // taken care of restoring the fragments we previously had instantiated.
         if (mFragments.size() > position) {
-            Fragment f = mFragments.get(position);
+            final Fragment f = mFragments.get(position);
             if (f != null) {
                 return f;
             }
@@ -107,7 +107,7 @@ public class IRCPagerAdapter extends PagerAdapter {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
 
-        Fragment fragment = getItem(position);
+        final Fragment fragment = getItem(position);
         if (DEBUG)
             Log.v(TAG, "Adding item #" + position + ": f=" + fragment);
         if (mSavedState.size() > position) {
@@ -144,7 +144,7 @@ public class IRCPagerAdapter extends PagerAdapter {
                     mSavedState.add((Fragment.SavedState) stat);
                 }
             }
-            Iterable<String> keys = bundle.keySet();
+            final Iterable<String> keys = bundle.keySet();
             for (String key : keys) {
                 if (key.startsWith("f")) {
                     int index = Integer.parseInt(key.substring(1));
@@ -168,18 +168,18 @@ public class IRCPagerAdapter extends PagerAdapter {
         Bundle state = null;
         if (mSavedState.size() > 0) {
             state = new Bundle();
-            Fragment.SavedState[] fss = new Fragment.SavedState[mSavedState
+            final Fragment.SavedState[] fss = new Fragment.SavedState[mSavedState
                     .size()];
             mSavedState.toArray(fss);
             state.putParcelableArray("states", fss);
         }
         for (int i = 0; i < mFragments.size(); i++) {
-            Fragment f = mFragments.get(i);
+            final Fragment f = mFragments.get(i);
             if (f != null) {
                 if (state == null) {
                     state = new Bundle();
                 }
-                String key = "f" + i;
+                final String key = "f" + i;
                 mFragmentManager.putFragment(state, key, f);
             }
         }
@@ -187,8 +187,8 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-        Fragment fragment = (Fragment) object;
+    public void setPrimaryItem(final ViewGroup container, final int position, final Object object) {
+        final Fragment fragment = (Fragment) object;
         if (fragment != mCurrentPrimaryItem) {
             if (mCurrentPrimaryItem != null) {
                 mCurrentPrimaryItem.setMenuVisibility(false);
@@ -229,13 +229,22 @@ public class IRCPagerAdapter extends PagerAdapter {
         return views.get(position).getTitle();
     }
 
-    public void removeView(int index) {
-        views.remove(index);
-        notifyDataSetChanged();
+    public int removeView(final String title) {
+        for (final IRCFragment i : views) {
+            if (i.getTitle() != null) {
+                if (i.getTitle().equals(title)) {
+                    final int index = views.indexOf(i);
+                    views.remove(index);
+                    notifyDataSetChanged();
+                    return index;
+                }
+            }
+        }
+        return -1;
     }
 
     public IRCFragment getTab(String title) {
-        for (IRCFragment i : views) {
+        for (final IRCFragment i : views) {
             if (i.getTitle() != null) {
                 if (i.getTitle().equals(title)) {
                     int indexofi = views.indexOf(i);

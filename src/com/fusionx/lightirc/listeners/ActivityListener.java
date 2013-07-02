@@ -195,6 +195,17 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
+    protected void onUserPart(final PartEvent<PircBotX> event) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int index = mIRCPagerAdapter.removeView(event.getChannel().getName());
+                getActivity().removeTab(index);
+            }
+        });
+    }
+
+    @Override
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 

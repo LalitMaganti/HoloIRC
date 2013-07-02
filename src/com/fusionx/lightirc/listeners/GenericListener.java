@@ -61,6 +61,9 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
 
     protected abstract void onOtherUserPart(final PartEvent<PircBotX> event);
 
+    protected void onUserPart(final PartEvent<PircBotX> event) {
+    }
+
     @Override
     public void onJoin(final JoinEvent<PircBotX> event) {
         if (!((JoinEvent) event).getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
@@ -74,6 +77,8 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     public void onPart(final PartEvent<PircBotX> event) {
         if (!event.getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
             onOtherUserPart(event);
+        } else {
+            onUserPart(event);
         }
     }
 }
