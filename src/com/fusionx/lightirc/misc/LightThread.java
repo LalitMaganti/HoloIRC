@@ -13,7 +13,7 @@ public class LightThread extends Thread {
     @Getter(AccessLevel.PUBLIC)
     private PircBotX bot;
 
-    public LightThread(PircBotX bot) {
+    public LightThread(final PircBotX bot) {
         this.bot = bot;
     }
 

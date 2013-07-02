@@ -19,32 +19,15 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 
 public class PMFragment extends IRCFragment {
-    private String serverName;
-
-    @Override
-    public View onCreateView(final LayoutInflater inflater,
-                             final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
-
-        setTitle(getArguments().getString("nick"));
-
-        serverName = getArguments().getString("serverName");
-
-        return rootView;
-    }
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -65,19 +48,10 @@ public class PMFragment extends IRCFragment {
                 final String server = strings[0];
                 final String userNick = strings[1];
                 final String message = strings[2];
-                ((ServerChannelActivity) getActivity())
+                ((IRCFragmentActivity) getActivity())
                         .getParser().userMessageToParse(server, userNick, message);
             }
             return null;
         }
-    }
-
-    @Override
-    public void onViewStateRestored(final Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-
-        final String buffer = ((ServerChannelActivity) getActivity()).getService().getBot(serverName)
-                .getUserChannelDao().getChannel(getTitle()).getBuffer();
-        writeToTextView(buffer);
     }
 }

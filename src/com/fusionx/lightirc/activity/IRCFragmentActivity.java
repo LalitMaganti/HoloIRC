@@ -44,6 +44,10 @@ import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.*;
+import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
+import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
+import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
+import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.listeners.ActivityListener;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
@@ -60,7 +64,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class ServerChannelActivity extends FragmentActivity implements TabListener,
+public class IRCFragmentActivity extends FragmentActivity implements TabListener,
         OnPageChangeListener, SlidingMenu.OnOpenListener {
     private UserListFragment mUserFragment;
     private IRCPagerAdapter mIRCPagerAdapter;
@@ -234,7 +238,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     public void onNewChannelJoined(final String channelName, final ArrayList<String> userList) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
-        bundle.putString("channel", channelName);
+        bundle.putString("title", channelName);
         bundle.putString("serverName", builder.getTitle());
         bundle.putStringArrayList("userList", userList);
         channel.setArguments(bundle);
@@ -250,10 +254,10 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     public void onNewPrivateMessage(final String userNick) {
         final PMFragment pmFragment = new PMFragment();
-        final Bundle b = new Bundle();
-        b.putString("serverName", builder.getTitle());
-        b.putString("nick", userNick);
-        pmFragment.setArguments(b);
+        final Bundle bundle = new Bundle();
+        bundle.putString("serverName", builder.getTitle());
+        bundle.putString("title", userNick);
+        pmFragment.setArguments(bundle);
 
         final int position = mIRCPagerAdapter.addView(pmFragment);
         addTab(userNick);
@@ -277,23 +281,15 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         startActivity(intent);
     }
 
-    private void closePMConversation() {
-        int index = mViewPager.getCurrentItem();
-
-        mViewPager.setCurrentItem(index - 1, true);
-
-        service.removePrivateMessage(builder.getTitle(), ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
-
-        mIRCPagerAdapter.removeView(index);
-        removeTab(index);
-    }
-
-    private void partFromChannel() {
+    private void partChannelOrClosePm(boolean channel) {
         int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1, true);
 
-        service.partFromChannel(builder.getTitle(),
-                ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
+        if(channel) {
+            service.partFromChannel(builder.getTitle(), ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
+        } else {
+            service.removePrivateMessage(builder.getTitle(), ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
+        }
 
         mIRCPagerAdapter.removeView(index);
         removeTab(index);
@@ -301,8 +297,9 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
 
     @Override
     public void onDestroy() {
-        if (service.getBot(builder.getTitle()) != null) {
-            service.getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(mListener);
+        final PircBotX bot = service.getBot(builder.getTitle());
+        if (bot != null) {
+            bot.getConfiguration().getListenerManager().removeListener(mListener);
         }
         unbindService(mConnection);
 
@@ -341,7 +338,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                 mActionsSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_part:
-                partFromChannel();
+                partChannelOrClosePm(true);
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
@@ -350,7 +347,7 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
                 mUserSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_close:
-                closePMConversation();
+                partChannelOrClosePm(false);
                 return true;
         }
         return super.onOptionsItemSelected(item);

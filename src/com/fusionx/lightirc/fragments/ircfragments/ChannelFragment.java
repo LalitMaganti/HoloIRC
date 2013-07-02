@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -29,7 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,8 +37,6 @@ import lombok.Setter;
 import java.util.ArrayList;
 
 public class ChannelFragment extends IRCFragment {
-    private String serverName;
-
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PUBLIC)
     private ArrayList<String> userList;
@@ -47,9 +45,6 @@ public class ChannelFragment extends IRCFragment {
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = super.onCreateView(inflater, container, savedInstanceState);
-
-        setTitle(getArguments().getString("channel"));
-        serverName = getArguments().getString("serverName");
 
         final ArrayList<String> userLi = getArguments().getStringArrayList("userList");
         if (userLi != null) {
@@ -66,7 +61,7 @@ public class ChannelFragment extends IRCFragment {
             getEditText().setText("");
 
             final ParserTask task = new ParserTask();
-            String[] strings = {serverName, getTitle(), message};
+            final String[] strings = {serverName, getTitle(), message};
             task.execute(strings);
         }
         return false;
@@ -78,19 +73,10 @@ public class ChannelFragment extends IRCFragment {
                 final String server = strings[0];
                 final String channelName = strings[1];
                 final String message = strings[2];
-                ((ServerChannelActivity) getActivity())
+                ((IRCFragmentActivity) getActivity())
                         .getParser().channelMessageToParse(server, channelName, message);
             }
             return null;
         }
-    }
-
-    @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-
-        final String buffer = ((ServerChannelActivity) getActivity()).getService().getBot(serverName)
-                .getUserChannelDao().getChannel(getTitle()).getBuffer();
-        writeToTextView(buffer);
     }
 }

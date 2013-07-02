@@ -7,7 +7,7 @@ import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.misc.Utils;
 
@@ -64,15 +64,15 @@ public class UserListFragment extends ListFragment
 
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
-                ((ServerChannelActivity) getActivity()).userListMention(positions);
+                ((IRCFragmentActivity) getActivity()).userListMention(positions);
                 mode.finish();
-                ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
+                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
                 return true;
             case R.id.fragment_userlist_cab_pm:
                 final String nick = Utils.stripPrefixFromNick(String.valueOf(Html.fromHtml((String) positions.toArray()[0])));
-                ((ServerChannelActivity) getActivity()).onNewPrivateMessage(nick);
+                ((IRCFragmentActivity) getActivity()).onNewPrivateMessage(nick);
                 mode.finish();
-                ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
+                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
                 return true;
             default:
                 return false;

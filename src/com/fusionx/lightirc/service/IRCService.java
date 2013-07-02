@@ -35,8 +35,8 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
@@ -184,7 +184,7 @@ public class IRCService extends Service {
     }
 
     public void mention(final String serverName, final String messageDest) {
-        final Intent mIntent = new Intent(this, ServerChannelActivity.class);
+        final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
         mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
         mIntent.putExtra("mention", messageDest);
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, mIntent, 0);

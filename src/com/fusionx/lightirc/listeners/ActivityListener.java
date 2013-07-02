@@ -22,12 +22,12 @@
 package com.fusionx.lightirc.listeners;
 
 import android.support.v4.view.ViewPager;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.fragments.ChannelFragment;
-import com.fusionx.lightirc.fragments.IRCFragment;
-import com.fusionx.lightirc.fragments.PMFragment;
+import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
+import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
+import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import com.fusionx.lightirc.misc.UserComparator;
@@ -48,14 +48,14 @@ import java.util.Collections;
 
 public class ActivityListener extends GenericListener {
     @Getter(AccessLevel.PRIVATE)
-    private final ServerChannelActivity mActivity;
+    private final IRCFragmentActivity mActivity;
     private final IRCPagerAdapter mIRCPagerAdapter;
     private final ViewPager mViewPager;
 
     @Setter(AccessLevel.PUBLIC)
     private UserListAdapter arrayAdapter;
 
-    public ActivityListener(ServerChannelActivity activity, IRCPagerAdapter d, ViewPager pager) {
+    public ActivityListener(IRCFragmentActivity activity, IRCPagerAdapter d, ViewPager pager) {
         mActivity = activity;
         mIRCPagerAdapter = d;
         mViewPager = pager;

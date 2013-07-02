@@ -29,7 +29,7 @@ import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 public class EventParser {
-    public static String getOutputForEvent(Event e) {
+    public static String getOutputForEvent(final Event e) {
         if (e instanceof MotdEvent) {
             final MotdEvent event = (MotdEvent) e;
             return event.getMotd() + "\n";
@@ -44,25 +44,9 @@ public class EventParser {
             JoinEvent event = (JoinEvent) e;
             return event.getUser().getPrettyNick(event.getChannel()) + " entered the room\n";
         } else if (e instanceof TopicEvent) {
-            final TopicEvent event = (TopicEvent) e;
-            String newMessage;
-            if (event.isChanged()) {
-                newMessage = "The topic for this channel has been changed to: " + event.getTopic()
-                        + " by " + event.getChannel().getTopicSetter() + "\n";
-            } else {
-                newMessage = "The topic is: " + event.getTopic() + " as set forth by "
-                        + event.getChannel().getTopicSetter() + "\n";
-            }
-            return newMessage;
+            return topicEventOutput((TopicEvent) e);
         } else if (e instanceof MessageEvent) {
-            final MessageEvent event = (MessageEvent) e;
-            String baseMessage = event.getUser().getPrettyNick(event.getChannel())
-                    + ": " + event.getMessage() + "\n";
-            if (event.getMessage().contains(event.getBot().getNick()) &&
-                    !event.getUser().getNick().equals(event.getBot().getNick())) {
-                baseMessage = "<b>" + baseMessage + "</b>";
-            }
-            return baseMessage;
+            return messageEventOutput((MessageEvent) e);
         } else if (e instanceof QuitEventPerChannel) {
             final QuitEventPerChannel event = (QuitEventPerChannel) e;
             return event.getUser().getPrettyNick(event.getChannel()) + " quit the server (Reason: "
@@ -72,23 +56,9 @@ public class EventParser {
             return event.getUser().getPrettyNick(event.getChannel()) + " parted from the room (Reason: "
                     + event.getReason() + ")\n";
         } else if (e instanceof NickChangeEventPerChannel) {
-            final NickChangeEventPerChannel event = (NickChangeEventPerChannel) e;
-            String newMessage;
-            if (event.getUser().getNick().equals(event.getBot().getNick())) {
-                newMessage = "You (" + event.getOldNick() + ") are now known as "
-                        + event.getNewNick() + "\n";
-            } else {
-                newMessage = event.getOldNick() + " is now known as "
-                        + event.getNewNick() + "\n";
-            }
-            return newMessage;
+            return nickChangeEventOutput((NickChangeEventPerChannel) e);
         } else if (e instanceof PrivateMessageEvent) {
-            final PrivateMessageEvent event = (PrivateMessageEvent) e;
-            if (event.isBotMessage()) {
-                return event.getBot().getUserBot().getColourfulNick() + ": " + event.getMessage() + "\n";
-            } else {
-                return event.getUser().getColourfulNick() + ": " + event.getMessage() + "\n";
-            }
+            return privateMessageEventOutput((PrivateMessageEvent) e);
         } else if (e instanceof PrivateActionEvent) {
             final PrivateActionEvent event = (PrivateActionEvent) e;
             return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";
@@ -98,6 +68,48 @@ public class EventParser {
         } else {
             // Invalid event
             return "";
+        }
+    }
+
+    private static String topicEventOutput(final TopicEvent event) {
+        String newMessage;
+        if (event.isChanged()) {
+            newMessage = "The topic for this channel has been changed to: " + event.getTopic()
+                    + " by " + event.getChannel().getTopicSetter() + "\n";
+        } else {
+            newMessage = "The topic is: " + event.getTopic() + " as set forth by "
+                    + event.getChannel().getTopicSetter() + "\n";
+        }
+        return newMessage;
+    }
+
+    private static String messageEventOutput(final MessageEvent event) {
+        String baseMessage = event.getUser().getPrettyNick(event.getChannel())
+                + ": " + event.getMessage() + "\n";
+        if (event.getMessage().contains(event.getBot().getNick()) &&
+                !event.getUser().getNick().equals(event.getBot().getNick())) {
+            baseMessage = "<b>" + baseMessage + "</b>";
+        }
+        return baseMessage;
+    }
+
+    private static String nickChangeEventOutput(final NickChangeEventPerChannel event) {
+        String newMessage;
+        if (event.getUser().getNick().equals(event.getBot().getNick())) {
+            newMessage = "You (" + event.getOldNick() + ") are now known as "
+                    + event.getNewNick() + "\n";
+        } else {
+            newMessage = event.getOldNick() + " is now known as "
+                    + event.getNewNick() + "\n";
+        }
+        return newMessage;
+    }
+
+    private static String privateMessageEventOutput(final PrivateMessageEvent event) {
+        if (event.isBotMessage()) {
+            return event.getBot().getUserBot().getColourfulNick() + ": " + event.getMessage() + "\n";
+        } else {
+            return event.getUser().getColourfulNick() + ": " + event.getMessage() + "\n";
         }
     }
 }

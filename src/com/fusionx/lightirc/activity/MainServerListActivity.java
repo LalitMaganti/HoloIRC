@@ -112,7 +112,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(final MenuItem item) {
         switch (item.getItemId()) {
             case R.id.activity_server_list_ab_settings:
                 displaySettings();
@@ -164,7 +164,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpCards();
     }
 
-    private void setUpServers(ArrayList<String> servers) {
+    private void setUpServers(final ArrayList<String> servers) {
         mBuilderList.clear();
         for (final String server : servers) {
             final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
@@ -183,8 +183,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
                 bot.setNickservPassword(nickServPassword);
             }
 
-            Set<String> auto = new HashSet<String>();
-            auto = serverSettings.getStringSet(Constants.AutoJoin, auto);
+            final Set<String> auto = serverSettings.getStringSet(Constants.AutoJoin, new HashSet<String>());
             for (final String channel : auto) {
                 bot.addAutoJoinChannel(channel);
             }
@@ -220,9 +219,9 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private ArrayList<String> getListOfServersFromPrefsFiles() {
-        ArrayList<String> array = new ArrayList<String>();
-        File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs"));
-        for (String file : folder.list()) {
+        final ArrayList<String> array = new ArrayList<String>();
+        final File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs"));
+        for (final String file : folder.list()) {
             if (file.startsWith("server_")) {
                 array.add(file.replace(".xml", ""));
             }
@@ -234,14 +233,14 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     // Connect to server
     public void onCardClick(final View v) {
         final Intent intent = new Intent(MainServerListActivity.this,
-                ServerChannelActivity.class);
+                IRCFragmentActivity.class);
         intent.putExtra("server", (Configuration.Builder) v.getTag());
         startActivity(intent);
     }
 
     // Popup menu
     public void showPopup(final View v) {
-        PopupMenu popup = new PopupMenu(this, v);
+        final PopupMenu popup = new PopupMenu(this, v);
         mBuilder = (Configuration.Builder) v.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
@@ -261,7 +260,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
 
     @Override
-    public void onDismiss(PopupMenu popupMenu) {
+    public void onDismiss(final PopupMenu popupMenu) {
         mBuilder = null;
     }
 
@@ -285,7 +284,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         }
     }
 
-    private void deleteServer(String fileName) {
+    private void deleteServer(final String fileName) {
         final ArrayList<String> servers = getListOfServersFromPrefsFiles();
         servers.remove(fileName);
         final File folder = new File(getFilesDir().getAbsolutePath().
@@ -295,7 +294,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpCards();
     }
 
-    private void disconnectFromServer(Configuration.Builder builder) {
+    private void disconnectFromServer(final Configuration.Builder builder) {
         mService.disconnectFromServer(builder.getTitle());
         setUpCards();
     }

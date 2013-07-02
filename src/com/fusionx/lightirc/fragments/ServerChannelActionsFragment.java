@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AdapterView;
-import com.fusionx.lightirc.activity.ServerChannelActivity;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialog;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialog;
@@ -25,15 +25,15 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        final IRCService service = ((ServerChannelActivity) getActivity()).getService();
-        final PircBotX bot = service.getBot(((ServerChannelActivity) getActivity()).getBuilder().getTitle());
+        final IRCService service = ((IRCFragmentActivity) getActivity()).getService();
+        final PircBotX bot = service.getBot(((IRCFragmentActivity) getActivity()).getBuilder().getTitle());
         switch (i) {
             case 0:
                 final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
                     @Override
                     public void onOkClicked(final String input) {
                         bot.sendIRC().joinChannel(input);
-                        ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
+                        ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
                     }
                 };
                 dialog.show();
@@ -43,13 +43,13 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
                     @Override
                     public void onOkClicked(final String input) {
                         bot.sendIRC().changeNick(input);
-                        ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
+                        ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
                     }
                 };
                 nickDialog.show();
                 break;
             case 2:
-                ((ServerChannelActivity) getActivity()).disconnect();
+                ((IRCFragmentActivity) getActivity()).disconnect();
                 break;
         }
     }

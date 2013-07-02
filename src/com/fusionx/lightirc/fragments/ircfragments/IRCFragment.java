@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +48,8 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     @Setter(AccessLevel.PROTECTED)
     private TextView editText;
 
+    protected String serverName;
+
     @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
@@ -57,6 +60,14 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
         getEditText().setOnEditorActionListener(this);
 
+        setTitle(getArguments().getString("title"));
+
+        if(getArguments().getString("serverName") != null) {
+            serverName = getArguments().getString("serverName");
+        } else {
+            serverName = getTitle();
+        }
+
         return rootView;
     }
 
@@ -66,5 +77,14 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     public void writeToTextView(final String text) {
         textView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(getTitle())
+                .getUserChannelDao().getChannel(serverName).getBuffer();
+        writeToTextView(buffer);
     }
 }
