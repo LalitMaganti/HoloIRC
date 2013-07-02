@@ -39,12 +39,14 @@
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SettingsActivity"
-                  android:label="@string/settings_title">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN"/>
-        </intent-filter>
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/settings_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
         </activity>
+
         <service android:name="com.fusionx.lightirc.service.IRCService"/>
     </application>
 

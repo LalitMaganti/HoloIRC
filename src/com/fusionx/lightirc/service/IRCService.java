@@ -84,10 +84,8 @@ public class IRCService extends Service {
         final Intent intent = new Intent(this, MainServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
-        final PendingIntent pIntent = PendingIntent.getActivity(this, 0,
-                intent, 0);
-        final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
-                intent2, 0);
+        final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.service_one_server_joined))

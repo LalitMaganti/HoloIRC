@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+LightIRC - an IRC client for Android
+
+Copyright 2013 Lalit Maganti
+
+This file is part of LightIRC.
+
+LightIRC is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+LightIRC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+-->
 <resources>
 
     <string name="app_name">LightIRC</string>
@@ -21,14 +41,14 @@
     <string name="settings_requires_restart">This requires a full restart of the app</string>
 
     <!-- Output for events -->
-    <string name="output_event_entered_room"> entered the room</string>
-    <string name="output_event_quit_server"> quit the server (Reason: </string>
-    <string name="output_event_part_channel"> parted from the channel (Reason: </string>
+    <string name="output_event_entered_room">entered the room</string>
+    <string name="output_event_quit_server">quit the server (Reason:</string>
+    <string name="output_event_part_channel">parted from the channel (Reason:</string>
     <string name="output_event_trying_reconnect">\nTrying to reconnect in 5 seconds</string>
-    <string name="output_event_topic_changed_to">The topic for this channel has been changed to: </string>
-    <string name="output_event_by"> by </string>
-    <string name="output_event_topic_is">The topic is: </string>
-    <string name="output_event_topic_set_forth"> as set forth by </string>
+    <string name="output_event_topic_changed_to">The topic for this channel has been changed to:</string>
+    <string name="output_event_by">by</string>
+    <string name="output_event_topic_is">The topic is:</string>
+    <string name="output_event_topic_set_forth">as set forth by</string>
     <string name="output_event_you">You (</string>
     <string name="output_event_you_known_as">) are now known as</string>
     <string name="output_event_known_as">is now known as</string>

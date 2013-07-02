@@ -83,7 +83,7 @@ public class EventParser {
                     + context.getString(R.string.output_event_by) + event.getChannel().getTopicSetter();
         } else {
             newMessage = context.getString(R.string.output_event_topic_is) + event.getTopic() +
-                   context.getString(R.string.output_event_topic_set_forth) + event.getChannel().getTopicSetter();
+                    context.getString(R.string.output_event_topic_set_forth) + event.getChannel().getTopicSetter();
         }
         return newMessage;
     }
