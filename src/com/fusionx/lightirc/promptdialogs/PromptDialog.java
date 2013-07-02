@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.EditText;
+import com.fusionx.lightirc.R;
 
 public abstract class PromptDialog extends AlertDialog.Builder implements DialogInterface.OnClickListener {
     private final EditText input;
@@ -19,8 +20,8 @@ public abstract class PromptDialog extends AlertDialog.Builder implements Dialog
         input.setSingleLine(true);
         setView(input);
 
-        setPositiveButton("OK", this);
-        setNegativeButton("Cancel", this);
+        setPositiveButton(context.getString(R.string.ok), this);
+        setNegativeButton(context.getString(R.string.cancel), this);
     }
 
     @Override

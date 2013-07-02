@@ -31,7 +31,7 @@
         android:layout_alignParentRight="true"
         android:inputType="textCapSentences|textAutoCorrect"
         android:ems="10"
-        android:hint="@string/message_text_edit_hint"
+        android:hint="@string/message"
         android:imeOptions="actionDone">
     </EditText>
 

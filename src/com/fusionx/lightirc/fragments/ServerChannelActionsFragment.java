@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AdapterView;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialog;
@@ -16,7 +17,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        final String[] values = new String[]{"Join new channel", "Change nick", "Disconnect"};
+        final String[] values = getResources().getStringArray(R.array.actions);
         final ActionsArrayAdapter adapter = new ActionsArrayAdapter(getActivity(),
                 android.R.layout.simple_list_item_1, values);
         setListAdapter(adapter);

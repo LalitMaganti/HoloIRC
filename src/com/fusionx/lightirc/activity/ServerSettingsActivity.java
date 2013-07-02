@@ -70,9 +70,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
     public void onBackPressed() {
         if (!canExit && newServer) {
             AlertDialog.Builder build = new AlertDialog.Builder(this);
-            build.setTitle("Are you sure you want to exit?")
-                    .setMessage("Changes have been made - discard?")
-                    .setNegativeButton("Discard", new DialogInterface.OnClickListener() {
+            build.setTitle(getString(R.string.server_settings_save_question_title))
+                    .setMessage(getString(R.string.server_settings_save_question_message))
+                    .setNegativeButton(getString(R.string.discard), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             File folder = new File(getFilesDir().getAbsolutePath()
@@ -80,7 +80,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
                             folder.delete();
                             finish();
                         }
-                    }).setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                    }).setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     // do nothing
@@ -88,7 +88,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             });
             build.show();
         } else {
-            Toast.makeText(this, "Changes have been saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved), Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -161,16 +161,16 @@ public class ServerSettingsActivity extends PreferenceActivity {
             // TODO - consolidate this - use all the edittexts var
             if (newServer) {
                 // Title of server
-                mEditTextTitle.setSummary("This field should NOT be empty!");
+                mEditTextTitle.setSummary(getString(R.string.server_settings_not_empty));
 
                 // URL of server
-                mEditTextUrl.setSummary("This field should NOT be empty!");
+                mEditTextUrl.setSummary(getString(R.string.server_settings_not_empty));
 
                 // Port of server
-                mEditTextPort.setSummary("Usually 6667 - This field should NOT be empty!");
+                mEditTextPort.setSummary(getString(R.string.server_settings_not_empty_port));
 
                 // Nick of User
-                mEditTextNick.setSummary("This field should NOT be empty!");
+                mEditTextNick.setSummary(getString(R.string.server_settings_not_empty));
             } else {
                 for (EditTextPreference edit : mEditTexts) {
                     edit.setSummary(edit.getText());
@@ -252,12 +252,18 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public void onItemCheckedStateChanged(ActionMode mode, int position,
                                               long id, boolean checked) {
             mode.invalidate();
-            mode.setTitle(getListView().getCheckedItemCount() + " channels selected");
+
             if (checked) {
                 adapter.addSelection(position);
             } else {
                 adapter.removeSelection(position);
             }
+
+            int selectedItemCount = getListView().getCheckedItemCount();
+
+            final String quantityString = getResources().getQuantityString(R.plurals.channel_selection,
+                    selectedItemCount, selectedItemCount);
+            mode.setTitle(quantityString);
         }
 
         @Override

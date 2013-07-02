@@ -245,8 +245,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         popup.inflate(R.menu.activity_server_list_popup);
 
         if (mService != null && mService.getBot(mBuilder.getTitle()) != null &&
-                (mService.getBot(mBuilder.getTitle()).getStatus().equals("Connected") ||
-                        mService.getBot(mBuilder.getTitle()).getStatus().equals("Connecting"))) {
+                (mService.getBot(mBuilder.getTitle()).getStatus().equals(getString(R.string.status_connected)) ||
+                        mService.getBot(mBuilder.getTitle()).getStatus().equals(getString(R.string.status_connecting)))) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
         } else {

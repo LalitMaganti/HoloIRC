@@ -41,7 +41,7 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
             if (bot != null) {
                 bt.setText(bot.getStatus());
             } else {
-                bt.setText("Disconnected");
+                bt.setText(mActivity.getString(R.string.status_disconnected));
             }
         }
 

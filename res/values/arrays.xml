@@ -4,4 +4,10 @@
         <item>Holo Dark</item>
         <item>Holo Light</item>
     </string-array>
+
+    <string-array name="actions">
+        <item>Join new channel</item>
+        <item>Change nick</item>
+        <item>Disconnect</item>
+    </string-array>
 </resources>

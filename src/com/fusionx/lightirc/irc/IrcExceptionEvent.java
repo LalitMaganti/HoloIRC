@@ -17,6 +17,7 @@ public class IrcExceptionEvent<T extends PircBotX> extends Event<T> {
 
     @Override
     public void respond(String response) {
-        // do nothing
+        // Invalid
+        throw new UnsupportedOperationException();
     }
 }

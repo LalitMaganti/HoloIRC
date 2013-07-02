@@ -72,7 +72,7 @@ public class IRCService extends Service {
         final Configuration configuration = server.buildConfiguration();
 
         final PircBotX bot = new PircBotX(configuration);
-        bot.setStatus("Connecting");
+        bot.setStatus(getString(R.string.status_connecting));
 
         final LightThread thread = new LightThread(bot);
         thread.start();
@@ -89,14 +89,14 @@ public class IRCService extends Service {
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0,
                 intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle("LightIRC")
-                .setContentText("At least one server is joined")
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.service_one_server_joined))
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
 
         Notification notification = builder.addAction(android.R.drawable.ic_menu_close_clear_cancel,
-                "Disconnect all", pIntent2).build();
+                getString(R.string.service_disconnect_all), pIntent2).build();
 
         // Just a random number
         // TODO - maybe static int this?
@@ -112,14 +112,14 @@ public class IRCService extends Service {
     }
 
     public void disconnectFromServer(final String serverName) {
-        getBot(serverName).setStatus("Disconnected");
+        getBot(serverName).setStatus(getString(R.string.status_disconnected));
         final DisconnectTask disconnectTask = new DisconnectTask();
         disconnectTask.execute(serverName);
     }
 
     private class DisconnectTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(final String... strings) {
-            if (getBot(strings[0]).getStatus().equals("Connected")) {
+            if (getBot(strings[0]).getStatus().equals(getString(R.string.status_connected))) {
                 getBot(strings[0]).shutdown();
             } else {
                 botManager.get(strings[0]).interrupt();
@@ -189,8 +189,8 @@ public class IRCService extends Service {
         mIntent.putExtra("mention", messageDest);
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
         final Notification notification = new NotificationCompat.Builder(this)
-                .setContentTitle("LightIRC")
-                .setContentText("You have been mentioned")
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.service_you_mentioned))
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent).build();
         notification.flags |= Notification.FLAG_AUTO_CANCEL;

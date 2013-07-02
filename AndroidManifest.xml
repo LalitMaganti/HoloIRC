@@ -34,13 +34,17 @@
         </activity>
         <activity
             android:name="com.fusionx.lightirc.activity.ServerSettingsActivity"
-            android:label="@string/title_activity_server_settings">
+            android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SettingsActivity"/>
-
+        <activity android:name=".activity.SettingsActivity"
+                  android:label="@string/settings_title">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN"/>
+        </intent-filter>
+        </activity>
         <service android:name="com.fusionx.lightirc.service.IRCService"/>
     </application>
 

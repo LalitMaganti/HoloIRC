@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <plurals name="user_selectioon">
+    <plurals name="user_selection">
         <item quantity="one">1 user selected</item>
         <item quantity="other">%d users selected</item>
+    </plurals>
+
+    <plurals name="channel_selection">
+        <item quantity="one">1 channel selected</item>
+        <item quantity="other">%d channels selected</item>
     </plurals>
 </resources>

@@ -34,8 +34,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public boolean onPreferenceChange(final Preference preference, final Object newValue) {
         if (preference == mChooseTheme) {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
-            build.setMessage("This requires a full restart of the app")
-                    .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
+            build.setMessage(getString(R.string.settings_requires_restart))
+                    .setPositiveButton(getString(R.string.restart), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             Intent intent = getActivity().getBaseContext().getPackageManager()

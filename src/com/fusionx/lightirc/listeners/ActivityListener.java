@@ -55,9 +55,9 @@ public class ActivityListener extends GenericListener {
     @Setter(AccessLevel.PUBLIC)
     private UserListAdapter arrayAdapter;
 
-    public ActivityListener(IRCFragmentActivity activity, IRCPagerAdapter d, ViewPager pager) {
+    public ActivityListener(final IRCFragmentActivity activity, final IRCPagerAdapter adapter, final ViewPager pager) {
         this.activity = activity;
-        mIRCPagerAdapter = d;
+        mIRCPagerAdapter = adapter;
         mViewPager = pager;
     }
 
@@ -80,7 +80,7 @@ public class ActivityListener extends GenericListener {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                server.appendToTextView(EventParser.getOutputForEvent(event));
+                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
             }
         });
     }
@@ -96,7 +96,7 @@ public class ActivityListener extends GenericListener {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    server.appendToTextView(EventParser.getOutputForEvent(event));
+                    server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                 }
             });
         }
@@ -228,7 +228,7 @@ public class ActivityListener extends GenericListener {
                 if (fragment != null) {
                     final PMFragment pm = (PMFragment) fragment;
                     if (!message.equals("")) {
-                        pm.appendToTextView(EventParser.getOutputForEvent(event));
+                        pm.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                     }
                 } else {
                     getActivity().onNewPrivateMessage(user.getNick());
@@ -244,7 +244,7 @@ public class ActivityListener extends GenericListener {
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);
                 if (channel != null) {
-                    channel.appendToTextView(EventParser.getOutputForEvent(event));
+                    channel.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                 }
             }
         });

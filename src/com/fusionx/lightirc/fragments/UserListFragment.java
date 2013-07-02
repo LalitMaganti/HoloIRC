@@ -50,10 +50,10 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             adapter.removeSelection(position);
         }
 
-        int selectedItemCount = adapter.getSelectedItems().size();
+        int selectedItemCount = getListView().getCheckedItemCount();
 
         if (selectedItemCount != 0) {
-            final String quantityString = getResources().getQuantityString(R.plurals.user_selectioon,
+            final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
                     selectedItemCount, selectedItemCount);
 
             mode.setTitle(quantityString);

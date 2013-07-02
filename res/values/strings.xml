@@ -2,9 +2,47 @@
 <resources>
 
     <string name="app_name">LightIRC</string>
-    <string name="message_text_edit_hint">Message</string>
-    <string name="title_activity_server_settings">Server Settings</string>
 
+    <!-- Status -->
+    <string name="status_connecting">Connecting</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_disconnected">Disconnected</string>
+
+    <!-- Server settings -->
+    <string name="server_settings_title">Server Settings</string>
+    <string name="server_settings_save_question_title">Are you sure you want to exit?</string>
+    <string name="server_settings_save_question_message">Changes have been made - discard?</string>
+    <string name="server_settings_changes_saved">Changes have been saved</string>
+    <string name="server_settings_not_empty">This field should NOT be empty!</string>
+    <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!</string>
+
+    <!-- App settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_requires_restart">This requires a full restart of the app</string>
+
+    <!-- Output for events -->
+    <string name="output_event_entered_room"> entered the room</string>
+    <string name="output_event_quit_server"> quit the server (Reason: </string>
+    <string name="output_event_part_channel"> parted from the channel (Reason: </string>
+    <string name="output_event_trying_reconnect">\nTrying to reconnect in 5 seconds</string>
+    <string name="output_event_topic_changed_to">The topic for this channel has been changed to: </string>
+    <string name="output_event_by"> by </string>
+    <string name="output_event_topic_is">The topic is: </string>
+    <string name="output_event_topic_set_forth"> as set forth by </string>
+    <string name="output_event_you">You (</string>
+    <string name="output_event_you_known_as">) are now known as</string>
+    <string name="output_event_known_as">is now known as</string>
+
+    <!-- Prompt dialog -->
+    <string name="prompt_dialog_channel_name">Channel Name</string>
+    <string name="prompt_dialog_including_starting">Including the starting #</string>
+
+    <!-- Service/notification -->
+    <string name="service_one_server_joined">At least one server is joined</string>
+    <string name="service_disconnect_all">Disconnect all</string>
+    <string name="service_you_mentioned">You have been mentioned</string>
+
+    <!-- One word generics -->
     <string name="edit">Edit</string>
     <string name="save">Save</string>
     <string name="add">Add</string>
@@ -18,9 +56,15 @@
     <string name="title">Title</string>
     <string name="mention">Mention</string>
     <string name="appearance">Appearance</string>
-    <string name="settings">Settings</string>
     <string name="theme">Theme</string>
     <string name="join">Join</string>
-    <string name="private_message_short">PM</string>
+    <string name="private_message_short_form">PM</string>
+    <string name="discard">Discard</string>
+    <string name="cancel">Cancel</string>
+    <string name="restart">Restart</string>
+    <string name="nickname">Nickname</string>
+    <string name="new_nick">New nick</string>
+    <string name="ok">OK</string>
+    <string name="message">Message</string>
 
 </resources>

@@ -6,5 +6,5 @@
         android:title="@string/mention"/>
     <item
         android:id="@+id/fragment_userlist_cab_pm"
-        android:title="@string/private_message_short"/>
+        android:title="@string/private_message_short_form"/>
 </menu>

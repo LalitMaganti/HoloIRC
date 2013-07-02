@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
@@ -53,5 +54,14 @@ public class PMFragment extends IRCFragment {
             }
             return null;
         }
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName)
+                .getUserChannelDao().getUser(getTitle()).getBuffer();
+        writeToTextView(buffer);
     }
 }

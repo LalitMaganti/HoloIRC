@@ -140,7 +140,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             mIRCPagerAdapter.addView(fragment);
             addTab(builder.getTitle());
 
-            if (bot != null && bot.getStatus().equals("Connected")) {
+            if (bot != null && bot.getStatus().equals(getString(R.string.status_connected))) {
                 for (final Channel channelName : bot.getUserBot().getChannels()) {
                     onNewChannelJoined(channelName.getName(), channelName.getUserList());
                 }
@@ -183,7 +183,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.actions_fragment);
             final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-            arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
+            arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus()
+                    .equals(getString(R.string.status_connected)));
             arrayAdapter.notifyDataSetChanged();
         }
     };

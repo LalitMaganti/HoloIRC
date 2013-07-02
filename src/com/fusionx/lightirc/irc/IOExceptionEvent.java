@@ -18,6 +18,7 @@ public class IOExceptionEvent<T extends PircBotX> extends Event<T> {
 
     @Override
     public void respond(String response) {
-        // do nothing
+        // invalid
+        throw new UnsupportedOperationException();
     }
 }
