@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="Light" parent="@android:style/Theme.Holo.Light.DarkActionBar">
         <item name="android:homeAsUpIndicator">@drawable/ic_light_drawer</item>
         <item name="server_card_background">@color/server_card_background_light</item>

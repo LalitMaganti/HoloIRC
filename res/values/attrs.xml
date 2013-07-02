@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="server_card_background" format="reference|color" />
+    <attr name="server_card_background" format="reference|color"/>
 </resources>

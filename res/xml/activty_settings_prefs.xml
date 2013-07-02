@@ -32,7 +32,7 @@
             android:key="pref_auto_nick"
             android:defaultValue="true"
             android:title="Auto-change nick name"
-            android:summary="If someone else is using your preferred nick another will automatically be used" />
+            android:summary="If someone else is using your preferred nick another will automatically be used"/>
         <PreferenceScreen
             android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"

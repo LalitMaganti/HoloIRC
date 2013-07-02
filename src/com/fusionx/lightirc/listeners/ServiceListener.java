@@ -116,7 +116,7 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onAction(final ActionEvent<PircBotX> event) {
-        if(event.getChannel() == null) {
+        if (event.getChannel() == null) {
             event.getUser().appendToBuffer(EventParser.getOutputForEvent(event));
 
             if (!event.getUser().equals(event.getBot().getUserBot())) {

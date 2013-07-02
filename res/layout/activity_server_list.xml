@@ -14,6 +14,6 @@
               android:fadingEdge="none"
               android:dividerHeight="16dp"
               android:padding="16dp"
-              android:scrollbarStyle="outsideOverlay" />
+              android:scrollbarStyle="outsideOverlay"/>
 
 </LinearLayout>

@@ -96,7 +96,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpListView() {
         final ListView listView = (ListView) findViewById(R.id.server_list);
         mServerCardsAdapter = new BuilderAdapter(mService, this);
-        SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
+        final SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
                 = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
         swingBottomInAnimationAdapter.setAbsListView(listView);
 
@@ -126,12 +126,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void displaySettings() {
-        Intent intent = new Intent(MainServerListActivity.this, SettingsActivity.class);
+        final Intent intent = new Intent(MainServerListActivity.this, SettingsActivity.class);
         startActivity(intent);
     }
 
     private void addNewServer() {
-        Intent intent = new Intent(MainServerListActivity.this, ServerSettingsActivity.class);
+        final Intent intent = new Intent(MainServerListActivity.this, ServerSettingsActivity.class);
         intent.putExtra("new", true);
 
         final ArrayList<String> array = getListOfServersFromPrefsFiles();

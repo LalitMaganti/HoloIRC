@@ -37,7 +37,7 @@ public class EventParser {
             return event.getNotice() + "\n";
         } else if (e instanceof ActionEvent) {
             final ActionEvent event = (ActionEvent) e;
-            if(event.getChannel() == null) {
+            if (event.getChannel() == null) {
                 return "* " + event.getUser().getColourfulNick() + " " + event.getAction() + "\n";
             } else {
                 return "* " + event.getUser().getPrettyNick(event.getChannel())

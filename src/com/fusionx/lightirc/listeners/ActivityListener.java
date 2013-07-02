@@ -147,7 +147,7 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onAction(final ActionEvent<PircBotX> event) {
-        if(event.getChannel() == null) {
+        if (event.getChannel() == null) {
             onPrivateEvent(event.getUser(), event.getAction(), event);
         } else {
             sendMessage(event.getChannel().getName(), event);

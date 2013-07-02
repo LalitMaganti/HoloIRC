@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <plurals name="user_selectioon">
-            <item quantity="one">1 user selected</item>
-            <item quantity="other">%d users selected</item>
-        </plurals>
+    <plurals name="user_selectioon">
+        <item quantity="one">1 user selected</item>
+        <item quantity="other">%d users selected</item>
+    </plurals>
 </resources>
