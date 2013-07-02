@@ -109,8 +109,7 @@ public class ActivityListener extends GenericListener {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mActivity.onNewChannelJoined(joinevent.getChannel().getName(),
-                        EventParser.getOutputForEvent(event), null);
+                mActivity.onNewChannelJoined(joinevent.getChannel().getName(), null);
             }
         });
     }
@@ -223,15 +222,14 @@ public class ActivityListener extends GenericListener {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
+                final IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
                 if (fragment != null) {
-                    PMFragment pm = (PMFragment) fragment;
+                    final PMFragment pm = (PMFragment) fragment;
                     if (!event.getMessage().equals("")) {
                         pm.appendToTextView(EventParser.getOutputForEvent(event));
                     }
                 } else {
-                    mActivity.onNewPrivateMessage(event.getUser().getNick(),
-                            EventParser.getOutputForEvent(event));
+                    mActivity.onNewPrivateMessage(event.getUser().getNick());
                 }
             }
         });
@@ -242,13 +240,14 @@ public class ActivityListener extends GenericListener {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
+                final IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
                 if (fragment != null) {
-                    PMFragment pm = (PMFragment) fragment;
-                    pm.appendToTextView(EventParser.getOutputForEvent(event));
+                    final PMFragment pm = (PMFragment) fragment;
+                    if (!event.getAction().equals("")) {
+                        pm.appendToTextView(EventParser.getOutputForEvent(event));
+                    }
                 } else {
-                    mActivity.onNewPrivateMessage(event.getUser().getNick(),
-                            EventParser.getOutputForEvent(event));
+                    mActivity.onNewPrivateMessage(event.getUser().getNick());
                 }
             }
         });
@@ -268,8 +267,8 @@ public class ActivityListener extends GenericListener {
     }
 
     private boolean checkChannelFragment(String keyName) {
-        int position = mViewPager.getCurrentItem();
-        IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
+        final int position = mViewPager.getCurrentItem();
+        final IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
         return frag.getTitle().equals(keyName);
     }
 

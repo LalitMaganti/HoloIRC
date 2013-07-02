@@ -22,15 +22,14 @@ public class UserListFragment extends ListFragment
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
-                new ArrayList<String>());
+        final UserListAdapter adapter = new UserListAdapter(inflater.getContext(), new ArrayList<String>());
         setListAdapter(adapter);
 
         return view;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -71,7 +70,7 @@ public class UserListFragment extends ListFragment
                 return true;
             case R.id.fragment_userlist_cab_pm:
                 final String nick = Utils.stripPrefixFromNick(String.valueOf(Html.fromHtml((String) positions.toArray()[0])));
-                ((ServerChannelActivity) getActivity()).onNewPrivateMessage(nick, "");
+                ((ServerChannelActivity) getActivity()).onNewPrivateMessage(nick);
                 mode.finish();
                 ((ServerChannelActivity) getActivity()).closeAllSlidingMenus();
                 return true;

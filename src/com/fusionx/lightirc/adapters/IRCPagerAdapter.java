@@ -58,13 +58,13 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     @Override
     public void destroyItem(final ViewGroup container, final int position, final Object object) {
-        Fragment fragment = (Fragment)object;
+        Fragment fragment = (Fragment) object;
 
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
         if (DEBUG) Log.v(TAG, "Removing item #" + position + ": f=" + object
-                + " v=" + ((Fragment)object).getView());
+                + " v=" + ((Fragment) object).getView());
         while (mSavedState.size() <= position) {
             mSavedState.add(null);
         }
@@ -239,7 +239,7 @@ public class IRCPagerAdapter extends PagerAdapter {
             if (i.getTitle() != null) {
                 if (i.getTitle().equals(title)) {
                     int indexofi = views.indexOf(i);
-                    if(indexofi == currentItemIndex || indexofi == (currentItemIndex - 1)
+                    if (indexofi == currentItemIndex || indexofi == (currentItemIndex - 1)
                             || indexofi == (currentItemIndex + 1)) {
                         return i;
                     }

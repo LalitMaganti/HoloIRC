@@ -115,38 +115,34 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
-
             parser.setService(service);
-
-            final Bundle bundle = new Bundle();
-            bundle.putString("title", builder.getTitle());
 
             mListener.setArrayAdapter((UserListAdapter) mUserFragment.getListAdapter());
 
             final ServerFragment fragment = new ServerFragment();
+            final Bundle bundle = new Bundle();
+            bundle.putString("title", builder.getTitle());
+            fragment.setArguments(bundle);
 
+            PircBotX bot = null;
             if (service.getBot(builder.getTitle()) != null) {
-                PircBotX bot = service.getBot(builder.getTitle());
+                bot = service.getBot(builder.getTitle());
                 bot.getConfiguration().getListenerManager().addListener(mListener);
-                bundle.putString("buffer", bot.getBuffer());
-                fragment.setArguments(bundle);
-                mIRCPagerAdapter.addView(fragment);
-                addTab(builder.getTitle());
-
-                if (service.getBot(builder.getTitle()).getStatus().equals("Connected")) {
-                    for (final Channel channelName : bot.getUserBot().getChannels()) {
-                        onNewChannelJoined(channelName.getName(), channelName.getBuffer(), channelName.getUserList());
-                    }
-                    for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
-                        onNewPrivateMessage(user.getNick(), user.getBuffer());
-                    }
-                }
             } else {
                 builder.getListenerManager().addListener(mListener);
                 service.connectToServer(builder);
-                fragment.setArguments(bundle);
-                mIRCPagerAdapter.addView(fragment);
-                addTab(builder.getTitle());
+            }
+
+            mIRCPagerAdapter.addView(fragment);
+            addTab(builder.getTitle());
+
+            if (bot != null && bot.getStatus().equals("Connected")) {
+                for (final Channel channelName : bot.getUserBot().getChannels()) {
+                    onNewChannelJoined(channelName.getName(), channelName.getUserList());
+                }
+                for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
+                    onNewPrivateMessage(user.getNick());
+                }
             }
         }
 
@@ -213,31 +209,6 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         setSpinnerSelectedNavigationItem(position);
     }
 
-    private void userListUpdate() {
-        final ChannelFragment fragment = (ChannelFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
-        final UserListAdapter adapter = ((UserListAdapter) mUserFragment.getListAdapter());
-        adapter.clear();
-
-        final ArrayList<String> userList = fragment.getUserList();
-        if (userList != null) {
-            adapter.addAll(userList);
-            adapter.sort();
-        }
-    }
-
-    public void userListMention(final Set<String> users) {
-        for (String userNick : users) {
-            final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
-            String edit = channel.getEditText().getText().toString();
-            edit = Html.fromHtml(userNick) + ": " + edit;
-            channel.getEditText().setText("");
-            channel.getEditText().append(edit);
-            channel.getEditText().requestFocus();
-        }
-
-        mUserSlidingMenu.showContent();
-    }
-
     // Tab change listeners
     @Override
     public void onTabReselected(final Tab tab, final FragmentTransaction ft) {
@@ -260,13 +231,11 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         }
     }
 
-    public void onNewChannelJoined(final String channelName,
-                                   final String buffer, final ArrayList<String> userList) {
+    public void onNewChannelJoined(final String channelName, final ArrayList<String> userList) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("channel", channelName);
         bundle.putString("serverName", builder.getTitle());
-        bundle.putString("buffer", buffer);
         bundle.putStringArrayList("userList", userList);
         channel.setArguments(bundle);
 
@@ -279,11 +248,10 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         }
     }
 
-    public void onNewPrivateMessage(final String userNick, final String buffer) {
+    public void onNewPrivateMessage(final String userNick) {
         final PMFragment pmFragment = new PMFragment();
         final Bundle b = new Bundle();
         b.putString("serverName", builder.getTitle());
-        b.putString("buffer", buffer);
         b.putString("nick", userNick);
         pmFragment.setArguments(b);
 
@@ -388,6 +356,46 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         return super.onOptionsItemSelected(item);
     }
 
+    // Sliding Menu
+    @Override
+    public void onOpen() {
+        final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.actions_fragment);
+        final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
+        arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    public void closeAllSlidingMenus() {
+        mActionsSlidingMenu.showContent();
+        mUserSlidingMenu.showContent();
+    }
+
+    private void userListUpdate() {
+        final ChannelFragment fragment = (ChannelFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
+        final UserListAdapter adapter = ((UserListAdapter) mUserFragment.getListAdapter());
+        adapter.clear();
+
+        final ArrayList<String> userList = fragment.getUserList();
+        if (userList != null) {
+            adapter.addAll(userList);
+            adapter.sort();
+        }
+    }
+
+    public void userListMention(final Set<String> users) {
+        for (String userNick : users) {
+            final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
+            String edit = channel.getEditText().getText().toString();
+            edit = Html.fromHtml(userNick) + ": " + edit;
+            channel.getEditText().clearComposingText();
+            channel.getEditText().append(edit);
+            channel.getEditText().requestFocus();
+        }
+
+        mUserSlidingMenu.showContent();
+    }
+
     // Hack for http://code.google.com/p/android/issues/detail?id=38500
     private void setSpinnerSelectedNavigationItem(final int position) {
         try {
@@ -416,19 +424,5 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         } catch (final Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onOpen() {
-        final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.actions_fragment);
-        ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-        arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
-        arrayAdapter.notifyDataSetChanged();
-    }
-
-    public void closeAllSlidingMenus() {
-        mActionsSlidingMenu.showContent();
-        mUserSlidingMenu.showContent();
     }
 }

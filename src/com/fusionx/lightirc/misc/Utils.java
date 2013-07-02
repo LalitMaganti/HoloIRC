@@ -12,7 +12,7 @@ public class Utils {
     }
 
     public static String stripPrefixFromNick(final String nick) {
-        if(nick.startsWith("@") || nick.startsWith("+")) {
+        if (nick.startsWith("@") || nick.startsWith("+")) {
             return nick.substring(1);
         } else {
             return nick;

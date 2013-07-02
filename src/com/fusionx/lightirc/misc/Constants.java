@@ -27,6 +27,7 @@ public class Constants {
     public final static String URL = "pref_url";
     public final static String Port = "pref_port";
     public final static String Nick = "pref_nick";
+    public final static String AutoNickChange = "pref_auto_nick";
 
     public final static String ServerUserName = "pref_login_username";
     public final static String ServerPassword = "pref_login_password";

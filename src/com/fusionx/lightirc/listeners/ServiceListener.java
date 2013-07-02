@@ -53,6 +53,11 @@ public class ServiceListener extends GenericListener {
     @Override
     public void onDisconnect(final DisconnectEvent event) {
         event.getBot().setStatus("Disconnected");
+        service.getBotManager().remove(event.getBot());
+        if (service.getBotManager().keySet().isEmpty()) {
+            service.stopForeground(true);
+            service.stopSelf();
+        }
     }
 
     // Server stuff

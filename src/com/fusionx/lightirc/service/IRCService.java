@@ -41,6 +41,8 @@ import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
 import com.fusionx.lightirc.misc.LightThread;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.pircbotx.Channel;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
@@ -55,13 +57,11 @@ public class IRCService extends Service {
         }
     }
 
-    private final LightManager manager = new LightManager();
+    @Getter(AccessLevel.PUBLIC)
+    private final LightManager botManager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
 
     public void connectToServer(final Configuration.Builder server) {
-        // TODO - setup option for this
-        server.setAutoNickChange(true);
-
         final LightBotFactory factory = new LightBotFactory();
         factory.setApplicationContext(getApplicationContext());
         server.setBotFactory(factory);
@@ -76,7 +76,7 @@ public class IRCService extends Service {
 
         final LightThread thread = new LightThread(bot);
         thread.start();
-        manager.put(server.getTitle(), thread);
+        botManager.put(server.getTitle(), thread);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -104,7 +104,7 @@ public class IRCService extends Service {
     }
 
     private void disconnectAll() {
-        manager.disconnectAll();
+        botManager.disconnectAll();
         stopForeground(true);
         stopSelf();
         Intent intent = new Intent("serviceStopped");
@@ -122,22 +122,22 @@ public class IRCService extends Service {
             if (getBot(strings[0]).getStatus().equals("Connected")) {
                 getBot(strings[0]).shutdown();
             } else {
-                manager.get(strings[0]).interrupt();
+                botManager.get(strings[0]).interrupt();
             }
             return strings[0];
         }
 
         @Override
         protected void onPostExecute(final String strings) {
-            manager.remove(strings);
+            botManager.remove(strings);
             stopForeground(true);
             stopSelf();
         }
     }
 
     public PircBotX getBot(final String serverName) {
-        if (manager.get(serverName) != null) {
-            return manager.get(serverName).getBot();
+        if (botManager.get(serverName) != null) {
+            return botManager.get(serverName).getBot();
         } else {
             return null;
         }

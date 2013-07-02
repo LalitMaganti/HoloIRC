@@ -28,18 +28,18 @@
             android:title="Nick name"
             android:singleLine="true"
             android:lines="1"/>
+        <CheckBoxPreference
+            android:key="pref_auto_nick"
+            android:defaultValue="true"
+            android:title="Auto-change nick name"
+            android:summary="If someone else is using your preferred nick another will automatically be used" />
         <PreferenceScreen
             android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
             android:title="Auto-join channels"/>
-        <!--<CheckBoxPreference
-            android:key="pref_auto_nick"
-            android:defaultValue="false"
-            android:title="Auto-change nick name"
-            android:summary="If someone else is using your preferred nick another will automatically be used" />-->
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Login info - normally no need to edit this section">
+    <PreferenceCategory android:title="Server Login - normally no need to edit this">
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
             android:defaultValue="lightirc"
             android:key="pref_login_username"

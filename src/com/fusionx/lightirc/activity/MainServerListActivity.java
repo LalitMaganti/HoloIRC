@@ -175,6 +175,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             bot.setName(serverSettings.getString(Constants.Nick, ""));
             bot.setLogin(serverSettings.getString(Constants.ServerUserName, "lightirc"));
             bot.setServerPassword(serverSettings.getString(Constants.ServerPassword, ""));
+            bot.setAutoNickChange(serverSettings.getBoolean(Constants.AutoNickChange, true));
 
             final String nickServPassword = serverSettings.getString(Constants
                     .NickServPassword, null);
@@ -203,7 +204,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void firstRunAdditions() {
-        SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
+        final SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
         final Editor e = settings.edit();
 
         e.putString(Constants.Title, "Freenode");
@@ -211,8 +212,9 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         e.putString(Constants.Port, "6667");
         e.putString(Constants.Nick, "LightIRCUser");
         e.putString(Constants.ServerUserName, "lightirc");
+        e.putBoolean(Constants.AutoNickChange, true);
 
-        HashSet<String> auto = new HashSet<String>();
+        final HashSet<String> auto = new HashSet<String>();
         e.putStringSet(Constants.AutoJoin, auto);
         e.commit();
     }
