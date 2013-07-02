@@ -84,4 +84,13 @@ public class ChannelFragment extends IRCFragment {
             return null;
         }
     }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        final String buffer = ((ServerChannelActivity) getActivity()).getService().getBot(serverName)
+                .getUserChannelDao().getChannel(getTitle()).getBuffer();
+        writeToTextView(buffer);
+    }
 }

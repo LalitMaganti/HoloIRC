@@ -71,4 +71,13 @@ public class PMFragment extends IRCFragment {
             return null;
         }
     }
+
+    @Override
+    public void onViewStateRestored(final Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        final String buffer = ((ServerChannelActivity) getActivity()).getService().getBot(serverName)
+                .getUserChannelDao().getChannel(getTitle()).getBuffer();
+        writeToTextView(buffer);
+    }
 }

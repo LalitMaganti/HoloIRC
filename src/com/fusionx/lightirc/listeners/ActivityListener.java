@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.listeners;
 
-import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import com.fusionx.lightirc.activity.ServerChannelActivity;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
@@ -69,7 +68,7 @@ public class ActivityListener extends GenericListener {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                server.writeToTextView(event.getException().getMessage());
+                server.appendToTextView(event.getException().getMessage());
             }
         });
     }
@@ -81,7 +80,7 @@ public class ActivityListener extends GenericListener {
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                server.writeToTextView(EventParser.getOutputForEvent(event));
+                server.appendToTextView(EventParser.getOutputForEvent(event));
             }
         });
     }
@@ -97,7 +96,7 @@ public class ActivityListener extends GenericListener {
             mActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    server.writeToTextView(EventParser.getOutputForEvent(event));
+                    server.appendToTextView(EventParser.getOutputForEvent(event));
                 }
             });
         }
@@ -112,27 +111,6 @@ public class ActivityListener extends GenericListener {
             public void run() {
                 mActivity.onNewChannelJoined(joinevent.getChannel().getName(),
                         EventParser.getOutputForEvent(event), null);
-            }
-        });
-    }
-
-    @Override
-    public void onTopic(final TopicEvent<PircBotX> event) {
-        final String channelName = ((TopicEvent) event).getChannel().getName();
-
-        mActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
-                        if (channel != null) {
-                            channel.writeToTextView(EventParser.getOutputForEvent(event));
-                        }
-                    }
-                }, 750);
             }
         });
     }
@@ -249,7 +227,7 @@ public class ActivityListener extends GenericListener {
                 if (fragment != null) {
                     PMFragment pm = (PMFragment) fragment;
                     if (!event.getMessage().equals("")) {
-                        pm.writeToTextView(EventParser.getOutputForEvent(event));
+                        pm.appendToTextView(EventParser.getOutputForEvent(event));
                     }
                 } else {
                     mActivity.onNewPrivateMessage(event.getUser().getNick(),
@@ -267,7 +245,7 @@ public class ActivityListener extends GenericListener {
                 IRCFragment fragment = privateMessageCheck(event.getUser().getNick());
                 if (fragment != null) {
                     PMFragment pm = (PMFragment) fragment;
-                    pm.writeToTextView(EventParser.getOutputForEvent(event));
+                    pm.appendToTextView(EventParser.getOutputForEvent(event));
                 } else {
                     mActivity.onNewPrivateMessage(event.getUser().getNick(),
                             EventParser.getOutputForEvent(event));
@@ -283,7 +261,7 @@ public class ActivityListener extends GenericListener {
             public void run() {
                 final IRCFragment channel = mIRCPagerAdapter.getTab(title);
                 if (channel != null) {
-                    channel.writeToTextView(EventParser.getOutputForEvent(event));
+                    channel.appendToTextView(EventParser.getOutputForEvent(event));
                 }
             }
         });

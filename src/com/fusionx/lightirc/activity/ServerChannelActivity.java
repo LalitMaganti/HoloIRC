@@ -192,6 +192,8 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         mUserSlidingMenu.showContent();
         mActionsSlidingMenu.showContent();
 
+        mIRCPagerAdapter.setCurrentItemIndex(position);
+
         if (mIRCPagerAdapter.getItem(position).getView() != null) {
             final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
                     .getItem(position).getView().findViewById(R.id.scrollview);
@@ -251,10 +253,6 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
     }
 
     // New stuff
-    private void sendPrivateMessage(final String nick) {
-        getService().getBot(nick).sendIRC().message(nick, "");
-    }
-
     private void addTab(final String title) {
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
@@ -279,8 +277,6 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         if (mentionString.equals(channelName)) {
             mViewPager.setCurrentItem(position, true);
         }
-
-        mViewPager.setOffscreenPageLimit(position);
     }
 
     public void onNewPrivateMessage(final String userNick, final String buffer) {
@@ -298,8 +294,6 @@ public class ServerChannelActivity extends FragmentActivity implements TabListen
         if (mentionString.equals(userNick)) {
             mViewPager.setCurrentItem(position, true);
         }
-
-        mViewPager.setOffscreenPageLimit(position);
     }
 
     // Removal stuff

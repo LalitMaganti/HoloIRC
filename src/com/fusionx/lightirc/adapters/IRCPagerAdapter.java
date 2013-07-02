@@ -31,6 +31,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.fusionx.lightirc.fragments.IRCFragment;
+import lombok.AccessLevel;
+import lombok.Setter;
 
 import java.util.ArrayList;
 
@@ -47,22 +49,27 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     private final ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
 
+    @Setter(AccessLevel.PUBLIC)
+    private int currentItemIndex;
+
     public IRCPagerAdapter(final FragmentManager fm) {
         mFragmentManager = fm;
     }
 
     @Override
     public void destroyItem(final ViewGroup container, final int position, final Object object) {
-        final Fragment fragment = (Fragment) object;
+        Fragment fragment = (Fragment)object;
 
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
-        if (DEBUG)
-            Log.v(TAG, "Removing item #" + position + ": f=" + object + " v="
-                    + ((Fragment) object).getView());
-
-        mFragments.remove(position);
+        if (DEBUG) Log.v(TAG, "Removing item #" + position + ": f=" + object
+                + " v=" + ((Fragment)object).getView());
+        while (mSavedState.size() <= position) {
+            mSavedState.add(null);
+        }
+        mSavedState.set(position, mFragmentManager.saveFragmentInstanceState(fragment));
+        mFragments.set(position, null);
 
         mCurTransaction.remove(fragment);
     }
@@ -231,7 +238,11 @@ public class IRCPagerAdapter extends PagerAdapter {
         for (IRCFragment i : views) {
             if (i.getTitle() != null) {
                 if (i.getTitle().equals(title)) {
-                    return i;
+                    int indexofi = views.indexOf(i);
+                    if(indexofi == currentItemIndex || indexofi == (currentItemIndex - 1)
+                            || indexofi == (currentItemIndex + 1)) {
+                        return i;
+                    }
                 }
             }
         }

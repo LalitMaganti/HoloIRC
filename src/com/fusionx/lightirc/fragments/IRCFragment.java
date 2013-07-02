@@ -57,15 +57,14 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
         getEditText().setOnEditorActionListener(this);
 
-        String buffer = getArguments().getString("buffer");
-        if (buffer != null) {
-            writeToTextView(buffer);
-        }
-
         return rootView;
     }
 
-    public void writeToTextView(final String text) {
+    public void appendToTextView(final String text) {
         textView.append(Html.fromHtml(text.replace("\n", "<br/>")));
+    }
+
+    public void writeToTextView(final String text) {
+        textView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
     }
 }
