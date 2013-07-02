@@ -25,7 +25,6 @@ import com.fusionx.lightirc.irc.IOExceptionEvent;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
-import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 public class EventParser {
@@ -38,8 +37,12 @@ public class EventParser {
             return event.getNotice() + "\n";
         } else if (e instanceof ActionEvent) {
             final ActionEvent event = (ActionEvent) e;
-            return "* " + event.getUser().getPrettyNick(event.getChannel())
-                    + " " + event.getAction() + "\n";
+            if(event.getChannel() == null) {
+                return "* " + event.getUser().getColourfulNick() + " " + event.getAction() + "\n";
+            } else {
+                return "* " + event.getUser().getPrettyNick(event.getChannel())
+                        + " " + event.getAction() + "\n";
+            }
         } else if (e instanceof JoinEvent) {
             JoinEvent event = (JoinEvent) e;
             return event.getUser().getPrettyNick(event.getChannel()) + " entered the room\n";
@@ -59,9 +62,6 @@ public class EventParser {
             return nickChangeEventOutput((NickChangeEventPerChannel) e);
         } else if (e instanceof PrivateMessageEvent) {
             return privateMessageEventOutput((PrivateMessageEvent) e);
-        } else if (e instanceof PrivateActionEvent) {
-            final PrivateActionEvent event = (PrivateActionEvent) e;
-            return "* " + event.getUser().getColourfulNick() + " " + event.getMessage() + "\n";
         } else if (e instanceof IOExceptionEvent) {
             final IOExceptionEvent event = (IOExceptionEvent) e;
             return event.getException().getMessage() + "\nTrying to reconnect in 5 seconds\n";

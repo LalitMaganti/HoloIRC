@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.fragments;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
@@ -29,28 +30,53 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
         final PircBotX bot = service.getBot(((IRCFragmentActivity) getActivity()).getBuilder().getTitle());
         switch (i) {
             case 0:
-                final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
-                    @Override
-                    public void onOkClicked(final String input) {
-                        bot.sendIRC().joinChannel(input);
-                        ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
-                    }
-                };
-                dialog.show();
+                channelNameDialog(bot);
                 break;
             case 1:
-                final NickPromptDialog nickDialog = new NickPromptDialog(getActivity(), bot.getNick()) {
-                    @Override
-                    public void onOkClicked(final String input) {
-                        bot.sendIRC().changeNick(input);
-                        ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
-                    }
-                };
-                nickDialog.show();
+                nickChangeDialog(bot);
                 break;
             case 2:
                 ((IRCFragmentActivity) getActivity()).disconnect();
                 break;
         }
+    }
+
+    private void nickChangeDialog(final PircBotX bot) {
+        final NickPromptDialog nickDialog = new NickPromptDialog(getActivity(), bot.getNick()) {
+            @Override
+            public void onOkClicked(final String input) {
+                final DialogTask ChangeNickTask = new DialogTask() {
+                    @Override
+                    protected Void doInBackground(Void... objects) {
+                        bot.sendIRC().changeNick(input);
+                        return null;
+                    }
+                };
+                ChangeNickTask.execute();
+                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
+            }
+        };
+        nickDialog.show();
+    }
+
+    private void channelNameDialog(final PircBotX bot) {
+        final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
+            @Override
+            public void onOkClicked(final String input) {
+                final DialogTask JoinTask = new DialogTask() {
+                    @Override
+                    protected Void doInBackground(Void... objects) {
+                        bot.sendIRC().joinChannel(input);
+                        return null;
+                    }
+                };
+                JoinTask.execute();
+                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
+            }
+        };
+        dialog.show();
+    }
+
+    private abstract class DialogTask extends AsyncTask<Void, Void, Void> {
     }
 }

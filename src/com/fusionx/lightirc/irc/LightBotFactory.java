@@ -17,7 +17,7 @@ public class LightBotFactory extends Configuration.BotFactory {
     }
 
     @Override
-    public User createUser(final PircBotX bot, String nick) {
+    public User createUser(final PircBotX bot, final String nick) {
         if (Utils.getThemeInt(applicationContext) == R.style.Light) {
             return new User(bot, bot.getUserChannelDao(), nick, 0);
         } else {

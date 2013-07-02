@@ -62,7 +62,7 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
         setTitle(getArguments().getString("title"));
 
-        if(getArguments().getString("serverName") != null) {
+        if (getArguments().getString("serverName") != null) {
             serverName = getArguments().getString("serverName");
         } else {
             serverName = getTitle();

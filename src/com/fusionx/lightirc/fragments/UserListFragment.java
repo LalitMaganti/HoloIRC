@@ -14,8 +14,8 @@ import com.fusionx.lightirc.misc.Utils;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class UserListFragment extends ListFragment
-        implements AbsListView.MultiChoiceModeListener, AdapterView.OnItemClickListener {
+public class UserListFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
+        AdapterView.OnItemClickListener {
     private boolean modeStarted;
 
     public View onCreateView(final LayoutInflater inflater,
@@ -41,12 +41,16 @@ public class UserListFragment extends ListFragment
     public void onItemCheckedStateChanged(final ActionMode mode, final int position,
                                           final long id, final boolean checked) {
         mode.invalidate();
+
+        final UserListAdapter adapter = ((UserListAdapter) getListView().getAdapter());
+
         if (checked) {
-            ((UserListAdapter) getListView().getAdapter()).addSelection(position);
+            adapter.addSelection(position);
         } else {
-            ((UserListAdapter) getListView().getAdapter()).removeSelection(position);
+            adapter.removeSelection(position);
         }
-        int selectedItemCount = ((UserListAdapter) getListView().getAdapter()).getSelectedItems().size();
+
+        int selectedItemCount = adapter.getSelectedItems().size();
 
         if (selectedItemCount != 0) {
             final String quantityString = getResources().getQuantityString(R.plurals.user_selectioon,
@@ -81,7 +85,7 @@ public class UserListFragment extends ListFragment
 
     @Override
     public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        MenuInflater inflater = mode.getMenuInflater();
+        final MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.fragment_userlist_cab, menu);
 
         modeStarted = true;
@@ -105,6 +109,7 @@ public class UserListFragment extends ListFragment
         if (!modeStarted) {
             getActivity().startActionMode(this);
         }
+
         boolean checked = ((UserListAdapter) getListView().getAdapter()).getSelectedItems()
                 .contains(((UserListAdapter) getListView().getAdapter()).getItem(i));
         getListView().setItemChecked(i, !checked);

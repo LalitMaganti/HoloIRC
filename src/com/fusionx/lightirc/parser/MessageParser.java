@@ -27,7 +27,6 @@ import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
-import org.pircbotx.hooks.events.lightirc.PrivateActionEvent;
 import org.pircbotx.hooks.managers.ListenerManager;
 
 public class MessageParser {
@@ -86,7 +85,7 @@ public class MessageParser {
             if (parsedArray[0].startsWith("/me")) {
                 final User user = bot.getUserChannelDao().getUser(userNick);
                 String action = message.replace("/me ", "");
-                manager.dispatchEvent(new PrivateActionEvent<PircBotX>(bot, user, message));
+                manager.dispatchEvent(new ActionEvent<PircBotX>(bot, user, null, message));
                 user.send().action(action);
             } else {
                 serverCommandToParse(parsedArray, bot);

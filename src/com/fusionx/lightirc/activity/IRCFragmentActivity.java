@@ -43,7 +43,8 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.fragments.*;
+import com.fusionx.lightirc.fragments.ServerChannelActionsFragment;
+import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
@@ -64,8 +65,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class IRCFragmentActivity extends FragmentActivity implements TabListener,
-        OnPageChangeListener, SlidingMenu.OnOpenListener {
+public class IRCFragmentActivity extends FragmentActivity implements TabListener, OnPageChangeListener {
     private UserListFragment mUserFragment;
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
@@ -160,22 +160,33 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mUserSlidingMenu = new SlidingMenu(this);
         mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
         mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mUserSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         mUserSlidingMenu.setMenu(R.layout.slding_menu_fragment_user);
+        mUserSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 
         mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
 
         mActionsSlidingMenu = new SlidingMenu(this);
         mActionsSlidingMenu.setMode(SlidingMenu.LEFT);
         mActionsSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         mActionsSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
         mActionsSlidingMenu.setTouchmodeMarginThreshold(3);
         mActionsSlidingMenu.setMenu(R.layout.sliding_menu_fragment_actions);
         mActionsSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
-        mActionsSlidingMenu.setOnOpenListener(this);
+        mActionsSlidingMenu.setOnOpenListener(actionsSlidingOpenListener);
+        mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
     }
+
+    private final SlidingMenu.OnOpenListener actionsSlidingOpenListener = new SlidingMenu.OnOpenListener() {
+        @Override
+        public void onOpen() {
+            final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.actions_fragment);
+            final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
+            arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
+            arrayAdapter.notifyDataSetChanged();
+        }
+    };
 
     // Page change stuff
     @Override
@@ -189,8 +200,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     @Override
     public void onPageSelected(final int position) {
         invalidateOptionsMenu();
-        mUserSlidingMenu.showContent();
-        mActionsSlidingMenu.showContent();
+        closeAllSlidingMenus();
 
         mIRCPagerAdapter.setCurrentItemIndex(position);
 
@@ -215,12 +225,12 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
     // Tab change listeners
     @Override
-    public void onTabReselected(final Tab tab, final FragmentTransaction ft) {
+    public void onTabSelected(final Tab tab, final FragmentTransaction ft) {
+        mViewPager.setCurrentItem(tab.getPosition(), true);
     }
 
     @Override
-    public void onTabSelected(final Tab tab, final FragmentTransaction ft) {
-        mViewPager.setCurrentItem(tab.getPosition(), true);
+    public void onTabReselected(final Tab tab, final FragmentTransaction ft) {
     }
 
     @Override
@@ -281,11 +291,11 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         startActivity(intent);
     }
 
-    private void partChannelOrClosePm(boolean channel) {
-        int index = mViewPager.getCurrentItem();
+    private void closeIRCFragment(final boolean channel) {
+        final int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1, true);
 
-        if(channel) {
+        if (channel) {
             service.partFromChannel(builder.getTitle(), ((ChannelFragment) mIRCPagerAdapter.getItem(index)).getTitle());
         } else {
             service.removePrivateMessage(builder.getTitle(), ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle());
@@ -338,31 +348,23 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
                 mActionsSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_part:
-                partChannelOrClosePm(true);
+                closeIRCFragment(true);
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
                     userListUpdate();
+                    mUserFragment.getListView().smoothScrollToPosition(0);
                 }
                 mUserSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_close:
-                partChannelOrClosePm(false);
+                closeIRCFragment(false);
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     // Sliding Menu
-    @Override
-    public void onOpen() {
-        final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.actions_fragment);
-        final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-        arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus().equals("Connected"));
-        arrayAdapter.notifyDataSetChanged();
-    }
-
     public void closeAllSlidingMenus() {
         mActionsSlidingMenu.showContent();
         mUserSlidingMenu.showContent();
@@ -390,7 +392,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             channel.getEditText().requestFocus();
         }
 
-        mUserSlidingMenu.showContent();
+        closeAllSlidingMenus();
     }
 
     // Hack for http://code.google.com/p/android/issues/detail?id=38500
