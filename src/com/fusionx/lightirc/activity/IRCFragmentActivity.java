@@ -318,6 +318,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
                     service.partFromChannel(builder.getTitle(), fragment.getTitle());
                 } else {
                     service.removePrivateMessage(builder.getTitle(), fragment.getTitle());
+                    final int index = mIRCPagerAdapter.removeView(fragment.getTitle());
+                    removeTab(index);
                 }
                 return null;
             }
