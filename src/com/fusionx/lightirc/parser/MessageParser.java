@@ -22,6 +22,9 @@
 package com.fusionx.lightirc.parser;
 
 import com.fusionx.lightirc.service.IRCService;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -32,15 +35,9 @@ import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.managers.ListenerManager;
 
 public class MessageParser {
-    private IRCService mService;
-
-    private IRCService getService() {
-        return mService;
-    }
-
-    public void setService(final IRCService service) {
-        mService = service;
-    }
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PUBLIC)
+    private IRCService service;
 
     public void channelMessageToParse(final String serverName, final String channelName,
                                       final String message) {

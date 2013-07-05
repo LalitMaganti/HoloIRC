@@ -43,6 +43,11 @@
             android:defaultValue=""
             android:singleLine="true"
             android:lines="1"/>
+        <CheckBoxPreference
+            android:key="pref_ssl"
+            android:defaultValue="false"
+            android:title="Use SSL"
+            android:summary="Use SSL to connect to the server - the port will be different to normal"/>
         <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
             android:key="pref_nick"
             android:defaultValue=""

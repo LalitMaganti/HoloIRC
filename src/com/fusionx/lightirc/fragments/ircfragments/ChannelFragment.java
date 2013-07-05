@@ -57,8 +57,9 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-        if (i == EditorInfo.IME_ACTION_DONE && getEditText().getText() != null) {
-            final String message = getEditText().getText().toString();
+        final CharSequence text = getEditText().getText();
+        if (i == EditorInfo.IME_ACTION_DONE && text != null && !text.equals("")) {
+            final String message = text.toString();
             getEditText().setText("");
 
             final ParserTask task = new ParserTask();

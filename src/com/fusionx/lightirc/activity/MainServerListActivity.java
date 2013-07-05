@@ -46,6 +46,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.pircbotx.Configuration;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -179,12 +181,20 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             bot.setName(serverSettings.getString(Constants.Nick, ""));
             bot.setLogin(serverSettings.getString(Constants.ServerUserName, "lightirc"));
             bot.setServerPassword(serverSettings.getString(Constants.ServerPassword, ""));
-            bot.setAutoNickChange(serverSettings.getBoolean(Constants.AutoNickChange, true));
 
             final String nickServPassword = serverSettings.getString(Constants
                     .NickServPassword, null);
             if (nickServPassword != null && !nickServPassword.equals("")) {
                 bot.setNickservPassword(nickServPassword);
+            }
+
+            bot.setAutoNickChange(serverSettings.getBoolean(Constants.AutoNickChange, true));
+
+            final boolean ssl = serverSettings.getBoolean(Constants.SSL, false);
+            if(ssl) {
+                bot.setSocketFactory(SSLSocketFactory.getDefault());
+            } else {
+                bot.setSocketFactory(SocketFactory.getDefault());
             }
 
             final Set<String> auto = serverSettings.getStringSet(Constants.AutoJoin, new HashSet<String>());
@@ -216,6 +226,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         e.putString(Constants.Nick, "LightIRCUser");
         e.putString(Constants.ServerUserName, "lightirc");
         e.putBoolean(Constants.AutoNickChange, true);
+        e.putBoolean(Constants.SSL, false);
 
         final HashSet<String> auto = new HashSet<String>();
         e.putStringSet(Constants.AutoJoin, auto);
