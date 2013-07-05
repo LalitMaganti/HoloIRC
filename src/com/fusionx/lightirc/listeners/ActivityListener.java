@@ -247,7 +247,8 @@ public class ActivityListener extends GenericListener {
                         pm.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                     }
                 } else {
-                    getActivity().onNewPrivateMessage(user.getNick());
+                    final int position = getActivity().onNewPrivateMessage(user.getNick());
+                    mViewPager.setCurrentItem(position, true);
                 }
             }
         });

@@ -272,7 +272,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         return position;
     }
 
-    public void onNewPrivateMessage(final String userNick) {
+    public int onNewPrivateMessage(final String userNick) {
         final PMFragment pmFragment = new PMFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("serverName", builder.getTitle());
@@ -289,6 +289,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         if (mentionString.equals(userNick)) {
             mViewPager.setCurrentItem(position, true);
         }
+        return position;
     }
 
     // Removal stuff
