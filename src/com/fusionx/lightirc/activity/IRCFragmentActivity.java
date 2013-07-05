@@ -123,30 +123,33 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
             mListener.setArrayAdapter((UserListAdapter) mUserFragment.getListAdapter());
 
+            final PircBotX bot = service.getBot(builder.getTitle());
+            if (bot != null) {
+                bot.getConfiguration().getListenerManager().addListener(mListener);
+                addServerFragment();
+                if (bot.getStatus().equals(getString(R.string.status_connected))) {
+                    for (final Channel channelName : bot.getUserBot().getChannels()) {
+                        onNewChannelJoined(channelName.getName(), channelName.getUserList());
+                    }
+                    for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
+                        onNewPrivateMessage(user.getNick());
+                    }
+                }
+            } else {
+                builder.getListenerManager().addListener(mListener);
+                service.connectToServer(builder);
+                addServerFragment();
+            }
+        }
+
+        private void addServerFragment() {
             final ServerFragment fragment = new ServerFragment();
             final Bundle bundle = new Bundle();
             bundle.putString("title", builder.getTitle());
             fragment.setArguments(bundle);
 
-            final PircBotX bot = service.getBot(builder.getTitle());
-            if (bot != null) {
-                bot.getConfiguration().getListenerManager().addListener(mListener);
-            } else {
-                builder.getListenerManager().addListener(mListener);
-                service.connectToServer(builder);
-            }
-
             mIRCPagerAdapter.addView(fragment);
             addTab(builder.getTitle());
-
-            if (bot != null && bot.getStatus().equals(getString(R.string.status_connected))) {
-                for (final Channel channelName : bot.getUserBot().getChannels()) {
-                    onNewChannelJoined(channelName.getName(), channelName.getUserList());
-                }
-                for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
-                    onNewPrivateMessage(user.getNick());
-                }
-            }
         }
 
         @Override
