@@ -88,6 +88,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             service = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
+            unbindService(this);
         }
 
         @Override

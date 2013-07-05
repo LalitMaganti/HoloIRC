@@ -91,6 +91,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         setContentView(R.layout.activity_server_channel);
         setUpSlidingMenu();
 
+        mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
+
         mentionString = getIntent().getExtras().getString("mention", "");
 
         mIRCPagerAdapter = new IRCPagerAdapter(getSupportFragmentManager());
@@ -100,6 +102,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mViewPager.setOnPageChangeListener(this);
 
         mListener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
+        mListener.setArrayAdapter((UserListAdapter) mUserFragment.getListAdapter());
 
         builder = getIntent().getExtras().getParcelable("server");
 
@@ -120,8 +123,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
             parser.setService(service);
-
-            mListener.setArrayAdapter((UserListAdapter) mUserFragment.getListAdapter());
 
             final PircBotX bot = service.getBot(builder.getTitle());
             if (bot != null) {
@@ -165,8 +166,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         mUserSlidingMenu.setMenu(R.layout.slding_menu_fragment_user);
         mUserSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-
-        mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
 
         mActionsSlidingMenu = new SlidingMenu(this);
         mActionsSlidingMenu.setMode(SlidingMenu.LEFT);

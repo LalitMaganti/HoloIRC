@@ -24,6 +24,7 @@ package com.fusionx.lightirc.fragments.ircfragments;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Html;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,10 +74,12 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     public void appendToTextView(final String text) {
         getTextView().append(Html.fromHtml(text.replace("\n", "<br/>")));
+        Linkify.addLinks(getTextView(), Linkify.ALL);
     }
 
     public void writeToTextView(final String text) {
         getTextView().setText(Html.fromHtml(text.replace("\n", "<br/>")));
+        Linkify.addLinks(getTextView(), Linkify.ALL);
     }
 
     @Override
