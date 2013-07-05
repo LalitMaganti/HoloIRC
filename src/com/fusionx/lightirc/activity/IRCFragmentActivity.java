@@ -114,6 +114,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         service.putExtra("server", true);
         service.putExtra("serverName", builder.getTitle());
         service.putExtra("stop", false);
+        service.putExtra("setBound", builder.getTitle());
         startService(service);
         bindService(service, mConnection, 0);
     }
@@ -327,6 +328,12 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         unbindService(mConnection);
 
         super.onDestroy();
+    }
+
+    @Override
+    public void onPause() {
+        getService().setBoundToIRCFragmentActivity(null);
+        super.onPause();
     }
 
     // Options Menu stuff

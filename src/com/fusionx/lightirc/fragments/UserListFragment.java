@@ -61,8 +61,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     @Override
-    public void onItemCheckedStateChanged(final ActionMode mode, final int position,
-                                          final long id, final boolean checked) {
+    public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id, final boolean checked) {
         mode.invalidate();
 
         final UserListAdapter adapter = ((UserListAdapter) getListView().getAdapter());
@@ -107,8 +106,11 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                     activity.closeAllSlidingMenus();
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
-                    build.setTitle("Not possible").setMessage("You can not PM yourself")
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    build.setTitle(getActivity()
+                            .getString(R.string.user_list_not_possible)).setMessage(getActivity()
+                            .getString(R.string.user_list_pm_self_not_possible))
+                            .setPositiveButton(getActivity()
+                                    .getString(R.string.ok), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     dialogInterface.dismiss();

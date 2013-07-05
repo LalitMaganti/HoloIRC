@@ -33,6 +33,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
@@ -43,6 +44,7 @@ import com.fusionx.lightirc.listeners.ServiceListener;
 import com.fusionx.lightirc.misc.LightThread;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.pircbotx.*;
 import org.pircbotx.output.OutputChannel;
 
@@ -57,6 +59,8 @@ public class IRCService extends Service {
     @Getter(AccessLevel.PUBLIC)
     private final LightManager botManager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
+    @Setter(AccessLevel.PUBLIC)
+    private String boundToIRCFragmentActivity = null;
 
     public void connectToServer(final Configuration.Builder server) {
         final LightBotFactory factory = new LightBotFactory();
@@ -81,7 +85,10 @@ public class IRCService extends Service {
         final Intent intent = new Intent(this, MainServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
-        final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
+        taskStackBuilder.addParentStack(MainServerListActivity.class);
+        taskStackBuilder.addNextIntent(intent);
+        final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
@@ -146,8 +153,11 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (intent != null && intent.getBooleanExtra("stop", false)) {
-            disconnectAll();
+        if(intent != null) {
+            boundToIRCFragmentActivity = intent.getStringExtra("setBound");
+            if (intent.getBooleanExtra("stop", false)) {
+                disconnectAll();
+            }
             return 0;
         } else {
             return START_STICKY;
@@ -156,6 +166,7 @@ public class IRCService extends Service {
 
     @Override
     public boolean onUnbind(final Intent intent) {
+        boundToIRCFragmentActivity = null;
         return true;
     }
 
@@ -180,19 +191,30 @@ public class IRCService extends Service {
     }
 
     public void mention(final String serverName, final String messageDest) {
-        final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
-        mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
-        mIntent.putExtra("mention", messageDest);
-        final PendingIntent pIntent = PendingIntent.getActivity(this, 0, mIntent, 0);
-        final Notification notification = new NotificationCompat.Builder(this)
+        Notification notification;
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.service_you_mentioned))
+                .setContentText(getString(R.string.service_you_mentioned) + " " + messageDest)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pIntent).build();
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+                .setAutoCancel(true)
+                .setTicker(getString(R.string.service_you_mentioned) + " " + messageDest);
+
+        if(!serverName.equals(boundToIRCFragmentActivity)) {
+            final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
+            mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
+            mIntent.putExtra("mention", messageDest);
+            final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
+            taskStackBuilder.addParentStack(IRCFragmentActivity.class);
+            taskStackBuilder.addNextIntent(mIntent);
+            final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            notification = builder.setContentIntent(pIntent).build();
+        } else {
+            notification = builder.build();
+        }
 
         final NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(345, notification);
+        mNotificationManager.cancel(345);
     }
 }

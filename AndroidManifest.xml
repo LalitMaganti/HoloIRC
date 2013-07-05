@@ -27,7 +27,11 @@
         <activity
             android:name=".activity.IRCFragmentActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".activity.MainServerListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MainServerListActivity"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>

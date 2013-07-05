@@ -60,7 +60,11 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Service/notification -->
     <string name="service_one_server_joined">At least one server is joined</string>
     <string name="service_disconnect_all">Disconnect all</string>
-    <string name="service_you_mentioned">You have been mentioned</string>
+    <string name="service_you_mentioned">You have been mentioned on</string>
+
+    <!-- User list fragment -->
+    <string name="user_list_not_possible">Not possible</string>
+    <string name="user_list_pm_self_not_possible">You can not PM yourself</string>
 
     <!-- One word generics -->
     <string name="edit">Edit</string>

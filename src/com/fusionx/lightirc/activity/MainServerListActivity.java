@@ -239,6 +239,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         final Intent intent = new Intent(MainServerListActivity.this,
                 IRCFragmentActivity.class);
         intent.putExtra("server", (Configuration.Builder) v.getTag());
+        service = null;
         startActivity(intent);
     }
 
