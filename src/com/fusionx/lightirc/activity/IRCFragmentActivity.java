@@ -129,9 +129,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             bundle.putString("title", builder.getTitle());
             fragment.setArguments(bundle);
 
-            PircBotX bot = null;
-            if (service.getBot(builder.getTitle()) != null) {
-                bot = service.getBot(builder.getTitle());
+            final PircBotX bot = service.getBot(builder.getTitle());
+            if (bot != null) {
                 bot.getConfiguration().getListenerManager().addListener(mListener);
             } else {
                 builder.getListenerManager().addListener(mListener);
@@ -140,6 +139,13 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
             mIRCPagerAdapter.addView(fragment);
             addTab(builder.getTitle());
+
+            final ScrollView scrollView = (ScrollView) fragment.getView().findViewById(R.id.scrollview);
+            scrollView.post(new Runnable() {
+                public void run() {
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                }
+            });
 
             if (bot != null && bot.getStatus().equals(getString(R.string.status_connected))) {
                 for (final Channel channelName : bot.getUserBot().getChannels()) {
@@ -383,8 +389,9 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             case R.id.activity_server_channel_ab_close:
                 closeIRCFragment(false);
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     // Sliding Menu
