@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
@@ -31,6 +33,8 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.misc.Utils;
+import com.fusionx.lightirc.service.IRCService;
+import org.pircbotx.PircBotX;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -93,10 +97,25 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 activity.closeAllSlidingMenus();
                 return true;
             case R.id.fragment_userlist_cab_pm:
-                final String nick = Utils.stripPrefixFromNick(String.valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
-                activity.onNewPrivateMessage(nick);
-                mode.finish();
-                activity.closeAllSlidingMenus();
+                final String nick = Utils.stripPrefixFromNick(String
+                        .valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
+                final IRCService service = ((IRCFragmentActivity) getActivity()).getService();
+                final PircBotX bot = service.getBot(((IRCFragmentActivity) getActivity()).getBuilder().getTitle());
+                if (!bot.getNick().equals(nick)) {
+                    activity.onNewPrivateMessage(nick);
+                    mode.finish();
+                    activity.closeAllSlidingMenus();
+                } else {
+                    final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
+                    build.setTitle("Not possible").setMessage("You can not PM yourself")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            });
+                    build.show();
+                }
                 return true;
             default:
                 return false;

@@ -47,10 +47,11 @@ public class MessageParser {
         final PircBotX bot = getService().getBot(serverName);
         final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();
         final String parsedArray[] = message.split("\\s+");
+        final String command = parsedArray[0];
 
-        if (parsedArray[0].startsWith("/")) {
+        if (command.startsWith("/")) {
             // TODO parse this string fully
-            if (parsedArray[0].equals("/me")) {
+            if (command.equals("/me")) {
                 final String action = parsedArray[1];
                 // TODO - input validation
                 manager.dispatchEvent(new ActionEvent<PircBotX>(bot, bot.getUserBot(),
@@ -72,8 +73,9 @@ public class MessageParser {
         final PircBotX bot = getService().getBot(serverName);
         final String parsedArray[] = message.split("\\s+");
         final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();
+        final String command = parsedArray[0];
 
-        if (parsedArray[0].startsWith("/")) {
+        if (command.startsWith("/")) {
             serverCommandToParse(parsedArray, message, bot);
         } else {
             manager.dispatchEvent(new UnknownEvent<PircBotX>(bot, message));
@@ -84,20 +86,20 @@ public class MessageParser {
         final PircBotX bot = getService().getBot(serverName);
         final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();
         final String parsedArray[] = message.split("\\s+");
+        final String command = parsedArray[0];
+        final User user = bot.getUserChannelDao().getUser(userNick);
 
         // TODO parse this string fully
         // TODO - input validation
-        if (parsedArray[0].startsWith("/")) {
-            if (parsedArray[0].startsWith("/me")) {
-                final User user = bot.getUserChannelDao().getUser(userNick);
-                String action = message.replace("/me ", "");
+        if (command.startsWith("/")) {
+            if (command.startsWith("/me")) {
+                final String action = message.replace("/me ", "");
                 manager.dispatchEvent(new ActionEvent<PircBotX>(bot, user, null, message));
                 user.send().action(action);
             } else {
                 serverCommandToParse(parsedArray, message, bot);
             }
         } else {
-            final User user = bot.getUserChannelDao().getUser(userNick);
             manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message, true));
             user.send().message(message);
         }

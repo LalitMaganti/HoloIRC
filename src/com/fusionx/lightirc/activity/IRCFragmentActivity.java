@@ -272,7 +272,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         return position;
     }
 
-    public int onNewPrivateMessage(final String userNick) {
+    public void onNewPrivateMessage(final String userNick) {
         final PMFragment pmFragment = new PMFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("serverName", builder.getTitle());
@@ -286,10 +286,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             bar.getTabAt(position).setText(userNick);
         }
 
-        if (mentionString.equals(userNick)) {
-            mViewPager.setCurrentItem(position, true);
-        }
-        return position;
+        mViewPager.setCurrentItem(position, true);
     }
 
     // Removal stuff
@@ -310,18 +307,22 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mViewPager.setCurrentItem(index - 1, true);
 
         final Object[] objects = {channel, index};
-        final AsyncTask<Object, Void, Void> closeFragment = new AsyncTask<Object, Void, Void>() {
+        final AsyncTask<Object, Void, IRCFragment> closeFragment = new AsyncTask<Object, Void, IRCFragment>() {
             @Override
-            protected Void doInBackground(Object... booleans) {
-               final IRCFragment fragment = ((IRCFragment) mIRCPagerAdapter.getItem((Integer) booleans[1]));
+            protected IRCFragment doInBackground(Object... booleans) {
+                final IRCFragment fragment = ((IRCFragment) mIRCPagerAdapter.getItem((Integer) booleans[1]));
                 if ((Boolean) booleans[0]) {
                     service.partFromChannel(builder.getTitle(), fragment.getTitle());
                 } else {
                     service.removePrivateMessage(builder.getTitle(), fragment.getTitle());
-                    final int index = mIRCPagerAdapter.removeView(fragment.getTitle());
-                    removeTab(index);
                 }
-                return null;
+                return fragment;
+            }
+
+            @Override
+            protected void onPostExecute(final IRCFragment fragment) {
+                final int index = mIRCPagerAdapter.removeView(fragment.getTitle());
+                removeTab(index);
             }
         };
         closeFragment.execute(objects);
@@ -338,7 +339,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         super.onDestroy();
     }
 
-    // OptionsMenu stuff
+    // Options Menu stuff
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
@@ -405,7 +406,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     }
 
     public void userListMention(final Set<String> users) {
-        for (String userNick : users) {
+        for (final String userNick : users) {
             final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter.getItem(mViewPager.getCurrentItem());
             String edit = channel.getEditText().getText().toString();
             edit = Html.fromHtml(userNick) + ": " + edit;
@@ -420,13 +421,11 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     // Hack for http://code.google.com/p/android/issues/detail?id=38500
     private void setSpinnerSelectedNavigationItem(final int position) {
         try {
-            final int id = getResources()
-                    .getIdentifier("action_bar", "id", "android");
+            final int id = getResources().getIdentifier("action_bar", "id", "android");
             final View actionBarView = findViewById(id);
 
             final Class<?> actionBarViewClass = actionBarView.getClass();
-            final Field mTabScrollViewField = actionBarViewClass
-                    .getDeclaredField("mTabScrollView");
+            final Field mTabScrollViewField = actionBarViewClass.getDeclaredField("mTabScrollView");
             mTabScrollViewField.setAccessible(true);
 
             final Object mTabScrollView = mTabScrollViewField.get(actionBarView);
@@ -434,8 +433,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
                 return;
             }
 
-            final Field mTabSpinnerField = mTabScrollView.getClass()
-                    .getDeclaredField("mTabSpinner");
+            final Field mTabSpinnerField = mTabScrollView.getClass().getDeclaredField("mTabSpinner");
             mTabSpinnerField.setAccessible(true);
 
             final Object mTabSpinner = mTabSpinnerField.get(mTabScrollView);
