@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import lombok.AccessLevel;
@@ -76,5 +77,17 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     public void writeToTextView(final String text) {
         getTextView().setText(Html.fromHtml(text.replace("\n", "<br/>")));
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        final ScrollView scrollView = (ScrollView) getView().findViewById(R.id.scrollview);
+        scrollView.post(new Runnable() {
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
     }
 }

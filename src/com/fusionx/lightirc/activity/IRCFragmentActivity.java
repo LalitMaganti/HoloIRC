@@ -38,7 +38,6 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
@@ -140,13 +139,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             mIRCPagerAdapter.addView(fragment);
             addTab(builder.getTitle());
 
-            final ScrollView scrollView = (ScrollView) fragment.getView().findViewById(R.id.scrollview);
-            scrollView.post(new Runnable() {
-                public void run() {
-                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                }
-            });
-
             if (bot != null && bot.getStatus().equals(getString(R.string.status_connected))) {
                 for (final Channel channelName : bot.getUserBot().getChannels()) {
                     onNewChannelJoined(channelName.getName(), channelName.getUserList());
@@ -211,16 +203,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         closeAllSlidingMenus();
 
         mIRCPagerAdapter.setCurrentItemIndex(position);
-
-        if (mIRCPagerAdapter.getItem(position).getView() != null) {
-            final ScrollView scrollView = (ScrollView) mIRCPagerAdapter
-                    .getItem(position).getView().findViewById(R.id.scrollview);
-            scrollView.post(new Runnable() {
-                public void run() {
-                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-                }
-            });
-        }
 
         final ActionBar bar = getActionBar();
         if (bar != null) {
