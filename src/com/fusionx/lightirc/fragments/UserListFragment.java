@@ -41,12 +41,10 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
-        final View view = super.onCreateView(inflater, container, savedInstanceState);
-
         final UserListAdapter adapter = new UserListAdapter(inflater.getContext(), new ArrayList<String>());
         setListAdapter(adapter);
 
-        return view;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -85,19 +83,20 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final Set<String> positions = ((UserListAdapter) getListView().getAdapter()).getSelectedItems();
+        final Set<String> selectedItems = ((UserListAdapter) getListView().getAdapter()).getSelectedItems();
+        final IRCFragmentActivity activity = ((IRCFragmentActivity) getActivity());
 
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
-                ((IRCFragmentActivity) getActivity()).userListMention(positions);
+                activity.userListMention(selectedItems);
                 mode.finish();
-                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
+                activity.closeAllSlidingMenus();
                 return true;
             case R.id.fragment_userlist_cab_pm:
-                final String nick = Utils.stripPrefixFromNick(String.valueOf(Html.fromHtml((String) positions.toArray()[0])));
-                ((IRCFragmentActivity) getActivity()).onNewPrivateMessage(nick);
+                final String nick = Utils.stripPrefixFromNick(String.valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
+                activity.onNewPrivateMessage(nick);
                 mode.finish();
-                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
+                activity.closeAllSlidingMenus();
                 return true;
             default:
                 return false;
@@ -116,7 +115,9 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
-        ((UserListAdapter) getListView().getAdapter()).clearSelection();
+        final UserListAdapter adapter = (UserListAdapter) getListView().getAdapter();
+        adapter.clearSelection();
+
         modeStarted = false;
     }
 
@@ -131,8 +132,9 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             getActivity().startActionMode(this);
         }
 
-        boolean checked = ((UserListAdapter) getListView().getAdapter()).getSelectedItems()
-                .contains(((UserListAdapter) getListView().getAdapter()).getItem(i));
+        final UserListAdapter adapter = (UserListAdapter) getListView().getAdapter();
+
+        final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
         getListView().setItemChecked(i, !checked);
     }
 }

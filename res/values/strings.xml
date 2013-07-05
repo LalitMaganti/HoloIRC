@@ -86,5 +86,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="new_nick">New nick</string>
     <string name="ok">OK</string>
     <string name="message">Message</string>
+    <string name="output_event_unknown_event">Unknown command:</string>
 
 </resources>

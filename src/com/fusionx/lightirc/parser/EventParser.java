@@ -24,6 +24,7 @@ package com.fusionx.lightirc.parser;
 import android.content.Context;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
+import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
@@ -69,6 +70,9 @@ public class EventParser {
         } else if (e instanceof IOExceptionEvent) {
             final IOExceptionEvent event = (IOExceptionEvent) e;
             returnMessage = event.getException().getMessage() + context.getString(R.string.output_event_trying_reconnect);
+        } else if (e instanceof IrcExceptionEvent) {
+            final IrcExceptionEvent event = (IrcExceptionEvent) e;
+            returnMessage = event.getException().getMessage();
         } else {
             // Invalid event
             returnMessage = "";

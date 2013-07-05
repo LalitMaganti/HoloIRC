@@ -29,7 +29,6 @@ import android.widget.TextView;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 
 public class PMFragment extends IRCFragment {
-
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_DONE) {

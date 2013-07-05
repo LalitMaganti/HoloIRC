@@ -171,7 +171,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mActionsSlidingMenu.setMode(SlidingMenu.LEFT);
         mActionsSlidingMenu.setShadowDrawable(R.drawable.shadow);
         mActionsSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        mActionsSlidingMenu.setTouchmodeMarginThreshold(3);
+        mActionsSlidingMenu.setTouchmodeMarginThreshold(5);
         mActionsSlidingMenu.setMenu(R.layout.sliding_menu_fragment_actions);
         mActionsSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
         mActionsSlidingMenu.setOnOpenListener(actionsSlidingOpenListener);
@@ -247,21 +247,29 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         }
     }
 
-    public void onNewChannelJoined(final String channelName, final ArrayList<String> userList) {
+    public int onNewChannelJoined(final String channelName, final ArrayList<String> userList) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", channelName);
         bundle.putString("serverName", builder.getTitle());
-        bundle.putStringArrayList("userList", userList);
+
+        if (userList != null) {
+            bundle.putStringArrayList("userList", userList);
+        }
+
         channel.setArguments(bundle);
 
         final int position = mIRCPagerAdapter.addView(channel);
         addTab(channelName);
-        getActionBar().getTabAt(position).setText(channelName);
+        final ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.getTabAt(position).setText(channelName);
+        }
 
         if (mentionString.equals(channelName)) {
             mViewPager.setCurrentItem(position, true);
         }
+        return position;
     }
 
     public void onNewPrivateMessage(final String userNick) {
@@ -273,7 +281,10 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
         final int position = mIRCPagerAdapter.addView(pmFragment);
         addTab(userNick);
-        getActionBar().getTabAt(position).setText(userNick);
+        final ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.getTabAt(position).setText(userNick);
+        }
 
         if (mentionString.equals(userNick)) {
             mViewPager.setCurrentItem(position, true);
@@ -301,12 +312,11 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         final AsyncTask<Object, Void, Void> closeFragment = new AsyncTask<Object, Void, Void>() {
             @Override
             protected Void doInBackground(Object... booleans) {
+               final IRCFragment fragment = ((IRCFragment) mIRCPagerAdapter.getItem((Integer) booleans[1]));
                 if ((Boolean) booleans[0]) {
-                    service.partFromChannel(builder.getTitle(),
-                            ((ChannelFragment) mIRCPagerAdapter.getItem((Integer) booleans[1])).getTitle());
+                    service.partFromChannel(builder.getTitle(), fragment.getTitle());
                 } else {
-                    service.removePrivateMessage(builder.getTitle(),
-                            ((IRCFragment) mIRCPagerAdapter.getItem((Integer) booleans[1])).getTitle());
+                    service.removePrivateMessage(builder.getTitle(), fragment.getTitle());
                 }
                 return null;
             }

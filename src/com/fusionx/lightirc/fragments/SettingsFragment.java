@@ -22,14 +22,18 @@
 package com.fusionx.lightirc.fragments;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.service.IRCService;
 
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
     private ListPreference mChooseTheme;
@@ -59,14 +63,31 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
                     .setPositiveButton(getString(R.string.restart), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            Intent intent = getActivity().getBaseContext().getPackageManager()
-                                    .getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                            final Intent service = new Intent(getActivity(), IRCService.class);
+                            service.putExtra("stop", false);
+                            getActivity().bindService(service, mConnection, 0);
                         }
                     });
             build.show();
         }
         return true;
     }
+
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(final ComponentName className, final IBinder binder) {
+            final IRCService service = ((IRCService.IRCBinder) binder).getService();
+            service.disconnectAll();
+            getActivity().unbindService(mConnection);
+            final Intent intent = getActivity().getBaseContext().getPackageManager()
+                    .getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+
+        @Override
+        public void onServiceDisconnected(final ComponentName name) {
+        }
+    };
+
 }

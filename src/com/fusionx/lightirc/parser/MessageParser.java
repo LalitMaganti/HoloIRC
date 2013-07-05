@@ -22,11 +22,13 @@
 package com.fusionx.lightirc.parser;
 
 import com.fusionx.lightirc.service.IRCService;
+import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.ActionEvent;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
+import org.pircbotx.hooks.events.UnknownEvent;
 import org.pircbotx.hooks.managers.ListenerManager;
 
 public class MessageParser {
@@ -48,29 +50,33 @@ public class MessageParser {
 
         if (parsedArray[0].startsWith("/")) {
             // TODO parse this string fully
-            if (parsedArray[0].startsWith("/me")) {
+            if (parsedArray[0].equals("/me")) {
                 final String action = parsedArray[1];
                 // TODO - input validation
                 manager.dispatchEvent(new ActionEvent<PircBotX>(bot, bot.getUserBot(),
                         bot.getUserChannelDao().getChannel(channelName), action));
-                bot.sendIRC().action(channelName, action);
+                bot.getUserChannelDao().getChannel(channelName).send().action(action);
             } else {
-                serverCommandToParse(parsedArray, bot);
+                serverCommandToParse(parsedArray, message, bot);
             }
         } else {
+            final Channel channel = bot.getUserChannelDao().getChannel(channelName);
             manager.dispatchEvent(new MessageEvent<PircBotX>(bot,
-                    bot.getUserChannelDao().getChannel(channelName),
+                    channel,
                     bot.getUserBot(), message));
-            bot.sendIRC().message(channelName, message);
+            channel.send().message(message);
         }
     }
 
     public void serverMessageToParse(final String serverName, final String message) {
         final PircBotX bot = getService().getBot(serverName);
         final String parsedArray[] = message.split("\\s+");
+        final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();
 
         if (parsedArray[0].startsWith("/")) {
-            serverCommandToParse(parsedArray, bot);
+            serverCommandToParse(parsedArray, message, bot);
+        } else {
+            manager.dispatchEvent(new UnknownEvent<PircBotX>(bot, message));
         }
     }
 
@@ -88,7 +94,7 @@ public class MessageParser {
                 manager.dispatchEvent(new ActionEvent<PircBotX>(bot, user, null, message));
                 user.send().action(action);
             } else {
-                serverCommandToParse(parsedArray, bot);
+                serverCommandToParse(parsedArray, message, bot);
             }
         } else {
             final User user = bot.getUserChannelDao().getUser(userNick);
@@ -97,25 +103,26 @@ public class MessageParser {
         }
     }
 
-    private void serverCommandToParse(final String[] parsedArray, final PircBotX bot) {
+    private void serverCommandToParse(final String[] parsedArray, final String rawLine, final PircBotX bot) {
         // TODO parse this string fully
         // TODO - input validation
         final ListenerManager<PircBotX> manager = bot.getConfiguration().getListenerManager();
         final String command = parsedArray[0];
 
-        if (command.equals("/join")) {
+        if (command.equals("/join") || command.equals("/j")) {
             final String channel = parsedArray[1];
             bot.sendIRC().joinChannel(channel);
         } else if (command.equals("/msg")) {
             final String nick = parsedArray[1];
             final String message = ((parsedArray[2] == null) ? "" : parsedArray[2]);
-
             final User user = bot.getUserChannelDao().getUser(nick);
             manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message, true));
             user.send().message(message);
         } else if (parsedArray[0].startsWith("/nick")) {
             final String newNick = parsedArray[1];
             bot.sendIRC().changeNick(newNick);
+        } else {
+            manager.dispatchEvent(new UnknownEvent<PircBotX>(bot, rawLine));
         }
     }
 }

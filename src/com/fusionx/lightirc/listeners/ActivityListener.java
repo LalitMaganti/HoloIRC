@@ -68,7 +68,7 @@ public class ActivityListener extends GenericListener {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                server.appendToTextView(event.getException().getMessage());
+                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
             }
         });
     }
@@ -88,8 +88,6 @@ public class ActivityListener extends GenericListener {
     // Server events
     @Override
     public void onEvent(final Event event) throws Exception {
-        super.onEvent(event);
-
         if (event instanceof MotdEvent || event instanceof NoticeEvent) {
             final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
 
@@ -99,17 +97,31 @@ public class ActivityListener extends GenericListener {
                     server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                 }
             });
+        } else {
+            super.onEvent(event);
         }
+    }
+
+    @Override
+    public void onUnknown(final UnknownEvent<PircBotX> event) {
+        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
+            }
+        });
     }
 
     // Channel events
     @Override
     public void onBotJoin(final JoinEvent<PircBotX> event) {
-        final JoinEvent joinevent = (JoinEvent) event;
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getActivity().onNewChannelJoined(joinevent.getChannel().getName(), null);
+                final int position = getActivity().onNewChannelJoined(event.getChannel().getName(), null);
+                mViewPager.setCurrentItem(position, true);
             }
         });
     }
@@ -118,26 +130,18 @@ public class ActivityListener extends GenericListener {
     public void onUserList(final UserListEvent<PircBotX> event) {
         final ArrayList<String> userList = new ArrayList<String>();
 
-        if (userList.isEmpty()) {
-            for (final User u : event.getUsers()) {
-                userList.add(u.getPrettyNick(event.getChannel()));
-            }
-
-            event.getChannel().initialUserList(userList);
-            Collections.sort(userList, new UserComparator());
+        for (final User user : event.getUsers()) {
+            userList.add(user.getPrettyNick(event.getChannel()));
         }
 
+        event.getChannel().initialUserList(userList);
+        Collections.sort(userList, new UserComparator());
+
         final String channelName = event.getChannel().getName();
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter
-                        .getTab(channelName);
-                if (channel != null) {
-                    channel.setUserList(userList);
-                }
-            }
-        });
+        final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter.getTab(channelName);
+        if (channel != null) {
+            channel.setUserList(userList);
+        }
     }
 
     @Override
@@ -161,45 +165,46 @@ public class ActivityListener extends GenericListener {
 
         sendMessage(event.getChannel().getName(), event);
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkChannelFragment(event.getChannel().getName())) {
+        if (checkChannelFragment(event.getChannel().getName())) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
                     arrayAdapter.replace(oldFormattedNick, newFormattedNick);
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkChannelFragment(event.getChannel().getName())) {
+        if (checkChannelFragment(event.getChannel().getName())) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
                     arrayAdapter.add(event.getUser().getPrettyNick(event.getChannel()));
                     arrayAdapter.sort();
                     arrayAdapter.notifyDataSetChanged();
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
-        recreateUserList(event.getChannel(), event.getUser());
+        removeUserFromList(event.getChannel(), event.getUser());
     }
 
     @Override
     protected void onUserPart(final PartEvent<PircBotX> event) {
+        final int index = mIRCPagerAdapter.removeView(event.getChannel().getName());
+
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int index = mIRCPagerAdapter.removeView(event.getChannel().getName());
                 getActivity().removeTab(index);
             }
         });
@@ -209,20 +214,20 @@ public class ActivityListener extends GenericListener {
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
 
-        recreateUserList(event.getChannel(), event.getUser());
+        removeUserFromList(event.getChannel(), event.getUser());
     }
 
-    public void recreateUserList(final Channel channel, final User user) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (checkChannelFragment(channel.getName())) {
+    public void removeUserFromList(final Channel channel, final User user) {
+        if (checkChannelFragment(channel.getName())) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
                     arrayAdapter.remove(user.getPrettyNick(channel));
                     arrayAdapter.sort();
                     arrayAdapter.notifyDataSetChanged();
                 }
-            }
-        });
+            });
+        }
     }
 
     // Private message events
@@ -232,13 +237,13 @@ public class ActivityListener extends GenericListener {
     }
 
     private void onPrivateEvent(final User user, final String message, final Event<PircBotX> event) {
+        final IRCFragment fragment = privateMessageCheck(user.getNick());
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final IRCFragment fragment = privateMessageCheck(user.getNick());
                 if (fragment != null) {
-                    final PMFragment pm = (PMFragment) fragment;
                     if (!message.equals("")) {
+                        final PMFragment pm = (PMFragment) fragment;
                         pm.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                     }
                 } else {
@@ -249,16 +254,16 @@ public class ActivityListener extends GenericListener {
     }
 
     // Misc stuff
-    private void sendMessage(final String title, final Event event) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final IRCFragment channel = mIRCPagerAdapter.getTab(title);
-                if (channel != null) {
+    private void sendMessage(final String title, final Event<PircBotX> event) {
+        final IRCFragment channel = mIRCPagerAdapter.getTab(title);
+        if (channel != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
                     channel.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
                 }
-            }
-        });
+            });
+        }
     }
 
     private boolean checkChannelFragment(final String keyName) {

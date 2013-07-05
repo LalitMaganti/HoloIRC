@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import com.fusionx.lightirc.misc.Utils;
 import lombok.AccessLevel;
 import lombok.Setter;
 
@@ -35,7 +36,8 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
     @Setter(AccessLevel.PUBLIC)
     private boolean connected;
 
-    private LayoutInflater inflater;
+    private final LayoutInflater inflater;
+    private final Context applicationContext;
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
@@ -47,6 +49,8 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
 
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
+        } else if (!Utils.themeIsHoloLight(applicationContext)) {
+            row.setTextColor(Color.WHITE);
         } else {
             row.setTextColor(Color.BLACK);
         }
@@ -57,6 +61,7 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
     public ActionsArrayAdapter(final Context context, final int textViewResourceId, final CharSequence[] objects) {
         super(context, textViewResourceId, (String[]) objects);
         inflater = LayoutInflater.from(context);
+        applicationContext = context.getApplicationContext();
     }
 
     @Override

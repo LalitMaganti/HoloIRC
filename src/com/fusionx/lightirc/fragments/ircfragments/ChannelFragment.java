@@ -47,9 +47,9 @@ public class ChannelFragment extends IRCFragment {
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = super.onCreateView(inflater, container, savedInstanceState);
 
-        final ArrayList<String> userLi = getArguments().getStringArrayList("userList");
-        if (userLi != null) {
-            userList = userLi;
+        final ArrayList<String> list = getArguments().getStringArrayList("userList");
+        if (list != null) {
+            userList = list;
         }
 
         return rootView;

@@ -32,6 +32,10 @@ public class Utils {
         return Integer.parseInt(prefs.getString("fragment_settings_theme", String.valueOf(R.style.Light)));
     }
 
+    public static boolean themeIsHoloLight(final Context applicationContext) {
+        return (getThemeInt(applicationContext) == R.style.Light);
+    }
+
     public static String stripPrefixFromNick(final String nick) {
         if (nick.startsWith("@") || nick.startsWith("+")) {
             return nick.substring(1);

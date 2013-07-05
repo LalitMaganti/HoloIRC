@@ -42,6 +42,8 @@ import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.pircbotx.Configuration;
 
 import java.io.File;
@@ -52,8 +54,9 @@ import java.util.Set;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
         PopupMenu.OnDismissListener {
+    @Getter(AccessLevel.PUBLIC)
+    private IRCService service;
     private ArrayList<Configuration.Builder> mBuilderList;
-    private IRCService mService;
     private Configuration.Builder mBuilder;
     private BuilderAdapter mServerCardsAdapter;
 
@@ -68,7 +71,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     protected void onResume() {
         super.onResume();
-        if (mService == null) {
+        if (service == null) {
             final Intent service = new Intent(this, IRCService.class);
             service.putExtra("stop", false);
             startService(service);
@@ -82,20 +85,20 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCService.IRCBinder) binder).getService();
+            service = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
         }
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            mService = null;
+            service = null;
         }
     };
 
     private void setUpListView() {
         final ListView listView = (ListView) findViewById(R.id.server_list);
-        mServerCardsAdapter = new BuilderAdapter(mService, this);
+        mServerCardsAdapter = new BuilderAdapter(service, this);
         final SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
                 = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
         swingBottomInAnimationAdapter.setAbsListView(listView);
@@ -244,9 +247,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mBuilder = (Configuration.Builder) v.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
-        if (mService != null && mService.getBot(mBuilder.getTitle()) != null &&
-                (mService.getBot(mBuilder.getTitle()).getStatus().equals(getString(R.string.status_connected)) ||
-                        mService.getBot(mBuilder.getTitle()).getStatus().equals(getString(R.string.status_connecting)))) {
+        if (service != null && service.getBot(mBuilder.getTitle()) != null &&
+                !(service.getBot(mBuilder.getTitle()).getStatus().equals(getString(R.string.status_disconnected)))) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
         } else {
@@ -295,7 +297,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void disconnectFromServer(final Configuration.Builder builder) {
-        mService.disconnectFromServer(builder.getTitle());
+        service.disconnectFromServer(builder.getTitle());
         setUpCards();
     }
 

@@ -71,10 +71,10 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     }
 
     public void appendToTextView(final String text) {
-        textView.append(Html.fromHtml(text.replace("\n", "<br/>")));
+        getTextView().append(Html.fromHtml(text.replace("\n", "<br/>")));
     }
 
     public void writeToTextView(final String text) {
-        textView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
+        getTextView().setText(Html.fromHtml(text.replace("\n", "<br/>")));
     }
 }

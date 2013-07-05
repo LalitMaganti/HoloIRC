@@ -43,7 +43,7 @@ public class SelectionAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        View v = super.getView(position, convertView, parent);
+        final View v = super.getView(position, convertView, parent);
         if (selectedItems.containsKey(arrayList.get(position))) {
             v.setBackgroundResource(android.R.color.holo_blue_light);
         } else {

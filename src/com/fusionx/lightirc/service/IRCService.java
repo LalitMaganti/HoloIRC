@@ -43,10 +43,7 @@ import com.fusionx.lightirc.listeners.ServiceListener;
 import com.fusionx.lightirc.misc.LightThread;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.pircbotx.Channel;
-import org.pircbotx.Configuration;
-import org.pircbotx.PircBotX;
-import org.pircbotx.UserChannelDao;
+import org.pircbotx.*;
 import org.pircbotx.output.OutputChannel;
 
 public class IRCService extends Service {
@@ -101,7 +98,7 @@ public class IRCService extends Service {
         startForeground(1337, notification);
     }
 
-    private void disconnectAll() {
+    public void disconnectAll() {
         botManager.disconnectAll();
         stopForeground(true);
         stopSelf();
@@ -117,17 +114,18 @@ public class IRCService extends Service {
 
     private class DisconnectTask extends AsyncTask<String, Void, String> {
         protected String doInBackground(final String... strings) {
-            if (getBot(strings[0]).getStatus().equals(getString(R.string.status_connected))) {
-                getBot(strings[0]).shutdown();
+            final String botName = strings[0];
+            if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
+                getBot(botName).shutdown();
             } else {
-                botManager.get(strings[0]).interrupt();
+                botManager.get(botName).interrupt();
             }
-            return strings[0];
+            return botName;
         }
 
         @Override
-        protected void onPostExecute(final String strings) {
-            botManager.remove(strings);
+        protected void onPostExecute(final String botName) {
+            botManager.remove(botName);
             stopForeground(true);
             stopSelf();
         }
@@ -162,14 +160,14 @@ public class IRCService extends Service {
     }
 
     public void partFromChannel(final String serverName, final String channelName) {
-        final UserChannelDao dao = getBot(serverName).getUserChannelDao();
+        final UserChannelDao<User, Channel> dao = getBot(serverName).getUserChannelDao();
         final Channel channel = dao.getChannel(channelName);
         final OutputChannel outputChannel = channel.send();
         outputChannel.part();
     }
 
     public void removePrivateMessage(final String serverName, final String nick) {
-        final UserChannelDao dao = getBot(serverName).getUserChannelDao();
+        final UserChannelDao<User, Channel> dao = getBot(serverName).getUserChannelDao();
         dao.removePrivateMessage(nick);
         dao.getUser(nick).setBuffer("");
     }

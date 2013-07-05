@@ -45,32 +45,32 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        View v = convertView;
-        if (v == null) {
+        View view = convertView;
+        if (view == null) {
             final LayoutInflater vi = mActivity.getLayoutInflater();
-            v = vi.inflate(R.layout.item_server_card, parent, false);
+            view = vi.inflate(R.layout.item_server_card, parent, false);
         }
 
-        final TextView tt = (TextView) v.findViewById(R.id.title);
-        final TextView bt = (TextView) v.findViewById(R.id.description);
-        if (tt != null) {
-            tt.setText(getItem(position).getTitle());
+        final TextView textView = (TextView) view.findViewById(R.id.title);
+        final TextView descriptiontextView = (TextView) view.findViewById(R.id.description);
+        if (textView != null) {
+            textView.setText(getItem(position).getTitle());
         }
-        if (bt != null) {
+        if (descriptiontextView != null) {
             final PircBotX bot = mService.getBot(getItem(position).getTitle());
             if (bot != null) {
-                bt.setText(bot.getStatus());
+                descriptiontextView.setText(bot.getStatus());
             } else {
-                bt.setText(mActivity.getString(R.string.status_disconnected));
+                descriptiontextView.setText(mActivity.getString(R.string.status_disconnected));
             }
         }
 
-        LinearLayout linearLayout = (LinearLayout) v.findViewById(R.id.overflow_menu);
+        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.overflow_menu);
         linearLayout.setTag(getItem(position));
 
-        linearLayout = (LinearLayout) v.findViewById(R.id.contentLayout);
+        linearLayout = (LinearLayout) view.findViewById(R.id.contentLayout);
         linearLayout.setTag(getItem(position));
 
-        return v;
+        return view;
     }
 }
