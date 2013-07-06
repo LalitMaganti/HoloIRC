@@ -191,7 +191,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             bot.setAutoNickChange(serverSettings.getBoolean(Constants.AutoNickChange, true));
 
             final boolean ssl = serverSettings.getBoolean(Constants.SSL, false);
-            if(ssl) {
+            if (ssl) {
                 bot.setSocketFactory(SSLSocketFactory.getDefault());
             } else {
                 bot.setSocketFactory(SocketFactory.getDefault());

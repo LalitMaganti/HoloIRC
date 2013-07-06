@@ -35,10 +35,32 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_changes_saved">Changes have been saved</string>
     <string name="server_settings_not_empty">This field should NOT be empty!</string>
     <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!</string>
+    <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick another will
+        automatically be used
+    </string>
+    <string name="server_settings_auto_nick_title">Auto-change nick name</string>
+    <string name="server_settings_server_password_title">NickServ password</string>
+    <string name="server_settings_auto_join_title">Auto-join channels</string>
+    <string name="server_settings_ssl_title">Use SSL</string>
+    <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be different to
+        normal
+    </string>
+    <string name="server_settings_port_title">Server Port</string>
+    <string name="server_settings_url_title">Server URL</string>
+    <string name="server_settings_server_title">Server title</string>
 
     <!-- App settings -->
     <string name="settings_title">Settings</string>
-    <string name="settings_requires_restart">This requires a full restart of the app</string>
+    <string name="settings_appearance_summary">Settings to control the way the app looks</string>
+
+    <!-- Appearance settings -->
+    <string name="appearance_settings_requires_restart">This requires a full restart of the app</string>
+
+    <!-- General server settings -->
+    <string name="general_server_settings_motd_title">Display MOTD</string>
+    <string name="general_server_settings_motd_description">Display Message of the Day from the server</string>
+    <string name="general_server_settings_title">General Server Settings</string>
+    <string name="general_server_settings_summary">Settings for all servers in the app</string>
 
     <!-- Output for events -->
     <string name="output_event_entered_room">joined the channel</string>
@@ -52,6 +74,8 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="output_event_you">You (</string>
     <string name="output_event_you_known_as">) are now known as</string>
     <string name="output_event_known_as">is now known as</string>
+    <string name="output_event_unknown_event">Unknown command:</string>
+    <string name="output_event_connected_to_server">Connected to server</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -90,6 +114,7 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="new_nick">New nick</string>
     <string name="ok">OK</string>
     <string name="message">Message</string>
-    <string name="output_event_unknown_event">Unknown command:</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
 
 </resources>

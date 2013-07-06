@@ -124,7 +124,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             getPreferenceManager().setSharedPreferencesName(fileName);
 
-            addPreferencesFromResource(R.xml.activty_settings_prefs);
+            addPreferencesFromResource(R.xml.activty_server_settings_prefs);
 
             final PreferenceScreen prefSet = getPreferenceScreen();
 

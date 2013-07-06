@@ -69,10 +69,15 @@ public class EventParser {
             returnMessage = privateMessageEventOutput((PrivateMessageEvent) e);
         } else if (e instanceof IOExceptionEvent) {
             final IOExceptionEvent event = (IOExceptionEvent) e;
-            returnMessage = event.getException().getMessage() + context.getString(R.string.output_event_trying_reconnect);
+            returnMessage = event.getException().getMessage()
+                    + "\n" + context.getString(R.string.output_event_trying_reconnect);
         } else if (e instanceof IrcExceptionEvent) {
             final IrcExceptionEvent event = (IrcExceptionEvent) e;
             returnMessage = event.getException().getMessage();
+        } else if (e instanceof ConnectEvent) {
+            final ConnectEvent event = (ConnectEvent) e;
+            returnMessage = context.getString(R.string.output_event_connected_to_server)
+                    + " " + event.getBot().getConfiguration().getServerHostname();
         } else {
             // Invalid event
             returnMessage = "";
@@ -108,7 +113,8 @@ public class EventParser {
             newMessage = context.getString(R.string.output_event_you) + event.getOldNick() +
                     context.getString(R.string.output_event_you_known_as) + " " + event.getNewNick();
         } else {
-            newMessage = event.getOldNick() + " " + context.getString(R.string.output_event_known_as) + " " + event.getNewNick();
+            newMessage = event.getOldNick() + " " + context.getString(R.string.output_event_known_as)
+                    + " " + event.getNewNick();
         }
         return newMessage;
     }

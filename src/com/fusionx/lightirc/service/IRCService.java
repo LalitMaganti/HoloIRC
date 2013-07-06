@@ -57,7 +57,7 @@ public class IRCService extends Service {
     }
 
     @Getter(AccessLevel.PUBLIC)
-    private final LightManager botManager = new LightManager();
+    private final LightManager threadManager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
     private String boundToIRCFragmentActivity = null;
@@ -77,7 +77,7 @@ public class IRCService extends Service {
 
         final LightThread thread = new LightThread(bot);
         thread.start();
-        botManager.put(server.getTitle(), thread);
+        threadManager.put(server.getTitle(), thread);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -85,14 +85,12 @@ public class IRCService extends Service {
         final Intent intent = new Intent(this, MainServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
-        final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
-        taskStackBuilder.addParentStack(MainServerListActivity.class);
-        taskStackBuilder.addNextIntent(intent);
-        final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.service_one_server_joined))
+                .setTicker(getString(R.string.service_one_server_joined))
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
@@ -106,7 +104,7 @@ public class IRCService extends Service {
     }
 
     public void disconnectAll() {
-        botManager.disconnectAll();
+        threadManager.disconnectAll();
         stopForeground(true);
         stopSelf();
         Intent intent = new Intent("serviceStopped");
@@ -125,22 +123,24 @@ public class IRCService extends Service {
             if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
                 getBot(botName).shutdown();
             } else {
-                botManager.get(botName).interrupt();
+                getThreadManager().get(botName).interrupt();
             }
             return botName;
         }
 
         @Override
         protected void onPostExecute(final String botName) {
-            botManager.remove(botName);
-            stopForeground(true);
-            stopSelf();
+            threadManager.remove(botName);
+            if (getThreadManager().keySet().isEmpty()) {
+                stopForeground(true);
+                stopSelf();
+            }
         }
     }
 
     public PircBotX getBot(final String serverName) {
-        if (botManager.get(serverName) != null) {
-            return botManager.get(serverName).getBot();
+        if (threadManager.get(serverName) != null) {
+            return threadManager.get(serverName).getBot();
         } else {
             return null;
         }
@@ -153,7 +153,7 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if(intent != null) {
+        if (intent != null) {
             boundToIRCFragmentActivity = intent.getStringExtra("setBound");
             if (intent.getBooleanExtra("stop", false)) {
                 disconnectAll();
@@ -184,8 +184,7 @@ public class IRCService extends Service {
     }
 
     private void setupListeners(final Configuration.Builder bot) {
-        final ServiceListener mServiceListener = new ServiceListener();
-        mServiceListener.setService(this);
+        final ServiceListener mServiceListener = new ServiceListener(this);
 
         bot.getListenerManager().addListener(mServiceListener);
     }
@@ -199,7 +198,7 @@ public class IRCService extends Service {
                 .setAutoCancel(true)
                 .setTicker(getString(R.string.service_you_mentioned) + " " + messageDest);
 
-        if(!serverName.equals(boundToIRCFragmentActivity)) {
+        if (!serverName.equals(boundToIRCFragmentActivity)) {
             final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
             mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
             mIntent.putExtra("mention", messageDest);

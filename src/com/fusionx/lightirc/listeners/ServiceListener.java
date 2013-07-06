@@ -24,10 +24,14 @@ package com.fusionx.lightirc.listeners;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
+import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.service.IRCService;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
@@ -42,28 +46,35 @@ import java.util.Collections;
 @EqualsAndHashCode(callSuper = false)
 public class ServiceListener extends GenericListener {
     @Getter(AccessLevel.PRIVATE)
-    @Setter(AccessLevel.PUBLIC)
     private IRCService service;
+
+    public ServiceListener(final IRCService service) {
+        super(service.getApplicationContext());
+        this.service = service;
+    }
 
     // Server stuff
     @Override
-    public void onConnect(final ConnectEvent event) {
+    public void onConnect(final ConnectEvent<PircBotX> event) {
         event.getBot().setStatus(getService().getString(R.string.status_connected));
+
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
     }
 
     @Override
-    public void onDisconnect(final DisconnectEvent event) {
+    public void onDisconnect(final DisconnectEvent<PircBotX> event) {
         event.getBot().setStatus(getService().getString(R.string.status_disconnected));
-        getService().getBotManager().remove(event.getBot());
-        if (service.getBotManager().keySet().isEmpty()) {
-            service.stopForeground(true);
-            service.stopSelf();
+        final LightManager manager = getService().getThreadManager();
+        manager.remove(event.getBot().getConfiguration().getTitle());
+        if (getService().getThreadManager().keySet().isEmpty()) {
+            getService().stopForeground(true);
+            getService().stopSelf();
         }
     }
 
     @Override
-    public void onEvent(final Event event) throws Exception {
-        if (event instanceof MotdEvent || event instanceof NoticeEvent) {
+    public void onEvent(final Event<PircBotX> event) throws Exception {
+        if (event instanceof NoticeEvent) {
             event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
         } else {
             super.onEvent(event);
@@ -71,12 +82,17 @@ public class ServiceListener extends GenericListener {
     }
 
     @Override
-    protected void onIOException(IOExceptionEvent<PircBotX> event) {
+    public void onMotd(final MotdEvent<PircBotX> event) {
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
     }
 
     @Override
-    protected void onIrcException(IrcExceptionEvent event) {
+    public void onIOException(IOExceptionEvent<PircBotX> event) {
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+    }
+
+    @Override
+    public void onIrcException(IrcExceptionEvent<PircBotX> event) {
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
     }
 

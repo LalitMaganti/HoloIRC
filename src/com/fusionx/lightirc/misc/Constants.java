@@ -23,6 +23,8 @@ package com.fusionx.lightirc.misc;
 
 public class Constants {
     // Preference keys
+
+    // Server settings
     public final static String Title = "pref_title";
     public final static String URL = "pref_url";
     public final static String Port = "pref_port";
@@ -36,4 +38,8 @@ public class Constants {
     public final static String NickServPassword = "pref_nickserv_password";
 
     public final static String AutoJoin = "pref_autojoin";
+
+    // Appearance Settings
+    public final static String Theme = "fragment_settings_theme";
+    public final static String Motd = "pref_motd";
 }

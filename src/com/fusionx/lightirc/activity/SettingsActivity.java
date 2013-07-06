@@ -23,16 +23,20 @@ package com.fusionx.lightirc.activity;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import com.fusionx.lightirc.fragments.SettingsFragment;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.Utils;
 
+import java.util.List;
+
 public class SettingsActivity extends PreferenceActivity {
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Utils.getThemeInt(getApplicationContext()));
         super.onCreate(savedInstanceState);
+    }
 
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new SettingsFragment())
-                .commit();
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.main_settings_headers, target);
     }
 }

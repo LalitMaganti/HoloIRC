@@ -56,62 +56,51 @@ public class ActivityListener extends GenericListener {
     private UserListAdapter arrayAdapter;
 
     public ActivityListener(final IRCFragmentActivity activity, final IRCPagerAdapter adapter, final ViewPager pager) {
+        super(activity.getApplicationContext());
         this.activity = activity;
         mIRCPagerAdapter = adapter;
         mViewPager = pager;
     }
 
+    // Server stuff
     @Override
-    protected void onIrcException(final IrcExceptionEvent event) {
-        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+    public void onConnect(final ConnectEvent<PircBotX> event) {
+        appendToServer(event);
+    }
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
-            }
-        });
+    @Override
+    public void onDisconnect(final DisconnectEvent<PircBotX> event) {
+
+    }
+
+    @Override
+    protected void onIrcException(final IrcExceptionEvent<PircBotX> event) {
+        appendToServer(event);
     }
 
     @Override
     protected void onIOException(final IOExceptionEvent<PircBotX> event) {
-        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
-            }
-        });
+        appendToServer(event);
     }
 
     // Server events
     @Override
-    public void onEvent(final Event event) throws Exception {
-        if (event instanceof MotdEvent || event instanceof NoticeEvent) {
-            final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
-                }
-            });
+    public void onEvent(final Event<PircBotX> event) throws Exception {
+        if (event instanceof NoticeEvent) {
+            appendToServer(event);
         } else {
             super.onEvent(event);
         }
     }
 
     @Override
-    public void onUnknown(final UnknownEvent<PircBotX> event) {
-        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+    public void onMotd(final MotdEvent<PircBotX> event) {
+        appendToServer(event);
+    }
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
-            }
-        });
+    @Override
+    public void onUnknown(final UnknownEvent<PircBotX> event) {
+        appendToServer(event);
     }
 
     // Channel events
@@ -254,6 +243,17 @@ public class ActivityListener extends GenericListener {
     }
 
     // Misc stuff
+    private void appendToServer(final Event<PircBotX> event) {
+        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
+            }
+        });
+    }
+
     private void sendMessage(final String title, final Event<PircBotX> event) {
         final IRCFragment channel = mIRCPagerAdapter.getTab(title);
         if (channel != null) {

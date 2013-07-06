@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.fragments.settings;
 
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -33,20 +33,21 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.service.IRCService;
 
-public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+public class AppearanceSettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
     private ListPreference mChooseTheme;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.fragment_settings);
+        addPreferencesFromResource(R.xml.appearance_settings_fragment);
 
         final String[] themes_entries = {String.valueOf(R.style.Dark), String.valueOf(R.style.Light)};
 
         final PreferenceScreen prefSet = getPreferenceScreen();
-        mChooseTheme = (ListPreference) prefSet.findPreference("fragment_settings_theme");
+        mChooseTheme = (ListPreference) prefSet.findPreference(Constants.Theme);
         mChooseTheme.setEntryValues(themes_entries);
         if (mChooseTheme.getEntry() == null) {
             mChooseTheme.setValue(String.valueOf(R.style.Light));
@@ -59,7 +60,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     public boolean onPreferenceChange(final Preference preference, final Object newValue) {
         if (preference == mChooseTheme) {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
-            build.setMessage(getString(R.string.settings_requires_restart))
+            build.setMessage(getString(R.string.appearance_settings_requires_restart))
                     .setPositiveButton(getString(R.string.restart), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -89,5 +90,4 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         public void onServiceDisconnected(final ComponentName name) {
         }
     };
-
 }

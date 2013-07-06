@@ -21,29 +21,43 @@
 
 package com.fusionx.lightirc.listeners;
 
+import android.content.Context;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
+import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.JoinEvent;
+import org.pircbotx.hooks.events.MotdEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
+    protected final Context applicationContext;
+
+    protected GenericListener(final Context applicationContext) {
+        super();
+        this.applicationContext = applicationContext;
+    }
+
     @Override
-    public void onEvent(final Event event) throws Exception {
+    public void onEvent(final Event<PircBotX> event) throws Exception {
         if (event instanceof NickChangeEventPerChannel)
-            onNickChangePerChannel((NickChangeEventPerChannel) event);
+            onNickChangePerChannel((NickChangeEventPerChannel<PircBotX>) event);
         else if (event instanceof QuitEventPerChannel)
-            onQuitPerChannel((QuitEventPerChannel) event);
+            onQuitPerChannel((QuitEventPerChannel<PircBotX>) event);
         else if (event instanceof IrcExceptionEvent)
-            onIrcException((IrcExceptionEvent) event);
+            onIrcException((IrcExceptionEvent<PircBotX>) event);
         else if (event instanceof IOExceptionEvent)
-            onIOException((IOExceptionEvent) event);
-        else
+            onIOException((IOExceptionEvent<PircBotX>) event);
+        else if (event instanceof MotdEvent) {
+            if (Utils.isMotdAllowed(applicationContext)) {
+                onMotd((MotdEvent<PircBotX>) event);
+            }
+        } else
             super.onEvent(event);
     }
 
