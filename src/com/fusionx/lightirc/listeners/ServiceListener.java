@@ -64,6 +64,9 @@ public class ServiceListener extends GenericListener {
     @Override
     public void onDisconnect(final DisconnectEvent<PircBotX> event) {
         event.getBot().setStatus(getService().getString(R.string.status_disconnected));
+
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+
         final LightManager manager = getService().getThreadManager();
         manager.remove(event.getBot().getConfiguration().getTitle());
         if (getService().getThreadManager().keySet().isEmpty()) {

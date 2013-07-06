@@ -70,7 +70,8 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onDisconnect(final DisconnectEvent<PircBotX> event) {
-
+        appendToServer(event);
+        getActivity().onUnexpectedDisconnect();
     }
 
     @Override

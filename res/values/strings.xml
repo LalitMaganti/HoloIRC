@@ -52,15 +52,17 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- App settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_appearance_summary">Settings to control the way the app looks</string>
+    <string name="server_channel_settings_title">Server/Channel Settings</string>
+    <string name="server_channel_settings_summary">Common settings for all servers in the app</string>
 
     <!-- Appearance settings -->
     <string name="appearance_settings_requires_restart">This requires a full restart of the app</string>
 
-    <!-- General server settings -->
-    <string name="general_server_settings_motd_title">Display MOTD</string>
-    <string name="general_server_settings_motd_description">Display Message of the Day from the server</string>
-    <string name="general_server_settings_title">General Server Settings</string>
-    <string name="general_server_settings_summary">Settings for all servers in the app</string>
+    <!-- Server/channel settings -->
+    <string name="server_channel_settings_motd_title">Display MOTD</string>
+    <string name="server_channel_settings_motd_description">Display Message of the Day from the server</string>
+    <string name="server_channel_settings_hide_messages_summary">For example join, part and quit messages</string>
+    <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->
     <string name="output_event_entered_room">joined the channel</string>
@@ -116,5 +118,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="message">Message</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
+    <string name="output_event_disconnected_from">Disconnected from</string>
 
 </resources>

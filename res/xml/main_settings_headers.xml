@@ -6,7 +6,7 @@
         android:title="@string/appearance"
         android:summary="@string/settings_appearance_summary"/>
     <header
-        android:fragment="com.fusionx.lightirc.fragments.settings.GeneralServerSettingsFragment"
-        android:title="@string/general_server_settings_title"
-        android:summary="@string/general_server_settings_summary"/>
+        android:fragment="com.fusionx.lightirc.fragments.settings.ServerChannelSettingsFragment"
+        android:title="@string/server_channel_settings_title"
+        android:summary="@string/server_channel_settings_summary"/>
 </preference-headers>

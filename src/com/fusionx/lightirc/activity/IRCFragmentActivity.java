@@ -156,7 +156,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            finish();
+            onUnexpectedDisconnect();
         }
     };
 
@@ -185,7 +185,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.actions_fragment);
             final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-            arrayAdapter.setConnected(service.getBot(builder.getTitle()).getStatus()
+            arrayAdapter.setConnected(service != null && service.getBot(builder.getTitle()).getStatus()
                     .equals(getString(R.string.status_connected)));
             arrayAdapter.notifyDataSetChanged();
         }
@@ -286,13 +286,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         actionBar.removeTabAt(i);
     }
 
-    public void disconnect() {
-        service.disconnectFromServer(builder.getTitle());
-        final Intent intent = new Intent(this, MainServerListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-
     private void closeIRCFragment(final boolean channel) {
         final int index = mViewPager.getCurrentItem();
         mViewPager.setCurrentItem(index - 1, true);
@@ -321,11 +314,13 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
     @Override
     public void onDestroy() {
-        final PircBotX bot = service.getBot(builder.getTitle());
-        if (bot != null) {
-            bot.getConfiguration().getListenerManager().removeListener(mListener);
+        if (service != null) {
+            final PircBotX bot = service.getBot(builder.getTitle());
+            if (bot != null) {
+                bot.getConfiguration().getListenerManager().removeListener(mListener);
+            }
+            unbindService(mConnection);
         }
-        unbindService(mConnection);
 
         super.onDestroy();
     }
@@ -333,6 +328,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     @Override
     public void onPause() {
         getService().setBoundToIRCFragmentActivity(null);
+
         super.onPause();
     }
 
@@ -346,7 +342,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final int server = mViewPager.getCurrentItem();
-        if (server != 0) {
+        if (server != 0 && service != null) {
             final IRCFragment fragment = (IRCFragment) mIRCPagerAdapter.getItem(server);
             final boolean channel = fragment instanceof ChannelFragment;
             final boolean userPM = fragment instanceof PMFragment;
@@ -414,6 +410,14 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         }
 
         closeAllSlidingMenus();
+    }
+
+    // Occurs
+    public void onUnexpectedDisconnect() {
+        service = null;
+        mIRCPagerAdapter.disableAllEditTexts();
+        closeAllSlidingMenus();
+        mViewPager.setCurrentItem(0, true);
     }
 
     // Hack for http://code.google.com/p/android/issues/detail?id=38500

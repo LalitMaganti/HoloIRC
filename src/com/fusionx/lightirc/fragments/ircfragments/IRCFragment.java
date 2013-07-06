@@ -47,7 +47,7 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PROTECTED)
-    private TextView editText;
+    private EditText editText;
 
     protected String serverName;
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Server Settings">
+    <CheckBoxPreference
+        android:key="pref_motd"
+        android:defaultValue="true"
+        android:title="@string/server_channel_settings_motd_title"
+        android:summary="@string/server_channel_settings_motd_description"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Channel Settings">
+        <CheckBoxPreference
+            android:key="pref_hide_messages"
+            android:defaultValue="true"
+            android:title="@string/server_channel_settings_hide_messages_title"
+            android:summary="@string/server_channel_settings_hide_messages_summary"/>
+    </PreferenceCategory>
+</PreferenceScreen>

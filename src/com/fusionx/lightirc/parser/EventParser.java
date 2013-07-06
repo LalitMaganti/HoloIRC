@@ -69,14 +69,18 @@ public class EventParser {
             returnMessage = privateMessageEventOutput((PrivateMessageEvent) e);
         } else if (e instanceof IOExceptionEvent) {
             final IOExceptionEvent event = (IOExceptionEvent) e;
-            returnMessage = event.getException().getMessage()
-                    + "\n" + context.getString(R.string.output_event_trying_reconnect);
+            returnMessage = event.getException().getMessage();
+            //+ "\n" + context.getString(R.string.output_event_trying_reconnect);
         } else if (e instanceof IrcExceptionEvent) {
             final IrcExceptionEvent event = (IrcExceptionEvent) e;
             returnMessage = event.getException().getMessage();
         } else if (e instanceof ConnectEvent) {
             final ConnectEvent event = (ConnectEvent) e;
             returnMessage = context.getString(R.string.output_event_connected_to_server)
+                    + " " + event.getBot().getConfiguration().getServerHostname();
+        } else if (e instanceof DisconnectEvent) {
+            final DisconnectEvent event = (DisconnectEvent) e;
+            returnMessage = context.getString(R.string.output_event_disconnected_from)
                     + " " + event.getBot().getConfiguration().getServerHostname();
         } else {
             // Invalid event

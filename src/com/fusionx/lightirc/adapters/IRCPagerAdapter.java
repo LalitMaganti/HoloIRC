@@ -245,16 +245,22 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     public IRCFragment getTab(final String title) {
         for (final IRCFragment i : views) {
-            if (i.getTitle() != null) {
-                if (i.getTitle().equals(title)) {
-                    int indexofi = views.indexOf(i);
-                    if (indexofi == currentItemIndex || indexofi == (currentItemIndex - 1)
-                            || indexofi == (currentItemIndex + 1)) {
-                        return i;
-                    }
+            if (title.equals(i.getTitle())) {
+                int indexofi = views.indexOf(i);
+                if (indexofi == currentItemIndex || indexofi == (currentItemIndex - 1)
+                        || indexofi == (currentItemIndex + 1)) {
+                    return i;
+                } else {
+                    return null;
                 }
             }
         }
         return null;
+    }
+
+    public void disableAllEditTexts() {
+        for (IRCFragment fragment : views) {
+            fragment.getEditText().setEnabled(false);
+        }
     }
 }
