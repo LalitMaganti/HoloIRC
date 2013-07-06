@@ -38,13 +38,17 @@ import android.widget.PopupMenu;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.adapters.ServerCardsAdapter;
-import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.misc.LightThread;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Listener;
+import org.pircbotx.hooks.ListenerAdapter;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -61,6 +65,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private ArrayList<Configuration.Builder> mBuilderList;
     private Configuration.Builder mBuilder;
     private BuilderAdapter mServerCardsAdapter;
+
+    private MainActivityListener listener = new MainActivityListener();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -84,20 +90,39 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(service != null) {
+            for(LightThread thread : service.getThreadManager().values()) {
+                thread.getBot().getConfiguration().getListenerManager().removeListener(listener);
+            }
+        }
+        unbindService(mConnection);
+        service = null;
+    }
+
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
-            unbindService(this);
+            for(LightThread thread : service.getThreadManager().values()) {
+                thread.getBot().getConfiguration().getListenerManager().addListener(listener);
+            }
         }
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
             service = null;
+            setUpServerList();
         }
     };
+
+    private class MainActivityListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
+
+    }
 
     private void setUpListView() {
         final ListView listView = (ListView) findViewById(R.id.server_list);
@@ -175,29 +200,29 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         for (final String server : servers) {
             final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
             final Configuration.Builder bot = new Configuration.Builder();
-            bot.setTitle(serverSettings.getString(Constants.Title, ""));
-            bot.setServerHostname(serverSettings.getString(Constants.URL, ""));
-            bot.setServerPort(Integer.parseInt(serverSettings.getString(Constants.Port, "6667")));
-            bot.setName(serverSettings.getString(Constants.Nick, ""));
-            bot.setLogin(serverSettings.getString(Constants.ServerUserName, "lightirc"));
-            bot.setServerPassword(serverSettings.getString(Constants.ServerPassword, ""));
+            bot.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
+            bot.setServerHostname(serverSettings.getString(PreferenceKeys.URL, ""));
+            bot.setServerPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
+            bot.setName(serverSettings.getString(PreferenceKeys.Nick, ""));
+            bot.setLogin(serverSettings.getString(PreferenceKeys.ServerUserName, "lightirc"));
+            bot.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
 
-            final String nickServPassword = serverSettings.getString(Constants
+            final String nickServPassword = serverSettings.getString(PreferenceKeys
                     .NickServPassword, null);
             if (nickServPassword != null && !nickServPassword.equals("")) {
                 bot.setNickservPassword(nickServPassword);
             }
 
-            bot.setAutoNickChange(serverSettings.getBoolean(Constants.AutoNickChange, true));
+            bot.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
-            final boolean ssl = serverSettings.getBoolean(Constants.SSL, false);
+            final boolean ssl = serverSettings.getBoolean(PreferenceKeys.SSL, false);
             if (ssl) {
                 bot.setSocketFactory(SSLSocketFactory.getDefault());
             } else {
                 bot.setSocketFactory(SocketFactory.getDefault());
             }
 
-            final Set<String> auto = serverSettings.getStringSet(Constants.AutoJoin, new HashSet<String>());
+            final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
             for (final String channel : auto) {
                 bot.addAutoJoinChannel(channel);
             }
@@ -220,16 +245,16 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         final SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
         final Editor e = settings.edit();
 
-        e.putString(Constants.Title, "Freenode");
-        e.putString(Constants.URL, "irc.freenode.net");
-        e.putString(Constants.Port, "6667");
-        e.putString(Constants.Nick, "LightIRCUser");
-        e.putString(Constants.ServerUserName, "lightirc");
-        e.putBoolean(Constants.AutoNickChange, true);
-        e.putBoolean(Constants.SSL, false);
+        e.putString(PreferenceKeys.Title, "Freenode");
+        e.putString(PreferenceKeys.URL, "irc.freenode.net");
+        e.putString(PreferenceKeys.Port, "6667");
+        e.putString(PreferenceKeys.Nick, "LightIRCUser");
+        e.putString(PreferenceKeys.ServerUserName, "lightirc");
+        e.putBoolean(PreferenceKeys.AutoNickChange, true);
+        e.putBoolean(PreferenceKeys.SSL, false);
 
         final HashSet<String> auto = new HashSet<String>();
-        e.putStringSet(Constants.AutoJoin, auto);
+        e.putStringSet(PreferenceKeys.AutoJoin, auto);
         e.commit();
     }
 

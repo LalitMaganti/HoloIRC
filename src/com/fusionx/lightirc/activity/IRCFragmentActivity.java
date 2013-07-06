@@ -288,32 +288,26 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
     private void closeIRCFragment(final boolean channel) {
         final int index = mViewPager.getCurrentItem();
+        final String title = ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle();
         mViewPager.setCurrentItem(index - 1, true);
+        removeTab(index);
 
-        final Object[] objects = {channel, index};
-        final AsyncTask<Object, Void, IRCFragment> closeFragment = new AsyncTask<Object, Void, IRCFragment>() {
+        final AsyncTask<Void, Void, Void> closeFragment = new AsyncTask<Void, Void, Void>() {
             @Override
-            protected IRCFragment doInBackground(Object... booleans) {
-                final IRCFragment fragment = ((IRCFragment) mIRCPagerAdapter.getItem((Integer) booleans[1]));
-                if ((Boolean) booleans[0]) {
-                    service.partFromChannel(builder.getTitle(), fragment.getTitle());
+            protected Void doInBackground(Void... v) {
+                if (channel) {
+                    service.partFromChannel(builder.getTitle(), title);
                 } else {
-                    service.removePrivateMessage(builder.getTitle(), fragment.getTitle());
+                    service.removePrivateMessage(builder.getTitle(), title);
                 }
-                return fragment;
-            }
-
-            @Override
-            protected void onPostExecute(final IRCFragment fragment) {
-                final int index = mIRCPagerAdapter.removeView(fragment.getTitle());
-                removeTab(index);
+                return null;
             }
         };
-        closeFragment.execute(objects);
+        closeFragment.execute();
     }
 
     @Override
-    public void onDestroy() {
+    public void onPause() {
         if (service != null) {
             final PircBotX bot = service.getBot(builder.getTitle());
             if (bot != null) {
@@ -321,12 +315,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             }
             unbindService(mConnection);
         }
-
-        super.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
         getService().setBoundToIRCFragmentActivity(null);
 
         super.onPause();
@@ -392,7 +380,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         final UserListAdapter adapter = ((UserListAdapter) mUserFragment.getListAdapter());
         adapter.clear();
 
-        final ArrayList<String> userList = fragment.getUserList();
+        final ArrayList<String> userList = service.getBot(builder.getTitle()).getUserChannelDao()
+                .getChannel(fragment.getTitle()).getUserList();
         if (userList != null) {
             adapter.addAll(userList);
             adapter.sort();

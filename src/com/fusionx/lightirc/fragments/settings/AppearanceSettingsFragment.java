@@ -33,7 +33,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.service.IRCService;
 
 public class AppearanceSettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
@@ -47,7 +47,7 @@ public class AppearanceSettingsFragment extends PreferenceFragment implements Pr
         final String[] themes_entries = {String.valueOf(R.style.Dark), String.valueOf(R.style.Light)};
 
         final PreferenceScreen prefSet = getPreferenceScreen();
-        mChooseTheme = (ListPreference) prefSet.findPreference(Constants.Theme);
+        mChooseTheme = (ListPreference) prefSet.findPreference(PreferenceKeys.Theme);
         mChooseTheme.setEntryValues(themes_entries);
         if (mChooseTheme.getEntry() == null) {
             mChooseTheme.setValue(String.valueOf(R.style.Light));

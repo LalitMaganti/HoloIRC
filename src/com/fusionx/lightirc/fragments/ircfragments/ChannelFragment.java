@@ -24,37 +24,12 @@ package com.fusionx.lightirc.fragments.ircfragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
 import org.pircbotx.Channel;
 
-import java.util.ArrayList;
-
 public class ChannelFragment extends IRCFragment {
-    @Getter(AccessLevel.PUBLIC)
-    @Setter(AccessLevel.PUBLIC)
-    private ArrayList<String> userList;
-
-    @Override
-    public View onCreateView(final LayoutInflater inflater,
-                             final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
-
-        final ArrayList<String> list = getArguments().getStringArrayList("userList");
-        if (list != null) {
-            userList = list;
-        }
-
-        return rootView;
-    }
-
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         final CharSequence text = getEditText().getText();
@@ -89,6 +64,5 @@ public class ChannelFragment extends IRCFragment {
         final Channel channel = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName)
                 .getUserChannelDao().getChannel(getTitle());
         writeToTextView(channel.getBuffer());
-        setUserList(channel.getUserList());
     }
 }

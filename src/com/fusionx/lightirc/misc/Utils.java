@@ -29,7 +29,7 @@ import com.fusionx.lightirc.R;
 public class Utils {
     public static int getThemeInt(final Context applicationContext) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return Integer.parseInt(prefs.getString(Constants.Theme, String.valueOf(R.style.Light)));
+        return Integer.parseInt(prefs.getString(PreferenceKeys.Theme, String.valueOf(R.style.Light)));
     }
 
     public static boolean themeIsHoloLight(final Context applicationContext) {
@@ -46,6 +46,11 @@ public class Utils {
 
     public static boolean isMotdAllowed(final Context applicationContext) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return prefs.getBoolean(Constants.Motd, true);
+        return prefs.getBoolean(PreferenceKeys.Motd, true);
+    }
+
+    public static boolean isMessagesFromChannelHidden(final Context applicationContext) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return prefs.getBoolean(PreferenceKeys.HideMessages, false);
     }
 }

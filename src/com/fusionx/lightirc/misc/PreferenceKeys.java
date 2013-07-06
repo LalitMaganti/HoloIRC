@@ -21,9 +21,7 @@
 
 package com.fusionx.lightirc.misc;
 
-public class Constants {
-    // Preference keys
-
+public class PreferenceKeys {
     // Server settings
     public final static String Title = "pref_title";
     public final static String URL = "pref_url";
@@ -42,4 +40,7 @@ public class Constants {
     // Appearance Settings
     public final static String Theme = "fragment_settings_theme";
     public final static String Motd = "pref_motd";
+
+    // Server channel settings
+    public final static String HideMessages = "pref_hide_messages";
 }

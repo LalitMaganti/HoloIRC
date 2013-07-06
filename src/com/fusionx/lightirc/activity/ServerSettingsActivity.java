@@ -37,7 +37,7 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.Toast;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialog;
 
@@ -128,32 +128,32 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             final PreferenceScreen prefSet = getPreferenceScreen();
 
-            mEditTextTitle = (EditTextPreference) prefSet.findPreference(Constants.Title);
+            mEditTextTitle = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Title);
             mEditTextTitle.setOnPreferenceChangeListener(this);
             mEditTexts.add(mEditTextTitle);
 
             // URL of server
-            mEditTextUrl = (EditTextPreference) prefSet.findPreference(Constants.URL);
+            mEditTextUrl = (EditTextPreference) prefSet.findPreference(PreferenceKeys.URL);
             mEditTextUrl.setOnPreferenceChangeListener(this);
             mEditTexts.add(mEditTextUrl);
 
             // Port of server
-            mEditTextPort = (EditTextPreference) prefSet.findPreference(Constants.Port);
+            mEditTextPort = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Port);
             mEditTextPort.setOnPreferenceChangeListener(this);
             mEditTexts.add(mEditTextPort);
 
             // Nick of User
-            mEditTextNick = (EditTextPreference) prefSet.findPreference(Constants.Nick);
+            mEditTextNick = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Nick);
             mEditTextNick.setOnPreferenceChangeListener(this);
             mEditTexts.add(mEditTextNick);
 
-            mServerUserName = (EditTextPreference) prefSet.findPreference(Constants.ServerUserName);
+            mServerUserName = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerUserName);
             mServerUserName.setOnPreferenceChangeListener(this);
 
-            mServerPassword = (EditTextPreference) prefSet.findPreference(Constants.ServerPassword);
+            mServerPassword = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerPassword);
             mServerPassword.setOnPreferenceChangeListener(this);
 
-            mNickServPassword = (EditTextPreference) prefSet.findPreference(Constants.NickServPassword);
+            mNickServPassword = (EditTextPreference) prefSet.findPreference(PreferenceKeys.NickServPassword);
             mNickServPassword.setOnPreferenceChangeListener(this);
 
             canExit = !newServer;
@@ -292,7 +292,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             SharedPreferences settings = getActivity()
                     .getSharedPreferences(fileName, MODE_PRIVATE);
-            Set<String> set = settings.getStringSet(Constants.AutoJoin, new HashSet<String>());
+            Set<String> set = settings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
             for (String channel : set) {
                 adapter.add(channel);
             }
@@ -327,7 +327,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             SharedPreferences settings = getActivity()
                     .getSharedPreferences(fileName, MODE_PRIVATE);
             final Editor e = settings.edit();
-            e.putStringSet(Constants.AutoJoin, adapter.getItems());
+            e.putStringSet(PreferenceKeys.AutoJoin, adapter.getItems());
             e.commit();
 
             super.onPause();

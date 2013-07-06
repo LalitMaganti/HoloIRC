@@ -119,5 +119,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="password">Password</string>
     <string name="username">Username</string>
     <string name="output_event_disconnected_from">Disconnected from</string>
+    <string name="service_lightirc_running">LightIRC running</string>
 
 </resources>

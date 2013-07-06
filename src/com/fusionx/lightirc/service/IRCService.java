@@ -89,8 +89,8 @@ public class IRCService extends Service {
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.service_one_server_joined))
-                .setTicker(getString(R.string.service_one_server_joined))
+                .setContentText(getString(R.string.service_lightirc_running))
+                .setTicker(getString(R.string.service_lightirc_running))
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);

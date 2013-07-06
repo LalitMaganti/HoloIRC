@@ -25,26 +25,20 @@ import android.support.v4.view.ViewPager;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
-import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.parser.EventParser;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 public class ActivityListener extends GenericListener {
     @Getter(AccessLevel.PRIVATE)
@@ -117,24 +111,6 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onUserList(final UserListEvent<PircBotX> event) {
-        final ArrayList<String> userList = new ArrayList<String>();
-
-        for (final User user : event.getUsers()) {
-            userList.add(user.getPrettyNick(event.getChannel()));
-        }
-
-        event.getChannel().initialUserList(userList);
-        Collections.sort(userList, new UserComparator());
-
-        final String channelName = event.getChannel().getName();
-        final ChannelFragment channel = (ChannelFragment) mIRCPagerAdapter.getTab(channelName);
-        if (channel != null) {
-            channel.setUserList(userList);
-        }
-    }
-
-    @Override
     public void onMessage(final MessageEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
     }
@@ -150,42 +126,20 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
-        final String oldFormattedNick = event.getOldNick();
-        final String newFormattedNick = event.getNewNick();
-
         sendMessage(event.getChannel().getName(), event);
-
-        if (checkChannelFragment(event.getChannel().getName())) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    arrayAdapter.replace(oldFormattedNick, newFormattedNick);
-                }
-            });
-        }
+        getActivity().closeAllSlidingMenus();
     }
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
-
-        if (checkChannelFragment(event.getChannel().getName())) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    arrayAdapter.add(event.getUser().getPrettyNick(event.getChannel()));
-                    arrayAdapter.sort();
-                    arrayAdapter.notifyDataSetChanged();
-                }
-            });
-        }
+        getActivity().closeAllSlidingMenus();
     }
 
     @Override
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
-
-        removeUserFromList(event.getChannel(), event.getUser());
+        getActivity().closeAllSlidingMenus();
     }
 
     @Override
@@ -203,21 +157,7 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
         sendMessage(event.getChannel().getName(), event);
-
-        removeUserFromList(event.getChannel(), event.getUser());
-    }
-
-    public void removeUserFromList(final Channel channel, final User user) {
-        if (checkChannelFragment(channel.getName())) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    arrayAdapter.remove(user.getPrettyNick(channel));
-                    arrayAdapter.sort();
-                    arrayAdapter.notifyDataSetChanged();
-                }
-            });
-        }
+        getActivity().closeAllSlidingMenus();
     }
 
     // Private message events

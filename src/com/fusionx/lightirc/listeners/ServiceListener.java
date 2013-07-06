@@ -173,7 +173,8 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.add(event.getUser().getPrettyNick(event.getChannel()));
+        String nick = event.getUser().getPrettyNick(event.getChannel());
+        set.add(nick);
         Collections.sort(set, new UserComparator());
     }
 
@@ -182,7 +183,8 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
 
         final ArrayList<String> set = event.getChannel().getUserList();
-        set.remove(event.getUser().getPrettyNick(event.getChannel()));
+        String nick = event.getUser().getPrettyNick(event.getChannel());
+        set.remove(nick);
         Collections.sort(set, new UserComparator());
     }
 

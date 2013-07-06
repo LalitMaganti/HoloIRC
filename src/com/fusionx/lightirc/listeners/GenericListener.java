@@ -47,8 +47,11 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     public void onEvent(final Event<PircBotX> event) throws Exception {
         if (event instanceof NickChangeEventPerChannel)
             onNickChangePerChannel((NickChangeEventPerChannel<PircBotX>) event);
-        else if (event instanceof QuitEventPerChannel)
-            onQuitPerChannel((QuitEventPerChannel<PircBotX>) event);
+        else if (event instanceof QuitEventPerChannel) {
+            if(!Utils.isMessagesFromChannelHidden(applicationContext)) {
+                onQuitPerChannel((QuitEventPerChannel<PircBotX>) event);
+            }
+        }
         else if (event instanceof IrcExceptionEvent)
             onIrcException((IrcExceptionEvent<PircBotX>) event);
         else if (event instanceof IOExceptionEvent)
@@ -81,7 +84,9 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     @Override
     public void onJoin(final JoinEvent<PircBotX> event) {
         if (!((JoinEvent) event).getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
-            onOtherUserJoin(event);
+            if(!Utils.isMessagesFromChannelHidden(applicationContext)) {
+                onOtherUserJoin(event);
+            }
         } else {
             onBotJoin(event);
         }
@@ -90,7 +95,9 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     @Override
     public void onPart(final PartEvent<PircBotX> event) {
         if (!event.getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
-            onOtherUserPart(event);
+            if(!Utils.isMessagesFromChannelHidden(applicationContext)) {
+                onOtherUserPart(event);
+            }
         } else {
             onUserPart(event);
         }

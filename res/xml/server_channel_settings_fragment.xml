@@ -13,7 +13,7 @@
     <PreferenceCategory android:title="Channel Settings">
         <CheckBoxPreference
             android:key="pref_hide_messages"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:title="@string/server_channel_settings_hide_messages_title"
             android:summary="@string/server_channel_settings_hide_messages_summary"/>
     </PreferenceCategory>
