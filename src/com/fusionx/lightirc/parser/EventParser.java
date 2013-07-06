@@ -57,12 +57,18 @@ public class EventParser {
             returnMessage = messageEventOutput((MessageEvent) e);
         } else if (e instanceof QuitEventPerChannel) {
             final QuitEventPerChannel event = (QuitEventPerChannel) e;
-            returnMessage = event.getUser().getPrettyNick(event.getChannel())
-                    + " " + context.getString(R.string.output_event_quit_server) + " " + event.getReason() + ")";
+            returnMessage = event.getUser().getPrettyNick(event.getChannel()) + " "
+                    + context.getString(R.string.output_event_quit_server);
+            if (event.getReason() != null && !event.getReason().isEmpty()) {
+                returnMessage += " " + context.getString(R.string.output_event_reason) + " " + event.getReason() + ")";
+            }
         } else if (e instanceof PartEvent) {
             final PartEvent event = (PartEvent) e;
-            returnMessage = event.getUser().getPrettyNick(event.getChannel())
-                    + " " + context.getString(R.string.output_event_part_channel) + " " + event.getReason() + ")";
+            returnMessage = event.getUser().getPrettyNick(event.getChannel()) + " "
+                    + context.getString(R.string.output_event_part_channel);
+            if (event.getReason() != null && !event.getReason().isEmpty()) {
+                returnMessage += " " + context.getString(R.string.output_event_reason) + " " + event.getReason() + ")";
+            }
         } else if (e instanceof NickChangeEventPerChannel) {
             returnMessage = nickChangeEventOutput((NickChangeEventPerChannel) e, context);
         } else if (e instanceof PrivateMessageEvent) {
@@ -82,9 +88,13 @@ public class EventParser {
             final DisconnectEvent event = (DisconnectEvent) e;
             returnMessage = context.getString(R.string.output_event_disconnected_from)
                     + " " + event.getBot().getConfiguration().getServerHostname();
+        } else if (e instanceof ModeEvent) {
+            final ModeEvent event = (ModeEvent) e;
+            returnMessage = context.getString(R.string.mode) + " " + event.getMode() + " " +
+                    context.getString(R.string.by) + " " + event.getUser().getNick();
         } else {
             // Invalid event
-            returnMessage = "";
+            return "";
         }
         return returnMessage + "\n";
     }

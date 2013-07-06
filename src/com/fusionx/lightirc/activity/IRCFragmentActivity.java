@@ -102,7 +102,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mViewPager.setOnPageChangeListener(this);
 
         mListener = new ActivityListener(this, mIRCPagerAdapter, mViewPager);
-        mListener.setArrayAdapter((UserListAdapter) mUserFragment.getListAdapter());
 
         builder = getIntent().getExtras().getParcelable("server");
 
@@ -112,9 +111,9 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
         final Intent service = new Intent(this, IRCService.class);
         service.putExtra("server", true);
-        service.putExtra("serverName", builder.getTitle());
+        service.putExtra("serverName", getBuilder().getTitle());
         service.putExtra("stop", false);
-        service.putExtra("setBound", builder.getTitle());
+        service.putExtra("setBound", getBuilder().getTitle());
         startService(service);
         bindService(service, mConnection, 0);
     }
@@ -123,9 +122,9 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
-            parser.setService(service);
+            parser.setService(getService());
 
-            final PircBotX bot = service.getBot(builder.getTitle());
+            final PircBotX bot = getService().getBot(getBuilder().getTitle());
             if (bot != null) {
                 bot.getConfiguration().getListenerManager().addListener(mListener);
                 addServerFragment();
@@ -138,8 +137,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
                     }
                 }
             } else {
-                builder.getListenerManager().addListener(mListener);
-                service.connectToServer(builder);
+                getBuilder().getListenerManager().addListener(mListener);
+                getService().connectToServer(getBuilder());
                 addServerFragment();
             }
         }
@@ -147,11 +146,11 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         private void addServerFragment() {
             final ServerFragment fragment = new ServerFragment();
             final Bundle bundle = new Bundle();
-            bundle.putString("title", builder.getTitle());
+            bundle.putString("title", getBuilder().getTitle());
             fragment.setArguments(bundle);
 
             mIRCPagerAdapter.addView(fragment);
-            addTab(builder.getTitle());
+            addTab(getBuilder().getTitle());
         }
 
         @Override
@@ -185,7 +184,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.actions_fragment);
             final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-            arrayAdapter.setConnected(service != null && service.getBot(builder.getTitle()).getStatus()
+            arrayAdapter.setConnected(getService() != null && service.getBot(getBuilder().getTitle()).getStatus()
                     .equals(getString(R.string.status_connected)));
             arrayAdapter.notifyDataSetChanged();
         }
@@ -242,7 +241,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", channelName);
-        bundle.putString("serverName", builder.getTitle());
+        bundle.putString("serverName", getBuilder().getTitle());
 
         if (userList != null) {
             bundle.putStringArrayList("userList", userList);
@@ -296,9 +295,9 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             @Override
             protected Void doInBackground(Void... v) {
                 if (channel) {
-                    service.partFromChannel(builder.getTitle(), title);
+                    getService().partFromChannel(getBuilder().getTitle(), title);
                 } else {
-                    service.removePrivateMessage(builder.getTitle(), title);
+                    getService().removePrivateMessage(getBuilder().getTitle(), title);
                 }
                 return null;
             }
@@ -307,15 +306,33 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     }
 
     @Override
+    public void onResume() {
+        if (getService() != null) {
+            final PircBotX bot = getService().getBot(getBuilder().getTitle());
+            if (bot != null) {
+                bot.getConfiguration().getListenerManager().addListener(mListener);
+            }
+            getService().setBoundToIRCFragmentActivity(getBuilder().getTitle());
+        }
+
+        super.onResume();
+    }
+    @Override
+    public void onDestroy() {
+        unbindService(mConnection);
+
+        super.onDestroy();
+    }
+
+    @Override
     public void onPause() {
-        if (service != null) {
-            final PircBotX bot = service.getBot(builder.getTitle());
+        if (getService() != null) {
+            final PircBotX bot = getService().getBot(getBuilder().getTitle());
             if (bot != null) {
                 bot.getConfiguration().getListenerManager().removeListener(mListener);
             }
-            unbindService(mConnection);
+            getService().setBoundToIRCFragmentActivity(null);
         }
-        getService().setBoundToIRCFragmentActivity(null);
 
         super.onPause();
     }

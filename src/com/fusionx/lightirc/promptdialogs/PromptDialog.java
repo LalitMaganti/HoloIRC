@@ -24,11 +24,15 @@ package com.fusionx.lightirc.promptdialogs;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.Button;
 import android.widget.EditText;
 import com.fusionx.lightirc.R;
 
-public abstract class PromptDialog extends AlertDialog.Builder implements DialogInterface.OnClickListener {
+public abstract class PromptDialog extends AlertDialog.Builder implements DialogInterface.OnClickListener, TextWatcher {
     private final EditText input;
+    private AlertDialog dialog;
 
     public PromptDialog(final Context context, final String title, final String hint, final String edittextdefaulttext) {
         super(context);
@@ -42,7 +46,6 @@ public abstract class PromptDialog extends AlertDialog.Builder implements Dialog
         setView(input);
 
         setPositiveButton(context.getString(R.string.ok), this);
-
         setNegativeButton(context.getString(R.string.cancel), this);
     }
 
@@ -54,5 +57,37 @@ public abstract class PromptDialog extends AlertDialog.Builder implements Dialog
         dialog.dismiss();
     }
 
+    @Override
+    public AlertDialog show() {
+        dialog = super.show();
+        updateButton();
+
+        input.removeTextChangedListener(this);
+        input.addTextChangedListener(this);
+
+        return dialog;
+    }
+
     abstract public void onOkClicked(final String input);
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+        updateButton();
+    }
+
+    private void updateButton() {
+        final boolean enable = !input.getText().toString().isEmpty();
+        final Button btn = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        btn.setEnabled(enable);
+    }
 }

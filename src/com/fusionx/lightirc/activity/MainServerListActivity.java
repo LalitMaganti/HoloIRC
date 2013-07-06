@@ -93,8 +93,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     protected void onPause() {
         super.onPause();
-        if(service != null) {
-            for(LightThread thread : service.getThreadManager().values()) {
+        if (service != null) {
+            for (LightThread thread : service.getThreadManager().values()) {
                 thread.getBot().getConfiguration().getListenerManager().removeListener(listener);
             }
         }
@@ -108,7 +108,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             service = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
-            for(LightThread thread : service.getThreadManager().values()) {
+            for (LightThread thread : service.getThreadManager().values()) {
                 thread.getBot().getConfiguration().getListenerManager().addListener(listener);
             }
         }

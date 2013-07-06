@@ -24,15 +24,14 @@ package com.fusionx.lightirc.listeners;
 import android.support.v4.view.ViewPager;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
 import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
+import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
@@ -46,9 +45,6 @@ public class ActivityListener extends GenericListener {
     private final IRCPagerAdapter mIRCPagerAdapter;
     private final ViewPager mViewPager;
 
-    @Setter(AccessLevel.PUBLIC)
-    private UserListAdapter arrayAdapter;
-
     public ActivityListener(final IRCFragmentActivity activity, final IRCPagerAdapter adapter, final ViewPager pager) {
         super(activity.getApplicationContext());
         this.activity = activity;
@@ -60,6 +56,8 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onConnect(final ConnectEvent<PircBotX> event) {
         appendToServer(event);
+
+        activity.closeAllSlidingMenus();
     }
 
     @Override
@@ -126,20 +124,38 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
-        sendMessage(event.getChannel().getName(), event);
-        getActivity().closeAllSlidingMenus();
+        userListChanged(event, event.getChannel().getName());
     }
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
-        sendMessage(event.getChannel().getName(), event);
-        getActivity().closeAllSlidingMenus();
+        userListChanged(event, event.getChannel().getName());
     }
 
     @Override
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
-        sendMessage(event.getChannel().getName(), event);
-        getActivity().closeAllSlidingMenus();
+        userListChanged(event, event.getChannel().getName());
+    }
+
+    @Override
+    public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
+        userListChanged(event, event.getChannel().getName());
+    }
+
+    @Override
+    public void onMode(final ModeEvent<PircBotX> event) {
+        if (event.getUser() != null) {
+            userListChanged(event, event.getChannel().getName());
+        }
+    }
+
+    private void userListChanged(final Event<PircBotX> event, final String channelName) {
+        if(!Utils.isMessagesFromChannelHidden(applicationContext)) {
+            sendMessage(channelName, event);
+        }
+        if (checkChannelFragment(channelName)) {
+            getActivity().closeAllSlidingMenus();
+        }
     }
 
     @Override
@@ -152,12 +168,6 @@ public class ActivityListener extends GenericListener {
                 getActivity().removeTab(index);
             }
         });
-    }
-
-    @Override
-    public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
-        sendMessage(event.getChannel().getName(), event);
-        getActivity().closeAllSlidingMenus();
     }
 
     // Private message events

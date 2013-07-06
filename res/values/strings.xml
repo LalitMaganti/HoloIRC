@@ -66,8 +66,9 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Output for events -->
     <string name="output_event_entered_room">joined the channel</string>
-    <string name="output_event_quit_server">quit the server (Reason:</string>
-    <string name="output_event_part_channel">parted from the channel (Reason:</string>
+    <string name="output_event_quit_server">quit the server</string>
+    <string name="output_event_part_channel">parted from the channel</string>
+    <string name="output_event_reason">(Reason:</string>
     <string name="output_event_trying_reconnect">\nTrying to reconnect in 5 seconds</string>
     <string name="output_event_topic_changed_to">The topic for this channel has been changed to:</string>
     <string name="output_event_by">by</string>
@@ -78,6 +79,7 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="output_event_known_as">is now known as</string>
     <string name="output_event_unknown_event">Unknown command:</string>
     <string name="output_event_connected_to_server">Connected to server</string>
+    <string name="output_event_disconnected_from">Disconnected from</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -87,6 +89,7 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="service_one_server_joined">At least one server is joined</string>
     <string name="service_disconnect_all">Disconnect all</string>
     <string name="service_you_mentioned">You have been mentioned on</string>
+    <string name="service_lightirc_running">LightIRC running</string>
 
     <!-- User list fragment -->
     <string name="user_list_not_possible">Not possible</string>
@@ -118,7 +121,8 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="message">Message</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
-    <string name="output_event_disconnected_from">Disconnected from</string>
-    <string name="service_lightirc_running">LightIRC running</string>
+    <string name="mode">Mode</string>
+    <string name="on">on</string>
+    <string name="by">by</string>
 
 </resources>

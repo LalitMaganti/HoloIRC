@@ -26,6 +26,7 @@ import com.fusionx.lightirc.irc.IOExceptionEvent;
 import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.misc.UserComparator;
+import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.service.IRCService;
 import lombok.AccessLevel;
@@ -133,7 +134,7 @@ public class ServiceListener extends GenericListener {
             userList.add(user.getPrettyNick(event.getChannel()));
         }
 
-        event.getChannel().initialUserList(userList);
+        event.getChannel().setUserList(userList);
         Collections.sort(userList, new UserComparator());
     }
 
@@ -176,6 +177,23 @@ public class ServiceListener extends GenericListener {
         String nick = event.getUser().getPrettyNick(event.getChannel());
         set.add(nick);
         Collections.sort(set, new UserComparator());
+    }
+
+    @Override
+    public void onMode(final ModeEvent<PircBotX> event) {
+        if (event.getUser() != null) {
+            if (!Utils.isMessagesFromChannelHidden(applicationContext)) {
+                event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+            }
+            final ArrayList<String> userList = new ArrayList<String>();
+
+            for (final User user : event.getChannel().getUsers()) {
+                userList.add(user.getPrettyNick(event.getChannel()));
+            }
+
+            event.getChannel().setUserList(userList);
+            Collections.sort(userList, new UserComparator());
+        }
     }
 
     @Override

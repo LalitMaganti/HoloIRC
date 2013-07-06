@@ -85,7 +85,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
     }
 
     private void channelNameDialog(final PircBotX bot) {
-        final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity()) {
+        final ChannelNamePromptDialog builder = new ChannelNamePromptDialog(getActivity()) {
             @Override
             public void onOkClicked(final String input) {
                 final AsyncTask<Void, Void, Void> JoinTask = new AsyncTask<Void, Void, Void>() {
@@ -99,7 +99,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
                 ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
             }
         };
-        dialog.show();
+        builder.show();
     }
 
     public void disconnect() {

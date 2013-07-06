@@ -29,8 +29,6 @@ import android.widget.TextView;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 
 public class ServerFragment extends IRCFragment {
-    private boolean firstCreation = true;
-
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_DONE && getEditText().getText() != null) {
@@ -60,10 +58,7 @@ public class ServerFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        if(!firstCreation) {
-            final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName).getBuffer();
-            writeToTextView(buffer);
-            firstCreation = false;
-        }
+        final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName).getBuffer();
+        writeToTextView(buffer);
     }
 }
