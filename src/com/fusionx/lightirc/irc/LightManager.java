@@ -21,13 +21,25 @@
 
 package com.fusionx.lightirc.irc;
 
+import android.content.Context;
+import com.fusionx.lightirc.misc.Utils;
+
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class LightManager extends HashMap<String, LightThread> {
     private static final long serialVersionUID = 2426166268063489300L;
 
+    private final Context applicationContext;
+
+    public LightManager(Context applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
     public void disconnectAll() {
-        for (final LightThread bot : values()) {
+        final HashSet<LightThread> set = new HashSet<LightThread>(values());
+        for (final LightThread bot : set) {
+            bot.getBot().sendIRC().quitServer(Utils.getQuitReason(applicationContext));
             bot.getBot().shutdown();
         }
     }

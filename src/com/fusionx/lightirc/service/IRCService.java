@@ -60,12 +60,14 @@ public class IRCService extends Service {
     }
 
     @Getter(AccessLevel.PUBLIC)
-    private final LightManager threadManager = new LightManager();
+    private LightManager threadManager = null;
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
     private String boundToServer = null;
 
     public void connectToServer(final Configuration.Builder server) {
+        threadManager = new LightManager(getApplicationContext());
+
         final LightBotFactory factory = new LightBotFactory(getApplicationContext());
         server.setBotFactory(factory);
 
@@ -149,7 +151,7 @@ public class IRCService extends Service {
     }
 
     public PircBotX getBot(final String serverName) {
-        if (threadManager.get(serverName) != null) {
+        if (threadManager != null && threadManager.get(serverName) != null) {
             return threadManager.get(serverName).getBot();
         } else {
             return null;

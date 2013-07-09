@@ -387,7 +387,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
     public void onUnexpectedDisconnect() {
         viewPager.setCurrentItem(0, true);
 
-        for (int i = 1; i < ircPagerAdapter.getCount() - 1; i++) {
+        for (int i = 1; i < getActionBar().getTabCount();) {
             removeTab(i);
         }
         ircPagerAdapter.removeAllButServer();
@@ -396,6 +396,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
         service = null;
 
         ircPagerAdapter.disableAllEditTexts();
+        ((ActionsArrayAdapter) actionsFragment.getListAdapter()).setConnected(false);
+        ((ActionsArrayAdapter) actionsFragment.getListAdapter()).notifyDataSetChanged();
         closeAllSlidingMenus();
     }
 

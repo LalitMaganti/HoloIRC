@@ -59,6 +59,7 @@ public class ServiceListener extends GenericListener {
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
     }
 
+    // This HAS to be an unexpected disconnect. If it isn't then there's something wrong.
     @Override
     public void onDisconnect(final DisconnectEvent<PircBotX> event) {
         event.getBot().setStatus(getService().getString(R.string.status_disconnected));

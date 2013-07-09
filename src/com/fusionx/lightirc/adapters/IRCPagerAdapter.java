@@ -252,8 +252,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void removeAllButServer() {
-        final int count = getCount();
-        for (int i = 1; i < count - 1;) {
+        for (int i = 1; i < getCount();) {
             views.remove(i);
         }
 
