@@ -64,6 +64,7 @@ import java.util.Set;
 
 public class IRCFragmentActivity extends FragmentActivity implements TabListener, OnPageChangeListener {
     private UserListFragment mUserFragment;
+    private ServerChannelActionsFragment actionsFragment;
     private IRCPagerAdapter mIRCPagerAdapter;
     private ViewPager mViewPager;
     private ActivityListener mListener;
@@ -93,6 +94,8 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         setUpSlidingMenu();
 
         mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
+        actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.actions_fragment);
 
         mentionString = getIntent().getExtras().getString("mention", "");
 
@@ -125,15 +128,14 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             service = ((IRCService.IRCBinder) binder).getService();
             parser.setService(service);
 
-            final PircBotX bot = getBot();
-            if (bot != null) {
-                bot.getConfiguration().getListenerManager().addListener(mListener);
+            if (getBot() != null) {
+                getBot().getConfiguration().getListenerManager().addListener(mListener);
                 addServerFragment();
-                if (bot.getStatus().equals(getString(R.string.status_connected))) {
-                    for (final Channel channelName : bot.getUserBot().getChannels()) {
+                if (getBot().getStatus().equals(getString(R.string.status_connected))) {
+                    for (final Channel channelName : getBot().getUserBot().getChannels()) {
                         onNewChannelJoined(channelName.getName());
                     }
-                    for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
+                    for (final User user : getBot().getUserChannelDao().getPrivateMessages()) {
                         onNewPrivateMessage(user.getNick());
                     }
                 }
@@ -182,8 +184,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     private final SlidingMenu.OnOpenListener actionsSlidingOpenListener = new SlidingMenu.OnOpenListener() {
         @Override
         public void onOpen() {
-            final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.actions_fragment);
             final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
             arrayAdapter.setConnected(service != null && getBot().getStatus().equals(getString(R.string.status_connected)));
             arrayAdapter.notifyDataSetChanged();
