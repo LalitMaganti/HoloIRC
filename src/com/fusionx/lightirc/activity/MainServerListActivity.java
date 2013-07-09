@@ -37,11 +37,11 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
-import com.fusionx.lightirc.adapters.ServerCardsAdapter;
 import com.fusionx.lightirc.irc.LightThread;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
+import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -346,5 +346,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         intent.putExtra("server", builder);
         intent.putExtra("main", true);
         startActivity(intent);
+    }
+
+    private class ServerCardsAdapter extends BaseAdapterDecorator {
+        public ServerCardsAdapter(final BuilderAdapter adapter) {
+            super(adapter);
+        }
     }
 }

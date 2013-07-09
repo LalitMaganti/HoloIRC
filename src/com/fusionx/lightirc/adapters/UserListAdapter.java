@@ -28,10 +28,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.IRCUserComparator;
+import com.fusionx.lightlibrary.adapters.SelectionAdapter;
 
 import java.util.ArrayList;
 
-public class UserListAdapter extends SelectionAdapter {
+public class UserListAdapter extends SelectionAdapter<String> {
     public UserListAdapter(final Context context, final ArrayList<String> array) {
         super(context, array);
     }

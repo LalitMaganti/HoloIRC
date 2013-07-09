@@ -36,7 +36,7 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.Toast;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.SelectionAdapter;
+import com.fusionx.lightlibrary.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
@@ -203,7 +203,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
     public static class ListViewSettingsFragment extends ListFragment implements
             MultiChoiceModeListener, android.view.ActionMode.Callback {
-        private SelectionAdapter adapter;
+        private SelectionAdapter<String> adapter;
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -225,7 +225,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
                     final String edited = (String) positions.toArray()[0];
-                    final ChannelNamePromptDialogBuilder dialog = new ChannelNamePromptDialogBuilder(getActivity(), edited) {
+                    final ChannelNamePromptDialogBuilder dialog = new ChannelNamePromptDialogBuilder
+                            (getActivity(), edited) {
                         @Override
                         public void onOkClicked(final String input) {
                             adapter.remove(edited);
@@ -287,11 +288,11 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                                  final Bundle savedInstanceState) {
-            adapter = new SelectionAdapter(getActivity(), new ArrayList<String>());
+            adapter = new SelectionAdapter<String>(getActivity(), new ArrayList<String>());
 
             final SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
             final Set<String> set = settings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
-            for (String channel : set) {
+            for (final String channel : set) {
                 adapter.add(channel);
             }
 

@@ -47,7 +47,7 @@ import com.fusionx.lightirc.listeners.ActivityListener;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightlibrary.ui.AbstractPagerActivity;
+import com.fusionx.lightlibrary.activities.AbstractPagerActivity;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import lombok.AccessLevel;
 import lombok.Getter;
