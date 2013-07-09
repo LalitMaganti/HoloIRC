@@ -37,6 +37,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         final String[] values = getResources().getStringArray(R.array.actions);
         final ActionsArrayAdapter adapter = new ActionsArrayAdapter(getActivity(),
                 values);

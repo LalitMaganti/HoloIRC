@@ -37,7 +37,6 @@ import android.widget.ListView;
 import android.widget.PopupMenu;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
-import com.fusionx.lightirc.irc.LightThread;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
@@ -46,9 +45,6 @@ import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnim
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.pircbotx.Configuration;
-import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.Listener;
-import org.pircbotx.hooks.ListenerAdapter;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -65,8 +61,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private ArrayList<Configuration.Builder> mBuilderList;
     private Configuration.Builder mBuilder;
     private BuilderAdapter mServerCardsAdapter;
-
-    private final MainActivityListener listener = new MainActivityListener();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -93,11 +87,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     @Override
     protected void onPause() {
-        if (service != null) {
-            for (LightThread thread : service.getThreadManager().values()) {
-                thread.getBot().getConfiguration().getListenerManager().removeListener(listener);
-            }
-        }
         unbindService(mConnection);
         service = null;
 
@@ -110,21 +99,14 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             service = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
-            for (LightThread thread : service.getThreadManager().values()) {
-                thread.getBot().getConfiguration().getListenerManager().addListener(listener);
-            }
         }
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
             service = null;
-            setUpServerList();
+            mServerCardsAdapter.notifyDataSetChanged();
         }
     };
-
-    private class MainActivityListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
-
-    }
 
     private void setUpListView() {
         final ListView listView = (ListView) findViewById(R.id.server_list);

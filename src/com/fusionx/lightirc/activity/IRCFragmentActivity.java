@@ -83,9 +83,12 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         setTheme(Utils.getThemeInt(getApplicationContext()));
 
         setContentView(R.layout.activity_server_channel);
+
         setUpSlidingMenu();
 
         mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
@@ -116,8 +119,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
         service.putExtra("setBound", getServerTitle());
         startService(service);
         bindService(service, mConnection, 0);
-
-        super.onCreate(savedInstanceState);
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {

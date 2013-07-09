@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:theme="@style/Light">
         <activity
-            android:name="com.fusionx.lightirc.activity.MainServerListActivity"
+            android:name=".activity.MainServerListActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -37,7 +37,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.fusionx.lightirc.activity.ServerSettingsActivity"
+            android:name=".activity.ServerSettingsActivity"
             android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

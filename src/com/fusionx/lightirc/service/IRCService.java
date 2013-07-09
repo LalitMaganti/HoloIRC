@@ -48,6 +48,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Listener;
+import org.pircbotx.hooks.managers.ListenerManager;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -120,6 +122,10 @@ public class IRCService extends Service {
             protected String doInBackground(final String... strings) {
                 final String botName = strings[0];
                 if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
+                    final ListenerManager<PircBotX> manager = getBot(botName).getConfiguration().getListenerManager();
+                    for(final Listener l : manager.getListeners()) {
+                        manager.removeListener(l);
+                    }
                     getBot(botName).sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
                     getBot(botName).shutdown();
                 } else {
@@ -177,7 +183,6 @@ public class IRCService extends Service {
 
     private void setupListeners(final Configuration.Builder bot) {
         final ServiceListener mServiceListener = new ServiceListener(this);
-
         bot.getListenerManager().addListener(mServiceListener);
     }
 
