@@ -24,13 +24,14 @@ package com.fusionx.lightirc.irc;
 import android.content.Context;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.Utils;
-import lombok.AccessLevel;
-import lombok.Setter;
 import org.pircbotx.*;
 
 public class LightBotFactory extends Configuration.BotFactory {
-    @Setter(AccessLevel.PUBLIC)
-    private Context applicationContext;
+    private final Context applicationContext;
+
+    public LightBotFactory(final Context applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     @Override
     public InputParser createInputParser(final PircBotX bot) {

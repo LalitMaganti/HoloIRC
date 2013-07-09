@@ -19,13 +19,13 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.misc;
+package com.fusionx.lightirc.irc;
 
 import android.text.Html;
 
 import java.util.Comparator;
 
-public class UserComparator implements Comparator<String> {
+public class IRCUserComparator implements Comparator<String> {
     @Override
     public int compare(final String s, final String s2) {
         final String firstStripped = Html.fromHtml(s).toString();

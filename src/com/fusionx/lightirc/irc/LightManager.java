@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.irc;
 
-import com.fusionx.lightirc.misc.LightThread;
-
 import java.util.HashMap;
 
 public class LightManager extends HashMap<String, LightThread> {

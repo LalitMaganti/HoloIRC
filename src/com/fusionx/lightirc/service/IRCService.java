@@ -40,8 +40,8 @@ import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightManager;
+import com.fusionx.lightirc.irc.LightThread;
 import com.fusionx.lightirc.listeners.ServiceListener;
-import com.fusionx.lightirc.misc.LightThread;
 import com.fusionx.lightirc.misc.Utils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -64,13 +64,13 @@ public class IRCService extends Service {
     private String boundToServer = null;
 
     public void connectToServer(final Configuration.Builder server) {
-        final LightBotFactory factory = new LightBotFactory();
-        factory.setApplicationContext(getApplicationContext());
+        final LightBotFactory factory = new LightBotFactory(getApplicationContext());
         server.setBotFactory(factory);
 
         setupListeners(server);
         setupNotification();
 
+        @SuppressWarnings("unchecked")
         final Configuration<PircBotX> configuration = server.buildConfiguration();
 
         final PircBotX bot = new PircBotX(configuration);

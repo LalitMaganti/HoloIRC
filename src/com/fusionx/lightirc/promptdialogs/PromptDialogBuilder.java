@@ -29,21 +29,23 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import com.fusionx.lightirc.R;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class PromptDialog extends AlertDialog.Builder implements DialogInterface.OnClickListener, TextWatcher {
+public abstract class PromptDialogBuilder extends AlertDialog.Builder
+        implements DialogInterface.OnClickListener, TextWatcher {
     private final EditText input;
     private AlertDialog dialog;
 
-    public PromptDialog(final Context context, final String title, final String hint, final String edittextdefaulttext) {
+    PromptDialogBuilder(final Context context, final String title, final String hint, final String defaultText) {
         super(context);
 
         setTitle(title);
 
         input = new EditText(context);
         input.setHint(hint);
-        input.setText(edittextdefaulttext);
+        input.setText(defaultText);
         input.getText().clear();
-        input.append(edittextdefaulttext);
+        input.append(defaultText);
         input.setSingleLine(true);
         setView(input);
 
@@ -59,6 +61,7 @@ public abstract class PromptDialog extends AlertDialog.Builder implements Dialog
         dialog.dismiss();
     }
 
+    @NotNull
     @Override
     public AlertDialog show() {
         dialog = super.show();

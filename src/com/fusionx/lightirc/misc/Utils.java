@@ -28,8 +28,8 @@ import com.fusionx.lightirc.R;
 
 public class Utils {
     public static int getThemeInt(final Context applicationContext) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return Integer.parseInt(prefs.getString(PreferenceKeys.Theme, String.valueOf(R.style.Light)));
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return Integer.parseInt(preferences.getString(PreferenceKeys.Theme, String.valueOf(R.style.Light)));
     }
 
     public static boolean themeIsHoloLight(final Context applicationContext) {
@@ -45,23 +45,23 @@ public class Utils {
     }
 
     public static boolean isMotdAllowed(final Context applicationContext) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return prefs.getBoolean(PreferenceKeys.Motd, true);
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return preferences.getBoolean(PreferenceKeys.Motd, true);
     }
 
-    public static boolean isMessagesFromChannelHidden(final Context applicationContext) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return prefs.getBoolean(PreferenceKeys.HideMessages, false);
+    public static boolean isMessagesFromChannelShown(final Context applicationContext) {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return !preferences.getBoolean(PreferenceKeys.HideMessages, false);
     }
 
     public static String getPartReason(final Context applicationContext) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return prefs.getString(PreferenceKeys.PartReason, "");
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return preferences.getString(PreferenceKeys.PartReason, "");
     }
 
     public static String getQuitReason(final Context applicationContext) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
-        return prefs.getString(PreferenceKeys.QuitReason, "");
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return preferences.getString(PreferenceKeys.QuitReason, "");
     }
 
     public static String getSharedPreferencesPath(final Context applicationContext) {

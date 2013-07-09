@@ -38,7 +38,7 @@ import android.widget.PopupMenu;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.adapters.ServerCardsAdapter;
-import com.fusionx.lightirc.misc.LightThread;
+import com.fusionx.lightirc.irc.LightThread;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
@@ -66,14 +66,14 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private Configuration.Builder mBuilder;
     private BuilderAdapter mServerCardsAdapter;
 
-    private MainActivityListener listener = new MainActivityListener();
+    private final MainActivityListener listener = new MainActivityListener();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setTheme(Utils.getThemeInt(getApplicationContext()));
 
         setContentView(R.layout.activity_server_list);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         final Intent intent = new Intent(MainServerListActivity.this, ServerSettingsActivity.class);
         intent.putExtra("new", true);
 
-        final ArrayList<String> array = getListOfServersFromPrefsFiles();
+        final ArrayList<String> array = getListOfServersFromPreferencesFiles();
         Integer in;
         if (!array.isEmpty()) {
             in = Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
@@ -190,7 +190,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        setUpServers(getListOfServersFromPrefsFiles());
+        setUpServers(getListOfServersFromPreferencesFiles());
         setUpCards();
     }
 
@@ -256,7 +256,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         e.commit();
     }
 
-    private ArrayList<String> getListOfServersFromPrefsFiles() {
+    private ArrayList<String> getListOfServersFromPreferencesFiles() {
         final ArrayList<String> array = new ArrayList<String>();
         final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext()));
         for (final String file : folder.list()) {
@@ -324,7 +324,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void deleteServer(final String fileName) {
-        final ArrayList<String> servers = getListOfServersFromPrefsFiles();
+        final ArrayList<String> servers = getListOfServersFromPreferencesFiles();
         servers.remove(fileName);
 
         final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");

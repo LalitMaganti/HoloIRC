@@ -22,10 +22,8 @@
 package com.fusionx.lightirc.listeners;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.IOExceptionEvent;
-import com.fusionx.lightirc.irc.IrcExceptionEvent;
+import com.fusionx.lightirc.irc.IRCUserComparator;
 import com.fusionx.lightirc.irc.LightManager;
-import com.fusionx.lightirc.misc.UserComparator;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.service.IRCService;
@@ -36,6 +34,8 @@ import lombok.Getter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
+import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
@@ -138,7 +138,7 @@ public class ServiceListener extends GenericListener {
         }
 
         event.getChannel().setUserList(userList);
-        Collections.sort(userList, new UserComparator());
+        Collections.sort(userList, new IRCUserComparator());
     }
 
     @Override
@@ -169,7 +169,7 @@ public class ServiceListener extends GenericListener {
         event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
 
         set.set(set.indexOf(oldFormattedNick), newFormattedNick);
-        Collections.sort(set, new UserComparator());
+        Collections.sort(set, new IRCUserComparator());
     }
 
     @Override
@@ -179,13 +179,13 @@ public class ServiceListener extends GenericListener {
         final ArrayList<String> set = event.getChannel().getUserList();
         String nick = event.getUser().getPrettyNick(event.getChannel());
         set.add(nick);
-        Collections.sort(set, new UserComparator());
+        Collections.sort(set, new IRCUserComparator());
     }
 
     @Override
     public void onMode(final ModeEvent<PircBotX> event) {
         if (event.getUser() != null) {
-            if (!Utils.isMessagesFromChannelHidden(applicationContext)) {
+            if (Utils.isMessagesFromChannelShown(applicationContext)) {
                 event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
             }
             final ArrayList<String> userList = new ArrayList<String>();
@@ -195,7 +195,7 @@ public class ServiceListener extends GenericListener {
             }
 
             event.getChannel().setUserList(userList);
-            Collections.sort(userList, new UserComparator());
+            Collections.sort(userList, new IRCUserComparator());
         }
     }
 
@@ -206,7 +206,7 @@ public class ServiceListener extends GenericListener {
         final ArrayList<String> set = event.getChannel().getUserList();
         String nick = event.getUser().getPrettyNick(event.getChannel());
         set.remove(nick);
-        Collections.sort(set, new UserComparator());
+        Collections.sort(set, new IRCUserComparator());
     }
 
     @Override
@@ -215,7 +215,7 @@ public class ServiceListener extends GenericListener {
 
         final ArrayList<String> set = event.getChannel().getUserList();
         set.remove(event.getUser().getPrettyNick(event.getChannel()));
-        Collections.sort(set, new UserComparator());
+        Collections.sort(set, new IRCUserComparator());
     }
 
     @Override

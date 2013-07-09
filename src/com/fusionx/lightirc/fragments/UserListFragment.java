@@ -50,6 +50,17 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
+    public void userListUpdate(ArrayList<String> userList) {
+        final UserListAdapter adapter = ((UserListAdapter) getListAdapter());
+        adapter.clear();
+
+        if (userList != null) {
+            adapter.addAll(userList);
+            adapter.sort();
+        }
+    }
+
+
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

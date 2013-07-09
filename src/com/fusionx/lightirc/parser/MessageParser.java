@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.parser;
 
+import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -54,6 +55,10 @@ public class MessageParser {
                 manager.dispatchEvent(new ActionEvent<PircBotX>(bot, bot.getUserBot(),
                         bot.getUserChannelDao().getChannel(channelName), action));
                 bot.getUserChannelDao().getChannel(channelName).send().action(action);
+            } else if (command.equals("/part")) {
+                    // TODO - input validation
+                    bot.getUserChannelDao().getChannel(channelName)
+                            .send().part(Utils.getPartReason(getService().getApplicationContext()));
             } else {
                 serverCommandToParse(parsedArray, message, bot);
             }

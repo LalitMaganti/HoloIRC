@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.UserComparator;
+import com.fusionx.lightirc.irc.IRCUserComparator;
 
 import java.util.ArrayList;
 
@@ -36,15 +36,8 @@ public class UserListAdapter extends SelectionAdapter {
         super(context, array);
     }
 
-    public void replace(final String old, final String newString) {
-        remove(old);
-        add(newString);
-        sort(new UserComparator());
-        notifyDataSetChanged();
-    }
-
     public void sort() {
-        super.sort(new UserComparator());
+        super.sort(new IRCUserComparator());
     }
 
     @Override

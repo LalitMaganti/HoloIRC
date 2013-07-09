@@ -21,13 +21,10 @@
 
 package com.fusionx.lightirc.listeners;
 
-import android.support.v4.view.ViewPager;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
-import com.fusionx.lightirc.irc.IOExceptionEvent;
-import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import lombok.AccessLevel;
@@ -36,28 +33,26 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
+import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 public class ActivityListener extends GenericListener {
     @Getter(AccessLevel.PRIVATE)
     private final IRCFragmentActivity activity;
-    private final IRCPagerAdapter mIRCPagerAdapter;
-    private final ViewPager mViewPager;
 
-    public ActivityListener(final IRCFragmentActivity activity, final IRCPagerAdapter adapter, final ViewPager pager) {
+    public ActivityListener(final IRCFragmentActivity activity) {
         super(activity.getApplicationContext());
+
         this.activity = activity;
-        mIRCPagerAdapter = adapter;
-        mViewPager = pager;
     }
 
     // Server stuff
     @Override
     public void onConnect(final ConnectEvent<PircBotX> event) {
         appendToServer(event);
-
-        activity.closeAllSlidingMenus();
+        getActivity().closeAllSlidingMenus();
     }
 
     @Override
@@ -98,7 +93,7 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onUnknown(final UnknownEvent<PircBotX> event) {
         appendToServer(event);
-        mViewPager.setCurrentItem(0, true);
+        getActivity().getViewPager().setCurrentItem(0, true);
     }
 
     // Channel events
@@ -108,7 +103,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 final int position = getActivity().onNewChannelJoined(event.getChannel().getName());
-                mViewPager.setCurrentItem(position, true);
+                getActivity().getViewPager().setCurrentItem(position, true);
             }
         });
     }
@@ -155,7 +150,7 @@ public class ActivityListener extends GenericListener {
     }
 
     private void userListChanged(final Event<PircBotX> event, final String channelName) {
-        if (!Utils.isMessagesFromChannelHidden(applicationContext)) {
+        if (Utils.isMessagesFromChannelShown(applicationContext)) {
             onChannelMessage(channelName, event);
         }
         if (checkChannelFragment(channelName)) {
@@ -165,12 +160,13 @@ public class ActivityListener extends GenericListener {
 
     @Override
     protected void onUserPart(final PartEvent<PircBotX> event) {
-        final int index = mIRCPagerAdapter.removeView(event.getChannel().getName());
+        final IRCPagerAdapter adapter = getActivity().getIrcPagerAdapter();
+        final int index = adapter.getItemPosition(adapter.getFragment(event.getChannel().getName()));
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                getActivity().removeTab(index);
+                getActivity().removeIRCFragment(index);
             }
         });
     }
@@ -200,18 +196,21 @@ public class ActivityListener extends GenericListener {
 
     // Misc stuff
     private void appendToServer(final Event<PircBotX> event) {
-        final IRCFragment server = (IRCFragment) mIRCPagerAdapter.getItem(0);
+        final IRCFragment server = getActivity().getIrcPagerAdapter()
+                .getFragment(event.getBot().getConfiguration().getTitle());
 
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
-            }
-        });
+        if(server != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    server.appendToTextView(EventParser.getOutputForEvent(event, getActivity()));
+                }
+            });
+        }
     }
 
     private void onChannelMessage(final String channelName, final Event<PircBotX> event) {
-        final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
+        final IRCFragment channel = getActivity().getIrcPagerAdapter().getFragment(channelName);
         if (channel != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -223,12 +222,10 @@ public class ActivityListener extends GenericListener {
     }
 
     private boolean checkChannelFragment(final String keyName) {
-        final int position = mViewPager.getCurrentItem();
-        final IRCFragment frag = (IRCFragment) mIRCPagerAdapter.getItem(position);
-        return frag.getTitle().equals(keyName);
+        return getActivity().getCurrentItem().getTitle().equals(keyName);
     }
 
     private IRCFragment privateMessageCheck(final String userNick) {
-        return mIRCPagerAdapter.getTab(userNick);
+        return getActivity().getIrcPagerAdapter().getFragment(userNick);
     }
 }

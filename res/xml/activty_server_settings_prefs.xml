@@ -24,19 +24,19 @@
                   android:layout_height="match_parent">
 
     <PreferenceCategory android:title="Server info">
-        <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
+        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:key="pref_title"
             android:defaultValue=""
             android:singleLine="true"
             android:lines="1"
             android:title="@string/server_settings_server_title"/>
-        <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
+        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:key="pref_url"
             android:defaultValue=""
             android:singleLine="true"
             android:lines="1"
             android:title="@string/server_settings_url_title"/>
-        <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
+        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:key="pref_port"
             android:title="@string/server_settings_port_title"
             android:inputType="number"
@@ -48,7 +48,7 @@
             android:defaultValue="false"
             android:title="@string/server_settings_ssl_title"
             android:summary="@string/server_settings_ssl_summary"/>
-        <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
+        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:key="pref_nick"
             android:defaultValue=""
             android:title="@string/nickname"
@@ -66,7 +66,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Login - normally no need to edit this">
-        <com.fusionx.lightirc.uisubclasses.LightEditTextPreference
+        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:defaultValue="lightirc"
             android:key="pref_login_username"
             android:title="@string/username"

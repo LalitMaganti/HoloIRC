@@ -19,26 +19,19 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc;
+package com.fusionx.lightirc.promptdialogs;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import org.pircbotx.PircBotX;
-import org.pircbotx.exception.IrcException;
-import org.pircbotx.hooks.Event;
+import android.content.Context;
+import com.fusionx.lightirc.R;
 
-public class IrcExceptionEvent<T extends PircBotX> extends Event<T> {
-    @Getter(AccessLevel.PUBLIC)
-    private final IrcException exception;
-
-    public IrcExceptionEvent(T bot, IrcException exception) {
-        super(bot);
-        this.exception = exception;
+public abstract class ChannelNamePromptDialogBuilder extends PromptDialogBuilder {
+    public ChannelNamePromptDialogBuilder(final Context context) {
+        super(context, context.getString(R.string.prompt_dialog_channel_name),
+                context.getString(R.string.prompt_dialog_including_starting), "");
     }
 
-    @Override
-    public void respond(String response) {
-        // Invalid
-        throw new UnsupportedOperationException();
+    public ChannelNamePromptDialogBuilder(final Context context, final String channelName) {
+        super(context, context.getString(R.string.prompt_dialog_channel_name),
+                context.getString(R.string.prompt_dialog_including_starting), channelName);
     }
 }

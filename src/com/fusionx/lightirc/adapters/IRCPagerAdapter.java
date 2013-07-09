@@ -31,7 +31,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
-import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import lombok.AccessLevel;
 import lombok.Setter;
 
@@ -201,11 +200,7 @@ public class IRCPagerAdapter extends PagerAdapter {
         }
     }
 
-    @Override
-    public void startUpdate(ViewGroup container) {
-    }
-
-    public int addView(final IRCFragment s) {
+    public int addFragment(final IRCFragment s) {
         views.add(s);
         notifyDataSetChanged();
         return views.indexOf(s);
@@ -230,21 +225,12 @@ public class IRCPagerAdapter extends PagerAdapter {
         return views.get(position).getTitle();
     }
 
-    public int removeView(final String title) {
-        for (final IRCFragment i : views) {
-            if (i.getTitle() != null) {
-                if (i.getTitle().equals(title)) {
-                    final int index = views.indexOf(i);
-                    views.remove(index);
-                    notifyDataSetChanged();
-                    return index;
-                }
-            }
-        }
-        return -1;
+    public void removeFragment(final int index) {
+        views.remove(index);
+        notifyDataSetChanged();
     }
 
-    public IRCFragment getTab(final String title) {
+    public IRCFragment getFragment(final String title) {
         for (final IRCFragment i : views) {
             if (title.equals(i.getTitle())) {
                 int indexOfFragment = views.indexOf(i);
@@ -260,16 +246,17 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void disableAllEditTexts() {
-        for (IRCFragment fragment : views) {
+        for (final IRCFragment fragment : views) {
             fragment.getEditText().setEnabled(false);
         }
     }
 
     public void removeAllButServer() {
-        for (IRCFragment fragment : views) {
-            if (!(fragment instanceof ServerFragment)) {
-                views.remove(fragment);
-            }
+        final int count = getCount();
+        for (int i = 1; i < count - 1;) {
+            views.remove(i);
         }
+
+        notifyDataSetChanged();
     }
 }

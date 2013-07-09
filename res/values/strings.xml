@@ -86,7 +86,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="prompt_dialog_including_starting">Including the starting #</string>
 
     <!-- Service/notification -->
-    <string name="service_one_server_joined">At least one server is joined</string>
     <string name="service_disconnect_all">Disconnect all</string>
     <string name="service_you_mentioned">You have been mentioned on</string>
     <string name="service_lightirc_running">LightIRC running</string>
@@ -110,7 +109,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="mention">Mention</string>
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
-    <string name="join">Join</string>
     <string name="private_message_short_form">PM</string>
     <string name="discard">Discard</string>
     <string name="cancel">Cancel</string>
@@ -122,7 +120,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="password">Password</string>
     <string name="username">Username</string>
     <string name="mode">Mode</string>
-    <string name="on">on</string>
     <string name="by">by</string>
 
 </resources>

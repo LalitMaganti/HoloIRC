@@ -29,6 +29,8 @@ import android.widget.TextView;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import org.pircbotx.Channel;
 
+import java.util.ArrayList;
+
 public class ChannelFragment extends IRCFragment {
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -55,6 +57,10 @@ public class ChannelFragment extends IRCFragment {
             }
             return null;
         }
+    }
+
+    public ArrayList<String> getUserList() {
+        return ((IRCFragmentActivity) getActivity()).getBot().getUserChannelDao().getChannel(getTitle()).getUserList();
     }
 
     @Override

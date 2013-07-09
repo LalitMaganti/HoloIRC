@@ -19,14 +19,14 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.misc;
+package com.fusionx.lightirc.irc;
 
-import com.fusionx.lightirc.irc.IOExceptionEvent;
-import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.exception.IrcException;
+import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
+import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
 
 import java.io.IOException;
 

@@ -29,8 +29,8 @@ import android.widget.AdapterView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
-import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialog;
-import com.fusionx.lightirc.promptdialogs.NickPromptDialog;
+import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
 import org.pircbotx.PircBotX;
 
 public class ServerChannelActionsFragment extends ListFragment implements AdapterView.OnItemClickListener {
@@ -39,7 +39,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
         super.onActivityCreated(savedInstanceState);
         final String[] values = getResources().getStringArray(R.array.actions);
         final ActionsArrayAdapter adapter = new ActionsArrayAdapter(getActivity(),
-                android.R.layout.simple_list_item_1, values);
+                values);
         setListAdapter(adapter);
 
         getListView().setOnItemClickListener(this);
@@ -62,7 +62,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
 
     private void nickChangeDialog() {
         final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();
-        final NickPromptDialog nickDialog = new NickPromptDialog(getActivity(), bot.getNick()) {
+        final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(), bot.getNick()) {
             @Override
             public void onOkClicked(final String input) {
                 final AsyncTask<Void, Void, Void> ChangeNickTask = new AsyncTask<Void, Void, Void>() {
@@ -81,7 +81,7 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
 
     private void channelNameDialog() {
         final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();
-        final ChannelNamePromptDialog builder = new ChannelNamePromptDialog(getActivity()) {
+        final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder(getActivity()) {
             @Override
             public void onOkClicked(final String input) {
                 final AsyncTask<Void, Void, Void> JoinTask = new AsyncTask<Void, Void, Void>() {

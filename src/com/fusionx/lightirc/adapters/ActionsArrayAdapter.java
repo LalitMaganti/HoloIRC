@@ -58,8 +58,8 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
         return row;
     }
 
-    public ActionsArrayAdapter(final Context context, final int textViewResourceId, final CharSequence[] objects) {
-        super(context, textViewResourceId, (String[]) objects);
+    public ActionsArrayAdapter(final Context context, final CharSequence[] objects) {
+        super(context, android.R.layout.simple_list_item_1, (String[]) objects);
         inflate = LayoutInflater.from(context);
         applicationContext = context.getApplicationContext();
     }

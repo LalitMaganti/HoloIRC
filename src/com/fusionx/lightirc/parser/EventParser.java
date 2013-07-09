@@ -23,10 +23,10 @@ package com.fusionx.lightirc.parser;
 
 import android.content.Context;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.IOExceptionEvent;
-import com.fusionx.lightirc.irc.IrcExceptionEvent;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
+import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 

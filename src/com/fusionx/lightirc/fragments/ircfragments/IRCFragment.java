@@ -49,7 +49,7 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     @Setter(AccessLevel.PROTECTED)
     private EditText editText;
 
-    protected String serverName;
+    String serverName;
 
     @Override
     public View onCreateView(final LayoutInflater inflate,
@@ -77,7 +77,7 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
         Linkify.addLinks(getTextView(), Linkify.ALL);
     }
 
-    public void writeToTextView(final String text) {
+    void writeToTextView(final String text) {
         getTextView().setText(Html.fromHtml(text.replace("\n", "<br/>")));
         Linkify.addLinks(getTextView(), Linkify.ALL);
     }
