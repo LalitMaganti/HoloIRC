@@ -42,6 +42,7 @@ import com.fusionx.lightirc.irc.LightBotFactory;
 import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.listeners.ServiceListener;
 import com.fusionx.lightirc.misc.LightThread;
+import com.fusionx.lightirc.misc.Utils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -60,7 +61,7 @@ public class IRCService extends Service {
     private final LightManager threadManager = new LightManager();
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
-    private String boundToIRCFragmentActivity = null;
+    private String boundToServer = null;
 
     public void connectToServer(final Configuration.Builder server) {
         final LightBotFactory factory = new LightBotFactory();
@@ -118,6 +119,7 @@ public class IRCService extends Service {
             @Override
             protected String doInBackground(final String... strings) {
                 final String botName = strings[0];
+                getBot(botName).sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
                 if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
                     getBot(botName).shutdown();
                 } else {
@@ -156,7 +158,7 @@ public class IRCService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (intent != null) {
-            boundToIRCFragmentActivity = intent.getStringExtra("setBound");
+            boundToServer = intent.getStringExtra("setBound");
             if (intent.getBooleanExtra("stop", false)) {
                 disconnectAll();
             }
@@ -168,7 +170,7 @@ public class IRCService extends Service {
 
     @Override
     public boolean onUnbind(final Intent intent) {
-        boundToIRCFragmentActivity = null;
+        boundToServer = null;
 
         return true;
     }
@@ -188,7 +190,7 @@ public class IRCService extends Service {
                 .setAutoCancel(true)
                 .setTicker(getString(R.string.service_you_mentioned) + " " + messageDestination);
 
-        if (!serverName.equals(boundToIRCFragmentActivity)) {
+        if (!serverName.equals(boundToServer)) {
             final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
             mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
             mIntent.putExtra("mention", messageDestination);

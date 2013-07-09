@@ -69,14 +69,14 @@ public class ServerSettingsActivity extends PreferenceActivity {
     @Override
     public void onBackPressed() {
         if (!canExit && newServer) {
-            AlertDialog.Builder build = new AlertDialog.Builder(this);
+            final AlertDialog.Builder build = new AlertDialog.Builder(this);
             build.setTitle(getString(R.string.server_settings_save_question_title))
                     .setMessage(getString(R.string.server_settings_save_question_message))
                     .setNegativeButton(getString(R.string.discard), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            File folder = new File(getFilesDir().getAbsolutePath()
-                                    .replace("files", "shared_prefs/") + fileName + ".xml");
+                            final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext())
+                                    + fileName + ".xml");
                             folder.delete();
                             finish();
                         }
@@ -158,7 +158,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             canExit = !newServer;
 
-            // TODO - consolidate this - use all the edittexts var
             if (newServer) {
                 // Title of server
                 mEditTextTitle.setSummary(getString(R.string.server_settings_not_empty));
@@ -208,8 +207,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.activty_server_settings_cab, menu);
+            MenuInflater inflate = mode.getMenuInflater();
+            inflate.inflate(R.menu.activty_server_settings_cab, menu);
             return true;
         }
 
@@ -225,11 +224,11 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
-                    final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity(),
-                            (String) positions.toArray()[0]) {
+                    final String edited = (String) positions.toArray()[0];
+                    final ChannelNamePromptDialog dialog = new ChannelNamePromptDialog(getActivity(), edited) {
                         @Override
                         public void onOkClicked(final String input) {
-                            adapter.remove((String) positions.toArray()[0]);
+                            adapter.remove(edited);
                             adapter.add(input);
                         }
                     };
@@ -280,19 +279,18 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
 
         @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-            inflater.inflate(R.menu.activity_server_settings_channellist_ab, menu);
-            super.onCreateOptionsMenu(menu, inflater);
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflate) {
+            inflate.inflate(R.menu.activity_server_settings_channellist_ab, menu);
+            super.onCreateOptionsMenu(menu, inflate);
         }
 
         @Override
-        public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+        public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                                  final Bundle savedInstanceState) {
             adapter = new SelectionAdapter(getActivity(), new ArrayList<String>());
 
-            SharedPreferences settings = getActivity()
-                    .getSharedPreferences(fileName, MODE_PRIVATE);
-            Set<String> set = settings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
+            final SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
+            final Set<String> set = settings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
             for (String channel : set) {
                 adapter.add(channel);
             }
@@ -300,7 +298,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             setListAdapter(adapter);
             setHasOptionsMenu(true);
 
-            return super.onCreateView(inflater, container, savedInstanceState);
+            return super.onCreateView(inflate, container, savedInstanceState);
         }
 
         @Override
@@ -324,11 +322,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public void onPause() {
-            SharedPreferences settings = getActivity()
-                    .getSharedPreferences(fileName, MODE_PRIVATE);
+            SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
             final Editor e = settings.edit();
-            e.putStringSet(PreferenceKeys.AutoJoin, adapter.getItems());
-            e.commit();
+            e.putStringSet(PreferenceKeys.AutoJoin, adapter.getItems()).commit();
 
             super.onPause();
         }

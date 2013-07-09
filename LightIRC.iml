@@ -25,6 +25,15 @@
     <orderEntry type="module" module-name="slidingmenu" />
     <orderEntry type="library" name="android-support-lib" level="project" />
     <orderEntry type="module" module-name="pircbotx" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$APPLICATION_HOME_DIR$/lib/annotations.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
 

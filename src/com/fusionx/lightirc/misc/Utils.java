@@ -63,4 +63,8 @@ public class Utils {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
         return prefs.getString(PreferenceKeys.QuitReason, "");
     }
+
+    public static String getSharedPreferencesPath(final Context applicationContext) {
+        return applicationContext.getFilesDir().getAbsolutePath().replace("files", "shared_prefs/");
+    }
 }

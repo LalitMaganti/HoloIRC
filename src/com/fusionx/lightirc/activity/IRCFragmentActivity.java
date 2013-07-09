@@ -298,7 +298,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             protected Void doInBackground(Void... v) {
                 final UserChannelDao<User, Channel> dao = getBot().getUserChannelDao();
                 if (channel) {
-                    dao.getChannel(title).send().part();
+                    dao.getChannel(title).send().part(Utils.getPartReason(getApplicationContext()));
                 } else {
                     dao.removePrivateMessage(title);
                     dao.getUser(title).setBuffer("");
@@ -316,7 +316,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             if (bot != null) {
                 bot.getConfiguration().getListenerManager().addListener(mListener);
             }
-            service.setBoundToIRCFragmentActivity(getServerTitle());
+            service.setBoundToServer(getServerTitle());
         }
 
         super.onResume();
@@ -337,7 +337,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             if (getBot() != null) {
                 getBot().getConfiguration().getListenerManager().removeListener(mListener);
             }
-            service.setBoundToIRCFragmentActivity(null);
+            service.setBoundToServer(null);
         }
 
         super.onPause();
@@ -441,7 +441,6 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     public void disconnect() {
         getBot().getConfiguration().getListenerManager().removeListener(mListener);
 
-        getBot().sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
         service.disconnectFromServer(getServerTitle());
         unbindService(mConnection);
         service = null;

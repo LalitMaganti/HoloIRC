@@ -78,7 +78,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     @Override
     protected void onResume() {
-        super.onResume();
         if (service == null) {
             final Intent service = new Intent(this, IRCService.class);
             service.putExtra("stop", false);
@@ -88,11 +87,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             setUpListView();
             setUpServerList();
         }
+
+        super.onResume();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         if (service != null) {
             for (LightThread thread : service.getThreadManager().values()) {
                 thread.getBot().getConfiguration().getListenerManager().removeListener(listener);
@@ -100,6 +100,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         }
         unbindService(mConnection);
         service = null;
+
+        super.onPause();
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -137,8 +139,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     // Action bar
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        final MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.activity_server_list_ab, menu);
+        final MenuInflater inflate = getMenuInflater();
+        inflate.inflate(R.menu.activity_server_list_ab, menu);
         return true;
     }
 
@@ -185,10 +187,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
         if (firstRun) {
             firstRunAdditions();
-            final Editor e = globalSettings.edit();
-            e.putBoolean("firstrun", false);
-
-            e.commit();
+            globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
         setUpServers(getListOfServersFromPrefsFiles());
@@ -207,8 +206,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             bot.setLogin(serverSettings.getString(PreferenceKeys.ServerUserName, "lightirc"));
             bot.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
 
-            final String nickServPassword = serverSettings.getString(PreferenceKeys
-                    .NickServPassword, null);
+            final String nickServPassword = serverSettings.getString(PreferenceKeys.NickServPassword, null);
             if (nickServPassword != null && !nickServPassword.equals("")) {
                 bot.setNickservPassword(nickServPassword);
             }
@@ -260,7 +258,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     private ArrayList<String> getListOfServersFromPrefsFiles() {
         final ArrayList<String> array = new ArrayList<String>();
-        final File folder = new File(getFilesDir().getAbsolutePath().replace("files", "shared_prefs"));
+        final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext()));
         for (final String file : folder.list()) {
             if (file.startsWith("server_")) {
                 array.add(file.replace(".xml", ""));
@@ -272,17 +270,18 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     // Connect to server
     public void onCardClick(final View v) {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                IRCFragmentActivity.class);
+        final Intent intent = new Intent(MainServerListActivity.this, IRCFragmentActivity.class);
+
         intent.putExtra("server", (Configuration.Builder) v.getTag());
         service = null;
+
         startActivity(intent);
     }
 
     // Popup menu
-    public void showPopup(final View v) {
-        final PopupMenu popup = new PopupMenu(this, v);
-        mBuilder = (Configuration.Builder) v.getTag();
+    public void showPopup(final View view) {
+        final PopupMenu popup = new PopupMenu(this, view);
+        mBuilder = (Configuration.Builder) view.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
         if (service != null && service.getBot(mBuilder.getTitle()) != null &&
@@ -327,9 +326,10 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void deleteServer(final String fileName) {
         final ArrayList<String> servers = getListOfServersFromPrefsFiles();
         servers.remove(fileName);
-        final File folder = new File(getFilesDir().getAbsolutePath().
-                replace("files", "shared_prefs/") + fileName + ".xml");
+
+        final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");
         folder.delete();
+
         setUpServers(servers);
         setUpCards();
     }
