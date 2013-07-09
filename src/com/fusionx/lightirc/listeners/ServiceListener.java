@@ -75,7 +75,6 @@ public class ServiceListener extends GenericListener {
                 manager.remove(event.getBot().getConfiguration().getTitle());
                 if (getService().getThreadManager().keySet().isEmpty()) {
                     getService().stopForeground(true);
-                    getService().stopSelf();
                 }
             }
         }, 2000);

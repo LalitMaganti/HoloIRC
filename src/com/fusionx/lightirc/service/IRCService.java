@@ -34,7 +34,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v4.content.LocalBroadcastManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.activity.MainServerListActivity;
@@ -112,10 +111,6 @@ public class IRCService extends Service {
         threadManager.disconnectAll();
 
         stopForeground(true);
-        stopSelf();
-
-        Intent intent = new Intent("serviceStopped");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void disconnectFromServer(final String serverName) {
@@ -123,14 +118,18 @@ public class IRCService extends Service {
             @Override
             protected String doInBackground(final String... strings) {
                 final String botName = strings[0];
+
+                final ListenerManager<PircBotX> manager = getBot(botName).getConfiguration().getListenerManager();
+                for(final Listener l : manager.getListeners()) {
+                    manager.removeListener(l);
+                }
+
                 if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
-                    final ListenerManager<PircBotX> manager = getBot(botName).getConfiguration().getListenerManager();
-                    for(final Listener l : manager.getListeners()) {
-                        manager.removeListener(l);
-                    }
+                    getBot(botName).setStatus(getString(R.string.status_disconnected));
                     getBot(botName).sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
                     getBot(botName).shutdown();
                 } else {
+                    getBot(botName).setStatus(getString(R.string.status_disconnected));
                     getThreadManager().get(botName).interrupt();
                 }
                 return botName;
@@ -138,12 +137,9 @@ public class IRCService extends Service {
 
             @Override
             protected void onPostExecute(final String botName) {
-                getBot(botName).setStatus(getString(R.string.status_disconnected));
-
                 threadManager.remove(botName);
                 if (getThreadManager().keySet().isEmpty()) {
                     stopForeground(true);
-                    stopSelf();
                 }
             }
         };

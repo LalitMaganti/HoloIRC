@@ -78,7 +78,11 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
     private final MessageParser parser = new MessageParser();
 
     public PircBotX getBot() {
-        return service.getBot(getServerTitle());
+        if(service != null) {
+            return service.getBot(getServerTitle());
+        } else {
+            return null;
+        }
     }
 
     @Override
