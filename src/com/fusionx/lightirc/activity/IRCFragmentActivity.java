@@ -404,9 +404,11 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
     public void disconnect() {
         getBot().getConfiguration().getListenerManager().removeListener(mListener);
 
-        service.disconnectFromServer(getServerTitle());
-        unbindService(mConnection);
-        service = null;
+        if(service != null) {
+            service.disconnectFromServer(getServerTitle());
+            unbindService(mConnection);
+            service = null;
+        }
 
         final Intent intent = new Intent(this, MainServerListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
