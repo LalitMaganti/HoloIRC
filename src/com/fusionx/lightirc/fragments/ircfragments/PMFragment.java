@@ -59,8 +59,8 @@ public class PMFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName)
-                .getUserChannelDao().getUser(getTitle()).getBuffer();
+        final String buffer = ((IRCFragmentActivity) getActivity()).getBot().getUserChannelDao()
+                .getUser(getTitle()).getBuffer();
         writeToTextView(buffer);
     }
 }

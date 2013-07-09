@@ -58,7 +58,7 @@ public class ServerFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        final String buffer = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName).getBuffer();
+        final String buffer = ((IRCFragmentActivity) getActivity()).getBot().getBuffer();
         writeToTextView(buffer);
     }
 }

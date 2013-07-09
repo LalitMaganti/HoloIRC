@@ -35,7 +35,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
-import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
 import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
@@ -77,11 +76,15 @@ public class ServiceListener extends GenericListener {
     }
 
     @Override
-    public void onEvent(final Event<PircBotX> event) throws Exception {
-        if (event instanceof NoticeEvent) {
-            event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+    public void onNotice(final NoticeEvent<PircBotX> event) {
+        if(event.getChannel() == null) {
+            if(event.getUser().getBuffer().isEmpty()) {
+                event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+            } else {
+                event.getUser().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+            }
         } else {
-            super.onEvent(event);
+            event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
         }
     }
 

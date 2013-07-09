@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
+import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import lombok.AccessLevel;
 import lombok.Setter;
 
@@ -261,6 +262,14 @@ public class IRCPagerAdapter extends PagerAdapter {
     public void disableAllEditTexts() {
         for (IRCFragment fragment : views) {
             fragment.getEditText().setEnabled(false);
+        }
+    }
+
+    public void removeAllButServer() {
+        for (IRCFragment fragment : views) {
+            if(!(fragment instanceof ServerFragment)) {
+                views.remove(fragment);
+            }
         }
     }
 }

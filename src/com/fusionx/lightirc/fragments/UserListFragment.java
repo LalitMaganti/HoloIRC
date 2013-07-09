@@ -33,7 +33,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.misc.Utils;
-import com.fusionx.lightirc.service.IRCService;
 import org.pircbotx.PircBotX;
 
 import java.util.ArrayList;
@@ -98,8 +97,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             case R.id.fragment_userlist_cab_pm:
                 final String nick = Utils.stripPrefixFromNick(String
                         .valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
-                final IRCService service = ((IRCFragmentActivity) getActivity()).getService();
-                final PircBotX bot = service.getBot(((IRCFragmentActivity) getActivity()).getBuilder().getTitle());
+                final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();;
                 if (!bot.getNick().equals(nick)) {
                     activity.onNewPrivateMessage(nick);
                     mode.finish();

@@ -56,10 +56,7 @@ import com.fusionx.lightirc.service.IRCService;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.pircbotx.Channel;
-import org.pircbotx.Configuration;
-import org.pircbotx.PircBotX;
-import org.pircbotx.User;
+import org.pircbotx.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -73,15 +70,19 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     private String mentionString;
     private SlidingMenu mUserSlidingMenu;
     private SlidingMenu mActionsSlidingMenu;
-
-    @Getter(AccessLevel.PUBLIC)
     private Configuration.Builder builder;
+    private IRCService service;
 
     @Getter(AccessLevel.PUBLIC)
     private final MessageParser parser = new MessageParser();
 
-    @Getter(AccessLevel.PUBLIC)
-    private IRCService service;
+    private String getServerTitle() {
+        return builder.getTitle();
+    }
+
+    public PircBotX getBot() {
+        return service.getBot(getServerTitle());
+    }
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -111,34 +112,34 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
         final Intent service = new Intent(this, IRCService.class);
         service.putExtra("server", true);
-        service.putExtra("serverName", getBuilder().getTitle());
+        service.putExtra("serverName", getServerTitle());
         service.putExtra("stop", false);
-        service.putExtra("setBound", getBuilder().getTitle());
+        service.putExtra("setBound", getServerTitle());
         startService(service);
         bindService(service, mConnection, 0);
     }
 
-    private final ServiceConnection mConnection = new ServiceConnection() {
+    public final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             service = ((IRCService.IRCBinder) binder).getService();
-            parser.setService(getService());
+            parser.setService(service);
 
-            final PircBotX bot = getService().getBot(getBuilder().getTitle());
+            final PircBotX bot = getBot();
             if (bot != null) {
                 bot.getConfiguration().getListenerManager().addListener(mListener);
                 addServerFragment();
                 if (bot.getStatus().equals(getString(R.string.status_connected))) {
                     for (final Channel channelName : bot.getUserBot().getChannels()) {
-                        onNewChannelJoined(channelName.getName(), channelName.getUserList());
+                        onNewChannelJoined(channelName.getName());
                     }
                     for (final User user : bot.getUserChannelDao().getPrivateMessages()) {
                         onNewPrivateMessage(user.getNick());
                     }
                 }
             } else {
-                getBuilder().getListenerManager().addListener(mListener);
-                getService().connectToServer(getBuilder());
+                builder.getListenerManager().addListener(mListener);
+                service.connectToServer(builder);
                 addServerFragment();
             }
         }
@@ -146,11 +147,11 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         private void addServerFragment() {
             final ServerFragment fragment = new ServerFragment();
             final Bundle bundle = new Bundle();
-            bundle.putString("title", getBuilder().getTitle());
+            bundle.putString("title", getServerTitle());
             fragment.setArguments(bundle);
 
             mIRCPagerAdapter.addView(fragment);
-            addTab(getBuilder().getTitle());
+            addTab(getServerTitle());
         }
 
         @Override
@@ -184,7 +185,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.actions_fragment);
             final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-            arrayAdapter.setConnected(getService() != null && service.getBot(getBuilder().getTitle()).getStatus()
+            arrayAdapter.setConnected(service != null && getBot().getStatus()
                     .equals(getString(R.string.status_connected)));
             arrayAdapter.notifyDataSetChanged();
         }
@@ -237,15 +238,11 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         }
     }
 
-    public int onNewChannelJoined(final String channelName, final ArrayList<String> userList) {
+    public int onNewChannelJoined(final String channelName) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", channelName);
-        bundle.putString("serverName", getBuilder().getTitle());
-
-        if (userList != null) {
-            bundle.putStringArrayList("userList", userList);
-        }
+        bundle.putString("serverName", getServerTitle());
 
         channel.setArguments(bundle);
 
@@ -288,16 +285,22 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     private void closeIRCFragment(final boolean channel) {
         final int index = mViewPager.getCurrentItem();
         final String title = ((IRCFragment) mIRCPagerAdapter.getItem(index)).getTitle();
+
         mViewPager.setCurrentItem(index - 1, true);
         removeTab(index);
+        if(!channel) {
+            mIRCPagerAdapter.removeView(title);
+        }
 
         final AsyncTask<Void, Void, Void> closeFragment = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... v) {
+                final UserChannelDao<User, Channel> dao = getBot().getUserChannelDao();
                 if (channel) {
-                    getService().partFromChannel(getBuilder().getTitle(), title);
+                    dao.getChannel(title).send().part();
                 } else {
-                    getService().removePrivateMessage(getBuilder().getTitle(), title);
+                    dao.removePrivateMessage(title);
+                    dao.getUser(title).setBuffer("");
                 }
                 return null;
             }
@@ -307,31 +310,32 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
     @Override
     public void onResume() {
-        if (getService() != null) {
-            final PircBotX bot = getService().getBot(getBuilder().getTitle());
+        if (service != null) {
+            final PircBotX bot = getBot();
             if (bot != null) {
                 bot.getConfiguration().getListenerManager().addListener(mListener);
             }
-            getService().setBoundToIRCFragmentActivity(getBuilder().getTitle());
+            service.setBoundToIRCFragmentActivity(getServerTitle());
         }
 
         super.onResume();
     }
     @Override
     public void onDestroy() {
-        unbindService(mConnection);
+        if(service != null) {
+            unbindService(mConnection);
+        }
 
         super.onDestroy();
     }
 
     @Override
     public void onPause() {
-        if (getService() != null) {
-            final PircBotX bot = getService().getBot(getBuilder().getTitle());
-            if (bot != null) {
-                bot.getConfiguration().getListenerManager().removeListener(mListener);
+        if (service != null) {
+            if (getBot() != null) {
+                getBot().getConfiguration().getListenerManager().removeListener(mListener);
             }
-            getService().setBoundToIRCFragmentActivity(null);
+            service.setBoundToIRCFragmentActivity(null);
         }
 
         super.onPause();
@@ -397,8 +401,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         final UserListAdapter adapter = ((UserListAdapter) mUserFragment.getListAdapter());
         adapter.clear();
 
-        final ArrayList<String> userList = service.getBot(builder.getTitle()).getUserChannelDao()
-                .getChannel(fragment.getTitle()).getUserList();
+        final ArrayList<String> userList = getBot().getUserChannelDao().getChannel(fragment.getTitle()).getUserList();
         if (userList != null) {
             adapter.addAll(userList);
             adapter.sort();
@@ -418,12 +421,33 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         closeAllSlidingMenus();
     }
 
-    // Occurs
     public void onUnexpectedDisconnect() {
+        mViewPager.setCurrentItem(0, true);
+
+        mIRCPagerAdapter.removeAllButServer();
+        for(int i = 1; i < mIRCPagerAdapter.getCount(); i++) {
+            removeTab(i);
+        }
+
+        unbindService(mConnection);
         service = null;
+
         mIRCPagerAdapter.disableAllEditTexts();
         closeAllSlidingMenus();
-        mViewPager.setCurrentItem(0, true);
+    }
+
+    public void disconnect() {
+        getBot().getConfiguration().getListenerManager().removeListener(mListener);
+
+        service.disconnectFromServer(getServerTitle());
+        unbindService(mConnection);
+        service.stopSelf();
+        service.stopForeground(true);
+        service = null;
+
+        final Intent intent = new Intent(this, MainServerListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     // Hack for http://code.google.com/p/android/issues/detail?id=38500

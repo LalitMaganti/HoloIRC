@@ -46,7 +46,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.pircbotx.*;
-import org.pircbotx.output.OutputChannel;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -70,7 +69,7 @@ public class IRCService extends Service {
         setupListeners(server);
         setupNotification();
 
-        final Configuration configuration = server.buildConfiguration();
+        final Configuration<PircBotX> configuration = server.buildConfiguration();
 
         final PircBotX bot = new PircBotX(configuration);
         bot.setStatus(getString(R.string.status_connecting));
@@ -168,13 +167,6 @@ public class IRCService extends Service {
     public boolean onUnbind(final Intent intent) {
         boundToIRCFragmentActivity = null;
         return true;
-    }
-
-    public void partFromChannel(final String serverName, final String channelName) {
-        final UserChannelDao<User, Channel> dao = getBot(serverName).getUserChannelDao();
-        final Channel channel = dao.getChannel(channelName);
-        final OutputChannel outputChannel = channel.send();
-        outputChannel.part();
     }
 
     public void removePrivateMessage(final String serverName, final String nick) {

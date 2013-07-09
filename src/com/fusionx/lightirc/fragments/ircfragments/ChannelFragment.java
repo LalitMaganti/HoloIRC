@@ -61,8 +61,7 @@ public class ChannelFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        final Channel channel = ((IRCFragmentActivity) getActivity()).getService().getBot(serverName)
-                .getUserChannelDao().getChannel(getTitle());
+        final Channel channel = ((IRCFragmentActivity) getActivity()).getBot().getUserChannelDao().getChannel(getTitle());
         writeToTextView(channel.getBuffer());
     }
 }

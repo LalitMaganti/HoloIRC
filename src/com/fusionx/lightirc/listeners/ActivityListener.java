@@ -78,11 +78,15 @@ public class ActivityListener extends GenericListener {
 
     // Server events
     @Override
-    public void onEvent(final Event<PircBotX> event) throws Exception {
-        if (event instanceof NoticeEvent) {
-            appendToServer(event);
+    public void onNotice(final NoticeEvent<PircBotX> event) {
+        if(event.getChannel() == null) {
+            if(event.getUser().getBuffer().isEmpty()) {
+                appendToServer(event);
+            } else {
+                onPrivateEvent(event.getUser(), event.getNotice(), event);
+            }
         } else {
-            super.onEvent(event);
+            onChannelMessage(event.getChannel().getName(), event);
         }
     }
 
@@ -94,6 +98,7 @@ public class ActivityListener extends GenericListener {
     @Override
     public void onUnknown(final UnknownEvent<PircBotX> event) {
         appendToServer(event);
+        mViewPager.setCurrentItem(0, true);
     }
 
     // Channel events
@@ -102,7 +107,7 @@ public class ActivityListener extends GenericListener {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                final int position = getActivity().onNewChannelJoined(event.getChannel().getName(), null);
+                final int position = getActivity().onNewChannelJoined(event.getChannel().getName());
                 mViewPager.setCurrentItem(position, true);
             }
         });
@@ -110,7 +115,7 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onMessage(final MessageEvent<PircBotX> event) {
-        sendMessage(event.getChannel().getName(), event);
+        onChannelMessage(event.getChannel().getName(), event);
     }
 
     @Override
@@ -118,7 +123,7 @@ public class ActivityListener extends GenericListener {
         if (event.getChannel() == null) {
             onPrivateEvent(event.getUser(), event.getAction(), event);
         } else {
-            sendMessage(event.getChannel().getName(), event);
+            onChannelMessage(event.getChannel().getName(), event);
         }
     }
 
@@ -151,7 +156,7 @@ public class ActivityListener extends GenericListener {
 
     private void userListChanged(final Event<PircBotX> event, final String channelName) {
         if(!Utils.isMessagesFromChannelHidden(applicationContext)) {
-            sendMessage(channelName, event);
+            onChannelMessage(channelName, event);
         }
         if (checkChannelFragment(channelName)) {
             getActivity().closeAllSlidingMenus();
@@ -205,8 +210,8 @@ public class ActivityListener extends GenericListener {
         });
     }
 
-    private void sendMessage(final String title, final Event<PircBotX> event) {
-        final IRCFragment channel = mIRCPagerAdapter.getTab(title);
+    private void onChannelMessage(final String channelName, final Event<PircBotX> event) {
+        final IRCFragment channel = mIRCPagerAdapter.getTab(channelName);
         if (channel != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
