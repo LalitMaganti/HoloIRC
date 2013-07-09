@@ -36,14 +36,14 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
     @Setter(AccessLevel.PUBLIC)
     private boolean connected;
 
-    private final LayoutInflater inflater;
+    private final LayoutInflater inflate;
     private final Context applicationContext;
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         TextView row = (TextView) convertView;
         if (row == null) {
-            row = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            row = (TextView) inflate.inflate(android.R.layout.simple_list_item_1, parent, false);
         }
         row.setText(getItem(position));
 
@@ -60,7 +60,7 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
 
     public ActionsArrayAdapter(final Context context, final int textViewResourceId, final CharSequence[] objects) {
         super(context, textViewResourceId, (String[]) objects);
-        inflater = LayoutInflater.from(context);
+        inflate = LayoutInflater.from(context);
         applicationContext = context.getApplicationContext();
     }
 

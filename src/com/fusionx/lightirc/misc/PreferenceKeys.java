@@ -39,8 +39,11 @@ public class PreferenceKeys {
 
     // Appearance Settings
     public final static String Theme = "fragment_settings_theme";
-    public final static String Motd = "pref_motd";
 
     // Server channel settings
+    public final static String Motd = "pref_motd";
+    public final static String QuitReason = "pref_quit_reason";
+
     public final static String HideMessages = "pref_hide_messages";
+    public final static String PartReason = "pref_part_reason";
 }

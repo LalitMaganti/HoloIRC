@@ -32,8 +32,8 @@ import android.util.AttributeSet;
 import android.widget.Button;
 
 public class LightEditTextPreference extends EditTextPreference implements TextWatcher {
-    public LightEditTextPreference(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
+    public LightEditTextPreference(final Context context, final AttributeSet attributes) {
+        super(context, attributes);
     }
 
     @Override
@@ -62,6 +62,10 @@ public class LightEditTextPreference extends EditTextPreference implements TextW
     @Override
     protected void showDialog(final Bundle state) {
         super.showDialog(state);
+
+        final String text = getEditText().getText().toString();
+        getEditText().getText().clear();
+        getEditText().getText().append(text);
 
         getEditText().removeTextChangedListener(this);
         getEditText().addTextChangedListener(this);

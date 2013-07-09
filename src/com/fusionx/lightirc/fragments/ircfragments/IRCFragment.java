@@ -52,9 +52,9 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     protected String serverName;
 
     @Override
-    public View onCreateView(final LayoutInflater inflater,
+    public View onCreateView(final LayoutInflater inflate,
                              final ViewGroup container, final Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.fragment_irc, container, false);
+        final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
 
         setTextView((TextView) rootView.findViewById(R.id.textview));
         setEditText((EditText) rootView.findViewById(R.id.editText1));

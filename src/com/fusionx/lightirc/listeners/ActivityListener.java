@@ -79,8 +79,8 @@ public class ActivityListener extends GenericListener {
     // Server events
     @Override
     public void onNotice(final NoticeEvent<PircBotX> event) {
-        if(event.getChannel() == null) {
-            if(event.getUser().getBuffer().isEmpty()) {
+        if (event.getChannel() == null) {
+            if (event.getUser().getBuffer().isEmpty()) {
                 appendToServer(event);
             } else {
                 onPrivateEvent(event.getUser(), event.getNotice(), event);
@@ -155,7 +155,7 @@ public class ActivityListener extends GenericListener {
     }
 
     private void userListChanged(final Event<PircBotX> event, final String channelName) {
-        if(!Utils.isMessagesFromChannelHidden(applicationContext)) {
+        if (!Utils.isMessagesFromChannelHidden(applicationContext)) {
             onChannelMessage(channelName, event);
         }
         if (checkChannelFragment(channelName)) {

@@ -77,8 +77,8 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onNotice(final NoticeEvent<PircBotX> event) {
-        if(event.getChannel() == null) {
-            if(event.getUser().getBuffer().isEmpty()) {
+        if (event.getChannel() == null) {
+            if (event.getUser().getBuffer().isEmpty()) {
                 event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
             } else {
                 event.getUser().appendToBuffer(EventParser.getOutputForEvent(event, getService()));

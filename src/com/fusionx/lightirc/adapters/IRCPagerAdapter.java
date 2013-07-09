@@ -247,9 +247,9 @@ public class IRCPagerAdapter extends PagerAdapter {
     public IRCFragment getTab(final String title) {
         for (final IRCFragment i : views) {
             if (title.equals(i.getTitle())) {
-                int indexofi = views.indexOf(i);
-                if (indexofi == currentItemIndex || indexofi == (currentItemIndex - 1)
-                        || indexofi == (currentItemIndex + 1)) {
+                int indexOfFragment = views.indexOf(i);
+                if (indexOfFragment == currentItemIndex || indexOfFragment == (currentItemIndex - 1)
+                        || indexOfFragment == (currentItemIndex + 1)) {
                     return i;
                 } else {
                     return null;
@@ -267,7 +267,7 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     public void removeAllButServer() {
         for (IRCFragment fragment : views) {
-            if(!(fragment instanceof ServerFragment)) {
+            if (!(fragment instanceof ServerFragment)) {
                 views.remove(fragment);
             }
         }

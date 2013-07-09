@@ -53,4 +53,14 @@ public class Utils {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
         return prefs.getBoolean(PreferenceKeys.HideMessages, false);
     }
+
+    public static String getPartReason(final Context applicationContext) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return prefs.getString(PreferenceKeys.PartReason, "");
+    }
+
+    public static String getQuitReason(final Context applicationContext) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext);
+        return prefs.getString(PreferenceKeys.QuitReason, "");
+    }
 }

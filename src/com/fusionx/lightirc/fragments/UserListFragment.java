@@ -97,7 +97,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             case R.id.fragment_userlist_cab_pm:
                 final String nick = Utils.stripPrefixFromNick(String
                         .valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
-                final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();;
+                final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();
+
                 if (!bot.getNick().equals(nick)) {
                     activity.onNewPrivateMessage(nick);
                     mode.finish();

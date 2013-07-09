@@ -185,8 +185,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
             final ServerChannelActionsFragment actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.actions_fragment);
             final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) actionsFragment.getListView().getAdapter();
-            arrayAdapter.setConnected(service != null && getBot().getStatus()
-                    .equals(getString(R.string.status_connected)));
+            arrayAdapter.setConnected(service != null && getBot().getStatus().equals(getString(R.string.status_connected)));
             arrayAdapter.notifyDataSetChanged();
         }
     };
@@ -279,7 +278,9 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     // Removal stuff
     public void removeTab(final int i) {
         final ActionBar actionBar = getActionBar();
-        actionBar.removeTabAt(i);
+        if (actionBar != null) {
+            actionBar.removeTabAt(i);
+        }
     }
 
     private void closeIRCFragment(final boolean channel) {
@@ -288,7 +289,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
         mViewPager.setCurrentItem(index - 1, true);
         removeTab(index);
-        if(!channel) {
+        if (!channel) {
             mIRCPagerAdapter.removeView(title);
         }
 
@@ -320,9 +321,10 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
 
         super.onResume();
     }
+
     @Override
     public void onDestroy() {
-        if(service != null) {
+        if (service != null) {
             unbindService(mConnection);
         }
 
@@ -425,7 +427,7 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
         mViewPager.setCurrentItem(0, true);
 
         mIRCPagerAdapter.removeAllButServer();
-        for(int i = 1; i < mIRCPagerAdapter.getCount(); i++) {
+        for (int i = 1; i < mIRCPagerAdapter.getCount(); i++) {
             removeTab(i);
         }
 
@@ -439,10 +441,9 @@ public class IRCFragmentActivity extends FragmentActivity implements TabListener
     public void disconnect() {
         getBot().getConfiguration().getListenerManager().removeListener(mListener);
 
+        getBot().sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
         service.disconnectFromServer(getServerTitle());
         unbindService(mConnection);
-        service.stopSelf();
-        service.stopForeground(true);
         service = null;
 
         final Intent intent = new Intent(this, MainServerListActivity.class);

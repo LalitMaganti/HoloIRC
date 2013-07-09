@@ -45,7 +45,8 @@ import com.fusionx.lightirc.misc.LightThread;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.pircbotx.*;
+import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -94,7 +95,7 @@ public class IRCService extends Service {
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
 
-        Notification notification = builder.addAction(android.R.drawable.ic_menu_close_clear_cancel,
+        final Notification notification = builder.addAction(android.R.drawable.ic_menu_close_clear_cancel,
                 getString(R.string.service_disconnect_all), pIntent2).build();
 
         // Just a random number
@@ -104,37 +105,39 @@ public class IRCService extends Service {
 
     public void disconnectAll() {
         threadManager.disconnectAll();
+
         stopForeground(true);
         stopSelf();
+
         Intent intent = new Intent("serviceStopped");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void disconnectFromServer(final String serverName) {
-        getBot(serverName).setStatus(getString(R.string.status_disconnected));
-        final DisconnectTask disconnectTask = new DisconnectTask();
+        final AsyncTask<String, Void, String> disconnectTask = new AsyncTask<String, Void, String>() {
+            @Override
+            protected String doInBackground(final String... strings) {
+                final String botName = strings[0];
+                if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
+                    getBot(botName).shutdown();
+                } else {
+                    getThreadManager().get(botName).interrupt();
+                }
+                return botName;
+            }
+
+            @Override
+            protected void onPostExecute(final String botName) {
+                getBot(botName).setStatus(getString(R.string.status_disconnected));
+
+                threadManager.remove(botName);
+                if (getThreadManager().keySet().isEmpty()) {
+                    stopForeground(true);
+                    stopSelf();
+                }
+            }
+        };
         disconnectTask.execute(serverName);
-    }
-
-    private class DisconnectTask extends AsyncTask<String, Void, String> {
-        protected String doInBackground(final String... strings) {
-            final String botName = strings[0];
-            if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
-                getBot(botName).shutdown();
-            } else {
-                getThreadManager().get(botName).interrupt();
-            }
-            return botName;
-        }
-
-        @Override
-        protected void onPostExecute(final String botName) {
-            threadManager.remove(botName);
-            if (getThreadManager().keySet().isEmpty()) {
-                stopForeground(true);
-                stopSelf();
-            }
-        }
     }
 
     public PircBotX getBot(final String serverName) {
@@ -166,13 +169,8 @@ public class IRCService extends Service {
     @Override
     public boolean onUnbind(final Intent intent) {
         boundToIRCFragmentActivity = null;
-        return true;
-    }
 
-    public void removePrivateMessage(final String serverName, final String nick) {
-        final UserChannelDao<User, Channel> dao = getBot(serverName).getUserChannelDao();
-        dao.removePrivateMessage(nick);
-        dao.getUser(nick).setBuffer("");
+        return true;
     }
 
     private void setupListeners(final Configuration.Builder bot) {
@@ -181,19 +179,19 @@ public class IRCService extends Service {
         bot.getListenerManager().addListener(mServiceListener);
     }
 
-    public void mention(final String serverName, final String messageDest) {
+    public void mention(final String serverName, final String messageDestination) {
         Notification notification;
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.service_you_mentioned) + " " + messageDest)
+                .setContentText(getString(R.string.service_you_mentioned) + " " + messageDestination)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setAutoCancel(true)
-                .setTicker(getString(R.string.service_you_mentioned) + " " + messageDest);
+                .setTicker(getString(R.string.service_you_mentioned) + " " + messageDestination);
 
         if (!serverName.equals(boundToIRCFragmentActivity)) {
             final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
             mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
-            mIntent.putExtra("mention", messageDest);
+            mIntent.putExtra("mention", messageDestination);
             final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
             taskStackBuilder.addParentStack(IRCFragmentActivity.class);
             taskStackBuilder.addNextIntent(mIntent);

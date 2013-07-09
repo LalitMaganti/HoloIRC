@@ -112,7 +112,7 @@ public class MessageParser {
             final String channel = parsedArray[1];
             bot.sendIRC().joinChannel(channel);
         } else if (command.equals("/msg")) {
-            if(parsedArray.length > 1) {
+            if (parsedArray.length > 1) {
                 final String nick = parsedArray[1];
                 final String message = ((parsedArray.length == 2) ? "" : rawLine.replace("/msg ", ""));
                 final User user = bot.getUserChannelDao().getUser(nick);

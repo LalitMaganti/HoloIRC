@@ -41,6 +41,8 @@ public abstract class PromptDialog extends AlertDialog.Builder implements Dialog
 
         input = new EditText(context);
         input.setHint(hint);
+        input.setText(edittextdefaulttext);
+        input.getText().clear();
         input.append(edittextdefaulttext);
         input.setSingleLine(true);
         setView(input);

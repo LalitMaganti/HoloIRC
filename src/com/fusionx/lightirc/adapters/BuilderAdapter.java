@@ -52,16 +52,16 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
         }
 
         final TextView textView = (TextView) view.findViewById(R.id.title);
-        final TextView descriptiontextView = (TextView) view.findViewById(R.id.description);
+        final TextView description = (TextView) view.findViewById(R.id.description);
         if (textView != null) {
             textView.setText(getItem(position).getTitle());
         }
-        if (descriptiontextView != null) {
+        if (description != null) {
             final PircBotX bot = mService.getBot(getItem(position).getTitle());
             if (bot != null) {
-                descriptiontextView.setText(bot.getStatus());
+                description.setText(bot.getStatus());
             } else {
-                descriptiontextView.setText(mActivity.getString(R.string.status_disconnected));
+                description.setText(mActivity.getString(R.string.status_disconnected));
             }
         }
 
