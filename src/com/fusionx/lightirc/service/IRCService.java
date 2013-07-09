@@ -119,8 +119,8 @@ public class IRCService extends Service {
             @Override
             protected String doInBackground(final String... strings) {
                 final String botName = strings[0];
-                getBot(botName).sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
                 if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
+                    getBot(botName).sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
                     getBot(botName).shutdown();
                 } else {
                     getThreadManager().get(botName).interrupt();
