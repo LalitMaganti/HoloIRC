@@ -49,10 +49,10 @@ public class ActionsArrayAdapter extends ArrayAdapter<String> {
 
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
-        } else if (!Utils.themeIsHoloLight(applicationContext)) {
-            row.setTextColor(Color.WHITE);
-        } else {
+        } else if (Utils.themeIsHoloLight(applicationContext)) {
             row.setTextColor(Color.BLACK);
+        } else {
+            row.setTextColor(Color.WHITE);
         }
 
         return row;

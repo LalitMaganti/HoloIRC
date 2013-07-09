@@ -92,8 +92,8 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onUnknown(final UnknownEvent<PircBotX> event) {
-        appendToServer(event);
         getActivity().getViewPager().setCurrentItem(0, true);
+        appendToServer(event);
     }
 
     // Channel events
@@ -171,12 +171,12 @@ public class ActivityListener extends GenericListener {
         });
     }
 
-    // Private message events
     @Override
     public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
         onPrivateEvent(event.getUser(), event.getMessage(), event);
     }
 
+    // Misc stuff
     private void onPrivateEvent(final User user, final String message, final Event<PircBotX> event) {
         final IRCFragment fragment = privateMessageCheck(user.getNick());
         getActivity().runOnUiThread(new Runnable() {
@@ -194,11 +194,9 @@ public class ActivityListener extends GenericListener {
         });
     }
 
-    // Misc stuff
     private void appendToServer(final Event<PircBotX> event) {
         final IRCFragment server = getActivity().getIrcPagerAdapter()
                 .getFragment(event.getBot().getConfiguration().getTitle());
-
         if(server != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override

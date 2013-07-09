@@ -92,6 +92,9 @@ public class EventParser {
             final ModeEvent event = (ModeEvent) e;
             returnMessage = context.getString(R.string.mode) + " " + event.getMode() + " " +
                     context.getString(R.string.by) + " " + event.getUser().getNick();
+        } else if (e instanceof UnknownEvent) {
+            final UnknownEvent event = (UnknownEvent) e;
+            returnMessage = context.getString(R.string.output_event_unknown_event) + " " + event.getLine();
         } else {
             // Invalid event
             return "";
