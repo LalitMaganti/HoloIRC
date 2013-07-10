@@ -68,8 +68,9 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        mCommonListener.closeAllSlidingMenus();
-
+        if(i != 2) {
+            mCommonListener.closeAllSlidingMenus();
+        }
         switch (i) {
             case 0:
                 channelNameDialog();

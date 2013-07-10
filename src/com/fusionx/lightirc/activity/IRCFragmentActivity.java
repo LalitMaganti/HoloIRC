@@ -97,8 +97,10 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         mListener = new ActivityListener(this);
 
         final ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        if(actionBar != null) {
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         final Intent service = new Intent(this, IRCService.class);
         service.putExtra("server", true);
@@ -158,7 +160,9 @@ public class IRCFragmentActivity extends AbstractPagerActivity
                 }
             } else {
                 final Configuration.Builder<PircBotX> builder = getIntent().getExtras().getParcelable("server");
-                builder.getListenerManager().addListener(mListener);
+                if(builder != null) {
+                    builder.getListenerManager().addListener(mListener);
+                }
                 mService.connectToServer(builder);
                 addServerFragment();
             }
@@ -349,6 +353,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
             removeTab(i);
         }
         mViewPager.disconnect();
+        mActionsFragment.connectionStatusChanged(false);
 
         getBot().getConfiguration().getListenerManager().removeListener(mListener);
         mService.setServerDisplayed(null);
@@ -430,6 +435,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         parser.userMessageToParse(serverName, nick, message);
     }
 
+    // ServerFragment Listener Callbacks
     @Override
     public PircBotX getBot() {
         if (mService != null) {
@@ -439,7 +445,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         }
     }
 
-    // ServerFragment Listener Callbacks
     @Override
     public void sendServerMessage(String serverName, String message) {
         parser.serverMessageToParse(serverName, message);
