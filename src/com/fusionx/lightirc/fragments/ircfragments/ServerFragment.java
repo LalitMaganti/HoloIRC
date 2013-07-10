@@ -21,14 +21,27 @@
 
 package com.fusionx.lightirc.fragments.ircfragments;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
+import org.pircbotx.PircBotX;
 
 public class ServerFragment extends IRCFragment {
+    private ServerFragmentListenerInterface mListener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (ServerFragmentListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement ServerFragmentListenerInterface");
+        }
+    }
+
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_DONE && getEditText().getText() != null) {
@@ -36,8 +49,7 @@ public class ServerFragment extends IRCFragment {
             getEditText().setText("");
 
             final ParserTask task = new ParserTask();
-            String[] strings = {getTitle(), message};
-            task.execute(strings);
+            task.execute(message);
         }
         return false;
     }
@@ -45,10 +57,8 @@ public class ServerFragment extends IRCFragment {
     private class ParserTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(final String... strings) {
             if (strings != null) {
-                final String server = strings[0];
-                final String message = strings[1];
-                ((IRCFragmentActivity) getActivity())
-                        .getParser().serverMessageToParse(server, message);
+                final String message = strings[0];
+                mListener.sendServerMessage(getTitle(), message);
             }
             return null;
         }
@@ -58,7 +68,13 @@ public class ServerFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        final String buffer = ((IRCFragmentActivity) getActivity()).getBot().getBuffer();
+        final String buffer = mListener.getBot().getBuffer();
         writeToTextView(buffer);
+    }
+
+    public interface ServerFragmentListenerInterface {
+        public PircBotX getBot();
+
+        public void sendServerMessage(final String serverName, final String message);
     }
 }

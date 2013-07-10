@@ -21,17 +21,31 @@
 
 package com.fusionx.lightirc.fragments.ircfragments;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
+import com.fusionx.lightirc.misc.Utils;
 import org.pircbotx.Channel;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 public class ChannelFragment extends IRCFragment {
+    private ChannelFragmentListenerInterface mListener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (ChannelFragmentListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement ChannelFragmentListenerInterface");
+        }
+    }
+
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         final CharSequence text = getEditText().getText();
@@ -40,34 +54,53 @@ public class ChannelFragment extends IRCFragment {
             getEditText().setText("");
 
             final ParserTask task = new ParserTask();
-            final String[] strings = {serverName, getTitle(), message};
-            task.execute(strings);
+            task.execute(message);
         }
         return false;
     }
 
     private class ParserTask extends AsyncTask<String, Void, Void> {
         protected Void doInBackground(final String... strings) {
-            if (strings != null) {
-                final String server = strings[0];
-                final String channelName = strings[1];
-                final String message = strings[2];
-                ((IRCFragmentActivity) getActivity())
-                        .getParser().channelMessageToParse(server, channelName, message);
-            }
+            final String message = strings[0];
+            mListener.sendChannelMessage(serverName, getTitle(), message);
             return null;
         }
     }
 
-    public ArrayList<String> getUserList() {
-        return ((IRCFragmentActivity) getActivity()).getBot().getUserChannelDao().getChannel(getTitle()).getUserList();
+    public void onUserMention(final Set<String> users) {
+        for (final String userNick : users) {
+            String edit = getEditText().getText().toString();
+            edit = Html.fromHtml(userNick) + ": " + edit;
+            getEditText().clearComposingText();
+            getEditText().append(edit);
+            getEditText().requestFocus();
+        }
     }
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
+        writeToTextView(mListener.getChannel(getTitle()).getBuffer());
+    }
 
-        final Channel channel = ((IRCFragmentActivity) getActivity()).getBot().getUserChannelDao().getChannel(getTitle());
-        writeToTextView(channel.getBuffer());
+    @Override
+    public void partOrCloseIRC(final boolean channel) {
+        if (channel) {
+            final AsyncTask<Void, Void, Void> closeFragment = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... v) {
+                    mListener.getChannel(getTitle()).send()
+                            .part(Utils.getPartReason(getActivity().getApplicationContext()));
+                    return null;
+                }
+            };
+            closeFragment.execute();
+        }
+    }
+
+    public interface ChannelFragmentListenerInterface {
+        public Channel getChannel(final String channelName);
+
+        public void sendChannelMessage(final String serverName, final String channelName, final String message);
     }
 }

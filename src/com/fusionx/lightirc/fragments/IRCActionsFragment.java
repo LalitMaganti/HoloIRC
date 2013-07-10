@@ -21,19 +21,39 @@
 
 package com.fusionx.lightirc.fragments;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.AdapterView;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.ActionsArrayAdapter;
+import com.fusionx.lightirc.interfaces.CommonIRCListenerInterface;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
-import org.pircbotx.PircBotX;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-public class ServerChannelActionsFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
+        SlidingMenu.OnOpenListener {
+    private IRCActionsListenerInterface mListener;
+    private CommonIRCListenerInterface mCommonListener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (IRCActionsListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement IRCActionsListenerInterface");
+        }
+        try {
+            mCommonListener = (CommonIRCListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement CommonIRCListenerInterface");
+        }
+    }
+
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -48,6 +68,8 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
+        mCommonListener.closeAllSlidingMenus();
+
         switch (i) {
             case 0:
                 channelNameDialog();
@@ -56,46 +78,65 @@ public class ServerChannelActionsFragment extends ListFragment implements Adapte
                 nickChangeDialog();
                 break;
             case 2:
-                ((IRCFragmentActivity) getActivity()).disconnect();
+                disconnect();
+                mListener.disconnect();
                 break;
         }
     }
 
+    public void disconnect() {
+        ((ActionsArrayAdapter) getListAdapter()).setConnected(false);
+        ((ActionsArrayAdapter) getListAdapter()).notifyDataSetChanged();
+    }
+
     private void nickChangeDialog() {
-        final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();
-        final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(), bot.getNick()) {
+        final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(), mListener.getNick()) {
             @Override
             public void onOkClicked(final String input) {
                 final AsyncTask<Void, Void, Void> ChangeNickTask = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... objects) {
-                        bot.sendIRC().changeNick(input);
+                        mListener.changeNick(input);
                         return null;
                     }
                 };
                 ChangeNickTask.execute();
-                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
             }
         };
         nickDialog.show();
     }
 
     private void channelNameDialog() {
-        final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();
         final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder(getActivity()) {
             @Override
             public void onOkClicked(final String input) {
                 final AsyncTask<Void, Void, Void> JoinTask = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... objects) {
-                        bot.sendIRC().joinChannel(input);
+                        mListener.joinChannel(input);
                         return null;
                     }
                 };
                 JoinTask.execute();
-                ((IRCFragmentActivity) getActivity()).closeAllSlidingMenus();
             }
         };
         builder.show();
+    }
+
+    @Override
+    public void onOpen() {
+        final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) getListView().getAdapter();
+        arrayAdapter.setConnected(mCommonListener.isConnectedToServer());
+        arrayAdapter.notifyDataSetChanged();
+    }
+
+    public interface IRCActionsListenerInterface {
+        public String getNick();
+
+        public void joinChannel(final String channel);
+
+        public void changeNick(final String newNick);
+
+        public void disconnect();
     }
 }

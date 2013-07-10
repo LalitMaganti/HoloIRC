@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -30,10 +31,9 @@ import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.interfaces.CommonIRCListenerInterface;
 import com.fusionx.lightirc.misc.Utils;
-import org.pircbotx.PircBotX;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -41,6 +41,24 @@ import java.util.Set;
 public class UserListFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
         AdapterView.OnItemClickListener {
     private boolean modeStarted = false;
+
+    private UserListListenerInterface mListener;
+    private CommonIRCListenerInterface mCommonListener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (UserListListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement UserListListenerInterface");
+        }
+        try {
+            mCommonListener = (CommonIRCListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement CommonIRCListenerInterface");
+        }
+    }
 
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
@@ -50,16 +68,16 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    public void userListUpdate(ArrayList<String> userList) {
+    public void userListUpdate(final String channelName) {
         final UserListAdapter adapter = ((UserListAdapter) getListAdapter());
         adapter.clear();
 
+        final ArrayList<String> userList = mListener.getUserList(channelName);
         if (userList != null) {
             adapter.addAll(userList);
             adapter.sort();
         }
     }
-
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
@@ -97,23 +115,22 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         final Set<String> selectedItems = ((UserListAdapter) getListView().getAdapter()).getSelectedItems();
-        final IRCFragmentActivity activity = ((IRCFragmentActivity) getActivity());
+        //final IRCFragmentActivity activity = ((IRCFragmentActivity) getActivity());
 
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
-                activity.userListMention(selectedItems);
+                mListener.onUserMention(selectedItems);
                 mode.finish();
-                activity.closeAllSlidingMenus();
+                mCommonListener.closeAllSlidingMenus();
                 return true;
             case R.id.fragment_userlist_cab_pm:
                 final String nick = Utils.stripPrefixFromNick(String
                         .valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
-                final PircBotX bot = ((IRCFragmentActivity) getActivity()).getBot();
 
-                if (!bot.getNick().equals(nick)) {
-                    activity.onNewPrivateMessage(nick);
+                if (!mListener.isNickUsers(nick)) {
+                    mCommonListener.onCreatePMFragment(nick);
                     mode.finish();
-                    activity.closeAllSlidingMenus();
+                    mCommonListener.closeAllSlidingMenus();
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
                     build.setTitle(getActivity()
@@ -167,5 +184,13 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
         final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
         getListView().setItemChecked(i, !checked);
+    }
+
+    public interface UserListListenerInterface {
+        public void onUserMention(final Set<String> users);
+
+        public boolean isNickUsers(final String nick);
+
+        public ArrayList<String> getUserList(final String channelName);
     }
 }

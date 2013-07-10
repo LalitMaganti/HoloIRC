@@ -28,10 +28,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Binder;
-import android.os.Build;
-import android.os.IBinder;
+import android.os.*;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import com.fusionx.lightirc.R;
@@ -60,7 +57,7 @@ public class IRCService extends Service {
     private LightManager threadManager = null;
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
-    private String boundToServer = null;
+    private String serverDisplayed = null;
     private ServiceListener mServiceListener;
 
     public void connectToServer(final Configuration.Builder server) {
@@ -143,6 +140,20 @@ public class IRCService extends Service {
         disconnectTask.execute();
     }
 
+    public void onUnexpectedDisconnect(final String serverName) {
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                final LightManager manager = getThreadManager();
+                manager.remove(serverName);
+            }
+        };
+        if (serverDisplayed == null) {
+            handler.post(runnable);
+        }
+    }
+
     public PircBotX getBot(final String serverName) {
         if (threadManager != null && threadManager.get(serverName) != null) {
             return threadManager.get(serverName).getBot();
@@ -159,7 +170,7 @@ public class IRCService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (intent != null) {
-            boundToServer = intent.getStringExtra("setBound");
+            serverDisplayed = intent.getStringExtra("setBound");
             if (intent.getBooleanExtra("stop", false)) {
                 disconnectAll();
             }
@@ -171,13 +182,13 @@ public class IRCService extends Service {
 
     @Override
     public boolean onUnbind(final Intent intent) {
-        boundToServer = null;
+        serverDisplayed = null;
 
         return true;
     }
 
     private void setupListeners(final Configuration.Builder bot) {
-        if(mServiceListener == null) {
+        if (mServiceListener == null) {
             mServiceListener = new ServiceListener(this);
         }
         bot.getListenerManager().addListener(mServiceListener);
@@ -192,7 +203,7 @@ public class IRCService extends Service {
                 .setAutoCancel(true)
                 .setTicker(getString(R.string.service_you_mentioned) + " " + messageDestination);
 
-        if (!serverName.equals(boundToServer)) {
+        if (!serverName.equals(serverDisplayed)) {
             final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
             mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
             mIntent.putExtra("mention", messageDestination);

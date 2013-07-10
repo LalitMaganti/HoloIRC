@@ -36,10 +36,10 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.Toast;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightlibrary.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightlibrary.adapters.SelectionAdapter;
 
 import java.io.File;
 import java.util.ArrayList;

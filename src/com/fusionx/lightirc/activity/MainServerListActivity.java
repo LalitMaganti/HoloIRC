@@ -213,7 +213,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             builder.setFile(server);
             mBuilderList.add(builder);
 
-            if(serverIsConnected(builder.getTitle())) {
+            if (serverIsConnected(builder.getTitle())) {
                 getService().getBot(builder.getTitle()).getConfiguration().getListenerManager().addListener(mListener);
             }
         }
@@ -320,6 +320,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void disconnectFromServer(final Configuration.Builder builder) {
+        getService().getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(mListener);
         getService().disconnectFromServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }

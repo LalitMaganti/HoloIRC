@@ -21,10 +21,8 @@
 
 package com.fusionx.lightirc.listeners;
 
-import android.os.Handler;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.IRCUserComparator;
-import com.fusionx.lightirc.irc.LightManager;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.service.IRCService;
@@ -67,17 +65,11 @@ public class ServiceListener extends GenericListener {
 
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final LightManager manager = getService().getThreadManager();
-                manager.remove(event.getBot().getConfiguration().getTitle());
-                if (getService().getThreadManager().keySet().isEmpty()) {
-                    getService().stopForeground(true);
-                }
-            }
-        }, 500);
+        if (getService().getThreadManager().keySet().size() == 1) {
+            getService().stopForeground(true);
+        }
+
+        getService().onUnexpectedDisconnect(event.getBot().getConfiguration().getTitle());
     }
 
     @Override

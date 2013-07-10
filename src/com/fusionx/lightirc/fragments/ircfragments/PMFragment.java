@@ -26,41 +26,57 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
+import org.pircbotx.User;
 
 public class PMFragment extends IRCFragment {
+    private PMFragmentListenerInterface mListener;
+
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
         if (i == EditorInfo.IME_ACTION_DONE) {
             final String message = getEditText().getText().toString();
             getEditText().setText("");
 
-            final ParserTask task = new ParserTask();
-            String[] strings = {serverName, getTitle(), message};
-            task.execute(strings);
+            ParserTask.execute(message);
         }
         return false;
     }
 
-    private class ParserTask extends AsyncTask<String, Void, Void> {
+    final AsyncTask<String, Void, Void> ParserTask = new AsyncTask<String, Void, Void>() {
         protected Void doInBackground(final String... strings) {
             if (strings != null) {
-                final String server = strings[0];
-                final String userNick = strings[1];
-                final String message = strings[2];
-                ((IRCFragmentActivity) getActivity())
-                        .getParser().userMessageToParse(server, userNick, message);
+                final String message = strings[0];
+                mListener.sendUserMessage(serverName, getTitle(), message);
             }
             return null;
         }
-    }
+    };
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        final String buffer = ((IRCFragmentActivity) getActivity()).getBot().getUserChannelDao()
-                .getUser(getTitle()).getBuffer();
+        final String buffer = mListener.getUser(getTitle()).getBuffer();
         writeToTextView(buffer);
+    }
+
+    @Override
+    public void partOrCloseIRC(final boolean channel) {
+        if (!channel) {
+            final AsyncTask<Void, Void, Void> closeFragment = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... v) {
+                    mListener.getUser(getTitle()).closePrivateMessage();
+                    return null;
+                }
+            };
+            closeFragment.execute();
+        }
+    }
+
+    public interface PMFragmentListenerInterface {
+        public User getUser(final String channelName);
+
+        public void sendUserMessage(final String serverName, final String nick, final String message);
     }
 }

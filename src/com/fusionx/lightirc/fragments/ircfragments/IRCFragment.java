@@ -52,6 +52,13 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     String serverName = null;
 
     @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflate,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
@@ -92,5 +99,9 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
                 scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
         });
+    }
+
+    public void partOrCloseIRC(final boolean channel) {
+        throw new NullPointerException();
     }
 }

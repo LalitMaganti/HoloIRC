@@ -56,9 +56,9 @@ public class MessageParser {
                         bot.getUserChannelDao().getChannel(channelName), action));
                 bot.getUserChannelDao().getChannel(channelName).send().action(action);
             } else if (command.equals("/part")) {
-                    // TODO - input validation
-                    bot.getUserChannelDao().getChannel(channelName)
-                            .send().part(Utils.getPartReason(getService().getApplicationContext()));
+                // TODO - input validation
+                bot.getUserChannelDao().getChannel(channelName)
+                        .send().part(Utils.getPartReason(getService().getApplicationContext()));
             } else {
                 serverCommandToParse(parsedArray, message, bot);
             }

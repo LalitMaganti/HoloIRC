@@ -86,7 +86,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     /**
      * Return the Fragment associated with a specified position.
      */
-    public Fragment getItem(final int position) {
+    public IRCFragment getItem(final int position) {
         return views.get(position);
     }
 
@@ -245,6 +245,15 @@ public class IRCPagerAdapter extends PagerAdapter {
         return null;
     }
 
+    public int getIndexFromTitle(final String title) {
+        for (final IRCFragment i : views) {
+            if (title.equals(i.getTitle())) {
+                return views.indexOf(i);
+            }
+        }
+        return -1;
+    }
+
     public void disableAllEditTexts() {
         for (final IRCFragment fragment : views) {
             fragment.getEditText().setEnabled(false);
@@ -252,7 +261,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void removeAllButServer() {
-        for (int i = 1; i < getCount();) {
+        for (int i = 1; i < getCount(); ) {
             views.remove(i);
         }
 
