@@ -76,7 +76,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     @Override
-    protected void onResume() {
+    protected void onStart() {
         if (getService() == null) {
             final Intent service = new Intent(this, IRCService.class);
             service.putExtra("stop", false);
@@ -87,15 +87,15 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             setUpServerList();
         }
 
-        super.onResume();
+        super.onStart();
     }
 
     @Override
-    protected void onPause() {
+    protected void onStop() {
         unbindService(mConnection);
         service = null;
 
-        super.onPause();
+        super.onStop();
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -336,7 +336,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     private boolean serverIsConnected(final String title) {
         return getService() != null && getService().getBot(title) != null &&
-                !(getService().getBot(title).getStatus().equals(getString(R.string.status_disconnected)));
+                (getService().getBot(title).getStatus().equals(getString(R.string.status_connected)));
     }
 
     private class ListListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {

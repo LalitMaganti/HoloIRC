@@ -28,7 +28,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.*;
+import android.os.AsyncTask;
+import android.os.Binder;
+import android.os.Build;
+import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import com.fusionx.lightirc.R;
@@ -40,8 +43,8 @@ import com.fusionx.lightirc.irc.LightThread;
 import com.fusionx.lightirc.listeners.ServiceListener;
 import com.fusionx.lightirc.misc.Utils;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.Synchronized;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 
@@ -53,7 +56,6 @@ public class IRCService extends Service {
         }
     }
 
-    @Getter(AccessLevel.PUBLIC)
     private LightManager threadManager = null;
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
@@ -124,7 +126,7 @@ public class IRCService extends Service {
                     bot.sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
                     bot.shutdown();
                 } else {
-                    getThreadManager().get(serverName).interrupt();
+                    threadManager.get(serverName).interrupt();
                 }
                 return null;
             }
@@ -132,7 +134,7 @@ public class IRCService extends Service {
             @Override
             protected void onPostExecute(final Void bot) {
                 threadManager.remove(serverName);
-                if (getThreadManager().keySet().isEmpty()) {
+                if (threadManager.isEmpty()) {
                     stopForeground(true);
                 }
             }
@@ -140,17 +142,15 @@ public class IRCService extends Service {
         disconnectTask.execute();
     }
 
+    @Synchronized
     public void onUnexpectedDisconnect(final String serverName) {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final LightManager manager = getThreadManager();
-                manager.remove(serverName);
-            }
-        };
         if (serverDisplayed == null) {
-            handler.post(runnable);
+            if(threadManager.containsKey(serverName)) {
+                threadManager.remove(serverName);
+                if (threadManager.isEmpty()) {
+                   stopForeground(true);
+                }
+            }
         }
     }
 

@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.fragments.ircfragments;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -30,6 +31,16 @@ import org.pircbotx.User;
 
 public class PMFragment extends IRCFragment {
     private PMFragmentListenerInterface mListener;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (PMFragmentListenerInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement PMFragmentListenerInterface");
+        }
+    }
 
     @Override
     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {

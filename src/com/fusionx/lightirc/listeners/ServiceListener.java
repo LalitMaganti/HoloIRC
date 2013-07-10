@@ -26,8 +26,6 @@ import com.fusionx.lightirc.irc.IRCUserComparator;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import com.fusionx.lightirc.service.IRCService;
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -42,88 +40,87 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class ServiceListener extends GenericListener {
-    @Getter(AccessLevel.PRIVATE)
-    private final IRCService service;
+    private final IRCService mService;
 
     public ServiceListener(final IRCService service) {
         super(service.getApplicationContext());
-        this.service = service;
+        mService = service;
     }
 
     // Server stuff
     @Override
     public void onConnect(final ConnectEvent<PircBotX> event) {
-        event.getBot().setStatus(getService().getString(R.string.status_connected));
+        event.getBot().setStatus(mService.getString(R.string.status_connected));
 
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     // This HAS to be an unexpected disconnect. If it isn't then there's something wrong.
     @Override
     public void onDisconnect(final DisconnectEvent<PircBotX> event) {
-        event.getBot().setStatus(getService().getString(R.string.status_disconnected));
+        event.getBot().setStatus(mService.getString(R.string.status_disconnected));
 
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
-        if (getService().getThreadManager().keySet().size() == 1) {
-            getService().stopForeground(true);
-        }
-
-        getService().onUnexpectedDisconnect(event.getBot().getConfiguration().getTitle());
+        mService.onUnexpectedDisconnect(event.getBot().getConfiguration().getTitle());
     }
 
     @Override
     public void onNotice(final NoticeEvent<PircBotX> event) {
         if (event.getChannel() == null) {
             if (event.getUser().getBuffer().isEmpty()) {
-                event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+                event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
             } else {
-                event.getUser().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+                event.getUser().appendToBuffer(EventParser.getOutputForEvent(event, mService));
             }
         } else {
-            event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+            event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
         }
     }
 
     @Override
     public void onMotd(final MotdEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     @Override
-    public void onIOException(IOExceptionEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+    public void onIOException(final IOExceptionEvent<PircBotX> event) {
+        event.getBot().setStatus(mService.getString(R.string.status_disconnected));
+
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
+
+        mService.onUnexpectedDisconnect(event.getBot().getConfiguration().getTitle());
     }
 
     @Override
-    public void onIrcException(IrcExceptionEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+    public void onIrcException(final IrcExceptionEvent<PircBotX> event) {
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     @Override
     public void onUnknown(final UnknownEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     // Channel stuff
     @Override
     public void onBotJoin(final JoinEvent<PircBotX> event) {
-        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     @Override
     public void onTopic(final TopicEvent<PircBotX> event) {
-        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     @Override
     public void onMessage(final MessageEvent<PircBotX> event) {
         if (event.getMessage().contains(event.getBot().getNick())) {
             final String title = event.getBot().getConfiguration().getTitle();
-            getService().mention(title, event.getChannel().getName());
+            mService.mention(title, event.getChannel().getName());
         }
 
-        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     @Override
@@ -143,11 +140,11 @@ public class ServiceListener extends GenericListener {
         if (event.getChannel() == null) {
             onPrivateEvent(event, event.getAction(), event.getUser());
         } else {
-            event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+            event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
             if (event.getMessage().contains(event.getBot().getNick())) {
                 final String title = event.getBot().getConfiguration().getTitle();
-                getService().mention(title, event.getChannel().getName());
+                mService.mention(title, event.getChannel().getName());
             }
         }
     }
@@ -158,7 +155,7 @@ public class ServiceListener extends GenericListener {
         final String oldFormattedNick = event.getOldNick();
         final String newFormattedNick = event.getNewNick();
 
-        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
         set.set(set.indexOf(oldFormattedNick), newFormattedNick);
         Collections.sort(set, new IRCUserComparator());
@@ -166,7 +163,7 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
-        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
         final ArrayList<String> set = event.getChannel().getUserList();
         set.add(event.getUser().getPrettyNick(event.getChannel()));
@@ -177,7 +174,7 @@ public class ServiceListener extends GenericListener {
     public void onMode(final ModeEvent<PircBotX> event) {
         if (event.getUser() != null) {
             if (Utils.isMessagesFromChannelShown(applicationContext)) {
-                event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+                event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
             }
             final ArrayList<String> userList = new ArrayList<String>();
 
@@ -201,7 +198,7 @@ public class ServiceListener extends GenericListener {
     }
 
     private void onOtherUserDepart(final Event<PircBotX> event, final Channel channel, final User user) {
-        channel.appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+        channel.appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
         final ArrayList<String> set = channel.getUserList();
         set.remove(user.getPrettyNick(channel));
@@ -215,12 +212,16 @@ public class ServiceListener extends GenericListener {
 
     public void onPrivateEvent(final Event<PircBotX> event, final String message, final User user) {
         if (!message.equals("")) {
-            user.appendToBuffer(EventParser.getOutputForEvent(event, getService()));
+            user.appendToBuffer(EventParser.getOutputForEvent(event, mService));
+        }
+
+        if(!event.getBot().getUserChannelDao().getPrivateMessages().contains(user)) {
+            user.createPrivateMessage();
         }
 
         if (!user.equals(event.getBot().getUserBot())) {
             final String title = event.getBot().getConfiguration().getTitle();
-            getService().mention(title, user.getNick());
+            mService.mention(title, user.getNick());
         }
     }
 }

@@ -27,6 +27,7 @@ import android.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -112,33 +113,33 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
-    public void onResume() {
-        if (isConnectedToServer()) {
-            getBot().getConfiguration().getListenerManager().addListener(mListener);
-            mService.setServerDisplayed(mServerTitle);
-        }
+    public void onStop() {
+        super.onStop();
 
-        super.onResume();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (isConnectedToServer()) {
-            unbindService(mConnection);
-            mService = null;
-        }
-
-        super.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
         if (isConnectedToServer()) {
             getBot().getConfiguration().getListenerManager().removeListener(mListener);
             mService.setServerDisplayed(null);
         }
+    }
 
-        super.onPause();
+    @Override
+    public void onRestart() {
+        super.onRestart();
+
+        if (isConnectedToServer()) {
+            getBot().getConfiguration().getListenerManager().addListener(mListener);
+            mService.setServerDisplayed(mServerTitle);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (isConnectedToServer()) {
+            unbindService(mConnection);
+            mService = null;
+        }
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -148,6 +149,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
             parser.setService(mService);
 
             if (getBot() != null) {
+                mActionsFragment.connectionStatusChanged(true);
                 getBot().getConfiguration().getListenerManager().addListener(mListener);
                 addServerFragment();
                 if (isConnectedToServer()) {
@@ -243,20 +245,19 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     private void removeFragment(final int index) {
-        mViewPager.setCurrentItem(index - 1, true);
         removeTab(index);
         mViewPager.getAdapter().removeFragment(index);
     }
 
     private void partOrCloseIRC(final boolean channel) {
         final int index = mViewPager.getCurrentItem();
-        if (channel) {
-            mViewPager.setCurrentItem(index - 1, true);
-        } else {
+        mViewPager.setCurrentItem(index - 1, true);
+
+        if (!channel) {
             removeFragment(index);
         }
 
-        getCurrentItem().partOrCloseIRC(channel);
+        mViewPager.getAdapter().getItem(index).partOrCloseIRC(channel);
     }
 
     private void setUpSlidingMenu() {
@@ -317,8 +318,12 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
-    public void removeFragment(final String channelName) {
-        removeFragment(mViewPager.getAdapter().getIndexFromTitle(channelName));
+    public void switchFragmentAndRemove(final String channelName) {
+        final int index = mViewPager.getAdapter().getIndexFromTitle(channelName);
+        if(getCurrentItem().getTitle().equals(channelName)) {
+            mViewPager.setCurrentItem(index - 1, true);
+        }
+        removeFragment(index);
     }
 
     @Override
@@ -345,20 +350,36 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         }
     }
 
+    private final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void, Void, Void>() {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mService.onUnexpectedDisconnect(mServerTitle);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            unbindService(mConnection);
+            mService = null;
+        }
+    };
+
     @Override
     public void onUnexpectedDisconnect() {
         selectServerFragment();
 
-        for (int i = 1; i < getActionBar().getTabCount(); ) {
-            removeTab(i);
+        final ActionBar bar = getActionBar();
+        if(bar != null) {
+            for (int i = 1; i < bar.getTabCount(); ) {
+                removeTab(i);
+            }
         }
         mViewPager.disconnect();
         mActionsFragment.connectionStatusChanged(false);
 
         getBot().getConfiguration().getListenerManager().removeListener(mListener);
         mService.setServerDisplayed(null);
-        unbindService(mConnection);
-        mService = null;
+        unexpectedDisconnect.execute();
 
         closeAllSlidingMenus();
     }
@@ -411,7 +432,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
 
     @Override
     public void disconnect() {
-        if (isConnectedToServer()) {
+        if (mService != null && getBot() != null) {
             getBot().getConfiguration().getListenerManager().removeListener(mListener);
 
             mService.disconnectFromServer(mServerTitle);

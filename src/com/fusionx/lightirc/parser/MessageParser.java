@@ -119,14 +119,15 @@ public class MessageParser {
         } else if (command.equals("/msg")) {
             if (parsedArray.length > 1) {
                 final String nick = parsedArray[1];
-                final String message = ((parsedArray.length == 2) ? "" : rawLine.replace("/msg ", ""));
+                final String message = ((parsedArray.length == 2) ? "" : rawLine.replace("/msg ", "")
+                        .replace(nick + " ", ""));
                 final User user = bot.getUserChannelDao().getUser(nick);
                 manager.dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message, true));
                 user.send().message(message);
             } else {
                 manager.dispatchEvent(new UnknownEvent<PircBotX>(bot, rawLine));
             }
-        } else if (parsedArray[0].startsWith("/nick")) {
+        } else if (command.startsWith("/nick")) {
             final String newNick = parsedArray[1];
             bot.sendIRC().changeNick(newNick);
         } else {

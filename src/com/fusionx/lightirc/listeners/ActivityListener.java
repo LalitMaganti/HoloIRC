@@ -95,6 +95,13 @@ public class ActivityListener extends GenericListener {
     @Override
     protected void onIOException(final IOExceptionEvent<PircBotX> event) {
         appendToServer(event);
+
+        mListener.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mListener.onUnexpectedDisconnect();
+            }
+        });
     }
 
     // Server events
@@ -198,7 +205,7 @@ public class ActivityListener extends GenericListener {
         mListener.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mListener.removeFragment(event.getChannel().getName());
+                mListener.switchFragmentAndRemove(event.getChannel().getName());
             }
         });
     }
@@ -266,6 +273,6 @@ public class ActivityListener extends GenericListener {
 
         public void selectServerFragment();
 
-        public void removeFragment(final String channelName);
+        public void switchFragmentAndRemove(final String channelName);
     }
 }
