@@ -39,17 +39,17 @@ import lombok.Setter;
 public abstract class IRCFragment extends Fragment implements TextView.OnEditorActionListener {
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PROTECTED)
-    private String title;
+    private String title = null;
 
     @Getter(AccessLevel.PROTECTED)
     @Setter(AccessLevel.PROTECTED)
-    private TextView textView;
+    private TextView textView = null;
 
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PROTECTED)
-    private EditText editText;
+    private EditText editText = null;
 
-    String serverName;
+    String serverName = null;
 
     @Override
     public View onCreateView(final LayoutInflater inflate,

@@ -45,6 +45,10 @@ import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnim
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.pircbotx.Configuration;
+import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Listener;
+import org.pircbotx.hooks.ListenerAdapter;
+import org.pircbotx.hooks.events.DisconnectEvent;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -57,22 +61,23 @@ import java.util.Set;
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
         PopupMenu.OnDismissListener {
     @Getter(AccessLevel.PUBLIC)
-    private IRCService service;
-    private ArrayList<Configuration.Builder> mBuilderList;
-    private Configuration.Builder mBuilder;
-    private BuilderAdapter mServerCardsAdapter;
+    private IRCService service = null;
+    private ArrayList<Configuration.Builder> mBuilderList = null;
+    private Configuration.Builder mBuilder = null;
+    private BuilderAdapter mServerCardsAdapter = null;
+    private ListListener mListener = new ListListener();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(Utils.getThemeInt(getApplicationContext()));
-
-        setContentView(R.layout.activity_server_list);
         super.onCreate(savedInstanceState);
+
+        setTheme(Utils.getThemeInt(getApplicationContext()));
+        setContentView(R.layout.activity_server_list);
     }
 
     @Override
     protected void onResume() {
-        if (service == null) {
+        if (getService() == null) {
             final Intent service = new Intent(this, IRCService.class);
             service.putExtra("stop", false);
             startService(service);
@@ -103,14 +108,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            service = null;
-            mServerCardsAdapter.notifyDataSetChanged();
         }
     };
 
     private void setUpListView() {
         final ListView listView = (ListView) findViewById(R.id.server_list);
-        mServerCardsAdapter = new BuilderAdapter(service, this);
+        mServerCardsAdapter = new BuilderAdapter(this);
         final SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
                 = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
         swingBottomInAnimationAdapter.setAbsListView(listView);
@@ -180,35 +183,39 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mBuilderList.clear();
         for (final String server : servers) {
             final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
-            final Configuration.Builder bot = new Configuration.Builder();
-            bot.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
-            bot.setServerHostname(serverSettings.getString(PreferenceKeys.URL, ""));
-            bot.setServerPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
-            bot.setName(serverSettings.getString(PreferenceKeys.Nick, ""));
-            bot.setLogin(serverSettings.getString(PreferenceKeys.ServerUserName, "lightirc"));
-            bot.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
+            final Configuration.Builder builder = new Configuration.Builder();
+            builder.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
+            builder.setServerHostname(serverSettings.getString(PreferenceKeys.URL, ""));
+            builder.setServerPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
+            builder.setName(serverSettings.getString(PreferenceKeys.Nick, ""));
+            builder.setLogin(serverSettings.getString(PreferenceKeys.ServerUserName, "lightirc"));
+            builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
 
             final String nickServPassword = serverSettings.getString(PreferenceKeys.NickServPassword, null);
             if (nickServPassword != null && !nickServPassword.equals("")) {
-                bot.setNickservPassword(nickServPassword);
+                builder.setNickservPassword(nickServPassword);
             }
 
-            bot.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
+            builder.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
             final boolean ssl = serverSettings.getBoolean(PreferenceKeys.SSL, false);
             if (ssl) {
-                bot.setSocketFactory(SSLSocketFactory.getDefault());
+                builder.setSocketFactory(SSLSocketFactory.getDefault());
             } else {
-                bot.setSocketFactory(SocketFactory.getDefault());
+                builder.setSocketFactory(SocketFactory.getDefault());
             }
 
             final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
             for (final String channel : auto) {
-                bot.addAutoJoinChannel(channel);
+                builder.addAutoJoinChannel(channel);
             }
 
-            bot.setFile(server);
-            mBuilderList.add(bot);
+            builder.setFile(server);
+            mBuilderList.add(builder);
+
+            if(serverIsConnected(builder.getTitle())) {
+                getService().getBot(builder.getTitle()).getConfiguration().getListenerManager().addListener(mListener);
+            }
         }
     }
 
@@ -253,10 +260,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     // Connect to server
     public void onCardClick(final View v) {
         final Intent intent = new Intent(MainServerListActivity.this, IRCFragmentActivity.class);
-
         intent.putExtra("server", (Configuration.Builder) v.getTag());
-        service = null;
-
         startActivity(intent);
     }
 
@@ -266,8 +270,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mBuilder = (Configuration.Builder) view.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
-        if (service != null && service.getBot(mBuilder.getTitle()) != null &&
-                !(service.getBot(mBuilder.getTitle()).getStatus().equals(getString(R.string.status_disconnected)))) {
+        if (serverIsConnected(mBuilder.getTitle())) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
         } else {
@@ -317,7 +320,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void disconnectFromServer(final Configuration.Builder builder) {
-        service.disconnectFromServer(builder.getTitle());
+        getService().disconnectFromServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
@@ -328,6 +331,19 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         intent.putExtra("server", builder);
         intent.putExtra("main", true);
         startActivity(intent);
+    }
+
+    private boolean serverIsConnected(final String title) {
+        return getService() != null && getService().getBot(title) != null &&
+                !(getService().getBot(title).getStatus().equals(getString(R.string.status_disconnected)));
+    }
+
+    private class ListListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
+        @Override
+        public void onDisconnect(final DisconnectEvent<PircBotX> event) {
+            mServerCardsAdapter.notifyDataSetChanged();
+            event.getBot().getConfiguration().getListenerManager().removeListener(mListener);
+        }
     }
 
     private class ServerCardsAdapter extends BaseAdapterDecorator {

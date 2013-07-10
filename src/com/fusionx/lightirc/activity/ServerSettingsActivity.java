@@ -48,9 +48,9 @@ import java.util.List;
 import java.util.Set;
 
 public class ServerSettingsActivity extends PreferenceActivity {
-    private static boolean canExit;
-    private static boolean newServer;
-    private static String fileName;
+    private static boolean canExit = true;
+    private static boolean newServer = false;
+    private static String fileName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,17 +96,17 @@ public class ServerSettingsActivity extends PreferenceActivity {
     public class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
         // Generic
-        private EditTextPreference mEditTextNick;
-        private EditTextPreference mEditTextUrl;
-        private EditTextPreference mEditTextPort;
-        private EditTextPreference mEditTextTitle;
+        private EditTextPreference mEditTextNick = null;
+        private EditTextPreference mEditTextUrl = null;
+        private EditTextPreference mEditTextPort = null;
+        private EditTextPreference mEditTextTitle = null;
 
         // Server login
-        private EditTextPreference mServerUserName;
-        private EditTextPreference mServerPassword;
+        private EditTextPreference mServerUserName = null;
+        private EditTextPreference mServerPassword = null;
 
         // NickServ
-        private EditTextPreference mNickServPassword;
+        private EditTextPreference mNickServPassword = null;
 
         private final List<EditTextPreference> mEditTexts = new ArrayList<EditTextPreference>();
 

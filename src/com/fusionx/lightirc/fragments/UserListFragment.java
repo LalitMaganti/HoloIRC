@@ -40,7 +40,7 @@ import java.util.Set;
 
 public class UserListFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
         AdapterView.OnItemClickListener {
-    private boolean modeStarted;
+    private boolean modeStarted = false;
 
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {

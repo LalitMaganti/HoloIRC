@@ -47,8 +47,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.Listener;
-import org.pircbotx.hooks.managers.ListenerManager;
 
 public class IRCService extends Service {
     // Binder which returns this service
@@ -63,6 +61,7 @@ public class IRCService extends Service {
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
     private String boundToServer = null;
+    private ServiceListener mServiceListener;
 
     public void connectToServer(final Configuration.Builder server) {
         threadManager = new LightManager(getApplicationContext());
@@ -114,36 +113,34 @@ public class IRCService extends Service {
     }
 
     public void disconnectFromServer(final String serverName) {
-        final AsyncTask<String, Void, String> disconnectTask = new AsyncTask<String, Void, String>() {
+        final AsyncTask<Void, Void, Void> disconnectTask = new AsyncTask<Void, Void, Void>() {
             @Override
-            protected String doInBackground(final String... strings) {
-                final String botName = strings[0];
+            protected Void doInBackground(final Void... strings) {
+                final PircBotX bot = getBot(serverName);
 
-                final ListenerManager<PircBotX> manager = getBot(botName).getConfiguration().getListenerManager();
-                for(final Listener l : manager.getListeners()) {
-                    manager.removeListener(l);
-                }
+                bot.getConfiguration().getListenerManager().removeListener(mServiceListener);
 
-                if (getBot(botName).getStatus().equals(getString(R.string.status_connected))) {
-                    getBot(botName).setStatus(getString(R.string.status_disconnected));
-                    getBot(botName).sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
-                    getBot(botName).shutdown();
+                final String status = bot.getStatus();
+                bot.setStatus(getString(R.string.status_disconnected));
+
+                if (status.equals(getString(R.string.status_connected))) {
+                    bot.sendIRC().quitServer(Utils.getQuitReason(getApplicationContext()));
+                    bot.shutdown();
                 } else {
-                    getBot(botName).setStatus(getString(R.string.status_disconnected));
-                    getThreadManager().get(botName).interrupt();
+                    getThreadManager().get(serverName).interrupt();
                 }
-                return botName;
+                return null;
             }
 
             @Override
-            protected void onPostExecute(final String botName) {
-                threadManager.remove(botName);
+            protected void onPostExecute(final Void bot) {
+                threadManager.remove(serverName);
                 if (getThreadManager().keySet().isEmpty()) {
                     stopForeground(true);
                 }
             }
         };
-        disconnectTask.execute(serverName);
+        disconnectTask.execute();
     }
 
     public PircBotX getBot(final String serverName) {
@@ -180,7 +177,9 @@ public class IRCService extends Service {
     }
 
     private void setupListeners(final Configuration.Builder bot) {
-        final ServiceListener mServiceListener = new ServiceListener(this);
+        if(mServiceListener == null) {
+            mServiceListener = new ServiceListener(this);
+        }
         bot.getListenerManager().addListener(mServiceListener);
     }
 

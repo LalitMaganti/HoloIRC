@@ -34,7 +34,7 @@ import lombok.Setter;
 
 public class ActionsArrayAdapter extends ArrayAdapter<String> {
     @Setter(AccessLevel.PUBLIC)
-    private boolean connected;
+    private boolean connected = false;
 
     private final LayoutInflater inflate;
     private final Context applicationContext;

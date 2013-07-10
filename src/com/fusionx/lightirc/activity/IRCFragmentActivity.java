@@ -57,22 +57,21 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public class IRCFragmentActivity extends AbstractPagerActivity {
-    private UserListFragment mUserFragment;
-    private ServerChannelActionsFragment actionsFragment;
-    private ActivityListener mListener;
-    private String mentionString;
-    private SlidingMenu mUserSlidingMenu;
-    private SlidingMenu mActionsSlidingMenu;
-    private IRCService service;
+    private UserListFragment mUserFragment = null;
+    private ServerChannelActionsFragment actionsFragment = null;
+    private ActivityListener mListener = null;
+    private SlidingMenu mUserSlidingMenu = null;
+    private SlidingMenu mActionsSlidingMenu = null;
+    private IRCService service = null;
 
     @Getter(AccessLevel.PUBLIC)
-    private IRCPagerAdapter ircPagerAdapter;
+    private IRCPagerAdapter ircPagerAdapter = null;
 
     @Getter(AccessLevel.PUBLIC)
-    private ViewPager viewPager;
+    private ViewPager viewPager = null;
 
     @Getter(AccessLevel.PRIVATE)
-    private String serverTitle;
+    private String serverTitle = null;
 
     @Getter(AccessLevel.PUBLIC)
     private final MessageParser parser = new MessageParser();
@@ -98,8 +97,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
         mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
         actionsFragment = (ServerChannelActionsFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.actions_fragment);
-
-        mentionString = getIntent().getExtras().getString("mention", "");
 
         final Configuration.Builder<PircBotX> builder = getIntent().getExtras().getParcelable("server");
         serverTitle = builder.getTitle();
@@ -162,7 +159,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            onUnexpectedDisconnect();
         }
     };
 
@@ -231,7 +227,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
             bar.getTabAt(position).setText(channelName);
         }
 
-        if (mentionString.equals(channelName)) {
+        final String mentionString = getIntent().getExtras().getString("mention", "");
+        if (channelName.equals(mentionString)) {
             viewPager.setCurrentItem(position, true);
         }
         return position;
@@ -406,7 +403,9 @@ public class IRCFragmentActivity extends AbstractPagerActivity {
     }
 
     public void disconnect() {
-        getBot().getConfiguration().getListenerManager().removeListener(mListener);
+        if(getBot() != null) {
+            getBot().getConfiguration().getListenerManager().removeListener(mListener);
+        }
 
         if(service != null) {
             service.disconnectFromServer(getServerTitle());

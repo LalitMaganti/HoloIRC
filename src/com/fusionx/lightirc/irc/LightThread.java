@@ -32,7 +32,7 @@ import java.io.IOException;
 
 public class LightThread extends Thread {
     @Getter(AccessLevel.PUBLIC)
-    private PircBotX bot;
+    private final PircBotX bot;
 
     public LightThread(final PircBotX bot) {
         this.bot = bot;

@@ -29,17 +29,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.service.IRCService;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 
 public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
     private final MainServerListActivity mActivity;
-    private final IRCService mService;
 
-    public BuilderAdapter(final IRCService service, final MainServerListActivity activity) {
+    public BuilderAdapter(final MainServerListActivity activity) {
         super(activity, android.R.layout.simple_list_item_1);
-        mService = service;
         mActivity = activity;
     }
 
@@ -57,7 +54,7 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
             textView.setText(getItem(position).getTitle());
         }
         if (description != null) {
-            final PircBotX bot = mService.getBot(getItem(position).getTitle());
+            final PircBotX bot = mActivity.getService().getBot(getItem(position).getTitle());
             if (bot != null) {
                 description.setText(bot.getStatus());
             } else {

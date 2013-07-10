@@ -45,7 +45,7 @@ import java.util.Collections;
 
 public class ServiceListener extends GenericListener {
     @Getter(AccessLevel.PRIVATE)
-    private IRCService service;
+    private final IRCService service;
 
     public ServiceListener(final IRCService service) {
         super(service.getApplicationContext());
@@ -77,7 +77,7 @@ public class ServiceListener extends GenericListener {
                     getService().stopForeground(true);
                 }
             }
-        }, 2000);
+        }, 500);
     }
 
     @Override

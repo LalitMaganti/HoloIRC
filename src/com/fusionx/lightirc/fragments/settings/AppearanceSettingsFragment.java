@@ -37,7 +37,7 @@ import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.service.IRCService;
 
 public class AppearanceSettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
-    private ListPreference mChooseTheme;
+    private ListPreference mChooseTheme = null;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {

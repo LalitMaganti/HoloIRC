@@ -38,7 +38,7 @@ import org.pircbotx.hooks.managers.ListenerManager;
 public class MessageParser {
     @Getter(AccessLevel.PRIVATE)
     @Setter(AccessLevel.PUBLIC)
-    private IRCService service;
+    private IRCService service = null;
 
     public void channelMessageToParse(final String serverName, final String channelName,
                                       final String message) {
