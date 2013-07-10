@@ -3,14 +3,15 @@ package com.fusionx.lightirc.ui;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 
 public class IRCViewPager extends ViewPager {
-    public IRCViewPager(final Context context) {
-        super(context);
+    public IRCViewPager(Context context, AttributeSet attrs) {
+        super(context, attrs);
     }
 
     @Override

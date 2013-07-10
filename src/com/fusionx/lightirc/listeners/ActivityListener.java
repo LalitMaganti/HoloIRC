@@ -69,6 +69,7 @@ public class ActivityListener extends GenericListener {
             @Override
             public void run() {
                 mCommonListener.closeAllSlidingMenus();
+                mListener.onConnect();
             }
         });
     }
@@ -249,6 +250,8 @@ public class ActivityListener extends GenericListener {
     }
 
     public interface ActivityListenerInterface {
+        public void onConnect();
+
         public void onCreateChannelFragment(final String channelName);
 
         public void onNewChannelJoined(final String channelName, final boolean forceSwitch);

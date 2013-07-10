@@ -318,6 +318,11 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
+    public void onConnect() {
+        mActionsFragment.connectionStatusChanged(true);
+    }
+
+    @Override
     public void onCreateChannelFragment(final String channelName) {
         onNewChannelJoined(channelName, false);
     }

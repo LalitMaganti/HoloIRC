@@ -78,14 +78,14 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                 nickChangeDialog();
                 break;
             case 2:
-                disconnect();
+                connectionStatusChanged(false);
                 mListener.disconnect();
                 break;
         }
     }
 
-    public void disconnect() {
-        ((ActionsArrayAdapter) getListAdapter()).setConnected(false);
+    public void connectionStatusChanged(boolean connected) {
+        ((ActionsArrayAdapter) getListAdapter()).setConnected(connected);
         ((ActionsArrayAdapter) getListAdapter()).notifyDataSetChanged();
     }
 
