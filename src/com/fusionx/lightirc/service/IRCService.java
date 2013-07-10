@@ -63,7 +63,9 @@ public class IRCService extends Service {
     private ServiceListener mServiceListener;
 
     public void connectToServer(final Configuration.Builder server) {
-        threadManager = new LightManager(getApplicationContext());
+        if(threadManager == null) {
+            threadManager = new LightManager(getApplicationContext());
+        }
 
         final LightBotFactory factory = new LightBotFactory(getApplicationContext());
         server.setBotFactory(factory);
