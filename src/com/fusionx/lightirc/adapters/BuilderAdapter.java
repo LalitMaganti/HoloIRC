@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,23 +29,29 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.MainServerListActivity;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
 
 public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
-    private final MainServerListActivity mActivity;
+    private final Context mContext;
+    private final BuilderAdapterListenerInterface mListener;
 
-    public BuilderAdapter(final MainServerListActivity activity) {
-        super(activity, android.R.layout.simple_list_item_1);
-        mActivity = activity;
+    public BuilderAdapter(final Context context) {
+        super(context, android.R.layout.simple_list_item_1);
+        mContext = context;
+
+        try {
+            mListener = (BuilderAdapterListenerInterface) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement BuilderAdapterListenerInterface");
+        }
     }
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         View view = convertView;
         if (view == null) {
-            final LayoutInflater vi = mActivity.getLayoutInflater();
+            final LayoutInflater vi = LayoutInflater.from(mContext);
             view = vi.inflate(R.layout.item_server_card, parent, false);
         }
 
@@ -54,11 +61,11 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
             textView.setText(getItem(position).getTitle());
         }
         if (description != null) {
-            final PircBotX bot = mActivity.getService().getBot(getItem(position).getTitle());
+            final PircBotX bot = mListener.getBot(getItem(position).getTitle());
             if (bot != null) {
                 description.setText(bot.getStatus());
             } else {
-                description.setText(mActivity.getString(R.string.status_disconnected));
+                description.setText(mContext.getString(R.string.status_disconnected));
             }
         }
 
@@ -69,5 +76,9 @@ public class BuilderAdapter extends ArrayAdapter<Configuration.Builder> {
         linearLayout.setTag(getItem(position));
 
         return view;
+    }
+
+    public interface BuilderAdapterListenerInterface {
+        public PircBotX getBot(final String title);
     }
 }

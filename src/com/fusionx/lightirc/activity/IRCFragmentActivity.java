@@ -65,7 +65,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         IRCActionsFragment.IRCActionsListenerInterface, ServerFragment.ServerFragmentListenerInterface,
         PMFragment.PMFragmentListenerInterface {
 
-    private UserListFragment mUserFragment = null;
     private IRCActionsFragment mActionsFragment = null;
     private ActivityListener mListener = null;
     private IRCService mService = null;
@@ -84,7 +83,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity
 
         setUpSlidingMenu();
 
-        mUserFragment = (UserListFragment) getSupportFragmentManager().findFragmentById(R.id.user_fragment);
         mActionsFragment = (IRCActionsFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.actions_fragment);
 
@@ -103,6 +101,19 @@ public class IRCFragmentActivity extends AbstractPagerActivity
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        setUpService();
+    }
+
+    private void setUpSlidingMenu() {
+        mUserSlidingMenu = new UserListSlidingMenu(this);
+        mUserSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+
+        mActionsSlidingMenu = new ActionsSlidingMenu(this);
+        mActionsSlidingMenu.setOnOpenListener(mActionsFragment);
+        mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+    }
+
+    private void setUpService() {
         final Intent service = new Intent(this, IRCService.class);
         service.putExtra("server", true);
         service.putExtra("serverName", mServerTitle);
@@ -116,7 +127,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     public void onStop() {
         super.onStop();
 
-        if (isConnectedToServer()) {
+        if (mService != null && getBot() != null) {
             getBot().getConfiguration().getListenerManager().removeListener(mListener);
             mService.setServerDisplayed(null);
         }
@@ -126,7 +137,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     public void onRestart() {
         super.onRestart();
 
-        if (isConnectedToServer()) {
+        if (mService != null && getBot() != null) {
             getBot().getConfiguration().getListenerManager().addListener(mListener);
             mService.setServerDisplayed(mServerTitle);
         }
@@ -136,7 +147,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     public void onDestroy() {
         super.onDestroy();
 
-        if (isConnectedToServer()) {
+        if (mService != null) {
             unbindService(mConnection);
             mService = null;
         }
@@ -147,11 +158,11 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
             if (getBot() != null) {
-                if(isConnectedToServer()) {
-                    mActionsFragment.connectionStatusChanged(true);
-                }
+                mActionsFragment.connectionStatusChanged(isConnectedToServer());
+
                 getBot().getConfiguration().getListenerManager().addListener(mListener);
                 addServerFragment();
+
                 if (isConnectedToServer()) {
                     for (final Channel channelName : getBot().getUserBot().getChannels()) {
                         onCreateChannelFragment(channelName.getName());
@@ -175,8 +186,10 @@ public class IRCFragmentActivity extends AbstractPagerActivity
             addTab(mServerTitle);
         }
 
+        // Should not occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
+            mService = null;
         }
     };
 
@@ -231,6 +244,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
+                    final UserListFragment mUserFragment = (UserListFragment) getSupportFragmentManager()
+                            .findFragmentById(R.id.user_fragment);
                     mUserFragment.userListUpdate(getCurrentItem().getTitle());
                     mUserFragment.getListView().smoothScrollToPosition(0);
                 }
@@ -242,20 +257,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void removeFragment(final int index) {
-        removeTab(index);
-        mViewPager.getAdapter().removeFragment(index);
-    }
-
-    private void setUpSlidingMenu() {
-        mUserSlidingMenu = new UserListSlidingMenu(this);
-        mUserSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-
-        mActionsSlidingMenu = new ActionsSlidingMenu(this);
-        mActionsSlidingMenu.setOnOpenListener(mActionsFragment);
-        mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
     }
 
     private IRCFragment getCurrentItem() {
@@ -312,7 +313,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         if(getCurrentItem().getTitle().equals(channelName)) {
             mViewPager.setCurrentItem(index - 1, true);
         }
-        removeFragment(index);
+        removeTab(index);
+        mViewPager.getAdapter().removeFragment(index);
     }
 
     @Override

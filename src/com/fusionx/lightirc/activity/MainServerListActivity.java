@@ -42,13 +42,13 @@ import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
-import lombok.AccessLevel;
-import lombok.Getter;
 import org.pircbotx.Configuration;
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
 import org.pircbotx.hooks.events.DisconnectEvent;
+import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
@@ -59,9 +59,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener {
-    @Getter(AccessLevel.PUBLIC)
-    private IRCService service = null;
+        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterListenerInterface {
+    private IRCService mService = null;
     private ArrayList<Configuration.Builder> mBuilderList = null;
     private Configuration.Builder mBuilder = null;
     private BuilderAdapter mServerCardsAdapter = null;
@@ -77,7 +76,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     @Override
     protected void onStart() {
-        if (getService() == null) {
+        if (mService == null) {
             final Intent service = new Intent(this, IRCService.class);
             service.putExtra("stop", false);
             startService(service);
@@ -93,7 +92,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     protected void onStop() {
         unbindService(mConnection);
-        service = null;
+        mService = null;
 
         super.onStop();
     }
@@ -101,7 +100,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            service = ((IRCService.IRCBinder) binder).getService();
+            mService = ((IRCService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
         }
@@ -214,7 +213,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             mBuilderList.add(builder);
 
             if (serverIsConnected(builder.getTitle())) {
-                getService().getBot(builder.getTitle()).getConfiguration().getListenerManager().addListener(mListener);
+                getBot(builder.getTitle()).getConfiguration().getListenerManager().addListener(mListener);
             }
         }
     }
@@ -320,8 +319,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void disconnectFromServer(final Configuration.Builder builder) {
-        getService().getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(mListener);
-        getService().disconnectFromServer(builder.getTitle());
+        getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(mListener);
+        mService.disconnectFromServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
@@ -335,13 +334,36 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private boolean serverIsConnected(final String title) {
-        return getService() != null && getService().getBot(title) != null &&
-                (getService().getBot(title).getStatus().equals(getString(R.string.status_connected)));
+        return mService != null && getBot(title) != null &&
+                (getBot(title).getStatus().equals(getString(R.string.status_connected)));
+    }
+
+    // BuilderAdapter Listener Interface
+    @Override
+    public PircBotX getBot(final String title) {
+        return mService.getBot(title);
     }
 
     private class ListListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
         @Override
+        public void onEvent(final Event<PircBotX> event) throws Exception {
+            if (event instanceof IOExceptionEvent)
+                onIOException((IOExceptionEvent<PircBotX>) event);
+            else
+                super.onEvent(event);
+        }
+
+        @Override
         public void onDisconnect(final DisconnectEvent<PircBotX> event) {
+            event.getBot().setStatus(getString(R.string.status_disconnected));
+
+            mServerCardsAdapter.notifyDataSetChanged();
+            event.getBot().getConfiguration().getListenerManager().removeListener(mListener);
+        }
+
+        public void onIOException(final IOExceptionEvent<PircBotX> event) {
+            event.getBot().setStatus(getString(R.string.status_disconnected));
+
             mServerCardsAdapter.notifyDataSetChanged();
             event.getBot().getConfiguration().getListenerManager().removeListener(mListener);
         }
