@@ -105,6 +105,11 @@ public class ServerCommunicator {
         sendPart.execute();
     }
 
+
+    public static void sendClosePrivateMessage(final PircBotX bot, final String userNick) {
+        sendClosePrivateMessage(bot.getUserChannelDao().getUser(userNick));
+    }
+
     public static void sendClosePrivateMessage(final User user) {
         final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
             @Override

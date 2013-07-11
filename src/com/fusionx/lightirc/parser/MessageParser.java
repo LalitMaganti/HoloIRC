@@ -38,7 +38,7 @@ public class MessageParser {
             if (command.equals("/me")) {
                 final String action = message.replace("/me ", "");
                 ServerCommunicator.sendActionToChannel(bot, channelName, action);
-            } else if (command.equals("/part")) {
+            } else if (command.equals("/part") || command.equals("/p")) {
                 ServerCommunicator.sendPart(bot, channelName, applicationContext);
             } else {
                 serverCommandToParse(bot, message);
@@ -64,9 +64,11 @@ public class MessageParser {
         final String command = parsedArray[0];
 
         if (command.startsWith("/")) {
-            if (command.startsWith("/me")) {
+            if (command.equals("/me")) {
                 final String action = message.replace("/me ", "");
                 ServerCommunicator.sendActionToUser(bot, userNick, action);
+            } else if (command.equals("/close") || command.equals("/c")) {
+                ServerCommunicator.sendClosePrivateMessage(bot, userNick);
             } else {
                 serverCommandToParse(bot, message);
             }

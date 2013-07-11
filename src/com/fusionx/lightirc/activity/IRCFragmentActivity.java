@@ -227,7 +227,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
                 mActionsSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_part:
-                partOrCloseIRC(true);
+                ServerCommunicator.sendPart(getBot(), getCurrentItem().getTitle(), getApplicationContext());
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
@@ -237,7 +237,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
                 mUserSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_close:
-                partOrCloseIRC(false);
+                ServerCommunicator.sendClosePrivateMessage(getUser(getCurrentItem().getTitle()));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -247,17 +247,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     private void removeFragment(final int index) {
         removeTab(index);
         mViewPager.getAdapter().removeFragment(index);
-    }
-
-    private void partOrCloseIRC(final boolean channel) {
-        final int index = mViewPager.getCurrentItem();
-        mViewPager.setCurrentItem(index - 1, true);
-
-        if (!channel) {
-            removeFragment(index);
-        }
-
-        mViewPager.getAdapter().getItem(index).partOrCloseIRC(channel);
     }
 
     private void setUpSlidingMenu() {
