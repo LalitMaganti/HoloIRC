@@ -92,7 +92,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id, final boolean checked) {
         mode.invalidate();
 
-        final UserListAdapter adapter = ((UserListAdapter) getListView().getAdapter());
+        final UserListAdapter adapter = (UserListAdapter) getListView().getAdapter();
 
         if (checked) {
             adapter.addSelection(position);
@@ -115,8 +115,6 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         final Set<String> selectedItems = ((UserListAdapter) getListView().getAdapter()).getSelectedItems();
-        //final IRCFragmentActivity activity = ((IRCFragmentActivity) getActivity());
-
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
                 mListener.onUserMention(selectedItems);
@@ -129,8 +127,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
                 if (!mListener.isNickUsers(nick)) {
                     mCommonListener.onCreatePMFragment(nick);
-                    mode.finish();
                     mCommonListener.closeAllSlidingMenus();
+                    mode.finish();
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
                     build.setTitle(getActivity()
