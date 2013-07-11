@@ -45,11 +45,9 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     @Setter(AccessLevel.PROTECTED)
     private TextView textView = null;
 
-    @Getter(AccessLevel.PUBLIC)
+    @Getter(AccessLevel.PROTECTED)
     @Setter(AccessLevel.PROTECTED)
     private EditText editText = null;
-
-    String serverName = null;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -70,23 +68,17 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
         setTitle(getArguments().getString("title"));
 
-        if (getArguments().getString("serverName") != null) {
-            serverName = getArguments().getString("serverName");
-        } else {
-            serverName = getTitle();
-        }
-
         return rootView;
     }
 
     public void appendToTextView(final String text) {
         getTextView().append(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(getTextView(), Linkify.ALL);
+        Linkify.addLinks(getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
     }
 
     void writeToTextView(final String text) {
         getTextView().setText(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(getTextView(), Linkify.ALL);
+        Linkify.addLinks(getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
     }
 
     @Override
@@ -103,5 +95,9 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     public void partOrCloseIRC(final boolean channel) {
         throw new NullPointerException();
+    }
+
+    public void disableEditText() {
+        editText.setEnabled(false);
     }
 }

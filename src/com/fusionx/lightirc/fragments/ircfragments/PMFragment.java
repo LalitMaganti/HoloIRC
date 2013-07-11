@@ -22,11 +22,11 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
+import com.fusionx.lightirc.parser.ServerCommunicator;
 import org.pircbotx.User;
 
 public class PMFragment extends IRCFragment {
@@ -48,20 +48,10 @@ public class PMFragment extends IRCFragment {
             final String message = getEditText().getText().toString();
             getEditText().setText("");
 
-            ParserTask.execute(message);
+            mListener.sendUserMessage(getTitle(), message);
         }
         return false;
     }
-
-    final AsyncTask<String, Void, Void> ParserTask = new AsyncTask<String, Void, Void>() {
-        protected Void doInBackground(final String... strings) {
-            if (strings != null) {
-                final String message = strings[0];
-                mListener.sendUserMessage(serverName, getTitle(), message);
-            }
-            return null;
-        }
-    };
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
@@ -74,20 +64,13 @@ public class PMFragment extends IRCFragment {
     @Override
     public void partOrCloseIRC(final boolean channel) {
         if (!channel) {
-            final AsyncTask<Void, Void, Void> closeFragment = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... v) {
-                    mListener.getUser(getTitle()).closePrivateMessage();
-                    return null;
-                }
-            };
-            closeFragment.execute();
+            ServerCommunicator.sendClosePrivateMessage(mListener.getUser(getTitle()));
         }
     }
 
     public interface PMFragmentListenerInterface {
         public User getUser(final String channelName);
 
-        public void sendUserMessage(final String serverName, final String nick, final String message);
+        public void sendUserMessage(final String nick, final String message);
     }
 }

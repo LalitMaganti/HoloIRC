@@ -94,14 +94,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(), mListener.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                final AsyncTask<Void, Void, Void> ChangeNickTask = new AsyncTask<Void, Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... objects) {
-                        mListener.changeNick(input);
-                        return null;
-                    }
-                };
-                ChangeNickTask.execute();
+                mListener.changeNick(input);
             }
         };
         nickDialog.show();

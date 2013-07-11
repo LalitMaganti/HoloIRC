@@ -19,11 +19,10 @@ public class IRCViewPager extends ViewPager {
         return (IRCPagerAdapter) super.getAdapter();
     }
 
-    public int onNewChannelJoined(final String serverName, final String channelName, final boolean mentioned) {
+    public int onNewChannelJoined(final String channelName, final boolean mentioned) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", channelName);
-        bundle.putString("serverName", serverName);
 
         channel.setArguments(bundle);
 
@@ -36,10 +35,9 @@ public class IRCViewPager extends ViewPager {
         return position;
     }
 
-    public int onNewPrivateMessage(final String serverName, final String userNick) {
+    public int onNewPrivateMessage(final String userNick) {
         final PMFragment pmFragment = new PMFragment();
         final Bundle bundle = new Bundle();
-        bundle.putString("serverName", serverName);
         bundle.putString("title", userNick);
         pmFragment.setArguments(bundle);
 

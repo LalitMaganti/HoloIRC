@@ -22,13 +22,12 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.misc.Utils;
+import com.fusionx.lightirc.parser.ServerCommunicator;
 import org.pircbotx.Channel;
 
 import java.util.Set;
@@ -53,18 +52,9 @@ public class ChannelFragment extends IRCFragment {
             final String message = text.toString();
             getEditText().setText("");
 
-            final ParserTask task = new ParserTask();
-            task.execute(message);
+            mListener.sendChannelMessage(getTitle(), message);
         }
         return false;
-    }
-
-    private class ParserTask extends AsyncTask<String, Void, Void> {
-        protected Void doInBackground(final String... strings) {
-            final String message = strings[0];
-            mListener.sendChannelMessage(serverName, getTitle(), message);
-            return null;
-        }
     }
 
     public void onUserMention(final Set<String> users) {
@@ -86,21 +76,13 @@ public class ChannelFragment extends IRCFragment {
     @Override
     public void partOrCloseIRC(final boolean channel) {
         if (channel) {
-            final AsyncTask<Void, Void, Void> closeFragment = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... v) {
-                    mListener.getChannel(getTitle()).send()
-                            .part(Utils.getPartReason(getActivity().getApplicationContext()));
-                    return null;
-                }
-            };
-            closeFragment.execute();
+            ServerCommunicator.sendPart(mListener.getChannel(getTitle()), getActivity().getApplicationContext());
         }
     }
 
     public interface ChannelFragmentListenerInterface {
         public Channel getChannel(final String channelName);
 
-        public void sendChannelMessage(final String serverName, final String channelName, final String message);
+        public void sendChannelMessage(final String channelName, final String message);
     }
 }

@@ -44,6 +44,7 @@ import com.fusionx.lightirc.interfaces.CommonIRCListenerInterface;
 import com.fusionx.lightirc.listeners.ActivityListener;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
+import com.fusionx.lightirc.parser.ServerCommunicator;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.IRCViewPager;
@@ -70,7 +71,6 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     private IRCService mService = null;
     private IRCViewPager mViewPager = null;
     private String mServerTitle = null;
-    private final MessageParser parser = new MessageParser();
     private UserListSlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
 
@@ -146,10 +146,10 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
-            parser.setService(mService);
-
             if (getBot() != null) {
-                mActionsFragment.connectionStatusChanged(true);
+                if(isConnectedToServer()) {
+                    mActionsFragment.connectionStatusChanged(true);
+                }
                 getBot().getConfiguration().getListenerManager().addListener(mListener);
                 addServerFragment();
                 if (isConnectedToServer()) {
@@ -281,7 +281,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     public void onCreatePMFragment(final String userNick) {
         addTab(userNick);
 
-        final int position = mViewPager.onNewPrivateMessage(mServerTitle, userNick);
+        final int position = mViewPager.onNewPrivateMessage(userNick);
 
         final ActionBar bar = getActionBar();
         if (bar != null) {
@@ -342,7 +342,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
 
         final boolean switchToTab = channelName.equals(getIntent().getExtras().getString("mention", ""))
                 || forceSwitch;
-        final int position = mViewPager.onNewChannelJoined(mServerTitle, channelName, switchToTab);
+        final int position = mViewPager.onNewChannelJoined(channelName, switchToTab);
 
         final ActionBar bar = getActionBar();
         if (bar != null) {
@@ -410,8 +410,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
-    public void sendChannelMessage(final String serverName, final String channelName, final String message) {
-        parser.channelMessageToParse(serverName, channelName, message);
+    public void sendChannelMessage(final String channelName, final String message) {
+        MessageParser.channelMessageToParse(getApplicationContext(), getBot(), channelName, message);
     }
 
     // ActionsFragment Listener Callbacks
@@ -422,12 +422,12 @@ public class IRCFragmentActivity extends AbstractPagerActivity
 
     @Override
     public void joinChannel(final String channel) {
-        getBot().sendIRC().joinChannel(channel);
+        ServerCommunicator.sendJoin(getBot(), channel);
     }
 
     @Override
     public void changeNick(String newNick) {
-        getBot().sendIRC().changeNick(newNick);
+        ServerCommunicator.sendNickChange(getBot(), newNick);
     }
 
     @Override
@@ -452,8 +452,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
-    public void sendUserMessage(final String serverName, final String nick, final String message) {
-        parser.userMessageToParse(serverName, nick, message);
+    public void sendUserMessage(final String nick, final String message) {
+        MessageParser.userMessageToParse(getBot(), nick, message);
     }
 
     // ServerFragment Listener Callbacks
@@ -467,7 +467,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
-    public void sendServerMessage(String serverName, String message) {
-        parser.serverMessageToParse(serverName, message);
+    public void sendServerMessage(final String message) {
+        MessageParser.serverMessageToParse(getBot(), message);
     }
 }

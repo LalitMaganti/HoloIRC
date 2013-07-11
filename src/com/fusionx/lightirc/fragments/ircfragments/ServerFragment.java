@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -48,20 +47,9 @@ public class ServerFragment extends IRCFragment {
             final String message = getEditText().getText().toString();
             getEditText().setText("");
 
-            final ParserTask task = new ParserTask();
-            task.execute(message);
+            mListener.sendServerMessage(message);
         }
         return false;
-    }
-
-    private class ParserTask extends AsyncTask<String, Void, Void> {
-        protected Void doInBackground(final String... strings) {
-            if (strings != null) {
-                final String message = strings[0];
-                mListener.sendServerMessage(getTitle(), message);
-            }
-            return null;
-        }
     }
 
     @Override
@@ -75,6 +63,6 @@ public class ServerFragment extends IRCFragment {
     public interface ServerFragmentListenerInterface {
         public PircBotX getBot();
 
-        public void sendServerMessage(final String serverName, final String message);
+        public void sendServerMessage(final String message);
     }
 }

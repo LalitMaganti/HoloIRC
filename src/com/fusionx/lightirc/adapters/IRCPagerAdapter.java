@@ -256,7 +256,7 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     public void disableAllEditTexts() {
         for (final IRCFragment fragment : views) {
-            fragment.getEditText().setEnabled(false);
+            fragment.disableEditText();
         }
     }
 
