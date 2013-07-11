@@ -89,7 +89,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
                 .findFragmentById(R.id.actions_fragment);
 
         final Configuration.Builder<PircBotX> builder = getIntent().getExtras().getParcelable("server");
-        mServerTitle = builder.getTitle();
+        mServerTitle = builder != null ? builder.getTitle() : null;
 
         mViewPager = (IRCViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(new IRCPagerAdapter(getSupportFragmentManager()));

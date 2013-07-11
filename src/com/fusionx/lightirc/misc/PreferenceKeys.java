@@ -46,4 +46,7 @@ public class PreferenceKeys {
 
     public final static String HideMessages = "pref_hide_messages";
     public final static String PartReason = "pref_part_reason";
+
+    // About settings
+    public final static String AppVersion = "pref_app_version";
 }

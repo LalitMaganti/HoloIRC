@@ -118,9 +118,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
             setHasOptionsMenu(true);
 
             final Bundle bundle = getActivity().getIntent().getExtras();
-            newServer = bundle.getBoolean("new", false);
-
-            fileName = bundle.getString("file");
+            if (bundle != null) {
+                newServer = bundle.getBoolean("new", false);
+                fileName = bundle.getString("file");
+            }
 
             getPreferenceManager().setSharedPreferencesName(fileName);
 
@@ -129,32 +130,46 @@ public class ServerSettingsActivity extends PreferenceActivity {
             final PreferenceScreen prefSet = getPreferenceScreen();
 
             mEditTextTitle = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Title);
-            mEditTextTitle.setOnPreferenceChangeListener(this);
+            if (mEditTextTitle != null) {
+                mEditTextTitle.setOnPreferenceChangeListener(this);
+            }
             mEditTexts.add(mEditTextTitle);
 
             // URL of server
             mEditTextUrl = (EditTextPreference) prefSet.findPreference(PreferenceKeys.URL);
-            mEditTextUrl.setOnPreferenceChangeListener(this);
+            if (mEditTextUrl != null) {
+                mEditTextUrl.setOnPreferenceChangeListener(this);
+            }
             mEditTexts.add(mEditTextUrl);
 
             // Port of server
             mEditTextPort = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Port);
-            mEditTextPort.setOnPreferenceChangeListener(this);
+            if (mEditTextPort != null) {
+                mEditTextPort.setOnPreferenceChangeListener(this);
+            }
             mEditTexts.add(mEditTextPort);
 
             // Nick of User
             mEditTextNick = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Nick);
-            mEditTextNick.setOnPreferenceChangeListener(this);
+            if (mEditTextNick != null) {
+                mEditTextNick.setOnPreferenceChangeListener(this);
+            }
             mEditTexts.add(mEditTextNick);
 
             mServerUserName = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerUserName);
-            mServerUserName.setOnPreferenceChangeListener(this);
+            if (mServerUserName != null) {
+                mServerUserName.setOnPreferenceChangeListener(this);
+            }
 
             mServerPassword = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerPassword);
-            mServerPassword.setOnPreferenceChangeListener(this);
+            if (mServerPassword != null) {
+                mServerPassword.setOnPreferenceChangeListener(this);
+            }
 
             mNickServPassword = (EditTextPreference) prefSet.findPreference(PreferenceKeys.NickServPassword);
-            mNickServPassword.setOnPreferenceChangeListener(this);
+            if (mNickServPassword != null) {
+                mNickServPassword.setOnPreferenceChangeListener(this);
+            }
 
             canExit = !newServer;
 
@@ -177,7 +192,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
             }
 
             // Server username
-            mServerUserName.setSummary(mServerUserName.getText());
+            if (mServerUserName != null) {
+                mServerUserName.setSummary(mServerUserName.getText());
+            }
         }
 
         @Override

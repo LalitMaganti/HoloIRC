@@ -121,5 +121,8 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="username">Username</string>
     <string name="mode">Mode</string>
     <string name="by">by</string>
+    <string name="about">About</string>
+    <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
+    <string name="about_settings_app_version">App Version</string>
 
 </resources>
