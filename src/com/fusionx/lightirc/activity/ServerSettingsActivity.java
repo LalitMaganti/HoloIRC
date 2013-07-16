@@ -34,6 +34,7 @@ import android.preference.Preference.OnPreferenceChangeListener;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView;
 import android.widget.Toast;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
@@ -222,13 +223,17 @@ public class ServerSettingsActivity extends PreferenceActivity {
     }
 
     public static class ListViewSettingsFragment extends ListFragment implements
-            MultiChoiceModeListener, android.view.ActionMode.Callback {
+            MultiChoiceModeListener, android.view.ActionMode.Callback, AdapterView.OnItemClickListener {
         private SelectionAdapter<String> adapter;
+        private boolean modeStarted = false;
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflate = mode.getMenuInflater();
             inflate.inflate(R.menu.activty_server_settings_cab, menu);
+
+            modeStarted = true;
+
             return true;
         }
 
@@ -281,14 +286,18 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             int selectedItemCount = getListView().getCheckedItemCount();
 
-            final String quantityString = getResources().getQuantityString(R.plurals.channel_selection,
-                    selectedItemCount, selectedItemCount);
-            mode.setTitle(quantityString);
+            if (selectedItemCount != 0) {
+                final String quantityString = getResources().getQuantityString(R.plurals.channel_selection,
+                        selectedItemCount, selectedItemCount);
+                mode.setTitle(quantityString);
+            }
         }
 
         @Override
         public void onDestroyActionMode(ActionMode arg0) {
             adapter.clearSelection();
+
+            modeStarted = false;
         }
 
         @Override
@@ -348,6 +357,16 @@ public class ServerSettingsActivity extends PreferenceActivity {
             e.putStringSet(AutoJoin, adapter.getItems()).commit();
 
             super.onPause();
+        }
+
+        @Override
+        public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
+            if (!modeStarted) {
+                getActivity().startActionMode(this);
+            }
+
+            final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
+            getListView().setItemChecked(i, !checked);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.parser;
+package com.fusionx.lightirc.irc;
 
 import android.content.Context;
 import android.os.AsyncTask;

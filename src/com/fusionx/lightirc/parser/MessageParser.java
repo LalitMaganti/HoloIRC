@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.parser;
 
 import android.content.Context;
+import com.fusionx.lightirc.irc.ServerCommunicator;
 import org.pircbotx.PircBotX;
 
 public class MessageParser {
