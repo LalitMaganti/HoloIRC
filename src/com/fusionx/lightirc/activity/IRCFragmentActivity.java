@@ -340,22 +340,9 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         }
     }
 
-    private final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void, Void, Void>() {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            mService.onUnexpectedDisconnect(mServerTitle);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            unbindService(mConnection);
-            mService = null;
-        }
-    };
-
     @Override
     public void onUnexpectedDisconnect() {
+        closeAllSlidingMenus();
         selectServerFragment();
 
         final ActionBar bar = getActionBar();
@@ -367,11 +354,22 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         mViewPager.disconnect();
         mActionsFragment.connectionStatusChanged(false);
 
-        getBot().getConfiguration().getListenerManager().removeListener(mListener);
-        mService.setServerDisplayed(null);
-        unexpectedDisconnect.execute();
+        final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                getBot().getConfiguration().getListenerManager().removeListener(mListener);
+                mService.setServerDisplayed(null);
+                mService.onUnexpectedDisconnect(mServerTitle);
+                return null;
+            }
 
-        closeAllSlidingMenus();
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                unbindService(mConnection);
+                mService = null;
+            }
+        };
+        unexpectedDisconnect.execute();
     }
 
     // UserListFragment Listener Callbacks
