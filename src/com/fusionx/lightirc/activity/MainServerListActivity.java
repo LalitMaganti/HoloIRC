@@ -184,7 +184,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             builder.setSocketFactory(ssl ? SSLSocketFactory.getDefault() : SocketFactory.getDefault());
 
             builder.setName(serverSettings.getString(PreferenceKeys.Nick, ""));
-            builder.setRealname(serverSettings.getString(PreferenceKeys.RealName, ""));
+            builder.setRealname(serverSettings.getString(PreferenceKeys.RealName, "LightIRC"));
             builder.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
             final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
