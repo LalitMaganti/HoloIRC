@@ -28,14 +28,16 @@ import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.interfaces.CommonIRCListenerInterface;
-import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
-import org.pircbotx.hooks.events.lightirc.*;
+import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
+import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.NickInUseEvent;
+import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
 
 public class ActivityListener extends GenericListener {
     private final Context mContext;
@@ -135,32 +137,18 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onMessage(final MessageEvent<PircBotX> event) {
-        onChannelMessage(event, event.getChannel());
-    }
-
-    @Override
-    public void onAction(final ActionEvent<PircBotX> event) {
-        if (event.getChannel() == null) {
-            onPrivateEvent(event, event.getUser(), event.getAction());
-        } else {
-            onChannelMessage(event, event.getChannel());
-        }
-    }
-
-    @Override
     public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
-        userListChanged(event, event.getChannel());
+        onUserListChanged(event, event.getChannel());
     }
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
-        userListChanged(event, event.getChannel());
+        onUserListChanged(event, event.getChannel());
     }
 
     @Override
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
-        userListChanged(event, event.getChannel());
+        onUserListChanged(event, event.getChannel());
     }
 
     @Override
@@ -172,20 +160,19 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
-        userListChanged(event, event.getChannel());
+        onUserListChanged(event, event.getChannel());
     }
 
     @Override
     public void onMode(final ModeEvent<PircBotX> event) {
         if (event.getUser() != null) {
-            userListChanged(event, event.getChannel());
+            super.onMode(event);
+
+            onUserListChanged(event, event.getChannel());
         }
     }
 
-    private void userListChanged(final Event<PircBotX> event, final Channel channel) {
-        if (Utils.isMessagesFromChannelShown(applicationContext)) {
-            onChannelMessage(event, channel);
-        }
+    private void onUserListChanged(final Event<PircBotX> event, final Channel channel) {
         if (mListener.isFragmentSelected(channel.getName())) {
             mListener.runOnUiThread(new Runnable() {
                 @Override

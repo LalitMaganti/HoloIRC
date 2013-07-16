@@ -78,6 +78,13 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     }
 
     @Override
+    public void onMode(final ModeEvent<PircBotX> event) {
+        if (Utils.isMessagesFromChannelShown(applicationContext)) {
+                onChannelMessage(event, event.getChannel());
+        }
+    }
+
+    @Override
     public void onJoin(final JoinEvent<PircBotX> event) {
         if (!((JoinEvent) event).getUser().getNick().equals(event.getBot().getUserBot().getNick())) {
             if (Utils.isMessagesFromChannelShown(applicationContext)) {
@@ -115,6 +122,25 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     @Override
     public void onUnknown(final UnknownEvent<PircBotX> event) {
         onServerMessage(event);
+    }
+
+    @Override
+    public void onTopic(final TopicEvent<PircBotX> event) {
+        onChannelMessage(event, event.getChannel());
+    }
+
+    @Override
+    public void onAction(final ActionEvent<PircBotX> event) {
+        if (event.getChannel() != null) {
+            onChannelMessage(event, event.getChannel());
+        } else {
+            onPrivateEvent(event, event.getUser(), event.getAction());
+        }
+    }
+
+    @Override
+    public void onMessage(final MessageEvent<PircBotX> event) {
+        onChannelMessage(event, event.getChannel());
     }
 
     @Override
