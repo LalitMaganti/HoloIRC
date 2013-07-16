@@ -215,7 +215,7 @@ public class ActivityListener extends GenericListener {
         });
     }
 
-    public void onServerMessage(final Event<PircBotX> event) {
+    void onServerMessage(final Event<PircBotX> event) {
         final IRCFragment fragment = mListener.isFragmentAvailable(event.getBot().getConfiguration().getTitle());
         if (fragment != null && fragment instanceof ServerFragment) {
             mListener.runOnUiThread(new Runnable() {

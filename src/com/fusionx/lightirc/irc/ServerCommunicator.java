@@ -94,7 +94,7 @@ public class ServerCommunicator {
         sendPart(channel, applicationContext);
     }
 
-    public static void sendPart(final Channel channel, final Context applicationContext) {
+    private static void sendPart(final Channel channel, final Context applicationContext) {
         final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {

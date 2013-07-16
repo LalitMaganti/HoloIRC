@@ -33,7 +33,7 @@ import org.pircbotx.hooks.events.*;
 import org.pircbotx.hooks.events.lightirc.*;
 
 abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
-    final Context applicationContext;
+    private final Context applicationContext;
 
     GenericListener(final Context applicationContext) {
         this.applicationContext = applicationContext;
@@ -106,11 +106,11 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
         }
     }
 
-    public void onNickInUse(NickInUseEvent<PircBotX> event) {
+    void onNickInUse(NickInUseEvent<PircBotX> event) {
         onServerMessage(event);
     }
 
-    protected void onIrcException(final IrcExceptionEvent<PircBotX> event) {
+    void onIrcException(final IrcExceptionEvent<PircBotX> event) {
         onServerMessage(event);
     }
 

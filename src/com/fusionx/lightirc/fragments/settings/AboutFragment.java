@@ -19,7 +19,9 @@ public class AboutFragment extends PreferenceFragment {
         try {
             final PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
             final String version = info.versionName;
-            appVersionPreference.setSummary(version);
+            if (appVersionPreference != null) {
+                appVersionPreference.setSummary(version);
+            }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
