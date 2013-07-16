@@ -64,7 +64,7 @@ public class ChannelFragment extends IRCFragment {
         }
 
         getEditText().clearComposingText();
-        getEditText().append(nicks + text);
+        getEditText().setText(nicks + text);
         getEditText().requestFocus();
     }
 
