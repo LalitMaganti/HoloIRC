@@ -44,7 +44,7 @@ public class UserListAdapter extends SelectionAdapter<String> {
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         final View view = super.getView(position, convertView, parent);
-        TextView textView = (TextView) view.findViewById(R.id.text1);
+        final TextView textView = (TextView) view.findViewById(R.id.text1);
         textView.setText(Html.fromHtml(getItem(position)));
         return view;
     }

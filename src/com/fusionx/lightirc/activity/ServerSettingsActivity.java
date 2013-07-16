@@ -96,7 +96,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
     }
 
-    public class BaseServerSettingFragment extends PreferenceFragment
+    public static class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
 
         // Server login
