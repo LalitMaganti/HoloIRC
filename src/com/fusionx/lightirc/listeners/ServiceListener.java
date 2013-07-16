@@ -103,14 +103,7 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onUserList(final UserListEvent<PircBotX> event) {
-        final ArrayList<String> userList = new ArrayList<>();
-
-        for (final User user : event.getUsers()) {
-            userList.add(user.getPrettyNick(event.getChannel()));
-        }
-
-        Collections.sort(userList, new IRCUserComparator());
-        event.getChannel().setUserList(userList);
+        onSetupChannelUserList(event.getChannel());
     }
 
     @Override
@@ -149,14 +142,7 @@ public class ServiceListener extends GenericListener {
         if (event.getUser() != null) {
             super.onMode(event);
 
-            final ArrayList<String> userList = new ArrayList<>();
-
-            for (final User user : event.getChannel().getUsers()) {
-                userList.add(user.getPrettyNick(event.getChannel()));
-            }
-
-            event.getChannel().setUserList(userList);
-            Collections.sort(userList, new IRCUserComparator());
+            onSetupChannelUserList(event.getChannel());
         }
     }
 
@@ -192,6 +178,17 @@ public class ServiceListener extends GenericListener {
             final String title = event.getBot().getConfiguration().getTitle();
             mService.mention(title, user.getNick());
         }
+    }
+
+    private void onSetupChannelUserList(final Channel channel) {
+        final ArrayList<String> userList = new ArrayList<>();
+
+        for (final User user : channel.getUsers()) {
+            userList.add(user.getPrettyNick(channel));
+        }
+
+        Collections.sort(userList, new IRCUserComparator());
+        channel.setUserList(userList);
     }
 
     @Override

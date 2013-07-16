@@ -138,17 +138,17 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
-        onUserListChanged(event, event.getChannel());
+        onUserListChanged(event.getChannel());
     }
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
-        onUserListChanged(event, event.getChannel());
+        onUserListChanged(event.getChannel());
     }
 
     @Override
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
-        onUserListChanged(event, event.getChannel());
+        onUserListChanged(event.getChannel());
     }
 
     @Override
@@ -160,7 +160,7 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
-        onUserListChanged(event, event.getChannel());
+        onUserListChanged(event.getChannel());
     }
 
     @Override
@@ -168,11 +168,16 @@ public class ActivityListener extends GenericListener {
         if (event.getUser() != null) {
             super.onMode(event);
 
-            onUserListChanged(event, event.getChannel());
+            onUserListChanged(event.getChannel());
         }
     }
 
-    private void onUserListChanged(final Event<PircBotX> event, final Channel channel) {
+    @Override
+    public void onUserList(final UserListEvent<PircBotX> event) {
+        onUserListChanged(event.getChannel());
+    }
+
+    private void onUserListChanged(final Channel channel) {
         if (mListener.isFragmentSelected(channel.getName())) {
             mListener.runOnUiThread(new Runnable() {
                 @Override

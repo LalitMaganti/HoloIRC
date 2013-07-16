@@ -80,7 +80,7 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     @Override
     public void onMode(final ModeEvent<PircBotX> event) {
         if (Utils.isMessagesFromChannelShown(applicationContext)) {
-                onChannelMessage(event, event.getChannel());
+            onChannelMessage(event, event.getChannel());
         }
     }
 
