@@ -96,7 +96,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         mListener = new ActivityListener(this);
 
         final ActionBar actionBar = getActionBar();
-        if(actionBar != null) {
+        if (actionBar != null) {
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -173,7 +173,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
                 }
             } else {
                 final Configuration.Builder<PircBotX> builder = getIntent().getExtras().getParcelable("server");
-                if(builder != null) {
+                if (builder != null) {
                     builder.getListenerManager().addListener(mListener);
                 }
                 mService.connectToServer(builder);
@@ -310,7 +310,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     @Override
     public void switchFragmentAndRemove(final String channelName) {
         final int index = mViewPager.getAdapter().getIndexFromTitle(channelName);
-        if(getCurrentItem().getTitle().equals(channelName)) {
+        if (getCurrentItem().getTitle().equals(channelName)) {
             mViewPager.setCurrentItem(index - 1, true);
         }
         removeTab(index);
@@ -346,7 +346,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         selectServerFragment();
 
         final ActionBar bar = getActionBar();
-        if(bar != null) {
+        if (bar != null) {
             for (int i = 1; i < bar.getTabCount(); ) {
                 removeTab(i);
             }
@@ -447,11 +447,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     // ServerFragment Listener Callbacks
     @Override
     public PircBotX getBot() {
-        if (mService != null) {
-            return mService.getBot(mServerTitle);
-        } else {
-            return null;
-        }
+        return mService != null ? mService.getBot(mServerTitle) : null;
     }
 
     @Override

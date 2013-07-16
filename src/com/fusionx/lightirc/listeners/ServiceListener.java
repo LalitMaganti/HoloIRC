@@ -215,7 +215,7 @@ public class ServiceListener extends GenericListener {
             user.appendToBuffer(EventParser.getOutputForEvent(event, mService));
         }
 
-        if(!event.getBot().getUserChannelDao().getPrivateMessages().contains(user)) {
+        if (!event.getBot().getUserChannelDao().getPrivateMessages().contains(user)) {
             user.createPrivateMessage();
         }
 

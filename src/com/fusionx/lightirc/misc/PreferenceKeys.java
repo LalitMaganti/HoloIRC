@@ -26,16 +26,18 @@ public class PreferenceKeys {
     public final static String Title = "pref_title";
     public final static String URL = "pref_url";
     public final static String Port = "pref_port";
-    public final static String Nick = "pref_nick";
-    public final static String AutoNickChange = "pref_auto_nick";
     public final static String SSL = "pref_ssl";
+
+    public final static String Nick = "pref_nick";
+    public final static String RealName = "pref_realname";
+    public final static String AutoNickChange = "pref_auto_nick";
+
+    public final static String AutoJoin = "pref_autojoin";
 
     public final static String ServerUserName = "pref_login_username";
     public final static String ServerPassword = "pref_login_password";
 
     public final static String NickServPassword = "pref_nickserv_password";
-
-    public final static String AutoJoin = "pref_autojoin";
 
     // Appearance Settings
     public final static String Theme = "fragment_settings_theme";

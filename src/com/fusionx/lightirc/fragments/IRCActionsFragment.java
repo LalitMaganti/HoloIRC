@@ -68,7 +68,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        if(i != 2) {
+        if (i != 2) {
             mCommonListener.closeAllSlidingMenus();
         }
         switch (i) {

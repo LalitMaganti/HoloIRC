@@ -23,7 +23,7 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
 
-    <PreferenceCategory android:title="Server info">
+    <PreferenceCategory android:title="Connection">
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:key="pref_title"
             android:defaultValue=""
@@ -48,10 +48,19 @@
             android:defaultValue="false"
             android:title="@string/server_settings_ssl_title"
             android:summary="@string/server_settings_ssl_summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="User">
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:key="pref_nick"
             android:defaultValue=""
             android:title="@string/nickname"
+            android:singleLine="true"
+            android:lines="1"/>
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="pref_realname"
+            android:title="Real Name"
             android:singleLine="true"
             android:lines="1"/>
         <CheckBoxPreference
@@ -59,13 +68,16 @@
             android:defaultValue="true"
             android:title="@string/server_settings_auto_nick_title"
             android:summary="@string/server_settings_auto_nick_summary"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Channel">
         <PreferenceScreen
             android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
             android:title="@string/server_settings_auto_join_title"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Server Login - normally no need to edit this">
+    <PreferenceCategory android:title="Server Login - usually need not be changed">
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:defaultValue="lightirc"
             android:key="pref_login_username"
@@ -81,7 +93,7 @@
             android:lines="1"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="NickServ Info">
+    <PreferenceCategory android:title="NickServ - if server uses NickServ">
         <EditTextPreference
             android:defaultValue=""
             android:key="pref_nickserv_password"

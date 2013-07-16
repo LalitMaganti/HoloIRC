@@ -26,7 +26,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Menu;
@@ -38,6 +37,7 @@ import android.widget.PopupMenu;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.service.IRCService;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
@@ -54,7 +54,6 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -151,13 +150,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         final Intent intent = new Intent(MainServerListActivity.this, ServerSettingsActivity.class);
         intent.putExtra("new", true);
 
-        final ArrayList<String> array = getListOfServersFromPreferencesFiles();
-        Integer in;
-        if (!array.isEmpty()) {
-            in = Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
-        } else {
-            in = 0;
-        }
+        final ArrayList<String> array = SharedPreferencesUtils.getServersFromPreferences(getApplicationContext());
+        final Integer in = array.isEmpty() ? 0 : Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
 
         intent.putExtra("file", "server_" + in);
         intent.putExtra("main", true);
@@ -170,11 +164,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mBuilderList = new ArrayList<Configuration.Builder>();
 
         if (firstRun) {
-            firstRunAdditions();
+            SharedPreferencesUtils.firstTimeServerSetup(this);
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        setUpServers(getListOfServersFromPreferencesFiles());
+        setUpServers(SharedPreferencesUtils.getServersFromPreferences(getApplicationContext()));
         setUpCards();
     }
 
@@ -186,27 +180,24 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
             builder.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
             builder.setServerHostname(serverSettings.getString(PreferenceKeys.URL, ""));
             builder.setServerPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
+            final boolean ssl = serverSettings.getBoolean(PreferenceKeys.SSL, false);
+            builder.setSocketFactory(ssl ? SSLSocketFactory.getDefault() : SocketFactory.getDefault());
+
             builder.setName(serverSettings.getString(PreferenceKeys.Nick, ""));
+            builder.setRealname(serverSettings.getString(PreferenceKeys.RealName, ""));
+            builder.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
+
+            final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
+            for (final String channel : auto) {
+                builder.addAutoJoinChannel(channel);
+            }
+
             builder.setLogin(serverSettings.getString(PreferenceKeys.ServerUserName, "lightirc"));
             builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
 
             final String nickServPassword = serverSettings.getString(PreferenceKeys.NickServPassword, null);
             if (nickServPassword != null && !nickServPassword.equals("")) {
                 builder.setNickservPassword(nickServPassword);
-            }
-
-            builder.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
-
-            final boolean ssl = serverSettings.getBoolean(PreferenceKeys.SSL, false);
-            if (ssl) {
-                builder.setSocketFactory(SSLSocketFactory.getDefault());
-            } else {
-                builder.setSocketFactory(SocketFactory.getDefault());
-            }
-
-            final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
-            for (final String channel : auto) {
-                builder.addAutoJoinChannel(channel);
             }
 
             builder.setFile(server);
@@ -225,35 +216,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
                 mServerCardsAdapter.add(bot);
             }
         }
-    }
-
-    private void firstRunAdditions() {
-        final SharedPreferences settings = getSharedPreferences("server_0", MODE_PRIVATE);
-        final Editor e = settings.edit();
-
-        e.putString(PreferenceKeys.Title, "Freenode");
-        e.putString(PreferenceKeys.URL, "irc.freenode.net");
-        e.putString(PreferenceKeys.Port, "6667");
-        e.putString(PreferenceKeys.Nick, "LightIRCUser");
-        e.putString(PreferenceKeys.ServerUserName, "lightirc");
-        e.putBoolean(PreferenceKeys.AutoNickChange, true);
-        e.putBoolean(PreferenceKeys.SSL, false);
-
-        final HashSet<String> auto = new HashSet<String>();
-        e.putStringSet(PreferenceKeys.AutoJoin, auto);
-        e.commit();
-    }
-
-    private ArrayList<String> getListOfServersFromPreferencesFiles() {
-        final ArrayList<String> array = new ArrayList<String>();
-        final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext()));
-        for (final String file : folder.list()) {
-            if (file.startsWith("server_")) {
-                array.add(file.replace(".xml", ""));
-            }
-        }
-        Collections.sort(array);
-        return array;
     }
 
     // Connect to server
@@ -308,10 +270,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void deleteServer(final String fileName) {
-        final ArrayList<String> servers = getListOfServersFromPreferencesFiles();
+        final ArrayList<String> servers = SharedPreferencesUtils.getServersFromPreferences(getApplicationContext());
         servers.remove(fileName);
 
-        final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(getApplicationContext())
+                + fileName + ".xml");
         folder.delete();
 
         setUpServers(servers);

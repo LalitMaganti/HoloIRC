@@ -63,7 +63,7 @@ public class IRCService extends Service {
     private ServiceListener mServiceListener;
 
     public void connectToServer(final Configuration.Builder server) {
-        if(threadManager == null) {
+        if (threadManager == null) {
             threadManager = new LightManager(getApplicationContext());
         }
 
@@ -147,10 +147,10 @@ public class IRCService extends Service {
     @Synchronized
     public void onUnexpectedDisconnect(final String serverName) {
         if (serverDisplayed == null) {
-            if(threadManager.containsKey(serverName)) {
+            if (threadManager.containsKey(serverName)) {
                 threadManager.remove(serverName);
                 if (threadManager.isEmpty()) {
-                   stopForeground(true);
+                    stopForeground(true);
                 }
             }
         }

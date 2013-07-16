@@ -26,8 +26,8 @@ import org.pircbotx.PircBotX;
 
 public class MessageParser {
     /**
-        This entire class needs input validation and full parsing
-    */
+     * This entire class needs input validation and full parsing
+     */
 
     public static void channelMessageToParse(final Context applicationContext, final PircBotX bot,
                                              final String channelName, final String message) {

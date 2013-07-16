@@ -37,6 +37,7 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.Toast;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightlibrary.adapters.SelectionAdapter;
@@ -75,7 +76,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     .setNegativeButton(getString(R.string.discard), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            final File folder = new File(Utils.getSharedPreferencesPath(getApplicationContext())
+                            final File folder = new File(SharedPreferencesUtils
+                                    .getSharedPreferencesPath(getApplicationContext())
                                     + fileName + ".xml");
                             folder.delete();
                             finish();
