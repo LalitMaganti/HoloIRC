@@ -210,7 +210,7 @@ public class ServiceListener extends GenericListener {
         onPrivateEvent(event, event.getMessage(), event.getUser());
     }
 
-    public void onPrivateEvent(final Event<PircBotX> event, final String message, final User user) {
+    void onPrivateEvent(final Event<PircBotX> event, final String message, final User user) {
         if (!message.equals("")) {
             user.appendToBuffer(EventParser.getOutputForEvent(event, mService));
         }

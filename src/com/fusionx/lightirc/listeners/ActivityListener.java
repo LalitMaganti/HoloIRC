@@ -259,8 +259,6 @@ public class ActivityListener extends GenericListener {
     public interface ActivityListenerInterface {
         public void onConnect();
 
-        public void onCreateChannelFragment(final String channelName);
-
         public void onNewChannelJoined(final String channelName, final boolean forceSwitch);
 
         public void onUnexpectedDisconnect();

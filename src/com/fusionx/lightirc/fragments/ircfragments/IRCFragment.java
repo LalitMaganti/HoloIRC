@@ -93,10 +93,6 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
         });
     }
 
-    public void partOrCloseIRC(final boolean channel) {
-        throw new NullPointerException();
-    }
-
     public void disableEditText() {
         editText.setEnabled(false);
     }

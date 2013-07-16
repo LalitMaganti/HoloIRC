@@ -64,7 +64,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private ArrayList<Configuration.Builder> mBuilderList = null;
     private Configuration.Builder mBuilder = null;
     private BuilderAdapter mServerCardsAdapter = null;
-    private ListListener mListener = new ListListener();
+    private final ListListener mListener = new ListListener();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {

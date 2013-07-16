@@ -95,14 +95,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
     public class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
-        // Generic
-        private EditTextPreference mEditTextNick = null;
-        private EditTextPreference mEditTextUrl = null;
-        private EditTextPreference mEditTextPort = null;
-        private EditTextPreference mEditTextTitle = null;
 
         // Server login
-        private EditTextPreference mServerUserName = null;
         private EditTextPreference mServerPassword = null;
 
         // NickServ
@@ -129,34 +123,34 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             final PreferenceScreen prefSet = getPreferenceScreen();
 
-            mEditTextTitle = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Title);
+            EditTextPreference mEditTextTitle = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Title);
             if (mEditTextTitle != null) {
                 mEditTextTitle.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextTitle);
 
             // URL of server
-            mEditTextUrl = (EditTextPreference) prefSet.findPreference(PreferenceKeys.URL);
+            EditTextPreference mEditTextUrl = (EditTextPreference) prefSet.findPreference(PreferenceKeys.URL);
             if (mEditTextUrl != null) {
                 mEditTextUrl.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextUrl);
 
             // Port of server
-            mEditTextPort = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Port);
+            EditTextPreference mEditTextPort = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Port);
             if (mEditTextPort != null) {
                 mEditTextPort.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextPort);
 
             // Nick of User
-            mEditTextNick = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Nick);
+            EditTextPreference mEditTextNick = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Nick);
             if (mEditTextNick != null) {
                 mEditTextNick.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextNick);
 
-            mServerUserName = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerUserName);
+            EditTextPreference mServerUserName = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerUserName);
             if (mServerUserName != null) {
                 mServerUserName.setOnPreferenceChangeListener(this);
             }

@@ -322,8 +322,7 @@ public class IRCFragmentActivity extends AbstractPagerActivity
         mActionsFragment.connectionStatusChanged(true);
     }
 
-    @Override
-    public void onCreateChannelFragment(final String channelName) {
+    private void onCreateChannelFragment(final String channelName) {
         onNewChannelJoined(channelName, false);
     }
 
@@ -385,8 +384,8 @@ public class IRCFragmentActivity extends AbstractPagerActivity
     }
 
     @Override
-    public boolean isNickUsers(final String nick) {
-        return getBot().getNick().equals(nick);
+    public boolean isNickOtherUsers(final String nick) {
+        return !getBot().getNick().equals(nick);
     }
 
     @Override

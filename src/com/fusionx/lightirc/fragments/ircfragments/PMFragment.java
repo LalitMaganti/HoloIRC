@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.parser.ServerCommunicator;
 import org.pircbotx.User;
 
 public class PMFragment extends IRCFragment {
@@ -59,13 +58,6 @@ public class PMFragment extends IRCFragment {
 
         final String buffer = mListener.getUser(getTitle()).getBuffer();
         writeToTextView(buffer);
-    }
-
-    @Override
-    public void partOrCloseIRC(final boolean channel) {
-        if (!channel) {
-            ServerCommunicator.sendClosePrivateMessage(mListener.getUser(getTitle()));
-        }
     }
 
     public interface PMFragmentListenerInterface {

@@ -27,7 +27,6 @@ import android.text.Html;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.lightirc.parser.ServerCommunicator;
 import org.pircbotx.Channel;
 
 import java.util.Set;
@@ -71,13 +70,6 @@ public class ChannelFragment extends IRCFragment {
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
         writeToTextView(mListener.getChannel(getTitle()).getBuffer());
-    }
-
-    @Override
-    public void partOrCloseIRC(final boolean channel) {
-        if (channel) {
-            ServerCommunicator.sendPart(mListener.getChannel(getTitle()), getActivity().getApplicationContext());
-        }
     }
 
     public interface ChannelFragmentListenerInterface {

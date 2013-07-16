@@ -125,7 +125,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 final String nick = Utils.stripPrefixFromNick(String
                         .valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
 
-                if (!mListener.isNickUsers(nick)) {
+                if (mListener.isNickOtherUsers(nick)) {
                     mCommonListener.onCreatePMFragment(nick);
                     mCommonListener.closeAllSlidingMenus();
                     mode.finish();
@@ -187,7 +187,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public interface UserListListenerInterface {
         public void onUserMention(final Set<String> users);
 
-        public boolean isNickUsers(final String nick);
+        public boolean isNickOtherUsers(final String nick);
 
         public ArrayList<String> getUserList(final String channelName);
     }
