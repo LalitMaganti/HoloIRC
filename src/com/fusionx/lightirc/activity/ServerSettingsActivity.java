@@ -36,7 +36,6 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.Toast;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
@@ -47,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.fusionx.lightirc.misc.PreferenceKeys.*;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     private static boolean canExit = true;
@@ -125,44 +126,52 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             final PreferenceScreen prefSet = getPreferenceScreen();
 
-            EditTextPreference mEditTextTitle = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Title);
+            EditTextPreference mEditTextTitle = (EditTextPreference) prefSet.findPreference(Title);
             if (mEditTextTitle != null) {
                 mEditTextTitle.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextTitle);
 
             // URL of server
-            EditTextPreference mEditTextUrl = (EditTextPreference) prefSet.findPreference(PreferenceKeys.URL);
+            EditTextPreference mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
             if (mEditTextUrl != null) {
                 mEditTextUrl.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextUrl);
 
             // Port of server
-            EditTextPreference mEditTextPort = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Port);
+            EditTextPreference mEditTextPort = (EditTextPreference) prefSet.findPreference(Port);
             if (mEditTextPort != null) {
                 mEditTextPort.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextPort);
 
             // Nick of User
-            EditTextPreference mEditTextNick = (EditTextPreference) prefSet.findPreference(PreferenceKeys.Nick);
+            EditTextPreference mEditTextNick = (EditTextPreference) prefSet.findPreference(Nick);
             if (mEditTextNick != null) {
                 mEditTextNick.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextNick);
 
-            EditTextPreference mServerUserName = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerUserName);
-            if (mServerUserName != null) {
-                mServerUserName.setOnPreferenceChangeListener(this);
+            // Nick of User
+            EditTextPreference mEditTextRealName = (EditTextPreference) prefSet.findPreference(RealName);
+            if (mEditTextRealName != null) {
+                mEditTextRealName.setOnPreferenceChangeListener(this);
+                mEditTextRealName.setSummary(mEditTextRealName.getText());
             }
 
-            mServerPassword = (EditTextPreference) prefSet.findPreference(PreferenceKeys.ServerPassword);
+            EditTextPreference mServerUserName = (EditTextPreference) prefSet.findPreference(ServerUserName);
+            if (mServerUserName != null) {
+                mServerUserName.setOnPreferenceChangeListener(this);
+                mServerUserName.setSummary(mServerUserName.getText());
+            }
+
+            mServerPassword = (EditTextPreference) prefSet.findPreference(ServerPassword);
             if (mServerPassword != null) {
                 mServerPassword.setOnPreferenceChangeListener(this);
             }
 
-            mNickServPassword = (EditTextPreference) prefSet.findPreference(PreferenceKeys.NickServPassword);
+            mNickServPassword = (EditTextPreference) prefSet.findPreference(NickServPassword);
             if (mNickServPassword != null) {
                 mNickServPassword.setOnPreferenceChangeListener(this);
             }
@@ -185,11 +194,6 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 for (EditTextPreference edit : mEditTexts) {
                     edit.setSummary(edit.getText());
                 }
-            }
-
-            // Server username
-            if (mServerUserName != null) {
-                mServerUserName.setSummary(mServerUserName.getText());
             }
         }
 
@@ -304,7 +308,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             adapter = new SelectionAdapter<String>(getActivity(), new ArrayList<String>());
 
             final SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
-            final Set<String> set = settings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
+            final Set<String> set = settings.getStringSet(AutoJoin, new HashSet<String>());
             for (final String channel : set) {
                 adapter.add(channel);
             }
@@ -338,7 +342,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public void onPause() {
             SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
             final Editor e = settings.edit();
-            e.putStringSet(PreferenceKeys.AutoJoin, adapter.getItems()).commit();
+            e.putStringSet(AutoJoin, adapter.getItems()).commit();
 
             super.onPause();
         }
