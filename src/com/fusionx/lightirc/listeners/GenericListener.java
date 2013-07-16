@@ -23,17 +23,14 @@ package com.fusionx.lightirc.listeners;
 
 import android.content.Context;
 import com.fusionx.lightirc.misc.Utils;
+import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.Listener;
 import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.events.JoinEvent;
-import org.pircbotx.hooks.events.MotdEvent;
-import org.pircbotx.hooks.events.PartEvent;
-import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
-import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
+import org.pircbotx.hooks.events.*;
+import org.pircbotx.hooks.events.lightirc.*;
 
 abstract class GenericListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
     final Context applicationContext;
@@ -58,13 +55,13 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
             if (Utils.isMotdAllowed(applicationContext)) {
                 onMotd((MotdEvent<PircBotX>) event);
             }
+        } else if (event instanceof NickInUseEvent) {
+            onNickInUse((NickInUseEvent<PircBotX>) event);
         } else
             super.onEvent(event);
     }
 
     protected abstract void onIOException(final IOExceptionEvent<PircBotX> event);
-
-    protected abstract void onIrcException(final IrcExceptionEvent<PircBotX> event);
 
     protected abstract void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event);
 
@@ -75,6 +72,7 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
     protected abstract void onOtherUserJoin(final JoinEvent<PircBotX> event);
 
     protected abstract void onOtherUserPart(final PartEvent<PircBotX> event);
+
 
     void onUserPart(final PartEvent<PircBotX> event) {
     }
@@ -100,4 +98,35 @@ abstract class GenericListener extends ListenerAdapter<PircBotX> implements List
             onUserPart(event);
         }
     }
+
+    public void onNickInUse(NickInUseEvent<PircBotX> event) {
+        onServerMessage(event);
+    }
+
+    protected void onIrcException(final IrcExceptionEvent<PircBotX> event) {
+        onServerMessage(event);
+    }
+
+    @Override
+    public void onMotd(final MotdEvent<PircBotX> event) {
+        onServerMessage(event);
+    }
+
+    @Override
+    public void onUnknown(final UnknownEvent<PircBotX> event) {
+        onServerMessage(event);
+    }
+
+    @Override
+    public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
+        onPrivateEvent(event, event.getUser(), event.getMessage());
+    }
+
+    abstract void onPrivateEvent(Event<PircBotX> event, User user, String message);
+
+    abstract void onServerMessage(Event<PircBotX> event);
+
+    abstract void onChannelMessage(Event<PircBotX> event, Channel channel);
+
+    abstract void onUserMessage(Event<PircBotX> event, User user);
 }

@@ -106,7 +106,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         // NickServ
         private EditTextPreference mNickServPassword = null;
 
-        private final List<EditTextPreference> mEditTexts = new ArrayList<EditTextPreference>();
+        private final List<EditTextPreference> mEditTexts = new ArrayList<>();
 
         @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
         @Override
@@ -317,7 +317,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                                  final Bundle savedInstanceState) {
-            adapter = new SelectionAdapter<String>(getActivity(), new ArrayList<String>());
+            adapter = new SelectionAdapter<>(getActivity(), new ArrayList<String>());
 
             final SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
             final Set<String> set = settings.getStringSet(AutoJoin, new HashSet<String>());

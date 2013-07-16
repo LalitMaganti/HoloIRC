@@ -207,7 +207,7 @@ public class IRCService extends Service {
 
         if (!serverName.equals(serverDisplayed)) {
             final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
-            mIntent.putExtra("server", new Configuration.Builder<PircBotX>(getBot(serverName).getConfiguration()));
+            mIntent.putExtra("server", new Configuration.Builder<>(getBot(serverName).getConfiguration()));
             mIntent.putExtra("mention", messageDestination);
             final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
             taskStackBuilder.addParentStack(IRCFragmentActivity.class);

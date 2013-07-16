@@ -37,7 +37,7 @@ public class LightManager extends HashMap<String, LightThread> {
     }
 
     public void disconnectAll() {
-        final HashSet<LightThread> set = new HashSet<LightThread>(values());
+        final HashSet<LightThread> set = new HashSet<>(values());
         for (final LightThread bot : set) {
             bot.getBot().sendIRC().quitServer(Utils.getQuitReason(applicationContext));
             bot.getBot().shutdown();

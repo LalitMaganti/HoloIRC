@@ -27,13 +27,13 @@ public class SharedPreferencesUtils {
 
         e.putString(PreferenceKeys.ServerUserName, "lightirc");
 
-        final HashSet<String> auto = new HashSet<String>();
+        final HashSet<String> auto = new HashSet<>();
         e.putStringSet(PreferenceKeys.AutoJoin, auto);
         e.commit();
     }
 
     public static ArrayList<String> getServersFromPreferences(final Context applicationContext) {
-        final ArrayList<String> array = new ArrayList<String>();
+        final ArrayList<String> array = new ArrayList<>();
         final File folder = new File(getSharedPreferencesPath(applicationContext));
         for (final String file : folder.list()) {
             if (file.startsWith("server_")) {

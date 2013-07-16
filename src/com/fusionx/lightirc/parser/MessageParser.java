@@ -36,13 +36,18 @@ public class MessageParser {
         final String command = parsedArray[0];
 
         if (command.startsWith("/")) {
-            if (command.equals("/me")) {
-                final String action = message.replace("/me ", "");
-                ServerCommunicator.sendActionToChannel(bot, channelName, action);
-            } else if (command.equals("/part") || command.equals("/p")) {
-                ServerCommunicator.sendPart(bot, channelName, applicationContext);
-            } else {
-                serverCommandToParse(bot, message);
+            switch (command) {
+                case "/me":
+                    final String action = message.replace("/me ", "");
+                    ServerCommunicator.sendActionToChannel(bot, channelName, action);
+                    break;
+                case "/part":
+                case "/p":
+                    ServerCommunicator.sendPart(bot, channelName, applicationContext);
+                    break;
+                default:
+                    serverCommandToParse(bot, message);
+                    break;
             }
         } else {
             ServerCommunicator.sendMessageToChannel(bot, channelName, message);
@@ -65,13 +70,18 @@ public class MessageParser {
         final String command = parsedArray[0];
 
         if (command.startsWith("/")) {
-            if (command.equals("/me")) {
-                final String action = message.replace("/me ", "");
-                ServerCommunicator.sendActionToUser(bot, userNick, action);
-            } else if (command.equals("/close") || command.equals("/c")) {
-                ServerCommunicator.sendClosePrivateMessage(bot, userNick);
-            } else {
-                serverCommandToParse(bot, message);
+            switch (command) {
+                case "/me":
+                    final String action = message.replace("/me ", "");
+                    ServerCommunicator.sendActionToUser(bot, userNick, action);
+                    break;
+                case "/close":
+                case "/c":
+                    ServerCommunicator.sendClosePrivateMessage(bot, userNick);
+                    break;
+                default:
+                    serverCommandToParse(bot, message);
+                    break;
             }
         } else {
             ServerCommunicator.sendMessageToUser(bot, userNick, message);

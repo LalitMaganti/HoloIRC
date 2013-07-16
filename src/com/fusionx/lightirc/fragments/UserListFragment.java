@@ -69,13 +69,12 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     public void userListUpdate(final String channelName) {
-        final UserListAdapter adapter = ((UserListAdapter) getListAdapter());
-        adapter.clear();
+        getListAdapter().clear();
 
         final ArrayList<String> userList = mListener.getUserList(channelName);
         if (userList != null) {
-            adapter.addAll(userList);
-            adapter.sort();
+            getListAdapter().addAll(userList);
+            getListAdapter().sort();
         }
     }
 
@@ -92,12 +91,10 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id, final boolean checked) {
         mode.invalidate();
 
-        final UserListAdapter adapter = (UserListAdapter) getListView().getAdapter();
-
         if (checked) {
-            adapter.addSelection(position);
+            getListAdapter().addSelection(position);
         } else {
-            adapter.removeSelection(position);
+            getListAdapter().removeSelection(position);
         }
 
         int selectedItemCount = getListView().getCheckedItemCount();
@@ -114,7 +111,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final Set<String> selectedItems = ((UserListAdapter) getListView().getAdapter()).getSelectedItems();
+        final Set<String> selectedItems = getListAdapter().getSelectedItems();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
                 mListener.onUserMention(selectedItems);
@@ -161,8 +158,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
-        final UserListAdapter adapter = (UserListAdapter) getListView().getAdapter();
-        adapter.clearSelection();
+        getListAdapter().clearSelection();
 
         modeStarted = false;
     }
@@ -178,10 +174,13 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             getActivity().startActionMode(this);
         }
 
-        final UserListAdapter adapter = (UserListAdapter) getListView().getAdapter();
-
-        final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
+        final boolean checked = getListAdapter().getSelectedItems().contains(getListAdapter().getItem(i));
         getListView().setItemChecked(i, !checked);
+    }
+
+    @Override
+    public UserListAdapter getListAdapter() {
+        return (UserListAdapter) super.getListAdapter();
     }
 
     public interface UserListListenerInterface {

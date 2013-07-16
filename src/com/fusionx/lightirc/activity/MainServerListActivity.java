@@ -161,7 +161,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpServerList() {
         final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-        mBuilderList = new ArrayList<Configuration.Builder>();
+        mBuilderList = new ArrayList<>();
 
         if (firstRun) {
             SharedPreferencesUtils.firstTimeServerSetup(this);

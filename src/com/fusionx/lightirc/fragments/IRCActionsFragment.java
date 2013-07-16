@@ -86,8 +86,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     public void connectionStatusChanged(boolean connected) {
-        ((ActionsArrayAdapter) getListAdapter()).setConnected(connected);
-        ((ActionsArrayAdapter) getListAdapter()).notifyDataSetChanged();
+        getListAdapter().setConnected(connected);
+        getListAdapter().notifyDataSetChanged();
     }
 
     private void nickChangeDialog() {
@@ -119,9 +119,13 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onOpen() {
-        final ActionsArrayAdapter arrayAdapter = (ActionsArrayAdapter) getListView().getAdapter();
-        arrayAdapter.setConnected(mCommonListener.isConnectedToServer());
-        arrayAdapter.notifyDataSetChanged();
+        getListAdapter().setConnected(mCommonListener.isConnectedToServer());
+        getListAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public ActionsArrayAdapter getListAdapter() {
+        return (ActionsArrayAdapter) super.getListAdapter();
     }
 
     public interface IRCActionsListenerInterface {

@@ -30,14 +30,12 @@ import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.interfaces.CommonIRCListenerInterface;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.EventParser;
+import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
-import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
-import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.*;
 
 public class ActivityListener extends GenericListener {
     private final Context mContext;
@@ -63,7 +61,7 @@ public class ActivityListener extends GenericListener {
     // Server stuff
     @Override
     public void onConnect(final ConnectEvent<PircBotX> event) {
-        appendToServer(event);
+        onServerMessage(event);
 
         mListener.runOnUiThread(new Runnable() {
             @Override
@@ -77,7 +75,7 @@ public class ActivityListener extends GenericListener {
     // This HAS to be an unexpected disconnect. If it isn't then there's something wrong.
     @Override
     public void onDisconnect(final DisconnectEvent<PircBotX> event) {
-        appendToServer(event);
+        onServerMessage(event);
 
         mListener.runOnUiThread(new Runnable() {
             @Override
@@ -88,13 +86,8 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    protected void onIrcException(final IrcExceptionEvent<PircBotX> event) {
-        appendToServer(event);
-    }
-
-    @Override
     protected void onIOException(final IOExceptionEvent<PircBotX> event) {
-        appendToServer(event);
+        onServerMessage(event);
 
         mListener.runOnUiThread(new Runnable() {
             @Override
@@ -109,18 +102,13 @@ public class ActivityListener extends GenericListener {
     public void onNotice(final NoticeEvent<PircBotX> event) {
         if (event.getChannel() == null) {
             if (event.getUser().getBuffer().isEmpty()) {
-                appendToServer(event);
+                onServerMessage(event);
             } else {
-                onPrivateEvent(event.getUser(), event.getNotice(), event);
+                onPrivateEvent(event, event.getUser(), event.getNotice());
             }
         } else {
-            onChannelMessage(event.getChannel().getName(), event);
+            onChannelMessage(event, event.getChannel());
         }
-    }
-
-    @Override
-    public void onMotd(final MotdEvent<PircBotX> event) {
-        appendToServer(event);
     }
 
     @Override
@@ -131,7 +119,8 @@ public class ActivityListener extends GenericListener {
                 mListener.selectServerFragment();
             }
         });
-        appendToServer(event);
+
+        super.onUnknown(event);
     }
 
     // Channel events
@@ -147,50 +136,57 @@ public class ActivityListener extends GenericListener {
 
     @Override
     public void onMessage(final MessageEvent<PircBotX> event) {
-        onChannelMessage(event.getChannel().getName(), event);
+        onChannelMessage(event, event.getChannel());
     }
 
     @Override
     public void onAction(final ActionEvent<PircBotX> event) {
         if (event.getChannel() == null) {
-            onPrivateEvent(event.getUser(), event.getAction(), event);
+            onPrivateEvent(event, event.getUser(), event.getAction());
         } else {
-            onChannelMessage(event.getChannel().getName(), event);
+            onChannelMessage(event, event.getChannel());
         }
     }
 
     @Override
     public void onNickChangePerChannel(final NickChangeEventPerChannel<PircBotX> event) {
-        userListChanged(event, event.getChannel().getName());
+        userListChanged(event, event.getChannel());
     }
 
     @Override
     public void onOtherUserJoin(final JoinEvent<PircBotX> event) {
-        userListChanged(event, event.getChannel().getName());
+        userListChanged(event, event.getChannel());
     }
 
     @Override
     public void onOtherUserPart(final PartEvent<PircBotX> event) {
-        userListChanged(event, event.getChannel().getName());
+        userListChanged(event, event.getChannel());
+    }
+
+    @Override
+    public void onNickInUse(NickInUseEvent<PircBotX> event) {
+        mListener.selectServerFragment();
+
+        super.onNickInUse(event);
     }
 
     @Override
     public void onQuitPerChannel(final QuitEventPerChannel<PircBotX> event) {
-        userListChanged(event, event.getChannel().getName());
+        userListChanged(event, event.getChannel());
     }
 
     @Override
     public void onMode(final ModeEvent<PircBotX> event) {
         if (event.getUser() != null) {
-            userListChanged(event, event.getChannel().getName());
+            userListChanged(event, event.getChannel());
         }
     }
 
-    private void userListChanged(final Event<PircBotX> event, final String channelName) {
+    private void userListChanged(final Event<PircBotX> event, final Channel channel) {
         if (Utils.isMessagesFromChannelShown(applicationContext)) {
-            onChannelMessage(channelName, event);
+            onChannelMessage(event, channel);
         }
-        if (mListener.isFragmentSelected(channelName)) {
+        if (mListener.isFragmentSelected(channel.getName())) {
             mListener.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -211,19 +207,14 @@ public class ActivityListener extends GenericListener {
     }
 
     @Override
-    public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
-        onPrivateEvent(event.getUser(), event.getMessage(), event);
-    }
-
-    // Misc stuff
-    private void onPrivateEvent(final User user, final String message, final Event<PircBotX> event) {
+    void onPrivateEvent(final Event<PircBotX> event, final User user, final String message) {
         final IRCFragment fragment = mListener.isFragmentAvailable(user.getNick());
         mListener.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (fragment != null && fragment instanceof PMFragment) {
                     if (!message.equals("")) {
-                        fragment.appendToTextView(EventParser.getOutputForEvent(event, mContext));
+                        onUserMessage(event, user);
                     }
                 } else {
                     mCommonListener.onCreatePMFragment(user.getNick());
@@ -232,7 +223,7 @@ public class ActivityListener extends GenericListener {
         });
     }
 
-    private void appendToServer(final Event<PircBotX> event) {
+    public void onServerMessage(final Event<PircBotX> event) {
         final IRCFragment fragment = mListener.isFragmentAvailable(event.getBot().getConfiguration().getTitle());
         if (fragment != null && fragment instanceof ServerFragment) {
             mListener.runOnUiThread(new Runnable() {
@@ -244,8 +235,9 @@ public class ActivityListener extends GenericListener {
         }
     }
 
-    private void onChannelMessage(final String channelName, final Event<PircBotX> event) {
-        final IRCFragment fragment = mListener.isFragmentAvailable(channelName);
+    @Override
+    void onChannelMessage(final Event<PircBotX> event, Channel channel) {
+        final IRCFragment fragment = mListener.isFragmentAvailable(channel.getName());
         if (fragment != null && fragment instanceof ChannelFragment) {
             mListener.runOnUiThread(new Runnable() {
                 @Override
@@ -254,6 +246,12 @@ public class ActivityListener extends GenericListener {
                 }
             });
         }
+    }
+
+    @Override
+    void onUserMessage(Event<PircBotX> event, User user) {
+        final IRCFragment fragment = mListener.isFragmentAvailable(user.getNick());
+        fragment.appendToTextView(EventParser.getOutputForEvent(event, mContext));
     }
 
     public interface ActivityListenerInterface {

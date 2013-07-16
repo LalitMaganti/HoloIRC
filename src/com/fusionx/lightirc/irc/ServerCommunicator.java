@@ -28,7 +28,7 @@ public class ServerCommunicator {
             @Override
             protected Void doInBackground(Void... voids) {
                 final Channel channel = bot.getUserChannelDao().getChannel(channelName);
-                bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent<PircBotX>(bot,
+                bot.getConfiguration().getListenerManager().dispatchEvent(new MessageEvent<>(bot,
                         channel, bot.getUserBot(), message));
                 channel.send().message(message);
                 return null;
@@ -41,7 +41,7 @@ public class ServerCommunicator {
         final AsyncTask<Void, Void, Void> sendAction = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                bot.getConfiguration().getListenerManager().dispatchEvent(new ActionEvent<PircBotX>(bot, bot.getUserBot(),
+                bot.getConfiguration().getListenerManager().dispatchEvent(new ActionEvent<>(bot, bot.getUserBot(),
                         bot.getUserChannelDao().getChannel(channelName), action));
                 bot.getUserChannelDao().getChannel(channelName).send().action(action);
                 return null;
@@ -56,7 +56,7 @@ public class ServerCommunicator {
             protected Void doInBackground(Void... voids) {
                 final User user = bot.getUserChannelDao().getUser(userNick);
                 bot.getConfiguration().getListenerManager()
-                        .dispatchEvent(new PrivateMessageEvent<PircBotX>(bot, user, message, true));
+                        .dispatchEvent(new PrivateMessageEvent<>(bot, user, message, true));
                 user.send().message(message);
                 return null;
             }
@@ -70,7 +70,7 @@ public class ServerCommunicator {
             protected Void doInBackground(Void... voids) {
                 final User user = bot.getUserChannelDao().getUser(userNick);
                 bot.getConfiguration().getListenerManager()
-                        .dispatchEvent(new ActionEvent<PircBotX>(bot, user, null, action));
+                        .dispatchEvent(new ActionEvent<>(bot, user, null, action));
                 user.send().action(action);
                 return null;
             }
@@ -125,7 +125,7 @@ public class ServerCommunicator {
         final AsyncTask<Void, Void, Void> unknownEvent = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                bot.getConfiguration().getListenerManager().dispatchEvent(new UnknownEvent<PircBotX>(bot, event));
+                bot.getConfiguration().getListenerManager().dispatchEvent(new UnknownEvent<>(bot, event));
                 return null;
             }
         };

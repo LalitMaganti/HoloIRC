@@ -31,10 +31,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
-import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
-import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -79,27 +76,12 @@ public class ServiceListener extends GenericListener {
     }
 
     @Override
-    public void onMotd(final MotdEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
-    }
-
-    @Override
     public void onIOException(final IOExceptionEvent<PircBotX> event) {
         event.getBot().setStatus(mService.getString(R.string.status_disconnected));
 
         event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
         mService.onUnexpectedDisconnect(event.getBot().getConfiguration().getTitle());
-    }
-
-    @Override
-    public void onIrcException(final IrcExceptionEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
-    }
-
-    @Override
-    public void onUnknown(final UnknownEvent<PircBotX> event) {
-        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 
     // Channel stuff
@@ -125,7 +107,7 @@ public class ServiceListener extends GenericListener {
 
     @Override
     public void onUserList(final UserListEvent<PircBotX> event) {
-        final ArrayList<String> userList = new ArrayList<String>();
+        final ArrayList<String> userList = new ArrayList<>();
 
         for (final User user : event.getUsers()) {
             userList.add(user.getPrettyNick(event.getChannel()));
@@ -138,7 +120,7 @@ public class ServiceListener extends GenericListener {
     @Override
     public void onAction(final ActionEvent<PircBotX> event) {
         if (event.getChannel() == null) {
-            onPrivateEvent(event, event.getAction(), event.getUser());
+            onPrivateEvent(event, event.getUser(), event.getAction());
         } else {
             event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
 
@@ -176,7 +158,7 @@ public class ServiceListener extends GenericListener {
             if (Utils.isMessagesFromChannelShown(applicationContext)) {
                 event.getChannel().appendToBuffer(EventParser.getOutputForEvent(event, mService));
             }
-            final ArrayList<String> userList = new ArrayList<String>();
+            final ArrayList<String> userList = new ArrayList<>();
 
             for (final User user : event.getChannel().getUsers()) {
                 userList.add(user.getPrettyNick(event.getChannel()));
@@ -206,13 +188,9 @@ public class ServiceListener extends GenericListener {
     }
 
     @Override
-    public void onPrivateMessage(final PrivateMessageEvent<PircBotX> event) {
-        onPrivateEvent(event, event.getMessage(), event.getUser());
-    }
-
-    void onPrivateEvent(final Event<PircBotX> event, final String message, final User user) {
+    void onPrivateEvent(final Event<PircBotX> event, final User user, final String message) {
         if (!message.equals("")) {
-            user.appendToBuffer(EventParser.getOutputForEvent(event, mService));
+            onUserMessage(event, user);
         }
 
         if (!event.getBot().getUserChannelDao().getPrivateMessages().contains(user)) {
@@ -223,5 +201,20 @@ public class ServiceListener extends GenericListener {
             final String title = event.getBot().getConfiguration().getTitle();
             mService.mention(title, user.getNick());
         }
+    }
+
+    @Override
+    public void onServerMessage(Event<PircBotX> event) {
+        event.getBot().appendToBuffer(EventParser.getOutputForEvent(event, mService));
+    }
+
+    @Override
+    void onChannelMessage(Event<PircBotX> event, Channel channel) {
+        channel.appendToBuffer(EventParser.getOutputForEvent(event, mService));
+    }
+
+    @Override
+    void onUserMessage(Event<PircBotX> event, User user) {
+        user.appendToBuffer(EventParser.getOutputForEvent(event, mService));
     }
 }

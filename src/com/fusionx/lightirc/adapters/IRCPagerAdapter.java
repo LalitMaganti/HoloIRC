@@ -44,10 +44,10 @@ public class IRCPagerAdapter extends PagerAdapter {
     private FragmentTransaction mCurTransaction = null;
 
     private final FragmentManager mFragmentManager;
-    private final ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
-    private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
+    private final ArrayList<Fragment> mFragments = new ArrayList<>();
+    private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<>();
 
-    private final ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
+    private final ArrayList<IRCFragment> views = new ArrayList<>();
 
     @Setter(AccessLevel.PUBLIC)
     private int currentItemIndex;

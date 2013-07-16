@@ -25,10 +25,7 @@ import android.content.Context;
 import com.fusionx.lightirc.R;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
-import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.IrcExceptionEvent;
-import org.pircbotx.hooks.events.lightirc.NickChangeEventPerChannel;
-import org.pircbotx.hooks.events.lightirc.QuitEventPerChannel;
+import org.pircbotx.hooks.events.lightirc.*;
 
 public class EventParser {
     public static String getOutputForEvent(final Event e, final Context context) {
@@ -95,6 +92,9 @@ public class EventParser {
         } else if (e instanceof UnknownEvent) {
             final UnknownEvent event = (UnknownEvent) e;
             returnMessage = context.getString(R.string.output_event_unknown_event) + " " + event.getLine();
+        } else if (e instanceof NickInUseEvent) {
+            final NickInUseEvent event = (NickInUseEvent) e;
+            returnMessage = event.getMessage();
         } else {
             // Invalid event
             return "";

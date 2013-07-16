@@ -33,15 +33,11 @@ public class Utils {
     }
 
     public static boolean themeIsHoloLight(final Context applicationContext) {
-        return (getThemeInt(applicationContext) == R.style.Light);
+        return getThemeInt(applicationContext) == R.style.Light;
     }
 
     public static String stripPrefixFromNick(final String nick) {
-        if (nick.startsWith("@") || nick.startsWith("+")) {
-            return nick.substring(1);
-        } else {
-            return nick;
-        }
+        return IRCUtils.isUserOwnerOrVoice(nick) ? nick.substring(1) : nick;
     }
 
     public static boolean isMotdAllowed(final Context applicationContext) {
