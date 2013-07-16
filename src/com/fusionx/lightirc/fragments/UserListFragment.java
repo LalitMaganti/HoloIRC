@@ -172,10 +172,10 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
         if (!modeStarted) {
             getActivity().startActionMode(this);
-        }
 
-        final boolean checked = getListAdapter().getSelectedItems().contains(getListAdapter().getItem(i));
-        getListView().setItemChecked(i, !checked);
+            final boolean checked = getListAdapter().getSelectedItems().contains(getListAdapter().getItem(i));
+            getListView().setItemChecked(i, !checked);
+        }
     }
 
     @Override

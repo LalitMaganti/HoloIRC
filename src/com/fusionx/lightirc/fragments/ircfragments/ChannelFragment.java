@@ -57,13 +57,15 @@ public class ChannelFragment extends IRCFragment {
     }
 
     public void onUserMention(final Set<String> users) {
+        final String text = String.valueOf(getEditText().getText());
+        String nicks = "";
         for (final String userNick : users) {
-            String edit = getEditText().getText().toString();
-            edit = Html.fromHtml(userNick) + ": " + edit;
-            getEditText().clearComposingText();
-            getEditText().append(edit);
-            getEditText().requestFocus();
+            nicks += Html.fromHtml(userNick) + ": ";
         }
+
+        getEditText().clearComposingText();
+        getEditText().append(nicks + text);
+        getEditText().requestFocus();
     }
 
     @Override
