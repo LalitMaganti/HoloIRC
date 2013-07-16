@@ -60,7 +60,7 @@
             android:title="@string/server_settings_auto_nick_title"
             android:summary="@string/server_settings_auto_nick_summary"/>
         <PreferenceScreen
-            android:fragment="com.fusionx.lightirc.fragments.serversettings.ListViewSettingsFragment"
+            android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
             android:title="@string/server_settings_auto_join_title"/>
     </PreferenceCategory>
