@@ -157,8 +157,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
             EditTextPreference mEditTextRealName = (EditTextPreference) prefSet.findPreference(RealName);
             if (mEditTextRealName != null) {
                 mEditTextRealName.setOnPreferenceChangeListener(this);
-                mEditTextRealName.setSummary(mEditTextRealName.getText());
             }
+            mEditTexts.add(mEditTextRealName);
 
             EditTextPreference mServerUserName = (EditTextPreference) prefSet.findPreference(ServerUserName);
             if (mServerUserName != null) {
@@ -190,6 +190,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
                 // Nick of User
                 mEditTextNick.setSummary(getString(R.string.server_settings_not_empty));
+
+                // RealName of User
+                mEditTextRealName.setSummary(getString(R.string.server_settings_not_empty));
             } else {
                 for (EditTextPreference edit : mEditTexts) {
                     edit.setSummary(edit.getText());

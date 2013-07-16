@@ -57,7 +57,7 @@
             android:title="@string/nickname"
             android:singleLine="true"
             android:lines="1"/>
-        <EditTextPreference
+        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
             android:defaultValue="LightIRC"
             android:key="pref_realname"
             android:title="Real Name"
