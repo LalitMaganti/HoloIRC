@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
@@ -58,7 +58,7 @@
             android:singleLine="true"
             android:lines="1"/>
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
-            android:defaultValue="LightIRC"
+            android:defaultValue="HoloIRC"
             android:key="pref_realname"
             android:title="Real Name"
             android:singleLine="true"
@@ -72,14 +72,14 @@
 
     <PreferenceCategory android:title="Channel">
         <PreferenceScreen
-            android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
+            android:fragment="com.fusionx.holoirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
             android:title="@string/server_settings_auto_join_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Login - usually need not be changed">
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
-            android:defaultValue="lightirc"
+            android:defaultValue="holoirc"
             android:key="pref_login_username"
             android:title="@string/username"
             android:singleLine="true"

@@ -1,0 +1,49 @@
+/*
+    HoloIRC - an IRC client for Android
+
+    Copyright 2013 Lalit Maganti
+
+    This file is part of HoloIRC.
+
+    HoloIRC is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    HoloIRC is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.fusionx.holoirc.irc;
+
+import android.content.Context;
+import com.fusionx.holoirc.R;
+import com.fusionx.holoirc.misc.Utils;
+import org.pircbotx.*;
+
+public class LightBotFactory extends Configuration.BotFactory {
+    private final Context applicationContext;
+
+    public LightBotFactory(final Context applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public InputParser createInputParser(final PircBotX bot) {
+        return new LightInputParser(bot);
+    }
+
+    @Override
+    public User createUser(final PircBotX bot, final String nick) {
+        if (Utils.getThemeInt(applicationContext) == R.style.Light) {
+            return new User(bot, bot.getUserChannelDao(), nick, 0);
+        } else {
+            return new User(bot, bot.getUserChannelDao(), nick, 255);
+        }
+    }
+}

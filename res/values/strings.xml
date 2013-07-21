@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-LightIRC - an IRC client for Android
+HoloIRC - an IRC client for Android
 
 Copyright 2013 Lalit Maganti
 
-This file is part of LightIRC.
+This file is part of HoloIRC.
 
-LightIRC is free software: you can redistribute it and/or modify
+HoloIRC is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-LightIRC is distributed in the hope that it will be useful,
+HoloIRC is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
 
-    <string name="app_name">LightIRC</string>
+    <string name="app_name">HoloIRC</string>
 
     <!-- Status -->
     <string name="status_connecting">Connecting</string>
@@ -88,7 +88,7 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Service/notification -->
     <string name="service_disconnect_all">Disconnect all</string>
     <string name="service_you_mentioned">You have been mentioned on</string>
-    <string name="service_lightirc_running">LightIRC running</string>
+    <string name="service_holoirc_running">HoloIRC running</string>
 
     <!-- User list fragment -->
     <string name="user_list_not_possible">Not possible</string>
@@ -124,5 +124,6 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="about">About</string>
     <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
     <string name="about_settings_app_version">App Version</string>
+    <string name="whois">WHOIS</string>
 
 </resources>
