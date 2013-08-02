@@ -72,7 +72,7 @@
 
     <PreferenceCategory android:title="Channel">
         <PreferenceScreen
-            android:fragment="com.fusionx.holoirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
+            android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
             android:key="pref_autojoin"
             android:title="@string/server_settings_auto_join_title"/>
     </PreferenceCategory>

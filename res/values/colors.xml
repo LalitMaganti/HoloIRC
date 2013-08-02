@@ -24,4 +24,6 @@
     <color name="server_card_background_light">#ffffffff</color>
     <color name="server_card_background_dark">#202122</color>
 
+    <color name="sliding_menu_background">#ff2f2f2f</color>
+
 </resources>

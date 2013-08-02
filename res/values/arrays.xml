@@ -21,13 +21,21 @@
 -->
 <resources>
     <string-array name="themes">
-        <item>Holo Dark</item>
-        <item>Holo Light</item>
+        <item>(Holo) Dark</item>
+        <item>(Holo) Light</item>
     </string-array>
 
-    <string-array name="actions">
+    <string-array name="server_actions">
         <item>Join new channel</item>
         <item>Change nick</item>
         <item>Disconnect</item>
+    </string-array>
+
+    <string-array name="channel_actions">
+        <item>Part channel</item>
+    </string-array>
+
+    <string-array name="user_actions">
+        <item>Close PM</item>
     </string-array>
 </resources>

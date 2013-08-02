@@ -22,19 +22,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/activity_server_channel_ab_part"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/part"
-        android:visible="false"/>
-    <item
         android:id="@+id/activity_server_channel_ab_users"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/users"
-        android:visible="false"/>
-    <item
-        android:id="@+id/activity_server_channel_ab_close"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/close"
-        android:visible="false"/>
+        android:showAsAction="withText|ifRoom"
+        android:title="@string/users"/>
 
 </menu>

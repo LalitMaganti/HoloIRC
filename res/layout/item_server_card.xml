@@ -48,6 +48,7 @@
             android:layout_marginLeft="8dip"
             android:fontFamily="sans-serif-thin"
             android:text="@string/title"
+            android:textColor="?attr/server_card_text"
             android:textSize="24sp"/>
 
         <TextView
@@ -62,6 +63,7 @@
             android:fontFamily="sans-serif-light"
             android:maxLines="3"
             android:text="@string/description"
+            android:textColor="?attr/server_card_text"
             android:textSize="16sp"/>
     </LinearLayout>
 

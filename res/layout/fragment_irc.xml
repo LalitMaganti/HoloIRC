@@ -34,11 +34,11 @@
         android:layout_marginTop="10dip"
         android:lineSpacingExtra="3dip">
 
-        <TextView
+        <com.fusionx.lightirc.ui.HoloTextView
             android:id="@+id/textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autoLink="all"
+            android:textSize="14sp"
             android:textIsSelectable="true"/>
     </ScrollView>
 

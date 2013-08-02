@@ -21,4 +21,5 @@
 -->
 <resources>
     <attr name="server_card_background" format="reference|color"/>
+    <attr name="server_card_text" format="reference|color"/>
 </resources>

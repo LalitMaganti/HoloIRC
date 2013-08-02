@@ -2,14 +2,7 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="android" name="Android">
-      <configuration>
-        <notImportedProperties>
-          <property>MANIFEST_FILE_PATH</property>
-          <property>RESOURCES_DIR_PATH</property>
-          <property>ASSETS_DIR_PATH</property>
-          <property>NATIVE_LIBS_DIR_PATH</property>
-        </notImportedProperties>
-      </configuration>
+      <configuration />
     </facet>
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -18,13 +11,16 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="Android SDK" jdkType="Android SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="holoirc-libs" level="project" />
     <orderEntry type="module" module-name="listviewanimations" />
-    <orderEntry type="module" module-name="slidingmenu" />
-    <orderEntry type="library" name="android-support-lib" level="project" />
+    <orderEntry type="library" name="holoirc-libs" level="project" />
     <orderEntry type="module" module-name="LightLibrary" />
+    <orderEntry type="module" module-name="SlidingMenu" />
+    <orderEntry type="library" name="android-support-v4" level="project" />
+    <orderEntry type="module" module-name="UpdateableTreeSet" />
+    <orderEntry type="module" module-name="SlidingTabs" />
+    <orderEntry type="module" module-name="cwac-merge" />
   </component>
 </module>
 

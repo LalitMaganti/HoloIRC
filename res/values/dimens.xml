@@ -20,5 +20,5 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-    <dimen name="server_channel_sliding_actions_menu_width">200dip</dimen>
+    <dimen name="server_channel_sliding_actions_menu_width">300dp</dimen>
 </resources>
