@@ -9,6 +9,7 @@ import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.irc.UserChannelInterface;
+import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
@@ -104,7 +105,7 @@ public class ServerCommandParser {
                 mSender.sendPrivateMessage(sendingUser, message);
 
                 final Bundle event = Utils.parcelDataForBroadcast(null,
-                        ServerEventType.NewPrivateMessage, sendingUser.getNick());
+                        ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
                 mSender.sendServerMessage(event);
             } else {
                 mSender.sendPrivateMessage(sendingUser, message);
@@ -126,7 +127,7 @@ public class ServerCommandParser {
                 mSender.sendAction(sendingUser.getNick(), sendingUser, message);
 
                 final Bundle event = Utils.parcelDataForBroadcast(null,
-                        ServerEventType.NewPrivateMessage, sendingUser.getNick());
+                        ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
                 mSender.sendServerMessage(event);
             } else {
                 mSender.sendAction(sendingUser.getNick(), sendingUser, message);

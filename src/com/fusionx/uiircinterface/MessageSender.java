@@ -122,10 +122,6 @@ public class MessageSender {
     Start of sending messages
      */
     public void sendServerChannelMessage(final Bundle event) {
-        final Message message = Message.obtain();
-        message.setData(event);
-        mServerHandler.dispatchMessage(message);
-
         if (mServerChannelHandler != null) {
             final Message fragmentMessage = Message.obtain();
             fragmentMessage.setData(event);
