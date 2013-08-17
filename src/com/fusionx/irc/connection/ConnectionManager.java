@@ -24,7 +24,6 @@ package com.fusionx.irc.connection;
 import android.content.Context;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.Utils;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -35,10 +35,10 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
 import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
-import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
+import com.fusionx.uiircinterface.ServerCommandSender;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,

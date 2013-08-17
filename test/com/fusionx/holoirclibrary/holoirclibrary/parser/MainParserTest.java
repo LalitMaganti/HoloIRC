@@ -5,6 +5,7 @@ import com.fusionx.irc.holoirclibrary.constants.EventDestination;
 import com.fusionx.irc.holoirclibrary.enums.ServerEventType;
 import com.fusionx.irc.holoirclibrary.events.Event;
 import com.fusionx.irc.holoirclibrary.interfaces.CommonInterface;
+
 import org.junit.Test;
 
 public class MainParserTest {

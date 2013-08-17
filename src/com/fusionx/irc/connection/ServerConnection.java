@@ -8,25 +8,25 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.irc.parser.ServerConnectionParser;
 import com.fusionx.irc.parser.ServerLineParser;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
-
-import lombok.AccessLevel;
-import lombok.Getter;
+import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
-
-import javax.net.ssl.SSLSocketFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+
+import javax.net.ssl.SSLSocketFactory;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 class ServerConnection {
     @Getter(AccessLevel.PACKAGE)

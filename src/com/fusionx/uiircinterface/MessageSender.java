@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
@@ -25,8 +24,6 @@ import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 
 import java.util.LinkedHashMap;
-
-import static com.fusionx.irc.constants.Constants.LOG_TAG;
 
 public class MessageSender {
     private static LinkedHashMap<String, MessageSender> sender = new LinkedHashMap<>();

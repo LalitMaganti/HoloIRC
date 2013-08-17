@@ -35,11 +35,11 @@ import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import lombok.AccessLevel;
+import lombok.Setter;
 
 public class IRCPagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;

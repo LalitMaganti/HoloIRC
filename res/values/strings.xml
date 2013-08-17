@@ -34,15 +34,18 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_save_question_message">Changes have been made - discard?</string>
     <string name="server_settings_changes_saved">Changes have been saved</string>
     <string name="server_settings_not_empty">This field should NOT be empty!</string>
-    <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!</string>
-    <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick another will
+    <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!
+    </string>
+    <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick
+        another will
         automatically be used
     </string>
     <string name="server_settings_auto_nick_title">Auto-change nick name</string>
     <string name="server_settings_server_password_title">NickServ password</string>
     <string name="server_settings_auto_join_title">Auto-join channels</string>
     <string name="server_settings_ssl_title">Use SSL</string>
-    <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be different to
+    <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be
+        different to
         normal
     </string>
     <string name="server_settings_port_title">Server Port</string>
@@ -53,17 +56,23 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="settings_title">Settings</string>
     <string name="settings_appearance_summary">Settings to control the way the app looks</string>
     <string name="server_channel_settings_title">Server/Channel Settings</string>
-    <string name="server_channel_settings_summary">Common settings for all servers in the app</string>
+    <string name="server_channel_settings_summary">Common settings for all servers in the app
+    </string>
     <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
     <string name="about_settings_app_version">App Version</string>
 
     <!-- Appearance settings -->
-    <string name="appearance_settings_requires_restart">This requires a full restart of the app</string>
+    <string name="appearance_settings_requires_restart">This requires a full restart of the app
+    </string>
 
     <!-- Server/channel settings -->
     <string name="server_channel_settings_motd_title">Display MOTD</string>
-    <string name="server_channel_settings_motd_description">Display Message of the Day from the server</string>
-    <string name="server_channel_settings_hide_messages_summary">For example join, part and quit messages</string>
+    <string name="server_channel_settings_motd_description">Display Message of the Day from the
+        server
+    </string>
+    <string name="server_channel_settings_hide_messages_summary">For example join, part and quit
+        messages
+    </string>
     <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->

@@ -3,9 +3,9 @@ package com.fusionx.irc.writers;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.constants.WriterCommands;
 
-import lombok.NonNull;
-
 import java.io.OutputStreamWriter;
+
+import lombok.NonNull;
 
 public class ChannelWriter extends RawWriter {
     private Channel mChannel;

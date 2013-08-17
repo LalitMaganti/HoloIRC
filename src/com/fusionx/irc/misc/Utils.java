@@ -10,13 +10,13 @@ import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 
-import lombok.NonNull;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import lombok.NonNull;
 
 import static com.fusionx.lightirc.misc.Utils.themeIsHoloLight;
 

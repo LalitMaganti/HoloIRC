@@ -2,7 +2,6 @@ package com.fusionx.irc;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.irc.constants.EventBundleKeys;
@@ -15,13 +14,13 @@ import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 import com.google.common.collect.ImmutableList;
 
+import java.util.HashMap;
+
 import de.scrum_master.util.UpdateableTreeSet;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.util.HashMap;
 
 @Data
 public class User implements UpdateableTreeSet.Updateable {

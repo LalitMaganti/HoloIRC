@@ -7,13 +7,13 @@ import com.fusionx.irc.misc.IRCUserComparator;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightlibrary.collections.TwoWayHashSet;
 
+import java.io.OutputStreamWriter;
+import java.util.Set;
+
 import de.scrum_master.util.UpdateableTreeSet;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.io.OutputStreamWriter;
-import java.util.Set;
 
 @Getter(AccessLevel.PACKAGE)
 public final class UserChannelInterface extends TwoWayHashSet<User, Channel> {

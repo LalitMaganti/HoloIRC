@@ -42,7 +42,6 @@ import com.fusionx.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.misc.Utils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -127,7 +126,7 @@ public class IRCBridgeService extends Service {
 
                 if (status.equals(getString(R.string.status_connected))) {
                     wrapper.disconnectFromServer();
-                } else if(wrapper.isAlive()) {
+                } else if (wrapper.isAlive()) {
                     wrapper.interrupt();
                 }
                 return null;

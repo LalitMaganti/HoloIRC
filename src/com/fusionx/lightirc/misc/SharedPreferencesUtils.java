@@ -8,7 +8,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.*;
+import static com.fusionx.lightirc.misc.PreferenceKeys.AutoNickChange;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Nick;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
+import static com.fusionx.lightirc.misc.PreferenceKeys.SSL;
+import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
+import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
 public class SharedPreferencesUtils {
     public static String getSharedPreferencesPath(final Context applicationContext) {

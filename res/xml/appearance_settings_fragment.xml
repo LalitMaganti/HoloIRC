@@ -21,7 +21,7 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <ListPreference
-        android:title="@string/theme"
-        android:key="fragment_settings_theme"
-        android:entries="@array/themes"/>
+            android:title="@string/theme"
+            android:key="fragment_settings_theme"
+            android:entries="@array/themes"/>
 </PreferenceScreen>

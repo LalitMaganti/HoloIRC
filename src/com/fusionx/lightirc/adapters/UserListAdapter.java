@@ -29,9 +29,9 @@ import android.widget.TextView;
 
 import com.fusionx.irc.User;
 
-import lombok.Setter;
-
 import java.util.SortedSet;
+
+import lombok.Setter;
 
 public class UserListAdapter extends SelectionAdapter<User> {
     @Setter

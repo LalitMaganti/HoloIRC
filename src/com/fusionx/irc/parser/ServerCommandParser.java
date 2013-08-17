@@ -4,16 +4,20 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.fusionx.irc.*;
+import com.fusionx.irc.AppUser;
+import com.fusionx.irc.Channel;
+import com.fusionx.irc.Server;
+import com.fusionx.irc.User;
+import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
-
-import de.scrum_master.util.UpdateableTreeSet;
+import com.fusionx.uiircinterface.MessageSender;
 
 import java.util.ArrayList;
 import java.util.Set;
+
+import de.scrum_master.util.UpdateableTreeSet;
 
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 

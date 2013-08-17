@@ -22,8 +22,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/activity_server_channel_ab_users"
-        android:showAsAction="withText|ifRoom"
-        android:title="@string/users"/>
+            android:id="@+id/activity_server_channel_ab_users"
+            android:showAsAction="withText|ifRoom"
+            android:title="@string/users"/>
 
 </menu>

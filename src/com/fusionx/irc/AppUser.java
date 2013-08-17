@@ -1,9 +1,9 @@
 package com.fusionx.irc;
 
+import java.util.HashSet;
+
 import lombok.Getter;
 import lombok.NonNull;
-
-import java.util.HashSet;
 
 public class AppUser extends User {
     @Getter

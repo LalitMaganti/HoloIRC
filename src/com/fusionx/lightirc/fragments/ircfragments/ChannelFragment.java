@@ -23,7 +23,6 @@ package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 import android.view.KeyEvent;
@@ -35,13 +34,13 @@ import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
-import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
+import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 

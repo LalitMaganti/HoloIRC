@@ -1,21 +1,22 @@
 package com.fusionx.irc;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
-import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.irc.handlerabstract.ChannelHandler;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.Utils;
+import com.fusionx.uiircinterface.MessageSender;
 
 import de.scrum_master.util.UpdateableTreeSet;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 @Data
 @Setter(AccessLevel.PACKAGE)

@@ -29,9 +29,19 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.*;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.view.*;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
@@ -44,9 +54,21 @@ import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.*;
+import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Nick;
+import static com.fusionx.lightirc.misc.PreferenceKeys.NickServPassword;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
+import static com.fusionx.lightirc.misc.PreferenceKeys.RealName;
+import static com.fusionx.lightirc.misc.PreferenceKeys.ServerPassword;
+import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
+import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     private static boolean canExit = true;

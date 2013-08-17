@@ -26,7 +26,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.*;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
@@ -36,10 +42,10 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.uiircinterface.ServerCommandSender;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.TreeSet;
+
+import lombok.Getter;
 
 public class UserListFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
         AdapterView.OnItemClickListener {

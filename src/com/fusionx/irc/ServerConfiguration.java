@@ -3,9 +3,9 @@ package com.fusionx.irc;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import lombok.Data;
-
 import java.util.ArrayList;
+
+import lombok.Data;
 
 @Data
 public class ServerConfiguration {

@@ -21,11 +21,11 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/activity_server_list_ab_add"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/add"/>
+            android:id="@+id/activity_server_list_ab_add"
+            android:showAsAction="ifRoom|withText"
+            android:title="@string/add"/>
     <item
-        android:id="@+id/activity_server_list_ab_settings"
-        android:showAsAction="never"
-        android:title="@string/settings_title"/>
+            android:id="@+id/activity_server_list_ab_settings"
+            android:showAsAction="never"
+            android:title="@string/settings_title"/>
 </menu>

@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.misc.Utils;
+import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -8,17 +8,17 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.listeners.CoreListener;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.misc.Utils;
-
-import lombok.AccessLevel;
-import lombok.Getter;
+import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import lombok.AccessLevel;
+import lombok.Getter;
 
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 import static com.fusionx.irc.misc.Utils.parcelDataForBroadcast;

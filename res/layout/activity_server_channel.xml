@@ -25,14 +25,14 @@
                 android:layout_height="match_parent">
 
     <com.astuetz.viewpager.extensions.PagerSlidingTabStrip
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="48dip"/>
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="48dip"/>
 
     <com.jeremyfeinstein.slidingmenu.lib.SlidingMenu
-        android:id="@+id/slidingmenulayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tabs"
-        sliding:sliding=".activity.IRCFragmentActivity"/>
+            android:id="@+id/slidingmenulayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tabs"
+            sliding:sliding=".activity.IRCFragmentActivity"/>
 </RelativeLayout>

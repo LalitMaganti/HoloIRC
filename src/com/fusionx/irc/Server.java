@@ -1,14 +1,13 @@
 package com.fusionx.irc;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.handlerabstract.ServerHandler;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.writers.ServerWriter;
+import com.fusionx.uiircinterface.MessageSender;
 
 import lombok.AccessLevel;
 import lombok.Data;
