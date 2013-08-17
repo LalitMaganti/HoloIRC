@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-LightIRC - an IRC client for Android
+HoloIRC - an IRC client for Android
 
 Copyright 2013 Lalit Maganti
 
-This file is part of LightIRC.
+This file is part of HoloIRC.
 
-LightIRC is free software: you can redistribute it and/or modify
+HoloIRC is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-LightIRC is distributed in the hope that it will be useful,
+HoloIRC is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
 
-    <string name="app_name">LightIRC</string>
+    <string name="app_name" translatable="false">HoloIRC</string>
 
     <!-- Status -->
     <string name="status_connecting">Connecting</string>
@@ -34,15 +34,18 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_save_question_message">Changes have been made - discard?</string>
     <string name="server_settings_changes_saved">Changes have been saved</string>
     <string name="server_settings_not_empty">This field should NOT be empty!</string>
-    <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!</string>
-    <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick another will
+    <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!
+    </string>
+    <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick
+        another will
         automatically be used
     </string>
     <string name="server_settings_auto_nick_title">Auto-change nick name</string>
     <string name="server_settings_server_password_title">NickServ password</string>
     <string name="server_settings_auto_join_title">Auto-join channels</string>
     <string name="server_settings_ssl_title">Use SSL</string>
-    <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be different to
+    <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be
+        different to
         normal
     </string>
     <string name="server_settings_port_title">Server Port</string>
@@ -53,33 +56,41 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="settings_title">Settings</string>
     <string name="settings_appearance_summary">Settings to control the way the app looks</string>
     <string name="server_channel_settings_title">Server/Channel Settings</string>
-    <string name="server_channel_settings_summary">Common settings for all servers in the app</string>
+    <string name="server_channel_settings_summary">Common settings for all servers in the app
+    </string>
+    <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
+    <string name="about_settings_app_version">App Version</string>
 
     <!-- Appearance settings -->
-    <string name="appearance_settings_requires_restart">This requires a full restart of the app</string>
+    <string name="appearance_settings_requires_restart">This requires a full restart of the app
+    </string>
 
     <!-- Server/channel settings -->
     <string name="server_channel_settings_motd_title">Display MOTD</string>
-    <string name="server_channel_settings_motd_description">Display Message of the Day from the server</string>
-    <string name="server_channel_settings_hide_messages_summary">For example join, part and quit messages</string>
+    <string name="server_channel_settings_motd_description">Display Message of the Day from the
+        server
+    </string>
+    <string name="server_channel_settings_hide_messages_summary">For example join, part and quit
+        messages
+    </string>
     <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->
-    <string name="output_event_entered_room">joined the channel</string>
-    <string name="output_event_quit_server">quit the server</string>
-    <string name="output_event_part_channel">parted from the channel</string>
-    <string name="output_event_reason">(Reason:</string>
-    <string name="output_event_trying_reconnect">\nTrying to reconnect in 5 seconds</string>
-    <string name="output_event_topic_changed_to">The topic for this channel has been changed to:</string>
-    <string name="output_event_by">by</string>
-    <string name="output_event_topic_is">The topic is:</string>
-    <string name="output_event_topic_set_forth">as set forth by</string>
-    <string name="output_event_you">You (</string>
-    <string name="output_event_you_known_as">) are now known as</string>
-    <string name="output_event_known_as">is now known as</string>
-    <string name="output_event_unknown_event">Unknown command:</string>
-    <string name="output_event_connected_to_server">Connected to server</string>
-    <string name="output_event_disconnected_from">Disconnected from</string>
+    <string name="parser_message">%1$s: %2$s</string>
+    <string name="parser_connected">Connected to %1$s</string>
+    <string name="parser_joined_channel">%1$s joined the channel</string>
+    <string name="parser_quit_server">%1$s quit the server</string>
+    <string name="parser_parted_channel">%1$s parted from the channel</string>
+    <string name="parser_reason">(Reason: %1$s)</string>
+    <string name="parser_mode_changed">Mode %1$s on %2$s by %3$s</string>
+    <string name="parser_new_topic">The topic is %1$s as set forth by %2$s</string>
+    <string name="parser_topic_changed">
+        The topic for this channel has been changed to %1$s by %2$s
+    </string>
+    <string name="parser_nick_in_use">Nickname is already in use.</string>
+    <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
+    <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
+    <string name="parser_action">* %1$s %2$s</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -88,7 +99,7 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Service/notification -->
     <string name="service_disconnect_all">Disconnect all</string>
     <string name="service_you_mentioned">You have been mentioned on</string>
-    <string name="service_lightirc_running">LightIRC running</string>
+    <string name="service_holoirc_running">HoloIRC running</string>
 
     <!-- User list fragment -->
     <string name="user_list_not_possible">Not possible</string>
@@ -120,9 +131,8 @@ along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="password">Password</string>
     <string name="username">Username</string>
     <string name="mode">Mode</string>
-    <string name="by">by</string>
     <string name="about">About</string>
-    <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
-    <string name="about_settings_app_version">App Version</string>
+    <string name="whois" translatable="false">WHOIS</string>
+    <string name="server">Server</string>
 
 </resources>

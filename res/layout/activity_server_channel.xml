@@ -1,28 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<com.fusionx.lightirc.ui.IRCViewPager
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pager"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activity.IRCFragmentActivity"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:sliding="http://schemas.android.com/apk/lib/com.jeremyfeinstein.slidingmenu.lib"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <com.astuetz.viewpager.extensions.PagerSlidingTabStrip
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="48dip"/>
+
+    <com.jeremyfeinstein.slidingmenu.lib.SlidingMenu
+            android:id="@+id/slidingmenulayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/tabs"
+            sliding:sliding=".activity.IRCFragmentActivity"/>
+</RelativeLayout>

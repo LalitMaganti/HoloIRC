@@ -4,27 +4,27 @@
 
     <PreferenceCategory android:title="Server Settings">
         <CheckBoxPreference
-            android:key="pref_motd"
-            android:defaultValue="true"
-            android:title="@string/server_channel_settings_motd_title"
-            android:summary="@string/server_channel_settings_motd_description"/>
+                android:key="pref_motd"
+                android:defaultValue="true"
+                android:title="@string/server_channel_settings_motd_title"
+                android:summary="@string/server_channel_settings_motd_description"/>
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
-            android:key="pref_quit_reason"
-            android:defaultValue=""
-            android:title="Reason for quitting server"
-            android:summary=""/>
+                android:key="pref_quit_reason"
+                android:defaultValue=""
+                android:title="Reason for quitting server"
+                android:summary=""/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Channel Settings">
         <CheckBoxPreference
-            android:key="pref_hide_messages"
-            android:defaultValue="false"
-            android:title="@string/server_channel_settings_hide_messages_title"
-            android:summary="@string/server_channel_settings_hide_messages_summary"/>
+                android:key="pref_hide_messages"
+                android:defaultValue="false"
+                android:title="@string/server_channel_settings_hide_messages_title"
+                android:summary="@string/server_channel_settings_hide_messages_summary"/>
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
-            android:key="pref_part_reason"
-            android:defaultValue=""
-            android:title="Reason for parting channel"
-            android:summary=""/>
+                android:key="pref_part_reason"
+                android:defaultValue=""
+                android:title="Reason for parting channel"
+                android:summary=""/>
     </PreferenceCategory>
 </PreferenceScreen>

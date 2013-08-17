@@ -1,22 +1,22 @@
 /*
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.fusionx.lightirc.fragments;
@@ -26,24 +26,35 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.text.Html;
-import android.view.*;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+
+import com.fusionx.irc.User;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.interfaces.CommonIRCListenerInterface;
-import com.fusionx.lightirc.misc.Utils;
+import com.fusionx.lightirc.interfaces.CommonCallbacks;
+import com.fusionx.uiircinterface.ServerCommandSender;
 
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.TreeSet;
+
+import lombok.Getter;
 
 public class UserListFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
         AdapterView.OnItemClickListener {
-    private boolean modeStarted = false;
+    @Getter
+    private ActionMode mode;
 
     private UserListListenerInterface mListener;
-    private CommonIRCListenerInterface mCommonListener;
+    @Getter
+    private String currentUserList;
 
     @Override
     public void onAttach(Activity activity) {
@@ -51,30 +62,37 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         try {
             mListener = (UserListListenerInterface) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement UserListListenerInterface");
-        }
-        try {
-            mCommonListener = (CommonIRCListenerInterface) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement CommonIRCListenerInterface");
+            throw new ClassCastException(activity.toString()
+                    + " must implement UserListListenerInterface");
         }
     }
 
+    @Override
     public View onCreateView(final LayoutInflater inflater,
                              final ViewGroup container, final Bundle savedInstanceState) {
-        final UserListAdapter adapter = new UserListAdapter(inflater.getContext(), new ArrayList<String>());
+        final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
+                new TreeSet<User>());
         setListAdapter(adapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-    public void userListUpdate(final String channelName) {
-        getListAdapter().clear();
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        final ArrayList<String> userList = mListener.getUserList(channelName);
-        if (userList != null) {
-            getListAdapter().addAll(userList);
-            getListAdapter().sort();
+        // TODO - do this in a better way
+        getListView().setBackgroundColor(getResources().getColor(android.R.color.transparent));
+    }
+
+    public void userListUpdate(final String channelName) {
+        if (!channelName.equals(currentUserList)) {
+            final TreeSet<User> userList = getUserList(channelName);
+            if (userList != null) {
+                getListAdapter().setInternalSet(userList);
+                getListAdapter().setChannelName(channelName);
+                currentUserList = channelName;
+            }
         }
     }
 
@@ -88,7 +106,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     @Override
-    public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id, final boolean checked) {
+    public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id,
+                                          final boolean checked) {
         mode.invalidate();
 
         if (checked) {
@@ -106,40 +125,47 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             mode.setTitle(quantityString);
 
             mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
+            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
         }
     }
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final Set<String> selectedItems = getListAdapter().getSelectedItems();
+        final ArrayList<User> selectedItems = getListAdapter().getSelectedItems();
+        final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
                 mListener.onUserMention(selectedItems);
                 mode.finish();
-                mCommonListener.closeAllSlidingMenus();
+                mListener.closeAllSlidingMenus();
                 return true;
-            case R.id.fragment_userlist_cab_pm:
-                final String nick = Utils.stripPrefixFromNick(String
-                        .valueOf(Html.fromHtml((String) selectedItems.toArray()[0])));
-
-                if (mListener.isNickOtherUsers(nick)) {
-                    mCommonListener.onCreatePMFragment(nick);
-                    mCommonListener.closeAllSlidingMenus();
+            case R.id.fragment_userlist_cab_pm: {
+                if (isNickOtherUsers(nick)) {
+                    ServerCommandSender.sendMessageToUser(mListener.getServer(false), nick, "");
+                    mListener.closeAllSlidingMenus();
                     mode.finish();
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
                     build.setTitle(getActivity()
-                            .getString(R.string.user_list_not_possible)).setMessage(getActivity()
-                            .getString(R.string.user_list_pm_self_not_possible))
+                            .getString(R.string.user_list_not_possible))
+                            .setMessage(getActivity()
+                                    .getString(R.string.user_list_pm_self_not_possible))
                             .setPositiveButton(getActivity()
-                                    .getString(R.string.ok), new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            });
+                                    .getString(R.string.ok),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
                     build.show();
                 }
+                return true;
+            }
+            case R.id.fragment_userlist_cab_whois:
+                mListener.selectServerFragment();
+                ServerCommandSender.sendUserWhois(mListener.getServer(false), nick);
+                mode.finish();
                 return true;
             default:
                 return false;
@@ -151,7 +177,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         final MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.fragment_userlist_cab, menu);
 
-        modeStarted = true;
+        this.mode = mode;
 
         return true;
     }
@@ -160,7 +186,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public void onDestroyActionMode(final ActionMode mode) {
         getListAdapter().clearSelection();
 
-        modeStarted = false;
+        this.mode = null;
     }
 
     @Override
@@ -169,11 +195,13 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
-        if (!modeStarted) {
+    public void onItemClick(final AdapterView<?> adapterView,
+                            final View view, final int i, final long l) {
+        if (mode == null) {
             getActivity().startActionMode(this);
 
-            final boolean checked = getListAdapter().getSelectedItems().contains(getListAdapter().getItem(i));
+            final boolean checked = getListAdapter().getSelectedItems()
+                    .contains(getListAdapter().getItem(i));
             getListView().setItemChecked(i, !checked);
         }
     }
@@ -183,11 +211,25 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return (UserListAdapter) super.getListAdapter();
     }
 
-    public interface UserListListenerInterface {
-        public void onUserMention(final Set<String> users);
+    public void notifyDataSetChanged() {
+        if (mode != null) {
+            mode.finish();
+        }
+        getListAdapter().notifyDataSetChanged();
+    }
 
-        public boolean isNickOtherUsers(final String nick);
+    public TreeSet<User> getUserList(final String channelName) {
+        return mListener.getServer(false).getUserChannelInterface()
+                .getChannel(channelName).getUsers();
+    }
 
-        public ArrayList<String> getUserList(final String channelName);
+    public boolean isNickOtherUsers(final String nick) {
+        return !mListener.getServer(false).getUser().getNick().equals(nick);
+    }
+
+    public interface UserListListenerInterface extends CommonCallbacks {
+        public void onUserMention(final ArrayList<User> users);
+
+        public void onCreatePMFragment(final String userNick);
     }
 }

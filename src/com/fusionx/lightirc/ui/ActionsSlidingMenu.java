@@ -1,12 +1,14 @@
 package com.fusionx.lightirc.ui;
 
 import android.content.Context;
+
 import com.fusionx.lightirc.R;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-public class ActionsSlidingMenu extends LightSlidingMenu {
+public class ActionsSlidingMenu extends SlidingMenu {
     public ActionsSlidingMenu(Context context) {
         super(context);
+        setShadowDrawable(R.drawable.shadow);
         setMode(SlidingMenu.LEFT);
         setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
         setTouchmodeMarginThreshold(5);

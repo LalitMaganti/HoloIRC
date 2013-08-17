@@ -4,10 +4,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
-import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 
 public class IRCViewPager extends ViewPager {
     public IRCViewPager(Context context, AttributeSet attrs) {
@@ -46,15 +46,6 @@ public class IRCViewPager extends ViewPager {
         setCurrentItem(position, true);
 
         return position;
-    }
-
-    public void addServerFragment(final String serverName) {
-        final ServerFragment fragment = new ServerFragment();
-        final Bundle bundle = new Bundle();
-        bundle.putString("title", serverName);
-        fragment.setArguments(bundle);
-
-        getAdapter().addFragment(fragment);
     }
 
     public void disconnect() {

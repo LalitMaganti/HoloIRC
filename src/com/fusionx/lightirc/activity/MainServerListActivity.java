@@ -1,22 +1,22 @@
 /*
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.fusionx.lightirc.activity;
@@ -34,36 +34,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+
+import com.fusionx.Utils;
+import com.fusionx.irc.Server;
+import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
-import com.fusionx.lightirc.misc.Utils;
-import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.uiircinterface.IRCBridgeService;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
-import org.pircbotx.Configuration;
-import org.pircbotx.PircBotX;
-import org.pircbotx.hooks.Event;
-import org.pircbotx.hooks.Listener;
-import org.pircbotx.hooks.ListenerAdapter;
-import org.pircbotx.hooks.events.DisconnectEvent;
-import org.pircbotx.hooks.events.lightirc.IOExceptionEvent;
 
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocketFactory;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterListenerInterface {
-    private IRCService mService = null;
-    private ArrayList<Configuration.Builder> mBuilderList = null;
-    private Configuration.Builder mBuilder = null;
+        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterCallback {
+    private IRCBridgeService mService = null;
+    private ArrayList<ServerConfiguration.Builder> mBuilderList = null;
+    private ServerConfiguration.Builder mBuilder = null;
     private BuilderAdapter mServerCardsAdapter = null;
-    private final ListListener mListener = new ListListener();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -76,7 +67,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     protected void onStart() {
         if (mService == null) {
-            final Intent service = new Intent(this, IRCService.class);
+            final Intent service = new Intent(this, IRCBridgeService.class);
             service.putExtra("stop", false);
             startService(service);
             bindService(service, mConnection, 0);
@@ -99,7 +90,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCService.IRCBinder) binder).getService();
+            mService = ((IRCBridgeService.IRCBinder) binder).getService();
             setUpListView();
             setUpServerList();
         }
@@ -112,11 +103,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpListView() {
         final ListView listView = (ListView) findViewById(R.id.server_list);
         mServerCardsAdapter = new BuilderAdapter(this);
-        final SwingBottomInAnimationAdapter swingBottomInAnimationAdapter
-                = new SwingBottomInAnimationAdapter(new ServerCardsAdapter(mServerCardsAdapter));
-        swingBottomInAnimationAdapter.setAbsListView(listView);
+        final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter
+                (new ServerCardsAdapter(mServerCardsAdapter));
+        adapter.setAbsListView(listView);
 
-        listView.setAdapter(swingBottomInAnimationAdapter);
+        listView.setAdapter(adapter);
     }
 
     // Action bar
@@ -142,16 +133,20 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void displaySettings() {
-        final Intent intent = new Intent(MainServerListActivity.this, SettingsActivity.class);
+        final Intent intent = new Intent(MainServerListActivity.this,
+                SettingsActivity.class);
         startActivity(intent);
     }
 
     private void addNewServer() {
-        final Intent intent = new Intent(MainServerListActivity.this, ServerSettingsActivity.class);
+        final Intent intent = new Intent(MainServerListActivity.this,
+                ServerSettingsActivity.class);
         intent.putExtra("new", true);
 
-        final ArrayList<String> array = SharedPreferencesUtils.getServersFromPreferences(getApplicationContext());
-        final Integer in = array.isEmpty() ? 0 : Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
+        final ArrayList<String> array = SharedPreferencesUtils
+                .getServersFromPreferences(getApplicationContext());
+        final Integer in = array.isEmpty() ? 0 :
+                Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
 
         intent.putExtra("file", "server_" + in);
         intent.putExtra("main", true);
@@ -172,47 +167,17 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpCards();
     }
 
-    private void setUpServers(final ArrayList<String> servers) {
+    private void setUpServers(final ArrayList<String> serverFiles) {
         mBuilderList.clear();
-        for (final String server : servers) {
-            final SharedPreferences serverSettings = getSharedPreferences(server, MODE_PRIVATE);
-            final Configuration.Builder builder = new Configuration.Builder();
-            builder.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
-            builder.setServerHostname(serverSettings.getString(PreferenceKeys.URL, ""));
-            builder.setServerPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
-            final boolean ssl = serverSettings.getBoolean(PreferenceKeys.SSL, false);
-            builder.setSocketFactory(ssl ? SSLSocketFactory.getDefault() : SocketFactory.getDefault());
-
-            builder.setName(serverSettings.getString(PreferenceKeys.Nick, ""));
-            builder.setRealname(serverSettings.getString(PreferenceKeys.RealName, "LightIRC"));
-            builder.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
-
-            final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
-            for (final String channel : auto) {
-                builder.addAutoJoinChannel(channel);
-            }
-
-            builder.setLogin(serverSettings.getString(PreferenceKeys.ServerUserName, "lightirc"));
-            builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
-
-            final String nickServPassword = serverSettings.getString(PreferenceKeys.NickServPassword, null);
-            if (nickServPassword != null && !nickServPassword.equals("")) {
-                builder.setNickservPassword(nickServPassword);
-            }
-
-            builder.setFile(server);
-            mBuilderList.add(builder);
-
-            if (serverIsConnected(builder.getTitle())) {
-                getBot(builder.getTitle()).getConfiguration().getListenerManager().addListener(mListener);
-            }
+        for (final String file : serverFiles) {
+            mBuilderList.add(FileConfigurationConverter.convertFileToBuilder(this, file));
         }
     }
 
     private void setUpCards() {
         mServerCardsAdapter.clear();
         if (!mBuilderList.isEmpty()) {
-            for (final Configuration.Builder bot : mBuilderList) {
+            for (final ServerConfiguration.Builder bot : mBuilderList) {
                 mServerCardsAdapter.add(bot);
             }
         }
@@ -220,15 +185,16 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     // Connect to server
     public void onCardClick(final View v) {
-        final Intent intent = new Intent(MainServerListActivity.this, IRCFragmentActivity.class);
-        intent.putExtra("server", (Configuration.Builder) v.getTag());
+        final Intent intent = new Intent(MainServerListActivity.this,
+                IRCFragmentActivity.class);
+        intent.putExtra("server", (ServerConfiguration.Builder) v.getTag());
         startActivity(intent);
     }
 
     // Popup menu
     public void showPopup(final View view) {
         final PopupMenu popup = new PopupMenu(this, view);
-        mBuilder = (Configuration.Builder) view.getTag();
+        mBuilder = (ServerConfiguration.Builder) view.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
         if (serverIsConnected(mBuilder.getTitle())) {
@@ -270,10 +236,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void deleteServer(final String fileName) {
-        final ArrayList<String> servers = SharedPreferencesUtils.getServersFromPreferences(getApplicationContext());
+        final ArrayList<String> servers = SharedPreferencesUtils
+                .getServersFromPreferences(getApplicationContext());
         servers.remove(fileName);
 
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(getApplicationContext())
+        final File folder = new File(SharedPreferencesUtils
+                .getSharedPreferencesPath(getApplicationContext())
                 + fileName + ".xml");
         folder.delete();
 
@@ -281,13 +249,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpCards();
     }
 
-    private void disconnectFromServer(final Configuration.Builder builder) {
-        getBot(builder.getTitle()).getConfiguration().getListenerManager().removeListener(mListener);
+    private void disconnectFromServer(final ServerConfiguration.Builder builder) {
         mService.disconnectFromServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
-    private void editServer(final Configuration.Builder builder) {
+    private void editServer(final ServerConfiguration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
         intent.putExtra("file", builder.getFile());
@@ -297,39 +264,14 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private boolean serverIsConnected(final String title) {
-        return mService != null && getBot(title) != null &&
-                (getBot(title).getStatus().equals(getString(R.string.status_connected)));
+        return mService != null && getServer(title) != null &&
+                (getServer(title).getStatus().equals(getString(R.string.status_connected)));
     }
 
     // BuilderAdapter Listener Interface
     @Override
-    public PircBotX getBot(final String title) {
-        return mService.getBot(title);
-    }
-
-    private class ListListener extends ListenerAdapter<PircBotX> implements Listener<PircBotX> {
-        @Override
-        public void onEvent(final Event<PircBotX> event) throws Exception {
-            if (event instanceof IOExceptionEvent)
-                onIOException((IOExceptionEvent<PircBotX>) event);
-            else
-                super.onEvent(event);
-        }
-
-        @Override
-        public void onDisconnect(final DisconnectEvent<PircBotX> event) {
-            event.getBot().setStatus(getString(R.string.status_disconnected));
-
-            mServerCardsAdapter.notifyDataSetChanged();
-            event.getBot().getConfiguration().getListenerManager().removeListener(mListener);
-        }
-
-        public void onIOException(final IOExceptionEvent<PircBotX> event) {
-            event.getBot().setStatus(getString(R.string.status_disconnected));
-
-            mServerCardsAdapter.notifyDataSetChanged();
-            event.getBot().getConfiguration().getListenerManager().removeListener(mListener);
-        }
+    public Server getServer(final String title) {
+        return mService.getServer(title);
     }
 
     private class ServerCardsAdapter extends BaseAdapterDecorator {

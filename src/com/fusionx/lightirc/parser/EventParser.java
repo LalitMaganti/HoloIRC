@@ -1,31 +1,32 @@
 /*
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.fusionx.lightirc.parser;
+/*
+package com.fusionx.holoirc.parser;
 
 import android.content.Context;
-import com.fusionx.lightirc.R;
+import com.fusionx.holoirc.R;
+import org.pircbotx.exception.IrcException;
 import org.pircbotx.hooks.Event;
 import org.pircbotx.hooks.events.*;
-import org.pircbotx.hooks.events.lightirc.*;
+import org.pircbotx.hooks.events.holoirc.*;
 
 public class EventParser {
     public static String getOutputForEvent(final Event e, final Context context) {
@@ -75,16 +76,15 @@ public class EventParser {
             returnMessage = event.getException().getMessage();
             //+ "\n" + context.getString(R.string.output_event_trying_reconnect);
         } else if (e instanceof IrcExceptionEvent) {
-            final IrcExceptionEvent event = (IrcExceptionEvent) e;
-            returnMessage = event.getException().getMessage();
+            returnMessage = ircExceptionEventOutput((IrcExceptionEvent) e);
         } else if (e instanceof ConnectEvent) {
             final ConnectEvent event = (ConnectEvent) e;
             returnMessage = context.getString(R.string.output_event_connected_to_server)
-                    + " " + event.getBot().getConfiguration().getServerHostname();
+                    + " " + event.getServer().getConfiguration().getServerHostname();
         } else if (e instanceof DisconnectEvent) {
             final DisconnectEvent event = (DisconnectEvent) e;
             returnMessage = context.getString(R.string.output_event_disconnected_from)
-                    + " " + event.getBot().getConfiguration().getServerHostname();
+                    + " " + event.getServer().getConfiguration().getServerHostname();
         } else if (e instanceof ModeEvent) {
             final ModeEvent event = (ModeEvent) e;
             returnMessage = context.getString(R.string.mode) + " " + event.getMode() + " " +
@@ -102,6 +102,15 @@ public class EventParser {
         return returnMessage + "\n";
     }
 
+    private static String ircExceptionEventOutput(IrcExceptionEvent event) {
+        String returnMessage = event.getException().getMessage();
+        if (event.getException().getMessage().contains(IrcException.Reason.NickAlreadyInUse.toString())) {
+            return "The nick chosen is already in use. Please choose a new one.";
+        } else {
+            return returnMessage;
+        }
+    }
+
     private static String topicEventOutput(final TopicEvent event, final Context context) {
         String newMessage;
         if (event.isChanged()) {
@@ -117,8 +126,8 @@ public class EventParser {
     private static String messageEventOutput(final MessageEvent event) {
         String baseMessage = event.getUser().getPrettyNick(event.getChannel())
                 + ": " + event.getMessage();
-        if (event.getMessage().contains(event.getBot().getNick()) &&
-                !event.getUser().getNick().equals(event.getBot().getNick())) {
+        if (event.getMessage().contains(event.getServer().getNick()) &&
+                !event.getUser().getNick().equals(event.getServer().getNick())) {
             baseMessage = "<b>" + baseMessage + "</b>";
         }
         return baseMessage;
@@ -126,7 +135,7 @@ public class EventParser {
 
     private static String nickChangeEventOutput(final NickChangeEventPerChannel event, final Context context) {
         String newMessage;
-        if (event.getUser().getNick().equals(event.getBot().getNick())) {
+        if (event.getUser().getNick().equals(event.getServer().getNick())) {
             newMessage = context.getString(R.string.output_event_you) + event.getOldNick() +
                     context.getString(R.string.output_event_you_known_as) + " " + event.getNewNick();
         } else {
@@ -138,9 +147,9 @@ public class EventParser {
 
     private static String privateMessageEventOutput(final PrivateMessageEvent event) {
         if (event.isBotMessage()) {
-            return event.getBot().getUserBot().getColourfulNick() + ": " + event.getMessage();
+            return event.getServer().getUserBot().getColourfulNick() + ": " + event.getMessage();
         } else {
             return event.getUser().getColourfulNick() + ": " + event.getMessage();
         }
     }
-}
+}*/

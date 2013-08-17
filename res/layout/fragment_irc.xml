@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
     <ScrollView
-        android:id="@+id/scrollview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/editText1"
-        android:layout_marginBottom="10dip"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
-        android:lineSpacingExtra="3dip">
-
-        <TextView
-            android:id="@+id/textview"
+            android:id="@+id/scrollview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autoLink="all"
-            android:textIsSelectable="true"/>
+            android:layout_height="match_parent"
+            android:layout_above="@+id/editText1"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:lineSpacingExtra="3dip">
+
+        <com.fusionx.lightirc.ui.HoloTextView
+                android:id="@+id/textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textIsSelectable="true"/>
     </ScrollView>
 
     <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:inputType="textCapSentences|textAutoCorrect"
-        android:ems="10"
-        android:hint="@string/message"
-        android:imeOptions="actionDone">
+            android:id="@+id/editText1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:inputType="textCapSentences|textAutoCorrect"
+            android:ems="10"
+            android:hint="@string/message"
+            android:imeOptions="actionDone">
     </EditText>
 
 </RelativeLayout>

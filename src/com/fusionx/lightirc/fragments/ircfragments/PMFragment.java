@@ -1,68 +1,115 @@
 /*
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import org.pircbotx.User;
+
+import com.fusionx.irc.User;
+import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.UserEventType;
+import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
+import com.fusionx.lightirc.interfaces.CommonCallbacks;
+import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.parser.MessageParser;
+import com.fusionx.uiircinterface.MessageSender;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class PMFragment extends IRCFragment {
-    private PMFragmentListenerInterface mListener;
+    private CommonCallbacks mCallback;
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        MessageSender.getSender(mCallback.getServer(false).getTitle())
+                .registerUserFragmentHandler(getTitle(), mUserFragmentHandler);
+
+        final User user = mCallback.getServer(false).getUserChannelInterface()
+                .getUser(getTitle());
+        if (user != null) {
+            writeToTextView(user.getBuffer());
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        MessageSender.getSender(mCallback.getServer(false).getTitle())
+                .unregisterUserFragmentHandler(getTitle());
+    }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (PMFragmentListenerInterface) activity;
+            mCallback = (CommonCallbacks) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement PMFragmentListenerInterface");
+            throw new ClassCastException(activity.toString() +
+                    " must implement PMFragmentCallbacks");
         }
     }
 
     @Override
-    public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-        if (i == EditorInfo.IME_ACTION_DONE) {
-            final String message = getEditText().getText().toString();
-            getEditText().setText("");
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        final CharSequence text = mEditText.getText();
 
-            mListener.sendUserMessage(getTitle(), message);
+        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
+                || actionId == EditorInfo.IME_ACTION_DONE
+                || event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
+            final String message = text.toString();
+            mEditText.setText("");
+
+            sendUserMessage(getTitle(), message);
         }
         return false;
     }
 
     @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-
-        final String buffer = mListener.getUser(getTitle()).getBuffer();
-        writeToTextView(buffer);
+    public FragmentType getType() {
+        return FragmentType.User;
     }
 
-    public interface PMFragmentListenerInterface {
-        public User getUser(final String channelName);
-
-        public void sendUserMessage(final String nick, final String message);
+    public void sendUserMessage(final String nick, final String message) {
+        MessageParser.userMessageToParse(mCallback.getServer(false), nick, message);
     }
+
+    private final PMFragmentHandler mUserFragmentHandler = new PMFragmentHandler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final UserEventType type = (UserEventType) bundle.getSerializable(EventBundleKeys.eventType);
+            final String message = bundle.getString(EventBundleKeys.message);
+            switch (type) {
+                case Generic:
+                    appendToTextView(message + "\n");
+            }
+        }
+    };
 }

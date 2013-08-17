@@ -1,15 +1,15 @@
-    LightIRC - Copyright (c) Lalit Maganti 2013
+    HoloIRC - Copyright (c) Lalit Maganti 2013
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
-    along with LightIRC.  If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC.  If not, see <http://www.gnu.org/licenses/>.
 
     This project depends on several libraries each of which have their own license and deserve sincere thanks:
     * SlidingMenu by Jeremy Feinstein - the project can be found at https://github.com/jfeinstein10/SlidingMenu and is licensed under the Apache License v2

@@ -1,22 +1,22 @@
 /*
-    LightIRC - an IRC client for Android
+    HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+    This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
+    HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
+    HoloIRC is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
+    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.fusionx.lightirc.adapters;
@@ -30,11 +30,16 @@ import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
-import lombok.AccessLevel;
-import lombok.Setter;
+import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import lombok.AccessLevel;
+import lombok.Setter;
 
 public class IRCPagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;
@@ -48,6 +53,9 @@ public class IRCPagerAdapter extends PagerAdapter {
     private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<>();
 
     private final ArrayList<IRCFragment> views = new ArrayList<>();
+
+    @Setter
+    private PagerSlidingTabStrip tabStrip;
 
     @Setter(AccessLevel.PUBLIC)
     private int currentItemIndex;
@@ -186,6 +194,15 @@ public class IRCPagerAdapter extends PagerAdapter {
         return state;
     }
 
+    public void addServerFragment(final String serverName) {
+        final ServerFragment fragment = new ServerFragment();
+        final Bundle bundle = new Bundle();
+        bundle.putString("title", serverName);
+        fragment.setArguments(bundle);
+
+        addFragment(fragment);
+    }
+
     @Override
     public void setPrimaryItem(final ViewGroup container, final int position, final Object object) {
         final Fragment fragment = (Fragment) object;
@@ -203,6 +220,9 @@ public class IRCPagerAdapter extends PagerAdapter {
     public int addFragment(final IRCFragment s) {
         views.add(s);
         notifyDataSetChanged();
+        if (tabStrip != null) {
+            tabStrip.notifyDataSetChanged();
+        }
         return views.indexOf(s);
     }
 
@@ -222,11 +242,13 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(final int position) {
-        return views.get(position).getTitle();
+        final IRCFragment fragment = views.get(position);
+        return fragment.isAdded() ? fragment.getTitle() : fragment.getArguments().getString("title");
     }
 
     public void removeFragment(final int index) {
         views.remove(index);
+        tabStrip.notifyDataSetChanged();
         notifyDataSetChanged();
     }
 
@@ -261,10 +283,14 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void removeAllButServer() {
-        for (int i = 1; i < getCount(); ) {
-            views.remove(i);
+        final Iterator<IRCFragment> iterator = views.iterator();
+        iterator.next();
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
         }
 
+        tabStrip.notifyDataSetChanged();
         notifyDataSetChanged();
     }
 }

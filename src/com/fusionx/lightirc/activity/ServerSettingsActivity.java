@@ -1,23 +1,23 @@
 /*
-    LightIRC - an IRC client for Android
+HoloIRC - an IRC client for Android
 
-    Copyright 2013 Lalit Maganti
+Copyright 2013 Lalit Maganti
 
-    This file is part of LightIRC.
+This file is part of HoloIRC.
 
-    LightIRC is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+HoloIRC is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    LightIRC is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
+HoloIRC is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
- */
+You should have received a copy of the GNU General Public License
+along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package com.fusionx.lightirc.activity;
 
@@ -29,26 +29,46 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.*;
+import android.preference.EditTextPreference;
+import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
-import android.view.*;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.Toast;
+
+import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
-import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightlibrary.adapters.SelectionAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.*;
+import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Nick;
+import static com.fusionx.lightirc.misc.PreferenceKeys.NickServPassword;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
+import static com.fusionx.lightirc.misc.PreferenceKeys.RealName;
+import static com.fusionx.lightirc.misc.PreferenceKeys.ServerPassword;
+import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
+import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
 public class ServerSettingsActivity extends PreferenceActivity {
     private static boolean canExit = true;
@@ -155,13 +175,15 @@ public class ServerSettingsActivity extends PreferenceActivity {
             mEditTexts.add(mEditTextNick);
 
             // Nick of User
-            EditTextPreference mEditTextRealName = (EditTextPreference) prefSet.findPreference(RealName);
+            EditTextPreference mEditTextRealName = (EditTextPreference)
+                    prefSet.findPreference(RealName);
             if (mEditTextRealName != null) {
                 mEditTextRealName.setOnPreferenceChangeListener(this);
             }
             mEditTexts.add(mEditTextRealName);
 
-            EditTextPreference mServerUserName = (EditTextPreference) prefSet.findPreference(ServerUserName);
+            EditTextPreference mServerUserName = (EditTextPreference)
+                    prefSet.findPreference(ServerUserName);
             if (mServerUserName != null) {
                 mServerUserName.setOnPreferenceChangeListener(this);
                 mServerUserName.setSummary(mServerUserName.getText());
@@ -223,7 +245,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
     }
 
     public static class ListViewSettingsFragment extends ListFragment implements
-            MultiChoiceModeListener, android.view.ActionMode.Callback, AdapterView.OnItemClickListener {
+            MultiChoiceModeListener, android.view.ActionMode.Callback,
+            AdapterView.OnItemClickListener {
         private SelectionAdapter<String> adapter;
         private boolean modeStarted = false;
 
@@ -245,11 +268,11 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            final Set<String> positions = adapter.getSelectedItems();
+            final ArrayList<String> positions = adapter.getSelectedItems();
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_cab_edit:
-                    final String edited = (String) positions.toArray()[0];
+                    final String edited = adapter.getItem(0);
                     final ChannelNamePromptDialogBuilder dialog = new ChannelNamePromptDialogBuilder
                             (getActivity(), edited) {
                         @Override
@@ -287,8 +310,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
             int selectedItemCount = getListView().getCheckedItemCount();
 
             if (selectedItemCount != 0) {
-                final String quantityString = getResources().getQuantityString(R.plurals.channel_selection,
-                        selectedItemCount, selectedItemCount);
+                final String quantityString = getResources()
+                        .getQuantityString(R.plurals.channel_selection,
+                                selectedItemCount, selectedItemCount);
                 mode.setTitle(quantityString);
             }
         }
@@ -317,9 +341,10 @@ public class ServerSettingsActivity extends PreferenceActivity {
         @Override
         public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                                  final Bundle savedInstanceState) {
-            adapter = new SelectionAdapter<>(getActivity(), new ArrayList<String>());
+            adapter = new SelectionAdapter<>(getActivity(), new TreeSet<String>());
 
-            final SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
+            final SharedPreferences settings = getActivity()
+                    .getSharedPreferences(fileName, MODE_PRIVATE);
             final Set<String> set = settings.getStringSet(AutoJoin, new HashSet<String>());
             for (final String channel : set) {
                 adapter.add(channel);
@@ -337,12 +362,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             switch (item.getItemId()) {
                 case R.id.activity_server_settings_ab_add:
-                    final ChannelNamePromptDialogBuilder dialog = new ChannelNamePromptDialogBuilder(getActivity()) {
-                        @Override
-                        public void onOkClicked(final String input) {
-                            adapter.add(input);
-                        }
-                    };
+                    final ChannelNamePromptDialogBuilder dialog =
+                            new ChannelNamePromptDialogBuilder(getActivity()) {
+                                @Override
+                                public void onOkClicked(final String input) {
+                                    adapter.add(input);
+                                }
+                            };
                     dialog.show();
                     return true;
                 default:
@@ -354,13 +380,14 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public void onPause() {
             SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
             final Editor e = settings.edit();
-            e.putStringSet(AutoJoin, adapter.getItems()).commit();
+            e.putStringSet(AutoJoin, adapter.getCopyOfItems()).commit();
 
             super.onPause();
         }
 
         @Override
-        public void onItemClick(final AdapterView<?> adapterView, final View view, final int i, final long l) {
+        public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
+                                final long l) {
             if (!modeStarted) {
                 getActivity().startActionMode(this);
             }
@@ -370,3 +397,4 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
     }
 }
+
