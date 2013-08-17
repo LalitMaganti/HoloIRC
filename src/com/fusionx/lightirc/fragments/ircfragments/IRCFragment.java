@@ -39,25 +39,23 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class IRCFragment extends Fragment
-        implements TextView.OnEditorActionListener {
+public abstract class IRCFragment extends Fragment implements TextView.OnEditorActionListener {
     @Getter(AccessLevel.PUBLIC)
     @Setter(AccessLevel.PROTECTED)
     private String title = null;
 
-    protected TextView textView = null;
-
-    protected EditText editText = null;
+    protected TextView mTextView = null;
+    protected EditText mEditText = null;
 
     @Override
     public View onCreateView(final LayoutInflater inflate,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
 
-        textView = (TextView) rootView.findViewById(R.id.textview);
-        editText = (EditText) rootView.findViewById(R.id.editText1);
+        mTextView = (TextView) rootView.findViewById(R.id.textview);
+        mEditText = (EditText) rootView.findViewById(R.id.editText1);
 
-        editText.setOnEditorActionListener(this);
+        mEditText.setOnEditorActionListener(this);
 
         setTitle(getArguments().getString("title"));
 
@@ -65,13 +63,13 @@ public abstract class IRCFragment extends Fragment
     }
 
     public void appendToTextView(final String text) {
-        textView.append(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(textView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+        mTextView.append(Html.fromHtml(text.replace("\n", "<br/>")));
+        Linkify.addLinks(mTextView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
     }
 
     void writeToTextView(final String text) {
-        textView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(textView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+        mTextView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
+        Linkify.addLinks(mTextView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
     }
 
     @Override
@@ -87,7 +85,7 @@ public abstract class IRCFragment extends Fragment
     }
 
     public void disableEditText() {
-        editText.setEnabled(false);
+        mEditText.setEnabled(false);
     }
 
     public abstract FragmentType getType();

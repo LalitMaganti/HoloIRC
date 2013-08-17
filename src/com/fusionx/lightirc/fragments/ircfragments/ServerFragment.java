@@ -49,7 +49,7 @@ public class ServerFragment extends IRCFragment {
         MessageSender.getSender(mCallback.getServerTitle()).registerServerFragmentHandler
                 (mServerHandler);
 
-        editText.setEnabled(mCallback.isConnectedToServer());
+        mEditText.setEnabled(mCallback.isConnectedToServer());
 
         final Server server = mCallback.getServer(true);
         if (server != null) {
@@ -87,35 +87,37 @@ public class ServerFragment extends IRCFragment {
                     .eventType);
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
-                case Error:
-                    appendToTextView(message + "\n");
-                    break;
                 case ServerConnected:
                     mCallback.connectedToServer();
-                    editText.setEnabled(true);
-                    // FALL THROUGH INTENTIONAL
+                    mEditText.setEnabled(true);
+                    break;
+                case Error:
+                    mCallback.onUnexpectedDisconnect();
+                    break;
                 case NickInUse:
                 case Generic:
-                    appendToTextView(message + "\n");
                     break;
             }
+            appendToTextView(message + "\n");
         }
     };
 
     public interface ServerFragmentCallback extends CommonCallbacks {
         public void connectedToServer();
+
+        public void onUnexpectedDisconnect();
     }
 
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = editText.getText();
+        final CharSequence text = mEditText.getText();
 
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
                 && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            editText.setText("");
+            mEditText.setText("");
 
             sendServerMessage(message);
         }

@@ -54,8 +54,7 @@ public class ChannelFragment extends IRCFragment {
         super.onViewCreated(view, savedInstanceState);
 
         final String message = String.format(getActivity().getString(R.string
-                .parser_joined_channel),
-                mCallback.getServer(false).getUser().getColorfulNick());
+                .parser_joined_channel), mCallback.getServer(false).getUser().getColorfulNick());
         appendToTextView(message + "\n");
     }
 
@@ -94,14 +93,14 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = editText.getText();
+        final CharSequence text = mEditText.getText();
 
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
                 && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            editText.setText("");
+            mEditText.setText("");
 
             sendChannelMessage(getTitle(), message);
         }
@@ -109,15 +108,15 @@ public class ChannelFragment extends IRCFragment {
     }
 
     public void onUserMention(final ArrayList<User> users) {
-        final String text = String.valueOf(editText.getText());
+        final String text = String.valueOf(mEditText.getText());
         String nicks = "";
         for (final User userNick : users) {
             nicks += Html.fromHtml(userNick.getPrettyNick(getTitle())) + ": ";
         }
 
-        editText.clearComposingText();
-        editText.setText(nicks + text);
-        editText.requestFocus();
+        mEditText.clearComposingText();
+        mEditText.setText(nicks + text);
+        mEditText.requestFocus();
     }
 
     @Override

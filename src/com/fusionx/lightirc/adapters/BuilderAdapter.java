@@ -35,16 +35,16 @@ import com.fusionx.lightirc.R;
 
 public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
     private final Context mContext;
-    private final BuilderAdapterListenerInterface mListener;
+    private final BuilderAdapterCallback mCallback;
 
     public BuilderAdapter(final Context context) {
         super(context, android.R.layout.simple_list_item_1);
         mContext = context;
 
         try {
-            mListener = (BuilderAdapterListenerInterface) context;
+            mCallback = (BuilderAdapterCallback) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement BuilderAdapterListenerInterface");
+            throw new ClassCastException(context.toString() + " must implement BuilderAdapterCallback");
         }
     }
 
@@ -62,7 +62,7 @@ public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
             textView.setText(getItem(position).getTitle());
         }
         if (description != null) {
-            final Server bot = mListener.getBot(getItem(position).getTitle());
+            final Server bot = mCallback.getServer(getItem(position).getTitle());
             if (bot != null) {
                 description.setText(bot.getStatus());
             } else {
@@ -79,7 +79,7 @@ public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
         return view;
     }
 
-    public interface BuilderAdapterListenerInterface {
-        public Server getBot(final String title);
+    public interface BuilderAdapterCallback {
+        public Server getServer(final String title);
     }
 }

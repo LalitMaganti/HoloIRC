@@ -50,7 +50,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterListenerInterface {
+        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterCallback {
     private IRCBridgeService mService = null;
     private ArrayList<ServerConfiguration.Builder> mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
@@ -264,13 +264,13 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private boolean serverIsConnected(final String title) {
-        return mService != null && getBot(title) != null &&
-                (getBot(title).getStatus().equals(getString(R.string.status_connected)));
+        return mService != null && getServer(title) != null &&
+                (getServer(title).getStatus().equals(getString(R.string.status_connected)));
     }
 
     // BuilderAdapter Listener Interface
     @Override
-    public Server getBot(final String title) {
+    public Server getServer(final String title) {
         return mService.getServer(title);
     }
 

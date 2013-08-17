@@ -77,14 +77,14 @@ public class PMFragment extends IRCFragment {
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        final CharSequence text = editText.getText();
+        final CharSequence text = mEditText.getText();
 
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
                 && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            editText.setText("");
+            mEditText.setText("");
 
             sendUserMessage(getTitle(), message);
         }

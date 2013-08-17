@@ -123,14 +123,19 @@ class ServerConnection {
             }
         } catch (final IOException ex) {
             // Delay is to allow event to be sent while activity is visible
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerEventType.Error, ex.getMessage());
             sender.sendServerMessage(event);
 
             server.setStatus(mContext.getString(R.string.status_disconnected));
+            return;
         }
+
+        final Bundle event = Utils.parcelDataForBroadcast(null,
+                ServerEventType.Error, "An unexpected error occured");
+        sender.sendServerMessage(event);
     }
 
     public void disconnectFromServer() {
