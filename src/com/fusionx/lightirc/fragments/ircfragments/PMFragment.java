@@ -105,9 +105,10 @@ public class PMFragment extends IRCFragment {
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
             final UserEventType type = (UserEventType) bundle.getSerializable(EventBundleKeys.eventType);
+            final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
                 case Generic:
-                    appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
+                    appendToTextView(message + "\n");
             }
         }
     };

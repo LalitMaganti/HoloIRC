@@ -24,6 +24,7 @@ package com.fusionx.lightirc.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,11 +88,6 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        view.setBackground(null);
-    }
-
-    @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view,
                             final int i, final long l) {
         switch (i) {
@@ -107,6 +103,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
             case 5:
                 mListener.removeCurrentTab();
                 break;
+            default:
+                Log.e("HoloIRC", String.valueOf(i));
         }
         mListener.closeAllSlidingMenus();
     }
@@ -178,6 +176,11 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     public UserChannelActionsAdapter getUserChannelAdapter() {
         return (UserChannelActionsAdapter) getListAdapter().getAdapter(3);
+    }
+
+    public void setConnectedToServer() {
+        getServerAdapter().setConnected(mListener.isConnectedToServer());
+        getServerAdapter().notifyDataSetChanged();
     }
 
     public interface IRCActionsListenerInterface extends CommonCallbacks {

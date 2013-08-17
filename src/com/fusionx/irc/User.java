@@ -14,6 +14,8 @@ import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 import com.google.common.collect.ImmutableList;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 
 import de.scrum_master.util.UpdateableTreeSet;
@@ -164,18 +166,23 @@ public class User implements UpdateableTreeSet.Updateable {
                 .registerUserHandler(nick, userHandler);
     }
 
+    void unregisterHandler() {
+        MessageSender.getSender(userChannelInterface.getServer().getTitle())
+                .unregisterUserHandler(nick);
+    }
+
     private UserHandler userHandler = new UserHandler() {
         @Override
         public void handleMessage(Message msg) {
             final Bundle event = msg.getData();
-            if (event != null) {
-                final UserEventType type = (UserEventType) event.getSerializable(EventBundleKeys.eventType);
+                final UserEventType type = (UserEventType) event
+                        .getSerializable(EventBundleKeys.eventType);
+                final String message = event.getString(EventBundleKeys.message);
                 switch (type) {
                     case Generic:
-                        buffer += event
-                                .getString(EventBundleKeys.message) + "\n";
+                        buffer += message + "\n";
+                        break;
                 }
-            }
         }
     };
 }

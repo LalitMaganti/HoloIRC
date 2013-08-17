@@ -40,7 +40,7 @@ import com.fusionx.uiircinterface.MessageSender;
 import org.apache.commons.lang3.StringUtils;
 
 public class ServerFragment extends IRCFragment {
-    private CommonCallbacks mCallback;
+    private ServerFragmentCallback mCallback;
 
     @Override
     public void onResume() {
@@ -68,7 +68,7 @@ public class ServerFragment extends IRCFragment {
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (CommonCallbacks) activity;
+            mCallback = (ServerFragmentCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() +
                     " must implement ServerFragmentCallback");
@@ -91,6 +91,7 @@ public class ServerFragment extends IRCFragment {
                     appendToTextView(message + "\n");
                     break;
                 case ServerConnected:
+                    mCallback.connectedToServer();
                     editText.setEnabled(true);
                     // FALL THROUGH INTENTIONAL
                 case Generic:
@@ -99,6 +100,10 @@ public class ServerFragment extends IRCFragment {
             }
         }
     };
+
+    public interface ServerFragmentCallback extends CommonCallbacks {
+        public void connectedToServer();
+    }
 
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {

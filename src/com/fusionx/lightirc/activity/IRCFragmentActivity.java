@@ -48,6 +48,7 @@ import com.fusionx.lightirc.fragments.IRCActionsFragment;
 import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
+import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.misc.Utils;
@@ -62,7 +63,7 @@ import java.util.ArrayList;
 
 public class IRCFragmentActivity extends FragmentActivity implements
         UserListFragment.UserListListenerInterface, ChannelFragment.ChannelFragmentCallback,
-        IRCActionsFragment.IRCActionsListenerInterface {
+        IRCActionsFragment.IRCActionsListenerInterface, ServerFragment.ServerFragmentCallback {
 
     private UserListFragment mUserFragment = null;
     private IRCBridgeService mService = null;
@@ -71,6 +72,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
     private final ViewPagerOnPagerListener listener = new ViewPagerOnPagerListener();
+    private IRCActionsFragment mActionsFragment;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -107,9 +109,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
                 .findFragmentById(R.id.userlist_fragment);
 
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
-        final IRCActionsFragment mActionsFragment = (IRCActionsFragment)
-                getSupportFragmentManager()
-                        .findFragmentById(R.id.actions_fragment);
+        mActionsFragment = (IRCActionsFragment)
+                getSupportFragmentManager().findFragmentById(R.id.actions_fragment);
         mActionsSlidingMenu.setBehindScrollScale(0);
 
         mActionsSlidingMenu.setOnOpenListener(mActionsFragment);
@@ -324,9 +325,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     @Override
-    public void switchFragmentAndRemove(final String channelName) {
-        final int index = mViewPager.getAdapter().getIndexFromTitle(channelName);
-        if (getCurrentItem().getTitle().equals(channelName)) {
+    public void switchFragmentAndRemove(final String tabName) {
+        final int index = mViewPager.getAdapter().getIndexFromTitle(tabName);
+        if (getCurrentItem().getTitle().equals(tabName)) {
             mViewPager.setCurrentItem(index - 1, true);
         }
         mViewPager.getAdapter().removeFragment(index);
@@ -390,13 +391,14 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     @Override
     public void removeCurrentTab() {
+        final Server server = getServer(false);
         if (getCurrentlyDisplayedFragment().equals(FragmentType.User)) {
-            final Server server = getServer(false);
-
             ServerCommandSender.sendClosePrivateMessage(server,
                     server.getUserChannelInterface().getUser(getCurrentItem().getTitle()));
+
+            switchFragmentAndRemove(getCurrentItem().getTitle());
         } else {
-            ServerCommandSender.sendPart(getServer(false), getCurrentItem().getTitle(),
+            ServerCommandSender.sendPart(server, getCurrentItem().getTitle(),
                     getApplicationContext());
         }
     }
@@ -411,6 +413,13 @@ public class IRCFragmentActivity extends FragmentActivity implements
         final boolean switchToTab = channelName.equals(getIntent().getStringExtra("mention"))
                 || forceSwitch;
         mViewPager.onNewChannelJoined(channelName, switchToTab);
+    }
+
+    @Override
+    public void connectedToServer() {
+        if(mActionsSlidingMenu.isMenuShowing()) {
+            mActionsFragment.setConnectedToServer();
+        }
     }
 
     private class ViewPagerOnPagerListener extends ViewPager.SimpleOnPageChangeListener {

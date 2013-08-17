@@ -22,10 +22,14 @@
 package com.fusionx.lightirc.parser;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import com.fusionx.irc.Server;
 import com.fusionx.lightirc.misc.Utils;
+import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.uiircinterface.ServerCommandSender;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -94,23 +98,28 @@ public class MessageParser {
         final ArrayList<String> parsedArray = Utils.splitLineBySpaces(rawLine);
         final String command = parsedArray.remove(0);
 
-        if (command.equals("/join") || command.equals("/j")) {
-            final String channelName = parsedArray.get(0);
-            ServerCommandSender.sendJoin(server, channelName);
-        } else if (command.equals("/msg")) {
-            if (parsedArray.size() > 1) {
-                final String nick = parsedArray.remove(0);
-                final String message = parsedArray.size() >= 1 ?
-                        Utils.convertArrayListToString(parsedArray) : "";
-                ServerCommandSender.sendMessageToUser(server, nick, message);
-            } else {
-                ServerCommandSender.sendUnknownEvent(server, rawLine);
-            }
-        } else if (command.startsWith("/nick")) {
-            final String newNick = parsedArray.get(0);
-            ServerCommandSender.sendNickChange(server, newNick);
-        } else {
-            ServerCommandSender.sendUnknownEvent(server, rawLine);
+        switch (command) {
+            case "/join":
+            case "/j":
+                final String channelName = parsedArray.get(0);
+                ServerCommandSender.sendJoin(server, channelName);
+                break;
+            case "/msg":
+                if (parsedArray.size() > 1) {
+                    final String nick = parsedArray.remove(0);
+                    final String message = parsedArray.size() >= 1 ?
+                            Utils.convertArrayListToString(parsedArray) : "";
+                    ServerCommandSender.sendMessageToUser(server, nick, message);
+                } else {
+                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                }
+                break;
+            case "/nick":
+                final String newNick = parsedArray.get(0);
+                ServerCommandSender.sendNickChange(server, newNick);
+                break;
+            default:
+                    ServerCommandSender.sendUnknownEvent(server, rawLine);
         }
     }
 }

@@ -8,6 +8,8 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.lightirc.misc.Utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ServerCommandSender {
     public static void sendJoin(final Server server, final String channelName) {
         final AsyncTask<Void, Void, Void> sendJoin = new AsyncTask<Void, Void, Void>() {
@@ -58,9 +60,10 @@ public class ServerCommandSender {
             @Override
             protected Void doInBackground(Void... voids) {
                 final User user = server.getUserChannelInterface().getUser(userNick);
-                user.getWriter().sendMessage(message);
-
-                MessageSender.getSender(server.getTitle()).sendPrivateMessage(user, message);
+                if(StringUtils.isNotEmpty(message)) {
+                    user.getWriter().sendMessage(message);
+                }
+                server.privateMessageSent(user, message);
                 return null;
             }
         };
@@ -72,9 +75,9 @@ public class ServerCommandSender {
         final AsyncTask<Void, Void, Void> sendAction = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                server.getUserChannelInterface().getUser(userNick).getWriter().sendAction(action);
-
-                MessageSender.getSender(server.getTitle()).sendAction(userNick, server.getUser(), action);
+                final User user = server.getUserChannelInterface().getUser(userNick);
+                user.getWriter().sendAction(action);
+                server.privateActionSent(user, action);
                 return null;
             }
         };

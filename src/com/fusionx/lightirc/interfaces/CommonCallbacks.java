@@ -5,7 +5,7 @@ import com.fusionx.irc.Server;
 public interface CommonCallbacks {
     public String getServerTitle();
 
-    public void onCreatePMFragment(final String userNick);
+    //public void onCreatePMFragment(final String userNick);
 
     public void closeAllSlidingMenus();
 

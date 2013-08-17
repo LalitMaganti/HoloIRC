@@ -4,10 +4,14 @@ import android.os.Bundle;
 import android.os.Message;
 
 import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.handlerabstract.ServerHandler;
+import com.fusionx.irc.misc.Utils;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.uiircinterface.MessageSender;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -30,6 +34,38 @@ public class Server {
         title = serverTitle;
 
         MessageSender.getSender(serverTitle).registerServerHandler(serverHandler);
+    }
+
+    public void privateMessageSent(final User sendingUser, final String message) {
+        final MessageSender sender = MessageSender.getSender(title);
+        if (!user.isPrivateMessageOpen(sendingUser)) {
+            user.newPrivateMessage(sendingUser);
+
+            if(StringUtils.isNotEmpty(message)) {
+                sender.sendPrivateMessage(sendingUser, message);
+            }
+
+            final Bundle event = Utils.parcelDataForBroadcast(null,
+                    ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
+            sender.sendServerChannelMessage(event);
+        } else {
+            sender.sendPrivateMessage(sendingUser, message);
+        }
+    }
+
+    public void privateActionSent(final User sendingUser, final String action) {
+        final MessageSender sender = MessageSender.getSender(title);
+        if (!user.isPrivateMessageOpen(sendingUser)) {
+            user.newPrivateMessage(sendingUser);
+
+            sender.sendAction(sendingUser.getNick(), sendingUser, action);
+
+            final Bundle event = Utils.parcelDataForBroadcast(null,
+                    ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
+            sender.sendServerMessage(event);
+        } else {
+            sender.sendAction(sendingUser.getNick(), sendingUser, action);
+        }
     }
 
     private ServerHandler serverHandler = new ServerHandler() {

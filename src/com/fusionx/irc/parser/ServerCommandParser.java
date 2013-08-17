@@ -10,7 +10,6 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.enums.ServerChannelEventType;
-import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
@@ -94,44 +93,21 @@ public class ServerCommandParser {
         if (Utils.isChannel(recipient)) {
             // PRIVMSG to channel
             final Channel channel = mUserChannelInterface.getChannel(recipient);
-            mSender.sendAppUserMessageToChannel(channel,
-                    sendingUser, message);
+            mSender.sendAppUserMessageToChannel(channel, sendingUser, message);
         } else {
-            // PRIVMSG to user
-            if (!mServer.getUser().getPrivateMessages().contains(sendingUser)) {
-                mServer.getUser().newPrivateMessage(sendingUser);
-                sendingUser.registerHandler();
-
-                mSender.sendPrivateMessage(sendingUser, message);
-
-                final Bundle event = Utils.parcelDataForBroadcast(null,
-                        ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
-                mSender.sendServerMessage(event);
-            } else {
-                mSender.sendPrivateMessage(sendingUser, message);
-            }
+            mServer.privateMessageSent(sendingUser, message);
         }
     }
 
     private void parseAction(ArrayList<String> parsedArray, String rawSource) {
         final User sendingUser = mUserChannelInterface.getUserFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
-        final String message = parsedArray.get(3).replace("ACTION ", "");
+        final String action = parsedArray.get(3).replace("ACTION ", "");
+
         if (Utils.isChannel(recipient)) {
-            mSender.sendAction(recipient, sendingUser, message);
+            mSender.sendAction(recipient, sendingUser, action);
         } else {
-            if (!mServer.getUser().getPrivateMessages().contains(sendingUser)) {
-                mServer.getUser().newPrivateMessage(sendingUser);
-                sendingUser.registerHandler();
-
-                mSender.sendAction(sendingUser.getNick(), sendingUser, message);
-
-                final Bundle event = Utils.parcelDataForBroadcast(null,
-                        ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
-                mSender.sendServerMessage(event);
-            } else {
-                mSender.sendAction(sendingUser.getNick(), sendingUser, message);
-            }
+            mServer.privateActionSent(sendingUser, action);
         }
     }
 

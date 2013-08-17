@@ -141,7 +141,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 return true;
             case R.id.fragment_userlist_cab_pm: {
                 if (isNickOtherUsers(nick)) {
-                    mListener.onCreatePMFragment(nick);
+                    ServerCommandSender.sendMessageToUser(mListener.getServer(false), nick, "");
                     mListener.closeAllSlidingMenus();
                     mode.finish();
                 } else {
@@ -229,5 +229,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     public interface UserListListenerInterface extends CommonCallbacks {
         public void onUserMention(final ArrayList<User> users);
+
+        public void onCreatePMFragment(final String userNick);
     }
 }

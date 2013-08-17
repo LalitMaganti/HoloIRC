@@ -157,7 +157,7 @@ public class MessageSender {
         }
     }
 
-    public void sendUserMessage(final Bundle event) {
+    private void sendUserMessage(final Bundle event) {
         final String destination = event.getString(EventBundleKeys.destination);
 
         final Message message = Message.obtain();
@@ -196,7 +196,7 @@ public class MessageSender {
         sendChannelMessage(genericEvent);
     }
 
-    public void sendGenericUserEvent(final String nick, final String message) {
+    private void sendGenericUserEvent(final String nick, final String message) {
         final Bundle privateMessageEvent = Utils.parcelDataForBroadcast(nick, UserEventType.Generic,
                 message);
         sendUserMessage(privateMessageEvent);
@@ -237,8 +237,7 @@ public class MessageSender {
 
     public void sendPrivateMessage(final User sending,
                                    final String rawMessage) {
-        final String message = String.format(mContext.getString(R.string.parser_message),
-                sending.getColorfulNick(), rawMessage);
+        final String message = String.format(mContext.getString(R.string.parser_message), sending.getColorfulNick(), rawMessage);
         sendGenericUserEvent(sending.getNick(), message);
     }
 

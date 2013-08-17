@@ -17,9 +17,15 @@ public class AppUser extends User {
 
     public void newPrivateMessage(User user) {
         privateMessages.add(user);
+        user.registerHandler();
     }
 
     public void closePrivateMessage(User user) {
         privateMessages.remove(user);
+        user.unregisterHandler();
+    }
+
+    public boolean isPrivateMessageOpen(User user) {
+        return privateMessages.contains(user);
     }
 }
