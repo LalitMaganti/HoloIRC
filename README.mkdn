@@ -13,5 +13,8 @@
 
     This project depends on several libraries each of which have their own license and deserve sincere thanks:
     * SlidingMenu by Jeremy Feinstein - the project can be found at https://github.com/jfeinstein10/SlidingMenu and is licensed under the Apache License v2
-    * PircBotX by Leon Blakey - the project can be found at http://code.google.com/p/pircbotx/ and is licensed under the GPL v3 or later
-    * ListViewAnimations by Niek Haarman - the project can be found at https://github.com/nhaarman/ListViewAnimations/ and is licensed under the Apache License v2
+    * ListViewAnimations by Niek Haarman - the project can be found at https://github.com/nhaarman/ListViewAnimations and is licensed under the Apache License v2
+    * PagingSliderTabStrip by Andreas Stuetz - the project can be found at https://github.com/astuetz/PagerSlidingTabStrip and is licensed under the Apache License v2
+    * CWAC MergeAdapter by CommonsWare - the project can be found at https://github.com/commonsguy/cwac-merge and is licensed under the Apache License v2
+    * UpdateableTreeSet by kriegaex - the project can be found at https://github.com/kriegaex/UpdateableTreeSet and is licensed under the Apache License v2
+    * LightLibrary by Lalit Maganti - the project can be found at https://github.com/tilal6991/LightLibrary and is licensed under the GPLv3
