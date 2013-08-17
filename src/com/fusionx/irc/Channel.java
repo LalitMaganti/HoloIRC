@@ -8,6 +8,7 @@ import android.util.Log;
 import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
+import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.R;
@@ -72,10 +73,9 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         throw new IllegalArgumentException();
     }
 
-    private Handler channelHandler = new Handler() {
+    private ChannelHandler channelHandler = new ChannelHandler() {
         @Override
         public void handleMessage(final Message msg) {
-            Log.e(Constants.LOG_TAG, "Message recieved");
             final Bundle event = msg.getData();
             final ChannelEventType type = (ChannelEventType) event
                     .getSerializable(EventBundleKeys.eventType);

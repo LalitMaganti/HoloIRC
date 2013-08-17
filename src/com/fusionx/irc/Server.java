@@ -6,6 +6,7 @@ import android.os.Message;
 
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.irc.handlerabstract.ServerHandler;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.irc.writers.ServerWriter;
 
@@ -32,7 +33,7 @@ public class Server {
         MessageSender.getSender(serverTitle).registerServerHandler(serverHandler);
     }
 
-    private Handler serverHandler = new Handler() {
+    private ServerHandler serverHandler = new ServerHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();

@@ -4,8 +4,5 @@ public enum ServerEventType {
     NickInUse,
     Generic,
     Error,
-    Join,
-    SocketConnected,
     ServerConnected,
-    NewPrivateMessage
 }

@@ -89,7 +89,7 @@ public class ServerCommandParser {
         if (Utils.isChannel(recipient)) {
             // PRIVMSG to channel
             final Channel channel = mUserChannelInterface.getChannel(recipient);
-            mSender.sendUserMessageToChannel(channel,
+            mSender.sendAppUserMessageToChannel(channel,
                     sendingUser, message);
         } else {
             // PRIVMSG to user
@@ -199,7 +199,7 @@ public class ServerCommandParser {
         } else {
             mSender.sendGenericUserListChangedEvent(channel.getName(),
                     String.format(mContext
-                    .getString(R.string.parser_joined_channel), user.getPrettyNick(channel)));
+                            .getString(R.string.parser_joined_channel), user.getPrettyNick(channel)));
             user.getWriter().sendWho();
         }
     }

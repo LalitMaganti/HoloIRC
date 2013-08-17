@@ -33,10 +33,13 @@ import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
+import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.parser.MessageParser;
 import com.fusionx.uiircinterface.MessageSender;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class PMFragment extends IRCFragment {
     private CommonCallbacks mCallback;
@@ -76,15 +79,14 @@ public class PMFragment extends IRCFragment {
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        final CharSequence text = getEditText().getText();
+        final CharSequence text = editText.getText();
 
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && text != null
-                && !text.equals("")) {
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            getEditText().setText("");
+            editText.setText("");
 
             sendUserMessage(getTitle(), message);
         }
@@ -100,7 +102,7 @@ public class PMFragment extends IRCFragment {
         MessageParser.userMessageToParse(mCallback.getServer(false), nick, message);
     }
 
-    private final Handler mUserFragmentHandler = new Handler() {
+    private final PMFragmentHandler mUserFragmentHandler = new PMFragmentHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();

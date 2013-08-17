@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.lightirc.misc.Utils;
 
 public class ServerCommandSender {
@@ -29,7 +28,7 @@ public class ServerCommandSender {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendMessage(message);
 
-                MessageSender.getSender(server.getTitle()).sendUserMessageToChannel(channel,
+                MessageSender.getSender(server.getTitle()).sendAppUserMessageToChannel(channel,
                         server.getUser(), message);
                 return null;
             }

@@ -45,10 +45,8 @@ public abstract class IRCFragment extends Fragment
     @Setter(AccessLevel.PROTECTED)
     private String title = null;
 
-    @Getter(AccessLevel.PROTECTED)
     protected TextView textView = null;
 
-    @Getter(AccessLevel.PUBLIC)
     protected EditText editText = null;
 
     @Override
@@ -59,7 +57,7 @@ public abstract class IRCFragment extends Fragment
         textView = (TextView) rootView.findViewById(R.id.textview);
         editText = (EditText) rootView.findViewById(R.id.editText1);
 
-        getEditText().setOnEditorActionListener(this);
+        editText.setOnEditorActionListener(this);
 
         setTitle(getArguments().getString("title"));
 
@@ -67,13 +65,13 @@ public abstract class IRCFragment extends Fragment
     }
 
     public void appendToTextView(final String text) {
-        getTextView().append(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+        textView.append(Html.fromHtml(text.replace("\n", "<br/>")));
+        Linkify.addLinks(textView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
     }
 
     void writeToTextView(final String text) {
-        getTextView().setText(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(getTextView(), Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+        textView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
+        Linkify.addLinks(textView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
     }
 
     @Override

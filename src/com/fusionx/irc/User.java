@@ -8,6 +8,7 @@ import android.os.Message;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.irc.enums.UserLevel;
+import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.irc.writers.UserWriter;
 import com.fusionx.lightirc.R;
@@ -164,7 +165,7 @@ public class User implements UpdateableTreeSet.Updateable {
                 .registerUserHandler(nick, userHandler);
     }
 
-    private Handler userHandler = new Handler() {
+    private UserHandler userHandler = new UserHandler() {
         @Override
         public void handleMessage(Message msg) {
             final Bundle event = msg.getData();

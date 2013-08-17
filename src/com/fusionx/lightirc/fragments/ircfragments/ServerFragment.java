@@ -23,29 +23,35 @@ package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import com.fusionx.irc.Server;
+import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.parser.MessageParser;
+import com.fusionx.uiircinterface.MessageSender;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class ServerFragment extends IRCFragment {
-    private ServerFragmentCallback mCallback;
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // TODO - fix this up
-        //getEditText().setEnabled(false);
-    }
+    private CommonCallbacks mCallback;
 
     @Override
     public void onResume() {
         super.onResume();
+
+        MessageSender.getSender(mCallback.getServerTitle()).registerServerFragmentHandler
+                (mServerHandler);
+
+        editText.setEnabled(mCallback.isConnectedToServer());
 
         final Server server = mCallback.getServer(true);
         if (server != null) {
@@ -54,28 +60,60 @@ public class ServerFragment extends IRCFragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        MessageSender.getSender(mCallback.getServerTitle()).unregisterServerFragmentHandler();
+    }
+
+    @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (ServerFragmentCallback) activity;
+            mCallback = (CommonCallbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() +
                     " must implement ServerFragmentCallback");
         }
     }
 
+    public void sendServerMessage(final String message) {
+        MessageParser.serverMessageToParse(mCallback.getServer(false), message);
+    }
+
+    private final ServerFragHandler mServerHandler = new ServerFragHandler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
+                    .eventType);
+            final String message = bundle.getString(EventBundleKeys.message);
+            switch (type) {
+                case Error:
+                    appendToTextView(message + "\n");
+                    break;
+                case ServerConnected:
+                    editText.setEnabled(true);
+                    // FALL THROUGH INTENTIONAL
+                case Generic:
+                    appendToTextView(message + "\n");
+                    break;
+            }
+        }
+    };
+
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = getEditText().getText();
+        final CharSequence text = editText.getText();
 
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && text != null && !text.equals("")) {
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            getEditText().setText("");
+            editText.setText("");
 
-            mCallback.sendServerMessage(message);
+            sendServerMessage(message);
         }
         return false;
     }
@@ -83,9 +121,5 @@ public class ServerFragment extends IRCFragment {
     @Override
     public FragmentType getType() {
         return FragmentType.Server;
-    }
-
-    public interface ServerFragmentCallback extends CommonCallbacks {
-        public void sendServerMessage(final String message);
     }
 }

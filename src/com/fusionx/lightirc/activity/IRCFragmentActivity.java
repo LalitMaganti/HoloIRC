@@ -39,7 +39,9 @@ import android.view.MenuItem;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.irc.*;
 import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
@@ -61,7 +63,7 @@ import java.util.ArrayList;
 
 public class IRCFragmentActivity extends FragmentActivity implements
         UserListFragment.UserListListenerInterface, ChannelFragment.ChannelFragmentCallback,
-        IRCActionsFragment.IRCActionsListenerInterface, ServerFragment.ServerFragmentCallback {
+        IRCActionsFragment.IRCActionsListenerInterface {
 
     private UserListFragment mUserFragment = null;
     private IRCBridgeService mService = null;
@@ -168,6 +170,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
     public void onDestroy() {
         super.onDestroy();
 
+        MessageSender.getSender(mServerTitle).unregisterServerChannelHandler();
+
         if (mService != null) {
             unbindService(mConnection);
             mService = null;
@@ -197,7 +201,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
                 mService.connectToServer(builder);
             }
 
-            MessageSender.getSender(builder.getTitle()).registerServerFragmentHandler(mServerHandler);
+            MessageSender.getSender(builder.getTitle())
+                    .registerServerChannelHandler(mServerChannelHandler);
         }
 
         // Should not occur
@@ -207,11 +212,11 @@ public class IRCFragmentActivity extends FragmentActivity implements
         }
     };
 
-    private final Handler mServerHandler = new Handler() {
+    private final ServerChannelHandler mServerChannelHandler = new ServerChannelHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
+            final ServerChannelEventType type = (ServerChannelEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
@@ -220,18 +225,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
                     break;
                 case NewPrivateMessage:
                     onCreatePMFragment(message);
-                    break;
-                case Error:
-                    mViewPager.getAdapter().getFragment(getServer(false).getTitle())
-                            .appendToTextView(message + "\n");
-                    break;
-                case ServerConnected:
-                    mViewPager.getAdapter().getFragment(getServer(false).getTitle())
-                            .getEditText().setEnabled(true);
-                    // FALL THROUGH INTENTIONAL
-                case Generic:
-                    mViewPager.getAdapter().getFragment(getServer(false).getTitle())
-                            .appendToTextView(message + "\n");
                     break;
             }
         }
@@ -246,7 +239,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(getCurrentlyDisplayedFragment().equals(FragmentType.Channel));
+        menu.getItem(0).setVisible(getCurrentlyDisplayedFragment()
+                .equals(FragmentType.Channel));
         return true;
     }
 
@@ -288,6 +282,11 @@ public class IRCFragmentActivity extends FragmentActivity implements
         } else {
             return server;
         }
+    }
+
+    @Override
+    public String getServerTitle() {
+        return mServerTitle;
     }
 
     @Override
@@ -409,11 +408,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     // ServerFragment Listener Callbacks
-    @Override
-    public void sendServerMessage(final String message) {
-        MessageParser.serverMessageToParse(getServer(false), message);
-    }
-
     public void onNewChannelJoined(final String channelName, final boolean forceSwitch) {
         final boolean switchToTab = channelName.equals(getIntent().getStringExtra("mention"))
                 || forceSwitch;

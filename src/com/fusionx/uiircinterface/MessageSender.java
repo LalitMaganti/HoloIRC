@@ -11,10 +11,18 @@ import com.fusionx.irc.User;
 import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
+import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.enums.UserEventType;
+import com.fusionx.irc.handlerabstract.ChannelHandler;
+import com.fusionx.irc.handlerabstract.ServerHandler;
+import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
+import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
+import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
+import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 
 import java.util.LinkedHashMap;
 
@@ -29,6 +37,7 @@ public class MessageSender {
     private LinkedHashMap<String, Handler> mPMHandlers = new LinkedHashMap<>();
 
     private Handler mServerFragmentHandler;
+    private Handler mServerChannelHandler;
     private LinkedHashMap<String, Handler> mChannelFragmentHandlers = new LinkedHashMap<>();
     private LinkedHashMap<String, Handler> mPMFragmentHandlers = new LinkedHashMap<>();
 
@@ -51,28 +60,32 @@ public class MessageSender {
     /*
     Start of registers
      */
-    public void registerServerHandler(final Handler serverHandler) {
+    public void registerServerHandler(final ServerHandler serverHandler) {
         mServerHandler = serverHandler;
     }
 
-    public void registerChannelHandler(final String channelName, final Handler channelHandler) {
+    public void registerChannelHandler(final String channelName, final ChannelHandler channelHandler) {
         mChannelHandlers.put(channelName, channelHandler);
     }
 
-    public void registerUserHandler(final String userNick, final Handler userHandler) {
+    public void registerUserHandler(final String userNick, final UserHandler userHandler) {
         mPMHandlers.put(userNick, userHandler);
     }
 
-    public void registerServerFragmentHandler(final Handler serverHandler) {
+    public void registerServerChannelHandler(final ServerChannelHandler serverChannelHandler) {
+        mServerChannelHandler = serverChannelHandler;
+    }
+
+    public void registerServerFragmentHandler(final ServerFragHandler serverHandler) {
         mServerFragmentHandler = serverHandler;
     }
 
     public void registerChannelFragmentHandler(final String channelName,
-                                               final Handler channelHandler) {
+                                               final ChannelFragmentHandler channelHandler) {
         mChannelFragmentHandlers.put(channelName, channelHandler);
     }
 
-    public void registerUserFragmentHandler(final String userNick, final Handler userHandler) {
+    public void registerUserFragmentHandler(final String userNick, final PMFragmentHandler userHandler) {
         mPMFragmentHandlers.put(userNick, userHandler);
     }
 
@@ -92,9 +105,12 @@ public class MessageSender {
         mChannelHandlers.remove(userNick);
     }
 
+    public void unregisterServerChannelHandler() {
+        mServerChannelHandler = null;
+    }
+
     public void unregisterServerFragmentHandler() {
         mServerFragmentHandler = null;
-        Log.e(LOG_TAG, "Server fragment unregistered");
     }
 
     public void unregisterChannelFragmentHandler(final String channelName) {
@@ -108,18 +124,27 @@ public class MessageSender {
     /*
     Start of sending messages
      */
+    public void sendServerChannelMessage(final Bundle event) {
+        final Message message = Message.obtain();
+        message.setData(event);
+        mServerHandler.dispatchMessage(message);
+
+        if (mServerChannelHandler != null) {
+            final Message fragmentMessage = Message.obtain();
+            fragmentMessage.setData(event);
+            mServerChannelHandler.sendMessage(fragmentMessage);
+        }
+    }
+
     public void sendServerMessage(final Bundle event) {
         final Message message = Message.obtain();
         message.setData(event);
         mServerHandler.dispatchMessage(message);
 
-        Log.e(LOG_TAG, "Sent server message to service");
         if (mServerFragmentHandler != null) {
             final Message fragmentMessage = Message.obtain();
             fragmentMessage.setData(event);
             mServerFragmentHandler.sendMessage(fragmentMessage);
-
-            Log.e(LOG_TAG, "Sent server message to front end");
         }
     }
 
@@ -155,6 +180,11 @@ public class MessageSender {
         }
     }
 
+    /*
+    End of internal methods
+     */
+
+    // Generic events start
     public void sendGenericServerEvent(final String message) {
         final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
                 ServerEventType.Generic, message);
@@ -167,10 +197,35 @@ public class MessageSender {
         sendChannelMessage(privateMessageEvent);
     }
 
+    public void sendGenericUserListChangedEvent(final String channelName, final String message) {
+        final Bundle genericEvent = Utils.parcelDataForBroadcast(channelName,
+                ChannelEventType.UserListChanged, message);
+        sendChannelMessage(genericEvent);
+    }
+
     public void sendGenericUserEvent(final String nick, final String message) {
         final Bundle privateMessageEvent = Utils.parcelDataForBroadcast(nick, UserEventType.Generic,
                 message);
         sendUserMessage(privateMessageEvent);
+    }
+    // Generic events end
+
+    public void sendServerConnection(final String connectionLine) {
+        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
+                ServerEventType.ServerConnected, connectionLine);
+        sendServerMessage(joinEvent);
+    }
+
+    public void sendChanelJoined(final String channelName) {
+        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
+                ServerChannelEventType.Join, channelName);
+        sendServerChannelMessage(joinEvent);
+    }
+
+    public void sendChanelParted(final String channelName) {
+        final Bundle partEvent = Utils.parcelDataForBroadcast(channelName,
+                ChannelEventType.UserParted, channelName);
+        sendChannelMessage(partEvent);
     }
 
     public void sendAction(final String actionDestination, final User sendingUser,
@@ -194,32 +249,8 @@ public class MessageSender {
         sendGenericUserEvent(sending.getNick(), message);
     }
 
-    public void sendServerConnection(final String connectionLine) {
-        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
-                ServerEventType.ServerConnected, connectionLine);
-        sendServerMessage(joinEvent);
-    }
-
-    public void sendGenericUserListChangedEvent(final String channelName, final String message) {
-        final Bundle genericEvent = Utils.parcelDataForBroadcast(channelName,
-                ChannelEventType.UserListChanged, message);
-        sendChannelMessage(genericEvent);
-    }
-
-    public void sendChanelJoined(final String channelName) {
-        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
-                ServerEventType.Join, channelName);
-        sendServerMessage(joinEvent);
-    }
-
-    public void sendChanelParted(final String channelName) {
-        final Bundle partEvent = Utils.parcelDataForBroadcast(channelName,
-                ChannelEventType.UserParted, channelName);
-        sendChannelMessage(partEvent);
-    }
-
-    public void sendUserMessageToChannel(final Channel channel, final User sending,
-                                         final String rawMessage) {
+    public void sendAppUserMessageToChannel(final Channel channel, final User sending,
+                                            final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getPrettyNick(channel), rawMessage);
         sendGenericChannelEvent(channel.getName(), message);

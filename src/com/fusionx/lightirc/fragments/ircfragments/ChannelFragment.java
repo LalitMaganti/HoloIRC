@@ -35,6 +35,7 @@ import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
+import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
@@ -63,7 +64,7 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServer(false).getTitle()).registerChannelFragmentHandler
+        MessageSender.getSender(mCallback.getServerTitle()).registerChannelFragmentHandler
                 (getTitle(), mChannelFragmentHandler);
 
         final Channel channel = mCallback.getServer(false).getUserChannelInterface().getChannel
@@ -92,17 +93,16 @@ public class ChannelFragment extends IRCFragment {
         }
     }
 
-    // Options Menu stuff
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = getEditText().getText();
+        final CharSequence text = editText.getText();
 
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
                 && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            getEditText().setText("");
+            editText.setText("");
 
             sendChannelMessage(getTitle(), message);
         }
@@ -110,15 +110,15 @@ public class ChannelFragment extends IRCFragment {
     }
 
     public void onUserMention(final ArrayList<User> users) {
-        final String text = String.valueOf(getEditText().getText());
+        final String text = String.valueOf(editText.getText());
         String nicks = "";
         for (final User userNick : users) {
             nicks += Html.fromHtml(userNick.getPrettyNick(getTitle())) + ": ";
         }
 
-        getEditText().clearComposingText();
-        getEditText().setText(nicks + text);
-        getEditText().requestFocus();
+        editText.clearComposingText();
+        editText.setText(nicks + text);
+        editText.requestFocus();
     }
 
     @Override
@@ -137,7 +137,7 @@ public class ChannelFragment extends IRCFragment {
         public void updateUserList(final String channelName);
     }
 
-    private final Handler mChannelFragmentHandler = new Handler() {
+    private final ChannelFragmentHandler mChannelFragmentHandler = new ChannelFragmentHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
