@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
@@ -38,7 +39,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
 import com.fusionx.uiircinterface.MessageSender;
 

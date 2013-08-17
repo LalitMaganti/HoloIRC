@@ -23,9 +23,9 @@ package com.fusionx.irc;
 
 import android.content.Context;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.enums.UserLevel;
 import com.fusionx.irc.misc.IRCUserComparator;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightlibrary.collections.TwoWayHashSet;
 
 import java.io.OutputStreamWriter;

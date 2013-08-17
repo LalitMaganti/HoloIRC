@@ -24,8 +24,8 @@ package com.fusionx.lightirc.activity;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
+import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.Utils;
 
 import java.util.List;
 

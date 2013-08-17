@@ -36,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
@@ -51,7 +52,6 @@ import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.IRCViewPager;
 import com.fusionx.uiircinterface.IRCBridgeService;

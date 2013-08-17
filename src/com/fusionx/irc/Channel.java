@@ -24,12 +24,12 @@ package com.fusionx.irc;
 import android.os.Bundle;
 import android.os.Message;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.uiircinterface.MessageSender;
 
 import de.scrum_master.util.UpdateableTreeSet;

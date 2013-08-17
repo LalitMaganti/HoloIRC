@@ -24,10 +24,10 @@ package com.fusionx.uiircinterface;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
-import com.fusionx.lightirc.misc.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 

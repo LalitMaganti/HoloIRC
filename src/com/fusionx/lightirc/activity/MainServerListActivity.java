@@ -35,13 +35,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
-import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.uiircinterface.IRCBridgeService;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;

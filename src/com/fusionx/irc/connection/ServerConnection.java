@@ -24,12 +24,12 @@ package com.fusionx.irc.connection;
 import android.content.Context;
 import android.os.Bundle;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.AppUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.irc.parser.ServerConnectionParser;
 import com.fusionx.irc.parser.ServerLineParser;
 import com.fusionx.irc.writers.ServerWriter;
@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -92,11 +93,11 @@ class ServerConnection {
                     StringUtils.isNotEmpty(serverConfiguration.getRealName()) ?
                             serverConfiguration.getRealName() : "HoloIRC");
 
-            final String channel = "#holoirc";
-
             final BufferedReader reader = new BufferedReader(
                     new InputStreamReader(mSocket.getInputStream()));
-            final String nick = ServerConnectionParser.parseConnect(server.getTitle(), reader);
+            final String nick = ServerConnectionParser.parseConnect(server.getTitle(), reader,
+                    mContext, serverConfiguration.isNickChangable(), server.getWriter(),
+                    serverConfiguration.getNick());
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerEventType.ServerConnected, String.format(mContext
@@ -111,7 +112,9 @@ class ServerConnection {
                 final AppUser user = new AppUser(nick, server.getUserChannelInterface());
                 server.setUser(user);
 
-                server.getWriter().joinChannel(channel);
+                for (String channelName : serverConfiguration.getAutoJoinChannels()) {
+                    server.getWriter().joinChannel(channelName);
+                }
 
                 final ServerLineParser parser = new ServerLineParser(mContext, server);
                 parser.parseMain(reader);

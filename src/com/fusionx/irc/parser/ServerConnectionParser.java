@@ -21,11 +21,15 @@
 
 package com.fusionx.irc.parser;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.fusionx.Utils;
+import com.fusionx.irc.Server;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.irc.misc.Utils;
+import com.fusionx.irc.writers.ServerWriter;
+import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,9 +43,12 @@ import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WELCOME;
 
 public class ServerConnectionParser {
-    public static String parseConnect(final String title, final BufferedReader reader) throws
-            IOException {
+    public static String parseConnect(final String title, final BufferedReader reader,
+                                      final Context context, final boolean canChangeNick,
+                                      final ServerWriter writer,
+                                      final String rawNick) throws IOException {
         String line;
+        int suffix = 0;
         final MessageSender sender = MessageSender.getSender(title);
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = Utils.splitRawLine(line);
@@ -55,9 +62,14 @@ public class ServerConnectionParser {
                         return nick;
                     }
                     case ERR_NICKNAMEINUSE: {
-                        final Bundle event = Utils.parcelDataForBroadcast(null,
-                                ServerEventType.NickInUse, "Nickname is already in use.");
-                        sender.sendServerMessage(event);
+                        if(canChangeNick) {
+                            ++suffix;
+                            writer.changeNick(rawNick + suffix);
+                        } else {
+                            final Bundle event = Utils.parcelDataForBroadcast(null,
+                                    ServerEventType.NickInUse, context.getString(R.string.parser_nick_in_use));
+                            sender.sendServerMessage(event);
+                        }
                         break;
                     }
                     default: {

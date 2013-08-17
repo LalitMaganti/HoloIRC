@@ -28,9 +28,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.HackedArrayAdapter;
-import com.fusionx.lightirc.misc.Utils;
 
 public abstract class ActionsArrayAdapter extends HackedArrayAdapter<String> {
     private final LayoutInflater inflater;

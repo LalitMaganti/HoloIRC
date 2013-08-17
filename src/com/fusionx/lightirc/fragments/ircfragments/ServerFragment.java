@@ -94,6 +94,7 @@ public class ServerFragment extends IRCFragment {
                     mCallback.connectedToServer();
                     editText.setEnabled(true);
                     // FALL THROUGH INTENTIONAL
+                case NickInUse:
                 case Generic:
                     appendToTextView(message + "\n");
                     break;

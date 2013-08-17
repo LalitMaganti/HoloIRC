@@ -21,10 +21,10 @@
 
 package com.fusionx.irc.parser;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
 import com.fusionx.irc.UserChannelInterface;
-import com.fusionx.irc.misc.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 

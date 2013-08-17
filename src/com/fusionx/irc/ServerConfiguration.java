@@ -37,6 +37,7 @@ public class ServerConfiguration {
 
     private final String nick;
     private final String realName;
+    private final boolean nickChangable;
 
     private final String serverUserName;
     private final String serverPassword;
@@ -53,13 +54,14 @@ public class ServerConfiguration {
 
         nick = builder.getNick();
         realName = builder.getRealName();
+        nickChangable = builder.isNickChangeable();
 
         serverUserName = builder.getServerUserName();
         serverPassword = builder.getServerPassword();
 
         nickservPassword = builder.getNickservPassword();
 
-        autoJoinChannels = null;
+        autoJoinChannels = builder.getAutoJoinChannels();
     }
 
     @Data
@@ -73,6 +75,7 @@ public class ServerConfiguration {
 
         private String nick;
         private String realName;
+        private boolean nickChangeable;
 
         private String serverUserName;
         private String serverPassword;
@@ -95,6 +98,7 @@ public class ServerConfiguration {
 
             out.writeString(nick);
             out.writeString(realName);
+            out.writeInt(nickChangeable ? 1 : 0);
 
             out.writeString(serverUserName);
             out.writeString(serverPassword);
@@ -127,6 +131,7 @@ public class ServerConfiguration {
 
             nick = in.readString();
             realName = in.readString();
+            nickChangeable = in.readInt() == 1;
 
             serverUserName = in.readString();
             serverPassword = in.readString();

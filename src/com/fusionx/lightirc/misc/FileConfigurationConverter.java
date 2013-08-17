@@ -26,6 +26,9 @@ import android.content.SharedPreferences;
 
 import com.fusionx.irc.ServerConfiguration;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class FileConfigurationConverter {
     public static ServerConfiguration.Builder convertFileToBuilder(final Context context,
                                                                    final String filename) {
@@ -39,12 +42,13 @@ public class FileConfigurationConverter {
 
         builder.setNick(serverSettings.getString(PreferenceKeys.Nick, ""));
         builder.setRealName(serverSettings.getString(PreferenceKeys.RealName, "HoloIRC"));
-        //builder.setAutoNickChange(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
+        builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
-        //final Set<String> auto = serverSettings.getStringSet(PreferenceKeys.AutoJoin, new HashSet<String>());
-        //for (final String channel : auto) {
-        //builder.addAutoJoinChannel(channel);
-        //}
+        final ArrayList<String> auto = new ArrayList<>(serverSettings.getStringSet(PreferenceKeys.AutoJoin,
+                new HashSet<String>()));
+        for (final String channel : auto) {
+            builder.getAutoJoinChannels().add(channel);
+        }
 
         builder.setServerUserName(serverSettings.getString(PreferenceKeys.ServerUserName, "holoirc"));
         builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));

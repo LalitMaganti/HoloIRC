@@ -29,8 +29,8 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.Utils;
 
 public abstract class PromptDialogBuilder extends AlertDialog.Builder
         implements DialogInterface.OnClickListener, TextWatcher {

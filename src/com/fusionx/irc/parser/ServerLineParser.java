@@ -25,11 +25,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.listeners.CoreListener;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
-import static com.fusionx.irc.misc.Utils.parcelDataForBroadcast;
+import static com.fusionx.Utils.parcelDataForBroadcast;
 
 @Getter(AccessLevel.PACKAGE)
 public class ServerLineParser {

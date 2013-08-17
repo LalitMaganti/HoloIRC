@@ -22,16 +22,14 @@
 package com.fusionx.irc.parser;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.AppUser;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.irc.UserChannelInterface;
-import com.fusionx.irc.enums.ServerChannelEventType;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 

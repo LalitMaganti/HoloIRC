@@ -24,11 +24,11 @@ package com.fusionx.irc;
 import android.os.Bundle;
 import android.os.Message;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.handlerabstract.ServerHandler;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.uiircinterface.MessageSender;
 
@@ -96,6 +96,7 @@ public class Server {
             final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
             switch (type) {
+                case NickInUse:
                 case ServerConnected:
                 case Generic:
                 case Error:

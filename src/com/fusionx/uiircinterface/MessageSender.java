@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.Constants;
@@ -37,7 +38,6 @@ import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.irc.handlerabstract.ServerHandler;
 import com.fusionx.irc.handlerabstract.UserHandler;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;

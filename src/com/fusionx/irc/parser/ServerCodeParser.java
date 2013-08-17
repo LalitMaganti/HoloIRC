@@ -25,11 +25,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.irc.misc.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 
@@ -44,7 +44,7 @@ import static com.fusionx.irc.constants.ServerReplyCodes.RPL_TOPIC;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_TOPICINFO;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WHOREPLY;
 import static com.fusionx.irc.constants.ServerReplyCodes.genericCodes;
-import static com.fusionx.lightirc.misc.Utils.isMotdAllowed;
+import static com.fusionx.Utils.isMotdAllowed;
 
 public class ServerCodeParser {
     private final StringBuilder mStringBuilder = new StringBuilder();
