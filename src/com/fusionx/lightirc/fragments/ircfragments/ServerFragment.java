@@ -22,53 +22,35 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.ircinterface.Server;
-import com.fusionx.ircinterface.constants.EventDestination;
-import com.fusionx.ircinterface.enums.ServerEventType;
-import com.fusionx.ircinterface.events.Event;
+
+import com.fusionx.irc.Server;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 
 public class ServerFragment extends IRCFragment {
     private ServerFragmentCallback mCallback;
-    private ServerListener mListener;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        getEditText().setEnabled(false);
-
         super.onViewCreated(view, savedInstanceState);
+
+        // TODO - fix this up
+        //getEditText().setEnabled(false);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
 
         final Server server = mCallback.getServer(true);
         if (server != null) {
             writeToTextView(server.getBuffer());
         }
-
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(EventDestination.Server);
-        mListener = new ServerListener();
-        mCallback.getBroadcastManager().registerReceiver(mListener, filter);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        mCallback.getBroadcastManager().unregisterReceiver(mListener);
     }
 
     @Override
@@ -105,32 +87,5 @@ public class ServerFragment extends IRCFragment {
 
     public interface ServerFragmentCallback extends CommonCallbacks {
         public void sendServerMessage(final String message);
-
-        public void onNewChannelJoined(final String channelName, final boolean forceSwitch);
-    }
-
-    private class ServerListener extends BroadcastReceiver {
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            final Event event = intent.getParcelableExtra("event");
-            final ServerEventType type = (ServerEventType) event.getType();
-            switch (type) {
-                case Join:
-                    mCallback.onNewChannelJoined(event.getMessage()[0], true);
-                    break;
-                case Error:
-                    appendToTextView(event.getMessage()[0] + "\n");
-                    break;
-                case NewPrivateMessage:
-                    mCallback.onCreatePMFragment(event.getMessage()[0]);
-                    break;
-                case ServerConnected:
-                    getEditText().setEnabled(true);
-                    // FALL THROUGH INTENTIONAL
-                case Generic:
-                    appendToTextView(event.getMessage()[0] + "\n");
-                    break;
-            }
-        }
     }
 }

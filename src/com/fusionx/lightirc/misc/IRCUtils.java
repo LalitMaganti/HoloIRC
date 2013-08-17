@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.misc;
 
-import com.fusionx.ircinterface.enums.UserLevel;
+import com.fusionx.irc.enums.UserLevel;
 
 public class IRCUtils {
     public static boolean isUserVoice(final String user) {

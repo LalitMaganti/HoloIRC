@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.promptdialogs;
 
 import android.content.Context;
+
 import com.fusionx.lightirc.R;
 
 public abstract class NickPromptDialogBuilder extends PromptDialogBuilder {

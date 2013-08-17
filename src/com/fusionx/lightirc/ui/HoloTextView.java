@@ -3,6 +3,7 @@ package com.fusionx.lightirc.ui;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
 import com.fusionx.lightirc.misc.Utils;
 
 public class HoloTextView extends TextView {

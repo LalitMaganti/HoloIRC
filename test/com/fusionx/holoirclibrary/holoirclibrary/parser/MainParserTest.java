@@ -1,10 +1,10 @@
-package com.fusionx.ircinterface.holoirclibrary.parser;
+package com.fusionx.irc.holoirclibrary.parser;
 
-import com.fusionx.ircinterface.holoirclibrary.Server;
-import com.fusionx.ircinterface.holoirclibrary.constants.EventDestination;
-import com.fusionx.ircinterface.holoirclibrary.enums.ServerEventType;
-import com.fusionx.ircinterface.holoirclibrary.events.Event;
-import com.fusionx.ircinterface.holoirclibrary.interfaces.CommonInterface;
+import com.fusionx.irc.holoirclibrary.Server;
+import com.fusionx.irc.holoirclibrary.constants.EventDestination;
+import com.fusionx.irc.holoirclibrary.enums.ServerEventType;
+import com.fusionx.irc.holoirclibrary.events.Event;
+import com.fusionx.irc.holoirclibrary.interfaces.CommonInterface;
 import org.junit.Test;
 
 public class MainParserTest {

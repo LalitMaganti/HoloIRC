@@ -34,9 +34,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.PopupMenu;
-import com.fusionx.ircinterface.IRCBridgeService;
-import com.fusionx.ircinterface.Server;
-import com.fusionx.ircinterface.ServerConfiguration;
+
+import com.fusionx.uiircinterface.IRCBridgeService;
+import com.fusionx.irc.Server;
+import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;

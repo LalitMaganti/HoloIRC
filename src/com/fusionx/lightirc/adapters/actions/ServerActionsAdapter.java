@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.adapters.actions;
 
 import android.content.Context;
+
 import lombok.Getter;
 import lombok.Setter;
 

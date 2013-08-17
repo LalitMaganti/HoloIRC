@@ -22,48 +22,63 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.ircinterface.User;
-import com.fusionx.ircinterface.constants.EventDestination;
-import com.fusionx.ircinterface.enums.ChannelEventType;
-import com.fusionx.ircinterface.events.Event;
+
+import com.fusionx.irc.Channel;
+import com.fusionx.irc.User;
+import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.ChannelEventType;
+import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
 public class ChannelFragment extends IRCFragment {
     private ChannelFragmentCallback mCallback;
-    private ChannelListener mListener;
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        writeToTextView(mCallback.getServer(false).getUserChannelInterface()
-                .getChannel(getTitle()).getBuffer());
-
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(EventDestination.Channel + "." + getTitle());
-        mListener = new ChannelListener();
-        mCallback.getBroadcastManager().registerReceiver(mListener, filter);
+        final String message = String.format(getActivity().getString(R.string
+                .parser_joined_channel),
+                mCallback.getServer(false).getUser().getColorfulNick());
+        appendToTextView(message + "\n");
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onResume() {
+        super.onResume();
 
-        mCallback.getBroadcastManager().unregisterReceiver(mListener);
+        MessageSender.getSender(mCallback.getServer(false).getTitle()).registerChannelFragmentHandler
+                (getTitle(), mChannelFragmentHandler);
+
+        final Channel channel = mCallback.getServer(false).getUserChannelInterface().getChannel
+                (getTitle());
+        if (channel != null) {
+            writeToTextView(channel.getBuffer());
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        MessageSender.getSender(mCallback.getServer(false).getTitle())
+                .unregisterChannelFragmentHandler(getTitle());
     }
 
     @Override
@@ -122,24 +137,25 @@ public class ChannelFragment extends IRCFragment {
         public void updateUserList(final String channelName);
     }
 
-    private class ChannelListener extends BroadcastReceiver {
+    private final Handler mChannelFragmentHandler = new Handler() {
         @Override
-        public void onReceive(final Context context, final Intent intent) {
-            final Event event = intent.getParcelableExtra("event");
-            final ChannelEventType type = (ChannelEventType) event.getType();
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final ChannelEventType type = (ChannelEventType) bundle.getSerializable(EventBundleKeys
+                    .eventType);
             switch (type) {
                 case UserListChanged:
                     mCallback.updateUserList(getTitle());
-                    if(!Utils.isMessagesFromChannelShown(getActivity())) {
+                    if (!Utils.isMessagesFromChannelShown(getActivity())) {
                         break;
                     }
                 case Generic:
-                    appendToTextView(event.getMessage()[0] + "\n");
+                    appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
                     break;
                 case UserParted:
                     mCallback.switchFragmentAndRemove(getTitle());
                     break;
             }
         }
-    }
+    };
 }

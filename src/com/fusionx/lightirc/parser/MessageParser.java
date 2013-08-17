@@ -22,8 +22,9 @@
 package com.fusionx.lightirc.parser;
 
 import android.content.Context;
-import com.fusionx.ircinterface.Server;
-import com.fusionx.lightirc.irc.ServerCommandSender;
+
+import com.fusionx.irc.Server;
+import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.misc.Utils;
 
 import java.util.ArrayList;

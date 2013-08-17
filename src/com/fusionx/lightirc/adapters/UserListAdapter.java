@@ -26,7 +26,9 @@ import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.fusionx.ircinterface.User;
+
+import com.fusionx.irc.User;
+
 import lombok.Setter;
 
 import java.util.SortedSet;

@@ -32,7 +32,8 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
-import com.fusionx.ircinterface.IRCBridgeService;
+
+import com.fusionx.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 

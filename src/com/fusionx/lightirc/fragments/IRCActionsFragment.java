@@ -29,12 +29,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.TextView;
+
 import com.commonsware.cwac.merge.MergeAdapter;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
 import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
-import com.fusionx.lightirc.irc.ServerCommandSender;
+import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
@@ -83,6 +84,11 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         setListAdapter(mergeAdapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        view.setBackground(null);
     }
 
     @Override

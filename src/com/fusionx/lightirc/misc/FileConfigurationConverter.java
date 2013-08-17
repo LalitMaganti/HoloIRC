@@ -2,7 +2,8 @@ package com.fusionx.lightirc.misc;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.fusionx.ircinterface.ServerConfiguration;
+
+import com.fusionx.irc.ServerConfiguration;
 
 public class FileConfigurationConverter {
     public static ServerConfiguration.Builder convertFileToBuilder(final Context context,

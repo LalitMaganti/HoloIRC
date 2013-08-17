@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 

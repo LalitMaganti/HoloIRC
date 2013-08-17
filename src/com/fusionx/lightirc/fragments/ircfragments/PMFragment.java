@@ -22,42 +22,45 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
-import com.fusionx.ircinterface.User;
-import com.fusionx.ircinterface.constants.EventDestination;
-import com.fusionx.ircinterface.enums.UserEventType;
-import com.fusionx.ircinterface.events.Event;
+
+import com.fusionx.irc.Channel;
+import com.fusionx.irc.User;
+import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.parser.MessageParser;
+import com.fusionx.uiircinterface.MessageSender;
 
 public class PMFragment extends IRCFragment {
     private CommonCallbacks mCallback;
-    private PMFragmentListener mListener;
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
 
-        writeToTextView(getUser(getTitle()).getBuffer());
+        MessageSender.getSender(mCallback.getServer(false).getTitle())
+                .registerUserFragmentHandler(getTitle(), mUserFragmentHandler);
 
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(EventDestination.User + "." + getTitle());
-        mListener = new PMFragmentListener();
-        mCallback.getBroadcastManager().registerReceiver(mListener, filter);
+        final User user = mCallback.getServer(false).getUserChannelInterface()
+                .getUser(getTitle());
+        if (user != null) {
+            writeToTextView(user.getBuffer());
+        }
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
 
-        mCallback.getBroadcastManager().unregisterReceiver(mListener);
+        MessageSender.getSender(mCallback.getServer(false).getTitle())
+                .unregisterUserFragmentHandler(getTitle());
     }
 
     @Override
@@ -93,23 +96,19 @@ public class PMFragment extends IRCFragment {
         return FragmentType.User;
     }
 
-    public User getUser(final String userNick) {
-        return mCallback.getServer(false).getUserChannelInterface().getUser(userNick);
-    }
-
     public void sendUserMessage(final String nick, final String message) {
         MessageParser.userMessageToParse(mCallback.getServer(false), nick, message);
     }
 
-    private class PMFragmentListener extends BroadcastReceiver {
+    private final Handler mUserFragmentHandler = new Handler() {
         @Override
-        public void onReceive(final Context context, final Intent intent) {
-            final Event event = intent.getParcelableExtra("event");
-            final UserEventType type = (UserEventType) event.getType();
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final UserEventType type = (UserEventType) bundle.getSerializable(EventBundleKeys.eventType);
             switch (type) {
                 case Generic:
-                    appendToTextView(event.getMessage()[0] + "\n");
+                    appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
             }
         }
-    }
+    };
 }

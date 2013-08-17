@@ -30,13 +30,16 @@ import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
+
 import lombok.AccessLevel;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class IRCPagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;
@@ -57,9 +60,8 @@ public class IRCPagerAdapter extends PagerAdapter {
     @Setter(AccessLevel.PUBLIC)
     private int currentItemIndex;
 
-    public IRCPagerAdapter(final FragmentManager fm, final String serverName) {
+    public IRCPagerAdapter(final FragmentManager fm) {
         mFragmentManager = fm;
-        addServerFragment(serverName);
     }
 
     @Override
@@ -192,7 +194,7 @@ public class IRCPagerAdapter extends PagerAdapter {
         return state;
     }
 
-    private void addServerFragment(final String serverName) {
+    public void addServerFragment(final String serverName) {
         final ServerFragment fragment = new ServerFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", serverName);
@@ -281,8 +283,11 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void removeAllButServer() {
-        for (int i = 1; i < getCount(); ) {
-            views.remove(i);
+        final Iterator<IRCFragment> iterator = views.iterator();
+        iterator.next();
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
         }
 
         tabStrip.notifyDataSetChanged();

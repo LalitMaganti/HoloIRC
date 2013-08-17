@@ -28,16 +28,19 @@ import android.content.ServiceConnection;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.ircinterface.*;
+import com.fusionx.irc.*;
+import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.IRCActionsFragment;
@@ -45,13 +48,13 @@ import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
-import com.fusionx.lightirc.irc.ServerCommandSender;
+import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.misc.Utils;
 import com.fusionx.lightirc.parser.MessageParser;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.IRCViewPager;
-import com.fusionx.lightirc.ui.RobotoTypefaceSpan;
+import com.fusionx.uiircinterface.IRCBridgeService;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
@@ -66,7 +69,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
     private String mServerTitle = null;
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
-    private LocalBroadcastManager broadcastManager;
     private final ViewPagerOnPagerListener listener = new ViewPagerOnPagerListener();
 
     @Override
@@ -81,33 +83,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
         setUpSlidingMenu();
 
-        final TypedArray a = getTheme().obtainStyledAttributes(new int[]
-                {android.R.attr.windowBackground});
-        final int background = a.getResourceId(0, 0);
-
-        final IRCPagerAdapter adapter = new IRCPagerAdapter(getSupportFragmentManager(),
-                mServerTitle);
-        mViewPager = (IRCViewPager) findViewById(R.id.pager);
-        mViewPager.setBackgroundResource(background);
-        mViewPager.setAdapter(adapter);
-
-        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        tabs.setViewPager(mViewPager);
-        tabs.setOnPageChangeListener(listener);
-        tabs.setBackgroundResource(R.color.sliding_menu_background);
-        tabs.setTextColorResource(android.R.color.white);
-        tabs.setIndicatorColorResource(android.R.color.white);
-        mViewPager.getAdapter().setTabStrip(tabs);
-
-        broadcastManager = LocalBroadcastManager.getInstance(this);
-
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            final SpannableString s = new SpannableString(mServerTitle);
-            s.setSpan(new RobotoTypefaceSpan("roboto-light", this), 0, s.length(),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            actionBar.setTitle(s);
+            actionBar.setTitle(mServerTitle);
         }
     }
 
@@ -134,6 +113,26 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
         mActionsSlidingMenu.setOnOpenListener(mActionsFragment);
         mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+    }
+
+    private void setUpViewPager() {
+        final TypedArray a = getTheme().obtainStyledAttributes(new int[]
+                {android.R.attr.windowBackground});
+        final int background = a.getResourceId(0, 0);
+
+        final IRCPagerAdapter adapter = new IRCPagerAdapter(getSupportFragmentManager());
+        adapter.addServerFragment(mServerTitle);
+        mViewPager = (IRCViewPager) findViewById(R.id.pager);
+        mViewPager.setBackgroundResource(background);
+        mViewPager.setAdapter(adapter);
+
+        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        tabs.setViewPager(mViewPager);
+        tabs.setOnPageChangeListener(listener);
+        tabs.setBackgroundResource(R.color.sliding_menu_background);
+        tabs.setTextColorResource(android.R.color.white);
+        tabs.setIndicatorColorResource(android.R.color.white);
+        mViewPager.getAdapter().setTabStrip(tabs);
     }
 
     @Override
@@ -179,7 +178,11 @@ public class IRCFragmentActivity extends FragmentActivity implements
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCBridgeService.IRCBinder) binder).getService();
+            setUpViewPager();
+
             mService.setServerDisplayed(mServerTitle);
+            final ServerConfiguration.Builder builder = getIntent()
+                    .getParcelableExtra("server");
 
             if (getServer(true) != null) {
                 if (isConnectedToServer()) {
@@ -191,16 +194,46 @@ public class IRCFragmentActivity extends FragmentActivity implements
                     }
                 }
             } else {
-                final ServerConfiguration.Builder builder = getIntent()
-                        .getParcelableExtra("server");
-                mService.connectToServer(builder, broadcastManager);
+                mService.connectToServer(builder);
             }
+
+            MessageSender.getSender(builder.getTitle()).registerServerFragmentHandler(mServerHandler);
         }
 
         // Should not occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
             mService = null;
+        }
+    };
+
+    private final Handler mServerHandler = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
+                    .eventType);
+            final String message = bundle.getString(EventBundleKeys.message);
+            switch (type) {
+                case Join:
+                    onNewChannelJoined(message, true);
+                    break;
+                case NewPrivateMessage:
+                    onCreatePMFragment(message);
+                    break;
+                case Error:
+                    mViewPager.getAdapter().getFragment(getServer(false).getTitle())
+                            .appendToTextView(message + "\n");
+                    break;
+                case ServerConnected:
+                    mViewPager.getAdapter().getFragment(getServer(false).getTitle())
+                            .getEditText().setEnabled(true);
+                    // FALL THROUGH INTENTIONAL
+                case Generic:
+                    mViewPager.getAdapter().getFragment(getServer(false).getTitle())
+                            .appendToTextView(message + "\n");
+                    break;
+            }
         }
     };
 
@@ -279,11 +312,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public void selectServerFragment() {
         mViewPager.setCurrentItem(0, true);
-    }
-
-    @Override
-    public LocalBroadcastManager getBroadcastManager() {
-        return broadcastManager;
     }
 
     // ActivityListener Callbacks
@@ -386,7 +414,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
         MessageParser.serverMessageToParse(getServer(false), message);
     }
 
-    @Override
     public void onNewChannelJoined(final String channelName, final boolean forceSwitch) {
         final boolean switchToTab = channelName.equals(getIntent().getStringExtra("mention"))
                 || forceSwitch;

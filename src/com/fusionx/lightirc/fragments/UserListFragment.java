@@ -29,11 +29,13 @@ import android.support.v4.app.ListFragment;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import com.fusionx.ircinterface.User;
+
+import com.fusionx.irc.User;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
-import com.fusionx.lightirc.irc.ServerCommandSender;
+import com.fusionx.uiircinterface.ServerCommandSender;
+
 import lombok.Getter;
 
 import java.util.ArrayList;

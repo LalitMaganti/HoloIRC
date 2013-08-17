@@ -3,6 +3,7 @@ package com.fusionx.lightirc.fragments.settings;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference;

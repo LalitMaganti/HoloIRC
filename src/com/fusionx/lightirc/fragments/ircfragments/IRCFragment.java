@@ -31,8 +31,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,20 +46,18 @@ public abstract class IRCFragment extends Fragment
     private String title = null;
 
     @Getter(AccessLevel.PROTECTED)
-    @Setter(AccessLevel.PROTECTED)
-    private TextView textView = null;
+    protected TextView textView = null;
 
-    @Getter(AccessLevel.PROTECTED)
-    @Setter(AccessLevel.PROTECTED)
-    private EditText editText = null;
+    @Getter(AccessLevel.PUBLIC)
+    protected EditText editText = null;
 
     @Override
     public View onCreateView(final LayoutInflater inflate,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
 
-        setTextView((TextView) rootView.findViewById(R.id.textview));
-        setEditText((EditText) rootView.findViewById(R.id.editText1));
+        textView = (TextView) rootView.findViewById(R.id.textview);
+        editText = (EditText) rootView.findViewById(R.id.editText1);
 
         getEditText().setOnEditorActionListener(this);
 

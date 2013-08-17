@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.interfaces;
 
-import android.support.v4.content.LocalBroadcastManager;
-import com.fusionx.ircinterface.Server;
+import com.fusionx.irc.Server;
 
 public interface CommonCallbacks {
     public void onCreatePMFragment(final String userNick);
@@ -11,8 +10,6 @@ public interface CommonCallbacks {
     public boolean isConnectedToServer();
 
     public void selectServerFragment();
-
-    public LocalBroadcastManager getBroadcastManager();
 
     public Server getServer(final boolean nullAllowed);
 }

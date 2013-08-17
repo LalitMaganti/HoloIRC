@@ -26,13 +26,16 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
+
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.ui.RobotoTypeface;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
 public class Utils {
+    private static Typeface robotoTypeface = null;
+
     public static int getThemeInt(final Context applicationContext) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(applicationContext);
@@ -62,8 +65,15 @@ public class Utils {
         return !preferences.getBoolean(PreferenceKeys.HideMessages, false);
     }
 
+    public static Typeface getRobotoLightTypeface(final Context context) {
+        if (robotoTypeface == null) {
+            robotoTypeface = Typeface.createFromAsset(context.getAssets(), "Roboto-Light.ttf");
+        }
+        return robotoTypeface;
+    }
+
     public static void setTypeface(final Context context, final TextView textView) {
-        final Typeface font = RobotoTypeface.getTypeface(context);
+        final Typeface font = getRobotoLightTypeface(context);
         textView.setTypeface(font);
     }
 
@@ -71,12 +81,6 @@ public class Utils {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(applicationContext);
         return preferences.getString(PreferenceKeys.PartReason, "");
-    }
-
-    public static String getQuitReason(final Context applicationContext) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(applicationContext);
-        return preferences.getString(PreferenceKeys.QuitReason, "");
     }
 
     public static ArrayList<String> splitLineBySpaces(final String rawLine) {

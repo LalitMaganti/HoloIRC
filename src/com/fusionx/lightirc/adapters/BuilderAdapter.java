@@ -28,8 +28,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.fusionx.ircinterface.Server;
-import com.fusionx.ircinterface.ServerConfiguration;
+
+import com.fusionx.irc.Server;
+import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 
 public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {

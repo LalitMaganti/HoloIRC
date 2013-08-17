@@ -28,6 +28,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.Utils;
 
