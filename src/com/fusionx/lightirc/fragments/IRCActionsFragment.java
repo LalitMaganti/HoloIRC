@@ -24,7 +24,6 @@ package com.fusionx.lightirc.fragments;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,17 +43,17 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
-    private IRCActionsListenerInterface mListener;
+    private IRCActionsCallback mListener;
     private FragmentType type;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (IRCActionsListenerInterface) activity;
+            mListener = (IRCActionsCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() +
-                    " must implement IRCActionsListenerInterface");
+                    " must implement IRCActionsCallback");
         }
     }
 
@@ -88,8 +87,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view,
-                            final int i, final long l) {
+    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
+                            final long l) {
         switch (i) {
             case 1:
                 channelNameDialog();
@@ -103,8 +102,6 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
             case 5:
                 mListener.closeOrPartCurrentTab();
                 break;
-            default:
-                Log.e("HoloIRC", String.valueOf(i));
         }
         mListener.closeAllSlidingMenus();
     }
@@ -121,8 +118,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void channelNameDialog() {
-        final ChannelNamePromptDialogBuilder builder =
-                new ChannelNamePromptDialogBuilder(getActivity()) {
+        final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder
+                (getActivity()) {
                     @Override
                     public void onOkClicked(final String input) {
                         ServerCommandSender.sendJoin(mListener.getServer(false), input);
@@ -183,7 +180,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         getServerAdapter().notifyDataSetChanged();
     }
 
-    public interface IRCActionsListenerInterface extends CommonCallbacks {
+    public interface IRCActionsCallback extends CommonCallbacks {
         public String getNick();
 
         public void closeOrPartCurrentTab();

@@ -28,6 +28,8 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
+import com.fusionx.irc.Channel;
+import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
@@ -49,10 +51,12 @@ public class PMFragment extends IRCFragment {
         MessageSender.getSender(mCallback.getServerTitle())
                 .registerUserFragmentHandler(getTitle(), mUserFragmentHandler);
 
-        final User user = mCallback.getServer(false).getUserChannelInterface()
-                .getUser(getTitle());
-        if (user != null) {
-            writeToTextView(user.getBuffer());
+        final Server server = mCallback.getServer(true);
+        if (server != null) {
+            final User user = server.getUserChannelInterface().getUser(getTitle());
+            if (user != null) {
+                writeToTextView(user.getBuffer());
+            }
         }
     }
 

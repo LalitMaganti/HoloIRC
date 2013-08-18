@@ -32,6 +32,7 @@ import android.widget.TextView;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
+import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
@@ -66,10 +67,12 @@ public class ChannelFragment extends IRCFragment {
         MessageSender.getSender(mCallback.getServerTitle()).registerChannelFragmentHandler
                 (getTitle(), mChannelFragmentHandler);
 
-        final Channel channel = mCallback.getServer(false).getUserChannelInterface().getChannel
-                (getTitle());
-        if (channel != null) {
-            writeToTextView(channel.getBuffer());
+        final Server server = mCallback.getServer(true);
+        if (server != null) {
+            final Channel channel = server.getUserChannelInterface().getChannel(getTitle());
+            if (channel != null) {
+                writeToTextView(channel.getBuffer());
+            }
         }
     }
 

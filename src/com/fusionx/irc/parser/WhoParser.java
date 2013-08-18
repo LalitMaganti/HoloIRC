@@ -49,7 +49,7 @@ public class WhoParser {
             user.setHost(parsedArray.get(2));
             user.setServerUrl(parsedArray.get(3));
             final ArrayList<String> secondParse = Utils.splitRawLine(parsedArray.get(6)
-                    .substring(2));
+                    .substring(2), true);
             user.setRealName(Utils.convertArrayListToString(secondParse));
         }
         mUserChannelInterface.addChannelToUser(user, whoChannel);

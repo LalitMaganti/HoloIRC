@@ -26,23 +26,25 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
 
-public abstract class PromptDialogBuilder extends AlertDialog.Builder
-        implements DialogInterface.OnClickListener, TextWatcher {
+public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface
+        .OnClickListener, TextWatcher {
     private final EditText input;
     private AlertDialog dialog = null;
 
-    PromptDialogBuilder(final Context context, final String title, final String hint, final String defaultText) {
+    PromptDialogBuilder(final Context context, final String title, final String hint,
+                        final String defaultText) {
         super(context);
 
         setTitle(title);
 
-        input = new EditText(context);
+        input = (EditText) LayoutInflater.from(context).inflate(R.layout.prompt_dialog, null);
         Utils.setTypeface(getContext(), input);
         input.setHint(hint);
         input.setText(defaultText);

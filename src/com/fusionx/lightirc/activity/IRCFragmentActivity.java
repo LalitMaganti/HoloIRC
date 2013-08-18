@@ -68,8 +68,8 @@ import java.util.ArrayList;
  * @author Lalit Maganti
  */
 public class IRCFragmentActivity extends FragmentActivity implements
-        UserListFragment.UserListListenerInterface, ChannelFragment.ChannelFragmentCallback,
-        IRCActionsFragment.IRCActionsListenerInterface, ServerFragment.ServerFragmentCallback {
+        UserListFragment.UserListCallback, ChannelFragment.ChannelFragmentCallback,
+        IRCActionsFragment.IRCActionsCallback, ServerFragment.ServerFragmentCallback {
 
     private UserListFragment mUserFragment = null;
     private IRCBridgeService mService = null;
@@ -168,12 +168,17 @@ public class IRCFragmentActivity extends FragmentActivity implements
         super.onStop();
 
         MessageSender.getSender(mServerTitle).unregisterServerChannelHandler();
-
-        unbindService(mConnection);
         if (mService != null) {
             mService.setServerDisplayed(null);
-            mService = null;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unbindService(mConnection);
+        mService = null;
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -327,17 +332,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
     public void selectServerFragment() {
         mViewPager.setCurrentItem(0, true);
     }
-
-    // ActivityListener Callbacks
-    //@Override
-    //public boolean isFragmentSelected(final String title) {
-    //    return getCurrentItem().getTitle().equals(title);
-    //}
-
-    //@Override
-    //public IRCFragment isFragmentAvailable(final String title) {
-    //    return mViewPager.getAdapter().getFragment(title);
-    //}
 
     /**
      * If the currently displayed fragment is the one being removed then switch

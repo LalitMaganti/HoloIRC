@@ -51,38 +51,28 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         AdapterView.OnItemClickListener {
     @Getter
     private ActionMode mode;
-
-    private UserListListenerInterface mListener;
-    @Getter
+    private UserListCallback mListener;
     private String currentlyDisplayedChannelName;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (UserListListenerInterface) activity;
+            mListener = (UserListCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement UserListListenerInterface");
+                    + " must implement UserListCallback");
         }
     }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater,
-                             final ViewGroup container, final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
         final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
                 new TreeSet<User>());
         setListAdapter(adapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        // TODO - do this in a better way
-        //getListView().setBackgroundColor(getResources().getColor(android.R.color.transparent));
     }
 
     public void onMenuOpened(final String channelName) {
@@ -196,8 +186,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> adapterView,
-                            final View view, final int i, final long l) {
+    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
+                            final long l) {
         if (mode == null) {
             getActivity().startActionMode(this);
 
@@ -228,7 +218,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return !mListener.getServer(false).getUser().getNick().equals(nick);
     }
 
-    public interface UserListListenerInterface extends CommonCallbacks {
+    public interface UserListCallback extends CommonCallbacks {
         public void onUserMention(final ArrayList<User> users);
 
         public void createPMFragment(final String userNick);

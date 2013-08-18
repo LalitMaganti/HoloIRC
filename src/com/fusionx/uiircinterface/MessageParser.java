@@ -36,7 +36,7 @@ import java.util.ArrayList;
 public class MessageParser {
     public static void channelMessageToParse(final CommonCallbacks callbacks,
                                              final String channelName, final String message) {
-        final ArrayList<String> parsedArray = Utils.splitLineBySpaces(message);
+        final ArrayList<String> parsedArray = Utils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final Server server = callbacks.getServer(false);
 
@@ -62,7 +62,7 @@ public class MessageParser {
 
     public static void userMessageToParse(final CommonCallbacks callbacks, final String userNick,
                                           final String message) {
-        final ArrayList<String> parsedArray = Utils.splitLineBySpaces(message);
+        final ArrayList<String> parsedArray = Utils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
         final Server server = callbacks.getServer(false);
 
@@ -98,7 +98,7 @@ public class MessageParser {
 
     private static void serverCommandToParse(final CommonCallbacks callbacks,
                                              final String rawLine) {
-        final ArrayList<String> parsedArray = Utils.splitLineBySpaces(rawLine);
+        final ArrayList<String> parsedArray = Utils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
         final Server server = callbacks.getServer(false);
 

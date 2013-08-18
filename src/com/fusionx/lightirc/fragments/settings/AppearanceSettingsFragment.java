@@ -37,7 +37,8 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.uiircinterface.IRCBridgeService;
 
-public class AppearanceSettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+public class AppearanceSettingsFragment extends PreferenceFragment
+        implements Preference.OnPreferenceChangeListener {
     private ListPreference mChooseTheme = null;
 
     @Override

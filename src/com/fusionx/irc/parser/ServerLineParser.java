@@ -70,7 +70,7 @@ public class ServerLineParser {
         try {
             while ((line = reader.readLine()) != null) {
                 final ServerEventType type = parseLine(line);
-                if (type != null && type.equals(ServerEventType.Error)) {
+                if (ServerEventType.Error.equals(type)) {
                     return;
                 }
             }
@@ -86,7 +86,7 @@ public class ServerLineParser {
      * @return returns an event if there is an error - otherwise returns null
      */
     ServerEventType parseLine(final String line) {
-        final ArrayList<String> parsedArray = Utils.splitRawLine(line);
+        final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
         switch (parsedArray.get(0)) {
             case ServerCommands.Ping: {
                 // Immediately return

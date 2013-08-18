@@ -51,7 +51,7 @@ public class ServerConnectionParser {
         int suffix = 0;
         final MessageSender sender = MessageSender.getSender(title);
         while ((line = reader.readLine()) != null) {
-            final ArrayList<String> parsedArray = Utils.splitRawLine(line);
+            final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
             if (StringUtils.isNumeric(parsedArray.get(1))) {
                 switch (Integer.parseInt(parsedArray.get(1))) {
                     case RPL_WELCOME: {

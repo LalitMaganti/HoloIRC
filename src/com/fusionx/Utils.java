@@ -71,37 +71,15 @@ public class Utils {
         return preferences.getString(PreferenceKeys.PartReason, "");
     }
 
-    public static ArrayList<String> splitLineBySpaces(final String rawLine) {
-        if (rawLine != null) {
-            final ArrayList<String> list = new ArrayList<>();
-            String buffer = "";
-
-            for (int i = 0; i < rawLine.length(); i++) {
-                final char c = rawLine.charAt(i);
-                if (c == ' ') {
-                    list.add(buffer);
-                    buffer = "";
-                } else {
-                    buffer += c;
-                }
-            }
-
-            if (!StringUtils.isEmpty(buffer)) {
-                list.add(buffer);
-            }
-            return list;
-        } else {
-            return null;
-        }
-    }
-
     /**
      * Split the line received from the server into it's components
      *
      * @param rawLine the line received from the server
+     * @param careAboutColon - whether a colon means the rest of the line should be added in one go
      * @return the parsed list
      */
-    public static ArrayList<String> splitRawLine(final String rawLine) {
+    public static ArrayList<String> splitRawLine(final String rawLine,
+                                                 final boolean careAboutColon) {
         if (rawLine != null) {
             final ArrayList<String> list = new ArrayList<>();
             String buffer = "";
@@ -112,7 +90,7 @@ public class Utils {
                 if (c == ' ') {
                     list.add(buffer);
                     buffer = "";
-                } else if (c == ':' && StringUtils.isEmpty(buffer)) {
+                } else if (c == ':' && StringUtils.isEmpty(buffer) && careAboutColon) {
                     // A colon can occur in an IPv6 address so that is why the buffer check
                     // is necessary - the final colon can only occur with an empty buffer
                     // Add all the stuff after the last colon as a single item
@@ -172,7 +150,7 @@ public class Utils {
     }
 
     public static int generateRandomColor(final int colorOffset) {
-        Random random = new Random();
+        final Random random = new Random();
         int red = random.nextInt(256);
         int green = random.nextInt(256);
         int blue = random.nextInt(256);
