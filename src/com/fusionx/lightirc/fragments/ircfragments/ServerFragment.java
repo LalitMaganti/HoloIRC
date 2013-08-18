@@ -95,6 +95,7 @@ public class ServerFragment extends IRCFragment {
                     mCallback.onUnexpectedDisconnect();
                     break;
                 case NickInUse:
+                    mCallback.selectServerFragment();
                 case Generic:
                     break;
             }

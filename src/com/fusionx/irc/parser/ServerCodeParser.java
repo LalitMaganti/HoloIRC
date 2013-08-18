@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import static com.fusionx.Utils.isMotdAllowed;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
+import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_ENDOFWHO;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_MOTD;
@@ -95,6 +96,12 @@ public class ServerCodeParser {
                 return;
             case RPL_ENDOFWHO:
                 mWhoParser.parseWhoFinished();
+                return;
+            case ERR_NICKNAMEINUSE:
+                final MessageSender sender = MessageSender.getSender(mServer.getTitle());
+                final Bundle event = Utils.parcelDataForBroadcast(null,
+                        ServerEventType.NickInUse, mContext.getString(R.string.parser_nick_in_use));
+                sender.sendServerMessage(event);
                 return;
             default:
                 parseFallThroughCode(code, message);

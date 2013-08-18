@@ -28,7 +28,7 @@ import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import java.util.ArrayList;
 
 /**
- * This entire class needs input validation and full parsing
+ * This entire class needs full parsing
  */
 public class MessageParser {
     public static void channelMessageToParse(final CommonCallbacks callbacks,
@@ -45,8 +45,12 @@ public class MessageParser {
                     break;
                 case "/part":
                 case "/p":
-                    ServerCommandSender.sendPart(server, channelName,
-                            callbacks.getApplicationContext());
+                    if(parsedArray.size() == 0) {
+                        ServerCommandSender.sendPart(server, channelName,
+                                callbacks.getApplicationContext());
+                    } else {
+                        ServerCommandSender.sendUnknownEvent(server, message);
+                    }
                     break;
                 default:
                     serverCommandToParse(callbacks, message);
@@ -71,8 +75,12 @@ public class MessageParser {
                     break;
                 case "/close":
                 case "/c":
-                    ServerCommandSender.sendClosePrivateMessage(server,
-                            server.getUserChannelInterface().getUser(userNick));
+                    if(parsedArray.size() == 0) {
+                        ServerCommandSender.sendClosePrivateMessage(server,
+                                server.getUserChannelInterface().getUser(userNick));
+                    } else {
+                        ServerCommandSender.sendUnknownEvent(server, message);
+                    }
                     break;
                 default:
                     serverCommandToParse(callbacks, message);
@@ -102,11 +110,15 @@ public class MessageParser {
         switch (command) {
             case "/join":
             case "/j":
-                final String channelName = parsedArray.get(0);
-                ServerCommandSender.sendJoin(server, channelName);
+                if(parsedArray.size() == 1) {
+                    final String channelName = parsedArray.get(0);
+                    ServerCommandSender.sendJoin(server, channelName);
+                } else {
+                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                }
                 break;
             case "/msg":
-                if (parsedArray.size() > 1) {
+                if (parsedArray.size() >= 1) {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ?
                             Utils.convertArrayListToString(parsedArray) : "";
@@ -116,11 +128,19 @@ public class MessageParser {
                 }
                 break;
             case "/nick":
-                final String newNick = parsedArray.get(0);
-                ServerCommandSender.sendNickChange(server, newNick);
+                if(parsedArray.size() == 1) {
+                    final String newNick = parsedArray.get(0);
+                    ServerCommandSender.sendNickChange(server, newNick);
+                } else {
+                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                }
                 break;
             case "/quit":
-                callbacks.disconnect();
+                if(parsedArray.size() == 0) {
+                    callbacks.disconnect();
+                } else {
+                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                }
                 break;
             default:
                 ServerCommandSender.sendUnknownEvent(server, rawLine);
