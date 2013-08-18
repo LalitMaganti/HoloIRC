@@ -34,7 +34,7 @@ import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.parser.MessageParser;
+import com.fusionx.uiircinterface.MessageParser;
 import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;

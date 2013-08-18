@@ -189,10 +189,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
             if (getServer(true) != null) {
                 if (isConnectedToServer()) {
                     for (final Channel channelName : getServer(false).getUser().getChannels()) {
-                        onCreateChannelFragment(channelName.getName());
+                        createChannelFragment(channelName.getName());
                     }
                     for (final User user : getServer(false).getUser().getPrivateMessages()) {
-                        onCreatePMFragment(user.getNick());
+                        createPMFragment(user.getNick());
                     }
                 }
             } else {
@@ -222,7 +222,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
                     createChannelFragment(message, true);
                     break;
                 case NewPrivateMessage:
-                    onCreatePMFragment(message);
+                    createPMFragment(message);
                     break;
             }
         }
@@ -250,8 +250,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
-                    mUserFragment.userListUpdate(getCurrentItem().getTitle());
-                    mUserFragment.getListView().smoothScrollToPosition(0);
+                    mUserFragment.onMenuOpened(getCurrentItem().getTitle());
                 }
                 mUserSlidingMenu.toggle();
                 return true;
@@ -282,22 +281,37 @@ public class IRCFragmentActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Get the name of the currently displayed server
+     * @return - the current server title
+     */
     @Override
     public String getServerTitle() {
         return mServerTitle;
     }
 
+    /**
+     * Method called when a new PMFragment is to be created
+     * @param userNick - the nick of the user the PM is to
+     */
     @Override
-    public void onCreatePMFragment(final String userNick) {
+    public void createPMFragment(final String userNick) {
         mViewPager.onNewPrivateMessage(userNick);
     }
 
+    /**
+     * Close all SlidingMenus (if open)
+     */
     @Override
     public void closeAllSlidingMenus() {
         mActionsSlidingMenu.showContent();
         mUserSlidingMenu.showContent();
     }
 
+    /**
+     * Checks if the app is connected to the server
+     * @return whether the app is connected to the server
+     */
     @Override
     public boolean isConnectedToServer() {
         final Server server = getServer(true);
@@ -306,6 +320,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
                 .equals(getString(R.string.status_connected));
     }
 
+    /**
+     * Selects the ServerFragment regardless of what is currently selected
+     */
     @Override
     public void selectServerFragment() {
         mViewPager.setCurrentItem(0, true);
@@ -313,36 +330,53 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     // ActivityListener Callbacks
     //@Override
-    public boolean isFragmentSelected(final String title) {
-        return getCurrentItem().getTitle().equals(title);
-    }
+    //public boolean isFragmentSelected(final String title) {
+    //    return getCurrentItem().getTitle().equals(title);
+    //}
 
     //@Override
-    public IRCFragment isFragmentAvailable(final String title) {
-        return mViewPager.getAdapter().getFragment(title);
-    }
+    //public IRCFragment isFragmentAvailable(final String title) {
+    //    return mViewPager.getAdapter().getFragment(title);
+    //}
 
+    /**
+     * If the currently displayed fragment is the one being removed then switch
+     * to one tab back. Then remove the fragment regardless.
+     * @param fragmentTitle - name of the fragment to be removed
+     */
     @Override
-    public void switchFragmentAndRemove(final String tabName) {
-        final int index = mViewPager.getAdapter().getIndexFromTitle(tabName);
-        if (getCurrentItem().getTitle().equals(tabName)) {
+    public void switchFragmentAndRemove(final String fragmentTitle) {
+        final int index = mViewPager.getAdapter().getIndexFromTitle(fragmentTitle);
+        if (getCurrentItem().getTitle().equals(fragmentTitle)) {
             mViewPager.setCurrentItem(index - 1, true);
         }
         mViewPager.getAdapter().removeFragment(index);
     }
 
+    /**
+     * Called when a user list update occurs
+     * @param channelName - name of channel which was updated
+     */
     @Override
-    public void updateUserList(String channelName) {
+    public void updateUserList(final String channelName) {
         if (getCurrentItem().getTitle().equals(channelName)) {
-            mUserFragment.notifyDataSetChanged();
+            mUserFragment.updateUserList();
         }
     }
 
-    private void onCreateChannelFragment(final String channelName) {
+    /**
+     * Create a ChannelFragment with the specified name
+     * @param channelName - name of the channel to create
+     */
+    private void createChannelFragment(final String channelName) {
         createChannelFragment(channelName, false);
     }
 
-    //@Override
+    /**
+     * Method called when the server disconnects unexpectedly - this could be due to
+     * loss of connection or for some reason the server has kicked us out
+     */
+    @Override
     public void onUnexpectedDisconnect() {
         closeAllSlidingMenus();
         selectServerFragment();
@@ -364,6 +398,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     // UserListFragment Listener Callbacks
+    /**
+     * Method which is called when the user requests a mention from
+     * the UserListFragment
+     */
     @Override
     public void onUserMention(final ArrayList<User> users) {
         final ChannelFragment channel = (ChannelFragment) getCurrentItem();
@@ -373,13 +411,17 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     // IRCActionsFragment Listener Callbacks
+    /**
+     * Method which returns the nick of the user
+     * @return - the nick of the user
+     */
     @Override
     public String getNick() {
         return getServer(false).getUser().getNick();
     }
 
     /**
-     * Called when disconnect
+     * Called when a disconnect is requested by the user
      */
     @Override
     public void disconnect() {

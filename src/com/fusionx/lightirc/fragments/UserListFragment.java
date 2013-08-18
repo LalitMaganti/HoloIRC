@@ -54,7 +54,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     private UserListListenerInterface mListener;
     @Getter
-    private String currentUserList;
+    private String currentlyDisplayedChannelName;
 
     @Override
     public void onAttach(Activity activity) {
@@ -82,18 +82,19 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         super.onViewCreated(view, savedInstanceState);
 
         // TODO - do this in a better way
-        getListView().setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        //getListView().setBackgroundColor(getResources().getColor(android.R.color.transparent));
     }
 
-    public void userListUpdate(final String channelName) {
-        if (!channelName.equals(currentUserList)) {
+    public void onMenuOpened(final String channelName) {
+        if (!channelName.equals(currentlyDisplayedChannelName)) {
             final TreeSet<User> userList = getUserList(channelName);
             if (userList != null) {
                 getListAdapter().setInternalSet(userList);
                 getListAdapter().setChannelName(channelName);
-                currentUserList = channelName;
+                currentlyDisplayedChannelName = channelName;
             }
         }
+        getListView().smoothScrollToPosition(0);
     }
 
     @Override
@@ -211,7 +212,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return (UserListAdapter) super.getListAdapter();
     }
 
-    public void notifyDataSetChanged() {
+    public void updateUserList() {
         if (mode != null) {
             mode.finish();
         }
@@ -230,6 +231,6 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public interface UserListListenerInterface extends CommonCallbacks {
         public void onUserMention(final ArrayList<User> users);
 
-        public void onCreatePMFragment(final String userNick);
+        public void createPMFragment(final String userNick);
     }
 }
