@@ -161,18 +161,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
     public void onStop() {
         super.onStop();
 
-        if (mService != null) {
-            mService.setServerDisplayed(null);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
         MessageSender.getSender(mServerTitle).unregisterServerChannelHandler();
 
         if (mService != null) {
+            mService.setServerDisplayed(null);
             unbindService(mConnection);
             mService = null;
         }

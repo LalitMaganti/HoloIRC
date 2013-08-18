@@ -62,8 +62,8 @@ public class ServerCommandParser {
             case "PRIVMSG":
                 final String message = parsedArray.get(3);
                 if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
-                    parseCTCPCommand(parsedArray, message
-                            .substring(1, message.length() - 1), rawSource);
+                    final String strippedMessage = message.substring(1, message.length() - 1);
+                    parseCTCPCommand(parsedArray, strippedMessage, rawSource);
                 } else {
                     parsePRIVMSGCommand(parsedArray, rawSource);
                 }
@@ -71,8 +71,9 @@ public class ServerCommandParser {
             case "JOIN":
                 parseChannelJoin(parsedArray, rawSource);
                 return;
-            //case "NOTICE":
-            //    throw new UnsupportedOperationException();
+            case "NOTICE":
+                parseNotice(parsedArray, rawSource);
+                return;
             case "PART":
                 parseChannelPart(parsedArray, rawSource);
                 return;
@@ -89,8 +90,24 @@ public class ServerCommandParser {
                 parseTopicChange(parsedArray, rawSource);
                 return;
             default:
-                // Not sure what to do here - TODO
                 Log.v(LOG_TAG, rawLine);
+                // Not sure what to do here - TODO
+        }
+    }
+
+    private void parseNotice(final ArrayList<String> parsedArray, final String rawSource) {
+        final String sendingUser = Utils.getNickFromRaw(rawSource);
+        final String recipient = parsedArray.get(2);
+        final String notice = parsedArray.get(3);
+
+        final String formattedNotice = String.format(mContext.getString(R.string
+                .parser_message), sendingUser, notice);
+        if(Utils.isChannel(recipient)) {
+            mSender.sendGenericChannelEvent(recipient, formattedNotice);
+        } else if (recipient.equals(mServer.getUser().getNick())) {
+            mSender.sendGenericServerEvent(formattedNotice);
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 
@@ -98,6 +115,8 @@ public class ServerCommandParser {
                                   final String rawSource) {
         if (message.startsWith("ACTION ")) {
             parseAction(parsedArray, rawSource);
+        } else if (message.startsWith("VERSION")) {
+            // TODO - figure out what should be done here
         } else {
             // TODO - add more things here
             throw new IllegalStateException();
@@ -110,9 +129,8 @@ public class ServerCommandParser {
         final String message = parsedArray.get(3);
 
         if (Utils.isChannel(recipient)) {
-            // PRIVMSG to channel
             final Channel channel = mUserChannelInterface.getChannel(recipient);
-            mSender.sendAppUserMessageToChannel(channel, sendingUser, message);
+            mSender.sendMessageToChannel(channel, sendingUser, message);
         } else {
             mServer.privateMessageSent(sendingUser, message);
         }

@@ -51,7 +51,7 @@ public class ServerCommandSender {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendMessage(message);
 
-                MessageSender.getSender(server.getTitle()).sendAppUserMessageToChannel(channel,
+                MessageSender.getSender(server.getTitle()).sendMessageToChannel(channel,
                         server.getUser(), message);
                 return null;
             }

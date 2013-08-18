@@ -262,8 +262,8 @@ public class MessageSender {
         sendGenericUserEvent(sending.getNick(), message);
     }
 
-    public void sendAppUserMessageToChannel(final Channel channel, final User sending,
-                                            final String rawMessage) {
+    public void sendMessageToChannel(final Channel channel, final User sending,
+                                     final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getPrettyNick(channel), rawMessage);
         sendGenericChannelEvent(channel.getName(), message);
