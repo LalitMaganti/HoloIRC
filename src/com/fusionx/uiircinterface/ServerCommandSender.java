@@ -81,7 +81,7 @@ public class ServerCommandSender {
             @Override
             protected Void doInBackground(Void... voids) {
                 final User user = server.getUserChannelInterface().getUser(userNick);
-                if(StringUtils.isNotEmpty(message)) {
+                if (StringUtils.isNotEmpty(message)) {
                     user.getWriter().sendMessage(message);
                 }
                 server.privateMessageSent(user, message);

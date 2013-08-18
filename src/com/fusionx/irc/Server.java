@@ -62,7 +62,7 @@ public class Server {
         if (!user.isPrivateMessageOpen(sendingUser)) {
             user.newPrivateMessage(sendingUser);
 
-            if(StringUtils.isNotEmpty(message)) {
+            if (StringUtils.isNotEmpty(message)) {
                 sender.sendPrivateMessage(sendingUser, message);
             }
 

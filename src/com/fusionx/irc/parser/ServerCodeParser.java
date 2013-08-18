@@ -35,6 +35,7 @@ import com.fusionx.uiircinterface.MessageSender;
 
 import java.util.ArrayList;
 
+import static com.fusionx.Utils.isMotdAllowed;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_ENDOFWHO;
@@ -44,7 +45,6 @@ import static com.fusionx.irc.constants.ServerReplyCodes.RPL_TOPIC;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_TOPICINFO;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WHOREPLY;
 import static com.fusionx.irc.constants.ServerReplyCodes.genericCodes;
-import static com.fusionx.Utils.isMotdAllowed;
 
 public class ServerCodeParser {
     private final StringBuilder mStringBuilder = new StringBuilder();

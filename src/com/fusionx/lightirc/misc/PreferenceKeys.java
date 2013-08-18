@@ -28,7 +28,10 @@ public class PreferenceKeys {
     public final static String Port = "pref_port";
     public final static String SSL = "pref_ssl";
 
-    public final static String Nick = "pref_nick";
+    public final static String NickStorage = "pref_nick_storage";
+    public final static String FirstNick = "pref_first_nick";
+    public final static String SecondNick = "pref_second_nick";
+    public final static String ThirdNick = "pref_third_nick";
     public final static String RealName = "pref_realname";
     public final static String AutoNickChange = "pref_auto_nick";
 

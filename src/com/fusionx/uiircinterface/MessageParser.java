@@ -21,12 +21,9 @@
 
 package com.fusionx.uiircinterface;
 
-import android.content.Context;
-
 import com.fusionx.Utils;
 import com.fusionx.irc.Server;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
-import com.fusionx.uiircinterface.ServerCommandSender;
 
 import java.util.ArrayList;
 

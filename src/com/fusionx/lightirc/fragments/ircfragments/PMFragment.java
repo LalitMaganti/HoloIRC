@@ -28,7 +28,6 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
-import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;

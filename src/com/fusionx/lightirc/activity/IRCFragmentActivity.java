@@ -288,6 +288,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     /**
      * Get the name of the currently displayed server
+     *
      * @return - the current server title
      */
     @Override
@@ -297,6 +298,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     /**
      * Method called when a new PMFragment is to be created
+     *
      * @param userNick - the nick of the user the PM is to
      */
     @Override
@@ -315,6 +317,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     /**
      * Checks if the app is connected to the server
+     *
      * @return whether the app is connected to the server
      */
     @Override
@@ -336,6 +339,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     /**
      * If the currently displayed fragment is the one being removed then switch
      * to one tab back. Then remove the fragment regardless.
+     *
      * @param fragmentTitle - name of the fragment to be removed
      */
     @Override
@@ -349,6 +353,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     /**
      * Called when a user list update occurs
+     *
      * @param channelName - name of channel which was updated
      */
     @Override
@@ -360,6 +365,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     /**
      * Create a ChannelFragment with the specified name
+     *
      * @param channelName - name of the channel to create
      */
     private void createChannelFragment(final String channelName) {
@@ -392,6 +398,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     // UserListFragment Listener Callbacks
+
     /**
      * Method which is called when the user requests a mention from
      * the UserListFragment
@@ -405,8 +412,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     // IRCActionsFragment Listener Callbacks
+
     /**
      * Method which returns the nick of the user
+     *
      * @return - the nick of the user
      */
     @Override
@@ -444,6 +453,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     /**
      * Returns the type of the currently displayed fragment in the ViewPager
+     *
      * @return - the type of fragment
      */
     @Override
@@ -456,6 +466,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     /**
      * Method called when a new ChannelFragment is to be created
+     *
      * @param channelName - name of the channel joined
      * @param forceSwitch - whether the channel should be forcibly switched to
      */
@@ -470,7 +481,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void connectedToServer() {
-        if(mActionsSlidingMenu.isMenuShowing()) {
+        if (mActionsSlidingMenu.isMenuShowing()) {
             mActionsFragment.setConnectedToServer();
         }
     }

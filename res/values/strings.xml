@@ -51,6 +51,10 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_port_title">Server Port</string>
     <string name="server_settings_url_title">Server URL</string>
     <string name="server_settings_server_title">Server title</string>
+    <string name="server_settings_nick_storage_title">Nick Names</string>
+    <string name="server_settings_nick_storage_summary">Choose first, second and third choice nick
+        names
+    </string>
 
     <!-- App settings -->
     <string name="settings_title">Settings</string>
@@ -134,5 +138,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="about">About</string>
     <string name="whois" translatable="false">WHOIS</string>
     <string name="server">Server</string>
+    <string name="optional">Optional</string>
 
 </resources>

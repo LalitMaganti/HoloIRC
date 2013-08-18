@@ -68,7 +68,10 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final MergeAdapter mergeAdapter = new MergeAdapter();
-        final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),
+        /*final String[] array = {"Join new channel",
+        "Change nick",
+        "Disconnect" };*/
+        final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),//array);
                 getResources().getStringArray(R.array.server_actions));
         final UserChannelActionsAdapter channelAdapter = new UserChannelActionsAdapter(getActivity());
         final View serverHeader = inflater.inflate(R.layout.sliding_menu_header, null);
@@ -120,11 +123,11 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     private void channelNameDialog() {
         final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder
                 (getActivity()) {
-                    @Override
-                    public void onOkClicked(final String input) {
-                        ServerCommandSender.sendJoin(mListener.getServer(false), input);
-                    }
-                };
+            @Override
+            public void onOkClicked(final String input) {
+                ServerCommandSender.sendJoin(mListener.getServer(false), input);
+            }
+        };
         builder.show();
     }
 

@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import static com.fusionx.irc.constants.Constants.LOG_TAG;
 import static com.fusionx.Utils.parcelDataForBroadcast;
+import static com.fusionx.irc.constants.Constants.LOG_TAG;
 
 @Getter(AccessLevel.PACKAGE)
 public class ServerLineParser {

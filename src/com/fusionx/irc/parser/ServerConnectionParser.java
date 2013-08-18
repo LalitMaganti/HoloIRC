@@ -26,8 +26,8 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.Utils;
-import com.fusionx.irc.Server;
 import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.irc.misc.NickStorage;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
@@ -46,8 +46,10 @@ public class ServerConnectionParser {
     public static String parseConnect(final String title, final BufferedReader reader,
                                       final Context context, final boolean canChangeNick,
                                       final ServerWriter writer,
-                                      final String rawNick) throws IOException {
+                                      final NickStorage nickStorage) throws IOException {
         String line;
+        boolean triedSecondNick = false;
+        boolean triedThirdNick = false;
         int suffix = 0;
         final MessageSender sender = MessageSender.getSender(title);
         while ((line = reader.readLine()) != null) {
@@ -62,9 +64,17 @@ public class ServerConnectionParser {
                         return nick;
                     }
                     case ERR_NICKNAMEINUSE: {
-                        if(canChangeNick) {
-                            ++suffix;
-                            writer.changeNick(rawNick + suffix);
+                        if (canChangeNick) {
+                            if(!triedSecondNick) {
+                                writer.changeNick(nickStorage.getSecondChoiceNick());
+                                triedSecondNick = true;
+                            } else if(!triedThirdNick) {
+                                writer.changeNick(nickStorage.getThirdChoiceNick());
+                                triedThirdNick = true;
+                            } else {
+                                ++suffix;
+                                writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
+                            }
                         } else {
                             final Bundle event = Utils.parcelDataForBroadcast(null,
                                     ServerEventType.NickInUse, context.getString(R.string.parser_nick_in_use));

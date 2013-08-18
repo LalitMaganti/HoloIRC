@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 
 import javax.net.ssl.SSLSocketFactory;
 
@@ -88,7 +87,7 @@ class ServerConnection {
                 server.getWriter().sendServerPassword(serverConfiguration.getServerPassword());
             }
 
-            server.getWriter().changeNick(serverConfiguration.getNick());
+            server.getWriter().changeNick(serverConfiguration.getNickStorage().getFirstChoiceNick());
             server.getWriter().sendUser(serverConfiguration.getServerUserName(), "8", "*",
                     StringUtils.isNotEmpty(serverConfiguration.getRealName()) ?
                             serverConfiguration.getRealName() : "HoloIRC");
@@ -97,7 +96,7 @@ class ServerConnection {
                     new InputStreamReader(mSocket.getInputStream()));
             final String nick = ServerConnectionParser.parseConnect(server.getTitle(), reader,
                     mContext, serverConfiguration.isNickChangable(), server.getWriter(),
-                    serverConfiguration.getNick());
+                    serverConfiguration.getNickStorage().getFirstChoiceNick());
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerEventType.ServerConnected, String.format(mContext
@@ -122,9 +121,6 @@ class ServerConnection {
                 // An error has occurred - TODO - find out which
             }
         } catch (final IOException ex) {
-            // Delay is to allow event to be sent while activity is visible
-            //Thread.sleep(1000);
-
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerEventType.Error, ex.getMessage());
             sender.sendServerMessage(event);

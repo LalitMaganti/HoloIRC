@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 import static com.fusionx.lightirc.misc.PreferenceKeys.AutoNickChange;
-import static com.fusionx.lightirc.misc.PreferenceKeys.Nick;
+import static com.fusionx.lightirc.misc.PreferenceKeys.FirstNick;
 import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
 import static com.fusionx.lightirc.misc.PreferenceKeys.SSL;
 import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
@@ -44,12 +44,11 @@ public class SharedPreferencesUtils {
 
     public static void firstTimeServerSetup(final Context context) {
         final HashSet<String> auto = new HashSet<>();
-
         final SharedPreferences settings = context.getSharedPreferences("server_0",
                 Context.MODE_PRIVATE);
         final SharedPreferences.Editor e = settings.edit();
         e.putString(Title, "Freenode").putString(URL, "irc.freenode.net")
-                .putString(Port, "6667").putBoolean(SSL, false).putString(Nick, "HoloIRCUser")
+                .putString(Port, "6667").putBoolean(SSL, false).putString(FirstNick, "HoloIRCUser")
                 .putBoolean(AutoNickChange, true).putString(ServerUserName, "holoirc")
                 .putStringSet(PreferenceKeys.AutoJoin, auto);
         e.commit();

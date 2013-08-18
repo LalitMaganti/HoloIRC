@@ -102,7 +102,7 @@ public class ServerCommandParser {
 
         final String formattedNotice = String.format(mContext.getString(R.string
                 .parser_message), sendingUser, notice);
-        if(Utils.isChannel(recipient)) {
+        if (Utils.isChannel(recipient)) {
             mSender.sendGenericChannelEvent(recipient, formattedNotice);
         } else if (recipient.equals(mServer.getUser().getNick())) {
             mSender.sendGenericServerEvent(formattedNotice);

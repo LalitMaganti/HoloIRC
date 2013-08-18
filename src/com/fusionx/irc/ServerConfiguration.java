@@ -24,9 +24,12 @@ package com.fusionx.irc;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fusionx.irc.misc.NickStorage;
+
 import java.util.ArrayList;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 public class ServerConfiguration {
@@ -35,7 +38,8 @@ public class ServerConfiguration {
     private final int port;
     private final boolean ssl;
 
-    private final String nick;
+    private final NickStorage nickStorage;
+    //private final String nick;
     private final String realName;
     private final boolean nickChangable;
 
@@ -52,7 +56,8 @@ public class ServerConfiguration {
         port = builder.getPort();
         ssl = builder.isSsl();
 
-        nick = builder.getNick();
+        nickStorage = builder.getNickStorage();
+        //nick = builder.getNick();
         realName = builder.getRealName();
         nickChangable = builder.isNickChangeable();
 
@@ -73,7 +78,8 @@ public class ServerConfiguration {
         private int port;
         private boolean ssl;
 
-        private String nick;
+        private NickStorage nickStorage;
+        //private String nick;
         private String realName;
         private boolean nickChangeable;
 
@@ -96,7 +102,8 @@ public class ServerConfiguration {
             out.writeString(url);
             out.writeInt(port);
 
-            out.writeString(nick);
+            out.writeParcelable(nickStorage, 0);
+            //out.writeString(nick);
             out.writeString(realName);
             out.writeInt(nickChangeable ? 1 : 0);
 
@@ -129,7 +136,8 @@ public class ServerConfiguration {
             url = in.readString();
             port = in.readInt();
 
-            nick = in.readString();
+            nickStorage = in.readParcelable(NickStorage.class.getClassLoader());
+            //nick = in.readString();
             realName = in.readString();
             nickChangeable = in.readInt() == 1;
 

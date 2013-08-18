@@ -194,14 +194,14 @@ public class User implements UpdateableTreeSet.Updateable {
         @Override
         public void handleMessage(Message msg) {
             final Bundle event = msg.getData();
-                final UserEventType type = (UserEventType) event
-                        .getSerializable(EventBundleKeys.eventType);
-                final String message = event.getString(EventBundleKeys.message);
-                switch (type) {
-                    case Generic:
-                        buffer += message + "\n";
-                        break;
-                }
+            final UserEventType type = (UserEventType) event
+                    .getSerializable(EventBundleKeys.eventType);
+            final String message = event.getString(EventBundleKeys.message);
+            switch (type) {
+                case Generic:
+                    buffer += message + "\n";
+                    break;
+            }
         }
     };
 }

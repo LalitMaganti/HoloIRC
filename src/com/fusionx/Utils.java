@@ -12,6 +12,7 @@ import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.ui.NickPreference;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -74,7 +75,7 @@ public class Utils {
     /**
      * Split the line received from the server into it's components
      *
-     * @param rawLine the line received from the server
+     * @param rawLine        the line received from the server
      * @param careAboutColon - whether a colon means the rest of the line should be added in one go
      * @return the parsed list
      */
