@@ -96,7 +96,7 @@ class ServerConnection {
                     new InputStreamReader(mSocket.getInputStream()));
             final String nick = ServerConnectionParser.parseConnect(server.getTitle(), reader,
                     mContext, serverConfiguration.isNickChangable(), server.getWriter(),
-                    serverConfiguration.getNickStorage().getFirstChoiceNick());
+                    serverConfiguration.getNickStorage());
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerEventType.ServerConnected, String.format(mContext
