@@ -21,12 +21,16 @@
 
 package com.fusionx.lightirc.interfaces;
 
+import android.content.Context;
+
 import com.fusionx.irc.Server;
 
 public interface CommonCallbacks {
     public String getServerTitle();
 
-    //public void onCreatePMFragment(final String userNick);
+    public Context getApplicationContext();
+
+    public void disconnect();
 
     public void closeAllSlidingMenus();
 

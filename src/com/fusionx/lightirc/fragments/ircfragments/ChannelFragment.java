@@ -54,7 +54,8 @@ public class ChannelFragment extends IRCFragment {
         super.onViewCreated(view, savedInstanceState);
 
         final String message = String.format(getActivity().getString(R.string
-                .parser_joined_channel), mCallback.getServer(false).getUser().getColorfulNick());
+                .parser_joined_channel), mCallback.getServer
+                (false).getUser().getColorfulNick());
         appendToTextView(message + "\n");
     }
 
@@ -125,8 +126,7 @@ public class ChannelFragment extends IRCFragment {
     }
 
     public void sendChannelMessage(final String channelName, final String message) {
-        MessageParser.channelMessageToParse(getActivity().getApplicationContext(),
-                mCallback.getServer(false), channelName, message);
+        MessageParser.channelMessageToParse(mCallback, channelName, message);
     }
 
     public interface ChannelFragmentCallback extends CommonCallbacks {

@@ -122,7 +122,7 @@ public class ActivityListener extends GenericListener {
         mListener.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mListener.onNewChannelJoined(event.getChannel().getName(), true);
+                mListener.createChannelFragment(event.getChannel().getName(), true);
             }
         });
     }
@@ -240,7 +240,7 @@ public class ActivityListener extends GenericListener {
     public interface ActivityListenerInterface {
         public void onConnect();
 
-        public void onNewChannelJoined(final String channelName, final boolean forceSwitch);
+        public void createChannelFragment(final String channelName, final boolean forceSwitch);
 
         public void onUnexpectedDisconnect();
 

@@ -101,7 +101,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                 mListener.disconnect();
                 return;
             case 5:
-                mListener.removeCurrentTab();
+                mListener.closeOrPartCurrentTab();
                 break;
             default:
                 Log.e("HoloIRC", String.valueOf(i));
@@ -186,9 +186,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public interface IRCActionsListenerInterface extends CommonCallbacks {
         public String getNick();
 
-        public void disconnect();
-
-        public void removeCurrentTab();
+        public void closeOrPartCurrentTab();
 
         public FragmentType getCurrentlyDisplayedFragment();
     }

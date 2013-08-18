@@ -25,6 +25,7 @@ import android.content.Context;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Server;
+import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.uiircinterface.ServerCommandSender;
 
 import java.util.ArrayList;
@@ -33,10 +34,11 @@ import java.util.ArrayList;
  * This entire class needs input validation and full parsing
  */
 public class MessageParser {
-    public static void channelMessageToParse(final Context applicationContext, final Server server,
+    public static void channelMessageToParse(final CommonCallbacks callbacks,
                                              final String channelName, final String message) {
         final ArrayList<String> parsedArray = Utils.splitLineBySpaces(message);
         final String command = parsedArray.remove(0);
+        final Server server = callbacks.getServer(false);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -46,10 +48,11 @@ public class MessageParser {
                     break;
                 case "/part":
                 case "/p":
-                    ServerCommandSender.sendPart(server, channelName, applicationContext);
+                    ServerCommandSender.sendPart(server, channelName,
+                            callbacks.getApplicationContext());
                     break;
                 default:
-                    serverCommandToParse(server, message);
+                    serverCommandToParse(callbacks, message);
                     break;
             }
         } else {
@@ -57,18 +60,11 @@ public class MessageParser {
         }
     }
 
-    public static void serverMessageToParse(final Server bot, final String message) {
-        if (message.startsWith("/")) {
-            serverCommandToParse(bot, message);
-        } else {
-            ServerCommandSender.sendUnknownEvent(bot, message);
-        }
-    }
-
-    public static void userMessageToParse(final Server server, final String userNick,
+    public static void userMessageToParse(final CommonCallbacks callbacks, final String userNick,
                                           final String message) {
         final ArrayList<String> parsedArray = Utils.splitLineBySpaces(message);
         final String command = parsedArray.remove(0);
+        final Server server = callbacks.getServer(false);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -82,7 +78,7 @@ public class MessageParser {
                             server.getUserChannelInterface().getUser(userNick));
                     break;
                 default:
-                    serverCommandToParse(server, message);
+                    serverCommandToParse(callbacks, message);
                     break;
             }
         } else {
@@ -90,9 +86,21 @@ public class MessageParser {
         }
     }
 
-    private static void serverCommandToParse(final Server server, final String rawLine) {
+    public static void serverMessageToParse(final CommonCallbacks callbacks,
+                                            final String message) {
+        final Server server = callbacks.getServer(false);
+        if (message.startsWith("/")) {
+            serverCommandToParse(callbacks, message);
+        } else {
+            ServerCommandSender.sendUnknownEvent(server, message);
+        }
+    }
+
+    private static void serverCommandToParse(final CommonCallbacks callbacks,
+                                             final String rawLine) {
         final ArrayList<String> parsedArray = Utils.splitLineBySpaces(rawLine);
         final String command = parsedArray.remove(0);
+        final Server server = callbacks.getServer(false);
 
         switch (command) {
             case "/join":
@@ -114,8 +122,11 @@ public class MessageParser {
                 final String newNick = parsedArray.get(0);
                 ServerCommandSender.sendNickChange(server, newNick);
                 break;
+            case "/quit":
+                callbacks.disconnect();
+                break;
             default:
-                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                ServerCommandSender.sendUnknownEvent(server, rawLine);
         }
     }
 }

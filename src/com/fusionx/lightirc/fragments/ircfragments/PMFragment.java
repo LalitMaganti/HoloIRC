@@ -46,7 +46,7 @@ public class PMFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServer(false).getTitle())
+        MessageSender.getSender(mCallback.getServerTitle())
                 .registerUserFragmentHandler(getTitle(), mUserFragmentHandler);
 
         final User user = mCallback.getServer(false).getUserChannelInterface()
@@ -60,7 +60,7 @@ public class PMFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        MessageSender.getSender(mCallback.getServer(false).getTitle())
+        MessageSender.getSender(mCallback.getServerTitle())
                 .unregisterUserFragmentHandler(getTitle());
     }
 
@@ -97,7 +97,7 @@ public class PMFragment extends IRCFragment {
     }
 
     public void sendUserMessage(final String nick, final String message) {
-        MessageParser.userMessageToParse(mCallback.getServer(false), nick, message);
+        MessageParser.userMessageToParse(mCallback, nick, message);
     }
 
     private final PMFragmentHandler mUserFragmentHandler = new PMFragmentHandler() {

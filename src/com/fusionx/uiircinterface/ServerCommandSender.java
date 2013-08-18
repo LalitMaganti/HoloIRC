@@ -133,6 +133,10 @@ public class ServerCommandSender {
         sendPart.execute();
     }
 
+    public static void sendClosePrivateMessage(final Server server, final String nick) {
+        sendClosePrivateMessage(server, server.getUserChannelInterface().getUser(nick));
+    }
+
     public static void sendClosePrivateMessage(final Server server, final User user) {
         final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
             @Override
@@ -148,8 +152,10 @@ public class ServerCommandSender {
         final AsyncTask<Void, Void, Void> unknownEvent = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                /**server.getConfiguration().getListenerManager()
-                 .dispatchEvent(new UnknownEvent<>(server, event));*/
+                /**
+                 * server.getConfiguration().getListenerManager().dispatchEvent(new UnknownEvent<>
+                 *     (server, event));
+                 */
                 return null;
             }
         };

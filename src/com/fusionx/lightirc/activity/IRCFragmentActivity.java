@@ -61,6 +61,12 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
 
+/**
+ * Activity which contains all the communication code between the fragments
+ * It also implements a lot of callbacks to stop exposing objects to the fragments
+ *
+ * @author Lalit Maganti
+ */
 public class IRCFragmentActivity extends FragmentActivity implements
         UserListFragment.UserListListenerInterface, ChannelFragment.ChannelFragmentCallback,
         IRCActionsFragment.IRCActionsListenerInterface, ServerFragment.ServerFragmentCallback {
@@ -163,9 +169,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
         MessageSender.getSender(mServerTitle).unregisterServerChannelHandler();
 
+        unbindService(mConnection);
         if (mService != null) {
             mService.setServerDisplayed(null);
-            unbindService(mConnection);
             mService = null;
         }
     }
@@ -213,7 +219,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
                 case Join:
-                    onNewChannelJoined(message, true);
+                    createChannelFragment(message, true);
                     break;
                 case NewPrivateMessage:
                     onCreatePMFragment(message);
@@ -333,7 +339,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     private void onCreateChannelFragment(final String channelName) {
-        onNewChannelJoined(channelName, false);
+        createChannelFragment(channelName, false);
     }
 
     //@Override
@@ -372,6 +378,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
         return getServer(false).getUser().getNick();
     }
 
+    /**
+     * Called when disconnect
+     */
     @Override
     public void disconnect() {
         mService.disconnectFromServer(mServerTitle);
@@ -381,12 +390,14 @@ public class IRCFragmentActivity extends FragmentActivity implements
         startActivity(intent);
     }
 
+    /**
+     * Close the currently displayed PM or part the currently displayed channel
+     */
     @Override
-    public void removeCurrentTab() {
+    public void closeOrPartCurrentTab() {
         final Server server = getServer(false);
         if (getCurrentlyDisplayedFragment().equals(FragmentType.User)) {
-            ServerCommandSender.sendClosePrivateMessage(server,
-                    server.getUserChannelInterface().getUser(getCurrentItem().getTitle()));
+            ServerCommandSender.sendClosePrivateMessage(server, getCurrentItem().getTitle());
 
             switchFragmentAndRemove(getCurrentItem().getTitle());
         } else {
@@ -395,27 +406,46 @@ public class IRCFragmentActivity extends FragmentActivity implements
         }
     }
 
+    /**
+     * Returns the type of the currently displayed fragment in the ViewPager
+     * @return - the type of fragment
+     */
     @Override
     public FragmentType getCurrentlyDisplayedFragment() {
         return getCurrentItem().getType();
     }
 
-    // ServerFragment Listener Callbacks
-    public void onNewChannelJoined(final String channelName, final boolean forceSwitch) {
+    /**
+     * Start of the ServerFragment callbacks
+     */
+    /**
+     * Method called when a new ChannelFragment is to be created
+     * @param channelName - name of the channel joined
+     * @param forceSwitch - whether the channel should be forcibly switched to
+     */
+    public void createChannelFragment(final String channelName, final boolean forceSwitch) {
         final boolean switchToTab = channelName.equals(getIntent().getStringExtra("mention"))
                 || forceSwitch;
         mViewPager.onNewChannelJoined(channelName, switchToTab);
     }
 
+    /**
+     * Method called when the server reports that it has been connected to
+     */
     @Override
     public void connectedToServer() {
         if(mActionsSlidingMenu.isMenuShowing()) {
             mActionsFragment.setConnectedToServer();
         }
     }
+    /**
+     * End of the ServerFragment callbacks
+     */
 
+    /**
+     * Listener used when the view pages changes pages
+     */
     private class ViewPagerOnPagerListener extends ViewPager.SimpleOnPageChangeListener {
-        // Page change stuff
         @Override
         public void onPageSelected(final int position) {
             supportInvalidateOptionsMenu();

@@ -76,7 +76,7 @@ public class ServerFragment extends IRCFragment {
     }
 
     public void sendServerMessage(final String message) {
-        MessageParser.serverMessageToParse(mCallback.getServer(false), message);
+        MessageParser.serverMessageToParse(mCallback, message);
     }
 
     private final ServerFragHandler mServerHandler = new ServerFragHandler() {
