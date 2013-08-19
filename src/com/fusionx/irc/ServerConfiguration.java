@@ -38,7 +38,6 @@ public class ServerConfiguration {
     private final boolean ssl;
 
     private final NickStorage nickStorage;
-    //private final String nick;
     private final String realName;
     private final boolean nickChangable;
 
@@ -49,7 +48,7 @@ public class ServerConfiguration {
 
     private final ArrayList<String> autoJoinChannels;
 
-    public ServerConfiguration(final Builder builder) {
+    private ServerConfiguration(final Builder builder) {
         title = builder.getTitle();
         url = builder.getUrl();
         port = builder.getPort();
@@ -111,7 +110,8 @@ public class ServerConfiguration {
             out.writeStringList(autoJoinChannels);
         }
 
-        public static final Parcelable.Creator<Builder> CREATOR = new Parcelable.Creator<Builder>() {
+        public static final Parcelable.Creator<Builder> CREATOR =
+                new Parcelable.Creator<Builder>() {
             public Builder createFromParcel(Parcel in) {
                 return new Builder(in);
             }
@@ -124,7 +124,7 @@ public class ServerConfiguration {
         public Builder() {
         }
 
-        private Builder(Parcel in) {
+        private Builder(final Parcel in) {
             file = in.readString();
 
             title = in.readString();

@@ -230,25 +230,20 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
                 ServerSettingsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-        final ArrayList<String> array = SharedPreferencesUtils
-                .getServersFromPreferences(getApplicationContext());
-        final Integer in = array.isEmpty() ? 0 :
-                Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
-
         intent.putExtra("new", true);
-        intent.putExtra("file", "server_" + in);
+        intent.putExtra("file", "server");
         intent.putExtra("main", true);
-        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles());
+        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles(null));
         startActivity(intent);
     }
 
     private void editServer(final ServerConfiguration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         intent.putExtra("file", builder.getFile());
-        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles());
+        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles(builder));
         intent.putExtra("server", builder);
         intent.putExtra("main", true);
         startActivity(intent);

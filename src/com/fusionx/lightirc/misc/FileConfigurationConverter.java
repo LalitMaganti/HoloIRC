@@ -46,7 +46,6 @@ public class FileConfigurationConverter {
         final String thirdChoice = serverSettings.getString(PreferenceKeys.ThirdNick, "");
         final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
-        //builder.setNick(serverSettings.getString(PreferenceKeys.Nick, ""));
 
         builder.setRealName(serverSettings.getString(PreferenceKeys.RealName, "HoloIRC"));
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));

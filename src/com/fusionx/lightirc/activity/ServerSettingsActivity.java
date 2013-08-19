@@ -112,10 +112,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 }
             });
             build.show();
-        } else {
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved), Toast.LENGTH_SHORT).show();
-            finish();
+            return;
+        } else if(newServer) {
+            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
         }
+        Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     @Override
@@ -127,6 +130,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
             if (folder.exists()) {
                 folder.delete();
             }
+        } else if(newServer) {
+            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
         }
     }
 
