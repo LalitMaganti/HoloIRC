@@ -56,7 +56,6 @@ public class ServerConfiguration {
         ssl = builder.isSsl();
 
         nickStorage = builder.getNickStorage();
-        //nick = builder.getNick();
         realName = builder.getRealName();
         nickChangable = builder.isNickChangeable();
 
@@ -78,7 +77,6 @@ public class ServerConfiguration {
         private boolean ssl;
 
         private NickStorage nickStorage;
-        //private String nick;
         private String realName;
         private boolean nickChangeable;
 
@@ -94,15 +92,14 @@ public class ServerConfiguration {
         }
 
         public void writeToParcel(Parcel out, int flags) {
-            out.writeString(title);
-
             out.writeString(file);
 
+            out.writeString(title);
             out.writeString(url);
             out.writeInt(port);
+            out.writeInt(ssl ? 1 : 0);
 
             out.writeParcelable(nickStorage, 0);
-            //out.writeString(nick);
             out.writeString(realName);
             out.writeInt(nickChangeable ? 1 : 0);
 
@@ -128,15 +125,14 @@ public class ServerConfiguration {
         }
 
         private Builder(Parcel in) {
-            title = in.readString();
-
             file = in.readString();
 
+            title = in.readString();
             url = in.readString();
             port = in.readInt();
+            ssl = in.readInt() == 1;
 
             nickStorage = in.readParcelable(NickStorage.class.getClassLoader());
-            //nick = in.readString();
             realName = in.readString();
             nickChangeable = in.readInt() == 1;
 
