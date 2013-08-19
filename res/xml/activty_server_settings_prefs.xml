@@ -22,9 +22,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
+    <com.fusionx.lightirc.ui.MustBeCompleteView
+            android:key="must_be_complete"/>
 
     <PreferenceCategory android:title="Connection">
-        <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
+        <com.fusionx.lightirc.ui.ServerTitleEditTextPreference
                 android:key="pref_title"
                 android:defaultValue=""
                 android:singleLine="true"

@@ -36,6 +36,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.view.ActionMode;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -50,10 +51,13 @@ import android.widget.Toast;
 import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.ui.MustBeCompleteView;
 import com.fusionx.lightirc.ui.NickPreference;
+import com.fusionx.lightirc.ui.ServerTitleEditTextPreference;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -63,7 +67,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
-//import static com.fusionx.lightirc.misc.PreferenceKeys.Nick;
 import static com.fusionx.lightirc.misc.PreferenceKeys.NickServPassword;
 import static com.fusionx.lightirc.misc.PreferenceKeys.NickStorage;
 import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
@@ -100,9 +103,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
                     .setNegativeButton(getString(R.string.discard), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            final File folder = new File(SharedPreferencesUtils
-                                    .getSharedPreferencesPath(getApplicationContext())
-                                    + fileName + ".xml");
+                            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
+                                    (getApplicationContext()) + fileName + ".xml");
                             folder.delete();
                             finish();
                         }
@@ -119,6 +121,18 @@ public class ServerSettingsActivity extends PreferenceActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!canExit && newServer) {
+            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
+                    (getApplicationContext()) + fileName + ".xml");
+            if(folder.exists()) {
+                folder.delete();
+            }
+        }
+    }
+
     public static class BaseServerSettingFragment extends PreferenceFragment
             implements OnPreferenceChangeListener {
 
@@ -127,6 +141,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
         // NickServ
         private EditTextPreference mNickServPassword = null;
+
+        private MustBeCompleteView mustBeCompleteView = null;
 
         private final List<EditTextPreference> mEditTexts = new ArrayList<>();
 
@@ -143,50 +159,45 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 fileName = bundle.getString("file");
             }
 
+            getPreferenceManager().setSharedPreferencesMode(MODE_MULTI_PROCESS);
             getPreferenceManager().setSharedPreferencesName(fileName);
 
             addPreferencesFromResource(R.xml.activty_server_settings_prefs);
 
             final PreferenceScreen prefSet = getPreferenceScreen();
 
-            final EditTextPreference mEditTextTitle = (EditTextPreference) prefSet.findPreference
-                    (Title);
-            if (mEditTextTitle != null) {
-                mEditTextTitle.setOnPreferenceChangeListener(this);
+            final ServerTitleEditTextPreference mTitle = (ServerTitleEditTextPreference)
+                    prefSet.findPreference(Title);
+            if (mTitle != null) {
+                mTitle.setOnPreferenceChangeListener(this);
+                mTitle.setListOfExistingServers(bundle.getStringArrayList("list"));
             }
-            mEditTexts.add(mEditTextTitle);
+            mEditTexts.add(mTitle);
 
             // URL of server
-            final EditTextPreference mEditTextUrl = (EditTextPreference) prefSet.findPreference(URL);
-            if (mEditTextUrl != null) {
-                mEditTextUrl.setOnPreferenceChangeListener(this);
+            mustBeCompleteView = (MustBeCompleteView) prefSet.findPreference("must_be_complete");
+
+            // URL of server
+            final EditTextPreference mUrl = (EditTextPreference) prefSet.findPreference(URL);
+            if (mUrl != null) {
+                mUrl.setOnPreferenceChangeListener(this);
             }
-            mEditTexts.add(mEditTextUrl);
+            mEditTexts.add(mUrl);
 
             // Port of server
-            final EditTextPreference mEditTextPort = (EditTextPreference) prefSet.findPreference(Port);
-            if (mEditTextPort != null) {
-                mEditTextPort.setOnPreferenceChangeListener(this);
+            final EditTextPreference mPort = (EditTextPreference) prefSet.findPreference(Port);
+            if (mPort != null) {
+                mPort.setOnPreferenceChangeListener(this);
             }
-            mEditTexts.add(mEditTextPort);
+            mEditTexts.add(mPort);
 
             // Nick of User
-            //final EditTextPreference mEditTextNick = (EditTextPreference) prefSet.findPreference
-            //        (Nick);
-            //if (mEditTextNick != null) {
-            //    mEditTextNick.setOnPreferenceChangeListener(this);
-            //}
-            //mEditTexts.add(mEditTextNick);
-            final NickPreference nickPreference = (NickPreference) prefSet.findPreference
-                    (NickStorage);
-
-            // Nick of User
-            final EditTextPreference mEditTextRealName = (EditTextPreference)
+            final EditTextPreference mRealName = (EditTextPreference)
                     prefSet.findPreference(RealName);
-            if (mEditTextRealName != null) {
-                mEditTextRealName.setOnPreferenceChangeListener(this);
+            if (mRealName != null) {
+                mRealName.setOnPreferenceChangeListener(this);
+                mRealName.setSummary(mRealName.getText());
             }
-            mEditTexts.add(mEditTextRealName);
 
             final EditTextPreference mServerUserName = (EditTextPreference)
                     prefSet.findPreference(ServerUserName);
@@ -207,22 +218,21 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
             canExit = !newServer;
 
-            if (newServer) {
-                // Title of server
-                mEditTextTitle.setSummary(getString(R.string.server_settings_not_empty));
-
-                // URL of server
-                mEditTextUrl.setSummary(getString(R.string.server_settings_not_empty));
-
-                // Port of server
-                mEditTextPort.setSummary(getString(R.string.server_settings_not_empty_port));
-
-                // Nick of User
-                //mEditTextNick.setSummary(getString(R.string.server_settings_not_empty));
-            } else {
+            if (!newServer) {
                 for (EditTextPreference edit : mEditTexts) {
                     edit.setSummary(edit.getText());
                 }
+            }
+        }
+
+        @Override
+        public void onViewCreated(View view, Bundle savedInstanceState) {
+            super.onViewCreated(view, savedInstanceState);
+
+            if(newServer) {
+                mustBeCompleteView.setInitialText(mEditTexts.get(0).getTitle().toString());
+            } else {
+                getPreferenceScreen().removePreference(mustBeCompleteView);
             }
         }
 
@@ -232,15 +242,22 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 final String newString = (String) newValue;
                 if (preference != mNickServPassword && preference != mServerPassword) {
                     preference.setSummary(newString);
+
+                    final EditTextPreference editTextPreference = (EditTextPreference) preference;
+                    editTextPreference.setText(newString);
                 }
             }
             if (newServer) {
                 canExit = true;
-                for (EditTextPreference edit : mEditTexts) {
-                    if (edit.getText() == null) {
+                for (final EditTextPreference edit : mEditTexts) {
+                    if (StringUtils.isEmpty(edit.getText())) {
+                        mustBeCompleteView.setInitialText(edit.getTitle().toString());
                         canExit = false;
                         break;
                     }
+                }
+                if(canExit) {
+                    getPreferenceScreen().removePreference(mustBeCompleteView);
                 }
             }
             return true;

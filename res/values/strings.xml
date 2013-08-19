@@ -139,5 +139,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="whois" translatable="false">WHOIS</string>
     <string name="server">Server</string>
     <string name="optional">Optional</string>
+    <string name="server_settings_non_empty">%1$s must not be empty</string>
 
 </resources>

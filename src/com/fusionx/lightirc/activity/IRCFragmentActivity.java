@@ -211,6 +211,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
         // Should not occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
+            mService.disconnectFromServer(mServerTitle);
             mService = null;
         }
     };
@@ -428,7 +429,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void disconnect() {
-        mService.disconnectFromServer(mServerTitle);
+        if(mService != null) {
+            mService.disconnectFromServer(mServerTitle);
+        }
 
         final Intent intent = new Intent(this, MainServerListActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

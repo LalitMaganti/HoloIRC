@@ -40,6 +40,7 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
+import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.uiircinterface.IRCBridgeService;
@@ -52,7 +53,7 @@ import java.util.ArrayList;
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
         PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterCallback {
     private IRCBridgeService mService = null;
-    private ArrayList<ServerConfiguration.Builder> mBuilderList = null;
+    private BuilderList mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
     private BuilderAdapter mServerCardsAdapter = null;
 
@@ -138,25 +139,10 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         startActivity(intent);
     }
 
-    private void addNewServer() {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                ServerSettingsActivity.class);
-        intent.putExtra("new", true);
-
-        final ArrayList<String> array = SharedPreferencesUtils
-                .getServersFromPreferences(getApplicationContext());
-        final Integer in = array.isEmpty() ? 0 :
-                Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
-
-        intent.putExtra("file", "server_" + in);
-        intent.putExtra("main", true);
-        startActivity(intent);
-    }
-
     private void setUpServerList() {
         final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-        mBuilderList = new ArrayList<>();
+        mBuilderList = new BuilderList();
 
         if (firstRun) {
             SharedPreferencesUtils.firstTimeServerSetup(this);
@@ -220,19 +206,52 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         switch (menuItem.getItemId()) {
             case R.id.activity_server_list_popup_edit:
                 editServer(mBuilder);
-                mBuilder = null;
-                return true;
+                break;
             case R.id.activity_server_list_popup_disconnect:
                 disconnectFromServer(mBuilder);
-                mBuilder = null;
-                return true;
+                break;
             case R.id.activity_server_list_popup_delete:
                 deleteServer(mBuilder.getFile());
-                mBuilder = null;
-                return true;
+                break;
             default:
                 return false;
         }
+        mBuilder = null;
+        return true;
+    }
+
+    private void disconnectFromServer(final ServerConfiguration.Builder builder) {
+        mService.disconnectFromServer(builder.getTitle());
+        mServerCardsAdapter.notifyDataSetChanged();
+    }
+
+    private void addNewServer() {
+        final Intent intent = new Intent(MainServerListActivity.this,
+                ServerSettingsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        final ArrayList<String> array = SharedPreferencesUtils
+                .getServersFromPreferences(getApplicationContext());
+        final Integer in = array.isEmpty() ? 0 :
+                Integer.parseInt(array.get(array.size() - 1).replace("server_", "")) + 1;
+
+        intent.putExtra("new", true);
+        intent.putExtra("file", "server_" + in);
+        intent.putExtra("main", true);
+        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles());
+        startActivity(intent);
+    }
+
+    private void editServer(final ServerConfiguration.Builder builder) {
+        final Intent intent = new Intent(MainServerListActivity.this,
+                ServerSettingsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        intent.putExtra("file", builder.getFile());
+        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles());
+        intent.putExtra("server", builder);
+        intent.putExtra("main", true);
+        startActivity(intent);
     }
 
     private void deleteServer(final String fileName) {
@@ -249,26 +268,12 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpCards();
     }
 
-    private void disconnectFromServer(final ServerConfiguration.Builder builder) {
-        mService.disconnectFromServer(builder.getTitle());
-        mServerCardsAdapter.notifyDataSetChanged();
-    }
-
-    private void editServer(final ServerConfiguration.Builder builder) {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                ServerSettingsActivity.class);
-        intent.putExtra("file", builder.getFile());
-        intent.putExtra("server", builder);
-        intent.putExtra("main", true);
-        startActivity(intent);
-    }
-
     private boolean serverIsConnected(final String title) {
         return mService != null && getServer(title) != null &&
                 (getServer(title).getStatus().equals(getString(R.string.status_connected)));
     }
 
-    // BuilderAdapter Listener Interface
+    // BuilderAdapter callbacks
     @Override
     public Server getServer(final String title) {
         return mService.getServer(title);
