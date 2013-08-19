@@ -54,30 +54,34 @@ public class SharedPreferencesUtils {
     }
 
     public static void firstTimeServerSetup(final Context context) {
-        AssetManager assetManager = context.getAssets();
-        final String[] files = {"freenode.xml"};
-        for(String filename : files) {
-            try {
-                final InputStream in = assetManager.open(filename);
-                final File outFile = new File(getSharedPreferencesPath(context));
-                if(outFile.mkdir()) {
-                    final File file = new File(getSharedPreferencesPath(context), filename);
-                    final FileOutputStream out = new FileOutputStream(file);
+        final AssetManager assetManager = context.getAssets();
+        final String[] files;
+        try {
+            files = assetManager.list("");
+            for(String filename : files) {
+                if(filename.endsWith(".xml")) {
+                    final InputStream in = assetManager.open(filename);
+                    final File outFile = new File(getSharedPreferencesPath(context));
+                    if(outFile.exists() || outFile.mkdir()) {
+                        final File file = new File(getSharedPreferencesPath(context), filename);
+                        final FileOutputStream out = new FileOutputStream(file);
 
-                    byte[] buffer = new byte[2048];
-                    int read;
-                    while((read = in.read(buffer)) != -1){
-                        out.write(buffer, 0, read);
+                        byte[] buffer = new byte[2048];
+                        int read;
+                        while((read = in.read(buffer)) != -1){
+                            out.write(buffer, 0, read);
+                        }
+
+                        in.close();
+                        out.flush();
+                        out.close();
                     }
-
-                    in.close();
-                    out.flush();
-                    out.close();
                 }
-            } catch(IOException e) {
-                // TODO - fix this
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     public static ArrayList<String> getServersFromPreferences(final Context context) {
@@ -86,7 +90,8 @@ public class SharedPreferencesUtils {
         for (final String file : folder.list()) {
             if (file.startsWith("server_")) {
                 array.add(migrateFileToNewSystem(context, file));
-            } else if(!file.equals("main.xml")) {
+            } else if(!file.equals("main.xml") &&
+                    !file.equals("com.fusionx.lightirc_preferences.xml")) {
                 array.add(file.replace(".xml", ""));
             }
         }
