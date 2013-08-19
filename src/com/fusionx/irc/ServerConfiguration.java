@@ -29,7 +29,6 @@ import com.fusionx.irc.misc.NickStorage;
 import java.util.ArrayList;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 @Data
 public class ServerConfiguration {

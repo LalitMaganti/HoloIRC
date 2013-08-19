@@ -64,21 +64,22 @@ public class ServerConnectionParser {
                         return nick;
                     }
                     case ERR_NICKNAMEINUSE: {
-                        if (canChangeNick) {
-                            if(!triedSecondNick) {
-                                writer.changeNick(nickStorage.getSecondChoiceNick());
-                                triedSecondNick = true;
-                            } else if(!triedThirdNick) {
-                                writer.changeNick(nickStorage.getThirdChoiceNick());
-                                triedThirdNick = true;
-                            } else {
+                        if (!triedSecondNick) {
+                            writer.changeNick(nickStorage.getSecondChoiceNick());
+                            triedSecondNick = true;
+                        } else if (!triedThirdNick) {
+                            writer.changeNick(nickStorage.getThirdChoiceNick());
+                            triedThirdNick = true;
+                        } else {
+                            if (canChangeNick) {
                                 ++suffix;
                                 writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
+                            } else {
+                                final Bundle event = Utils.parcelDataForBroadcast(null,
+                                        ServerEventType.NickInUse,
+                                        context.getString(R.string.parser_nick_in_use));
+                                sender.sendServerMessage(event);
                             }
-                        } else {
-                            final Bundle event = Utils.parcelDataForBroadcast(null,
-                                    ServerEventType.NickInUse, context.getString(R.string.parser_nick_in_use));
-                            sender.sendServerMessage(event);
                         }
                         break;
                     }

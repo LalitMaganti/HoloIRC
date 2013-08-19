@@ -1,15 +1,12 @@
 package com.fusionx.lightirc.ui;
 
 import android.content.Context;
-import android.opengl.Visibility;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
@@ -41,7 +38,7 @@ public class MustBeCompleteView extends Preference {
 
     public void setInitialText(String text) {
         mText = String.format(getContext().getString(R.string.server_settings_non_empty), text);
-        if(mTextView != null) {
+        if (mTextView != null) {
             mTextView.setText(mText);
         }
     }

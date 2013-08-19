@@ -36,7 +36,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 import android.view.ActionMode;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,7 +53,6 @@ import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.MustBeCompleteView;
-import com.fusionx.lightirc.ui.NickPreference;
 import com.fusionx.lightirc.ui.ServerTitleEditTextPreference;
 
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +66,6 @@ import java.util.TreeSet;
 
 import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
 import static com.fusionx.lightirc.misc.PreferenceKeys.NickServPassword;
-import static com.fusionx.lightirc.misc.PreferenceKeys.NickStorage;
 import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
 import static com.fusionx.lightirc.misc.PreferenceKeys.RealName;
 import static com.fusionx.lightirc.misc.PreferenceKeys.ServerPassword;
@@ -127,7 +124,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         if (!canExit && newServer) {
             final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
                     (getApplicationContext()) + fileName + ".xml");
-            if(folder.exists()) {
+            if (folder.exists()) {
                 folder.delete();
             }
         }
@@ -188,8 +185,8 @@ public class ServerSettingsActivity extends PreferenceActivity {
             final EditTextPreference mPort = (EditTextPreference) prefSet.findPreference(Port);
             if (mPort != null) {
                 mPort.setOnPreferenceChangeListener(this);
+                mPort.setSummary(mPort.getText());
             }
-            mEditTexts.add(mPort);
 
             // Nick of User
             final EditTextPreference mRealName = (EditTextPreference)
@@ -229,7 +226,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public void onViewCreated(View view, Bundle savedInstanceState) {
             super.onViewCreated(view, savedInstanceState);
 
-            if(newServer) {
+            if (newServer) {
                 mustBeCompleteView.setInitialText(mEditTexts.get(0).getTitle().toString());
             } else {
                 getPreferenceScreen().removePreference(mustBeCompleteView);
@@ -245,6 +242,9 @@ public class ServerSettingsActivity extends PreferenceActivity {
 
                     final EditTextPreference editTextPreference = (EditTextPreference) preference;
                     editTextPreference.setText(newString);
+                } else {
+                    //TODO - fix this up
+                    //preference.setSummary();
                 }
             }
             if (newServer) {
@@ -256,7 +256,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
                         break;
                     }
                 }
-                if(canExit) {
+                if (canExit) {
                     getPreferenceScreen().removePreference(mustBeCompleteView);
                 }
             }

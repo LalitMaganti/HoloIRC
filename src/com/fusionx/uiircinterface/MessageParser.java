@@ -45,7 +45,7 @@ public class MessageParser {
                     break;
                 case "/part":
                 case "/p":
-                    if(parsedArray.size() == 0) {
+                    if (parsedArray.size() == 0) {
                         ServerCommandSender.sendPart(server, channelName,
                                 callbacks.getApplicationContext());
                     } else {
@@ -75,7 +75,7 @@ public class MessageParser {
                     break;
                 case "/close":
                 case "/c":
-                    if(parsedArray.size() == 0) {
+                    if (parsedArray.size() == 0) {
                         ServerCommandSender.sendClosePrivateMessage(server,
                                 server.getUserChannelInterface().getUser(userNick));
                     } else {
@@ -110,7 +110,7 @@ public class MessageParser {
         switch (command) {
             case "/join":
             case "/j":
-                if(parsedArray.size() == 1) {
+                if (parsedArray.size() == 1) {
                     final String channelName = parsedArray.get(0);
                     ServerCommandSender.sendJoin(server, channelName);
                 } else {
@@ -128,7 +128,7 @@ public class MessageParser {
                 }
                 break;
             case "/nick":
-                if(parsedArray.size() == 1) {
+                if (parsedArray.size() == 1) {
                     final String newNick = parsedArray.get(0);
                     ServerCommandSender.sendNickChange(server, newNick);
                 } else {
@@ -136,7 +136,7 @@ public class MessageParser {
                 }
                 break;
             case "/quit":
-                if(parsedArray.size() == 0) {
+                if (parsedArray.size() == 0) {
                     callbacks.disconnect();
                 } else {
                     ServerCommandSender.sendUnknownEvent(server, rawLine);

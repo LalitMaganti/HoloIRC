@@ -12,7 +12,6 @@ import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceKeys;
-import com.fusionx.lightirc.ui.NickPreference;
 
 import org.apache.commons.lang3.StringUtils;
 

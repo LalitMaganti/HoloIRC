@@ -429,7 +429,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void disconnect() {
-        if(mService != null) {
+        if (mService != null) {
             mService.disconnectFromServer(mServerTitle);
         }
 

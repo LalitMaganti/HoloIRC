@@ -9,7 +9,6 @@ import android.preference.DialogPreference;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -61,7 +60,7 @@ public class NickPreference extends DialogPreference implements TextWatcher {
         final boolean enable = !mFirstChoice.getText().toString().isEmpty();
         final Dialog dlg = getDialog();
         final AlertDialog alertDlg = (AlertDialog) dlg;
-        if(alertDlg != null) {
+        if (alertDlg != null) {
             final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
             btn.setEnabled(enable);
             mFirstChoice.setError(enable ? null : "Must not be empty");

@@ -10,7 +10,6 @@ import com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference;
 import java.util.ArrayList;
 
 import lombok.Setter;
-import lombok.experimental.Accessors;
 
 public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
     @Setter
@@ -23,9 +22,9 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
     @Override
     protected AlertDialog onEditTextChanged() {
         AlertDialog dialog = super.onEditTextChanged();
-        if(dialog != null && listOfExistingServers != null) {
-            for(String title : listOfExistingServers) {
-                if(title.toLowerCase().equals(getEditText().getText().toString().toLowerCase())) {
+        if (dialog != null && listOfExistingServers != null) {
+            for (String title : listOfExistingServers) {
+                if (title.toLowerCase().equals(getEditText().getText().toString().toLowerCase())) {
                     getEditText().setError("Server with the same name already exists.");
                     dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
                     break;

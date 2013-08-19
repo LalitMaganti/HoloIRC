@@ -42,7 +42,7 @@
                 android:key="pref_port"
                 android:title="@string/server_settings_port_title"
                 android:inputType="number"
-                android:defaultValue=""
+                android:defaultValue="6667"
                 android:singleLine="true"
                 android:lines="1"/>
         <CheckBoxPreference
@@ -58,7 +58,7 @@
                 android:title="@string/server_settings_nick_storage_title"
                 android:summary="@string/server_settings_nick_storage_summary"/>
         <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
-                android:defaultValue="HoloIRC"
+                android:defaultValue="HoloIRCUser"
                 android:key="pref_realname"
                 android:title="Real Name"
                 android:singleLine="true"
