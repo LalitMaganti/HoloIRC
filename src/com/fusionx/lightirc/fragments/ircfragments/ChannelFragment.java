@@ -80,7 +80,7 @@ public class ChannelFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        MessageSender.getSender(mCallback.getServer(false).getTitle())
+        MessageSender.getSender(mCallback.getServerTitle())
                 .unregisterChannelFragmentHandler(getTitle());
     }
 
