@@ -391,8 +391,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public void onUnexpectedDisconnect() {
         closeAllSlidingMenus();
-        selectServerFragment();
-
         mViewPager.disconnect();
 
         if (getServer(true) != null) {
@@ -404,6 +402,11 @@ public class IRCFragmentActivity extends FragmentActivity implements
                     mService = null;
                     return null;
                 }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    mActionsFragment.updateConnectionStatus();
+                }
             };
             unexpectedDisconnect.execute();
         }
@@ -414,6 +417,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
     /**
      * Method which is called when the user requests a mention from
      * the UserListFragment
+     *
+     * @param users - the list of users which the app user wants to mentuin
      */
     @Override
     public void onUserMention(final ArrayList<ChannelUser> users) {
@@ -496,13 +501,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public void connectedToServer() {
         if (mActionsSlidingMenu.isMenuShowing()) {
-            mActionsFragment.setConnectedToServer();
+            mActionsFragment.updateConnectionStatus();
         }
     }
-
-    /**
-     * End of the ServerFragment callbacks
-     */
 
     @Override
     public ServerChannelHandler getServerChannelHandler() {

@@ -177,7 +177,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         return (UserChannelActionsAdapter) getListAdapter().getAdapter(3);
     }
 
-    public void setConnectedToServer() {
+    public void updateConnectionStatus() {
         getServerAdapter().setConnected(mListener.isConnectedToServer());
         getServerAdapter().notifyDataSetChanged();
     }

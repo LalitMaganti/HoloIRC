@@ -183,9 +183,15 @@ public class MessageSender {
     // Generic events end
 
     public void sendServerConnection(final String connectionLine) {
-        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
+        final Bundle connectEvent = Utils.parcelDataForBroadcast(null,
                 ServerEventType.Connected, connectionLine);
-        sendServerMessage(joinEvent);
+        sendServerMessage(connectEvent);
+    }
+
+    public void sendServerDisconnection(final String disconnectLine) {
+        final Bundle disconnectEvent = Utils.parcelDataForBroadcast(null,
+                ServerEventType.Disconnected, disconnectLine);
+        sendServerMessage(disconnectEvent);
     }
 
     public void sendChanelJoined(final String channelName) {

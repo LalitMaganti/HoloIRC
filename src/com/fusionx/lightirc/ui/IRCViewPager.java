@@ -49,6 +49,8 @@ public class IRCViewPager extends ViewPager {
     }
 
     public void disconnect() {
+        setCurrentItem(0, true);
+
         getAdapter().removeAllButServer();
         getAdapter().disableAllEditTexts();
     }

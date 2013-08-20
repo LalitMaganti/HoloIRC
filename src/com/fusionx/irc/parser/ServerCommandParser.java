@@ -22,6 +22,7 @@
 package com.fusionx.irc.parser;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.Utils;
@@ -31,8 +32,11 @@ import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.UserChannelInterface;
+import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -257,20 +261,16 @@ public class ServerCommandParser {
     private void parseServerQuit(final ArrayList<String> parsedArray, final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         if (user.equals(mServer.getUser())) {
-            //final Event joinEvent = Utils.parcelDataForBroadcast(EventDestination., channelName,
-            //        ServerEventType.Generic, message);
-            //mainParser.getBroadcastSender().sendBroadcast(joinEvent);
-            // TODO - unexpected disconnect?
+            // TODO - improve this
+            mSender.sendServerDisconnection("");
         } else {
-            // If you have 3 strings in the array, the last must be the reason for quitting
-            String message = (parsedArray.size() == 3) ? " " +
-                    String.format(mContext.getString(R.string.parser_reason),
-                            parsedArray.get(2).replace("\"", "")) : "";
-
-            final Set<Channel> channels = mUserChannelInterface.removeUser(user);
-            for (Channel channel : channels) {
-                message = String.format(mContext.getString(R.string.parser_quit_server),
-                        user.getPrettyNick(channel)) + message;
+            for (final Channel channel : mUserChannelInterface.removeUser(user)) {
+                final String message = String.format(mContext.getString(R.string.parser_quit_server),
+                        user.getPrettyNick(channel)) +
+                        // If you have 3 strings in the array, the last must be the reason for quitting
+                        ((parsedArray.size() == 3) ? " " +
+                                String.format(mContext.getString(R.string.parser_reason),
+                                        StringUtils.remove(parsedArray.get(2), "\"")) : "");
                 mSender.sendGenericUserListChangedEvent(channel.getName(), message);
             }
         }

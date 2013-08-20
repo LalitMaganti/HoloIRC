@@ -83,12 +83,12 @@ public class ServerFragment extends IRCFragment {
                     mCallback.connectedToServer();
                     mEditText.setEnabled(true);
                     break;
+                case Disconnected:
                 case Error:
                     mCallback.onUnexpectedDisconnect();
                     break;
                 case NickInUse:
                     mCallback.selectServerFragment();
-                case Generic:
                     break;
             }
             appendToTextView(message + "\n");
