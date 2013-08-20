@@ -10,4 +10,8 @@ public interface IRCSideHandlerInterface {
     public ChannelHandler getChannelHandler(final String channelName);
 
     public UserHandler getUserHandler(final String userNick);
+
+    public String getTitle();
+
+    public String getNick();
 }

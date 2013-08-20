@@ -21,10 +21,16 @@
 
 package com.fusionx.uiircinterface;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
@@ -36,6 +42,7 @@ import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
@@ -208,19 +215,21 @@ public class MessageSender {
 
     public void sendPrivateAction(final String actionDestination, final User sendingUser,
                                   final String rawAction) {
-        String message;
-
-        message = String.format(mContext.getString(R.string.parser_action),
+        String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
+        mention(actionDestination);
         sendGenericUserEvent(actionDestination, message);
     }
 
     public void sendChannelAction(final String actionDestination, final ChannelUser sendingUser,
                                   final String rawAction) {
-        String message;
-        message = String.format(mContext.getString(R.string.parser_action),
+        String finalMessage = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getPrettyNick(actionDestination), rawAction);
-        sendGenericChannelEvent(actionDestination, message);
+        if(rawAction.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
+            mention(actionDestination);
+            finalMessage = "<b>" + finalMessage + "</b>";
+        }
+        sendGenericChannelEvent(actionDestination, finalMessage);
     }
 
     /**
@@ -237,13 +246,53 @@ public class MessageSender {
                                    final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getColorfulNick(), rawMessage);
+        mention(messageDestination);
         sendGenericUserEvent(messageDestination, message);
     }
 
     public void sendMessageToChannel(final Channel channel, final ChannelUser sending,
                                      final String rawMessage) {
-        final String message = String.format(mContext.getString(R.string.parser_message),
+        String preMessage = String.format(mContext.getString(R.string.parser_message),
                 sending.getPrettyNick(channel), rawMessage);
-        sendGenericChannelEvent(channel.getName(), message);
+        if(rawMessage.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
+            mention(channel.getName());
+            preMessage = "<b>" + preMessage + "</b>";
+        }
+        sendGenericChannelEvent(channel.getName(), preMessage);
+    }
+
+    public void mention(final String messageDestination) {
+        final NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification notification;
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                .setContentTitle(mContext.getString(R.string.app_name))
+                .setContentText(mContext.getString(R.string.service_you_mentioned) + " " +
+                        messageDestination)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setAutoCancel(true)
+                .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
+                        messageDestination);
+
+        if (fragmentSideHandlerInterface == null) {
+            final Intent mIntent = new Intent(mContext, IRCFragmentActivity.class);
+            mIntent.putExtra("serverTitle", ircSideHandlerInterface.getTitle());
+            mIntent.putExtra("mention", messageDestination);
+            final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
+            taskStackBuilder.addParentStack(IRCFragmentActivity.class);
+            taskStackBuilder.addNextIntent(mIntent);
+            final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            notification = builder.setContentIntent(pIntent).build();
+            mNotificationManager.notify(345, notification);
+        } else {
+            final Handler mainHandler = new Handler(mContext.getMainLooper());
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    fragmentSideHandlerInterface.mention(messageDestination);
+                }
+            });
+        }
     }
 }

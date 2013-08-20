@@ -144,4 +144,9 @@ public class Server implements IRCSideHandlerInterface {
     public UserHandler getUserHandler(String userNick) {
         return getPrivateMessageUser(userNick).getUserHandler();
     }
+
+    @Override
+    public String getNick() {
+        return getUser().getNick();
+    }
 }

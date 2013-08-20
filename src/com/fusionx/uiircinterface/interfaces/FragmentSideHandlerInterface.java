@@ -13,4 +13,6 @@ public interface FragmentSideHandlerInterface {
     public ChannelFragmentHandler getChannelFragmentHandler(String channelName);
 
     public PMFragmentHandler getUserFragmentHandler(String userNick);
+
+    public void mention(final String destination);
 }

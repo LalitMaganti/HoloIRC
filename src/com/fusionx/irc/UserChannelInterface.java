@@ -58,7 +58,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized void addChannelToUser(@NonNull final ChannelUser user,
                                               @NonNull final Channel channel) {
-        addBToA(user, channel);
+        super.addBToA(user, channel);
     }
 
     private synchronized void addUserToChannel(@NonNull final ChannelUser user,

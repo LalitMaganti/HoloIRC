@@ -28,20 +28,11 @@ import lombok.NonNull;
 
 public class AppUser extends ChannelUser {
     private ArrayList<PrivateMessageUser> privateMessages = new ArrayList<>();
-    private static AppUser user;
 
-    private AppUser(final String nick,
+    public AppUser(final String nick,
                     final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
-    }
-
-    public static AppUser getAppUser(@NonNull final String nick,
-                                     @NonNull final UserChannelInterface userChannelInterface) {
-        if (user == null) {
-            user = new AppUser(nick, userChannelInterface);
-        }
-        return user;
     }
 
     public void newPrivateMessage(final PrivateMessageUser user) {

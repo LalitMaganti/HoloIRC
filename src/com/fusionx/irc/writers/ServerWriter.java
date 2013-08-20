@@ -53,4 +53,8 @@ public class ServerWriter extends RawWriter {
     public void sendServerPassword(final String password) {
         writeLineToServer("PASS " + password);
     }
+
+    public void sendNickServPasswod(final String password) {
+        writeLineToServer("NICKSERV IDENTIFY " + password);
+    }
 }

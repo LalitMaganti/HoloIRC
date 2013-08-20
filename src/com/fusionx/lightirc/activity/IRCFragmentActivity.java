@@ -32,8 +32,13 @@ import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.Utils;
@@ -93,7 +98,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
-        mServerTitle = builder != null ? builder.getTitle() : null;
+        mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
+                ("serverTitle");
 
         setTheme(Utils.getThemeInt(getApplicationContext()));
         setContentView(R.layout.activity_server_channel);
@@ -182,9 +188,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
             mService.setServerDisplayed(mServerTitle);
 
-            final ServerConfiguration.Builder builder = getIntent()
-                    .getParcelableExtra("server");
-
             if (getServer(true) != null) {
                 if (isConnectedToServer()) {
                     for (final Channel channelName : getServer(false).getUser().getChannels()) {
@@ -197,6 +200,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
                     }
                 }
             } else {
+                final ServerConfiguration.Builder builder =
+                        getIntent().getParcelableExtra("server");
                 mService.connectToServer(builder);
             }
         }
@@ -409,6 +414,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
                 }
             };
             unexpectedDisconnect.execute();
+        } else {
+            mActionsFragment.updateConnectionStatus();
         }
     }
 
@@ -445,6 +452,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void disconnect() {
+        MessageSender.getSender(mServerTitle).unregisterFragmentSideHandlerInterface();
         if (mService != null) {
             mService.disconnectFromServer(mServerTitle);
         }
@@ -529,6 +537,18 @@ public class IRCFragmentActivity extends FragmentActivity implements
         final IRCFragment fragment = mViewPager.getAdapter().getFragment(userNick,
                 FragmentType.User);
         return fragment == null ? null : ((UserFragment) fragment).getUserFragmnetHandler();
+    }
+
+    public void mention(final String destination) {
+        final String message = String.format(getString(R.string.activity_mentioned), destination);
+        final Toast toast = new Toast(this);
+        final View view = getLayoutInflater().inflate(R.layout.toast_mention,
+                (ViewGroup) findViewById(R.id.toast_layout_root));
+        final TextView textView = (TextView) view.findViewById(R.id.toast_text);
+        textView.setText(message);
+        toast.setView(view);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
     }
 
     /**

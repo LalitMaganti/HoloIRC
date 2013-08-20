@@ -108,8 +108,12 @@ class ServerConnection {
             server.setStatus(mContext.getString(R.string.status_connected));
 
             if (nick != null) {
-                final AppUser user = AppUser.getAppUser(nick, server.getUserChannelInterface());
+                final AppUser user = new AppUser(nick, server.getUserChannelInterface());
                 server.setUser(user);
+
+                if (StringUtils.isNotEmpty(serverConfiguration.getNickservPassword())) {
+                    server.getWriter().sendNickServPasswod(serverConfiguration.getNickservPassword());
+                }
 
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {
                     server.getWriter().joinChannel(channelName);

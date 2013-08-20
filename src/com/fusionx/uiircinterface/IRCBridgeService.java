@@ -77,7 +77,7 @@ public class IRCBridgeService extends Service {
 
         final ServerConfiguration configuration = server.build();
 
-        MessageSender.getSender(server.getTitle()).initialSetup(getApplicationContext());
+        MessageSender.getSender(server.getTitle()).initialSetup(this);
         final ConnectionWrapper thread = new ConnectionWrapper(configuration, this);
         connectionManager.put(server.getTitle(), thread);
         thread.start();
@@ -185,35 +185,5 @@ public class IRCBridgeService extends Service {
         serverDisplayed = null;
 
         return true;
-    }
-
-    public void mention(final String serverName, final String messageDestination) {
-        Notification notification;
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.service_you_mentioned) + " " + messageDestination)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setAutoCancel(true)
-                .setTicker(getString(R.string.service_you_mentioned) + " " + messageDestination);
-
-        if (!serverName.equals(serverDisplayed)) {
-            final Intent mIntent = new Intent(this, IRCFragmentActivity.class);
-            //mIntent.putExtra("server", new ServerConfiguration.Builder
-            // (getServer(serverName).getConfiguration()));
-            mIntent.putExtra("mention", messageDestination);
-            final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(this);
-            taskStackBuilder.addParentStack(IRCFragmentActivity.class);
-            taskStackBuilder.addNextIntent(mIntent);
-            final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            notification = builder.setContentIntent(pIntent).build();
-        } else {
-            notification = builder.build();
-        }
-
-        final NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(345, notification);
-        mNotificationManager.cancel(345);
     }
 }
