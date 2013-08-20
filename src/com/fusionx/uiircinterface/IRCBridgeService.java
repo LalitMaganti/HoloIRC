@@ -133,7 +133,7 @@ public class IRCBridgeService extends Service {
             }
 
             @Override
-            protected void onPostExecute(final Void bot) {
+            protected void onPostExecute(final Void server) {
                 connectionManager.remove(serverName);
                 if (connectionManager.isEmpty()) {
                     stopForeground(true);

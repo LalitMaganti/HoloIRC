@@ -163,8 +163,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpCards() {
         mServerCardsAdapter.clear();
         if (!mBuilderList.isEmpty()) {
-            for (final ServerConfiguration.Builder bot : mBuilderList) {
-                mServerCardsAdapter.add(bot);
+            for (final ServerConfiguration.Builder builder : mBuilderList) {
+                mServerCardsAdapter.add(builder);
             }
         }
     }

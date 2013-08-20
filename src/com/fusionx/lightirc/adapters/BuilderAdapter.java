@@ -62,9 +62,9 @@ public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
             textView.setText(getItem(position).getTitle());
         }
         if (description != null) {
-            final Server bot = mCallback.getServer(getItem(position).getTitle());
-            if (bot != null) {
-                description.setText(bot.getStatus());
+            final Server server = mCallback.getServer(getItem(position).getTitle());
+            if (server != null) {
+                description.setText(server.getStatus());
             } else {
                 description.setText(mContext.getString(R.string.status_disconnected));
             }
