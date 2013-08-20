@@ -77,7 +77,7 @@ public class MessageParser {
                 case "/c":
                     if (parsedArray.size() == 0) {
                         ServerCommandSender.sendClosePrivateMessage(server,
-                                server.getUserChannelInterface().getUser(userNick));
+                                server.getPrivateMessageUser(userNick));
                     } else {
                         ServerCommandSender.sendUnknownEvent(server, message);
                     }

@@ -28,43 +28,33 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
+import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
-import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
-import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class PMFragment extends IRCFragment {
+import lombok.Getter;
+
+public class UserFragment extends IRCFragment {
     private CommonCallbacks mCallback;
 
     @Override
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServerTitle())
-                .registerUserFragmentHandler(getTitle(), mUserFragmentHandler);
-
         final Server server = mCallback.getServer(true);
         if (server != null) {
-            final User user = server.getUserChannelInterface().getUser(getTitle());
+            final PrivateMessageUser user = server.getPrivateMessageUser(getTitle());
             if (user != null) {
                 writeToTextView(user.getBuffer());
             }
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        MessageSender.getSender(mCallback.getServerTitle())
-                .unregisterUserFragmentHandler(getTitle());
     }
 
     @Override
@@ -103,7 +93,8 @@ public class PMFragment extends IRCFragment {
         MessageParser.userMessageToParse(mCallback, nick, message);
     }
 
-    private final PMFragmentHandler mUserFragmentHandler = new PMFragmentHandler() {
+    @Getter
+    private final PMFragmentHandler userFragmnetHandler = new PMFragmentHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();

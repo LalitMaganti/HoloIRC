@@ -112,14 +112,14 @@ public class ServerConfiguration {
 
         public static final Parcelable.Creator<Builder> CREATOR =
                 new Parcelable.Creator<Builder>() {
-            public Builder createFromParcel(Parcel in) {
-                return new Builder(in);
-            }
+                    public Builder createFromParcel(Parcel in) {
+                        return new Builder(in);
+                    }
 
-            public Builder[] newArray(int size) {
-                return new Builder[size];
-            }
-        };
+                    public Builder[] newArray(int size) {
+                        return new Builder[size];
+                    }
+                };
 
         public Builder() {
         }

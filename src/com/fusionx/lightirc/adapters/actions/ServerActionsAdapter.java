@@ -24,11 +24,9 @@ package com.fusionx.lightirc.adapters.actions;
 import android.content.Context;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class ServerActionsAdapter extends ActionsArrayAdapter {
     @Getter
-    @Setter
     private boolean connected = false;
 
     public ServerActionsAdapter(final Context context, final String[] objects) {
@@ -38,5 +36,10 @@ public class ServerActionsAdapter extends ActionsArrayAdapter {
     @Override
     public boolean isEnabled(int position) {
         return !((position == 0) || (position == 1)) || connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+        mObjects.set(2, connected ? "Disconnect" : "Close");
     }
 }

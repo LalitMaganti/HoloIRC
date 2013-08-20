@@ -68,14 +68,13 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final MergeAdapter mergeAdapter = new MergeAdapter();
-        /*final String[] array = {"Join new channel",
-        "Change nick",
-        "Disconnect" };*/
-        final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),//array);
+        final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),
                 getResources().getStringArray(R.array.server_actions));
-        final UserChannelActionsAdapter channelAdapter = new UserChannelActionsAdapter(getActivity());
+        final UserChannelActionsAdapter channelAdapter = new UserChannelActionsAdapter
+                (getActivity());
         final View serverHeader = inflater.inflate(R.layout.sliding_menu_header, null);
-        TextView textView = (TextView) serverHeader.findViewById(R.id.sliding_menu_heading_textview);
+        TextView textView = (TextView) serverHeader.findViewById(R.id
+                .sliding_menu_heading_textview);
         textView.setText("Server");
         final View otherHeader = inflater.inflate(R.layout.sliding_menu_header, null);
 

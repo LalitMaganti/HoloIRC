@@ -21,32 +21,47 @@
 
 package com.fusionx.irc;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import lombok.Getter;
 import lombok.NonNull;
 
-public class AppUser extends User {
-    @Getter
-    private HashSet<User> privateMessages = new HashSet<>();
+public class AppUser extends ChannelUser {
+    private ArrayList<PrivateMessageUser> privateMessages = new ArrayList<>();
+    private static AppUser user;
 
-    public AppUser(@NonNull final String nick,
-                   @NonNull final UserChannelInterface userChannelInterface) {
+    private AppUser(final String nick,
+                    final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
     }
 
-    public void newPrivateMessage(User user) {
+    public static AppUser getAppUser(@NonNull final String nick,
+                                     @NonNull final UserChannelInterface userChannelInterface) {
+        if (user == null) {
+            user = new AppUser(nick, userChannelInterface);
+        }
+        return user;
+    }
+
+    public void newPrivateMessage(final PrivateMessageUser user) {
         privateMessages.add(user);
-        user.registerHandler();
     }
 
-    public void closePrivateMessage(User user) {
+    public void closePrivateMessage(final PrivateMessageUser user) {
         privateMessages.remove(user);
-        user.unregisterHandler();
     }
 
-    public boolean isPrivateMessageOpen(User user) {
+    public boolean isPrivateMessageOpen(final PrivateMessageUser user) {
         return privateMessages.contains(user);
+    }
+
+    public Iterator<PrivateMessageUser> getPrivateMessageIterator() {
+        return privateMessages.iterator();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return o instanceof AppUser && ((AppUser) o).getNick().equals(nick);
     }
 }

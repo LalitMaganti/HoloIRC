@@ -22,11 +22,10 @@
 package com.fusionx.irc.writers;
 
 import com.fusionx.irc.Channel;
-import com.fusionx.irc.constants.WriterCommands;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.OutputStreamWriter;
-
-import lombok.NonNull;
 
 public class ChannelWriter extends RawWriter {
     private Channel mChannel;
@@ -41,12 +40,14 @@ public class ChannelWriter extends RawWriter {
     }
 
     public void sendAction(final String action) {
-        final String s = String.format(WriterCommands.ACTION, mChannel.getName(), action);
+        final String s = String.format(WriterCommands.Action, mChannel.getName(), action);
         writeLineToServer(s);
     }
 
-    public void partChannel(@NonNull final String reason) {
-        writeLineToServer(String.format(WriterCommands.PART, mChannel.getName(), reason).trim());
+    public void partChannel(final String reason) {
+        writeLineToServer(StringUtils.isEmpty(reason) ?
+                String.format(WriterCommands.Part, mChannel.getName()) :
+                String.format(WriterCommands.PartWithReason, mChannel.getName(), reason).trim());
     }
 
     public void sendWho() {

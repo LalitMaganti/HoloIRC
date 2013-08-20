@@ -26,8 +26,8 @@ import android.os.AsyncTask;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
+import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
-import com.fusionx.irc.User;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -67,7 +67,7 @@ public class ServerCommandSender {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendAction(action);
 
-                MessageSender.getSender(server.getTitle()).sendAction(channelName,
+                MessageSender.getSender(server.getTitle()).sendChannelAction(channelName,
                         server.getUser(), action);
                 return null;
             }
@@ -77,14 +77,14 @@ public class ServerCommandSender {
 
     public static void sendMessageToUser(final Server server, final String userNick,
                                          final String message) {
+        final PrivateMessageUser user = server.getPrivateMessageUser(userNick);
         final AsyncTask<Void, Void, Void> sendMessage = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                final User user = server.getUserChannelInterface().getUser(userNick);
                 if (StringUtils.isNotEmpty(message)) {
                     user.getWriter().sendMessage(message);
                 }
-                server.privateMessageSent(user, message);
+                server.privateMessageSent(user, message, true);
                 return null;
             }
         };
@@ -93,12 +93,14 @@ public class ServerCommandSender {
 
     public static void sendActionToUser(final Server server, final String userNick,
                                         final String action) {
+        final PrivateMessageUser user = server.getPrivateMessageUser(userNick);
         final AsyncTask<Void, Void, Void> sendAction = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                final User user = server.getUserChannelInterface().getUser(userNick);
-                user.getWriter().sendAction(action);
-                server.privateActionSent(user, action);
+                if (StringUtils.isNotEmpty(action)) {
+                    user.getWriter().sendAction(action);
+                }
+                server.privateActionSent(user, action, true);
                 return null;
             }
         };
@@ -134,10 +136,10 @@ public class ServerCommandSender {
     }
 
     public static void sendClosePrivateMessage(final Server server, final String nick) {
-        sendClosePrivateMessage(server, server.getUserChannelInterface().getUser(nick));
+        sendClosePrivateMessage(server, server.getPrivateMessageUser(nick));
     }
 
-    public static void sendClosePrivateMessage(final Server server, final User user) {
+    public static void sendClosePrivateMessage(final Server server, final PrivateMessageUser user) {
         final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {

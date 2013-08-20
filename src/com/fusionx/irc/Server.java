@@ -28,81 +28,120 @@ import com.fusionx.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.irc.handlerabstract.ServerHandler;
+import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Iterator;
+
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Data
-public class Server {
-    protected ServerWriter writer;
-    protected UserChannelInterface userChannelInterface;
+public class Server implements IRCSideHandlerInterface {
+    private ServerWriter writer;
+    private UserChannelInterface userChannelInterface;
 
-    protected final String title;
-    protected AppUser user;
+    private final String title;
+    private AppUser user;
 
     @Setter(AccessLevel.NONE)
-    protected String buffer = "";
-    protected String status = "Disconnected";
-    protected String MOTD = "";
+    private String buffer = "";
+    private String status = "Disconnected";
+    private String MOTD = "";
 
-    public Server(final String serverTitle) {
-        title = serverTitle;
-
-        MessageSender.getSender(serverTitle).registerServerHandler(serverHandler);
-    }
-
-    public void privateMessageSent(final User sendingUser, final String message) {
-        final MessageSender sender = MessageSender.getSender(title);
-        if (!user.isPrivateMessageOpen(sendingUser)) {
-            user.newPrivateMessage(sendingUser);
-
-            if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(sendingUser, message);
-            }
-
-            final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
-            sender.sendServerChannelMessage(event);
-        } else {
-            sender.sendPrivateMessage(sendingUser, message);
-        }
-    }
-
-    public void privateActionSent(final User sendingUser, final String action) {
-        final MessageSender sender = MessageSender.getSender(title);
-        if (!user.isPrivateMessageOpen(sendingUser)) {
-            user.newPrivateMessage(sendingUser);
-
-            sender.sendAction(sendingUser.getNick(), sendingUser, action);
-
-            final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerChannelEventType.NewPrivateMessage, sendingUser.getNick());
-            sender.sendServerMessage(event);
-        } else {
-            sender.sendAction(sendingUser.getNick(), sendingUser, action);
-        }
-    }
-
-    private ServerHandler serverHandler = new ServerHandler() {
+    private final ServerHandler serverHandler = new ServerHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
             final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
             switch (type) {
-                case NickInUse:
-                case ServerConnected:
-                case Generic:
+                case Disconnected:
                 case Error:
+                    MessageSender.getSender(title).unregisterIRCSideHandlerInterface(title);
+                case NickInUse:
+                case Connected:
+                case Generic:
                     buffer += bundle.getString(EventBundleKeys.message) + "\n";
                     break;
             }
         }
     };
+
+    public Server(final String serverTitle) {
+        title = serverTitle;
+
+        MessageSender.getSender(serverTitle).registerIRCSideHandlerInterface(this);
+    }
+
+    public void privateMessageSent(final PrivateMessageUser userWhoIsNotUs, final String message,
+                                   final boolean weAreSending) {
+        final MessageSender sender = MessageSender.getSender(title);
+        final User sendingUser = weAreSending ? user : userWhoIsNotUs;
+        if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
+            user.newPrivateMessage(userWhoIsNotUs);
+
+            if (StringUtils.isNotEmpty(message)) {
+                sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
+            }
+
+            final Bundle event = Utils.parcelDataForBroadcast(null,
+                    ServerChannelEventType.NewPrivateMessage, userWhoIsNotUs.getNick());
+            sender.sendServerChannelMessage(event);
+        } else {
+            if (StringUtils.isNotEmpty(message)) {
+                sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
+            }
+        }
+    }
+
+    public void privateActionSent(final PrivateMessageUser userWhoIsNotUs, final String action,
+                                  final boolean weAreSending) {
+        final MessageSender sender = MessageSender.getSender(title);
+        final User sendingUser = weAreSending ? user : userWhoIsNotUs;
+        if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
+            user.newPrivateMessage(userWhoIsNotUs);
+
+            if (StringUtils.isNotEmpty(action)) {
+                sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);
+            }
+
+            final Bundle event = Utils.parcelDataForBroadcast(null,
+                    ServerChannelEventType.NewPrivateMessage, userWhoIsNotUs.getNick());
+            sender.sendServerMessage(event);
+        } else {
+            if (StringUtils.isNotEmpty(action)) {
+                sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);
+            }
+        }
+    }
+
+    public synchronized PrivateMessageUser getPrivateMessageUser(@NonNull final String nick) {
+        final Iterator<PrivateMessageUser> iterator = user.getPrivateMessageIterator();
+        while (iterator.hasNext()) {
+            final PrivateMessageUser privateMessageUser = iterator.next();
+            if (Utils.areNicksEqual(privateMessageUser.getNick(), nick)) {
+                return privateMessageUser;
+            }
+        }
+        return new PrivateMessageUser(nick, userChannelInterface);
+    }
+
+    @Override
+    public ChannelHandler getChannelHandler(String channelName) {
+        return userChannelInterface.getChannel(channelName).getChannelHandler();
+    }
+
+    @Override
+    public UserHandler getUserHandler(String userNick) {
+        return getPrivateMessageUser(userNick).getUserHandler();
+    }
 }

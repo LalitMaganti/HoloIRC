@@ -27,17 +27,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.irc.User;
+import com.fusionx.irc.ChannelUser;
 
 import java.util.SortedSet;
 
 import lombok.Setter;
 
-public class UserListAdapter extends SelectionAdapter<User> {
+public class UserListAdapter extends SelectionAdapter<ChannelUser> {
     @Setter
     private String channelName;
 
-    public UserListAdapter(final Context context, final SortedSet<User> array) {
+    public UserListAdapter(final Context context, final SortedSet<ChannelUser> array) {
         super(context, array);
     }
 

@@ -25,5 +25,6 @@ public enum ServerEventType {
     NickInUse,
     Generic,
     Error,
-    ServerConnected,
+    Connected,
+    Disconnected,
 }

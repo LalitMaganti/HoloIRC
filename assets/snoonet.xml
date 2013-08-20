@@ -3,9 +3,9 @@
     <string name="pref_title">Snoonet</string>
     <string name="pref_url">irc.snoonet.org</string>
     <string name="pref_port">6667</string>
-    <boolean name="pref_ssl" value="false" />
+    <boolean name="pref_ssl" value="false"/>
     <string name="pref_nick">HoloIRCUser</string>
     <string name="pref_realname">HoloIRCUser</string>
-    <boolean name="pref_auto_nick" value="true" />
+    <boolean name="pref_auto_nick" value="true"/>
     <string name="pref_login_username">holoirc</string>
 </map>

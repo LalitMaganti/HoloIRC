@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
-import com.fusionx.lightirc.fragments.ircfragments.PMFragment;
+import com.fusionx.lightirc.fragments.ircfragments.UserFragment;
 
 public class IRCViewPager extends ViewPager {
     public IRCViewPager(Context context, AttributeSet attrs) {
@@ -36,12 +36,12 @@ public class IRCViewPager extends ViewPager {
     }
 
     public int onNewPrivateMessage(final String userNick) {
-        final PMFragment pmFragment = new PMFragment();
+        final UserFragment userFragment = new UserFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", userNick);
-        pmFragment.setArguments(bundle);
+        userFragment.setArguments(bundle);
 
-        final int position = getAdapter().addFragment(pmFragment);
+        final int position = getAdapter().addFragment(userFragment);
 
         setCurrentItem(position, true);
 

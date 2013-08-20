@@ -8,7 +8,7 @@ public class BuilderList extends ArrayList<ServerConfiguration.Builder> {
     public ArrayList<String> getListOfTitles(final ServerConfiguration.Builder exclusion) {
         final ArrayList<String> listOfTitles = new ArrayList<>();
         for (ServerConfiguration.Builder builder : this) {
-            if(!builder.equals(exclusion)) {
+            if (!builder.equals(exclusion)) {
                 listOfTitles.add(builder.getTitle());
             }
         }

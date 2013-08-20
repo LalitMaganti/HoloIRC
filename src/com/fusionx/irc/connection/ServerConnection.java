@@ -99,7 +99,7 @@ class ServerConnection {
                     serverConfiguration.getNickStorage());
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerEventType.ServerConnected, String.format(mContext
+                    ServerEventType.Connected, String.format(mContext
                     .getString(R.string.parser_connected),
                     serverConfiguration.getUrl()));
 
@@ -108,7 +108,7 @@ class ServerConnection {
             server.setStatus(mContext.getString(R.string.status_connected));
 
             if (nick != null) {
-                final AppUser user = new AppUser(nick, server.getUserChannelInterface());
+                final AppUser user = AppUser.getAppUser(nick, server.getUserChannelInterface());
                 server.setUser(user);
 
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {

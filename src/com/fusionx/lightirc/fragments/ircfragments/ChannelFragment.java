@@ -32,8 +32,8 @@ import android.widget.TextView;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
+import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.Server;
-import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.R;
@@ -41,11 +41,12 @@ import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
-import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+
+import lombok.Getter;
 
 public class ChannelFragment extends IRCFragment {
     private ChannelFragmentCallback mCallback;
@@ -64,9 +65,6 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServerTitle()).registerChannelFragmentHandler
-                (getTitle(), mChannelFragmentHandler);
-
         final Server server = mCallback.getServer(true);
         if (server != null) {
             final Channel channel = server.getUserChannelInterface().getChannel(getTitle());
@@ -74,14 +72,6 @@ public class ChannelFragment extends IRCFragment {
                 writeToTextView(channel.getBuffer());
             }
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        MessageSender.getSender(mCallback.getServerTitle())
-                .unregisterChannelFragmentHandler(getTitle());
     }
 
     @Override
@@ -111,10 +101,10 @@ public class ChannelFragment extends IRCFragment {
         return false;
     }
 
-    public void onUserMention(final ArrayList<User> users) {
+    public void onUserMention(final ArrayList<ChannelUser> users) {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
-        for (final User userNick : users) {
+        for (final ChannelUser userNick : users) {
             nicks += Html.fromHtml(userNick.getPrettyNick(getTitle())) + ": ";
         }
 
@@ -138,7 +128,8 @@ public class ChannelFragment extends IRCFragment {
         public void updateUserList(final String channelName);
     }
 
-    private final ChannelFragmentHandler mChannelFragmentHandler = new ChannelFragmentHandler() {
+    @Getter
+    private final ChannelFragmentHandler channelFragmentHandler = new ChannelFragmentHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();

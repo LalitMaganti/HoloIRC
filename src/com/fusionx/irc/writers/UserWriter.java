@@ -21,15 +21,14 @@
 
 package com.fusionx.irc.writers;
 
-import com.fusionx.irc.User;
-import com.fusionx.irc.constants.WriterCommands;
+import com.fusionx.irc.PrivateMessageUser;
 
 import java.io.OutputStreamWriter;
 
 public class UserWriter extends RawWriter {
-    private final User mUser;
+    private final PrivateMessageUser mUser;
 
-    public UserWriter(OutputStreamWriter writer, final User user) {
+    public UserWriter(OutputStreamWriter writer, final PrivateMessageUser user) {
         super(writer);
         mUser = user;
     }
@@ -39,7 +38,7 @@ public class UserWriter extends RawWriter {
     }
 
     public void sendAction(String action) {
-        writeLineToServer(String.format(WriterCommands.ACTION, mUser.getNick(), action));
+        writeLineToServer(String.format(WriterCommands.Action, mUser.getNick(), action));
     }
 
     public void sendWho() {

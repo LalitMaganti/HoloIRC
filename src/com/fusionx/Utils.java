@@ -176,4 +176,10 @@ public class Utils {
                 .getDefaultSharedPreferences(applicationContext);
         return preferences.getString(PreferenceKeys.QuitReason, "");
     }
+
+    public static boolean areNicksEqual(final String firstNick, final String secondNick) {
+        return firstNick.equals(secondNick) ||
+                ((firstNick.toLowerCase().equals("nickserv") || firstNick.toLowerCase().equals
+                        ("chanserv")) && firstNick.toLowerCase().equals(secondNick.toLowerCase()));
+    }
 }

@@ -27,8 +27,9 @@ import android.util.Log;
 import com.fusionx.Utils;
 import com.fusionx.irc.AppUser;
 import com.fusionx.irc.Channel;
+import com.fusionx.irc.ChannelUser;
+import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
-import com.fusionx.irc.User;
 import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
@@ -105,7 +106,12 @@ public class ServerCommandParser {
         if (Utils.isChannel(recipient)) {
             mSender.sendGenericChannelEvent(recipient, formattedNotice);
         } else if (recipient.equals(mServer.getUser().getNick())) {
-            mSender.sendGenericServerEvent(formattedNotice);
+            final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
+            if (mServer.getUser().isPrivateMessageOpen(user)) {
+                mServer.privateMessageSent(user, notice, false);
+            } else {
+                mSender.sendGenericServerEvent(formattedNotice);
+            }
         } else {
             throw new IllegalArgumentException();
         }
@@ -124,32 +130,36 @@ public class ServerCommandParser {
     }
 
     private void parsePRIVMSGCommand(final ArrayList<String> parsedArray, final String rawSource) {
-        final User sendingUser = mUserChannelInterface.getUserFromRaw(rawSource);
+        final String nick = Utils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String message = parsedArray.get(3);
 
         if (Utils.isChannel(recipient)) {
+            final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
             final Channel channel = mUserChannelInterface.getChannel(recipient);
             mSender.sendMessageToChannel(channel, sendingUser, message);
         } else {
-            mServer.privateMessageSent(sendingUser, message);
+            final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+            mServer.privateMessageSent(sendingUser, message, false);
         }
     }
 
     private void parseAction(ArrayList<String> parsedArray, String rawSource) {
-        final User sendingUser = mUserChannelInterface.getUserFromRaw(rawSource);
+        final String nick = Utils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String action = parsedArray.get(3).replace("ACTION ", "");
 
         if (Utils.isChannel(recipient)) {
-            mSender.sendAction(recipient, sendingUser, action);
+            final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
+            mSender.sendChannelAction(recipient, sendingUser, action);
         } else {
-            mServer.privateActionSent(sendingUser, action);
+            final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+            mServer.privateActionSent(sendingUser, action, false);
         }
     }
 
-    private void parseTopicChange(ArrayList<String> parsedArray, String rawSource) {
-        final User user = mUserChannelInterface.getUserFromRaw(rawSource);
+    private void parseTopicChange(final ArrayList<String> parsedArray, final String rawSource) {
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
         final String setterNick = user.getPrettyNick(channel);
         final String newTopic = parsedArray.get(3);
@@ -163,7 +173,7 @@ public class ServerCommandParser {
     }
 
     private void parseNickChange(ArrayList<String> parsedArray, String rawSource) {
-        final User user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final UpdateableTreeSet<Channel> channels = user.getChannels();
         final String oldNick = user.getColorfulNick();
         user.setNick(parsedArray.get(2));
@@ -194,7 +204,7 @@ public class ServerCommandParser {
                 // User specified - therefore user mode in channel is being changed
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
                 final String userRecipient = parsedArray.get(4);
-                final User user = mUserChannelInterface.getUser(userRecipient);
+                final ChannelUser user = mUserChannelInterface.getUser(userRecipient);
 
                 final String message = user.processModeChange(mContext, sendingUser, channel, mode);
 
@@ -207,7 +217,7 @@ public class ServerCommandParser {
     }
 
     private void parseChannelJoin(final ArrayList<String> parsedArray, final String rawSource) {
-        final User user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
         mUserChannelInterface.coupleUserAndChannel(user, channel);
 
@@ -218,14 +228,14 @@ public class ServerCommandParser {
             mSender.sendGenericUserListChangedEvent(channel.getName(),
                     String.format(mContext
                             .getString(R.string.parser_joined_channel), user.getPrettyNick(channel)));
-            user.getWriter().sendWho();
+            //user.getWriter().sendWho();
         }
     }
 
     private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
 
-        final User user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         if (user.equals(mServer.getUser())) {
             Log.e(LOG_TAG, Utils.convertArrayListToString(parsedArray));
@@ -245,7 +255,7 @@ public class ServerCommandParser {
     }
 
     private void parseServerQuit(final ArrayList<String> parsedArray, final String rawSource) {
-        final User user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         if (user.equals(mServer.getUser())) {
             //final Event joinEvent = Utils.parcelDataForBroadcast(EventDestination., channelName,
             //        ServerEventType.Generic, message);

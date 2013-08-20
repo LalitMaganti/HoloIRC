@@ -28,36 +28,23 @@ import android.os.Message;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
+import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.User;
-import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.enums.UserEventType;
-import com.fusionx.irc.handlerabstract.ChannelHandler;
-import com.fusionx.irc.handlerabstract.ServerHandler;
-import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
-import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
-import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
+import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
+import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 
 import java.util.LinkedHashMap;
 
 public class MessageSender {
     private static LinkedHashMap<String, MessageSender> sender = new LinkedHashMap<>();
     private Context mContext;
-
-    private Handler mServerHandler;
-    private LinkedHashMap<String, Handler> mChannelHandlers = new LinkedHashMap<>();
-    private LinkedHashMap<String, Handler> mPMHandlers = new LinkedHashMap<>();
-
-    private Handler mServerFragmentHandler;
-    private Handler mServerChannelHandler;
-    private LinkedHashMap<String, Handler> mChannelFragmentHandlers = new LinkedHashMap<>();
-    private LinkedHashMap<String, Handler> mPMFragmentHandlers = new LinkedHashMap<>();
 
     private MessageSender() {
     }
@@ -75,90 +62,56 @@ public class MessageSender {
         return handler;
     }
 
+    private IRCSideHandlerInterface ircSideHandlerInterface;
+    private FragmentSideHandlerInterface fragmentSideHandlerInterface;
+
     /*
     Start of registers
      */
-    public void registerServerHandler(final ServerHandler serverHandler) {
-        mServerHandler = serverHandler;
+    public void registerIRCSideHandlerInterface(final IRCSideHandlerInterface handlerInterface) {
+        ircSideHandlerInterface = handlerInterface;
     }
 
-    public void registerChannelHandler(final String channelName, final ChannelHandler channelHandler) {
-        mChannelHandlers.put(channelName, channelHandler);
+    public void registerServerChannelHandler(final FragmentSideHandlerInterface handlerInterface) {
+        fragmentSideHandlerInterface = handlerInterface;
     }
 
-    public void registerUserHandler(final String userNick, final UserHandler userHandler) {
-        mPMHandlers.put(userNick, userHandler);
-    }
-
-    public void registerServerChannelHandler(final ServerChannelHandler serverChannelHandler) {
-        mServerChannelHandler = serverChannelHandler;
-    }
-
-    public void registerServerFragmentHandler(final ServerFragHandler serverHandler) {
-        mServerFragmentHandler = serverHandler;
-    }
-
-    public void registerChannelFragmentHandler(final String channelName,
-                                               final ChannelFragmentHandler channelHandler) {
-        mChannelFragmentHandlers.put(channelName, channelHandler);
-    }
-
-    public void registerUserFragmentHandler(final String userNick, final PMFragmentHandler userHandler) {
-        mPMFragmentHandlers.put(userNick, userHandler);
-    }
-
-        /*
+    /*
     Start of deregister
      */
-
-    public void unregisterServerHandler() {
-        mServerHandler = null;
+    public void unregisterIRCSideHandlerInterface(final String serverName) {
+        ircSideHandlerInterface = null;
+        sender.remove(serverName);
     }
 
-    public void unregisterChannelHandler(final String channelName) {
-        mChannelHandlers.remove(channelName);
-    }
-
-    public void unregisterUserHandler(final String userNick) {
-        mChannelHandlers.remove(userNick);
-    }
-
-    public void unregisterServerChannelHandler() {
-        mServerChannelHandler = null;
-    }
-
-    public void unregisterServerFragmentHandler() {
-        mServerFragmentHandler = null;
-    }
-
-    public void unregisterChannelFragmentHandler(final String channelName) {
-        mChannelFragmentHandlers.remove(channelName);
-    }
-
-    public void unregisterUserFragmentHandler(final String userNick) {
-        mPMFragmentHandlers.remove(userNick);
+    public void unregisterFragmentSideHandlerInterface() {
+        fragmentSideHandlerInterface = null;
     }
 
     /*
     Start of sending messages
      */
     public void sendServerChannelMessage(final Bundle event) {
-        if (mServerChannelHandler != null) {
+        if (fragmentSideHandlerInterface != null) {
             final Message fragmentMessage = Message.obtain();
             fragmentMessage.setData(event);
-            mServerChannelHandler.sendMessage(fragmentMessage);
+            fragmentSideHandlerInterface.getServerChannelHandler().sendMessage(fragmentMessage);
         }
     }
 
     public void sendServerMessage(final Bundle event) {
         final Message message = Message.obtain();
         message.setData(event);
-        mServerHandler.dispatchMessage(message);
+        ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
 
-        if (mServerFragmentHandler != null) {
-            final Message fragmentMessage = Message.obtain();
-            fragmentMessage.setData(event);
-            mServerFragmentHandler.sendMessage(fragmentMessage);
+        if (fragmentSideHandlerInterface != null) {
+            final ServerFragHandler handler = fragmentSideHandlerInterface
+                    .getServerFragmentHandler();
+            if (handler != null) {
+                final Message fragmentMessage = Message.obtain();
+                fragmentMessage.setData(event);
+                handler.sendMessage(fragmentMessage);
+            }
         }
     }
 
@@ -167,14 +120,17 @@ public class MessageSender {
 
         final Message message = Message.obtain();
         message.setData(event);
-        final Handler handler = mChannelHandlers.get(destination);
+        final Handler handler = ircSideHandlerInterface.getChannelHandler(destination);
         handler.dispatchMessage(message);
 
-        if (mChannelFragmentHandlers.get(destination) != null) {
-            final Message fragmentMessage = Message.obtain();
-            fragmentMessage.setData(event);
-            final Handler fragmentHandler = mChannelFragmentHandlers.get(destination);
-            fragmentHandler.sendMessage(fragmentMessage);
+        if (fragmentSideHandlerInterface != null) {
+            final Handler fragmentHandler = fragmentSideHandlerInterface
+                    .getChannelFragmentHandler(destination);
+            if (fragmentHandler != null) {
+                final Message fragmentMessage = Message.obtain();
+                fragmentMessage.setData(event);
+                fragmentHandler.sendMessage(fragmentMessage);
+            }
         }
     }
 
@@ -183,14 +139,16 @@ public class MessageSender {
 
         final Message message = Message.obtain();
         message.setData(event);
-        final Handler handler = mPMHandlers.get(destination);
+        final Handler handler = ircSideHandlerInterface.getUserHandler(destination);
         handler.dispatchMessage(message);
 
-        if (mPMFragmentHandlers.get(destination) != null) {
-            final Message fragmentMessage = Message.obtain();
-            fragmentMessage.setData(event);
-            final Handler fragmentHandler = mPMFragmentHandlers.get(destination);
-            fragmentHandler.sendMessage(fragmentMessage);
+        if (fragmentSideHandlerInterface != null) {
+            final Handler fragmentHandler = fragmentSideHandlerInterface.getUserFragmentHandler(destination);
+            if (fragmentHandler != null) {
+                final Message fragmentMessage = Message.obtain();
+                fragmentMessage.setData(event);
+                fragmentHandler.sendMessage(fragmentMessage);
+            }
         }
     }
 
@@ -226,7 +184,7 @@ public class MessageSender {
 
     public void sendServerConnection(final String connectionLine) {
         final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
-                ServerEventType.ServerConnected, connectionLine);
+                ServerEventType.Connected, connectionLine);
         sendServerMessage(joinEvent);
     }
 
@@ -242,27 +200,41 @@ public class MessageSender {
         sendChannelMessage(partEvent);
     }
 
-    public void sendAction(final String actionDestination, final User sendingUser,
-                           final String rawAction) {
+    public void sendPrivateAction(final String actionDestination, final User sendingUser,
+                                  final String rawAction) {
         String message;
-        if (Constants.channelPrefixes.contains(actionDestination.charAt(0))) {
-            message = String.format(mContext.getString(R.string.parser_action),
-                    sendingUser.getPrettyNick(actionDestination), rawAction);
-            sendGenericChannelEvent(actionDestination, message);
-        } else {
-            message = String.format(mContext.getString(R.string.parser_action),
-                    sendingUser.getColorfulNick(), rawAction);
-            sendGenericUserEvent(actionDestination, message);
-        }
+
+        message = String.format(mContext.getString(R.string.parser_action),
+                sendingUser.getColorfulNick(), rawAction);
+        sendGenericUserEvent(actionDestination, message);
     }
 
-    public void sendPrivateMessage(final User sending,
+    public void sendChannelAction(final String actionDestination, final ChannelUser sendingUser,
+                                  final String rawAction) {
+        String message;
+        message = String.format(mContext.getString(R.string.parser_action),
+                sendingUser.getPrettyNick(actionDestination), rawAction);
+        sendGenericChannelEvent(actionDestination, message);
+    }
+
+    /**
+     * Method used to send a private message.
+     * <p/>
+     * Method should not be used from anywhere but the Server class.
+     *
+     * @param messageDestination - the nick name of the destination user
+     * @param sending            - the user who is sending the message - it may be us or it may be the other
+     *                           user
+     * @param rawMessage         - the message being sent
+     */
+    public void sendPrivateMessage(final String messageDestination, final User sending,
                                    final String rawMessage) {
-        final String message = String.format(mContext.getString(R.string.parser_message), sending.getColorfulNick(), rawMessage);
-        sendGenericUserEvent(sending.getNick(), message);
+        final String message = String.format(mContext.getString(R.string.parser_message),
+                sending.getColorfulNick(), rawMessage);
+        sendGenericUserEvent(messageDestination, message);
     }
 
-    public void sendMessageToChannel(final Channel channel, final User sending,
+    public void sendMessageToChannel(final Channel channel, final ChannelUser sending,
                                      final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getPrettyNick(channel), rawMessage);

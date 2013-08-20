@@ -22,13 +22,13 @@
 package com.fusionx.irc.misc;
 
 import com.fusionx.irc.Channel;
-import com.fusionx.irc.User;
+import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.enums.UserLevel;
 import com.fusionx.lightirc.misc.IRCUtils;
 
 import java.util.Comparator;
 
-public class IRCUserComparator implements Comparator<User> {
+public class IRCUserComparator implements Comparator<ChannelUser> {
     private final Channel channel;
 
     public IRCUserComparator(final Channel channel) {
@@ -36,7 +36,7 @@ public class IRCUserComparator implements Comparator<User> {
     }
 
     @Override
-    public int compare(final User user1, final User user2) {
+    public int compare(final ChannelUser user1, final ChannelUser user2) {
         final UserLevel firstUserMode = user1.getUserLevelMap().get(channel);
         final UserLevel secondUserMode = user2.getUserLevelMap().get(channel);
 

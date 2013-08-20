@@ -24,29 +24,17 @@ package com.fusionx.lightirc.misc;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.util.Log;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.AutoNickChange;
-import static com.fusionx.lightirc.misc.PreferenceKeys.FirstNick;
-import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
-import static com.fusionx.lightirc.misc.PreferenceKeys.SSL;
-import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
 import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
-import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
 public class SharedPreferencesUtils {
     public static String getSharedPreferencesPath(final Context context) {
@@ -58,17 +46,17 @@ public class SharedPreferencesUtils {
         final String[] files;
         try {
             files = assetManager.list("");
-            for(String filename : files) {
-                if(filename.endsWith(".xml")) {
+            for (String filename : files) {
+                if (filename.endsWith(".xml")) {
                     final InputStream in = assetManager.open(filename);
                     final File outFile = new File(getSharedPreferencesPath(context));
-                    if(outFile.exists() || outFile.mkdir()) {
+                    if (outFile.exists() || outFile.mkdir()) {
                         final File file = new File(getSharedPreferencesPath(context), filename);
                         final FileOutputStream out = new FileOutputStream(file);
 
                         byte[] buffer = new byte[2048];
                         int read;
-                        while((read = in.read(buffer)) != -1){
+                        while ((read = in.read(buffer)) != -1) {
                             out.write(buffer, 0, read);
                         }
 
@@ -90,7 +78,7 @@ public class SharedPreferencesUtils {
         for (final String file : folder.list()) {
             if (file.startsWith("server_")) {
                 array.add(migrateFileToNewSystem(context, file));
-            } else if(!file.equals("main.xml") &&
+            } else if (!file.equals("main.xml") &&
                     !file.equals("com.fusionx.lightirc_preferences.xml")) {
                 array.add(file.replace(".xml", ""));
             }

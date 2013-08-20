@@ -35,9 +35,10 @@ import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
-import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
+
+import lombok.Getter;
 
 public class ServerFragment extends IRCFragment {
     private ServerFragmentCallback mCallback;
@@ -46,22 +47,12 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServerTitle()).registerServerFragmentHandler
-                (mServerHandler);
-
         mEditText.setEnabled(mCallback.isConnectedToServer());
 
         final Server server = mCallback.getServer(true);
         if (server != null) {
             writeToTextView(server.getBuffer());
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        MessageSender.getSender(mCallback.getServerTitle()).unregisterServerFragmentHandler();
     }
 
     @Override
@@ -79,7 +70,8 @@ public class ServerFragment extends IRCFragment {
         MessageParser.serverMessageToParse(mCallback, message);
     }
 
-    private final ServerFragHandler mServerHandler = new ServerFragHandler() {
+    @Getter
+    private final ServerFragHandler serverFragHandler = new ServerFragHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
@@ -87,7 +79,7 @@ public class ServerFragment extends IRCFragment {
                     .eventType);
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
-                case ServerConnected:
+                case Connected:
                     mCallback.connectedToServer();
                     mEditText.setEnabled(true);
                     break;

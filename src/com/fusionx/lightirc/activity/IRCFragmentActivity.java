@@ -38,9 +38,10 @@ import android.view.MenuItem;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
+import com.fusionx.irc.ChannelUser;
+import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
-import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.R;
@@ -50,16 +51,22 @@ import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
+import com.fusionx.lightirc.fragments.ircfragments.UserFragment;
+import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
+import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
+import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.IRCViewPager;
 import com.fusionx.uiircinterface.IRCBridgeService;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.uiircinterface.ServerCommandSender;
+import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Activity which contains all the communication code between the fragments
@@ -69,7 +76,8 @@ import java.util.ArrayList;
  */
 public class IRCFragmentActivity extends FragmentActivity implements
         UserListFragment.UserListCallback, ChannelFragment.ChannelFragmentCallback,
-        IRCActionsFragment.IRCActionsCallback, ServerFragment.ServerFragmentCallback {
+        IRCActionsFragment.IRCActionsCallback, ServerFragment.ServerFragmentCallback,
+        FragmentSideHandlerInterface {
 
     private UserListFragment mUserFragment = null;
     private IRCBridgeService mService = null;
@@ -147,6 +155,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
     protected void onStart() {
         super.onStart();
 
+        MessageSender.getSender(mServerTitle).registerServerChannelHandler
+                (IRCFragmentActivity.this);
+
         if (mService == null) {
             setUpService();
         }
@@ -163,11 +174,46 @@ public class IRCFragmentActivity extends FragmentActivity implements
         bindService(service, mConnection, 0);
     }
 
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(final ComponentName className, final IBinder binder) {
+            mService = ((IRCBridgeService.IRCBinder) binder).getService();
+            setUpViewPager();
+
+            mService.setServerDisplayed(mServerTitle);
+
+            final ServerConfiguration.Builder builder = getIntent()
+                    .getParcelableExtra("server");
+
+            if (getServer(true) != null) {
+                if (isConnectedToServer()) {
+                    for (final Channel channelName : getServer(false).getUser().getChannels()) {
+                        createChannelFragment(channelName.getName());
+                    }
+                    final Iterator<PrivateMessageUser> iterator = getServer(false).getUser()
+                            .getPrivateMessageIterator();
+                    while (iterator.hasNext()) {
+                        createPMFragment(iterator.next().getNick());
+                    }
+                }
+            } else {
+                mService.connectToServer(builder);
+            }
+        }
+
+        // Should not occur
+        @Override
+        public void onServiceDisconnected(final ComponentName name) {
+            mService.disconnectFromServer(mServerTitle);
+            mService = null;
+        }
+    };
+
     @Override
     public void onStop() {
         super.onStop();
 
-        MessageSender.getSender(mServerTitle).unregisterServerChannelHandler();
+        MessageSender.getSender(mServerTitle).unregisterFragmentSideHandlerInterface();
         if (mService != null) {
             mService.setServerDisplayed(null);
         }
@@ -181,47 +227,12 @@ public class IRCFragmentActivity extends FragmentActivity implements
         mService = null;
     }
 
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCBridgeService.IRCBinder) binder).getService();
-            setUpViewPager();
-
-            mService.setServerDisplayed(mServerTitle);
-            final ServerConfiguration.Builder builder = getIntent()
-                    .getParcelableExtra("server");
-
-            if (getServer(true) != null) {
-                if (isConnectedToServer()) {
-                    for (final Channel channelName : getServer(false).getUser().getChannels()) {
-                        createChannelFragment(channelName.getName());
-                    }
-                    for (final User user : getServer(false).getUser().getPrivateMessages()) {
-                        createPMFragment(user.getNick());
-                    }
-                }
-            } else {
-                mService.connectToServer(builder);
-            }
-
-            MessageSender.getSender(builder.getTitle())
-                    .registerServerChannelHandler(mServerChannelHandler);
-        }
-
-        // Should not occur
-        @Override
-        public void onServiceDisconnected(final ComponentName name) {
-            mService.disconnectFromServer(mServerTitle);
-            mService = null;
-        }
-    };
-
     private final ServerChannelHandler mServerChannelHandler = new ServerChannelHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-            final ServerChannelEventType type = (ServerChannelEventType) bundle.getSerializable(EventBundleKeys
-                    .eventType);
+            final ServerChannelEventType type = (ServerChannelEventType)
+                    bundle.getSerializable(EventBundleKeys.eventType);
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
                 case Join:
@@ -298,7 +309,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     /**
-     * Method called when a new PMFragment is to be created
+     * Method called when a new UserFragment is to be created
      *
      * @param userNick - the nick of the user the PM is to
      */
@@ -405,7 +416,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      * the UserListFragment
      */
     @Override
-    public void onUserMention(final ArrayList<User> users) {
+    public void onUserMention(final ArrayList<ChannelUser> users) {
         final ChannelFragment channel = (ChannelFragment) getCurrentItem();
         channel.onUserMention(users);
 
@@ -488,9 +499,36 @@ public class IRCFragmentActivity extends FragmentActivity implements
             mActionsFragment.setConnectedToServer();
         }
     }
+
     /**
      * End of the ServerFragment callbacks
      */
+
+    @Override
+    public ServerChannelHandler getServerChannelHandler() {
+        return mServerChannelHandler;
+    }
+
+    @Override
+    public ServerFragHandler getServerFragmentHandler() {
+        final IRCFragment fragment = mViewPager.getAdapter().getFragment(mServerTitle,
+                FragmentType.Server);
+        return fragment == null ? null : ((ServerFragment) fragment).getServerFragHandler();
+    }
+
+    @Override
+    public ChannelFragmentHandler getChannelFragmentHandler(String channelName) {
+        final IRCFragment fragment = mViewPager.getAdapter().getFragment(channelName,
+                FragmentType.Channel);
+        return fragment == null ? null : ((ChannelFragment) fragment).getChannelFragmentHandler();
+    }
+
+    @Override
+    public PMFragmentHandler getUserFragmentHandler(String userNick) {
+        final IRCFragment fragment = mViewPager.getAdapter().getFragment(userNick,
+                FragmentType.User);
+        return fragment == null ? null : ((UserFragment) fragment).getUserFragmnetHandler();
+    }
 
     /**
      * Listener used when the view pages changes pages

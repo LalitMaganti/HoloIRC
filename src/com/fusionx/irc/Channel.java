@@ -30,7 +30,6 @@ import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.MessageSender;
 
 import de.scrum_master.util.UpdateableTreeSet;
 import lombok.AccessLevel;
@@ -65,10 +64,6 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
                 .parser_joined_channel), userChannelInterface
                 .getServer().getUser().getColorfulNick());
         buffer += message + "\n";
-
-        final MessageSender sender = MessageSender.getSender(userChannelInterface.getServer()
-                .getTitle());
-        sender.registerChannelHandler(channelName, channelHandler);
     }
 
     @Override
@@ -76,7 +71,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         return this.getName().compareTo(channel.getName());
     }
 
-    public UpdateableTreeSet<User> getUsers() {
+    public UpdateableTreeSet<ChannelUser> getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
     }
 

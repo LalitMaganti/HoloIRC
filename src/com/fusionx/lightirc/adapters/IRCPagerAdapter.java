@@ -32,13 +32,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.fusionx.Utils;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
+import com.fusionx.lightirc.misc.FragmentType;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.Setter;
 
 public class IRCPagerAdapter extends PagerAdapter {
@@ -241,7 +244,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(final int position) {
+    public CharSequence getPageTitle(@NonNull final int position) {
         final IRCFragment fragment = views.get(position);
         return fragment.isAdded() ? fragment.getTitle() : fragment.getArguments().getString("title");
     }
@@ -252,12 +255,13 @@ public class IRCPagerAdapter extends PagerAdapter {
         notifyDataSetChanged();
     }
 
-    public IRCFragment getFragment(final String title) {
+    public IRCFragment getFragment(@NonNull final String title, @NonNull final FragmentType type) {
         for (final IRCFragment i : views) {
-            if (title.equals(i.getTitle())) {
+            if (i.getType().equals(type) && (title.equals(i.getTitle()) ||
+                    (type.equals(FragmentType.User) && Utils.areNicksEqual(i.getTitle(), title)))) {
                 int indexOfFragment = views.indexOf(i);
-                if (indexOfFragment == currentItemIndex || indexOfFragment == (currentItemIndex - 1)
-                        || indexOfFragment == (currentItemIndex + 1)) {
+                if ((indexOfFragment == currentItemIndex || indexOfFragment == (currentItemIndex
+                        - 1) || indexOfFragment == (currentItemIndex + 1))) {
                     return i;
                 } else {
                     return null;
@@ -267,7 +271,7 @@ public class IRCPagerAdapter extends PagerAdapter {
         return null;
     }
 
-    public int getIndexFromTitle(final String title) {
+    public int getIndexFromTitle(@NonNull final String title) {
         for (final IRCFragment i : views) {
             if (title.equals(i.getTitle())) {
                 return views.indexOf(i);

@@ -23,7 +23,7 @@ package com.fusionx.irc.parser;
 
 import com.fusionx.Utils;
 import com.fusionx.irc.Channel;
-import com.fusionx.irc.User;
+import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.UserChannelInterface;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +42,7 @@ public class WhoParser {
         if (whoChannel == null) {
             whoChannel = mUserChannelInterface.getChannel(parsedArray.get(0));
         }
-        final User user = mUserChannelInterface.getUser(parsedArray.get(4));
+        final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
         user.processWhoMode(parsedArray.get(5), whoChannel);
         if (StringUtils.isEmpty(user.getLogin())) {
             user.setLogin(parsedArray.get(1));

@@ -36,7 +36,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
-import com.fusionx.irc.User;
+import com.fusionx.irc.ChannelUser;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
@@ -69,7 +69,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
         final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
-                new TreeSet<User>());
+                new TreeSet<ChannelUser>());
         setListAdapter(adapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -77,7 +77,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     public void onMenuOpened(final String channelName) {
         if (!channelName.equals(currentlyDisplayedChannelName)) {
-            final TreeSet<User> userList = getUserList(channelName);
+            final TreeSet<ChannelUser> userList = getUserList(channelName);
             if (userList != null) {
                 getListAdapter().setInternalSet(userList);
                 getListAdapter().setChannelName(channelName);
@@ -122,7 +122,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final ArrayList<User> selectedItems = getListAdapter().getSelectedItems();
+        final ArrayList<ChannelUser> selectedItems = getListAdapter().getSelectedItems();
         final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
@@ -209,7 +209,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         getListAdapter().notifyDataSetChanged();
     }
 
-    public TreeSet<User> getUserList(final String channelName) {
+    public TreeSet<ChannelUser> getUserList(final String channelName) {
         return mListener.getServer(false).getUserChannelInterface()
                 .getChannel(channelName).getUsers();
     }
@@ -219,7 +219,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     public interface UserListCallback extends CommonCallbacks {
-        public void onUserMention(final ArrayList<User> users);
+        public void onUserMention(final ArrayList<ChannelUser> users);
 
         public void createPMFragment(final String userNick);
     }

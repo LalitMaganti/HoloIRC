@@ -22,6 +22,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 package com.fusionx.lightirc.activity;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ListFragment;
 import android.content.DialogInterface;
@@ -113,7 +114,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             });
             build.show();
             return;
-        } else if(newServer) {
+        } else if (newServer) {
             SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
         }
         Toast.makeText(this, getString(R.string.server_settings_changes_saved),
@@ -130,7 +131,7 @@ public class ServerSettingsActivity extends PreferenceActivity {
             if (folder.exists()) {
                 folder.delete();
             }
-        } else if(newServer) {
+        } else if (newServer) {
             SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
         }
     }
@@ -211,11 +212,13 @@ public class ServerSettingsActivity extends PreferenceActivity {
             mServerPassword = (EditTextPreference) prefSet.findPreference(ServerPassword);
             if (mServerPassword != null) {
                 mServerPassword.setOnPreferenceChangeListener(this);
+                updatePasswordSummary(mServerPassword);
             }
 
             mNickServPassword = (EditTextPreference) prefSet.findPreference(NickServPassword);
             if (mNickServPassword != null) {
                 mNickServPassword.setOnPreferenceChangeListener(this);
+                updatePasswordSummary(mNickServPassword);
             }
 
             canExit = !newServer;
@@ -242,14 +245,12 @@ public class ServerSettingsActivity extends PreferenceActivity {
         public boolean onPreferenceChange(Preference preference, Object newValue) {
             if (newValue instanceof String) {
                 final String newString = (String) newValue;
+                final EditTextPreference editTextPreference = (EditTextPreference) preference;
+                editTextPreference.setText(newString);
                 if (preference != mNickServPassword && preference != mServerPassword) {
                     preference.setSummary(newString);
-
-                    final EditTextPreference editTextPreference = (EditTextPreference) preference;
-                    editTextPreference.setText(newString);
                 } else {
-                    //TODO - fix this up
-                    //preference.setSummary();
+                    updatePasswordSummary(editTextPreference);
                 }
             }
             if (newServer) {
@@ -266,6 +267,15 @@ public class ServerSettingsActivity extends PreferenceActivity {
                 }
             }
             return true;
+        }
+
+        private void updatePasswordSummary(final EditTextPreference preference) {
+            final Activity activity = getActivity();
+            if (activity != null) {
+                preference.setSummary(StringUtils.isEmpty(preference.getText())
+                        ? activity.getString(R.string.server_settings_no_password)
+                        : activity.getString(R.string.server_settings_password_set));
+            }
         }
     }
 
