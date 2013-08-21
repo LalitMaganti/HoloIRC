@@ -24,13 +24,11 @@ package com.fusionx.irc;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import lombok.NonNull;
-
 public class AppUser extends ChannelUser {
     private ArrayList<PrivateMessageUser> privateMessages = new ArrayList<>();
 
     public AppUser(final String nick,
-                    final UserChannelInterface userChannelInterface) {
+                   final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
     }

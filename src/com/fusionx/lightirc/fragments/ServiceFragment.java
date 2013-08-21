@@ -8,17 +8,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.activity.MainServerListActivity;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.uiircinterface.IRCBridgeService;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
-
-import java.util.Iterator;
 
 public class ServiceFragment extends Fragment {
     private IRCBridgeService mService;
@@ -50,7 +45,7 @@ public class ServiceFragment extends Fragment {
         super.onAttach(activity);
 
         mCallback = (ServiceFragmentCallback) activity;
-        if(sender != null) {
+        if (sender != null) {
             sender.registerServerChannelHandler(mCallback);
         } else {
             MessageSender.getSender(mCallback.getServerTitle()).registerServerChannelHandler

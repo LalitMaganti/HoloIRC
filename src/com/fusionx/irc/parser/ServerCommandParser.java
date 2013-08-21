@@ -22,7 +22,6 @@
 package com.fusionx.irc.parser;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.Utils;
@@ -32,14 +31,12 @@ import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.UserChannelInterface;
-import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import de.scrum_master.util.UpdateableTreeSet;
 

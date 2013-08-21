@@ -8,6 +8,7 @@
               android:paddingTop="13dp"
               android:paddingBottom="13dp"
               android:background="@android:color/holo_blue_light">
+
     <TextView
             android:id="@+id/toast_text"
             xmlns:android="http://schemas.android.com/apk/res/android"

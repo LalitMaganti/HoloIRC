@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.text.Html;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
@@ -36,7 +35,6 @@ import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;

@@ -42,7 +42,9 @@ import java.util.ArrayList;
 
 import static com.fusionx.Utils.parcelDataForBroadcast;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
-import static com.fusionx.irc.constants.ServerReplyCodes.*;
+import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
+import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
+import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WELCOME;
 
 public class ServerConnectionParser {
     private static boolean triedSecondNick = false;
@@ -73,7 +75,7 @@ public class ServerConnectionParser {
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
                         final String nick = parseConnectionCode(canChangeNick, parsedArray,
                                 sender, writer, context, nickStorage, line);
-                        if(nick != null) {
+                        if (nick != null) {
                             return nick;
                         }
                     } else {
@@ -86,10 +88,10 @@ public class ServerConnectionParser {
     }
 
     private static String parseConnectionCode(final boolean canChangeNick,
-                                            final ArrayList<String> parsedArray,
-                                            final MessageSender sender,
-                                            final ServerWriter writer, final Context context,
-                                            final NickStorage nickStorage, final String line) {
+                                              final ArrayList<String> parsedArray,
+                                              final MessageSender sender,
+                                              final ServerWriter writer, final Context context,
+                                              final NickStorage nickStorage, final String line) {
         switch (Integer.parseInt(parsedArray.get(1))) {
             case RPL_WELCOME:
                 // We are now logged in.
@@ -127,8 +129,8 @@ public class ServerConnectionParser {
     }
 
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
-                                          final MessageSender sender, final ServerWriter writer,
-                                          final String line) {
+                                               final MessageSender sender, final ServerWriter writer,
+                                               final String line) {
         switch (parsedArray.get(1).toUpperCase()) {
             case ServerCommands.Notice:
                 Utils.removeFirstElementFromList(parsedArray, 3);

@@ -23,24 +23,20 @@ package com.fusionx.uiircinterface;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.connection.ConnectionManager;
 import com.fusionx.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 
 import lombok.AccessLevel;

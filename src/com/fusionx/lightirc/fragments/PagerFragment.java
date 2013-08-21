@@ -50,7 +50,7 @@ public class PagerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.view_pager, container);
 
-        if(mAdapter == null) {
+        if (mAdapter == null) {
             mAdapter = new IRCPagerAdapter(getChildFragmentManager());
             mAdapter.addServerFragment(mCallback.getServerTitle());
         }
@@ -99,6 +99,7 @@ public class PagerFragment extends Fragment {
             return null;
         }
     }
+
     public ChannelFragmentHandler getChannelFragmentHandler(String channelName) {
         if (mAdapter != null) {
             final IRCFragment fragment = mAdapter.getFragment(channelName,

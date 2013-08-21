@@ -225,7 +225,7 @@ public class MessageSender {
                                   final String rawAction) {
         String finalMessage = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getPrettyNick(actionDestination), rawAction);
-        if(rawAction.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
+        if (rawAction.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
             mention(actionDestination);
             finalMessage = "<b>" + finalMessage + "</b>";
         }
@@ -254,7 +254,7 @@ public class MessageSender {
                                      final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
                 sending.getPrettyNick(channel), rawMessage);
-        if(rawMessage.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
+        if (rawMessage.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
             mention(channel.getName());
             preMessage = "<b>" + preMessage + "</b>";
         }
