@@ -42,7 +42,7 @@ public class ConnectionManager extends HashMap<String, ConnectionWrapper> {
             final ConnectionWrapper wrapper = iterator.next();
             if (wrapper.getServer().getStatus().equals(applicationContext
                     .getString(R.string.status_connected))) {
-                wrapper.disconnectFromServer();
+                wrapper.disconnectFromServer(applicationContext);
             } else if (wrapper.isAlive()) {
                 wrapper.interrupt();
             }

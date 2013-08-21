@@ -157,8 +157,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     public void onTabChanged() {
-        if (mListener.getCurrentlyDisplayedFragment() != type) {
-            type = mListener.getCurrentlyDisplayedFragment();
+        if (mListener.getCurrentFragmentType() != type) {
+            type = mListener.getCurrentFragmentType();
             final View view = (View) getListAdapter().getItem(4);
             final TextView textView = (TextView) view.findViewById(R.id
                     .sliding_menu_heading_textview);
@@ -187,6 +187,6 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
         public void closeOrPartCurrentTab();
 
-        public FragmentType getCurrentlyDisplayedFragment();
+        public FragmentType getCurrentFragmentType();
     }
 }

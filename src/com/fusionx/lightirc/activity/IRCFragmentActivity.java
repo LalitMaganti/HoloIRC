@@ -28,6 +28,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.Menu;
@@ -78,10 +79,11 @@ public class IRCFragmentActivity extends FragmentActivity implements
     private UserListFragment mUserFragment = null;
     private PagerFragment mPagerFragment = null;
     private String mServerTitle = null;
-    private SlidingMenu mUserSlidingMenu = null;
-    private ActionsSlidingMenu mActionsSlidingMenu = null;
     private final ViewPagerOnPagerListener listener = new ViewPagerOnPagerListener();
     private IRCActionsFragment mActionsFragment;
+
+    private SlidingMenu mUserSlidingMenu = null;
+    private ActionsSlidingMenu mActionsSlidingMenu = null;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -114,17 +116,26 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     private void setUpSlidingMenu() {
-        mUserSlidingMenu = (SlidingMenu) findViewById(R.id.slidingmenulayout);
-        mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
-        mUserSlidingMenu.setMenu(R.layout.sliding_ment_fragment_userlist);
-        mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
-        mUserSlidingMenu.setBehindScrollScale(0);
-        mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-        mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
-        mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
+        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
+        if (!tabletSize) {
+            mUserSlidingMenu = (SlidingMenu) findViewById(R.id.slidingmenulayout);
+            mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
+            mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
+            mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
+            mUserSlidingMenu.setBehindScrollScale(0);
+            mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+            mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
+            mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
+        }
 
         mUserFragment = (UserListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.userlist_fragment);
+
+        if (tabletSize) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.hide(mUserFragment);
+            ft.commit();
+        }
 
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
         mActionsFragment = (IRCActionsFragment)
@@ -190,8 +201,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(getCurrentlyDisplayedFragment()
-                .equals(FragmentType.Channel));
+        menu.getItem(0).setVisible(getCurrentFragmentType()
+                .equals(FragmentType.Channel) && mUserSlidingMenu != null);
         return true;
     }
 
@@ -251,7 +262,9 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public void closeAllSlidingMenus() {
         mActionsSlidingMenu.showContent();
-        mUserSlidingMenu.showContent();
+        if (mUserSlidingMenu != null) {
+            mUserSlidingMenu.showContent();
+        }
     }
 
     /**
@@ -375,7 +388,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public void closeOrPartCurrentTab() {
         final Server server = getServer(false);
-        if (getCurrentlyDisplayedFragment().equals(FragmentType.User)) {
+        if (getCurrentFragmentType().equals(FragmentType.User)) {
             ServerCommandSender.sendClosePrivateMessage(server, getCurrentItem().getTitle());
 
             switchFragmentAndRemove(getCurrentItem().getTitle());
@@ -391,7 +404,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      * @return - the type of fragment
      */
     @Override
-    public FragmentType getCurrentlyDisplayedFragment() {
+    public FragmentType getCurrentFragmentType() {
         return getCurrentItem().getType();
     }
 
@@ -450,6 +463,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
             closeAllSlidingMenus();
 
             mActionsFragment.onTabChanged();
+
+            if (getResources().getBoolean(R.bool.isTablet)) {
+                mUserFragment.onMenuOpened(getCurrentItem().getTitle());
+            }
 
             if (mUserFragment.getMode() != null) {
                 mUserFragment.getMode().finish();
