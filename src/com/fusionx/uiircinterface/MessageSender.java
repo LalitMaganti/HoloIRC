@@ -43,7 +43,7 @@ import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.IRCFragmentActivity;
-import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 
@@ -112,8 +112,8 @@ public class MessageSender {
         ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
 
         if (fragmentSideHandlerInterface != null) {
-            final ServerFragHandler handler = fragmentSideHandlerInterface
-                    .getServerFragmentHandler();
+            final Handler handler = fragmentSideHandlerInterface.getFragmentHandler(null,
+                    FragmentType.Server);
             if (handler != null) {
                 final Message fragmentMessage = Message.obtain();
                 fragmentMessage.setData(event);
@@ -131,8 +131,8 @@ public class MessageSender {
         handler.dispatchMessage(message);
 
         if (fragmentSideHandlerInterface != null) {
-            final Handler fragmentHandler = fragmentSideHandlerInterface
-                    .getChannelFragmentHandler(destination);
+            final Handler fragmentHandler = fragmentSideHandlerInterface.getFragmentHandler
+                    (destination, FragmentType.Channel);
             if (fragmentHandler != null) {
                 final Message fragmentMessage = Message.obtain();
                 fragmentMessage.setData(event);
@@ -150,7 +150,8 @@ public class MessageSender {
         handler.dispatchMessage(message);
 
         if (fragmentSideHandlerInterface != null) {
-            final Handler fragmentHandler = fragmentSideHandlerInterface.getUserFragmentHandler(destination);
+            final Handler fragmentHandler = fragmentSideHandlerInterface.getFragmentHandler
+                    (destination, FragmentType.User);
             if (fragmentHandler != null) {
                 final Message fragmentMessage = Message.obtain();
                 fragmentMessage.setData(event);

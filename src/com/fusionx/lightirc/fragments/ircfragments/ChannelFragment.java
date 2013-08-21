@@ -23,6 +23,7 @@ package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 import android.view.KeyEvent;
@@ -35,7 +36,6 @@ import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
-import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
@@ -44,10 +44,30 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
-import lombok.Getter;
-
 public class ChannelFragment extends IRCFragment {
     private ChannelFragmentCallback mCallback;
+
+    private final Handler channelFragmentHandler = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final ChannelEventType type = (ChannelEventType) bundle.getSerializable(EventBundleKeys
+                    .eventType);
+            switch (type) {
+                case UserListChanged:
+                    mCallback.updateUserList(getTitle());
+                    if (!Utils.isMessagesFromChannelShown(getActivity())) {
+                        break;
+                    }
+                case Generic:
+                    appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
+                    break;
+                case UserParted:
+                    mCallback.switchFragmentAndRemove(getTitle());
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onResume() {
@@ -106,6 +126,11 @@ public class ChannelFragment extends IRCFragment {
         return FragmentType.Channel;
     }
 
+    @Override
+    public Handler getHandler() {
+        return channelFragmentHandler;
+    }
+
     public void sendChannelMessage(final String channelName, final String message) {
         MessageParser.channelMessageToParse(mCallback, channelName, message);
     }
@@ -115,27 +140,4 @@ public class ChannelFragment extends IRCFragment {
 
         public void updateUserList(final String channelName);
     }
-
-    @Getter
-    private final ChannelFragmentHandler channelFragmentHandler = new ChannelFragmentHandler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final ChannelEventType type = (ChannelEventType) bundle.getSerializable(EventBundleKeys
-                    .eventType);
-            switch (type) {
-                case UserListChanged:
-                    mCallback.updateUserList(getTitle());
-                    if (!Utils.isMessagesFromChannelShown(getActivity())) {
-                        break;
-                    }
-                case Generic:
-                    appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
-                    break;
-                case UserParted:
-                    mCallback.switchFragmentAndRemove(getTitle());
-                    break;
-            }
-        }
-    };
 }

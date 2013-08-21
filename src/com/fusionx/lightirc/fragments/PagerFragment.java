@@ -3,6 +3,7 @@ package com.fusionx.lightirc.fragments;
 import android.app.Activity;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,13 +11,7 @@ import android.view.ViewGroup;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
-import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
-import com.fusionx.lightirc.fragments.ircfragments.UserFragment;
-import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
-import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
-import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.IRCViewPager;
@@ -90,36 +85,17 @@ public class PagerFragment extends Fragment {
         mViewPager.createChannelFragment(channelName, switchToTab);
     }
 
-    public ServerFragHandler getServerFragmentHandler() {
-        if (mViewPager != null) {
-            final IRCFragment fragment = mAdapter.getFragment(mCallback.getServerTitle(),
-                    FragmentType.Server);
-            return fragment == null ? null : ((ServerFragment) fragment).getServerFragHandler();
-        } else {
-            return null;
-        }
-    }
-
-    public ChannelFragmentHandler getChannelFragmentHandler(String channelName) {
+    public Handler getFragmentHandler(final String destination, final FragmentType type) {
+        final String nonNullDestination = destination != null ? destination : mCallback
+                .getServerTitle();
         if (mAdapter != null) {
-            final IRCFragment fragment = mAdapter.getFragment(channelName,
-                    FragmentType.Channel);
-            return fragment == null ? null : ((ChannelFragment) fragment).getChannelFragmentHandler();
+            final IRCFragment fragment = mAdapter.getFragment(nonNullDestination,
+                    type);
+            return fragment == null ? null : fragment.getHandler();
         } else {
             return null;
         }
     }
-
-    public PMFragmentHandler getUserFragmentHandler(String userNick) {
-        if (mAdapter != null) {
-            final IRCFragment fragment = mAdapter.getFragment(userNick,
-                    FragmentType.User);
-            return fragment == null ? null : ((UserFragment) fragment).getUserFragmnetHandler();
-        } else {
-            return null;
-        }
-    }
-
 
     public IRCViewPager getViewPager() {
         return mViewPager;

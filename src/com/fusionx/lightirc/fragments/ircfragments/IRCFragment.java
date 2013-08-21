@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.util.Linkify;
@@ -46,14 +47,6 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     protected TextView mTextView = null;
     protected EditText mEditText = null;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Retain this fragment across configuration changes.
-        //setRetainInstance(true);
-    }
 
     @Override
     public View onCreateView(final LayoutInflater inflate,
@@ -97,4 +90,6 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     }
 
     public abstract FragmentType getType();
+
+    public abstract Handler getHandler();
 }

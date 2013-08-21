@@ -23,6 +23,7 @@ package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -32,17 +33,27 @@ import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
-import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.Getter;
-
 public class UserFragment extends IRCFragment {
     private CommonCallbacks mCallback;
+
+    private final Handler userFragmentHandler = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final UserEventType type = (UserEventType) bundle.getSerializable(EventBundleKeys.eventType);
+            final String message = bundle.getString(EventBundleKeys.message);
+            switch (type) {
+                case Generic:
+                    appendToTextView(message + "\n");
+            }
+        }
+    };
 
     @Override
     public void onResume() {
@@ -89,21 +100,12 @@ public class UserFragment extends IRCFragment {
         return FragmentType.User;
     }
 
+    @Override
+    public Handler getHandler() {
+        return userFragmentHandler;
+    }
+
     public void sendUserMessage(final String nick, final String message) {
         MessageParser.userMessageToParse(mCallback, nick, message);
     }
-
-    @Getter
-    private final PMFragmentHandler userFragmnetHandler = new PMFragmentHandler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final UserEventType type = (UserEventType) bundle.getSerializable(EventBundleKeys.eventType);
-            final String message = bundle.getString(EventBundleKeys.message);
-            switch (type) {
-                case Generic:
-                    appendToTextView(message + "\n");
-            }
-        }
-    };
 }

@@ -23,6 +23,7 @@ package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -31,7 +32,6 @@ import android.widget.TextView;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
@@ -42,6 +42,31 @@ import lombok.Getter;
 
 public class ServerFragment extends IRCFragment {
     private ServerFragmentCallback mCallback;
+
+    @Getter
+    private final Handler serverFragHandler = new Handler() {
+        @Override
+        public void handleMessage(final Message msg) {
+            final Bundle bundle = msg.getData();
+            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
+                    .eventType);
+            final String message = bundle.getString(EventBundleKeys.message);
+            switch (type) {
+                case Connected:
+                    mCallback.connectedToServer();
+                    mEditText.setEnabled(true);
+                    break;
+                case Disconnected:
+                case Error:
+                    mCallback.onUnexpectedDisconnect();
+                    break;
+                case NickInUse:
+                    mCallback.selectServerFragment();
+                    break;
+            }
+            appendToTextView(message + "\n");
+        }
+    };
 
     @Override
     public void onResume() {
@@ -70,31 +95,6 @@ public class ServerFragment extends IRCFragment {
         MessageParser.serverMessageToParse(mCallback, message);
     }
 
-    @Getter
-    private final ServerFragHandler serverFragHandler = new ServerFragHandler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
-                    .eventType);
-            final String message = bundle.getString(EventBundleKeys.message);
-            switch (type) {
-                case Connected:
-                    mCallback.connectedToServer();
-                    mEditText.setEnabled(true);
-                    break;
-                case Disconnected:
-                case Error:
-                    mCallback.onUnexpectedDisconnect();
-                    break;
-                case NickInUse:
-                    mCallback.selectServerFragment();
-                    break;
-            }
-            appendToTextView(message + "\n");
-        }
-    };
-
     public interface ServerFragmentCallback extends CommonCallbacks {
         public void connectedToServer();
     }
@@ -118,5 +118,10 @@ public class ServerFragment extends IRCFragment {
     @Override
     public FragmentType getType() {
         return FragmentType.Server;
+    }
+
+    @Override
+    public Handler getHandler() {
+        return serverFragHandler;
     }
 }

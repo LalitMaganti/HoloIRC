@@ -24,6 +24,7 @@ package com.fusionx.lightirc.activity;
 import android.app.ActionBar;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -53,10 +54,6 @@ import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
-import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
-import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
-import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
-import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
 import com.fusionx.uiircinterface.ServerCommandSender;
@@ -166,7 +163,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
         }
     }
 
-    private final ServerChannelHandler mServerChannelHandler = new ServerChannelHandler() {
+    private final Handler mServerChannelHandler = new Handler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
@@ -423,23 +420,13 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     @Override
-    public ServerChannelHandler getServerChannelHandler() {
+    public Handler getServerChannelHandler() {
         return mServerChannelHandler;
     }
 
     @Override
-    public ServerFragHandler getServerFragmentHandler() {
-        return mPagerFragment.getServerFragmentHandler();
-    }
-
-    @Override
-    public ChannelFragmentHandler getChannelFragmentHandler(final String channelName) {
-        return mPagerFragment.getChannelFragmentHandler(channelName);
-    }
-
-    @Override
-    public PMFragmentHandler getUserFragmentHandler(final String userNick) {
-        return mPagerFragment.getUserFragmentHandler(userNick);
+    public Handler getFragmentHandler(String destination, FragmentType type) {
+        return mPagerFragment.getFragmentHandler(destination, type);
     }
 
     public void mention(final String destination) {
