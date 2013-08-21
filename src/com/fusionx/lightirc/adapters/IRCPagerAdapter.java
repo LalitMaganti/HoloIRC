@@ -256,13 +256,13 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public IRCFragment getFragment(@NonNull final String title, @NonNull final FragmentType type) {
-        for (final IRCFragment i : views) {
-            if (i.getType().equals(type) && (title.equals(i.getTitle()) ||
-                    (type.equals(FragmentType.User) && Utils.areNicksEqual(i.getTitle(), title)))) {
-                int indexOfFragment = views.indexOf(i);
+        for (final IRCFragment fragment : views) {
+            if (fragment.getType().equals(type) && (title.equals(fragment.getTitle()) ||
+                    (type.equals(FragmentType.User) && Utils.areNicksEqual(fragment.getTitle(), title)))) {
+                int indexOfFragment = views.indexOf(fragment);
                 if ((indexOfFragment == currentItemIndex || indexOfFragment == (currentItemIndex
                         - 1) || indexOfFragment == (currentItemIndex + 1))) {
-                    return i;
+                    return fragment;
                 } else {
                     return null;
                 }
