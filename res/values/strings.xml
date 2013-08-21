@@ -143,5 +143,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_non_empty">%1$s must not be empty</string>
     <string name="server_settings_no_password">No password is set</string>
     <string name="server_settings_password_set">Password is set</string>
+    <string name="channel">Channel</string>
+    <string name="user">User</string>
 
 </resources>

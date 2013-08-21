@@ -136,32 +136,6 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
             getServerAdapter().setConnected(mListener.isConnectedToServer());
             getServerAdapter().notifyDataSetChanged();
         }
-        if (mListener.getCurrentlyDisplayedFragment() != type) {
-            type = mListener.getCurrentlyDisplayedFragment();
-            final View view = (View) getListAdapter().getItem(4);
-            final TextView textView = (TextView) view
-                    .findViewById(R.id.sliding_menu_heading_textview);
-            switch (type) {
-                case Server: {
-                    view.setVisibility(View.GONE);
-                    getUserChannelAdapter().setServerVisible();
-                    break;
-                }
-                case Channel: {
-                    view.setVisibility(View.VISIBLE);
-                    textView.setText("Channel");
-                    getUserChannelAdapter().setChannelVisible(true);
-                    break;
-                }
-                case User: {
-                    view.setVisibility(View.VISIBLE);
-                    textView.setText("User");
-                    getUserChannelAdapter().setChannelVisible(false);
-                    break;
-                }
-            }
-            getUserChannelAdapter().notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -180,6 +154,32 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public void updateConnectionStatus() {
         getServerAdapter().setConnected(mListener.isConnectedToServer());
         getServerAdapter().notifyDataSetChanged();
+    }
+
+    public void onTabChanged() {
+        if (mListener.getCurrentlyDisplayedFragment() != type) {
+            type = mListener.getCurrentlyDisplayedFragment();
+            final View view = (View) getListAdapter().getItem(4);
+            final TextView textView = (TextView) view.findViewById(R.id
+                    .sliding_menu_heading_textview);
+            switch (type) {
+                case Server:
+                    view.setVisibility(View.GONE);
+                    getUserChannelAdapter().setServerVisible();
+                    break;
+                case Channel:
+                    view.setVisibility(View.VISIBLE);
+                    textView.setText(getActivity().getString(R.string.channel));
+                    getUserChannelAdapter().setChannelVisible(true);
+                    break;
+                case User:
+                    view.setVisibility(View.VISIBLE);
+                    textView.setText(getActivity().getString(R.string.user));
+                    getUserChannelAdapter().setChannelVisible(false);
+                    break;
+            }
+            getUserChannelAdapter().notifyDataSetChanged();
+        }
     }
 
     public interface IRCActionsCallback extends CommonCallbacks {

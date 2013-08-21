@@ -414,9 +414,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void connectedToServer() {
-        if (mActionsSlidingMenu.isMenuShowing()) {
-            mActionsFragment.updateConnectionStatus();
-        }
+        mActionsFragment.updateConnectionStatus();
     }
 
     @Override
@@ -450,6 +448,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
             supportInvalidateOptionsMenu();
             invalidateOptionsMenu();
             closeAllSlidingMenus();
+
+            mActionsFragment.onTabChanged();
 
             if (mUserFragment.getMode() != null) {
                 mUserFragment.getMode().finish();
