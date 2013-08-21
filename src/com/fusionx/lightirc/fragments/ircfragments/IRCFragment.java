@@ -45,10 +45,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 public abstract class IRCFragment extends Fragment implements TextView.OnEditorActionListener {
-    @Getter(AccessLevel.PUBLIC)
-    @Setter(AccessLevel.PROTECTED)
-    private String title = null;
-
+    @Getter
+    protected String title = null;
     protected TextView mTextView = null;
     protected EditText mEditText = null;
 
@@ -62,7 +60,7 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
         mEditText.setOnEditorActionListener(this);
 
-        setTitle(getArguments().getString("title"));
+        title = getArguments().getString("title");
 
         return rootView;
     }

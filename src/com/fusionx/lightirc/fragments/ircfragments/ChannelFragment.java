@@ -55,7 +55,7 @@ public class ChannelFragment extends IRCFragment {
                     .eventType);
             switch (type) {
                 case UserListChanged:
-                    mCallback.updateUserList(getTitle());
+                    mCallback.updateUserList(title);
                     if (!Utils.isMessagesFromChannelShown(getActivity())) {
                         break;
                     }
@@ -63,7 +63,7 @@ public class ChannelFragment extends IRCFragment {
                     appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
                     break;
                 case UserParted:
-                    mCallback.switchFragmentAndRemove(getTitle());
+                    mCallback.switchFragmentAndRemove(title);
                     break;
             }
         }
@@ -75,7 +75,7 @@ public class ChannelFragment extends IRCFragment {
 
         final Server server = mCallback.getServer(true);
         if (server != null) {
-            final Channel channel = server.getUserChannelInterface().getChannel(getTitle());
+            final Channel channel = server.getUserChannelInterface().getChannel(title);
             if (channel != null) {
                 writeToTextView(channel.getBuffer());
             }
@@ -97,7 +97,7 @@ public class ChannelFragment extends IRCFragment {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
         for (final ChannelUser userNick : users) {
-            nicks += Html.fromHtml(userNick.getPrettyNick(getTitle())) + ": ";
+            nicks += Html.fromHtml(userNick.getPrettyNick(title)) + ": ";
         }
 
         mEditText.clearComposingText();
@@ -117,7 +117,7 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        MessageParser.channelMessageToParse(mCallback, getTitle(), message);
+        MessageParser.channelMessageToParse(mCallback, title, message);
     }
 
     public interface ChannelFragmentCallback extends CommonCallbacks {

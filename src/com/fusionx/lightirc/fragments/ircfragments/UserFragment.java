@@ -61,7 +61,7 @@ public class UserFragment extends IRCFragment {
 
         final Server server = mCallback.getServer(true);
         if (server != null) {
-            final PrivateMessageUser user = server.getPrivateMessageUser(getTitle());
+            final PrivateMessageUser user = server.getPrivateMessageUser(title);
             if (user != null) {
                 writeToTextView(user.getBuffer());
             }
@@ -91,6 +91,6 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        MessageParser.userMessageToParse(mCallback, getTitle(), message);
+        MessageParser.userMessageToParse(mCallback, title, message);
     }
 }
