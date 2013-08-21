@@ -26,6 +26,7 @@ import android.os.Looper;
 
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
+import com.fusionx.lightirc.R;
 
 import lombok.Getter;
 
@@ -49,7 +50,15 @@ public class ConnectionWrapper extends Thread {
         }
     }
 
-    public void disconnectFromServer() {
-        connection.disconnectFromServer();
+    public void disconnectFromServer(final Context context) {
+        final Server server = getServer();
+        final String status = server.getStatus();
+        server.setStatus(context.getString(R.string.status_disconnected));
+
+        if (status.equals(context.getString(R.string.status_connected))) {
+            connection.disconnectFromServer();
+        } else if (isAlive()) {
+            interrupt();
+        }
     }
 }

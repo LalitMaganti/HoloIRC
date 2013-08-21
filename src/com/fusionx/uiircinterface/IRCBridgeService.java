@@ -115,16 +115,7 @@ public class IRCBridgeService extends Service {
         final AsyncTask<Void, Void, Void> disconnectTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(final Void... strings) {
-                final ConnectionWrapper wrapper = connectionManager.get(serverName);
-                final Server server = wrapper.getServer();
-                final String status = server.getStatus();
-                server.setStatus(getString(R.string.status_disconnected));
-
-                if (status.equals(getString(R.string.status_connected))) {
-                    wrapper.disconnectFromServer();
-                } else if (wrapper.isAlive()) {
-                    wrapper.interrupt();
-                }
+                connectionManager.get(serverName).disconnectFromServer(IRCBridgeService.this);
                 return null;
             }
 
