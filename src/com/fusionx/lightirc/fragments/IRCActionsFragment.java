@@ -85,6 +85,10 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
         setListAdapter(mergeAdapter);
 
+        final View view = (View) mergeAdapter.getItem(4);
+        view.setVisibility(View.GONE);
+        channelAdapter.setServerVisible();
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 

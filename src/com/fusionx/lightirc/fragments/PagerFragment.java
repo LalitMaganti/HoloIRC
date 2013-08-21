@@ -43,8 +43,10 @@ public class PagerFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.view_pager, container);
+        return inflater.inflate(R.layout.view_pager, container);
+    }
 
+    public void createServerFragment() {
         if (mAdapter == null) {
             mAdapter = new IRCPagerAdapter(getChildFragmentManager());
             mAdapter.addServerFragment(mCallback.getServerTitle());
@@ -52,11 +54,9 @@ public class PagerFragment extends Fragment {
         final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
                 {android.R.attr.windowBackground});
         final int background = a.getResourceId(0, 0);
-        mViewPager = (IRCViewPager) view.findViewById(R.id.pager);
+        mViewPager = (IRCViewPager) getView().findViewById(R.id.pager);
         mViewPager.setBackgroundResource(background);
         mViewPager.setAdapter(mAdapter);
-
-        return view;
     }
 
     public IRCFragment getCurrentItem() {

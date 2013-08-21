@@ -150,6 +150,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     public void setUpViewPager() {
         mPagerFragment = (PagerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.pager_fragment);
+        mPagerFragment.createServerFragment();
 
         final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabs.setViewPager(mPagerFragment.getViewPager());
