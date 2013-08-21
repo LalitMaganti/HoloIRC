@@ -4,8 +4,9 @@ import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
+import com.fusionx.lightirc.interfaces.CommonCallbacks;
 
-public interface FragmentSideHandlerInterface {
+public interface FragmentSideHandlerInterface extends CommonCallbacks {
     public ServerChannelHandler getServerChannelHandler();
 
     public ServerFragHandler getServerFragmentHandler();

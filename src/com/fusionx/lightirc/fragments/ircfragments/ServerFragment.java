@@ -97,8 +97,6 @@ public class ServerFragment extends IRCFragment {
 
     public interface ServerFragmentCallback extends CommonCallbacks {
         public void connectedToServer();
-
-        public void onUnexpectedDisconnect();
     }
 
     @Override

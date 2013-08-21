@@ -27,6 +27,8 @@ import android.content.SharedPreferences;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.misc.NickStorage;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -41,7 +43,8 @@ public class FileConfigurationConverter {
         builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
         builder.setSsl(serverSettings.getBoolean(PreferenceKeys.SSL, false));
 
-        final String firstChoice = serverSettings.getString(PreferenceKeys.FirstNick, "");
+        final String firstChoice = serverSettings.getString(PreferenceKeys.FirstNick,
+                "HoloIRCUser");
         final String secondChoice = serverSettings.getString(PreferenceKeys.SecondNick, "");
         final String thirdChoice = serverSettings.getString(PreferenceKeys.ThirdNick, "");
         final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
@@ -60,7 +63,7 @@ public class FileConfigurationConverter {
         builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
 
         final String nickServPassword = serverSettings.getString(PreferenceKeys.NickServPassword, null);
-        if (nickServPassword != null && !nickServPassword.equals("")) {
+        if (StringUtils.isNotEmpty(nickServPassword)) {
             builder.setNickservPassword(nickServPassword);
         }
 

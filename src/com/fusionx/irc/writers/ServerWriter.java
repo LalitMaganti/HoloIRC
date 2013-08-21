@@ -26,7 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.OutputStreamWriter;
 
 public class ServerWriter extends RawWriter {
-    public ServerWriter(OutputStreamWriter out) {
+    public ServerWriter(final OutputStreamWriter out) {
         super(out);
     }
 

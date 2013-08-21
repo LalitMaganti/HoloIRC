@@ -19,7 +19,7 @@ public class IRCViewPager extends ViewPager {
         return (IRCPagerAdapter) super.getAdapter();
     }
 
-    public int onNewChannelJoined(final String channelName, final boolean mentioned) {
+    public int createChannelFragment(final String channelName, final boolean mentioned) {
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", channelName);

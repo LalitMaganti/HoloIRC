@@ -63,53 +63,50 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
         setTheme(Utils.getThemeInt(getApplicationContext()));
         setContentView(R.layout.activity_server_list);
+
+        mServerCardsAdapter = new BuilderAdapter(this);
+        mBuilderList = new BuilderList();
     }
 
     @Override
-    protected void onStart() {
+    protected void onResume() {
+        super.onResume();
+
         if (mService == null) {
             final Intent service = new Intent(this, IRCBridgeService.class);
             service.putExtra("stop", false);
             startService(service);
             bindService(service, mConnection, 0);
         } else {
-            setUpListView();
             setUpServerList();
         }
-
-        super.onStart();
     }
 
     @Override
     protected void onStop() {
+        super.onStop();
+
         unbindService(mConnection);
         mService = null;
-
-        super.onStop();
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCBridgeService.IRCBinder) binder).getService();
-            setUpListView();
             setUpServerList();
+
+            final ListView listView = (ListView) findViewById(R.id.server_list);
+            final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter
+                    (new ServerCardsAdapter(mServerCardsAdapter));
+            adapter.setAbsListView(listView);
+            listView.setAdapter(adapter);
         }
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
         }
     };
-
-    private void setUpListView() {
-        final ListView listView = (ListView) findViewById(R.id.server_list);
-        mServerCardsAdapter = new BuilderAdapter(this);
-        final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter
-                (new ServerCardsAdapter(mServerCardsAdapter));
-        adapter.setAbsListView(listView);
-
-        listView.setAdapter(adapter);
-    }
 
     // Action bar
     @Override
@@ -142,7 +139,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void setUpServerList() {
         final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-        mBuilderList = new BuilderList();
 
         if (firstRun) {
             SharedPreferencesUtils.firstTimeServerSetup(this);
@@ -150,7 +146,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         }
 
         setUpServers(SharedPreferencesUtils.getServersFromPreferences(getApplicationContext()));
-        setUpCards();
     }
 
     private void setUpServers(final ArrayList<String> serverFiles) {
@@ -158,9 +153,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         for (final String file : serverFiles) {
             mBuilderList.add(FileConfigurationConverter.convertFileToBuilder(this, file));
         }
-    }
 
-    private void setUpCards() {
         mServerCardsAdapter.clear();
         if (!mBuilderList.isEmpty()) {
             for (final ServerConfiguration.Builder builder : mBuilderList) {
@@ -255,17 +248,16 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         servers.remove(fileName);
 
         final File folder = new File(SharedPreferencesUtils
-                .getSharedPreferencesPath(getApplicationContext())
-                + fileName + ".xml");
+                .getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");
         folder.delete();
 
         setUpServers(servers);
-        setUpCards();
     }
 
     private boolean serverIsConnected(final String title) {
-        return mService != null && getServer(title) != null &&
-                (getServer(title).getStatus().equals(getString(R.string.status_connected)));
+        final Server server = getServer(title);
+        return mService != null && server != null &&
+                server.getStatus().equals(getString(R.string.status_connected));
     }
 
     // BuilderAdapter callbacks

@@ -26,7 +26,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.Utils;
+import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.irc.listeners.CoreListener;
 import com.fusionx.irc.misc.NickStorage;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
@@ -38,71 +40,104 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.fusionx.Utils.parcelDataForBroadcast;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
-import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
-import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WELCOME;
+import static com.fusionx.irc.constants.ServerReplyCodes.*;
 
 public class ServerConnectionParser {
-    public static String parseConnect(final String title, final BufferedReader reader,
+    private static boolean triedSecondNick = false;
+    private static boolean triedThirdNick = false;
+    private static int suffix = 0;
+
+    public static String parseConnect(final String serverTitle, final BufferedReader reader,
                                       final Context context, final boolean canChangeNick,
                                       final ServerWriter writer,
                                       final NickStorage nickStorage) throws IOException {
         String line;
-        boolean triedSecondNick = false;
-        boolean triedThirdNick = false;
-        int suffix = 0;
-        final MessageSender sender = MessageSender.getSender(title);
+        final MessageSender sender = MessageSender.getSender(serverTitle);
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
-            if (StringUtils.isNumeric(parsedArray.get(1))) {
-                switch (Integer.parseInt(parsedArray.get(1))) {
-                    case RPL_WELCOME: {
-                        // We are now logged in.
-                        final String nick = parsedArray.get(2);
-                        Utils.removeFirstElementFromList(parsedArray, 3);
-                        sender.sendServerConnection(parsedArray.get(0));
-                        return nick;
-                    }
-                    case ERR_NICKNAMEINUSE: {
-                        if (!triedSecondNick) {
-                            writer.changeNick(nickStorage.getSecondChoiceNick());
-                            triedSecondNick = true;
-                        } else if (!triedThirdNick) {
-                            writer.changeNick(nickStorage.getThirdChoiceNick());
-                            triedThirdNick = true;
-                        } else {
-                            if (canChangeNick) {
-                                ++suffix;
-                                writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
-                            } else {
-                                final Bundle event = Utils.parcelDataForBroadcast(null,
-                                        ServerEventType.NickInUse,
-                                        context.getString(R.string.parser_nick_in_use));
-                                sender.sendServerMessage(event);
-                            }
+            switch (parsedArray.get(0)) {
+                case ServerCommands.Ping:
+                    // Immediately return
+                    final String source = parsedArray.get(1);
+                    CoreListener.respondToPing(writer, source);
+                    break;
+                case ServerCommands.Error:
+                    // We are finished - the server has kicked us out for some reason
+                    final Bundle event = parcelDataForBroadcast(null,
+                            ServerEventType.Error, parsedArray.get(1));
+                    sender.sendServerMessage(event);
+                    return null;
+                default:
+                    if (StringUtils.isNumeric(parsedArray.get(1))) {
+                        final String nick = parseConnectionCode(canChangeNick, parsedArray,
+                                sender, writer, context, nickStorage, line);
+                        if(nick != null) {
+                            return nick;
                         }
-                        break;
+                    } else {
+                        parseConnectionCommand(parsedArray, sender, writer, line);
                     }
-                    default: {
-                        Log.v(LOG_TAG, line);
-                        break;
-                    }
-                }
-            } else {
-                switch (parsedArray.get(1).toUpperCase()) {
-                    case "NOTICE": {
-                        Utils.removeFirstElementFromList(parsedArray, 3);
-                        sender.sendGenericServerEvent(parsedArray.get(0));
-                        break;
-                    }
-                    default: {
-                        Log.v(LOG_TAG, line);
-                        break;
-                    }
-                }
+                    break;
             }
         }
         return null;
+    }
+
+    private static String parseConnectionCode(final boolean canChangeNick,
+                                            final ArrayList<String> parsedArray,
+                                            final MessageSender sender,
+                                            final ServerWriter writer, final Context context,
+                                            final NickStorage nickStorage, final String line) {
+        switch (Integer.parseInt(parsedArray.get(1))) {
+            case RPL_WELCOME:
+                // We are now logged in.
+                final String nick = parsedArray.get(2);
+                Utils.removeFirstElementFromList(parsedArray, 3);
+                sender.sendServerConnection(parsedArray.get(0));
+                return nick;
+            case ERR_NICKNAMEINUSE:
+                if (!triedSecondNick) {
+                    writer.changeNick(nickStorage.getSecondChoiceNick());
+                    triedSecondNick = true;
+                } else if (!triedThirdNick) {
+                    writer.changeNick(nickStorage.getThirdChoiceNick());
+                    triedThirdNick = true;
+                } else {
+                    if (canChangeNick) {
+                        ++suffix;
+                        writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
+                    } else {
+                        final Bundle event = Utils.parcelDataForBroadcast(null,
+                                ServerEventType.NickInUse,
+                                context.getString(R.string.parser_nick_in_use));
+                        sender.sendServerMessage(event);
+                    }
+                }
+                break;
+            case ERR_NONICKNAMEGIVEN:
+                writer.changeNick(nickStorage.getFirstChoiceNick());
+                break;
+            default:
+                Log.v(LOG_TAG, line);
+                break;
+        }
+        return null;
+    }
+
+    private static void parseConnectionCommand(final ArrayList<String> parsedArray,
+                                          final MessageSender sender, final ServerWriter writer,
+                                          final String line) {
+        switch (parsedArray.get(1).toUpperCase()) {
+            case ServerCommands.Notice:
+                Utils.removeFirstElementFromList(parsedArray, 3);
+                sender.sendGenericServerEvent(parsedArray.get(0));
+                break;
+            default:
+                Log.v(LOG_TAG, line);
+                break;
+        }
     }
 
     /**

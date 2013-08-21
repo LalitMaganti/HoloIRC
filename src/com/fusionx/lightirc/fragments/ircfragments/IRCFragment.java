@@ -48,6 +48,14 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     protected EditText mEditText = null;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Retain this fragment across configuration changes.
+        //setRetainInstance(true);
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflate,
                              final ViewGroup container, final Bundle savedInstanceState) {
         final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);

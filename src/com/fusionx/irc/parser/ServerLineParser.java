@@ -88,20 +88,18 @@ public class ServerLineParser {
     ServerEventType parseLine(final String line) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
         switch (parsedArray.get(0)) {
-            case ServerCommands.Ping: {
+            case ServerCommands.Ping:
                 // Immediately return
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(server.getWriter(), source);
                 return null;
-            }
-            case ServerCommands.Error: {
+            case ServerCommands.Error:
                 // We are finished - the server has kicked us out for some reason
                 final Bundle event = parcelDataForBroadcast(null,
                         ServerEventType.Error, parsedArray.get(1));
                 MessageSender.getSender(server.getTitle()).sendServerMessage(event);
                 return ServerEventType.Error;
-            }
-            default: {
+            default:
                 // Check if the second thing is a code or a command
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
                     codeParser.parseCode(parsedArray);
@@ -109,7 +107,6 @@ public class ServerLineParser {
                     commandParser.parseCommand(parsedArray, line);
                 }
                 return null;
-            }
         }
     }
 }

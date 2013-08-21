@@ -27,7 +27,7 @@ import java.io.OutputStreamWriter;
 abstract class RawWriter {
     protected final OutputStreamWriter streamWriter;
 
-    protected RawWriter(OutputStreamWriter writer) {
+    protected RawWriter(final OutputStreamWriter writer) {
         streamWriter = writer;
     }
 

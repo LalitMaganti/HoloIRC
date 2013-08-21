@@ -39,4 +39,6 @@ public interface CommonCallbacks {
     public void selectServerFragment();
 
     public Server getServer(final boolean nullAllowed);
+
+    public void onUnexpectedDisconnect();
 }

@@ -22,15 +22,11 @@
 package com.fusionx.lightirc.activity;
 
 import android.app.ActionBar;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.Menu;
@@ -50,22 +46,19 @@ import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.fragments.IRCActionsFragment;
+import com.fusionx.lightirc.fragments.PagerFragment;
+import com.fusionx.lightirc.fragments.ServiceFragment;
 import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
-import com.fusionx.lightirc.fragments.ircfragments.UserFragment;
 import com.fusionx.lightirc.handlerabstract.ChannelFragmentHandler;
 import com.fusionx.lightirc.handlerabstract.PMFragmentHandler;
 import com.fusionx.lightirc.handlerabstract.ServerChannelHandler;
 import com.fusionx.lightirc.handlerabstract.ServerFragHandler;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
-import com.fusionx.lightirc.ui.IRCViewPager;
-import com.fusionx.uiircinterface.IRCBridgeService;
-import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -82,11 +75,11 @@ import java.util.Iterator;
 public class IRCFragmentActivity extends FragmentActivity implements
         UserListFragment.UserListCallback, ChannelFragment.ChannelFragmentCallback,
         IRCActionsFragment.IRCActionsCallback, ServerFragment.ServerFragmentCallback,
-        FragmentSideHandlerInterface {
+        FragmentSideHandlerInterface, ServiceFragment.ServiceFragmentCallback {
 
+    private ServiceFragment mServiceFragment = null;
     private UserListFragment mUserFragment = null;
-    private IRCBridgeService mService = null;
-    private IRCViewPager mViewPager = null;
+    private PagerFragment mPagerFragment = null;
     private String mServerTitle = null;
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
@@ -106,6 +99,16 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
         setUpSlidingMenu();
 
+        final FragmentManager fm = getSupportFragmentManager();
+        mServiceFragment = (ServiceFragment) fm.findFragmentByTag("service");
+
+        if (mServiceFragment == null) {
+            mServiceFragment = new ServiceFragment();
+            fm.beginTransaction().add(mServiceFragment, "service").commit();
+        } else {
+            setUpViewPager();
+        }
+
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -114,10 +117,8 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     private void setUpSlidingMenu() {
-        mUserFragment = new UserListFragment();
-
         mUserSlidingMenu = (SlidingMenu) findViewById(R.id.slidingmenulayout);
-        mUserSlidingMenu.setContent(R.layout.view_pager);
+        mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
         mUserSlidingMenu.setMenu(R.layout.sliding_ment_fragment_userlist);
         mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
         mUserSlidingMenu.setBehindScrollScale(0);
@@ -137,99 +138,32 @@ public class IRCFragmentActivity extends FragmentActivity implements
         mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
     }
 
-    private void setUpViewPager() {
-        final TypedArray a = getTheme().obtainStyledAttributes(new int[]
-                {android.R.attr.windowBackground});
-        final int background = a.getResourceId(0, 0);
-
-        final IRCPagerAdapter adapter = new IRCPagerAdapter(getSupportFragmentManager());
-        adapter.addServerFragment(mServerTitle);
-        mViewPager = (IRCViewPager) findViewById(R.id.pager);
-        mViewPager.setBackgroundResource(background);
-        mViewPager.setAdapter(adapter);
+    @Override
+    public void setUpViewPager() {
+        mPagerFragment = (PagerFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.pager_fragment);
 
         final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        tabs.setViewPager(mViewPager);
+        tabs.setViewPager(mPagerFragment.getViewPager());
         tabs.setOnPageChangeListener(listener);
         tabs.setBackgroundResource(R.color.sliding_menu_background);
         tabs.setTextColorResource(android.R.color.white);
         tabs.setIndicatorColorResource(android.R.color.white);
-        mViewPager.getAdapter().setTabStrip(tabs);
+        mPagerFragment.getPagerAdapter().setTabStrip(tabs);
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        MessageSender.getSender(mServerTitle).registerServerChannelHandler
-                (IRCFragmentActivity.this);
-
-        if (mService == null) {
-            setUpService();
-        }
-    }
-
-    public void setUpService() {
-        final Intent service = new Intent(this, IRCBridgeService.class);
-        service.putExtra("server", true);
-        service.putExtra("serverName", mServerTitle);
-        service.putExtra("stop", false);
-        service.putExtra("setBound", mServerTitle);
-
-        startService(service);
-        bindService(service, mConnection, 0);
-    }
-
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCBridgeService.IRCBinder) binder).getService();
-            setUpViewPager();
-
-            mService.setServerDisplayed(mServerTitle);
-
-            if (getServer(true) != null) {
-                if (isConnectedToServer()) {
-                    for (final Channel channelName : getServer(false).getUser().getChannels()) {
-                        createChannelFragment(channelName.getName());
-                    }
-                    final Iterator<PrivateMessageUser> iterator = getServer(false).getUser()
-                            .getPrivateMessageIterator();
-                    while (iterator.hasNext()) {
-                        createPMFragment(iterator.next().getNick());
-                    }
-                }
-            } else {
-                final ServerConfiguration.Builder builder =
-                        getIntent().getParcelableExtra("server");
-                mService.connectToServer(builder);
+    public void repopulateFragmentsInPager() {
+        if (isConnectedToServer()) {
+            for (final Channel channelName : getServer(false).getUser().getChannels()) {
+                createChannelFragment(channelName.getName());
+            }
+            final Iterator<PrivateMessageUser> iterator = getServer(false).getUser()
+                    .getPrivateMessageIterator();
+            while (iterator.hasNext()) {
+                createPMFragment(iterator.next().getNick());
             }
         }
-
-        // Should not occur
-        @Override
-        public void onServiceDisconnected(final ComponentName name) {
-            mService.disconnectFromServer(mServerTitle);
-            mService = null;
-        }
-    };
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        MessageSender.getSender(mServerTitle).unregisterFragmentSideHandlerInterface();
-        if (mService != null) {
-            mService.setServerDisplayed(null);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        unbindService(mConnection);
-        mService = null;
     }
 
     private final ServerChannelHandler mServerChannelHandler = new ServerChannelHandler() {
@@ -282,7 +216,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     }
 
     private IRCFragment getCurrentItem() {
-        return mViewPager.getAdapter().getItem(mViewPager.getCurrentItem());
+        return mPagerFragment.getCurrentItem();
     }
 
     /*
@@ -291,16 +225,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     // CommonIRCListener Callbacks
     @Override
     public Server getServer(final boolean nullAllowed) {
-        Server server;
-        if (mService == null || (server = mService.getServer(mServerTitle)) == null) {
-            if (nullAllowed) {
-                return null;
-            } else {
-                throw new UnsupportedOperationException();
-            }
-        } else {
-            return server;
-        }
+        return mServiceFragment.getServer(nullAllowed);
     }
 
     /**
@@ -320,7 +245,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void createPMFragment(final String userNick) {
-        mViewPager.onNewPrivateMessage(userNick);
+        mPagerFragment.createPMFragment(userNick);
     }
 
     /**
@@ -340,9 +265,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public boolean isConnectedToServer() {
         final Server server = getServer(true);
-
-        return server != null && server.getStatus()
-                .equals(getString(R.string.status_connected));
+        return server != null && server.getStatus().equals(getString(R.string.status_connected));
     }
 
     /**
@@ -350,7 +273,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void selectServerFragment() {
-        mViewPager.setCurrentItem(0, true);
+        mPagerFragment.selectServerFragment();
     }
 
     /**
@@ -361,11 +284,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void switchFragmentAndRemove(final String fragmentTitle) {
-        final int index = mViewPager.getAdapter().getIndexFromTitle(fragmentTitle);
-        if (getCurrentItem().getTitle().equals(fragmentTitle)) {
-            mViewPager.setCurrentItem(index - 1, true);
-        }
-        mViewPager.getAdapter().removeFragment(index);
+        mPagerFragment.switchFragmentAndRemove(fragmentTitle);
     }
 
     /**
@@ -396,15 +315,13 @@ public class IRCFragmentActivity extends FragmentActivity implements
     @Override
     public void onUnexpectedDisconnect() {
         closeAllSlidingMenus();
-        mViewPager.disconnect();
+        mPagerFragment.getViewPager().disconnect();
 
         if (getServer(true) != null) {
             final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... voids) {
-                    mService.setServerDisplayed(null);
-                    mService.onUnexpectedDisconnect(mServerTitle);
-                    mService = null;
+                    mServiceFragment.removeServiceReference();
                     return null;
                 }
 
@@ -452,14 +369,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void disconnect() {
-        MessageSender.getSender(mServerTitle).unregisterFragmentSideHandlerInterface();
-        if (mService != null) {
-            mService.disconnectFromServer(mServerTitle);
-        }
-
-        final Intent intent = new Intent(this, MainServerListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        mServiceFragment.disconnect();
     }
 
     /**
@@ -491,6 +401,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
     /**
      * Start of the ServerFragment callbacks
      */
+
     /**
      * Method called when a new ChannelFragment is to be created
      *
@@ -498,9 +409,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      * @param forceSwitch - whether the channel should be forcibly switched to
      */
     public void createChannelFragment(final String channelName, final boolean forceSwitch) {
-        final boolean switchToTab = channelName.equals(getIntent().getStringExtra("mention"))
-                || forceSwitch;
-        mViewPager.onNewChannelJoined(channelName, switchToTab);
+        mPagerFragment.createChannelFragment(channelName, forceSwitch);
     }
 
     /**
@@ -520,23 +429,17 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     @Override
     public ServerFragHandler getServerFragmentHandler() {
-        final IRCFragment fragment = mViewPager.getAdapter().getFragment(mServerTitle,
-                FragmentType.Server);
-        return fragment == null ? null : ((ServerFragment) fragment).getServerFragHandler();
+        return mPagerFragment.getServerFragmentHandler();
     }
 
     @Override
-    public ChannelFragmentHandler getChannelFragmentHandler(String channelName) {
-        final IRCFragment fragment = mViewPager.getAdapter().getFragment(channelName,
-                FragmentType.Channel);
-        return fragment == null ? null : ((ChannelFragment) fragment).getChannelFragmentHandler();
+    public ChannelFragmentHandler getChannelFragmentHandler(final String channelName) {
+        return mPagerFragment.getChannelFragmentHandler(channelName);
     }
 
     @Override
-    public PMFragmentHandler getUserFragmentHandler(String userNick) {
-        final IRCFragment fragment = mViewPager.getAdapter().getFragment(userNick,
-                FragmentType.User);
-        return fragment == null ? null : ((UserFragment) fragment).getUserFragmnetHandler();
+    public PMFragmentHandler getUserFragmentHandler(final String userNick) {
+        return mPagerFragment.getUserFragmentHandler(userNick);
     }
 
     public void mention(final String destination) {
@@ -565,7 +468,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
                 mUserFragment.getMode().finish();
             }
 
-            mViewPager.getAdapter().setCurrentItemIndex(position);
+            mPagerFragment.getPagerAdapter().setCurrentItemIndex(position);
         }
     }
 }

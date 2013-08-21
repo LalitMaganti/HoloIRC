@@ -52,16 +52,6 @@ public class ChannelFragment extends IRCFragment {
     private ChannelFragmentCallback mCallback;
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        final String message = String.format(getActivity().getString(R.string
-                .parser_joined_channel), mCallback.getServer
-                (false).getUser().getColorfulNick());
-        appendToTextView(message + "\n");
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
