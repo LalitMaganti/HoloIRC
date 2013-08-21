@@ -26,15 +26,19 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.Html;
 import android.text.util.Linkify;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
+
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -88,6 +92,24 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
     public void disableEditText() {
         mEditText.setEnabled(false);
     }
+
+    @Override
+    public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
+        final CharSequence text = mEditText.getText();
+
+        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
+                || actionId == EditorInfo.IME_ACTION_DONE
+                || event.getAction() == KeyEvent.ACTION_DOWN
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
+            final String message = text.toString();
+            mEditText.setText("");
+
+            sendMessage(message);
+        }
+        return false;
+    }
+
+    public abstract void sendMessage(final String message);
 
     public abstract FragmentType getType();
 

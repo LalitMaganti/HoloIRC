@@ -80,22 +80,6 @@ public class UserFragment extends IRCFragment {
     }
 
     @Override
-    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        final CharSequence text = mEditText.getText();
-
-        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
-                || actionId == EditorInfo.IME_ACTION_DONE
-                || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
-            final String message = text.toString();
-            mEditText.setText("");
-
-            sendUserMessage(getTitle(), message);
-        }
-        return false;
-    }
-
-    @Override
     public FragmentType getType() {
         return FragmentType.User;
     }
@@ -105,7 +89,8 @@ public class UserFragment extends IRCFragment {
         return userFragmentHandler;
     }
 
-    public void sendUserMessage(final String nick, final String message) {
-        MessageParser.userMessageToParse(mCallback, nick, message);
+    @Override
+    public void sendMessage(final String message) {
+        MessageParser.userMessageToParse(mCallback, getTitle(), message);
     }
 }

@@ -81,6 +81,11 @@ public class ServerFragment extends IRCFragment {
     }
 
     @Override
+    public void sendMessage(String message) {
+        MessageParser.serverMessageToParse(mCallback, message);
+    }
+
+    @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
@@ -91,28 +96,8 @@ public class ServerFragment extends IRCFragment {
         }
     }
 
-    public void sendServerMessage(final String message) {
-        MessageParser.serverMessageToParse(mCallback, message);
-    }
-
     public interface ServerFragmentCallback extends CommonCallbacks {
         public void connectedToServer();
-    }
-
-    @Override
-    public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = mEditText.getText();
-
-        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
-                || actionId == EditorInfo.IME_ACTION_DONE
-                || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
-            final String message = text.toString();
-            mEditText.setText("");
-
-            sendServerMessage(message);
-        }
-        return false;
     }
 
     @Override

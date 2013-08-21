@@ -93,22 +93,6 @@ public class ChannelFragment extends IRCFragment {
         }
     }
 
-    @Override
-    public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = mEditText.getText();
-
-        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
-                || actionId == EditorInfo.IME_ACTION_DONE
-                || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
-            final String message = text.toString();
-            mEditText.setText("");
-
-            sendChannelMessage(getTitle(), message);
-        }
-        return false;
-    }
-
     public void onUserMention(final ArrayList<ChannelUser> users) {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
@@ -131,8 +115,9 @@ public class ChannelFragment extends IRCFragment {
         return channelFragmentHandler;
     }
 
-    public void sendChannelMessage(final String channelName, final String message) {
-        MessageParser.channelMessageToParse(mCallback, channelName, message);
+    @Override
+    public void sendMessage(final String message) {
+        MessageParser.channelMessageToParse(mCallback, getTitle(), message);
     }
 
     public interface ChannelFragmentCallback extends CommonCallbacks {
