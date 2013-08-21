@@ -25,9 +25,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
-import android.widget.TextView;
 
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
@@ -35,8 +32,6 @@ import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
-
-import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
 

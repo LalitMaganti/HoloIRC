@@ -40,9 +40,7 @@ import com.fusionx.lightirc.misc.FragmentType;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 
 public abstract class IRCFragment extends Fragment implements TextView.OnEditorActionListener {
     @Getter

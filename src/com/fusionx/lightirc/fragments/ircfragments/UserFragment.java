@@ -25,9 +25,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
-import android.widget.TextView;
 
 import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
@@ -36,8 +33,6 @@ import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class UserFragment extends IRCFragment {
     private CommonCallbacks mCallback;

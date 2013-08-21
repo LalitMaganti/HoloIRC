@@ -30,7 +30,6 @@ import android.widget.TextView;
 
 import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.HackedArrayAdapter;
 
 public abstract class ActionsArrayAdapter extends HackedArrayAdapter<String> {
     private final LayoutInflater inflater;
