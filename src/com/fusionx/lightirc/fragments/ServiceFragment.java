@@ -32,6 +32,10 @@ public class ServiceFragment extends Fragment {
         setRetainInstance(true);
 
         sender = MessageSender.getSender(mCallback.getServerTitle());
+
+        if (mService == null) {
+            setUpService();
+        }
     }
 
     /**
@@ -66,21 +70,23 @@ public class ServiceFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-
-        if (mService == null) {
-            setUpService();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
 
         if (mService != null) {
             mService.setServerDisplayed(null);
         }
+        sender.unregisterFragmentSideHandlerInterface();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mService != null) {
+            mService.setServerDisplayed(mCallback.getServerTitle());
+        }
+        sender.registerServerChannelHandler(mCallback);
     }
 
     @Override

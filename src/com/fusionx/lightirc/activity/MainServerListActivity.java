@@ -163,10 +163,10 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     // Connect to server
-    public void onCardClick(final View v) {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                IRCFragmentActivity.class);
-        intent.putExtra("server", (ServerConfiguration.Builder) v.getTag());
+    public void onCardClick(final View view) {
+        final Intent intent = new Intent(MainServerListActivity.this, IRCFragmentActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("server", (ServerConfiguration.Builder) view.getTag());
         startActivity(intent);
     }
 
@@ -221,7 +221,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void addNewServer() {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
@@ -233,7 +233,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     private void editServer(final ServerConfiguration.Builder builder) {
         final Intent intent = new Intent(MainServerListActivity.this,
                 ServerSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
         intent.putExtra("file", builder.getFile());
         intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles(builder));
