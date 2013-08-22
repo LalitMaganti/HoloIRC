@@ -52,6 +52,14 @@ public class MessageParser {
                         ServerCommandSender.sendUnknownEvent(server, message);
                     }
                     break;
+                case "/mode":
+                    if (parsedArray.size() == 2) {
+                        ServerCommandSender.sendMode(server, channelName, parsedArray.get(0),
+                                parsedArray.get(1));
+                    } else {
+                        ServerCommandSender.sendUnknownEvent(server, message);
+                    }
+                    break;
                 default:
                     serverCommandToParse(callbacks, message);
                     break;

@@ -150,6 +150,18 @@ public class ServerCommandSender {
         sendPart.execute();
     }
 
+    public static void sendMode(final Server server, final String channelName, final String
+            destination, final String mode) {
+        final AsyncTask<Void, Void, Void> sendMode = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                server.getWriter().sendChannelMode(channelName, destination, mode);
+                return null;
+            }
+        };
+        sendMode.execute();
+    }
+
     public static void sendUnknownEvent(final Server server, final String event) {
         final AsyncTask<Void, Void, Void> unknownEvent = new AsyncTask<Void, Void, Void>() {
             @Override

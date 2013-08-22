@@ -2,8 +2,10 @@ package com.fusionx.irc;
 
 import android.content.Context;
 
+import com.fusionx.Utils;
 import com.fusionx.irc.enums.UserLevel;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.IRCUtils;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
@@ -81,15 +83,14 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                         break;
                     }
                 case 'v':
-                    if (addingMode) {
+                    if (addingMode && !userLevelMap.get(channel).equals(UserLevel.OP)) {
                         channel.getUsers().update(this,
                                 ImmutableList.of(channel, UserLevel.VOICE));
                         break;
                     }
                 default:
                     if (!addingMode && (character == 'v' || character == 'o')) {
-                        channel.getUsers().update(this,
-                                ImmutableList.of(channel, UserLevel.NONE));
+                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevel.NONE));
                     }
                     break;
             }

@@ -112,7 +112,7 @@ class ServerConnection {
                 server.setUser(user);
 
                 if (StringUtils.isNotEmpty(serverConfiguration.getNickservPassword())) {
-                    server.getWriter().sendNickServPasswod(serverConfiguration.getNickservPassword());
+                    server.getWriter().sendNickServPassword(serverConfiguration.getNickservPassword());
                 }
 
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {
@@ -140,6 +140,10 @@ class ServerConnection {
 
     public void disconnectFromServer() {
         server.getWriter().quitServer(Utils.getQuitReason(mContext));
+        closeSocket();
+    }
+
+    public void closeSocket() {
         try {
             mSocket.close();
         } catch (IOException e) {

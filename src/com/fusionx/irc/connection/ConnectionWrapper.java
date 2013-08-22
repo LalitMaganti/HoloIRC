@@ -59,6 +59,7 @@ public class ConnectionWrapper extends Thread {
             connection.disconnectFromServer();
         } else if (isAlive()) {
             interrupt();
+            connection.closeSocket();
         }
     }
 }

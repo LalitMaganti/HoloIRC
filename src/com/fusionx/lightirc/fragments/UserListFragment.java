@@ -115,7 +115,6 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             mode.setTitle(quantityString);
 
             mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-            //mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
         }
     }
 
