@@ -33,7 +33,7 @@ public class AppUser extends ChannelUser {
         userChannelInterface.putAppUser(this);
     }
 
-    public void newPrivateMessage(final PrivateMessageUser user) {
+    public void createPrivateMessage(final PrivateMessageUser user) {
         privateMessages.add(user);
     }
 

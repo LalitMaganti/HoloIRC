@@ -87,7 +87,7 @@ public class Server implements IRCSideHandlerInterface {
         final MessageSender sender = MessageSender.getSender(title);
         final User sendingUser = weAreSending ? user : userWhoIsNotUs;
         if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
-            user.newPrivateMessage(userWhoIsNotUs);
+            user.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(message)) {
                 sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
@@ -108,7 +108,7 @@ public class Server implements IRCSideHandlerInterface {
         final MessageSender sender = MessageSender.getSender(title);
         final User sendingUser = weAreSending ? user : userWhoIsNotUs;
         if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
-            user.newPrivateMessage(userWhoIsNotUs);
+            user.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(action)) {
                 sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);

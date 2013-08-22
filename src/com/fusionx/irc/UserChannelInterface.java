@@ -113,8 +113,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
     }
 
     public synchronized ChannelUser getUser(@NonNull final String nick) {
-        return getUserIfExists(nick) != null ? getUserIfExists(nick)
-                : new ChannelUser(nick, this);
+        return getUserIfExists(nick) != null ? getUserIfExists(nick) : new ChannelUser(nick, this);
     }
 
     public synchronized Channel getChannel(@NonNull final String name) {
