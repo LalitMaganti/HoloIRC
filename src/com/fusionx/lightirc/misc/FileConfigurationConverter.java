@@ -39,7 +39,7 @@ public class FileConfigurationConverter {
                 Context.MODE_PRIVATE);
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
         builder.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
-        builder.setUrl(serverSettings.getString(PreferenceKeys.URL, ""));
+        builder.setUrl(serverSettings.getString(PreferenceKeys.URL, "").trim());
         builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
         builder.setSsl(serverSettings.getBoolean(PreferenceKeys.SSL, false));
 
