@@ -56,6 +56,9 @@ public class ServerConnectionParser {
                                       final ServerWriter writer,
                                       final NickStorage nickStorage) throws IOException {
         String line;
+        suffix = 0;
+        triedSecondNick = false;
+        triedThirdNick = false;
         final MessageSender sender = MessageSender.getSender(serverTitle);
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
@@ -100,10 +103,11 @@ public class ServerConnectionParser {
                 sender.sendServerConnection(parsedArray.get(0));
                 return nick;
             case ERR_NICKNAMEINUSE:
-                if (!triedSecondNick) {
+                if (!triedSecondNick && StringUtils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
                     writer.changeNick(nickStorage.getSecondChoiceNick());
                     triedSecondNick = true;
-                } else if (!triedThirdNick) {
+                } else if (!triedThirdNick && StringUtils.isNotEmpty(nickStorage
+                        .getThirdChoiceNick())) {
                     writer.changeNick(nickStorage.getThirdChoiceNick());
                     triedThirdNick = true;
                 } else {
