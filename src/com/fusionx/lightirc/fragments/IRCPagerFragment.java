@@ -16,7 +16,7 @@ import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.IRCViewPager;
 
-public class PagerFragment extends Fragment {
+public class IRCPagerFragment extends Fragment {
     private IRCViewPager mViewPager = null;
     private CommonCallbacks mCallback;
     private IRCPagerAdapter mAdapter;

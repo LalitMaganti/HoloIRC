@@ -85,7 +85,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
         setListAdapter(mergeAdapter);
 
-        final View view = (View) mergeAdapter.getItem(4);
+        final View view = (View) mergeAdapter.getItem(5);
         view.setVisibility(View.GONE);
         channelAdapter.setServerVisible();
 
@@ -105,7 +105,10 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
             case 3:
                 mListener.disconnect();
                 return;
-            case 5:
+            case 4:
+                mListener.switchToIgnoreFragment();
+                return;
+            case 6:
                 mListener.closeOrPartCurrentTab();
                 break;
         }
@@ -163,7 +166,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public void onTabChanged() {
         if (mListener.getCurrentFragmentType() != type) {
             type = mListener.getCurrentFragmentType();
-            final View view = (View) getListAdapter().getItem(4);
+            final View view = (View) getListAdapter().getItem(5);
             final TextView textView = (TextView) view.findViewById(R.id
                     .sliding_menu_heading_textview);
             switch (type) {
@@ -192,5 +195,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         public void closeOrPartCurrentTab();
 
         public FragmentType getCurrentFragmentType();
+
+        public void switchToIgnoreFragment();
     }
 }

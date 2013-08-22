@@ -30,6 +30,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,8 +49,10 @@ import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.ActionPagerAdapter;
 import com.fusionx.lightirc.fragments.IRCActionsFragment;
-import com.fusionx.lightirc.fragments.PagerFragment;
+import com.fusionx.lightirc.fragments.IRCPagerFragment;
+import com.fusionx.lightirc.fragments.IgnoreListFragment;
 import com.fusionx.lightirc.fragments.ServiceFragment;
 import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ChannelFragment;
@@ -57,6 +60,7 @@ import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
+import com.fusionx.lightlibrary.ui.NonSwipableViewPager;
 import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -73,14 +77,18 @@ import java.util.Iterator;
 public class IRCFragmentActivity extends FragmentActivity implements
         UserListFragment.UserListCallback, ChannelFragment.ChannelFragmentCallback,
         IRCActionsFragment.IRCActionsCallback, ServerFragment.ServerFragmentCallback,
-        FragmentSideHandlerInterface, ServiceFragment.ServiceFragmentCallback {
+        FragmentSideHandlerInterface, ServiceFragment.ServiceFragmentCallback,
+        IgnoreListFragment.IgnoreListCallback {
 
     private ServiceFragment mServiceFragment = null;
     private UserListFragment mUserFragment = null;
-    private PagerFragment mPagerFragment = null;
+    private IRCPagerFragment mPagerFragment = null;
+    private ActionPagerAdapter mActionsPagerAdapter = null;
+
+    private NonSwipableViewPager mActionViewPager;
+
     private String mServerTitle = null;
     private final ViewPagerOnPagerListener listener = new ViewPagerOnPagerListener();
-    private IRCActionsFragment mActionsFragment;
 
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
@@ -122,7 +130,6 @@ public class IRCFragmentActivity extends FragmentActivity implements
             mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
             mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
             mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
-            mUserSlidingMenu.setBehindScrollScale(0);
             mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
             mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
             mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
@@ -138,17 +145,19 @@ public class IRCFragmentActivity extends FragmentActivity implements
         }
 
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
-        mActionsFragment = (IRCActionsFragment)
-                getSupportFragmentManager().findFragmentById(R.id.actions_fragment);
-        mActionsSlidingMenu.setBehindScrollScale(0);
 
-        mActionsSlidingMenu.setOnOpenListener(mActionsFragment);
+        mActionsPagerAdapter = new ActionPagerAdapter(getSupportFragmentManager());
+        mActionsSlidingMenu.setOnOpenListener(getActionFragment());
         mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        mActionsSlidingMenu.setOnCloseListener(mActionsPagerAdapter.getIgnoreFragmentListener());
+
+        mActionViewPager = (NonSwipableViewPager) mActionsSlidingMenu.getMenu();
+        mActionViewPager.setAdapter(mActionsPagerAdapter);
     }
 
     @Override
     public void setUpViewPager() {
-        mPagerFragment = (PagerFragment) getSupportFragmentManager()
+        mPagerFragment = (IRCPagerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.pager_fragment);
         mPagerFragment.createServerFragment();
 
@@ -226,6 +235,10 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
     private IRCFragment getCurrentItem() {
         return mPagerFragment.getCurrentItem();
+    }
+
+    private IRCActionsFragment getActionFragment() {
+        return (IRCActionsFragment) mActionsPagerAdapter.getItem(0);
     }
 
     /*
@@ -338,12 +351,12 @@ public class IRCFragmentActivity extends FragmentActivity implements
 
                 @Override
                 protected void onPostExecute(Void aVoid) {
-                    mActionsFragment.updateConnectionStatus();
+                    getActionFragment().updateConnectionStatus();
                 }
             };
             unexpectedDisconnect.execute();
         } else {
-            mActionsFragment.updateConnectionStatus();
+            getActionFragment().updateConnectionStatus();
         }
     }
 
@@ -409,6 +422,12 @@ public class IRCFragmentActivity extends FragmentActivity implements
         return getCurrentItem().getType();
     }
 
+    @Override
+    public void switchToIgnoreFragment() {
+        mActionViewPager.setCurrentItem(1);
+        startActionMode((IgnoreListFragment) mActionsPagerAdapter.getItem(1));
+    }
+
     /**
      * Start of the ServerFragment callbacks
      */
@@ -428,7 +447,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
      */
     @Override
     public void connectedToServer() {
-        mActionsFragment.updateConnectionStatus();
+        getActionFragment().updateConnectionStatus();
     }
 
     @Override
@@ -453,6 +472,11 @@ public class IRCFragmentActivity extends FragmentActivity implements
         toast.show();
     }
 
+    @Override
+    public void switchToIRCActionFragment() {
+        mActionViewPager.setCurrentItem(0);
+    }
+
     /**
      * Listener used when the view pages changes pages
      */
@@ -463,7 +487,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
             invalidateOptionsMenu();
             closeAllSlidingMenus();
 
-            mActionsFragment.onTabChanged();
+            getActionFragment().onTabChanged();
 
             if (getResources().getBoolean(R.bool.isTablet)) {
                 mUserFragment.onMenuOpened(getCurrentItem().getTitle());

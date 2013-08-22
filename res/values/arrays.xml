@@ -29,6 +29,7 @@
         <item>Join new channel</item>
         <item>Change nick</item>
         <item>Disconnect</item>
+        <item>Ignore List</item>
     </string-array>
 
     <string-array name="channel_actions">

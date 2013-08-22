@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ignore_list_cab_add"
+          android:title="@string/add"/>
+</menu>

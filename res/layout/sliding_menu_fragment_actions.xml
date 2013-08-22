@@ -18,10 +18,15 @@
 
     You should have received a copy of the GNU General Public License
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
--->
+
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
           android:name="com.fusionx.lightirc.fragments.IRCActionsFragment"
           class="com.fusionx.lightirc.fragments.IRCActionsFragment"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
-          android:id="@+id/actions_fragment"/>
+          android:id="@+id/actions_fragment"/>-->
+<com.fusionx.lightlibrary.ui.NonSwipableViewPager
+        android:id="@+id/non_scrollable_pager"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>

@@ -22,6 +22,8 @@
 package com.fusionx.lightirc.misc;
 
 public class PreferenceKeys {
+    public final static String IgnoreList = "pref_ignore_list";
+
     // Server settings
     public final static String Title = "pref_title";
     public final static String URL = "pref_url";

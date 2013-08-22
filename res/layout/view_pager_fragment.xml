@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:tools="http://schemas.android.com/tools"
-          android:name="com.fusionx.lightirc.fragments.PagerFragment"
-          class="com.fusionx.lightirc.fragments.PagerFragment"
+          android:name="com.fusionx.lightirc.fragments.IRCPagerFragment"
+          class="com.fusionx.lightirc.fragments.IRCPagerFragment"
           android:layout_width="match_parent"
           android:layout_height="match_parent"
           android:id="@+id/pager_fragment"
