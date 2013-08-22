@@ -53,7 +53,7 @@ public abstract class ActionsArrayAdapter extends HackedArrayAdapter<String> {
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
         } else {
-            row.setTextColor(Utils.getThemeTextColor(row.getContext().getApplicationContext()));
+            row.setTextColor(Utils.getThemedTextColor(row.getContext()));
         }
 
         return row;

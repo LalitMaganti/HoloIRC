@@ -145,5 +145,8 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_password_set">Password is set</string>
     <string name="channel">Channel</string>
     <string name="user">User</string>
+    <string name="done">Done</string>
+    <string name="add_channel">Add channel</string>
+    <string name="server_settings_changes_discarded">Changes discarded</string>
 
 </resources>

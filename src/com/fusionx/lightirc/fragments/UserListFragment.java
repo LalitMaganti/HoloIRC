@@ -60,8 +60,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         try {
             mListener = (UserListCallback) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement UserListCallback");
+            throw new ClassCastException(activity.toString() + " must implement UserListCallback");
         }
     }
 
@@ -138,11 +137,9 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
                     build.setTitle(getActivity()
-                            .getString(R.string.user_list_not_possible))
-                            .setMessage(getActivity()
-                                    .getString(R.string.user_list_pm_self_not_possible))
-                            .setPositiveButton(getActivity()
-                                    .getString(R.string.ok),
+                            .getString(R.string.user_list_not_possible)).setMessage(getActivity()
+                            .getString(R.string.user_list_pm_self_not_possible))
+                            .setPositiveButton(getActivity().getString(R.string.ok),
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -153,11 +150,11 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 }
                 return true;
             }
-            case R.id.fragment_userlist_cab_whois:
+            /*case R.id.fragment_userlist_cab_whois:
                 mListener.selectServerFragment();
                 ServerCommandSender.sendUserWhois(mListener.getServer(false), nick);
                 mode.finish();
-                return true;
+                return true;*/
             default:
                 return false;
         }
@@ -191,8 +188,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         if (mode == null) {
             getActivity().startActionMode(this);
 
-            final boolean checked = getListAdapter().getSelectedItems()
-                    .contains(getListAdapter().getItem(i));
+            final boolean checked = getListAdapter().getSelectedItems().contains(getListAdapter
+                    ().getItem(i));
             getListView().setItemChecked(i, !checked);
         }
     }
@@ -210,8 +207,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     public TreeSet<ChannelUser> getUserList(final String channelName) {
-        return mListener.getServer(false).getUserChannelInterface()
-                .getChannel(channelName).getUsers();
+        return mListener.getServer(false).getUserChannelInterface().getChannel(channelName)
+                .getUsers();
     }
 
     public boolean isNickOtherUsers(final String nick) {

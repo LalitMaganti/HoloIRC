@@ -70,11 +70,14 @@
                 android:summary="@string/server_settings_auto_nick_summary"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Channel">
-        <PreferenceScreen
-                android:fragment="com.fusionx.lightirc.activity.ServerSettingsActivity$ListViewSettingsFragment"
-                android:key="pref_autojoin"
+    <PreferenceCategory android:title="Channels">
+        <Preference
+                android:key="pref_autojoin_intent"
                 android:title="@string/server_settings_auto_join_title"/>
+        <!--<PreferenceScreen
+                android:fragment="com.fusionx.lightirc.fragments.serversetttings.ListViewSettingsFragment"
+                android:key="pref_autojoin"
+                android:title="@string/server_settings_auto_join_title"/>-->
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Login - usually need not be changed">

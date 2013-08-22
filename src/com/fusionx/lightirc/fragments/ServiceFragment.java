@@ -49,12 +49,44 @@ public class ServiceFragment extends Fragment {
         super.onAttach(activity);
 
         mCallback = (ServiceFragmentCallback) activity;
-        if (sender != null) {
-            sender.registerServerChannelHandler(mCallback);
-        } else {
-            MessageSender.getSender(mCallback.getServerTitle()).registerServerChannelHandler
-                    (mCallback);
+        if (sender == null) {
+            sender = MessageSender.getSender(mCallback.getServerTitle());
         }
+        sender.registerServerChannelHandler(mCallback);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        sender.registerServerChannelHandler(mCallback);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mService != null) {
+            mService.setServerDisplayed(mCallback.getServerTitle());
+        }
+        sender.receiveMentionAsToast(true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mService != null) {
+            mService.setServerDisplayed(null);
+        }
+        sender.receiveMentionAsToast(false);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        sender.unregisterFragmentSideHandlerInterface();
     }
 
     /**
@@ -67,26 +99,6 @@ public class ServiceFragment extends Fragment {
 
         sender.unregisterFragmentSideHandlerInterface();
         mCallback = null;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        if (mService != null) {
-            mService.setServerDisplayed(null);
-        }
-        sender.unregisterFragmentSideHandlerInterface();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (mService != null) {
-            mService.setServerDisplayed(mCallback.getServerTitle());
-        }
-        sender.registerServerChannelHandler(mCallback);
     }
 
     @Override

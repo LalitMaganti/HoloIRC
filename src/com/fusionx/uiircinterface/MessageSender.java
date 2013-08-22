@@ -50,8 +50,9 @@ import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 import java.util.LinkedHashMap;
 
 public class MessageSender {
-    private static LinkedHashMap<String, MessageSender> sender = new LinkedHashMap<>();
+    private static LinkedHashMap<String, MessageSender> mHashMap = new LinkedHashMap<>();
     private Context mContext;
+    private boolean mToast;
 
     private MessageSender() {
     }
@@ -61,10 +62,10 @@ public class MessageSender {
     }
 
     public static MessageSender getSender(final String serverName) {
-        MessageSender handler = sender.get(serverName);
+        MessageSender handler = mHashMap.get(serverName);
         if (handler == null) {
             handler = new MessageSender();
-            sender.put(serverName, handler);
+            mHashMap.put(serverName, handler);
         }
         return handler;
     }
@@ -88,11 +89,15 @@ public class MessageSender {
      */
     public void unregisterIRCSideHandlerInterface(final String serverName) {
         ircSideHandlerInterface = null;
-        sender.remove(serverName);
+        mHashMap.remove(serverName);
     }
 
     public void unregisterFragmentSideHandlerInterface() {
         fragmentSideHandlerInterface = null;
+    }
+
+    public void receiveMentionAsToast(final boolean toast) {
+        mToast = toast;
     }
 
     /*
@@ -275,7 +280,15 @@ public class MessageSender {
                 .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
                         messageDestination);
 
-        if (fragmentSideHandlerInterface == null) {
+        if (mToast && fragmentSideHandlerInterface != null) {
+            final Handler mainHandler = new Handler(mContext.getMainLooper());
+            mainHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    fragmentSideHandlerInterface.mention(messageDestination);
+                }
+            });
+        } else {
             final Intent mIntent = new Intent(mContext, IRCFragmentActivity.class);
             mIntent.putExtra("serverTitle", ircSideHandlerInterface.getTitle());
             mIntent.putExtra("mention", messageDestination);
@@ -286,14 +299,6 @@ public class MessageSender {
                     PendingIntent.FLAG_UPDATE_CURRENT);
             notification = builder.setContentIntent(pIntent).build();
             mNotificationManager.notify(345, notification);
-        } else {
-            final Handler mainHandler = new Handler(mContext.getMainLooper());
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    fragmentSideHandlerInterface.mention(messageDestination);
-                }
-            });
         }
     }
 }

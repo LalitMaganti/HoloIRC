@@ -24,26 +24,24 @@ import lombok.NonNull;
 public class Utils {
     private static Typeface robotoTypeface = null;
 
-    public static int getThemeInt(final Context applicationContext) {
+    public static int getThemeInt(final Context context) {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        final int theme = Integer.parseInt(preferences.getString(PreferenceKeys.Theme, "1"));
+        return theme != 0 ? R.style.Light : R.style.Dark;
+    }
+
+    public static int getThemedTextColor(final Context context) {
+        return isThemeLight(context) ? context.getResources().getColor(android.R.color.black) :
+                context.getResources().getColor(android.R.color.white);
+    }
+
+    public static boolean isThemeLight(final Context context) {
+        return getThemeInt(context) == R.style.Light;
+    }
+
+    public static boolean isMotdAllowed(final Context context) {
         final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(applicationContext);
-        return Integer.parseInt(preferences.getString(PreferenceKeys.Theme,
-                String.valueOf(R.style.Light)));
-    }
-
-    public static int getThemeTextColor(final Context applicationContext) {
-        return themeIsHoloLight(applicationContext) ?
-                applicationContext.getResources().getColor(android.R.color.black) :
-                applicationContext.getResources().getColor(android.R.color.white);
-    }
-
-    public static boolean themeIsHoloLight(final Context applicationContext) {
-        return getThemeInt(applicationContext) == R.style.Light;
-    }
-
-    public static boolean isMotdAllowed(final Context applicationContext) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(applicationContext);
+                .getDefaultSharedPreferences(context);
         return preferences.getBoolean(PreferenceKeys.Motd, true);
     }
 
@@ -164,7 +162,7 @@ public class Utils {
     }
 
     public static int getUserColorOffset(final Context context) {
-        return themeIsHoloLight(context) ? 0 : 255;
+        return isThemeLight(context) ? 0 : 255;
     }
 
     public static boolean isChannel(String rawName) {

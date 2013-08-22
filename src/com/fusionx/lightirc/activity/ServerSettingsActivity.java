@@ -21,415 +21,119 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
 package com.fusionx.lightirc.activity;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.ListFragment;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.os.Build;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.SelectionAdapter;
+import com.fusionx.lightirc.fragments.serversetttings.BaseServerSettingsFragment;
+import com.fusionx.lightirc.fragments.serversetttings.ListViewSettingsFragment;
+import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
-import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightirc.ui.MustBeCompleteView;
-import com.fusionx.lightirc.ui.ServerTitleEditTextPreference;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
-import static com.fusionx.lightirc.misc.PreferenceKeys.NickServPassword;
-import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
-import static com.fusionx.lightirc.misc.PreferenceKeys.RealName;
-import static com.fusionx.lightirc.misc.PreferenceKeys.ServerPassword;
-import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
-import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
-import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
-
-public class ServerSettingsActivity extends PreferenceActivity {
-    private static boolean canExit = true;
-    private static boolean newServer = false;
-    private static String fileName = null;
+public class ServerSettingsActivity extends PreferenceActivity implements ServerSettingsCallbacks {
+    private boolean mCanSaveChanges = true;
+    private boolean mNewServer = false;
+    private String mFileName = null;
+    private BaseServerSettingsFragment mBaseFragment;
+    private ListViewSettingsFragment mListFragment;
+    private boolean mListDisplayed = false;
+    private boolean backPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTheme(Utils.getThemeInt(getApplicationContext()));
+        setTheme(Utils.getThemeInt(this));
 
-        if (getIntent().getExtras().getBoolean("main")) {
-            getFragmentManager().beginTransaction()
-                    .replace(android.R.id.content, new BaseServerSettingFragment())
-                    .commit();
-        }
+        mBaseFragment = new BaseServerSettingsFragment();
+        mListFragment = new ListViewSettingsFragment();
+
+        mFileName = getIntent().getStringExtra("file");
+        mNewServer = getIntent().getBooleanExtra("new", false);
+        mCanSaveChanges = !mNewServer;
+
+        getFragmentManager().beginTransaction().replace(android.R.id.content, mBaseFragment).commit();
     }
 
     @Override
     public void onBackPressed() {
-        if (!canExit && newServer) {
-            final AlertDialog.Builder build = new AlertDialog.Builder(this);
-            build.setTitle(getString(R.string.server_settings_save_question_title))
-                    .setMessage(getString(R.string.server_settings_save_question_message))
-                    .setNegativeButton(getString(R.string.discard), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                                    (getApplicationContext()) + fileName + ".xml");
-                            folder.delete();
-                            finish();
-                        }
-                    }).setPositiveButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    // do nothing
+        if (mListDisplayed) {
+            openBaseFragment();
+        } else {
+            if (!mCanSaveChanges) {
+                final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
+                        (getApplicationContext()) + "server.xml");
+                if (folder.exists()) {
+                    folder.delete();
                 }
-            });
-            build.show();
-            return;
-        } else if (newServer) {
-            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
+                Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
+                        Toast.LENGTH_SHORT).show();
+                backPressed = true;
+            } else if (mNewServer) {
+                SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
+                Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                        Toast.LENGTH_SHORT).show();
+                backPressed = true;
+            }
+            super.onBackPressed();
         }
-        Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                Toast.LENGTH_SHORT).show();
-        finish();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!canExit && newServer) {
+
+        if (!mCanSaveChanges && !backPressed) {
             final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                    (getApplicationContext()) + fileName + ".xml");
+                    (getApplicationContext()) + "server.xml");
             if (folder.exists()) {
                 folder.delete();
             }
-        } else if (newServer) {
+            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
+                    Toast.LENGTH_SHORT).show();
+        } else if (mNewServer && !backPressed) {
             SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static class BaseServerSettingFragment extends PreferenceFragment
-            implements OnPreferenceChangeListener {
-
-        // Server login
-        private EditTextPreference mServerPassword = null;
-
-        // NickServ
-        private EditTextPreference mNickServPassword = null;
-
-        private MustBeCompleteView mustBeCompleteView = null;
-
-        private final List<EditTextPreference> mEditTexts = new ArrayList<>();
-
-        @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-        @Override
-        public void onCreate(final Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-            setHasOptionsMenu(true);
-
-            final Bundle bundle = getActivity().getIntent().getExtras();
-            if (bundle != null) {
-                newServer = bundle.getBoolean("new", false);
-                fileName = bundle.getString("file");
-            }
-
-            getPreferenceManager().setSharedPreferencesMode(MODE_MULTI_PROCESS);
-            getPreferenceManager().setSharedPreferencesName(fileName);
-
-            addPreferencesFromResource(R.xml.activty_server_settings_prefs);
-
-            final PreferenceScreen prefSet = getPreferenceScreen();
-
-            final ServerTitleEditTextPreference mTitle = (ServerTitleEditTextPreference)
-                    prefSet.findPreference(Title);
-            if (mTitle != null) {
-                mTitle.setOnPreferenceChangeListener(this);
-                mTitle.setListOfExistingServers(bundle.getStringArrayList("list"));
-            }
-            mEditTexts.add(mTitle);
-
-            // URL of server
-            mustBeCompleteView = (MustBeCompleteView) prefSet.findPreference("must_be_complete");
-
-            // URL of server
-            final EditTextPreference mUrl = (EditTextPreference) prefSet.findPreference(URL);
-            if (mUrl != null) {
-                mUrl.setOnPreferenceChangeListener(this);
-            }
-            mEditTexts.add(mUrl);
-
-            // Port of server
-            final EditTextPreference mPort = (EditTextPreference) prefSet.findPreference(Port);
-            if (mPort != null) {
-                mPort.setOnPreferenceChangeListener(this);
-                mPort.setSummary(mPort.getText());
-            }
-
-            // Nick of User
-            final EditTextPreference mRealName = (EditTextPreference)
-                    prefSet.findPreference(RealName);
-            if (mRealName != null) {
-                mRealName.setOnPreferenceChangeListener(this);
-                mRealName.setSummary(mRealName.getText());
-            }
-
-            final EditTextPreference mServerUserName = (EditTextPreference)
-                    prefSet.findPreference(ServerUserName);
-            if (mServerUserName != null) {
-                mServerUserName.setOnPreferenceChangeListener(this);
-                mServerUserName.setSummary(mServerUserName.getText());
-            }
-
-            mServerPassword = (EditTextPreference) prefSet.findPreference(ServerPassword);
-            if (mServerPassword != null) {
-                mServerPassword.setOnPreferenceChangeListener(this);
-                updatePasswordSummary(mServerPassword);
-            }
-
-            mNickServPassword = (EditTextPreference) prefSet.findPreference(NickServPassword);
-            if (mNickServPassword != null) {
-                mNickServPassword.setOnPreferenceChangeListener(this);
-                updatePasswordSummary(mNickServPassword);
-            }
-
-            canExit = !newServer;
-
-            if (!newServer) {
-                for (EditTextPreference edit : mEditTexts) {
-                    edit.setSummary(edit.getText());
-                }
-            }
-        }
-
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-
-            if (newServer) {
-                mustBeCompleteView.setInitialText(mEditTexts.get(0).getTitle().toString());
-            } else {
-                getPreferenceScreen().removePreference(mustBeCompleteView);
-            }
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object newValue) {
-            if (newValue instanceof String) {
-                final String newString = (String) newValue;
-                final EditTextPreference editTextPreference = (EditTextPreference) preference;
-                editTextPreference.setText(newString);
-                if (preference != mNickServPassword && preference != mServerPassword) {
-                    preference.setSummary(newString);
-                } else {
-                    updatePasswordSummary(editTextPreference);
-                }
-            }
-            if (newServer) {
-                canExit = true;
-                for (final EditTextPreference edit : mEditTexts) {
-                    if (StringUtils.isEmpty(edit.getText())) {
-                        mustBeCompleteView.setInitialText(edit.getTitle().toString());
-                        canExit = false;
-                        break;
-                    }
-                }
-                if (canExit) {
-                    getPreferenceScreen().removePreference(mustBeCompleteView);
-                }
-            }
-            return true;
-        }
-
-        private void updatePasswordSummary(final EditTextPreference preference) {
-            final Activity activity = getActivity();
-            if (activity != null) {
-                preference.setSummary(StringUtils.isEmpty(preference.getText())
-                        ? activity.getString(R.string.server_settings_no_password)
-                        : activity.getString(R.string.server_settings_password_set));
-            }
-        }
+    @Override
+    public String getFileName() {
+        return mFileName;
     }
 
-    public static class ListViewSettingsFragment extends ListFragment implements
-            MultiChoiceModeListener, android.view.ActionMode.Callback,
-            AdapterView.OnItemClickListener {
-        private SelectionAdapter<String> adapter;
-        private boolean modeStarted = false;
+    @Override
+    public void openAutoJoinList() {
+        final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        ft.replace(android.R.id.content, mListFragment).commit();
+        mListDisplayed = true;
+    }
 
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflate = mode.getMenuInflater();
-            inflate.inflate(R.menu.activty_server_settings_cab, menu);
+    @Override
+    public void openBaseFragment() {
+        final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        ft.replace(android.R.id.content, mBaseFragment).commit();
+        mListDisplayed = false;
+    }
 
-            modeStarted = true;
+    @Override
+    public boolean canSaveChanges() {
+        return mCanSaveChanges;
+    }
 
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            menu.getItem(0).setVisible(!(getListView().getCheckedItemCount() > 1));
-            return false;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            final ArrayList<String> positions = adapter.getSelectedItems();
-
-            switch (item.getItemId()) {
-                case R.id.activity_server_settings_cab_edit:
-                    final String edited = adapter.getItem(0);
-                    final ChannelNamePromptDialogBuilder dialog = new ChannelNamePromptDialogBuilder
-                            (getActivity(), edited) {
-                        @Override
-                        public void onOkClicked(final String input) {
-                            adapter.remove(edited);
-                            adapter.add(input);
-                        }
-                    };
-                    dialog.show();
-
-                    mode.finish();
-                    return true;
-                case R.id.activity_server_settings_cab_delete:
-                    for (String selected : positions) {
-                        adapter.remove(selected);
-                    }
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                              long id, boolean checked) {
-            mode.invalidate();
-
-            if (checked) {
-                adapter.addSelection(position);
-            } else {
-                adapter.removeSelection(position);
-            }
-
-            int selectedItemCount = getListView().getCheckedItemCount();
-
-            if (selectedItemCount != 0) {
-                final String quantityString = getResources()
-                        .getQuantityString(R.plurals.channel_selection,
-                                selectedItemCount, selectedItemCount);
-                mode.setTitle(quantityString);
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode arg0) {
-            adapter.clearSelection();
-
-            modeStarted = false;
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-
-            getListView().setMultiChoiceModeListener(this);
-            getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        }
-
-        @Override
-        public void onCreateOptionsMenu(Menu menu, MenuInflater inflate) {
-            inflate.inflate(R.menu.activity_server_settings_channellist_ab, menu);
-            super.onCreateOptionsMenu(menu, inflate);
-        }
-
-        @Override
-        public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
-                                 final Bundle savedInstanceState) {
-            adapter = new SelectionAdapter<>(getActivity(), new TreeSet<String>());
-
-            final SharedPreferences settings = getActivity()
-                    .getSharedPreferences(fileName, MODE_PRIVATE);
-            final Set<String> set = settings.getStringSet(AutoJoin, new HashSet<String>());
-            for (final String channel : set) {
-                adapter.add(channel);
-            }
-
-            setListAdapter(adapter);
-            setHasOptionsMenu(true);
-
-            return super.onCreateView(inflate, container, savedInstanceState);
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            super.onOptionsItemSelected(item);
-
-            switch (item.getItemId()) {
-                case R.id.activity_server_settings_ab_add:
-                    final ChannelNamePromptDialogBuilder dialog =
-                            new ChannelNamePromptDialogBuilder(getActivity()) {
-                                @Override
-                                public void onOkClicked(final String input) {
-                                    adapter.add(input);
-                                }
-                            };
-                    dialog.show();
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        @Override
-        public void onPause() {
-            SharedPreferences settings = getActivity().getSharedPreferences(fileName, MODE_PRIVATE);
-            final Editor e = settings.edit();
-            e.putStringSet(AutoJoin, adapter.getCopyOfItems()).commit();
-
-            super.onPause();
-        }
-
-        @Override
-        public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
-                                final long l) {
-            if (!modeStarted) {
-                getActivity().startActionMode(this);
-            }
-
-            final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
-            getListView().setItemChecked(i, !checked);
-        }
+    @Override
+    public void setCanSaveChanges(boolean canSave) {
+        mCanSaveChanges = canSave;
     }
 }
-

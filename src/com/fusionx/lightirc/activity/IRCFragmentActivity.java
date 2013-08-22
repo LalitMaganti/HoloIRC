@@ -93,7 +93,7 @@ public class IRCFragmentActivity extends FragmentActivity implements
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
                 ("serverTitle");
 
-        setTheme(Utils.getThemeInt(getApplicationContext()));
+        setTheme(Utils.getThemeInt(this));
         setContentView(R.layout.activity_server_channel);
 
         setUpSlidingMenu();

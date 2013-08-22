@@ -35,7 +35,7 @@
             android:id="@+id/contentLayout"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:background="@drawable/selectable_background_cardbank"
+            android:background="@drawable/default_item_selector"
             android:layout_marginLeft="8dip"
             android:layout_weight="90"
             android:onClick="onCardClick"
@@ -79,7 +79,7 @@
                 android:id="@+id/overflow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/selectable_background_cardbank"
+                android:background="@drawable/default_item_selector"
                 android:contentDescription="@string/overflow"
                 android:padding="2dip"
                 android:src="@drawable/ic_menu_moreoverflow_normal_holo_light"/>

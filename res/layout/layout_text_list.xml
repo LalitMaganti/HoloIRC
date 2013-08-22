@@ -24,10 +24,9 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:gravity="center_vertical"
-          android:background="@drawable/selectable_background_cardbank"
+          android:background="@drawable/default_item_selector"
           android:minHeight="?android:attr/listPreferredItemHeight"
           android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
           android:paddingRight="?android:attr/listPreferredItemPaddingRight"
           android:textAppearance="?android:attr/textAppearanceListItem"
-          android:textColor="@android:color/white"
           android:textIsSelectable="false"/>

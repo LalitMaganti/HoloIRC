@@ -46,13 +46,13 @@ public class AppearanceSettingsFragment extends PreferenceFragment
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.appearance_settings_fragment);
 
-        final String[] themes_entries = {String.valueOf(R.style.Dark), String.valueOf(R.style.Light)};
+        final String[] themes_entries = {"0", "1"};
 
         final PreferenceScreen prefSet = getPreferenceScreen();
         mChooseTheme = (ListPreference) prefSet.findPreference(PreferenceKeys.Theme);
         mChooseTheme.setEntryValues(themes_entries);
         if (mChooseTheme.getEntry() == null) {
-            mChooseTheme.setValue(String.valueOf(R.style.Light));
+            mChooseTheme.setValue("1");
         }
         mChooseTheme.setOnPreferenceChangeListener(this);
         mChooseTheme.setSummary(mChooseTheme.getEntry());

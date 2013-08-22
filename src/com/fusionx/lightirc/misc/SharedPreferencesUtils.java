@@ -75,12 +75,12 @@ public class SharedPreferencesUtils {
     public static ArrayList<String> getServersFromPreferences(final Context context) {
         final ArrayList<String> array = new ArrayList<>();
         final File folder = new File(getSharedPreferencesPath(context));
-        for (final String file : folder.list()) {
-            if (file.startsWith("server_")) {
-                array.add(migrateFileToNewSystem(context, file));
-            } else if (!file.equals("main.xml") &&
-                    !file.equals("com.fusionx.lightirc_preferences.xml")) {
-                array.add(file.replace(".xml", ""));
+        for (final String fileName : folder.list()) {
+            if (fileName.startsWith("server_")) {
+                array.add(migrateFileToNewSystem(context, fileName));
+            } else if (!fileName.equals("main.xml") &&
+                    !fileName.equals("com.fusionx.lightirc_preferences.xml")) {
+                array.add(fileName.replace(".xml", ""));
             }
         }
         Collections.sort(array);

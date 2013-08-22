@@ -48,7 +48,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         if (selectedItems.contains(getItem(position))) {
             view.setBackgroundResource(android.R.color.holo_blue_light);
         } else {
-            view.setBackgroundResource(R.drawable.selectable_background_cardbank);
+            view.setBackgroundResource(R.drawable.default_item_selector);
         }
 
         return view;
