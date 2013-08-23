@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.ui;
+package com.fusionx.lightirc.ui.preferences;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

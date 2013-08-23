@@ -98,24 +98,13 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     @Override
     public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id,
                                           final boolean checked) {
-        mode.invalidate();
-
         if (checked) {
             getListAdapter().addSelection(position);
         } else {
             getListAdapter().removeSelection(position);
         }
 
-        int selectedItemCount = getListView().getCheckedItemCount();
-
-        if (selectedItemCount != 0) {
-            final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
-                    selectedItemCount, selectedItemCount);
-
-            mode.setTitle(quantityString);
-
-            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-        }
+        mode.invalidate();
     }
 
     @Override
@@ -149,11 +138,6 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 }
                 return true;
             }
-            /*case R.id.fragment_userlist_cab_whois:
-                mListener.selectServerFragment();
-                ServerCommandSender.sendUserWhois(mListener.getServer(false), nick);
-                mode.finish();
-                return true;*/
             default:
                 return false;
         }
@@ -178,7 +162,18 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        return false;
+        int selectedItemCount = getListView().getCheckedItemCount();
+
+        if (selectedItemCount != 0) {
+            final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
+                    selectedItemCount, selectedItemCount);
+
+            mode.setTitle(quantityString);
+
+            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
+        }
+
+        return true;
     }
 
     @Override

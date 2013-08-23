@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.fragments.ircfragments;
 
 import android.app.Activity;
 import android.content.res.TypedArray;
@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.IRCViewPager;

@@ -12,7 +12,7 @@ import android.view.View;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.ui.MustBeCompleteView;
-import com.fusionx.lightirc.ui.ServerTitleEditTextPreference;
+import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 
 import org.apache.commons.lang3.StringUtils;
 

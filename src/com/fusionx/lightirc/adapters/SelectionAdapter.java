@@ -22,22 +22,28 @@
 package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fusionx.Utils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightlibrary.adapters.TreeSetAdapter;
 
 import java.util.ArrayList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class SelectionAdapter<T> extends TreeSetAdapter<T> {
-    private final ArrayList<T> selectedItems = new ArrayList<>();
+    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
 
     public SelectionAdapter(final Context context, final SortedSet<T> objects) {
         super(context, R.layout.layout_text_list, (TreeSet<T>) objects);
+
+        for(int i = 0; i < objects.size(); i++) {
+            selectedItems.put(i, false);
+        }
     }
 
     @Override
@@ -45,8 +51,9 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         final TextView view = (TextView) super.getView(position, convertView, parent);
         Utils.setTypeface(getContext(), view);
 
-        if (selectedItems.contains(getItem(position))) {
-            view.setBackgroundResource(android.R.color.holo_blue_light);
+        if (selectedItems.get(position)) {
+            view.setBackgroundColor(getContext().getResources().getColor(android.R.color
+                    .holo_blue_light));
         } else {
             view.setBackgroundResource(R.drawable.default_item_selector);
         }
@@ -60,7 +67,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * @param position position of item in adapter to add to the list of selected items
      */
     public void addSelection(final int position) {
-        selectedItems.add(getItem(position));
+        selectedItems.put(position, true);
         notifyDataSetChanged();
     }
 
@@ -70,7 +77,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * @param position position of item in adapter to remove from the list of selected items
      */
     public void removeSelection(final int position) {
-        selectedItems.remove(getItem(position));
+        selectedItems.put(position, false);
         notifyDataSetChanged();
     }
 
@@ -88,11 +95,25 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * @return returns a Set of the currently selected items
      */
     public ArrayList<T> getSelectedItems() {
-        return selectedItems;
+        final ArrayList<T> list = new ArrayList<>();
+        for(int i = 0; i < selectedItems.size(); i++) {
+            if(selectedItems.get(i)) {
+                list.add(getItem(i));
+            }
+        }
+        return list;
     }
 
     public TreeSet<T> getCopyOfItems() {
         return new TreeSet<>(mObjects);
+    }
+
+    public boolean isItemAtPositionChecked(final int position) {
+        return selectedItems.get(position);
+    }
+
+    public int getSelectedItemCount() {
+        return selectedItems.size();
     }
 
     public void setInternalSet(SortedSet<T> set) {

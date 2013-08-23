@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.fragments.actions;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -43,14 +43,14 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
-    private IRCActionsCallback mListener;
+    private IRCActionsCallback mCallbacks;
     private FragmentType type;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (IRCActionsCallback) activity;
+            mCallbacks = (IRCActionsCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() +
                     " must implement IRCActionsCallback");
@@ -103,24 +103,24 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                 nickChangeDialog();
                 break;
             case 3:
-                mListener.disconnect();
+                mCallbacks.disconnect();
                 return;
             case 4:
-                mListener.switchToIgnoreFragment();
+                mCallbacks.switchToIgnoreFragment();
                 return;
             case 6:
-                mListener.closeOrPartCurrentTab();
+                mCallbacks.closeOrPartCurrentTab();
                 break;
         }
-        mListener.closeAllSlidingMenus();
+        mCallbacks.closeAllSlidingMenus();
     }
 
     private void nickChangeDialog() {
         final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(),
-                mListener.getNick()) {
+                mCallbacks.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendNickChange(mListener.getServer(false), input);
+                ServerCommandSender.sendNickChange(mCallbacks.getServer(false), input);
             }
         };
         nickDialog.show();
@@ -131,7 +131,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                 (getActivity()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendJoin(mListener.getServer(false), input);
+                ServerCommandSender.sendJoin(mCallbacks.getServer(false), input);
             }
         };
         builder.show();
@@ -139,8 +139,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onOpen() {
-        if (mListener.isConnectedToServer() != getServerAdapter().isConnected()) {
-            getServerAdapter().setConnected(mListener.isConnectedToServer());
+        if (mCallbacks.isConnectedToServer() != getServerAdapter().isConnected()) {
+            getServerAdapter().setConnected(mCallbacks.isConnectedToServer());
             getServerAdapter().notifyDataSetChanged();
         }
     }
@@ -159,13 +159,13 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     public void updateConnectionStatus() {
-        getServerAdapter().setConnected(mListener.isConnectedToServer());
+        getServerAdapter().setConnected(mCallbacks.isConnectedToServer());
         getServerAdapter().notifyDataSetChanged();
     }
 
     public void onTabChanged() {
-        if (mListener.getCurrentFragmentType() != type) {
-            type = mListener.getCurrentFragmentType();
+        if (mCallbacks.getCurrentFragmentType() != type) {
+            type = mCallbacks.getCurrentFragmentType();
             final View view = (View) getListAdapter().getItem(5);
             final TextView textView = (TextView) view.findViewById(R.id
                     .sliding_menu_heading_textview);

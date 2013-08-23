@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.fusionx.lightirc.fragments.IRCActionsFragment;
-import com.fusionx.lightirc.fragments.IgnoreListFragment;
+import com.fusionx.lightirc.fragments.actions.IRCActionsFragment;
+import com.fusionx.lightirc.fragments.actions.IgnoreListFragment;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionPagerAdapter extends FragmentStatePagerAdapter {
