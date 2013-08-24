@@ -39,6 +39,7 @@ import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
 import com.fusionx.uiircinterface.ServerCommandSender;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
@@ -84,9 +85,18 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         mergeAdapter.addView(otherHeader);
         mergeAdapter.addAdapter(channelAdapter);
 
-        setListAdapter(mergeAdapter);
+        final AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter
+                (mergeAdapter);
+        setListAdapter(alphaInAnimationAdapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        getAlphaAdapter().setAbsListView(getListView());
     }
 
     @Override
@@ -151,11 +161,19 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
             getServerAdapter().setConnected(callback.isConnectedToServer());
             getServerAdapter().notifyDataSetChanged();
         }
+        getAlphaAdapter().reset();
+        getAlphaAdapter().notifyDataSetChanged();
+
+        callback.switchToIRCActionFragment();
+    }
+
+    public AlphaInAnimationAdapter getAlphaAdapter() {
+        return (AlphaInAnimationAdapter) super.getListAdapter();
     }
 
     @Override
     public MergeAdapter getListAdapter() {
-        return (MergeAdapter) super.getListAdapter();
+        return (MergeAdapter) getAlphaAdapter().getDecoratedBaseAdapter();
     }
 
     private ServerActionsAdapter getServerAdapter() {
@@ -211,5 +229,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         public void closeAllSlidingMenus();
 
         public void onDisconnect(boolean expected, boolean retryPending);
+
+        public void switchToIRCActionFragment();
     }
 }

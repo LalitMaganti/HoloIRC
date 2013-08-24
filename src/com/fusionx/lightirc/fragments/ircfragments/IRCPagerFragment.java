@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +16,12 @@ import com.fusionx.irc.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.ui.IRCViewPager;
 
 import java.util.ArrayList;
 
-public class IRCPagerFragment extends Fragment implements ServerFragment
-        .ServerFragmentCallback, ChannelFragment.ChannelFragmentCallback {
-    private IRCViewPager mViewPager = null;
+public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
+        ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallbacks {
+    private ViewPager mViewPager = null;
     private IRCPagerInterface mCallback = null;
     private IRCPagerAdapter mAdapter = null;
 
@@ -35,9 +35,17 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        mCallback = (IRCPagerInterface) activity;
+        try {
+            mCallback = (IRCPagerInterface) activity;
+        } catch (ClassCastException ex) {
+            throw new ClassCastException(activity.toString() + " must implement IRCPagerInterface");
+        }
     }
 
+    /**
+     * Since the fragment is retained, when the activity detaches, a new activity is created so
+     * null the callback when the old activity detaches
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -45,6 +53,9 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
         mCallback = null;
     }
 
+    /**
+     * Retain the fragment through config changes
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,12 +63,18 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
         setRetainInstance(true);
     }
 
+    /**
+     * Create the view by inflating a generic view pager
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.view_pager, container);
     }
 
+    /**
+     * Creates the ServerFragment object
+     */
     public void createServerFragment() {
         if (mAdapter == null) {
             mAdapter = new IRCPagerAdapter(getChildFragmentManager());
@@ -66,21 +83,36 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
         final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
                 {android.R.attr.windowBackground});
         final int background = a.getResourceId(0, 0);
-        mViewPager = (IRCViewPager) getView().findViewById(R.id.pager);
+        mViewPager = (ViewPager) getView().findViewById(R.id.pager);
         mViewPager.setBackgroundResource(background);
         mViewPager.setAdapter(mAdapter);
     }
 
+    /**
+     * Get the currently displayed fragment
+     * @return - returns the currently displayed fragment
+     */
     private IRCFragment getCurrentItem() {
         return mAdapter.getItem(mViewPager.getCurrentItem());
     }
 
+    /**
+     * Creates a UserFragment with the specified nick
+     * @param userNick - the nick of the user we are PMing
+     */
     public void createPMFragment(final String userNick) {
-        mViewPager.onNewPrivateMessage(userNick);
+        final UserFragment userFragment = new UserFragment();
+        final Bundle bundle = new Bundle();
+        bundle.putString("title", userNick);
+        userFragment.setArguments(bundle);
+
+        final int position = mAdapter.addFragment(userFragment);
+
+        mViewPager.setCurrentItem(position, true);
     }
 
     /**
-     * Selects the ServerFragment regardless of what is currently selected
+     * Selects the ServerFragment regardless of what is currently selected in the ViewPager
      */
     public void selectServerFragment() {
         mViewPager.setCurrentItem(0, true);
@@ -109,9 +141,28 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
     public void createChannelFragment(final String channelName, final boolean forceSwitch) {
         final boolean switchToTab = channelName.equals(getActivity().getIntent().getStringExtra
                 ("mention")) || forceSwitch;
-        mViewPager.createChannelFragment(channelName, switchToTab);
+
+        final ChannelFragment channel = new ChannelFragment();
+        final Bundle bundle = new Bundle();
+        bundle.putString("title", channelName);
+
+        channel.setArguments(bundle);
+
+        final int position = mAdapter.addFragment(channel);
+
+        if (switchToTab) {
+            mViewPager.setCurrentItem(position, true);
+        }
     }
 
+    /**
+     * Get the handler object to send the message to.
+     *
+     * @param destination - the title of the tab we are trying to get
+     * @param type - the type of the fragment we are trying to get the handler from
+     *
+     * @return - the handler object we are trying to get
+     */
     public Handler getFragmentHandler(final String destination, final FragmentType type) {
         final String nonNullDestination = destination != null ? destination : mCallback
                 .getServerTitle();

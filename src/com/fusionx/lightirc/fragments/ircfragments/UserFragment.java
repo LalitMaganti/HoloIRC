@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.fragments.ircfragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,11 +30,10 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.uiircinterface.MessageParser;
 
 public class UserFragment extends IRCFragment {
-    private UserFragmentCallbacks mCallback;
-
     private final Handler userFragmentHandler = new Handler() {
         @Override
         public void handleMessage(final Message msg) {
@@ -53,23 +51,14 @@ public class UserFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final Server server = mCallback.getServer(true);
+        final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
+                UserFragmentCallbacks.class);
+        final Server server = callback.getServer(true);
         if (server != null) {
             final PrivateMessageUser user = server.getPrivateMessageUser(title);
             if (user != null) {
                 writeToTextView(user.getBuffer());
             }
-        }
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallback = (UserFragmentCallbacks) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() +
-                    " must implement UserFragmentCallbacks");
         }
     }
 
@@ -85,7 +74,9 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        MessageParser.userMessageToParse(getActivity(), mCallback.getServer(false), title,
+        UserFragmentCallbacks callback = FragmentUtils.getParent(this,
+                UserFragmentCallbacks.class);
+        MessageParser.userMessageToParse(getActivity(), callback.getServer(false), title,
                 message);
     }
 

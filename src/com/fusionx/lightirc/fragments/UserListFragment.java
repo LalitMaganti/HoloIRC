@@ -41,6 +41,7 @@ import com.fusionx.irc.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.uiircinterface.ServerCommandSender;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -69,21 +70,31 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                              final Bundle savedInstanceState) {
         final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
                 new TreeSet<ChannelUser>());
-        setListAdapter(adapter);
+        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
+        setListAdapter(alphaInAnimationAdapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        getListAdapter().setAbsListView(getListView());
     }
 
     public void onMenuOpened(final String channelName) {
         if (!channelName.equals(currentlyDisplayedChannelName)) {
             final TreeSet<ChannelUser> userList = getUserList(channelName);
             if (userList != null) {
-                getListAdapter().setInternalSet(userList);
-                getListAdapter().setChannelName(channelName);
+                getUserListAdapter().setInternalSet(userList);
+                getUserListAdapter().setChannelName(channelName);
                 currentlyDisplayedChannelName = channelName;
             }
         }
         getListView().smoothScrollToPosition(0);
+        getListAdapter().reset();
+        getListAdapter().notifyDataSetInvalidated();
     }
 
     @Override
@@ -99,9 +110,9 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id,
                                           final boolean checked) {
         if (checked) {
-            getListAdapter().addSelection(position);
+            getUserListAdapter().addSelection(position);
         } else {
-            getListAdapter().removeSelection(position);
+            getUserListAdapter().removeSelection(position);
         }
 
         mode.invalidate();
@@ -109,7 +120,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final ArrayList<ChannelUser> selectedItems = getListAdapter().getSelectedItems();
+        final ArrayList<ChannelUser> selectedItems = getUserListAdapter().getSelectedItems();
         final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
@@ -155,7 +166,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
 
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
-        getListAdapter().clearSelection();
+        getUserListAdapter().clearSelection();
 
         this.mode = null;
     }
@@ -182,15 +193,18 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         if (mode == null) {
             getActivity().startActionMode(this);
 
-            final boolean checked = getListAdapter().getSelectedItems().contains(getListAdapter
-                    ().getItem(i));
+            final boolean checked = getUserListAdapter().isItemAtPositionChecked(i);
             getListView().setItemChecked(i, !checked);
         }
     }
 
+    public UserListAdapter getUserListAdapter() {
+        return (UserListAdapter) getListAdapter().getDecoratedBaseAdapter();
+    }
+
     @Override
-    public UserListAdapter getListAdapter() {
-        return (UserListAdapter) super.getListAdapter();
+    public AlphaInAnimationAdapter getListAdapter() {
+        return (AlphaInAnimationAdapter) super.getListAdapter();
     }
 
     public void updateUserList() {

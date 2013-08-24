@@ -3,4 +3,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/ignore_list_cab_add"
           android:title="@string/add"/>
+    <item android:id="@+id/ignore_list_cab_remove"
+          android:title="@string/remove"/>
 </menu>

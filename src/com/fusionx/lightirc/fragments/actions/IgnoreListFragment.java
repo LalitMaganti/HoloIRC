@@ -19,15 +19,17 @@ import android.widget.TextView;
 import com.commonsware.cwac.merge.MergeAdapter;
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.IgnoreNickPromptDialogBuilder;
+import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.TreeSet;
 
 public class IgnoreListFragment extends ListFragment implements ActionMode.Callback,
-        SlidingMenu.OnCloseListener, ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
+        SlidingMenu.OnCloseListener, ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, OnDismissCallback {
     private ActionMode mMode;
 
     @Override
@@ -38,19 +40,13 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         final TreeSet<String> arrayList = new TreeSet<>(getActivity().getSharedPreferences
                 (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).getStringSet
                 (PreferenceKeys.IgnoreList, new TreeSet<String>()));
-        final View serverHeader = inflater.inflate(R.layout.sliding_menu_header, null);
-        final TextView textView = (TextView) serverHeader.findViewById(R.id
-                .sliding_menu_heading_textview);
-        textView.setText("Ignore List");
 
-        final MergeAdapter adapter = new MergeAdapter();
-        final SelectionAdapter ignoreAdapter = new SelectionAdapter<>(getActivity(),
+        final SelectionAdapter<String> ignoreAdapter = new SelectionAdapter<>(getActivity(),
                 arrayList);
+        final DecoratedIgnoreListAdapter listAdapter = new DecoratedIgnoreListAdapter
+                (ignoreAdapter, this);
 
-        adapter.addView(serverHeader);
-        adapter.addAdapter(ignoreAdapter);
-
-        setListAdapter(adapter);
+        setListAdapter(listAdapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
     }
@@ -58,6 +54,8 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        getListAdapter().setAbsListView(getListView());
 
         getListView().setLongClickable(true);
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
@@ -73,12 +71,12 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     }
 
     @Override
-    public MergeAdapter getListAdapter() {
-        return (MergeAdapter) super.getListAdapter();
+    public DecoratedIgnoreListAdapter getListAdapter() {
+        return (DecoratedIgnoreListAdapter) super.getListAdapter();
     }
 
     private SelectionAdapter<String> getIgnoreAdapter() {
-        return (SelectionAdapter) getListAdapter().getAdapter(1);
+        return (SelectionAdapter<String>) getListAdapter().getDecoratedBaseAdapter();
     }
 
     @Override
@@ -86,6 +84,9 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         // Inflate a menu resource providing context menu items
         final MenuInflater inflater = actionMode.getMenuInflater();
         inflater.inflate(R.menu.ignore_list_cab, menu);
+
+        getListAdapter().reset();
+        getListAdapter().notifyDataSetChanged();
 
         mMode = actionMode;
 
@@ -99,9 +100,10 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         if (checkedItemCount != 0) {
             actionMode.setTitle(checkedItemCount + " items checked");
         } else {
-            actionMode.setTitle("");
+            actionMode.setTitle("Ignore List");
         }
         menu.getItem(0).setVisible(checkedItemCount == 0);
+        menu.getItem(1).setVisible(checkedItemCount > 0);
 
         return true;
     }
@@ -118,6 +120,9 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
                     }
                 };
                 builder.show();
+                return true;
+            case R.id.ignore_list_cab_remove:
+                getListAdapter().animateDismiss(getIgnoreAdapter().getSelectedItemPositions());
                 return true;
             default:
                 return false;
@@ -143,11 +148,11 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        final boolean checked = getIgnoreAdapter().isItemAtPositionChecked(i - 1);
+        final boolean checked = getIgnoreAdapter().isItemAtPositionChecked(i);
         if (checked) {
-            getIgnoreAdapter().removeSelection(i - 1);
+            getIgnoreAdapter().removeSelection(i);
         } else {
-            getIgnoreAdapter().addSelection(i - 1);
+            getIgnoreAdapter().addSelection(i);
         }
 
         mMode.invalidate();
@@ -157,6 +162,15 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
         onItemClick(adapterView, view, i, l);
         return true;
+    }
+
+    @Override
+    public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+        for (int position : reverseSortedPositions) {
+            getIgnoreAdapter().remove(position);
+        }
+        getIgnoreAdapter().clearSelection();
+        mMode.invalidate();
     }
 
     public interface IgnoreListCallback {

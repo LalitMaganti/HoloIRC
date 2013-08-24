@@ -67,7 +67,7 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        ChannelFragmentCallback callback = FragmentUtils.getParent(this,
+        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
                 ChannelFragmentCallback.class);
         final Server server = callback.getServer(true);
         if (server != null) {

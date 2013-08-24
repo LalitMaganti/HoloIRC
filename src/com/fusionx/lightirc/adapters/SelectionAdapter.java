@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -36,14 +35,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class SelectionAdapter<T> extends TreeSetAdapter<T> {
-    private final SparseBooleanArray selectedItems = new SparseBooleanArray();
+    private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
+
+    private final Object mLock = new Object();
 
     public SelectionAdapter(final Context context, final SortedSet<T> objects) {
         super(context, R.layout.default_listview_textview, (TreeSet<T>) objects);
-
-        for (int i = 0; i < objects.size(); i++) {
-            selectedItems.put(i, false);
-        }
     }
 
     @Override
@@ -51,7 +48,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         final TextView view = (TextView) super.getView(position, convertView, parent);
         Utils.setTypeface(getContext(), view);
 
-        if (selectedItems.get(position)) {
+        if (mSelectedItems.contains(position)) {
             view.setBackgroundColor(getContext().getResources().getColor(android.R.color
                     .holo_blue_light));
         } else {
@@ -61,14 +58,22 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         return view;
     }
 
+    public void remove(final int position) {
+        super.remove(getItem(position));
+    }
+
     /**
      * Adds an item to the selected items list
      *
      * @param position position of item in adapter to add to the list of selected items
      */
     public void addSelection(final int position) {
-        selectedItems.put(position, true);
-        notifyDataSetChanged();
+        synchronized (mLock) {
+            mSelectedItems.add(position);
+        }
+        if(mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -76,17 +81,23 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      *
      * @param position position of item in adapter to remove from the list of selected items
      */
-    public void removeSelection(final int position) {
-        selectedItems.put(position, false);
-        notifyDataSetChanged();
+    public void removeSelection(final Integer position) {
+        synchronized (mLock) {
+            mSelectedItems.remove(position);
+        }
+        if(mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
      * Clears the selected items in the adapter
      */
     public void clearSelection() {
-        selectedItems.clear();
-        notifyDataSetChanged();
+        mSelectedItems.clear();
+        if(mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -96,12 +107,14 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      */
     public ArrayList<T> getSelectedItems() {
         final ArrayList<T> list = new ArrayList<>();
-        for (int i = 0; i < selectedItems.size(); i++) {
-            if (selectedItems.get(i)) {
-                list.add(getItem(i));
-            }
+        for (int i : mSelectedItems) {
+            list.add(getItem(i));
         }
         return list;
+    }
+
+    public ArrayList<Integer> getSelectedItemPositions() {
+        return mSelectedItems;
     }
 
     public TreeSet<T> getCopyOfItems() {
@@ -109,15 +122,21 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     }
 
     public boolean isItemAtPositionChecked(final int position) {
-        return selectedItems.get(position);
+        return mSelectedItems.contains(position);
     }
 
     public int getSelectedItemCount() {
-        return selectedItems.size();
+        return mSelectedItems.size();
     }
 
     public void setInternalSet(SortedSet<T> set) {
         mObjects = (TreeSet<T>) set;
-        notifyDataSetChanged();
+        if(mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
+
+        synchronized (mLock) {
+            mSelectedItems.clear();
+        }
     }
 }

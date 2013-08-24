@@ -148,5 +148,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="done">Done</string>
     <string name="add_channel">Add channel</string>
     <string name="server_settings_changes_discarded">Changes discarded</string>
+    <string name="remove">Remove</string>
 
 </resources>
