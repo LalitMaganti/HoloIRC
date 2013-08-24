@@ -176,6 +176,7 @@ class ServerConnection {
                 sender.sendRetryPendingServerDisconnection(ex.getMessage());
             }
         }
+        reconnectAttempts = 0;
         server.setStatus(mContext.getString(R.string.status_disconnected));
         closeSocket();
     }
