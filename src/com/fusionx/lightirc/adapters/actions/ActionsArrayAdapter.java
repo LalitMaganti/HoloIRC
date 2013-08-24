@@ -46,7 +46,7 @@ public abstract class ActionsArrayAdapter extends HackedArrayAdapter<String> {
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         TextView row = (TextView) convertView;
         if (row == null) {
-            row = (TextView) inflater.inflate(R.layout.layout_text_list, parent, false);
+            row = (TextView) inflater.inflate(R.layout.default_listview_textview, parent, false);
         }
         Utils.setTypeface(getContext(), row);
         row.setText(getItem(position));

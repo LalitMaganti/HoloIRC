@@ -44,6 +44,7 @@ import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.uiircinterface.IRCBridgeService;
+import com.fusionx.uiircinterface.ServerCommandSender;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
@@ -214,7 +215,8 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void disconnectFromServer(final ServerConfiguration.Builder builder) {
-        mService.disconnectFromServer(builder.getTitle());
+        ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
+        //mService.disconnectFromServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

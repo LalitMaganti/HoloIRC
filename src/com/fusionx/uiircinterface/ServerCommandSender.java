@@ -162,6 +162,17 @@ public class ServerCommandSender {
         sendMode.execute();
     }
 
+    public static void sendDisconnect(final Server server, final Context context) {
+        final AsyncTask<Void, Void, Void> disconnectEvent = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                server.disconnectFromServer(context);
+                return null;
+            }
+        };
+        disconnectEvent.execute();
+    }
+
     public static void sendUnknownEvent(final Server server, final String event) {
         final AsyncTask<Void, Void, Void> unknownEvent = new AsyncTask<Void, Void, Void>() {
             @Override

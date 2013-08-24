@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.os.Message;
 
 import com.fusionx.common.Utils;
+import com.fusionx.irc.connection.ConnectionWrapper;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
@@ -39,6 +40,7 @@ import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.Iterator;
 
 import lombok.AccessLevel;
@@ -59,27 +61,39 @@ public class Server implements IRCSideHandlerInterface {
     private String status = "Disconnected";
     private String MOTD = "";
 
+    private final ConnectionWrapper mWrapper;
+
     private final ServerHandler serverHandler = new ServerHandler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
-                    .eventType);
-            switch (type) {
-                case Disconnected:
-                case Error:
-                    MessageSender.getSender(title).unregisterIRCSideHandlerInterface(title);
-                case NickInUse:
-                case Connected:
-                case Generic:
-                    buffer += bundle.getString(EventBundleKeys.message) + "\n";
-                    break;
+            final Serializable serializable = bundle.getSerializable
+                    (EventBundleKeys.eventType);
+            if (serializable instanceof ServerEventType) {
+                final ServerEventType type = (ServerEventType) serializable;
+                switch (type) {
+                    case NickInUse:
+                    case Generic:
+                        buffer += bundle.getString(EventBundleKeys.message) + "\n";
+                        break;
+                }
+            } else if (serializable instanceof ServerChannelEventType) {
+                final ServerChannelEventType type = (ServerChannelEventType) serializable;
+                switch (type) {
+                    case FinalDisconnected:
+                        MessageSender.getSender(title).unregisterIRCSideHandlerInterface(title);
+                    case RetryPendingDisconnected:
+                    case Connected:
+                        buffer += bundle.getString(EventBundleKeys.message) + "\n";
+                        break;
+                }
             }
         }
     };
 
-    public Server(final String serverTitle) {
+    public Server(final String serverTitle, final ConnectionWrapper wrapper) {
         title = serverTitle;
+        mWrapper = wrapper;
 
         MessageSender.getSender(serverTitle).registerIRCSideHandlerInterface(this);
     }
@@ -154,5 +168,9 @@ public class Server implements IRCSideHandlerInterface {
 
     public boolean isConnected(final Context context) {
         return status.equals(context.getString(R.string.status_connected));
+    }
+
+    public void disconnectFromServer(final Context context) {
+        mWrapper.disconnectFromServer(context);
     }
 }

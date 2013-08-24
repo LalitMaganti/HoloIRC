@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
-import com.fusionx.lightirc.activity.MainServerListActivity;
 import com.fusionx.uiircinterface.IRCBridgeService;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
@@ -145,13 +144,11 @@ public class ServiceFragment extends Fragment {
             }
         }
 
-        // Should not occur
+        // Should never occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            mService.disconnectFromServer(mCallback.getServerTitle());
-            mService = null;
-
-            mCallback.onUnexpectedDisconnect();
+            mCallback.onDisconnect(false, false);
+            throw new IllegalArgumentException();
         }
     };
 
@@ -174,17 +171,6 @@ public class ServiceFragment extends Fragment {
         mService = null;
     }
 
-    public void disconnect() {
-        MessageSender.getSender(mCallback.getServerTitle()).unregisterFragmentSideHandlerInterface();
-        if (mService != null) {
-            mService.disconnectFromServer(mCallback.getServerTitle());
-        }
-
-        final Intent intent = new Intent(getActivity(), MainServerListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-
     public interface ServiceFragmentCallback extends FragmentSideHandlerInterface {
         public void setUpViewPager();
 
@@ -192,6 +178,6 @@ public class ServiceFragment extends Fragment {
 
         public String getServerTitle();
 
-        public void onUnexpectedDisconnect();
+        public void onDisconnect(final boolean expected, final boolean retryPending);
     }
 }

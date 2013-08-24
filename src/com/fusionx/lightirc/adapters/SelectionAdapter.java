@@ -39,7 +39,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     private final SparseBooleanArray selectedItems = new SparseBooleanArray();
 
     public SelectionAdapter(final Context context, final SortedSet<T> objects) {
-        super(context, R.layout.layout_text_list, (TreeSet<T>) objects);
+        super(context, R.layout.default_listview_textview, (TreeSet<T>) objects);
 
         for (int i = 0; i < objects.size(); i++) {
             selectedItems.put(i, false);

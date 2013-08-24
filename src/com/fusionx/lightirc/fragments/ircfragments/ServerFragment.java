@@ -46,14 +46,6 @@ public class ServerFragment extends IRCFragment {
             final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                     ServerFragmentCallback.class);
             switch (type) {
-                case Connected:
-                    callback.connectedToServer();
-                    mEditText.setEnabled(true);
-                    break;
-                case Disconnected:
-                case Error:
-                    callback.onUnexpectedDisconnect();
-                    break;
                 case NickInUse:
                     callback.selectServerFragment();
                     break;
@@ -81,14 +73,14 @@ public class ServerFragment extends IRCFragment {
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
         final Server server = callback.getServer(true);
-        MessageParser.serverMessageToParse(server, message);
+        MessageParser.serverMessageToParse(getActivity(), server, message);
+    }
+
+    public void onConnectedToServer() {
+        mEditText.setEnabled(true);
     }
 
     public interface ServerFragmentCallback {
-        public void connectedToServer();
-
-        public void onUnexpectedDisconnect();
-
         public Server getServer(boolean nullable);
 
         public void selectServerFragment();

@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.fragments.actions;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
@@ -36,6 +35,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
 import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
 import com.fusionx.uiircinterface.ServerCommandSender;
@@ -43,19 +43,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
-    private IRCActionsCallback mCallbacks;
     private FragmentType type;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallbacks = (IRCActionsCallback) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() +
-                    " must implement IRCActionsCallback");
-        }
-    }
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
@@ -65,18 +53,31 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
         final MergeAdapter mergeAdapter = new MergeAdapter();
         final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),
                 getResources().getStringArray(R.array.server_actions));
         final UserChannelActionsAdapter channelAdapter = new UserChannelActionsAdapter
                 (getActivity());
+
         final View serverHeader = inflater.inflate(R.layout.sliding_menu_header, null);
-        TextView textView = (TextView) serverHeader.findViewById(R.id
+        final TextView textView = (TextView) serverHeader.findViewById(R.id
                 .sliding_menu_heading_textview);
-        textView.setText("Server");
+        textView.setText(getActivity().getString(R.string.server));
+
         final View otherHeader = inflater.inflate(R.layout.sliding_menu_header, null);
+        final TextView otherTextView = (TextView) otherHeader.findViewById(R.id
+                .sliding_menu_heading_textview);
+
+        if (type == null || type.equals(FragmentType.Server)) {
+            otherHeader.setVisibility(View.GONE);
+            channelAdapter.setServerVisible();
+        } else if (type.equals(FragmentType.Channel)) {
+            otherTextView.setText(getActivity().getString(R.string.channel));
+        } else {
+            otherTextView.setText(getActivity().getString(R.string.user));
+        }
 
         mergeAdapter.addView(serverHeader);
         mergeAdapter.addAdapter(adapter);
@@ -85,16 +86,14 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
         setListAdapter(mergeAdapter);
 
-        final View view = (View) mergeAdapter.getItem(5);
-        view.setVisibility(View.GONE);
-        channelAdapter.setServerVisible();
-
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
                             final long l) {
+        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+
         switch (i) {
             case 1:
                 channelNameDialog();
@@ -103,36 +102,43 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                 nickChangeDialog();
                 break;
             case 3:
-                mCallbacks.disconnect();
+                final Server server = callback.getServer(true);
+                if (server == null) {
+                    callback.onDisconnect(true, false);
+                } else {
+                    ServerCommandSender.sendDisconnect(server, getActivity());
+                }
                 return;
             case 4:
                 ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
                 fragment.switchToIgnoreFragment();
                 return;
             case 6:
-                mCallbacks.closeOrPartCurrentTab();
+                callback.closeOrPartCurrentTab();
                 break;
         }
-        mCallbacks.closeAllSlidingMenus();
+        callback.closeAllSlidingMenus();
     }
 
     private void nickChangeDialog() {
+        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
         final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(),
-                mCallbacks.getNick()) {
+                callback.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendNickChange(mCallbacks.getServer(false), input);
+                ServerCommandSender.sendNickChange(callback.getServer(false), input);
             }
         };
         nickDialog.show();
     }
 
     private void channelNameDialog() {
+        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
         final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder
                 (getActivity()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendJoin(mCallbacks.getServer(false), input);
+                ServerCommandSender.sendJoin(callback.getServer(false), input);
             }
         };
         builder.show();
@@ -140,8 +146,9 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onOpen() {
-        if (mCallbacks.isConnectedToServer() != getServerAdapter().isConnected()) {
-            getServerAdapter().setConnected(mCallbacks.isConnectedToServer());
+        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+        if (callback.isConnectedToServer() != getServerAdapter().isConnected()) {
+            getServerAdapter().setConnected(callback.isConnectedToServer());
             getServerAdapter().notifyDataSetChanged();
         }
     }
@@ -159,34 +166,36 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         return (UserChannelActionsAdapter) getListAdapter().getAdapter(3);
     }
 
-    public void updateConnectionStatus() {
-        getServerAdapter().setConnected(mCallbacks.isConnectedToServer());
+    public void updateConnectionStatus(final boolean isConnected) {
+        getServerAdapter().setConnected(isConnected);
         getServerAdapter().notifyDataSetChanged();
     }
 
-    public void onTabChanged() {
-        if (mCallbacks.getCurrentFragmentType() != type) {
-            type = mCallbacks.getCurrentFragmentType();
-            final View view = (View) getListAdapter().getItem(5);
-            final TextView textView = (TextView) view.findViewById(R.id
-                    .sliding_menu_heading_textview);
-            switch (type) {
-                case Server:
-                    view.setVisibility(View.GONE);
-                    getUserChannelAdapter().setServerVisible();
-                    break;
-                case Channel:
-                    view.setVisibility(View.VISIBLE);
-                    textView.setText(getActivity().getString(R.string.channel));
-                    getUserChannelAdapter().setChannelVisible(true);
-                    break;
-                case User:
-                    view.setVisibility(View.VISIBLE);
-                    textView.setText(getActivity().getString(R.string.user));
-                    getUserChannelAdapter().setChannelVisible(false);
-                    break;
+    public void onTabChanged(final FragmentType selectedType) {
+        if (selectedType != type) {
+            type = selectedType;
+            if (getListAdapter() != null) {
+                final View view = (View) getListAdapter().getItem(5);
+                final TextView textView = (TextView) view.findViewById(R.id
+                        .sliding_menu_heading_textview);
+                switch (type) {
+                    case Server:
+                        view.setVisibility(View.GONE);
+                        getUserChannelAdapter().setServerVisible();
+                        break;
+                    case Channel:
+                        view.setVisibility(View.VISIBLE);
+                        textView.setText(getActivity().getString(R.string.channel));
+                        getUserChannelAdapter().setChannelVisible(true);
+                        break;
+                    case User:
+                        view.setVisibility(View.VISIBLE);
+                        textView.setText(getActivity().getString(R.string.user));
+                        getUserChannelAdapter().setChannelVisible(false);
+                        break;
+                }
+                getUserChannelAdapter().notifyDataSetChanged();
             }
-            getUserChannelAdapter().notifyDataSetChanged();
         }
     }
 
@@ -195,14 +204,12 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
         public void closeOrPartCurrentTab();
 
-        public FragmentType getCurrentFragmentType();
-
         public boolean isConnectedToServer();
 
         public Server getServer(boolean nullable);
 
         public void closeAllSlidingMenus();
 
-        public void disconnect();
+        public void onDisconnect(boolean expected, boolean retryPending);
     }
 }

@@ -104,6 +104,10 @@ public class MessageSender {
     Start of sending messages
      */
     public void sendServerChannelMessage(final Bundle event) {
+        final Message message = Message.obtain();
+        message.setData(event);
+        ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
+
         if (fragmentSideHandlerInterface != null) {
             final Message fragmentMessage = Message.obtain();
             fragmentMessage.setData(event);
@@ -197,14 +201,22 @@ public class MessageSender {
 
     public void sendServerConnection(final String connectionLine) {
         final Bundle connectEvent = Utils.parcelDataForBroadcast(null,
-                ServerEventType.Connected, connectionLine);
-        sendServerMessage(connectEvent);
+                ServerChannelEventType.Connected, connectionLine);
+        sendServerChannelMessage(connectEvent);
     }
 
-    public void sendServerDisconnection(final String disconnectLine) {
+    public void sendFinalDisconnection(final String disconnectLine,
+                                       final boolean expectedDisconnect) {
         final Bundle disconnectEvent = Utils.parcelDataForBroadcast(null,
-                ServerEventType.Disconnected, disconnectLine);
-        sendServerMessage(disconnectEvent);
+                ServerChannelEventType.FinalDisconnected, disconnectLine);
+        disconnectEvent.putBoolean(EventBundleKeys.disconnectSentByUser, expectedDisconnect);
+        sendServerChannelMessage(disconnectEvent);
+    }
+
+    public void sendRetryPendingServerDisconnection(final String disconnectLine) {
+        final Bundle disconnectEvent = Utils.parcelDataForBroadcast(null,
+                ServerChannelEventType.RetryPendingDisconnected, disconnectLine);
+        sendServerChannelMessage(disconnectEvent);
     }
 
     public void sendChanelJoined(final String channelName) {

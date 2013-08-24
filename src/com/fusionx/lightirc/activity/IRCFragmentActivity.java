@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.activity;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,7 +52,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.fragments.ServiceFragment;
 import com.fusionx.lightirc.fragments.UserListFragment;
 import com.fusionx.lightirc.fragments.actions.ActionsPagerFragment;
-import com.fusionx.lightirc.fragments.actions.IRCActionsFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCPagerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
@@ -70,12 +70,11 @@ import java.util.Iterator;
  */
 public class IRCFragmentActivity extends FragmentActivity implements UserListFragment
         .UserListCallback, FragmentSideHandlerInterface, ServiceFragment.ServiceFragmentCallback,
-        ActionsPagerFragment.ActionsPagerFragmentCallback, IRCActionsFragment.IRCActionsCallback,
-        IRCPagerFragment.IRCPagerInterface {
+        ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
     private ServiceFragment mServiceFragment = null;
     private UserListFragment mUserFragment = null;
-    private IRCPagerFragment mPagerFragment = null;
+    private IRCPagerFragment mIRCPagerFragment = null;
     private ActionsPagerFragment mActionsPagerFragment = null;
 
     private String mServerTitle = null;
@@ -147,12 +146,12 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
 
     @Override
     public void setUpViewPager() {
-        mPagerFragment = (IRCPagerFragment) getSupportFragmentManager()
+        mIRCPagerFragment = (IRCPagerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.pager_fragment);
-        mPagerFragment.createServerFragment();
+        mIRCPagerFragment.createServerFragment();
 
         final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        mPagerFragment.setTabStrip(tabs);
+        mIRCPagerFragment.setTabStrip(tabs);
         tabs.setOnPageChangeListener(mListener);
         tabs.setBackgroundResource(R.color.sliding_menu_background);
         tabs.setTextColorResource(android.R.color.white);
@@ -168,14 +167,33 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
                 case Join:
-                    mPagerFragment.createChannelFragment(message, true);
-                    break;
+                    mIRCPagerFragment.createChannelFragment(message, true);
+                    return;
                 case NewPrivateMessage:
                     createPMFragment(message);
+                    return;
+                case Connected:
+                    connectedToServer();
+                    break;
+                case RetryPendingDisconnected:
+                    onDisconnect(false, true);
+                    break;
+                case FinalDisconnected:
+                    onDisconnect(bundle.getBoolean(EventBundleKeys.disconnectSentByUser, true),
+                            false);
                     break;
             }
+            mIRCPagerFragment.writeMessageToServer(message);
         }
     };
+
+    /**
+     * Method called when the server reports that it has been connected to
+     */
+    private void connectedToServer() {
+        mIRCPagerFragment.connectedToServer();
+        mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
+    }
 
     // Options Menu stuff
     @Override
@@ -186,8 +204,8 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(getCurrentFragmentType()
-                .equals(FragmentType.Channel) && mUserSlidingMenu != null);
+        menu.getItem(0).setVisible(FragmentType.Channel
+                .equals(mIRCPagerFragment.getCurrentType()) && mUserSlidingMenu != null);
         return true;
     }
 
@@ -199,7 +217,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
-                    mUserFragment.onMenuOpened(mPagerFragment.getCurrentTitle());
+                    mUserFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
                 }
                 mUserSlidingMenu.toggle();
                 return true;
@@ -248,7 +266,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
      */
     @Override
     public void createPMFragment(final String userNick) {
-        mPagerFragment.createPMFragment(userNick);
+        mIRCPagerFragment.createPMFragment(userNick);
     }
 
     /**
@@ -270,7 +288,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     @Override
     public boolean isConnectedToServer() {
         final Server server = getServer(true);
-        return server != null && server.getStatus().equals(getString(R.string.status_connected));
+        return server != null && server.isConnected(this);
     }
 
     /**
@@ -280,7 +298,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
      */
     @Override
     public void updateUserList(final String channelName) {
-        if (channelName.equals(mPagerFragment.getCurrentTitle())) {
+        if (channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
             mUserFragment.updateUserList();
         }
     }
@@ -291,34 +309,54 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
      * @param channelName - name of the channel to create
      */
     private void createChannelFragment(final String channelName) {
-        mPagerFragment.createChannelFragment(channelName, false);
+        mIRCPagerFragment.createChannelFragment(channelName, false);
     }
 
-    /**
-     * Method called when the server disconnects unexpectedly - this could be due to
-     * loss of connection or for some reason the server has kicked us out
-     */
     @Override
-    public void onUnexpectedDisconnect() {
-        closeAllSlidingMenus();
-        mPagerFragment.disconnect();
+    public void onDisconnect(final boolean expected, final boolean retryPending) {
+        if (expected && !retryPending) {
+            if (getServer(true) != null) {
+                final AsyncTask<Void, Void, Void> disconnect = new AsyncTask<Void,
+                        Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mServiceFragment.removeServiceReference();
+                        return null;
+                    }
+                };
+                disconnect.execute();
+            }
+            final Intent intent = new Intent(this, MainServerListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        } else if (!expected && retryPending) {
+            closeAllSlidingMenus();
+            mIRCPagerFragment.onUnexpectedDisconnect();
+            mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
+        } else if (!expected) {
+            closeAllSlidingMenus();
+            mIRCPagerFragment.onUnexpectedDisconnect();
 
-        if (getServer(true) != null) {
-            final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... voids) {
-                    mServiceFragment.removeServiceReference();
-                    return null;
-                }
+            if (getServer(true) != null) {
+                final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void,
+                        Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mServiceFragment.removeServiceReference();
+                        return null;
+                    }
 
-                @Override
-                protected void onPostExecute(Void aVoid) {
-                    mActionsPagerFragment.updateConnectionStatus();
-                }
-            };
-            unexpectedDisconnect.execute();
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
+                    }
+                };
+                unexpectedDisconnect.execute();
+            } else {
+                mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
+            }
         } else {
-            mActionsPagerFragment.updateConnectionStatus();
+            throw new IllegalArgumentException();
         }
     }
 
@@ -332,7 +370,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
      */
     @Override
     public void onUserMention(final ArrayList<ChannelUser> users) {
-        mPagerFragment.onMentionRequested(users);
+        mIRCPagerFragment.onMentionRequested(users);
 
         closeAllSlidingMenus();
     }
@@ -350,49 +388,24 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     }
 
     /**
-     * Called when a disconnect is requested by the user
-     */
-    @Override
-    public void disconnect() {
-        mServiceFragment.disconnect();
-    }
-
-    /**
      * Close the currently displayed PM or part the currently displayed channel
      */
     @Override
     public void closeOrPartCurrentTab() {
         final Server server = getServer(false);
-        if (getCurrentFragmentType().equals(FragmentType.User)) {
-            ServerCommandSender.sendClosePrivateMessage(server, mPagerFragment.getCurrentTitle());
+        if (FragmentType.User.equals(mIRCPagerFragment.getCurrentType())) {
+            ServerCommandSender.sendClosePrivateMessage(server, mIRCPagerFragment.getCurrentTitle());
 
-            mPagerFragment.switchFragmentAndRemove(mPagerFragment.getCurrentTitle());
+            mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
         } else {
-            ServerCommandSender.sendPart(server, mPagerFragment.getCurrentTitle(),
+            ServerCommandSender.sendPart(server, mIRCPagerFragment.getCurrentTitle(),
                     getApplicationContext());
         }
     }
 
     /**
-     * Returns the type of the currently displayed fragment in the ViewPager
-     *
-     * @return - the type of fragment
-     */
-    @Override
-    public FragmentType getCurrentFragmentType() {
-        return mPagerFragment.getCurrentType();
-    }
-
-    /**
      * Start of the ServerFragment callbacks
      */
-    /**
-     * Method called when the server reports that it has been connected to
-     */
-    @Override
-    public void connectedToServer() {
-        mActionsPagerFragment.updateConnectionStatus();
-    }
 
     @Override
     public Handler getServerChannelHandler() {
@@ -401,16 +414,19 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
 
     @Override
     public Handler getFragmentHandler(String destination, FragmentType type) {
-        return mPagerFragment.getFragmentHandler(destination, type);
+        return mIRCPagerFragment.getFragmentHandler(destination, type);
     }
 
     public void mention(final String destination) {
         final String message = String.format(getString(R.string.activity_mentioned), destination);
         final Toast toast = new Toast(this);
+
         final View view = getLayoutInflater().inflate(R.layout.toast_mention,
                 (ViewGroup) findViewById(R.id.toast_layout_root));
+
         final TextView textView = (TextView) view.findViewById(R.id.toast_text);
         textView.setText(message);
+
         toast.setView(view);
         toast.setGravity(Gravity.TOP, 0, 0);
         toast.show();
@@ -426,17 +442,17 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
             invalidateOptionsMenu();
             closeAllSlidingMenus();
 
-            mActionsPagerFragment.onPageChanged();
+            mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
 
             if (getResources().getBoolean(R.bool.isTablet)) {
-                mUserFragment.onMenuOpened(mPagerFragment.getCurrentTitle());
+                mUserFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
             }
 
             if (mUserFragment.getMode() != null) {
                 mUserFragment.getMode().finish();
             }
 
-            mPagerFragment.setCurrentItemIndex(position);
+            mIRCPagerFragment.setCurrentItemIndex(position);
         }
     }
 }

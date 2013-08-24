@@ -53,7 +53,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         return inflater.inflate(R.layout.view_pager, container);
     }
 
@@ -130,7 +131,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
         }
     }
 
-    public void disconnect() {
+    public void onUnexpectedDisconnect() {
         mViewPager.setCurrentItem(0, true);
 
         mAdapter.removeAllButServer();
@@ -160,18 +161,20 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
     }
 
     @Override
-    public void connectedToServer() {
-        mCallback.connectedToServer();
-    }
-
-    @Override
-    public void onUnexpectedDisconnect() {
-        mCallback.onUnexpectedDisconnect();
-    }
-
-    @Override
     public Server getServer(boolean nullAllowed) {
         return mCallback.getServer(nullAllowed);
+    }
+
+    public void connectedToServer() {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(mCallback
+                .getServerTitle(), FragmentType.Server);
+        fragment.onConnectedToServer();
+    }
+
+    public void writeMessageToServer(final String message) {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(mCallback
+                .getServerTitle(), FragmentType.Server);
+        fragment.appendToTextView(message + "\n");
     }
 
     public interface IRCPagerInterface {
@@ -180,9 +183,5 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
         public void updateUserList(String channelName);
 
         public Server getServer(boolean nullAllowed);
-
-        public void connectedToServer();
-
-        public void onUnexpectedDisconnect();
     }
 }

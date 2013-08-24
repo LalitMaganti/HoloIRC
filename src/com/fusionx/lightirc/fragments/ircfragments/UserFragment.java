@@ -85,7 +85,8 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        MessageParser.userMessageToParse(mCallback.getServer(false), title, message);
+        MessageParser.userMessageToParse(getActivity(), mCallback.getServer(false), title,
+                message);
     }
 
     public interface UserFragmentCallbacks {

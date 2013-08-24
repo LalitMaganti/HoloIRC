@@ -26,7 +26,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -108,26 +107,15 @@ public class IRCBridgeService extends Service {
             connectionManager.disconnectAll();
         }
 
+        if (serverDisplayed != null) {
+            final Intent intent = new Intent(this,
+                    MainServerListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            serverDisplayed = null;
+        }
+
         stopForeground(true);
-    }
-
-    public void disconnectFromServer(final String serverName) {
-        final AsyncTask<Void, Void, Void> disconnectTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(final Void... strings) {
-                connectionManager.get(serverName).disconnectFromServer(IRCBridgeService.this);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(final Void server) {
-                connectionManager.remove(serverName);
-                if (connectionManager.isEmpty()) {
-                    stopForeground(true);
-                }
-            }
-        };
-        disconnectTask.execute();
     }
 
     @Synchronized

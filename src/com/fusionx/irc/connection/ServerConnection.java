@@ -29,7 +29,7 @@ import com.fusionx.irc.AppUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.UserChannelInterface;
-import com.fusionx.irc.enums.ServerEventType;
+import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.parser.ServerConnectionParser;
 import com.fusionx.irc.parser.ServerLineParser;
 import com.fusionx.irc.writers.ServerWriter;
@@ -48,6 +48,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 class ServerConnection {
     @Getter(AccessLevel.PACKAGE)
@@ -57,21 +58,47 @@ class ServerConnection {
     private final ServerConfiguration serverConfiguration;
     private Socket mSocket;
 
+    private ServerLineParser parser;
+
+    @Setter(AccessLevel.PACKAGE)
     private boolean disconnectSent = false;
 
-    ServerConnection(final ServerConfiguration configuration, final Context context) {
-        server = new Server(configuration.getTitle());
+    private int timesToTry;
+    private int reconnectAttempts = 0;
+
+    ServerConnection(final ServerConfiguration configuration, final Context context,
+                     final ConnectionWrapper wrapper) {
+        server = new Server(configuration.getTitle(), wrapper);
         serverConfiguration = configuration;
         mContext = context;
     }
 
     void connectToServer() {
-        final int timesToTry = Utils.getNumberOfReconnectEvents(mContext);
-        int reconnectAttempts = 0;
+        timesToTry = Utils.getNumberOfReconnectEvents(mContext);
+        reconnectAttempts = 0;
 
-        while (reconnectAttempts < timesToTry && !disconnectSent) {
-            connect();
-            ++reconnectAttempts;
+        connect();
+
+        while (true) {
+            final MessageSender sender = MessageSender.getSender(server.getTitle());
+            if (!disconnectSent) {
+                if(reconnectAttempts < timesToTry) {
+                    sender.sendGenericServerEvent("Trying to " +
+                            "reconnect to the server in 5 seconds.");
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
+                        break;
+                    }
+                    connect();
+                } else {
+                    break;
+                }
+                ++reconnectAttempts;
+            } else {
+                break;
+            }
         }
     }
 
@@ -111,11 +138,11 @@ class ServerConnection {
                     serverConfiguration.getNickStorage());
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerEventType.Connected, String.format(mContext
+                    ServerChannelEventType.Connected, String.format(mContext
                     .getString(R.string.parser_connected),
                     serverConfiguration.getUrl()));
 
-            sender.sendServerMessage(event);
+            sender.sendServerChannelMessage(event);
 
             server.setStatus(mContext.getString(R.string.status_connected));
 
@@ -132,38 +159,38 @@ class ServerConnection {
                     server.getWriter().joinChannel(channelName);
                 }
 
-                final ServerLineParser parser = new ServerLineParser(mContext, server);
+                parser = new ServerLineParser(mContext, server);
                 parser.parseMain(reader);
-            } else {
-                // An error has occurred - TODO - find out which
+
+                if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
+                    sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
+                } else {
+                    sender.sendRetryPendingServerDisconnection("Disconnected from the server");
+                }
             }
         } catch (final IOException ex) {
-            final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerEventType.Error, ex.getMessage());
-            sender.sendServerMessage(event);
-
-            server.setStatus(mContext.getString(R.string.status_disconnected));
-            closeSocket();
-            return;
+            if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
+                sender.sendFinalDisconnection(ex.getMessage() + "\n" + "Disconnected" +
+                        " from the server", disconnectSent);
+            } else {
+                sender.sendRetryPendingServerDisconnection(ex.getMessage());
+            }
         }
-
-        final Bundle event = Utils.parcelDataForBroadcast(null,
-                ServerEventType.Error, "Disconnected from the server");
-        sender.sendServerMessage(event);
-
         server.setStatus(mContext.getString(R.string.status_disconnected));
         closeSocket();
     }
 
     public void disconnectFromServer() {
         disconnectSent = true;
+        parser.setDisconnectSent(true);
         server.getWriter().quitServer(Utils.getQuitReason(mContext));
-        closeSocket();
     }
 
     public void closeSocket() {
         try {
-            mSocket.close();
+            if (mSocket != null) {
+                mSocket.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

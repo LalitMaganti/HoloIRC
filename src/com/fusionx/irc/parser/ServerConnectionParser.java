@@ -40,7 +40,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.fusionx.common.Utils.parcelDataForBroadcast;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
@@ -70,9 +69,6 @@ public class ServerConnectionParser {
                     break;
                 case ServerCommands.Error:
                     // We are finished - the server has kicked us out for some reason
-                    final Bundle event = parcelDataForBroadcast(null,
-                            ServerEventType.Error, parsedArray.get(1));
-                    sender.sendServerMessage(event);
                     return null;
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {

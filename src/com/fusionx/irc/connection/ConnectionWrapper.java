@@ -36,7 +36,7 @@ public class ConnectionWrapper extends Thread {
     private final ServerConnection connection;
 
     public ConnectionWrapper(final ServerConfiguration configuration, final Context context) {
-        connection = new ServerConnection(configuration, context);
+        connection = new ServerConnection(configuration, context, this);
         server = connection.getServer();
     }
 
@@ -51,13 +51,12 @@ public class ConnectionWrapper extends Thread {
     }
 
     public void disconnectFromServer(final Context context) {
-        final Server server = getServer();
         final String status = server.getStatus();
-        server.setStatus(context.getString(R.string.status_disconnected));
 
         if (status.equals(context.getString(R.string.status_connected))) {
             connection.disconnectFromServer();
         } else if (isAlive()) {
+            connection.setDisconnectSent(true);
             interrupt();
             connection.closeSocket();
         }

@@ -22,15 +22,12 @@
 package com.fusionx.irc.parser;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.common.Utils;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.ServerCommands;
-import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.listeners.CoreListener;
-import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,13 +37,16 @@ import java.util.ArrayList;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
-import static com.fusionx.common.Utils.parcelDataForBroadcast;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 
 @Getter(AccessLevel.PACKAGE)
 public class ServerLineParser {
     private final Server server;
+
+    @Setter
+    private boolean disconnectSent;
 
     @Getter(AccessLevel.NONE)
     private final ServerCodeParser codeParser;
@@ -69,8 +69,8 @@ public class ServerLineParser {
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                final ServerEventType type = parseLine(line);
-                if (ServerEventType.Error.equals(type)) {
+                final boolean quit = parseLine(line);
+                if (quit) {
                     return;
                 }
             }
@@ -83,30 +83,27 @@ public class ServerLineParser {
      * Parses a line from the server
      *
      * @param line - the raw line from the server
-     * @return returns an event if there is an error - otherwise returns null
+     * @return - returns a boolean which indicates whether the server has disconnected
      */
-    ServerEventType parseLine(final String line) {
+    boolean parseLine(final String line) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
         switch (parsedArray.get(0)) {
             case ServerCommands.Ping:
                 // Immediately return
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(server.getWriter(), source);
-                return null;
+                return false;
             case ServerCommands.Error:
                 // We are finished - the server has kicked us out for some reason
-                final Bundle event = parcelDataForBroadcast(null,
-                        ServerEventType.Error, parsedArray.get(1));
-                MessageSender.getSender(server.getTitle()).sendServerMessage(event);
-                return ServerEventType.Error;
+                return true;
             default:
                 // Check if the second thing is a code or a command
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
                     codeParser.parseCode(parsedArray);
+                    return false;
                 } else {
-                    commandParser.parseCommand(parsedArray, line);
+                    return commandParser.parseCommand(parsedArray, line, disconnectSent);
                 }
-                return null;
         }
     }
 }

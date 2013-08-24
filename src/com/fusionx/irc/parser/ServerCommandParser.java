@@ -56,7 +56,8 @@ public class ServerCommandParser {
     }
 
     // The server is sending a command to us - parse what it is
-    void parseCommand(final ArrayList<String> parsedArray, final String rawLine) {
+    boolean parseCommand(final ArrayList<String> parsedArray, final String rawLine,
+                         final boolean disconnectSent) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -69,31 +70,31 @@ public class ServerCommandParser {
                 } else {
                     parsePRIVMSGCommand(parsedArray, rawSource);
                 }
-                return;
+                return false;
             case "JOIN":
                 parseChannelJoin(parsedArray, rawSource);
-                return;
+                return false;
             case "NOTICE":
                 parseNotice(parsedArray, rawSource);
-                return;
+                return false;
             case "PART":
-                parseChannelPart(parsedArray, rawSource);
-                return;
+                parseChannelPart(parsedArray, rawSource, disconnectSent);
+                return false;
             case "MODE":
                 parseModeChange(parsedArray, rawSource);
-                return;
+                return false;
             case "QUIT":
-                parseServerQuit(parsedArray, rawSource);
-                return;
+                return parseServerQuit(parsedArray, rawSource);
             case "NICK":
                 parseNickChange(parsedArray, rawSource);
-                return;
+                return false;
             case "TOPIC":
                 parseTopicChange(parsedArray, rawSource);
-                return;
+                return false;
             default:
-                Log.v(LOG_TAG, rawLine);
                 // Not sure what to do here - TODO
+                Log.v(LOG_TAG, rawLine);
+                return false;
         }
     }
 
@@ -179,7 +180,7 @@ public class ServerCommandParser {
         final String oldNick = user.getColorfulNick();
         user.setNick(parsedArray.get(2));
 
-        String message = user instanceof AppUser ?
+        final String message = user instanceof AppUser ?
                 String.format(mContext.getString(R.string.parser_appuser_nick_changed),
                         oldNick, user.getColorfulNick()) :
                 String.format(mContext.getString(R.string.parser_other_user_nick_change),
@@ -233,13 +234,13 @@ public class ServerCommandParser {
         }
     }
 
-    private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
+    private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource,
+                                  final boolean disconnectSent) {
         final String channelName = parsedArray.get(2);
 
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        if (user.equals(mServer.getUser())) {
-            Log.e(LOG_TAG, Utils.convertArrayListToString(parsedArray));
+        if (user.equals(mServer.getUser()) && !disconnectSent) {
             mSender.sendChanelParted(channelName);
             mUserChannelInterface.removeChannel(channel);
         } else {
@@ -255,11 +256,11 @@ public class ServerCommandParser {
         }
     }
 
-    private void parseServerQuit(final ArrayList<String> parsedArray, final String rawSource) {
+    private boolean parseServerQuit(final ArrayList<String> parsedArray, final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         if (user.equals(mServer.getUser())) {
             // TODO - improve this
-            mSender.sendServerDisconnection("");
+            return true;
         } else {
             for (final Channel channel : mUserChannelInterface.removeUser(user)) {
                 final String message = String.format(mContext.getString(R.string.parser_quit_server),
@@ -270,6 +271,7 @@ public class ServerCommandParser {
                                         StringUtils.remove(parsedArray.get(2), "\"")) : "");
                 mSender.sendGenericUserListChangedEvent(channel.getName(), message);
             }
+            return false;
         }
     }
 }

@@ -26,6 +26,9 @@ public class EventBundleKeys {
     public final static String eventType = "eventType";
     public final static String message = "message";
 
+    // Only used by disconnect event
+    public final static String disconnectSentByUser = "disconnectExpected";
+
     private EventBundleKeys() {
     }
 }

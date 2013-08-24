@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * This entire class needs full parsing
  */
 public class MessageParser {
-    public static void channelMessageToParse(final Context callbacks, final Server server,
+    public static void channelMessageToParse(final Context context, final Server server,
                                              final String channelName, final String message) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
@@ -47,7 +47,7 @@ public class MessageParser {
                 case "/p":
                     if (parsedArray.size() == 0) {
                         ServerCommandSender.sendPart(server, channelName,
-                                callbacks.getApplicationContext());
+                                context.getApplicationContext());
                     } else {
                         ServerCommandSender.sendUnknownEvent(server, message);
                     }
@@ -61,7 +61,7 @@ public class MessageParser {
                     }
                     break;
                 default:
-                    serverCommandToParse(server, message);
+                    serverCommandToParse(context, server, message);
                     break;
             }
         } else {
@@ -69,8 +69,8 @@ public class MessageParser {
         }
     }
 
-    public static void userMessageToParse(final Server server, final String userNick,
-                                          final String message) {
+    public static void userMessageToParse(final Context context, final Server server,
+                                          final String userNick, final String message) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
 
@@ -90,7 +90,7 @@ public class MessageParser {
                     }
                     break;
                 default:
-                    serverCommandToParse(server, message);
+                    serverCommandToParse(context, server, message);
                     break;
             }
         } else {
@@ -98,16 +98,16 @@ public class MessageParser {
         }
     }
 
-    public static void serverMessageToParse(final Server server,
+    public static void serverMessageToParse(final Context context, final Server server,
                                             final String message) {
         if (message.startsWith("/")) {
-            serverCommandToParse(server, message);
+            serverCommandToParse(context, server, message);
         } else {
             ServerCommandSender.sendUnknownEvent(server, message);
         }
     }
 
-    private static void serverCommandToParse(final Server server,
+    private static void serverCommandToParse(final Context context, final Server server,
                                              final String rawLine) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
@@ -142,7 +142,7 @@ public class MessageParser {
                 break;
             case "/quit":
                 if (parsedArray.size() == 0) {
-                    //callbacks.disconnect();
+                    ServerCommandSender.sendDisconnect(server, context);
                 } else {
                     ServerCommandSender.sendUnknownEvent(server, rawLine);
                 }
