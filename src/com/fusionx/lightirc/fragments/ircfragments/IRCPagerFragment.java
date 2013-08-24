@@ -174,7 +174,9 @@ public class IRCPagerFragment extends Fragment implements ServerFragment
     public void writeMessageToServer(final String message) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(mCallback
                 .getServerTitle(), FragmentType.Server);
-        fragment.appendToTextView(message + "\n");
+        if(fragment != null) {
+            fragment.appendToTextView(message + "\n");
+        }
     }
 
     public interface IRCPagerInterface {

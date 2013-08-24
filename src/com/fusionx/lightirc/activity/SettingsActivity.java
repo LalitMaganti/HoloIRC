@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.activity;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
@@ -34,17 +35,18 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         setTheme(Utils.getThemeInt(this));
 
-        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-        alertDialog.setTitle("Warning");
-        alertDialog.setMessage("Modifying these settings while connected to server can cause " +
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Modifying these settings while connected to server can cause " +
                 "unexpected behaviour - this is not a bug. It is strongly recommended that you " +
-                "close any connections before modifying these settings.");
-        alertDialog.setCancelable(false);
-        alertDialog.show();
-
-        super.onCreate(savedInstanceState);
+                "close any connections before modifying these settings.").setTitle("Warning")
+                .setCancelable(false)
+                .setPositiveButton(getString(android.R.string.ok), null);
+        final AlertDialog alert = builder.create();
+        alert.show();
     }
 
     @Override
