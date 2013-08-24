@@ -30,12 +30,11 @@ import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.uiircinterface.MessageParser;
 
 public class UserFragment extends IRCFragment {
-    private CommonCallbacks mCallback;
+    private UserFragmentCallbacks mCallback;
 
     private final Handler userFragmentHandler = new Handler() {
         @Override
@@ -67,10 +66,10 @@ public class UserFragment extends IRCFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (CommonCallbacks) activity;
+            mCallback = (UserFragmentCallbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() +
-                    " must implement PMFragmentCallbacks");
+                    " must implement UserFragmentCallbacks");
         }
     }
 
@@ -86,6 +85,10 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        MessageParser.userMessageToParse(mCallback, title, message);
+        MessageParser.userMessageToParse(mCallback.getServer(false), title, message);
+    }
+
+    public interface UserFragmentCallbacks {
+        public Server getServer(boolean nullable);
     }
 }

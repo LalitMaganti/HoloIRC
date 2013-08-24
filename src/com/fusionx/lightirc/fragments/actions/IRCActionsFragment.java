@@ -31,10 +31,10 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.commonsware.cwac.merge.MergeAdapter;
+import com.fusionx.irc.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
 import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
@@ -106,7 +106,8 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                 mCallbacks.disconnect();
                 return;
             case 4:
-                mCallbacks.switchToIgnoreFragment();
+                ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
+                fragment.switchToIgnoreFragment();
                 return;
             case 6:
                 mCallbacks.closeOrPartCurrentTab();
@@ -150,11 +151,11 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         return (MergeAdapter) super.getListAdapter();
     }
 
-    public ServerActionsAdapter getServerAdapter() {
+    private ServerActionsAdapter getServerAdapter() {
         return (ServerActionsAdapter) getListAdapter().getAdapter(1);
     }
 
-    public UserChannelActionsAdapter getUserChannelAdapter() {
+    private UserChannelActionsAdapter getUserChannelAdapter() {
         return (UserChannelActionsAdapter) getListAdapter().getAdapter(3);
     }
 
@@ -189,13 +190,19 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         }
     }
 
-    public interface IRCActionsCallback extends CommonCallbacks {
+    public interface IRCActionsCallback {
         public String getNick();
 
         public void closeOrPartCurrentTab();
 
         public FragmentType getCurrentFragmentType();
 
-        public void switchToIgnoreFragment();
+        public boolean isConnectedToServer();
+
+        public Server getServer(boolean nullable);
+
+        public void closeAllSlidingMenus();
+
+        public void disconnect();
     }
 }

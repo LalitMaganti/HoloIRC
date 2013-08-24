@@ -37,9 +37,9 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 
 import com.fusionx.irc.ChannelUser;
+import com.fusionx.irc.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.uiircinterface.ServerCommandSender;
 
 import java.util.ArrayList;
@@ -209,9 +209,13 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return !mListener.getServer(false).getUser().getNick().equals(nick);
     }
 
-    public interface UserListCallback extends CommonCallbacks {
+    public interface UserListCallback {
         public void onUserMention(final ArrayList<ChannelUser> users);
 
         public void createPMFragment(final String userNick);
+
+        public Server getServer(boolean nullable);
+
+        public void closeAllSlidingMenus();
     }
 }

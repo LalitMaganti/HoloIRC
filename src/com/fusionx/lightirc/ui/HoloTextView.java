@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 
 public class HoloTextView extends TextView {
     public HoloTextView(Context context) {

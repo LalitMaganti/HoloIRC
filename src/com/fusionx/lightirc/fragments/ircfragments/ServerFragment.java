@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.fragments.ircfragments;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,15 +28,13 @@ import android.os.Message;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.uiircinterface.MessageParser;
 
 import lombok.Getter;
 
 public class ServerFragment extends IRCFragment {
-    private ServerFragmentCallback mCallback;
-
     @Getter
     private final Handler serverFragHandler = new Handler() {
         @Override
@@ -46,17 +43,19 @@ public class ServerFragment extends IRCFragment {
             final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
             final String message = bundle.getString(EventBundleKeys.message);
+            final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                    ServerFragmentCallback.class);
             switch (type) {
                 case Connected:
-                    mCallback.connectedToServer();
+                    callback.connectedToServer();
                     mEditText.setEnabled(true);
                     break;
                 case Disconnected:
                 case Error:
-                    mCallback.onUnexpectedDisconnect();
+                    callback.onUnexpectedDisconnect();
                     break;
                 case NickInUse:
-                    mCallback.selectServerFragment();
+                    callback.selectServerFragment();
                     break;
             }
             appendToTextView(message + "\n");
@@ -67,9 +66,11 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        mEditText.setEnabled(mCallback.isConnectedToServer());
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                ServerFragmentCallback.class);
+        final Server server = callback.getServer(true);
+        mEditText.setEnabled(server != null && server.isConnected(getActivity()));
 
-        final Server server = mCallback.getServer(true);
         if (server != null) {
             writeToTextView(server.getBuffer());
         }
@@ -77,22 +78,20 @@ public class ServerFragment extends IRCFragment {
 
     @Override
     public void sendMessage(String message) {
-        MessageParser.serverMessageToParse(mCallback, message);
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                ServerFragmentCallback.class);
+        final Server server = callback.getServer(true);
+        MessageParser.serverMessageToParse(server, message);
     }
 
-    @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallback = (ServerFragmentCallback) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() +
-                    " must implement ServerFragmentCallback");
-        }
-    }
-
-    public interface ServerFragmentCallback extends CommonCallbacks {
+    public interface ServerFragmentCallback {
         public void connectedToServer();
+
+        public void onUnexpectedDisconnect();
+
+        public Server getServer(boolean nullable);
+
+        public void selectServerFragment();
     }
 
     @Override

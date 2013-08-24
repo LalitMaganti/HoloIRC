@@ -26,8 +26,8 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.PreferenceKeys;
 
 public class ServerChannelSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {

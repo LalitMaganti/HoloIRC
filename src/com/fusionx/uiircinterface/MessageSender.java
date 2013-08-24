@@ -32,7 +32,7 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.User;

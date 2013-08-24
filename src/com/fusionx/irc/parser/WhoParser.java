@@ -21,7 +21,7 @@
 
 package com.fusionx.irc.parser;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.UserChannelInterface;

@@ -24,6 +24,7 @@ package com.fusionx.lightirc.misc;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.misc.NickStorage;
 

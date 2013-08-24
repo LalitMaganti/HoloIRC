@@ -25,7 +25,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.UserChannelInterface;
@@ -35,7 +35,7 @@ import com.fusionx.uiircinterface.MessageSender;
 
 import java.util.ArrayList;
 
-import static com.fusionx.Utils.isMotdAllowed;
+import static com.fusionx.common.Utils.isMotdAllowed;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_ENDOFMOTD;

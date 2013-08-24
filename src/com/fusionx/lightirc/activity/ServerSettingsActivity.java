@@ -26,7 +26,7 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.fragments.serversetttings.BaseServerSettingsFragment;
 import com.fusionx.lightirc.fragments.serversetttings.ListViewSettingsFragment;

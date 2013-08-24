@@ -24,7 +24,7 @@ package com.fusionx.irc.connection;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.AppUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
@@ -57,13 +57,25 @@ class ServerConnection {
     private final ServerConfiguration serverConfiguration;
     private Socket mSocket;
 
+    private boolean disconnectSent = false;
+
     ServerConnection(final ServerConfiguration configuration, final Context context) {
         server = new Server(configuration.getTitle());
         serverConfiguration = configuration;
         mContext = context;
     }
 
-    void connectToServer() throws InterruptedException {
+    void connectToServer() {
+        final int timesToTry = Utils.getNumberOfReconnectEvents(mContext);
+        int reconnectAttempts = 0;
+
+        while (reconnectAttempts < timesToTry && !disconnectSent) {
+            connect();
+            ++reconnectAttempts;
+        }
+    }
+
+    private void connect() {
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         try {
             final SSLSocketFactory sslSocketFactory = (SSLSocketFactory)
@@ -112,7 +124,8 @@ class ServerConnection {
                 server.setUser(user);
 
                 if (StringUtils.isNotEmpty(serverConfiguration.getNickservPassword())) {
-                    server.getWriter().sendNickServPassword(serverConfiguration.getNickservPassword());
+                    server.getWriter().sendNickServPassword(serverConfiguration
+                            .getNickservPassword());
                 }
 
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {
@@ -130,15 +143,20 @@ class ServerConnection {
             sender.sendServerMessage(event);
 
             server.setStatus(mContext.getString(R.string.status_disconnected));
+            closeSocket();
             return;
         }
 
         final Bundle event = Utils.parcelDataForBroadcast(null,
-                ServerEventType.Error, "An unexpected error occured");
+                ServerEventType.Error, "Disconnected from the server");
         sender.sendServerMessage(event);
+
+        server.setStatus(mContext.getString(R.string.status_disconnected));
+        closeSocket();
     }
 
     public void disconnectFromServer() {
+        disconnectSent = true;
         server.getWriter().quitServer(Utils.getQuitReason(mContext));
         closeSocket();
     }

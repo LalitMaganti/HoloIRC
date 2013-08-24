@@ -21,10 +21,11 @@
 
 package com.fusionx.irc;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Message;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
@@ -32,6 +33,7 @@ import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.irc.handlerabstract.ServerHandler;
 import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.irc.writers.ServerWriter;
+import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 
@@ -148,5 +150,9 @@ public class Server implements IRCSideHandlerInterface {
     @Override
     public String getNick() {
         return getUser().getNick();
+    }
+
+    public boolean isConnected(final Context context) {
+        return status.equals(context.getString(R.string.status_connected));
     }
 }

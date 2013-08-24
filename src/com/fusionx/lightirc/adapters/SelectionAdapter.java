@@ -27,7 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightlibrary.adapters.TreeSetAdapter;
 
@@ -41,7 +41,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     public SelectionAdapter(final Context context, final SortedSet<T> objects) {
         super(context, R.layout.layout_text_list, (TreeSet<T>) objects);
 
-        for(int i = 0; i < objects.size(); i++) {
+        for (int i = 0; i < objects.size(); i++) {
             selectedItems.put(i, false);
         }
     }
@@ -96,8 +96,8 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      */
     public ArrayList<T> getSelectedItems() {
         final ArrayList<T> list = new ArrayList<>();
-        for(int i = 0; i < selectedItems.size(); i++) {
-            if(selectedItems.get(i)) {
+        for (int i = 0; i < selectedItems.size(); i++) {
+            if (selectedItems.get(i)) {
                 list.add(getItem(i));
             }
         }

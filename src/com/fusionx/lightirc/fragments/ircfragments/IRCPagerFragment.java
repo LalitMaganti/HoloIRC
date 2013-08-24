@@ -9,16 +9,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.fusionx.irc.ChannelUser;
+import com.fusionx.irc.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.IRCViewPager;
 
-public class IRCPagerFragment extends Fragment {
+import java.util.ArrayList;
+
+public class IRCPagerFragment extends Fragment implements ServerFragment
+        .ServerFragmentCallback, ChannelFragment.ChannelFragmentCallback {
     private IRCViewPager mViewPager = null;
-    private CommonCallbacks mCallback;
-    private IRCPagerAdapter mAdapter;
+    private IRCPagerInterface mCallback = null;
+    private IRCPagerAdapter mAdapter = null;
 
     /**
      * Hold a reference to the parent Activity so we can report the
@@ -30,7 +35,14 @@ public class IRCPagerFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        mCallback = (CommonCallbacks) activity;
+        mCallback = (IRCPagerInterface) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mCallback = null;
     }
 
     @Override
@@ -58,7 +70,7 @@ public class IRCPagerFragment extends Fragment {
         mViewPager.setAdapter(mAdapter);
     }
 
-    public IRCFragment getCurrentItem() {
+    private IRCFragment getCurrentItem() {
         return mAdapter.getItem(mViewPager.getCurrentItem());
     }
 
@@ -66,18 +78,33 @@ public class IRCPagerFragment extends Fragment {
         mViewPager.onNewPrivateMessage(userNick);
     }
 
+    /**
+     * Selects the ServerFragment regardless of what is currently selected
+     */
     public void selectServerFragment() {
         mViewPager.setCurrentItem(0, true);
     }
 
+    /**
+     * If the currently displayed fragment is the one being removed then switch
+     * to one tab back. Then remove the fragment regardless.
+     *
+     * @param fragmentTitle - name of the fragment to be removed
+     */
     public void switchFragmentAndRemove(final String fragmentTitle) {
         final int index = mAdapter.getIndexFromTitle(fragmentTitle);
-        if (getCurrentItem().getTitle().equals(fragmentTitle)) {
+        if (fragmentTitle.equals(getCurrentTitle())) {
             mViewPager.setCurrentItem(index - 1, true);
         }
         mAdapter.removeFragment(index);
     }
 
+    /**
+     * Method called when a new ChannelFragment is to be created
+     *
+     * @param channelName - name of the channel joined
+     * @param forceSwitch - whether the channel should be forcibly switched to
+     */
     public void createChannelFragment(final String channelName, final boolean forceSwitch) {
         final boolean switchToTab = channelName.equals(getActivity().getIntent().getStringExtra
                 ("mention")) || forceSwitch;
@@ -96,11 +123,66 @@ public class IRCPagerFragment extends Fragment {
         }
     }
 
-    public IRCViewPager getViewPager() {
-        return mViewPager;
+    public void onMentionRequested(final ArrayList<ChannelUser> users) {
+        if (getCurrentType().equals(FragmentType.Channel)) {
+            final ChannelFragment channel = (ChannelFragment) getCurrentItem();
+            channel.onUserMention(users);
+        }
     }
 
-    public IRCPagerAdapter getPagerAdapter() {
-        return mAdapter;
+    public void disconnect() {
+        mViewPager.setCurrentItem(0, true);
+
+        mAdapter.removeAllButServer();
+        mAdapter.disableAllEditTexts();
+    }
+
+    public String getCurrentTitle() {
+        return getCurrentItem().getTitle();
+    }
+
+    public FragmentType getCurrentType() {
+        return getCurrentItem().getType();
+    }
+
+    public void setCurrentItemIndex(final int position) {
+        mAdapter.setCurrentItemIndex(position);
+    }
+
+    public void setTabStrip(PagerSlidingTabStrip tabs) {
+        tabs.setViewPager(mViewPager);
+        mAdapter.setTabStrip(tabs);
+    }
+
+    @Override
+    public void updateUserList(String channelName) {
+        mCallback.updateUserList(channelName);
+    }
+
+    @Override
+    public void connectedToServer() {
+        mCallback.connectedToServer();
+    }
+
+    @Override
+    public void onUnexpectedDisconnect() {
+        mCallback.onUnexpectedDisconnect();
+    }
+
+    @Override
+    public Server getServer(boolean nullAllowed) {
+        return mCallback.getServer(nullAllowed);
+    }
+
+    public interface IRCPagerInterface {
+        public String getServerTitle();
+
+        public void updateUserList(String channelName);
+
+        public Server getServer(boolean nullAllowed);
+
+        public void connectedToServer();
+
+        public void onUnexpectedDisconnect();
     }
 }

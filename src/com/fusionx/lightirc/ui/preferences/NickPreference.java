@@ -13,9 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.irc.misc.NickStorage;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.PreferenceKeys;
 
 public class NickPreference extends DialogPreference implements TextWatcher {
     private EditText mFirstChoice;

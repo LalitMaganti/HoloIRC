@@ -25,7 +25,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.enums.ServerEventType;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-import static com.fusionx.Utils.parcelDataForBroadcast;
+import static com.fusionx.common.Utils.parcelDataForBroadcast;
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 
 @Getter(AccessLevel.PACKAGE)

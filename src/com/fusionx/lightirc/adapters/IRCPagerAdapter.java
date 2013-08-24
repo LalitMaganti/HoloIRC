@@ -32,7 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.fragments.ircfragments.IRCFragment;
 import com.fusionx.lightirc.fragments.ircfragments.ServerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
@@ -40,7 +40,6 @@ import com.fusionx.lightirc.misc.FragmentType;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.Setter;
 
@@ -60,7 +59,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     @Setter
     private PagerSlidingTabStrip tabStrip;
 
-    @Setter(AccessLevel.PUBLIC)
+    @Setter
     private int currentItemIndex;
 
     public IRCPagerAdapter(final FragmentManager fm) {

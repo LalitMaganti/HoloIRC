@@ -35,7 +35,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
@@ -61,7 +61,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setTheme(Utils.getThemeInt(getApplicationContext()));
+        setTheme(Utils.getThemeInt(this));
         setContentView(R.layout.activity_server_list);
 
         mServerCardsAdapter = new BuilderAdapter(this);

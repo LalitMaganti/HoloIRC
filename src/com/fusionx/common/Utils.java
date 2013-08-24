@@ -1,4 +1,4 @@
-package com.fusionx;
+package com.fusionx.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.PreferenceKeys;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,9 +44,9 @@ public class Utils {
         return preferences.getBoolean(PreferenceKeys.Motd, true);
     }
 
-    public static boolean isMessagesFromChannelShown(final Context applicationContext) {
+    public static boolean isMessagesFromChannelShown(final Context context) {
         final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(applicationContext);
+                .getDefaultSharedPreferences(context);
         return !preferences.getBoolean(PreferenceKeys.HideMessages, false);
     }
 
@@ -63,9 +62,9 @@ public class Utils {
         textView.setTypeface(font);
     }
 
-    public static String getPartReason(final Context applicationContext) {
+    public static String getPartReason(final Context context) {
         final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(applicationContext);
+                .getDefaultSharedPreferences(context);
         return preferences.getString(PreferenceKeys.PartReason, "");
     }
 
@@ -169,10 +168,16 @@ public class Utils {
         return Constants.channelPrefixes.contains(rawName.charAt(0));
     }
 
-    public static String getQuitReason(final Context applicationContext) {
+    public static String getQuitReason(final Context context) {
         final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(applicationContext);
+                .getDefaultSharedPreferences(context);
         return preferences.getString(PreferenceKeys.QuitReason, "");
+    }
+
+    public static int getNumberOfReconnectEvents(final Context context) {
+        final SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return preferences.getInt(PreferenceKeys.ReconnectTries, 3);
     }
 
     public static boolean areNicksEqual(final String firstNick, final String secondNick) {

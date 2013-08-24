@@ -24,7 +24,7 @@ package com.fusionx.uiircinterface;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;

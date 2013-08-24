@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.fragments.actions;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,10 +17,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.commonsware.cwac.merge.MergeAdapter;
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.IgnoreNickPromptDialogBuilder;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -29,26 +28,15 @@ import java.util.TreeSet;
 
 public class IgnoreListFragment extends ListFragment implements ActionMode.Callback,
         SlidingMenu.OnCloseListener, ListView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-    private IgnoreListCallback mCallbacks;
-
     private ActionMode mMode;
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        try {
-            mCallbacks = (IgnoreListCallback) activity;
-        } catch (ClassCastException ex) {
-            throw new ClassCastException(activity.toString() +
-                    " must implement IgnoreListCallback");
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final IgnoreListCallback callback = FragmentUtils.getParent(this,
+                IgnoreListCallback.class);
+
         final TreeSet<String> arrayList = new TreeSet<>(getActivity().getSharedPreferences
-                (mCallbacks.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).getStringSet
+                (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).getStringSet
                 (PreferenceKeys.IgnoreList, new TreeSet<String>()));
         final View serverHeader = inflater.inflate(R.layout.sliding_menu_header, null);
         final TextView textView = (TextView) serverHeader.findViewById(R.id
@@ -108,7 +96,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
         final int checkedItemCount = getIgnoreAdapter().getSelectedItemCount();
 
-        if(checkedItemCount != 0) {
+        if (checkedItemCount != 0) {
             actionMode.setTitle(checkedItemCount + " items checked");
         } else {
             actionMode.setTitle("");
@@ -138,12 +126,14 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
+        final IgnoreListCallback callback = FragmentUtils.getParent(this,
+                IgnoreListCallback.class);
         getIgnoreAdapter().clearSelection();
 
-        mCallbacks.switchToIRCActionFragment();
+        callback.switchToIRCActionFragment();
 
         final SharedPreferences.Editor preferences = getActivity().getSharedPreferences
-                (mCallbacks.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).edit();
+                (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).edit();
         preferences.putStringSet(PreferenceKeys.IgnoreList,
                 getIgnoreAdapter().getCopyOfItems());
         preferences.commit();
@@ -169,7 +159,9 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         return true;
     }
 
-    public interface IgnoreListCallback extends CommonCallbacks {
+    public interface IgnoreListCallback {
         public void switchToIRCActionFragment();
+
+        public String getServerTitle();
     }
 }

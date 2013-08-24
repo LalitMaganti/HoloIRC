@@ -21,7 +21,7 @@
 
 package com.fusionx.irc;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 
 import lombok.AccessLevel;
 import lombok.Data;

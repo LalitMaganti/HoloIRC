@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightlibrary.adapters.HackedArrayAdapter;
 

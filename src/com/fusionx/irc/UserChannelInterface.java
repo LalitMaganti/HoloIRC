@@ -23,7 +23,7 @@ package com.fusionx.irc;
 
 import android.content.Context;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.enums.UserLevel;
 import com.fusionx.irc.misc.IRCUserComparator;
 import com.fusionx.lightlibrary.collections.TwoWayHashSet;

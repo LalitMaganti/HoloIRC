@@ -21,18 +21,28 @@
 
 package com.fusionx.lightirc.activity;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 
 import java.util.List;
 
 public class SettingsActivity extends PreferenceActivity {
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Utils.getThemeInt(this));
+
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Warning");
+        alertDialog.setMessage("Modifying these settings while connected to server can cause " +
+                "unexpected behaviour - this is not a bug. It is strongly recommended that you " +
+                "close any connections before modifying these settings.");
+        alertDialog.setCancelable(false);
+        alertDialog.show();
 
         super.onCreate(savedInstanceState);
     }

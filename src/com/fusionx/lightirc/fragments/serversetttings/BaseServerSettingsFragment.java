@@ -19,13 +19,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.NickServPassword;
-import static com.fusionx.lightirc.misc.PreferenceKeys.Port;
-import static com.fusionx.lightirc.misc.PreferenceKeys.RealName;
-import static com.fusionx.lightirc.misc.PreferenceKeys.ServerPassword;
-import static com.fusionx.lightirc.misc.PreferenceKeys.ServerUserName;
-import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
-import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
+import static com.fusionx.common.PreferenceKeys.NickServPassword;
+import static com.fusionx.common.PreferenceKeys.Port;
+import static com.fusionx.common.PreferenceKeys.RealName;
+import static com.fusionx.common.PreferenceKeys.ServerPassword;
+import static com.fusionx.common.PreferenceKeys.ServerUserName;
+import static com.fusionx.common.PreferenceKeys.Title;
+import static com.fusionx.common.PreferenceKeys.URL;
 
 public class BaseServerSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {

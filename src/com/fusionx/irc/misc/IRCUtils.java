@@ -19,26 +19,12 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.interfaces;
+package com.fusionx.irc.misc;
 
-import android.content.Context;
+import com.fusionx.irc.enums.UserLevel;
 
-import com.fusionx.irc.Server;
-
-public interface CommonCallbacks {
-    public String getServerTitle();
-
-    public Context getApplicationContext();
-
-    public void disconnect();
-
-    public void closeAllSlidingMenus();
-
-    public boolean isConnectedToServer();
-
-    public void selectServerFragment();
-
-    public Server getServer(final boolean nullAllowed);
-
-    public void onUnexpectedDisconnect();
+public class IRCUtils {
+    public static boolean isUserOwnerOrVoice(final UserLevel level) {
+        return level.equals(UserLevel.OP) || level.equals(UserLevel.VOICE);
+    }
 }

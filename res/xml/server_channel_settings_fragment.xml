@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:custom="http://schemas.android.com/apk/lib/com.fusionx.lightlibrary">
 
     <PreferenceCategory android:title="Server Settings">
+        <com.fusionx.lightlibrary.preferences.NumberPickerDialogPreference
+                android:defaultValue="3"
+                android:dialogMessage="The number of times the app should try to reconnect to the server"
+                android:max="20"
+                android:title="Reconnect attempets"
+                custom:min="0" />
         <CheckBoxPreference
                 android:key="pref_motd"
                 android:defaultValue="true"

@@ -30,7 +30,7 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 
 public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface

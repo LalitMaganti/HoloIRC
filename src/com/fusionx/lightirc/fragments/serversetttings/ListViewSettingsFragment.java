@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
+import static com.fusionx.common.PreferenceKeys.AutoJoin;
 
 public class ListViewSettingsFragment extends ListFragment implements AbsListView
         .MultiChoiceModeListener, android.view.ActionMode.Callback,

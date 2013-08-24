@@ -24,7 +24,6 @@ package com.fusionx.irc.misc;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.enums.UserLevel;
-import com.fusionx.lightirc.misc.IRCUtils;
 
 import java.util.Comparator;
 

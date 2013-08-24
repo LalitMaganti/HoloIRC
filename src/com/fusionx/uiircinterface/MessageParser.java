@@ -21,9 +21,10 @@
 
 package com.fusionx.uiircinterface;
 
-import com.fusionx.Utils;
+import android.content.Context;
+
+import com.fusionx.common.Utils;
 import com.fusionx.irc.Server;
-import com.fusionx.lightirc.interfaces.CommonCallbacks;
 
 import java.util.ArrayList;
 
@@ -31,11 +32,10 @@ import java.util.ArrayList;
  * This entire class needs full parsing
  */
 public class MessageParser {
-    public static void channelMessageToParse(final CommonCallbacks callbacks,
+    public static void channelMessageToParse(final Context callbacks, final Server server,
                                              final String channelName, final String message) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
-        final Server server = callbacks.getServer(false);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -61,7 +61,7 @@ public class MessageParser {
                     }
                     break;
                 default:
-                    serverCommandToParse(callbacks, message);
+                    serverCommandToParse(server, message);
                     break;
             }
         } else {
@@ -69,11 +69,10 @@ public class MessageParser {
         }
     }
 
-    public static void userMessageToParse(final CommonCallbacks callbacks, final String userNick,
+    public static void userMessageToParse(final Server server, final String userNick,
                                           final String message) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
-        final Server server = callbacks.getServer(false);
 
         if (command.startsWith("/")) {
             switch (command) {
@@ -91,7 +90,7 @@ public class MessageParser {
                     }
                     break;
                 default:
-                    serverCommandToParse(callbacks, message);
+                    serverCommandToParse(server, message);
                     break;
             }
         } else {
@@ -99,21 +98,19 @@ public class MessageParser {
         }
     }
 
-    public static void serverMessageToParse(final CommonCallbacks callbacks,
+    public static void serverMessageToParse(final Server server,
                                             final String message) {
-        final Server server = callbacks.getServer(false);
         if (message.startsWith("/")) {
-            serverCommandToParse(callbacks, message);
+            serverCommandToParse(server, message);
         } else {
             ServerCommandSender.sendUnknownEvent(server, message);
         }
     }
 
-    private static void serverCommandToParse(final CommonCallbacks callbacks,
+    private static void serverCommandToParse(final Server server,
                                              final String rawLine) {
         final ArrayList<String> parsedArray = Utils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
-        final Server server = callbacks.getServer(false);
 
         switch (command) {
             case "/join":
@@ -145,7 +142,7 @@ public class MessageParser {
                 break;
             case "/quit":
                 if (parsedArray.size() == 0) {
-                    callbacks.disconnect();
+                    //callbacks.disconnect();
                 } else {
                     ServerCommandSender.sendUnknownEvent(server, rawLine);
                 }

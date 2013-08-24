@@ -7,6 +7,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
@@ -109,6 +112,11 @@ public class ServiceFragment extends Fragment {
         mService = null;
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return null;
+    }
+
     public void setUpService() {
         final Intent service = new Intent(getActivity(), IRCBridgeService.class);
         service.putExtra("server", true);
@@ -181,5 +189,9 @@ public class ServiceFragment extends Fragment {
         public void setUpViewPager();
 
         public void repopulateFragmentsInPager();
+
+        public String getServerTitle();
+
+        public void onUnexpectedDisconnect();
     }
 }

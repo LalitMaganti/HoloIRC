@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.fusionx.lightirc.fragments.actions.IRCActionsFragment;
 import com.fusionx.lightirc.fragments.actions.IgnoreListFragment;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionPagerAdapter extends FragmentStatePagerAdapter {
     private final IRCActionsFragment mActionFragment;
@@ -28,10 +27,6 @@ public class ActionPagerAdapter extends FragmentStatePagerAdapter {
             default:
                 return null;
         }
-    }
-
-    public SlidingMenu.OnCloseListener getIgnoreFragmentListener() {
-        return mIgnoreListFragment;
     }
 
     @Override

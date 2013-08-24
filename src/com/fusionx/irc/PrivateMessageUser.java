@@ -3,7 +3,7 @@ package com.fusionx.irc;
 import android.os.Bundle;
 import android.os.Message;
 
-import com.fusionx.Utils;
+import com.fusionx.common.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.irc.handlerabstract.UserHandler;
