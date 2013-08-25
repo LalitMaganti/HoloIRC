@@ -41,6 +41,9 @@ public class PreferenceKeys {
     public final static String ServerUserName = "pref_login_username";
     public final static String ServerPassword = "pref_login_password";
 
+    public final static String SaslUsername = "pref_sasl_username";
+    public final static String SaslPassword = "pref_sasl_password";
+
     public final static String NickServPassword = "pref_nickserv_password";
 
     // Appearance Settings

@@ -74,10 +74,6 @@
         <Preference
                 android:key="pref_autojoin_intent"
                 android:title="@string/server_settings_auto_join_title"/>
-        <!--<PreferenceScreen
-                android:fragment="com.fusionx.lightirc.fragments.serversetttings.ListViewSettingsFragment"
-                android:key="pref_autojoin"
-                android:title="@string/server_settings_auto_join_title"/>-->
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Login - usually need not be changed">
@@ -92,6 +88,22 @@
                 android:inputType="textPassword"
                 android:key="pref_login_password"
                 android:title="@string/password"
+                android:singleLine="true"
+                android:lines="1"/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="SASL">
+        <EditTextPreference
+                android:defaultValue="holoirc"
+                android:key="pref_sasl_username"
+                android:title="SASL Username"
+                android:singleLine="true"
+                android:lines="1"/>
+        <EditTextPreference
+                android:defaultValue=""
+                android:inputType="textPassword"
+                android:key="pref_sasl_password"
+                android:title="SASL Password"
                 android:singleLine="true"
                 android:lines="1"/>
     </PreferenceCategory>

@@ -39,34 +39,40 @@ public class FileConfigurationConverter {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 Context.MODE_PRIVATE);
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+
+        // Server connection
         builder.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
         builder.setUrl(serverSettings.getString(PreferenceKeys.URL, "").trim());
         builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
         builder.setSsl(serverSettings.getBoolean(PreferenceKeys.SSL, false));
 
+        // User settings
         final String firstChoice = serverSettings.getString(PreferenceKeys.FirstNick,
                 "HoloIRCUser");
         final String secondChoice = serverSettings.getString(PreferenceKeys.SecondNick, "");
         final String thirdChoice = serverSettings.getString(PreferenceKeys.ThirdNick, "");
         final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
-
         builder.setRealName(serverSettings.getString(PreferenceKeys.RealName, "HoloIRC"));
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
-        final ArrayList<String> auto = new ArrayList<>(serverSettings.getStringSet(PreferenceKeys.AutoJoin,
-                new HashSet<String>()));
+        // Autojoin channels
+        final ArrayList<String> auto = new ArrayList<>(serverSettings.getStringSet(PreferenceKeys
+                .AutoJoin, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
         }
 
+        // Server authorisation
         builder.setServerUserName(serverSettings.getString(PreferenceKeys.ServerUserName, "holoirc"));
         builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
 
-        final String nickServPassword = serverSettings.getString(PreferenceKeys.NickServPassword, null);
-        if (StringUtils.isNotEmpty(nickServPassword)) {
-            builder.setNickservPassword(nickServPassword);
-        }
+        // SASL authorisation
+        builder.setSaslUsername(serverSettings.getString(PreferenceKeys.SaslUsername, ""));
+        builder.setSaslPassword(serverSettings.getString(PreferenceKeys.SaslPassword, ""));
+
+        // NickServ authorisation
+        builder.setNickservPassword(serverSettings.getString(PreferenceKeys.NickServPassword, ""));
 
         builder.setFile(filename);
         return builder;
