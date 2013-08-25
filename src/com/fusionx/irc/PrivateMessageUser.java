@@ -1,12 +1,12 @@
 package com.fusionx.irc;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.common.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserEventType;
-import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.irc.writers.UserWriter;
 
 import lombok.Data;
@@ -26,7 +26,7 @@ public class PrivateMessageUser extends User {
         writer = new UserWriter(userChannelInterface.getOutputStream(), this);
     }
 
-    private UserHandler userHandler = new UserHandler() {
+    private Handler userHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             final Bundle event = msg.getData();

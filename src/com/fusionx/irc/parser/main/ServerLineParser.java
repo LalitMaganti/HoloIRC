@@ -41,16 +41,15 @@ import lombok.Setter;
 
 import static com.fusionx.irc.constants.Constants.LOG_TAG;
 
-@Getter(AccessLevel.PACKAGE)
 public class ServerLineParser {
+    @Getter(AccessLevel.PACKAGE)
     private final Server server;
 
+    @Getter(AccessLevel.PACKAGE)
     @Setter
     private boolean disconnectSent;
 
-    @Getter(AccessLevel.NONE)
     private final ServerCodeParser codeParser;
-    @Getter(AccessLevel.NONE)
     private final ServerCommandParser commandParser;
 
     public ServerLineParser(final Context context, final Server server) {

@@ -1,15 +1,13 @@
 package com.fusionx.uiircinterface.interfaces;
 
-import com.fusionx.irc.handlerabstract.ChannelHandler;
-import com.fusionx.irc.handlerabstract.ServerHandler;
-import com.fusionx.irc.handlerabstract.UserHandler;
+import android.os.Handler;
 
 public interface IRCSideHandlerInterface {
-    public ServerHandler getServerHandler();
+    public Handler getServerHandler();
 
-    public ChannelHandler getChannelHandler(final String channelName);
+    public Handler getChannelHandler(final String channelName);
 
-    public UserHandler getUserHandler(final String userNick);
+    public Handler getUserHandler(final String userNick);
 
     public String getTitle();
 

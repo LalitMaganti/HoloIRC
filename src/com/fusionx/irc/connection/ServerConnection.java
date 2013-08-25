@@ -163,7 +163,8 @@ class ServerConnection {
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerChannelEventType.Connected, String.format(mContext
-                    .getString(R.string.parser_connected), serverConfiguration.getUrl()));
+                    .getString(R.string.parser_connected),
+                    serverConfiguration.getUrl()));
             sender.sendServerChannelMessage(event);
 
             // This nick may well be different from any of the nicks in storage - get the
@@ -220,6 +221,7 @@ class ServerConnection {
      */
     public void disconnectFromServer() {
         disconnectSent = true;
+        server.setStatus(mContext.getString(R.string.status_disconnected));
         parser.setDisconnectSent(true);
         server.getWriter().quitServer(Utils.getQuitReason(mContext));
     }

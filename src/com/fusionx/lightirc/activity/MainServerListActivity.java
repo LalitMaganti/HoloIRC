@@ -216,7 +216,6 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     private void disconnectFromServer(final ServerConfiguration.Builder builder) {
         ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
-        //mService.disconnectFromServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

@@ -23,6 +23,7 @@ package com.fusionx.irc;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.common.Utils;
@@ -30,9 +31,6 @@ import com.fusionx.irc.connection.ConnectionWrapper;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.irc.handlerabstract.ChannelHandler;
-import com.fusionx.irc.handlerabstract.ServerHandler;
-import com.fusionx.irc.handlerabstract.UserHandler;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
@@ -64,7 +62,7 @@ public class Server implements IRCSideHandlerInterface {
     private final ConnectionWrapper mWrapper;
     private final Context mContext;
 
-    private final ServerHandler serverHandler = new ServerHandler() {
+    private final Handler serverHandler = new Handler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
@@ -155,12 +153,12 @@ public class Server implements IRCSideHandlerInterface {
     }
 
     @Override
-    public ChannelHandler getChannelHandler(String channelName) {
+    public Handler getChannelHandler(String channelName) {
         return userChannelInterface.getChannel(channelName).getChannelHandler();
     }
 
     @Override
-    public UserHandler getUserHandler(String userNick) {
+    public Handler getUserHandler(String userNick) {
         return getPrivateMessageUser(userNick).getUserHandler();
     }
 

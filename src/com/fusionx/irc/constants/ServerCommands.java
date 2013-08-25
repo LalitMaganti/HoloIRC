@@ -34,4 +34,8 @@ public class ServerCommands {
     public final static String Topic = "TOPIC";
     public final static String Cap = "CAP";
     public final static String Authenticate = "AUTHENTICATE";
+
+    private ServerCommands() {
+
+    }
 }

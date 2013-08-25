@@ -27,15 +27,14 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
-@Data
 public abstract class User {
+    @Getter
+    @Setter
     protected String nick;
 
-    @Getter(AccessLevel.NONE)
-    protected String nickHTML;
-
-    @Getter(AccessLevel.NONE)
+    protected final String nickHTML;
     protected final UserChannelInterface userChannelInterface;
 
     public User(@NonNull final String nick,

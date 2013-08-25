@@ -21,6 +21,11 @@
 
 package com.fusionx.common;
 
+/**
+ * Contains the keys for retrieving settings from the SharedPreferences
+ *
+ * @author Lalit Maganti
+ */
 public class PreferenceKeys {
 
     // Server settings

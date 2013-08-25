@@ -22,12 +22,12 @@
 package com.fusionx.irc;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.common.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ChannelEventType;
-import com.fusionx.irc.handlerabstract.ChannelHandler;
 import com.fusionx.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.R;
 
@@ -90,7 +90,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         throw new IllegalArgumentException();
     }
 
-    private ChannelHandler channelHandler = new ChannelHandler() {
+    private Handler channelHandler = new Handler() {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle event = msg.getData();
