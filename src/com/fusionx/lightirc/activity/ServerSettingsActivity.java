@@ -114,7 +114,6 @@ public class ServerSettingsActivity extends PreferenceActivity implements Server
     @Override
     public void openAutoJoinList() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
         ft.replace(android.R.id.content, mListFragment).commit();
         mListDisplayed = true;
     }
@@ -122,7 +121,6 @@ public class ServerSettingsActivity extends PreferenceActivity implements Server
     @Override
     public void openBaseFragment() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
         ft.replace(android.R.id.content, mBaseFragment).commit();
         mListDisplayed = false;
     }

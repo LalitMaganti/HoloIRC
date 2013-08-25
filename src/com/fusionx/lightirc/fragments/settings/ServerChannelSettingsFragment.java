@@ -22,12 +22,14 @@
 package com.fusionx.lightirc.fragments.settings;
 
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightlibrary.preferences.NumberPickerDialogPreference;
 
 public class ServerChannelSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {
@@ -35,6 +37,13 @@ public class ServerChannelSettingsFragment extends PreferenceFragment implements
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.server_channel_settings_fragment);
+
+        final NumberPickerDialogPreference numberPickerDialogPreference =
+                (NumberPickerDialogPreference) getPreferenceScreen().findPreference
+                        (PreferenceKeys.ReconnectTries);
+        numberPickerDialogPreference.setOnPreferenceChangeListener(this);
+        numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
+                .getValue()));
 
         final EditTextPreference partReason = (EditTextPreference) getPreferenceScreen()
                 .findPreference(PreferenceKeys.PartReason);
@@ -49,7 +58,7 @@ public class ServerChannelSettingsFragment extends PreferenceFragment implements
 
     @Override
     public boolean onPreferenceChange(final Preference preference, final Object o) {
-        final EditTextPreference editTextPreference = (EditTextPreference) preference;
+        final DialogPreference editTextPreference = (DialogPreference) preference;
         editTextPreference.setSummary((CharSequence) o);
         return true;
     }

@@ -71,7 +71,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         synchronized (mLock) {
             mSelectedItems.add(position);
         }
-        if(mNotifyOnChange) {
+        if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
     }
@@ -85,7 +85,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         synchronized (mLock) {
             mSelectedItems.remove(position);
         }
-        if(mNotifyOnChange) {
+        if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
     }
@@ -95,7 +95,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      */
     public void clearSelection() {
         mSelectedItems.clear();
-        if(mNotifyOnChange) {
+        if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
     }
@@ -131,7 +131,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
 
     public void setInternalSet(SortedSet<T> set) {
         mObjects = (TreeSet<T>) set;
-        if(mNotifyOnChange) {
+        if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
 

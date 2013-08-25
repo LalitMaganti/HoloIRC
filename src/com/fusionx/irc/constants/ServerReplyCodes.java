@@ -167,6 +167,16 @@ public final class ServerReplyCodes {
     public static final int ERR_BADCHANMASK = 476;
     public static final int ERR_NOSERVICEHOST = 492;
 
+    // SASL codes
+    public static final int RPL_SASL_LOGGED_IN = 900;
+    public static final int RPL_SASL_SUCCESSFUL = 903;
+    public static final int ERR_SASL_FAILED = 904;
+    public static final int ERR_SASL_FAILED_2 = 905;
+
+    public static final ImmutableList<Integer> saslCodes = ImmutableList.of(RPL_SASL_LOGGED_IN,
+            RPL_SASL_SUCCESSFUL, ERR_SASL_FAILED, ERR_SASL_FAILED_2);
+
+
     public static final ImmutableList<Integer> genericCodes = ImmutableList.of(RPL_WELCOME, RPL_YOURHOST,
             RPL_CREATED, RPL_LUSERCLIENT, RPL_LUSEROP, RPL_LUSERUNKNOWN,
             RPL_LUSERCHANNELS, RPL_LUSERME);

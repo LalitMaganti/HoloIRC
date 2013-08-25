@@ -19,13 +19,15 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc.parser;
+package com.fusionx.irc.parser.connection;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.common.Utils;
+import com.fusionx.irc.Server;
+import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.listeners.CoreListener;
@@ -44,41 +46,48 @@ import static com.fusionx.irc.constants.Constants.LOG_TAG;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WELCOME;
+import static com.fusionx.irc.constants.ServerReplyCodes.saslCodes;
 
 public class ServerConnectionParser {
     private static boolean triedSecondNick = false;
     private static boolean triedThirdNick = false;
     private static int suffix = 0;
 
-    public static String parseConnect(final String serverTitle, final BufferedReader reader,
-                                      final Context context, final boolean canChangeNick,
-                                      final ServerWriter writer,
-                                      final NickStorage nickStorage) throws IOException {
+    public static String parseConnect(final Server server, final ServerConfiguration
+            configuration, final BufferedReader reader, final Context context) throws
+            IOException {
+
         String line;
         suffix = 0;
         triedSecondNick = false;
         triedThirdNick = false;
-        final MessageSender sender = MessageSender.getSender(serverTitle);
+        final MessageSender sender = MessageSender.getSender(server.getTitle());
+
         while ((line = reader.readLine()) != null) {
             final ArrayList<String> parsedArray = Utils.splitRawLine(line, true);
             switch (parsedArray.get(0)) {
                 case ServerCommands.Ping:
                     // Immediately return
                     final String source = parsedArray.get(1);
-                    CoreListener.respondToPing(writer, source);
+                    CoreListener.respondToPing(server.getWriter(), source);
                     break;
                 case ServerCommands.Error:
                     // We are finished - the server has kicked us out for some reason
                     return null;
+                case ServerCommands.Authenticate:
+                    CapParser.parseCommand(parsedArray, configuration, server.getWriter(), sender);
+                    break;
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
-                        final String nick = parseConnectionCode(canChangeNick, parsedArray,
-                                sender, writer, context, nickStorage, line);
+                        final String nick = parseConnectionCode(configuration.isNickChangable(),
+                                parsedArray, sender, server.getWriter(), context,
+                                configuration.getNickStorage(), line);
                         if (nick != null) {
                             return nick;
                         }
                     } else {
-                        parseConnectionCommand(parsedArray, sender, writer, line);
+                        parseConnectionCommand(parsedArray, configuration, sender,
+                                server.getWriter(), line);
                     }
                     break;
             }
@@ -91,7 +100,8 @@ public class ServerConnectionParser {
                                               final MessageSender sender,
                                               final ServerWriter writer, final Context context,
                                               final NickStorage nickStorage, final String line) {
-        switch (Integer.parseInt(parsedArray.get(1))) {
+        final int code = Integer.parseInt(parsedArray.get(1));
+        switch (code) {
             case RPL_WELCOME:
                 // We are now logged in.
                 final String nick = parsedArray.get(2);
@@ -122,19 +132,28 @@ public class ServerConnectionParser {
                 writer.changeNick(nickStorage.getFirstChoiceNick());
                 break;
             default:
-                Log.v(LOG_TAG, line);
+                if (saslCodes.contains(code)) {
+                    CapParser.parseCode(code, parsedArray, sender, writer);
+                } else {
+                    Log.v(LOG_TAG, line);
+                }
                 break;
         }
         return null;
     }
 
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
+                                               final ServerConfiguration configuration,
                                                final MessageSender sender, final ServerWriter writer,
                                                final String line) {
         switch (parsedArray.get(1).toUpperCase()) {
             case ServerCommands.Notice:
                 Utils.removeFirstElementFromList(parsedArray, 3);
                 sender.sendGenericServerEvent(parsedArray.get(0));
+                break;
+            case ServerCommands.Cap:
+                Utils.removeFirstElementFromList(parsedArray, 3);
+                CapParser.parseCommand(parsedArray, configuration, writer, sender);
                 break;
             default:
                 Log.v(LOG_TAG, line);

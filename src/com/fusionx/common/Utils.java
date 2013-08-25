@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import lombok.NonNull;
 
@@ -180,9 +182,15 @@ public class Utils {
         return preferences.getInt(PreferenceKeys.ReconnectTries, 3);
     }
 
+    public static Set<String> getIgnoreList(final Context context, final String fileName) {
+        final SharedPreferences preferences = context.getSharedPreferences(fileName,
+                Context.MODE_PRIVATE);
+        return preferences.getStringSet(PreferenceKeys.IgnoreList, new TreeSet<String>());
+    }
+
     public static boolean areNicksEqual(final String firstNick, final String secondNick) {
-        return firstNick.equals(secondNick) ||
-                ((firstNick.toLowerCase().equals("nickserv") || firstNick.toLowerCase().equals
-                        ("chanserv")) && firstNick.toLowerCase().equals(secondNick.toLowerCase()));
+        return firstNick.equals(secondNick) || (firstNick.equalsIgnoreCase(secondNick) &&
+                (firstNick.equalsIgnoreCase("nickserv") || firstNick.equalsIgnoreCase
+                        ("chanserv")));
     }
 }

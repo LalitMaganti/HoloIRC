@@ -14,10 +14,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.commonsware.cwac.merge.MergeAdapter;
 import com.fusionx.common.PreferenceKeys;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
@@ -37,9 +36,8 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
 
-        final TreeSet<String> arrayList = new TreeSet<>(getActivity().getSharedPreferences
-                (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).getStringSet
-                (PreferenceKeys.IgnoreList, new TreeSet<String>()));
+        final TreeSet<String> arrayList = new TreeSet<>(Utils.getIgnoreList(getActivity(),
+                callback.getServerTitle().toLowerCase()));
 
         final SelectionAdapter<String> ignoreAdapter = new SelectionAdapter<>(getActivity(),
                 arrayList);

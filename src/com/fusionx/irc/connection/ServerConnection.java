@@ -30,8 +30,8 @@ import com.fusionx.irc.Server;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.enums.ServerChannelEventType;
-import com.fusionx.irc.parser.ServerConnectionParser;
-import com.fusionx.irc.parser.ServerLineParser;
+import com.fusionx.irc.parser.connection.ServerConnectionParser;
+import com.fusionx.irc.parser.main.ServerLineParser;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
@@ -50,6 +50,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Class which carries out all the interesting connection stuff including the inital setting up
+ * logic
+ *
+ * @author Lalit Maganti
+ */
 class ServerConnection {
     @Getter(AccessLevel.PACKAGE)
     private Server server;
@@ -66,6 +72,14 @@ class ServerConnection {
     private int timesToTry;
     private int reconnectAttempts = 0;
 
+    /**
+     * Constructor for the object - package local since this object should always be contained
+     * only within a {@link ConnectionWrapper} object
+     *
+     * @param configuration - the ServerConfiguration which should be used to connect to the server
+     * @param context       - context for retrieving strings from the res files
+     * @param wrapper       - the wrapper object which the Connection is contained by
+     */
     ServerConnection(final ServerConfiguration configuration, final Context context,
                      final ConnectionWrapper wrapper) {
         server = new Server(configuration.getTitle(), wrapper);
@@ -73,35 +87,36 @@ class ServerConnection {
         mContext = context;
     }
 
+    /**
+     * Method which keeps trying to reconnect to the server the number of times specified and if
+     * the user has not explicitly tried to disconnect
+     */
     void connectToServer() {
         timesToTry = Utils.getNumberOfReconnectEvents(mContext);
         reconnectAttempts = 0;
 
         connect();
 
-        while (true) {
-            final MessageSender sender = MessageSender.getSender(server.getTitle());
-            if (!disconnectSent) {
-                if(reconnectAttempts < timesToTry) {
-                    sender.sendGenericServerEvent("Trying to " +
-                            "reconnect to the server in 5 seconds.");
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
-                        break;
-                    }
-                    connect();
-                } else {
-                    break;
-                }
-                ++reconnectAttempts;
-            } else {
+        final MessageSender sender = MessageSender.getSender(server.getTitle());
+        while (!disconnectSent && reconnectAttempts < timesToTry) {
+            sender.sendGenericServerEvent("Trying to " +
+                    "reconnect to the server in 5 seconds.");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                // This interrupt will *should* only ever occur if the user explicitly kills
+                // reconnection
+                sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
                 break;
             }
+            connect();
+            ++reconnectAttempts;
         }
     }
 
+    /**
+     * Called by the connectToServer method ONLY
+     */
     private void connect() {
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         try {
@@ -122,6 +137,13 @@ class ServerConnection {
                     mContext, server);
             server.setUserChannelInterface(userChannelInterface);
 
+            // By sending this line, the server *should* wait until we end the CAP stuff with CAP
+            // END
+            if (StringUtils.isNotEmpty(serverConfiguration.getSaslPassword()) && StringUtils
+                    .isNotEmpty(serverConfiguration.getSaslUsername())) {
+                server.getWriter().getSupportedCapabilities();
+            }
+
             if (StringUtils.isNotEmpty(serverConfiguration.getServerPassword())) {
                 server.getWriter().sendServerPassword(serverConfiguration.getServerPassword());
             }
@@ -131,37 +153,47 @@ class ServerConnection {
                     StringUtils.isNotEmpty(serverConfiguration.getRealName()) ?
                             serverConfiguration.getRealName() : "HoloIRC");
 
-            final BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(mSocket.getInputStream()));
-            final String nick = ServerConnectionParser.parseConnect(server.getTitle(), reader,
-                    mContext, serverConfiguration.isNickChangable(), server.getWriter(),
-                    serverConfiguration.getNickStorage());
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
+                    .getInputStream()));
+            final String nick = ServerConnectionParser.parseConnect(server, serverConfiguration,
+                    reader, mContext);
+
+            // We are connected
+            server.setStatus(mContext.getString(R.string.status_connected));
 
             final Bundle event = Utils.parcelDataForBroadcast(null,
                     ServerChannelEventType.Connected, String.format(mContext
-                    .getString(R.string.parser_connected),
-                    serverConfiguration.getUrl()));
-
+                    .getString(R.string.parser_connected), serverConfiguration.getUrl()));
             sender.sendServerChannelMessage(event);
 
-            server.setStatus(mContext.getString(R.string.status_connected));
-
+            // This nick may well be different from any of the nicks in storage - get the
+            // *official* nick from the server itself and use it
             if (nick != null) {
+                // Since we are now connected, reset the reconnect attempts
+                reconnectAttempts = 0;
+
                 final AppUser user = new AppUser(nick, server.getUserChannelInterface());
                 server.setUser(user);
 
+                // Identifies with NickServ if the password exists
                 if (StringUtils.isNotEmpty(serverConfiguration.getNickservPassword())) {
                     server.getWriter().sendNickServPassword(serverConfiguration
                             .getNickservPassword());
                 }
 
+                // Automatically join the channels specified in the configuration
                 for (String channelName : serverConfiguration.getAutoJoinChannels()) {
                     server.getWriter().joinChannel(channelName);
                 }
 
+                // Initialise the parser used to parse any lines from the server
                 parser = new ServerLineParser(mContext, server);
+                // Loops forever until broken
                 parser.parseMain(reader);
 
+                // If we have reached this point the connection has been broken - try to
+                // reconnect unless the disconnection was requested by the user or we have used
+                // all out lives
                 if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
                     sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
                 } else {
@@ -169,6 +201,8 @@ class ServerConnection {
                 }
             }
         } catch (final IOException ex) {
+            // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
+            // to reconnect but hey ho
             if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
                 sender.sendFinalDisconnection(ex.getMessage() + "\n" + "Disconnected" +
                         " from the server", disconnectSent);
@@ -176,21 +210,28 @@ class ServerConnection {
                 sender.sendRetryPendingServerDisconnection(ex.getMessage());
             }
         }
-        reconnectAttempts = 0;
+        // We are disconnected :( - close up shop
         server.setStatus(mContext.getString(R.string.status_disconnected));
         closeSocket();
     }
 
+    /**
+     * Called when the user explicitly requests a disconnect
+     */
     public void disconnectFromServer() {
         disconnectSent = true;
         parser.setDisconnectSent(true);
         server.getWriter().quitServer(Utils.getQuitReason(mContext));
     }
 
+    /**
+     * Closes the socket if it is not already closed
+     */
     public void closeSocket() {
         try {
             if (mSocket != null) {
                 mSocket.close();
+                mSocket = null;
             }
         } catch (IOException e) {
             e.printStackTrace();

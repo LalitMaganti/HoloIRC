@@ -217,7 +217,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
 
     public void animateDismiss(Collection<Integer> positions) {
         final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
-        if(getAbsListView() == null) {
+        if (getAbsListView() == null) {
             throw new IllegalStateException("Call setListView() on this AnimateDismissAdapter before calling setAdapter()!");
         }
 

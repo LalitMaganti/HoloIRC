@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc.parser;
+package com.fusionx.irc.parser.main;
 
 import com.fusionx.common.Utils;
 import com.fusionx.irc.Channel;

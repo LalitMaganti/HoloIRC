@@ -44,6 +44,9 @@ public class ServerConfiguration {
     private final String serverUserName;
     private final String serverPassword;
 
+    private final String saslUsername;
+    private final String saslPassword;
+
     private final String nickservPassword;
 
     private final ArrayList<String> autoJoinChannels;
@@ -60,6 +63,9 @@ public class ServerConfiguration {
 
         serverUserName = builder.getServerUserName();
         serverPassword = builder.getServerPassword();
+
+        saslUsername = builder.getServerUserName();
+        saslPassword = builder.getServerPassword();
 
         nickservPassword = builder.getNickservPassword();
 
@@ -81,6 +87,9 @@ public class ServerConfiguration {
 
         private String serverUserName;
         private String serverPassword;
+
+        private String saslUsername;
+        private String saslPassword;
 
         private String nickservPassword;
 
@@ -104,6 +113,9 @@ public class ServerConfiguration {
 
             out.writeString(serverUserName);
             out.writeString(serverPassword);
+
+            out.writeString(saslUsername);
+            out.writeString(saslPassword);
 
             out.writeString(nickservPassword);
 
@@ -138,6 +150,9 @@ public class ServerConfiguration {
 
             serverUserName = in.readString();
             serverPassword = in.readString();
+
+            saslUsername = in.readString();
+            saslPassword = in.readString();
 
             nickservPassword = in.readString();
 

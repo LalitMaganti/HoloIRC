@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc.parser;
+package com.fusionx.irc.parser.main;
 
 import android.content.Context;
 import android.util.Log;
@@ -31,6 +31,7 @@ import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.PrivateMessageUser;
 import com.fusionx.irc.Server;
 import com.fusionx.irc.UserChannelInterface;
+import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.MessageSender;
 
@@ -62,7 +63,7 @@ public class ServerCommandParser {
         final String command = parsedArray.get(1).toUpperCase();
 
         switch (command) {
-            case "PRIVMSG":
+            case ServerCommands.Privmsg:
                 final String message = parsedArray.get(3);
                 if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
                     final String strippedMessage = message.substring(1, message.length() - 1);
@@ -71,24 +72,24 @@ public class ServerCommandParser {
                     parsePRIVMSGCommand(parsedArray, rawSource);
                 }
                 return false;
-            case "JOIN":
+            case ServerCommands.Join:
                 parseChannelJoin(parsedArray, rawSource);
                 return false;
-            case "NOTICE":
+            case ServerCommands.Notice:
                 parseNotice(parsedArray, rawSource);
                 return false;
-            case "PART":
+            case ServerCommands.Part:
                 parseChannelPart(parsedArray, rawSource, disconnectSent);
                 return false;
-            case "MODE":
+            case ServerCommands.Mode:
                 parseModeChange(parsedArray, rawSource);
                 return false;
-            case "QUIT":
+            case ServerCommands.Quit:
                 return parseServerQuit(parsedArray, rawSource);
-            case "NICK":
+            case ServerCommands.Nick:
                 parseNickChange(parsedArray, rawSource);
                 return false;
-            case "TOPIC":
+            case ServerCommands.Topic:
                 parseTopicChange(parsedArray, rawSource);
                 return false;
             default:
@@ -121,7 +122,7 @@ public class ServerCommandParser {
 
     private void parseCTCPCommand(final ArrayList<String> parsedArray, final String message,
                                   final String rawSource) {
-        if (message.startsWith("ACTION ")) {
+        if (message.startsWith("ACTION")) {
             parseAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
             // TODO - figure out what should be done here

@@ -90,6 +90,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     /**
      * Get the currently displayed fragment
+     *
      * @return - returns the currently displayed fragment
      */
     private IRCFragment getCurrentItem() {
@@ -98,6 +99,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     /**
      * Creates a UserFragment with the specified nick
+     *
      * @param userNick - the nick of the user we are PMing
      */
     public void createPMFragment(final String userNick) {
@@ -159,8 +161,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * Get the handler object to send the message to.
      *
      * @param destination - the title of the tab we are trying to get
-     * @param type - the type of the fragment we are trying to get the handler from
-     *
+     * @param type        - the type of the fragment we are trying to get the handler from
      * @return - the handler object we are trying to get
      */
     public Handler getFragmentHandler(final String destination, final FragmentType type) {
@@ -225,7 +226,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     public void writeMessageToServer(final String message) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(mCallback
                 .getServerTitle(), FragmentType.Server);
-        if(fragment != null) {
+        if (fragment != null) {
             fragment.appendToTextView(message + "\n");
         }
     }

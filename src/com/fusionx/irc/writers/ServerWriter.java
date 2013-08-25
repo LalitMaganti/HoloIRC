@@ -21,6 +21,8 @@
 
 package com.fusionx.irc.writers;
 
+import android.util.Base64;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.OutputStreamWriter;
@@ -60,5 +62,27 @@ public class ServerWriter extends RawWriter {
 
     public void sendChannelMode(final String channel, final String mode, final String userNick) {
         writeLineToServer("MODE " + channel + " " + mode + " " + userNick);
+    }
+
+    public void getSupportedCapabilities() {
+        writeLineToServer("CAP LS");
+    }
+
+    public void sendEndCap() {
+        writeLineToServer("CAP END");
+    }
+
+    public void requestSasl() {
+        writeLineToServer("CAP REQ : sasl multi-prefix");
+    }
+
+    public void sendPlainSaslAuthentication() {
+        writeLineToServer("AUTHENTICATE PLAIN");
+    }
+
+    public void sendSaslAuthentication(final String saslUsername, final String saslPassword) {
+        final String authentication = saslUsername + "\0" + saslUsername + "\0" + saslPassword;
+        final String encoded = Base64.encodeToString(authentication.getBytes(), Base64.DEFAULT);
+        writeLineToServer("AUTHENTICATE " + encoded);
     }
 }
