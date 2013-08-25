@@ -176,6 +176,9 @@ public final class ServerReplyCodes {
     public static final ImmutableList<Integer> saslCodes = ImmutableList.of(RPL_SASL_LOGGED_IN,
             RPL_SASL_SUCCESSFUL, ERR_SASL_FAILED, ERR_SASL_FAILED_2);
 
+    public static final ImmutableList<Integer> whoisCodes = ImmutableList.of(RPL_WHOISCHANNELS,
+            RPL_WHOISCHANOP, RPL_WHOISIDLE, RPL_WHOISOPERATOR, RPL_WHOISSERVER,
+            RPL_WHOISUSER, RPL_ENDOFWHOIS);
 
     public static final ImmutableList<Integer> genericCodes = ImmutableList.of(RPL_WELCOME, RPL_YOURHOST,
             RPL_CREATED, RPL_LUSERCLIENT, RPL_LUSEROP, RPL_LUSERUNKNOWN,

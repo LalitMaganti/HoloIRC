@@ -64,6 +64,10 @@ public class ServerWriter extends RawWriter {
         writeLineToServer("MODE " + channel + " " + mode + " " + userNick);
     }
 
+    public void sendWhois(final String userNick) {
+        writeLineToServer("WHOIS " + userNick);
+    }
+
     public void getSupportedCapabilities() {
         writeLineToServer("CAP LS");
     }

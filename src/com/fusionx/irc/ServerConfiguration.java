@@ -64,8 +64,8 @@ public class ServerConfiguration {
         serverUserName = builder.getServerUserName();
         serverPassword = builder.getServerPassword();
 
-        saslUsername = builder.getServerUserName();
-        saslPassword = builder.getServerPassword();
+        saslUsername = builder.getSaslUsername();
+        saslPassword = builder.getSaslPassword();
 
         nickservPassword = builder.getNickservPassword();
 

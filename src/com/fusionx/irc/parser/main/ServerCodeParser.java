@@ -46,6 +46,7 @@ import static com.fusionx.irc.constants.ServerReplyCodes.RPL_TOPIC;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_TOPICINFO;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WHOREPLY;
 import static com.fusionx.irc.constants.ServerReplyCodes.genericCodes;
+import static com.fusionx.irc.constants.ServerReplyCodes.whoisCodes;
 
 public class ServerCodeParser {
     private final StringBuilder mStringBuilder = new StringBuilder();
@@ -97,14 +98,20 @@ public class ServerCodeParser {
             case RPL_ENDOFWHO:
                 mWhoParser.parseWhoFinished();
                 return;
-            case ERR_NICKNAMEINUSE:
+            case ERR_NICKNAMEINUSE: {
                 final MessageSender sender = MessageSender.getSender(mServer.getTitle());
                 final Bundle event = Utils.parcelDataForBroadcast(null,
                         ServerEventType.NickInUse, mContext.getString(R.string.parser_nick_in_use));
                 sender.sendServerMessage(event);
                 return;
-            default:
-                parseFallThroughCode(code, message);
+            }
+            default: {
+                if(whoisCodes.contains(code)) {
+                    mSender.switchToServerMessage(Utils.convertArrayListToString(parsedArray));
+                } else {
+                    parseFallThroughCode(code, message);
+                }
+            }
         }
     }
 

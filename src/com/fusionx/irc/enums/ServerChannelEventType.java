@@ -28,4 +28,5 @@ public enum ServerChannelEventType {
     Connected,
     RetryPendingDisconnected,
     FinalDisconnected,
+    SwitchToServerMessage,
 }

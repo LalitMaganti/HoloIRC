@@ -182,6 +182,9 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                     onDisconnect(bundle.getBoolean(EventBundleKeys.disconnectSentByUser, true),
                             false);
                     break;
+                case SwitchToServerMessage:
+                    mIRCPagerFragment.selectServerFragment();
+                    break;
             }
             mIRCPagerFragment.writeMessageToServer(message);
         }

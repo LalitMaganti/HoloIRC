@@ -279,6 +279,12 @@ public class MessageSender {
         sendGenericChannelEvent(channel.getName(), preMessage);
     }
 
+    public void switchToServerMessage(final String message) {
+        final Bundle event = Utils.parcelDataForBroadcast(null,
+                ServerChannelEventType.SwitchToServerMessage, message);
+        sendServerChannelMessage(event);
+    }
+
     public void mention(final String messageDestination) {
         final NotificationManager mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);

@@ -24,6 +24,7 @@
     <item
             android:id="@+id/activity_server_channel_ab_users"
             android:showAsAction="withText|ifRoom"
+            android:icon="@drawable/ic_menu_cc"
             android:title="@string/users"/>
 
 </menu>

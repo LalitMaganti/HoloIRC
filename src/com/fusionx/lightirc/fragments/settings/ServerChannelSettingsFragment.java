@@ -59,7 +59,7 @@ public class ServerChannelSettingsFragment extends PreferenceFragment implements
     @Override
     public boolean onPreferenceChange(final Preference preference, final Object o) {
         final DialogPreference editTextPreference = (DialogPreference) preference;
-        editTextPreference.setSummary((CharSequence) o);
+        editTextPreference.setSummary(String.valueOf(o));
         return true;
     }
 }

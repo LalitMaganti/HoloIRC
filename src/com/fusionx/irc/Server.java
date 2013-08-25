@@ -84,6 +84,7 @@ public class Server implements IRCSideHandlerInterface {
                         MessageSender.getSender(title).unregisterIRCSideHandlerInterface(title);
                     case RetryPendingDisconnected:
                     case Connected:
+                    case SwitchToServerMessage:
                         buffer += bundle.getString(EventBundleKeys.message) + "\n";
                         break;
                 }

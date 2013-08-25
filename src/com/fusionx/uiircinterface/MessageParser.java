@@ -49,7 +49,7 @@ public class MessageParser {
                         ServerCommandSender.sendPart(server, channelName,
                                 context.getApplicationContext());
                     } else {
-                        ServerCommandSender.sendUnknownEvent(server, message);
+                        sendUnknownEvent(server, message);
                     }
                     break;
                 case "/mode":
@@ -57,7 +57,7 @@ public class MessageParser {
                         ServerCommandSender.sendMode(server, channelName, parsedArray.get(0),
                                 parsedArray.get(1));
                     } else {
-                        ServerCommandSender.sendUnknownEvent(server, message);
+                        sendUnknownEvent(server, message);
                     }
                     break;
                 default:
@@ -86,7 +86,7 @@ public class MessageParser {
                         ServerCommandSender.sendClosePrivateMessage(server,
                                 server.getPrivateMessageUser(userNick));
                     } else {
-                        ServerCommandSender.sendUnknownEvent(server, message);
+                        sendUnknownEvent(server, message);
                     }
                     break;
                 default:
@@ -103,7 +103,7 @@ public class MessageParser {
         if (message.startsWith("/")) {
             serverCommandToParse(context, server, message);
         } else {
-            ServerCommandSender.sendUnknownEvent(server, message);
+            sendUnknownEvent(server, message);
         }
     }
 
@@ -119,7 +119,7 @@ public class MessageParser {
                     final String channelName = parsedArray.get(0);
                     ServerCommandSender.sendJoin(server, channelName);
                 } else {
-                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                    sendUnknownEvent(server, rawLine);
                 }
                 break;
             case "/msg":
@@ -129,7 +129,7 @@ public class MessageParser {
                             Utils.convertArrayListToString(parsedArray) : "";
                     ServerCommandSender.sendMessageToUser(server, nick, message);
                 } else {
-                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                    sendUnknownEvent(server, rawLine);
                 }
                 break;
             case "/nick":
@@ -137,18 +137,29 @@ public class MessageParser {
                     final String newNick = parsedArray.get(0);
                     ServerCommandSender.sendNickChange(server, newNick);
                 } else {
-                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                    sendUnknownEvent(server, rawLine);
                 }
                 break;
             case "/quit":
                 if (parsedArray.size() == 0) {
                     ServerCommandSender.sendDisconnect(server, context);
                 } else {
-                    ServerCommandSender.sendUnknownEvent(server, rawLine);
+                    sendUnknownEvent(server, rawLine);
+                }
+                break;
+            case "/whois":
+                if (parsedArray.size() == 1) {
+                    ServerCommandSender.sendUserWhois(server, parsedArray.get(0));
+                } else {
+                    sendUnknownEvent(server, rawLine);
                 }
                 break;
             default:
-                ServerCommandSender.sendUnknownEvent(server, rawLine);
+                sendUnknownEvent(server, rawLine);
         }
+    }
+
+    public static void sendUnknownEvent(final Server server, final String rawLine) {
+        ServerCommandSender.sendUnknownEvent(server, rawLine + " is not a valid command");
     }
 }
