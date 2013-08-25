@@ -63,7 +63,7 @@ public class ServerCommandParser {
         final String command = parsedArray.get(1).toUpperCase();
 
         switch (command) {
-            case ServerCommands.Privmsg:
+            case ServerCommands.Privmsg: {
                 final String message = parsedArray.get(3);
                 if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
                     final String strippedMessage = message.substring(1, message.length() - 1);
@@ -72,11 +72,18 @@ public class ServerCommandParser {
                     parsePRIVMSGCommand(parsedArray, rawSource);
                 }
                 return false;
+            }
             case ServerCommands.Join:
                 parseChannelJoin(parsedArray, rawSource);
                 return false;
             case ServerCommands.Notice:
-                parseNotice(parsedArray, rawSource);
+                final String message = parsedArray.get(3);
+                if (message.startsWith("\u0001") && message.endsWith("\u0001")) {
+                    final String strippedMessage = message.substring(1, message.length() - 1);
+                    parseCTCPCommand(parsedArray, strippedMessage, rawSource);
+                } else {
+                    parseNotice(parsedArray, rawSource);
+                }
                 return false;
             case ServerCommands.Part:
                 parseChannelPart(parsedArray, rawSource, disconnectSent);
@@ -125,6 +132,8 @@ public class ServerCommandParser {
         if (message.startsWith("ACTION")) {
             parseAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
+            final String nick = Utils.getNickFromRaw(rawSource);
+            mServer.getWriter().sendVersion(nick, mServer.toString());
             // TODO - figure out what should be done here
         } else {
             // TODO - add more things here

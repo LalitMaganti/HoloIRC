@@ -84,6 +84,10 @@ public class ServerWriter extends RawWriter {
         writeLineToServer("AUTHENTICATE PLAIN");
     }
 
+    public void sendVersion(final String requestingUser, final String version) {
+        writeLineToServer("PRIVMSG " + requestingUser + " :\u0001VERSION " + version + "\u0001");
+    }
+
     public void sendSaslAuthentication(final String saslUsername, final String saslPassword) {
         final String authentication = saslUsername + "\0" + saslUsername + "\0" + saslPassword;
         final String encoded = Base64.encodeToString(authentication.getBytes(), Base64.DEFAULT);

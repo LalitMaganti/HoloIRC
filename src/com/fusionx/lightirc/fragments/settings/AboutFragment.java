@@ -21,13 +21,12 @@
 
 package com.fusionx.lightirc.fragments.settings;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.fusionx.common.PreferenceKeys;
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 
 public class AboutFragment extends PreferenceFragment {
@@ -36,16 +35,10 @@ public class AboutFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.about_settings_fragment);
 
-        final Preference appVersionPreference = getPreferenceScreen().findPreference(PreferenceKeys.AppVersion);
-        final PackageManager manager = getActivity().getPackageManager();
-        try {
-            final PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
-            final String version = info.versionName;
+        final Preference appVersionPreference = getPreferenceScreen().findPreference
+                (PreferenceKeys.AppVersion);
             if (appVersionPreference != null) {
-                appVersionPreference.setSummary(version);
+                appVersionPreference.setSummary(Utils.getAppVersion(getActivity()));
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 }

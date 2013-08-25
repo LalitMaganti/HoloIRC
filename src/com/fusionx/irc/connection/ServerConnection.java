@@ -82,7 +82,7 @@ class ServerConnection {
      */
     ServerConnection(final ServerConfiguration configuration, final Context context,
                      final ConnectionWrapper wrapper) {
-        server = new Server(configuration.getTitle(), wrapper);
+        server = new Server(configuration.getTitle(), wrapper, context);
         serverConfiguration = configuration;
         mContext = context;
     }

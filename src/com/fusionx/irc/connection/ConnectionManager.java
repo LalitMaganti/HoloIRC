@@ -30,19 +30,19 @@ import java.util.Iterator;
 
 public class ConnectionManager extends HashMap<String, ConnectionWrapper> {
     private static final long serialVersionUID = 2426166268063489300L;
-    private final Context applicationContext;
+    private final Context context;
 
-    public ConnectionManager(Context applicationContext) {
-        this.applicationContext = applicationContext;
+    public ConnectionManager(final Context context) {
+        this.context = context;
     }
 
     public void disconnectAll() {
         final Iterator<ConnectionWrapper> iterator = values().iterator();
         while (iterator.hasNext()) {
             final ConnectionWrapper wrapper = iterator.next();
-            if (wrapper.getServer().getStatus().equals(applicationContext
+            if (wrapper.getServer().getStatus().equals(context
                     .getString(R.string.status_connected))) {
-                wrapper.disconnectFromServer(applicationContext);
+                wrapper.disconnectFromServer(context);
             } else if (wrapper.isAlive()) {
                 wrapper.interrupt();
             }

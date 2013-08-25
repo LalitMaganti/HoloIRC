@@ -40,8 +40,4 @@ public class UserWriter extends RawWriter {
     public void sendAction(String action) {
         writeLineToServer(String.format(WriterCommands.Action, mUser.getNick(), action));
     }
-
-    public void sendWho() {
-        writeLineToServer(String.format(WriterCommands.WHO, mUser.getNick()));
-    }
 }

@@ -2,9 +2,12 @@ package com.fusionx.common;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 
@@ -192,5 +195,16 @@ public class Utils {
         return firstNick.equals(secondNick) || (firstNick.equalsIgnoreCase(secondNick) &&
                 (firstNick.equalsIgnoreCase("nickserv") || firstNick.equalsIgnoreCase
                         ("chanserv")));
+    }
+
+    public static String getAppVersion(final Context context) {
+        try {
+            final PackageManager manager = context.getPackageManager();
+            final PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
+            return info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

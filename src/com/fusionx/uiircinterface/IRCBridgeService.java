@@ -65,7 +65,7 @@ public class IRCBridgeService extends Service {
     public void connectToServer(final ServerConfiguration.Builder server) {
         if (connectionManager == null) {
             // Means that this that a server is being connected to for the first time
-            connectionManager = new ConnectionManager(getApplicationContext());
+            connectionManager = new ConnectionManager(this);
         }
 
         setupNotification();

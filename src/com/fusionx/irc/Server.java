@@ -62,6 +62,7 @@ public class Server implements IRCSideHandlerInterface {
     private String MOTD = "";
 
     private final ConnectionWrapper mWrapper;
+    private final Context mContext;
 
     private final ServerHandler serverHandler = new ServerHandler() {
         @Override
@@ -92,9 +93,10 @@ public class Server implements IRCSideHandlerInterface {
         }
     };
 
-    public Server(final String serverTitle, final ConnectionWrapper wrapper) {
+    public Server(final String serverTitle, final ConnectionWrapper wrapper, final Context context) {
         title = serverTitle;
         mWrapper = wrapper;
+        mContext = context;
 
         MessageSender.getSender(serverTitle).registerIRCSideHandlerInterface(this);
     }
@@ -173,5 +175,10 @@ public class Server implements IRCSideHandlerInterface {
 
     public void disconnectFromServer(final Context context) {
         mWrapper.disconnectFromServer(context);
+    }
+
+    @Override
+    public String toString() {
+        return "HoloIRC " + Utils.getAppVersion(mContext) + " Android IRC client";
     }
 }
