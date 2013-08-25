@@ -26,7 +26,7 @@
     <item
             android:id="@+id/fragment_userlist_cab_pm"
             android:title="@string/private_message_short_form"/>
-    <!--<item
+    <item
             android:id="@+id/fragment_userlist_cab_whois"
-            android:title="@string/whois"/>-->
+            android:title="@string/whois"/>
 </menu>

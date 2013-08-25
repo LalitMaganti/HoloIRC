@@ -52,14 +52,14 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         AdapterView.OnItemClickListener {
     @Getter
     private ActionMode mode;
-    private UserListCallback mListener;
-    private String currentlyDisplayedChannelName;
+    private UserListCallback mCallback;
+    private String mChannelName;
 
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (UserListCallback) activity;
+            mCallback = (UserListCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement UserListCallback");
         }
@@ -84,12 +84,12 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     public void onMenuOpened(final String channelName) {
-        if (!channelName.equals(currentlyDisplayedChannelName)) {
+        if (!channelName.equals(mChannelName)) {
             final TreeSet<ChannelUser> userList = getUserList(channelName);
             if (userList != null) {
                 getUserListAdapter().setInternalSet(userList);
                 getUserListAdapter().setChannelName(channelName);
-                currentlyDisplayedChannelName = channelName;
+                mChannelName = channelName;
             }
         }
         getListView().smoothScrollToPosition(0);
@@ -124,14 +124,14 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
-                mListener.onUserMention(selectedItems);
+                mCallback.onUserMention(selectedItems);
                 mode.finish();
-                mListener.closeAllSlidingMenus();
+                mCallback.closeAllSlidingMenus();
                 return true;
             case R.id.fragment_userlist_cab_pm: {
                 if (isNickOtherUsers(nick)) {
-                    ServerCommandSender.sendMessageToUser(mListener.getServer(false), nick, "");
-                    mListener.closeAllSlidingMenus();
+                    ServerCommandSender.sendMessageToUser(mCallback.getServer(false), nick, "");
+                    mCallback.closeAllSlidingMenus();
                     mode.finish();
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
@@ -149,6 +149,9 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 }
                 return true;
             }
+            case R.id.fragment_userlist_cab_whois:
+                ServerCommandSender.sendUserWhois(mCallback.getServer(false), nick);
+                return true;
             default:
                 return false;
         }
@@ -182,6 +185,8 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
             mode.setTitle(quantityString);
 
             mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
+
+            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
         }
 
         return true;
@@ -215,12 +220,12 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
     }
 
     public TreeSet<ChannelUser> getUserList(final String channelName) {
-        return mListener.getServer(false).getUserChannelInterface().getChannel(channelName)
+        return mCallback.getServer(false).getUserChannelInterface().getChannel(channelName)
                 .getUsers();
     }
 
     public boolean isNickOtherUsers(final String nick) {
-        return !mListener.getServer(false).getUser().getNick().equals(nick);
+        return !mCallback.getServer(false).getUser().getNick().equals(nick);
     }
 
     public interface UserListCallback {
