@@ -3,6 +3,7 @@ package com.fusionx.lightirc.preferences.nick;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.text.Editable;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
 
 public abstract class AbstractNickPreference extends DialogPreference implements TextWatcher {
@@ -27,7 +29,7 @@ public abstract class AbstractNickPreference extends DialogPreference implements
     }
 
     @Override
-    protected void onBindDialogView(View view) {
+    protected void onBindDialogView(final View view) {
         super.onBindDialogView(view);
 
         mFirstChoice = (EditText) view.findViewById(R.id.edit_text_nick_first_choice);
@@ -37,7 +39,7 @@ public abstract class AbstractNickPreference extends DialogPreference implements
         retrieveNick();
     }
 
-    public abstract void retrieveNick();
+    protected abstract void retrieveNick();
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
@@ -48,7 +50,7 @@ public abstract class AbstractNickPreference extends DialogPreference implements
         }
     }
 
-    public abstract void persistNick();
+    protected abstract void persistNick();
 
     void onEditTextChanged() {
         final boolean enable = !mFirstChoice.getText().toString().isEmpty();

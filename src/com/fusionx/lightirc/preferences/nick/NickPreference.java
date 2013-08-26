@@ -13,7 +13,7 @@ public class NickPreference extends AbstractNickPreference {
 
     // TODO - make parent return SharedPreference
     @Override
-    public void retrieveNick() {
+    protected void retrieveNick() {
         final SharedPreferences sharedPreferences = getSharedPreferences();
         mFirstChoice.setText(sharedPreferences.getString(PreferenceKeys.FirstNick, "HoloIRCUser"));
         mSecondChoice.setText(sharedPreferences.getString(PreferenceKeys.SecondNick, ""));
@@ -22,11 +22,29 @@ public class NickPreference extends AbstractNickPreference {
 
     // TODO - make parent return Editor
     @Override
-    public void persistNick() {
+    protected void persistNick() {
         final SharedPreferences.Editor editor = getEditor();
         editor.putString(PreferenceKeys.FirstNick, mFirstChoice.getText().toString());
         editor.putString(PreferenceKeys.SecondNick, mSecondChoice.getText().toString());
         editor.putString(PreferenceKeys.ThirdNick, mThirdChoice.getText().toString());
+        editor.commit();
+    }
+
+    public void setFirstChoice(final String first) {
+        final SharedPreferences.Editor editor = getEditor();
+        editor.putString(PreferenceKeys.FirstNick, first);
+        editor.commit();
+    }
+
+    public void setSecondChoice(final String second) {
+        final SharedPreferences.Editor editor = getEditor();
+        editor.putString(PreferenceKeys.SecondNick, second);
+        editor.commit();
+    }
+
+    public void setThirdChoice(final String third) {
+        final SharedPreferences.Editor editor = getEditor();
+        editor.putString(PreferenceKeys.ThirdNick, third);
         editor.commit();
     }
 }

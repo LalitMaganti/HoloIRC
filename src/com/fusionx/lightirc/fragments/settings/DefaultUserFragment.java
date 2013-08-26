@@ -9,6 +9,6 @@ public class DefaultUserFragment extends PreferenceFragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.appearance_settings_fragment);
+        addPreferencesFromResource(R.xml.default_user_fragment);
     }
 }

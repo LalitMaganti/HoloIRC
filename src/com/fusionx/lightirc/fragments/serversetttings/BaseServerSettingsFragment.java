@@ -2,15 +2,20 @@ package com.fusionx.lightirc.fragments.serversetttings;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.view.View;
 
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.preferences.edittext.ServerTitleEditTextPreference;
+import com.fusionx.lightirc.preferences.nick.NickPreference;
 import com.fusionx.lightirc.views.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +66,10 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
         mUrl = (EditTextPreference) findPreference(URL);
         mUrl.setOnPreferenceChangeListener(this);
 
+        if(!mCallback.canSaveChanges()) {
+            setupNewServer();
+        }
+
         final Preference autoJoin = findPreference("pref_autojoin_intent");
         if (autoJoin != null) {
             autoJoin.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -71,6 +80,31 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
                 }
             });
         }
+    }
+
+    private void setupNewServer() {
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (getActivity());
+        final String firstNick = preferences.getString(PreferenceKeys.DefaultFirstNick, "holoirc");
+        final String secondNick = preferences.getString(PreferenceKeys.DefaultSecondNick, "");
+        final String thirdNick = preferences.getString(PreferenceKeys.DefaultThirdNick, "");
+
+        final String realName = preferences.getString(PreferenceKeys.DefaultRealName,
+                "HoloIRCUser");
+        final boolean autoNick = preferences.getBoolean(PreferenceKeys.DefaultAutoNickChange, true);
+
+        final NickPreference nickPreference = (NickPreference) getPreferenceManager()
+                .findPreference("pref_nick_storage");
+        nickPreference.setFirstChoice(firstNick);
+        nickPreference.setSecondChoice(secondNick);
+        nickPreference.setThirdChoice(thirdNick);
+
+        final EditTextPreference realNamePref = (EditTextPreference) getPreferenceManager()
+                .findPreference(PreferenceKeys.RealName);
+        realNamePref.setText(realName);
+        final CheckBoxPreference autoNickPref = (CheckBoxPreference) getPreferenceManager()
+                .findPreference(PreferenceKeys.AutoNickChange);
+        autoNickPref.setChecked(autoNick);
     }
 
     @Override

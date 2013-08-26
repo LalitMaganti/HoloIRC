@@ -68,6 +68,9 @@ public class PreferenceKeys {
     public final static String DefaultSecondNick = "pref_default_second_nick";
     public final static String DefaultThirdNick = "pref_default_third_nick";
 
+    public final static String DefaultRealName = "pref_default_realname";
+    public final static String DefaultAutoNickChange = "pref_default_auto_nick";
+
     // About settings
     public final static String AppVersion = "pref_app_version";
 }

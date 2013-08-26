@@ -12,7 +12,7 @@ public class DefaultNickPreference extends AbstractNickPreference {
     }
 
     @Override
-    public void retrieveNick() {
+    protected void retrieveNick() {
         final SharedPreferences preferences = getSharedPreferences();
         mFirstChoice.setText(preferences.getString(PreferenceKeys.DefaultFirstNick,
                 "HoloIRCUser"));
@@ -21,7 +21,7 @@ public class DefaultNickPreference extends AbstractNickPreference {
     }
 
     @Override
-    public void persistNick() {
+    protected void persistNick() {
         final SharedPreferences.Editor editor = getEditor();
         editor.putString(PreferenceKeys.DefaultFirstNick, mFirstChoice.getText().toString());
         editor.putString(PreferenceKeys.DefaultSecondNick, mSecondChoice.getText().toString());
