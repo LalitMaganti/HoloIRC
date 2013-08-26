@@ -92,6 +92,7 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 mChannelName = channelName;
             }
         }
+
         getListView().smoothScrollToPosition(0);
         getListAdapter().reset();
         getListAdapter().notifyDataSetInvalidated();

@@ -31,13 +31,14 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.common.Utils;
@@ -55,6 +56,7 @@ import com.fusionx.lightirc.fragments.actions.ActionsPagerFragment;
 import com.fusionx.lightirc.fragments.ircfragments.IRCPagerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.ActionsSlidingMenu;
+import com.fusionx.lightirc.ui.DecorChildLayout;
 import com.fusionx.uiircinterface.ServerCommandSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -83,15 +85,19 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
 
+    private final Handler handler = new Handler();
+    private View mHeaderView;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
+        setTheme(Utils.getThemeInt(this));
+
         super.onCreate(savedInstanceState);
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
                 ("serverTitle");
 
-        setTheme(Utils.getThemeInt(this));
         setContentView(R.layout.activity_server_channel);
 
         setUpSlidingMenu();
@@ -111,6 +117,24 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(mServerTitle);
         }
+
+        // Get Window Decor View
+        final ViewGroup decorView = (ViewGroup) getWindow()
+                .getDecorView();
+
+        // Create Header view and then add to Decor View
+        mHeaderView = LayoutInflater.from(this.getActionBar().getThemedContext()).inflate(R
+                .layout.toast_mention, decorView, false);
+        mHeaderView.setVisibility(View.GONE);
+
+        // Create DecorChildLayout which will move all of the system's decor
+        // view's children + the
+        // Header View to itself. See DecorChildLayout for more info.
+        final DecorChildLayout decorContents = new DecorChildLayout(this, decorView, mHeaderView);
+
+        // Now add the DecorChildLayout to the decor view
+        decorView.addView(decorContents, ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     private void setUpSlidingMenu() {
@@ -315,6 +339,12 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
         mIRCPagerFragment.createChannelFragment(channelName, false);
     }
 
+    /**
+     * Method called when the server disconnects
+     *
+     * @param expected     - whether the disconnect was triggered by the user
+     * @param retryPending - whether there is a reconnection attempt pending
+     */
     @Override
     public void onDisconnect(final boolean expected, final boolean retryPending) {
         if (expected && !retryPending) {
@@ -421,18 +451,29 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     }
 
     public void mention(final String destination) {
+        final int offset = -getActionBar().getHeight();
         final String message = String.format(getString(R.string.activity_mentioned), destination);
-        final Toast toast = new Toast(this);
 
-        final View view = getLayoutInflater().inflate(R.layout.toast_mention,
-                (ViewGroup) findViewById(R.id.toast_layout_root));
+        AnimationSet set = (AnimationSet) AnimationUtils.loadAnimation(this, R.anim.action_bar_in);
 
-        final TextView textView = (TextView) view.findViewById(R.id.toast_text);
+
+        final TextView textView = (TextView) mHeaderView.findViewById(R.id.toast_text);
         textView.setText(message);
 
-        toast.setView(view);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();
+        mHeaderView.startAnimation(set);
+        mHeaderView.setVisibility(View.VISIBLE);
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                AnimationSet set1 = (AnimationSet) AnimationUtils.loadAnimation
+                        (IRCFragmentActivity.this, R.anim.action_bar_out);
+
+                mHeaderView.startAnimation(set1);
+                mHeaderView.setVisibility(View.INVISIBLE);
+            }
+        }, 2500);
     }
 
     /**

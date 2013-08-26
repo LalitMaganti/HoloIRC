@@ -45,6 +45,7 @@ import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.uiircinterface.IRCBridgeService;
 import com.fusionx.uiircinterface.ServerCommandSender;
+import com.github.espiandev.showcaseview.ShowcaseView;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
 
@@ -52,7 +53,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterCallback {
+        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterCallback,
+        ShowcaseView.OnShowcaseEventListener {
     private IRCBridgeService mService = null;
     private BuilderList mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
@@ -265,6 +267,16 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     @Override
     public Server getServer(final String title) {
         return mService.getServer(title);
+    }
+
+    @Override
+    public void onShowcaseViewHide(ShowcaseView showcaseView) {
+
+    }
+
+    @Override
+    public void onShowcaseViewShow(ShowcaseView showcaseView) {
+
     }
 
     private class ServerCardsAdapter extends BaseAdapterDecorator {

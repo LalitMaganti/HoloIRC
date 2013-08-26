@@ -46,9 +46,9 @@ public class ServerSettingsActivity extends PreferenceActivity implements Server
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         setTheme(Utils.getThemeInt(this));
+
+        super.onCreate(savedInstanceState);
 
         mBaseFragment = new BaseServerSettingsFragment();
         mListFragment = new ListViewSettingsFragment();

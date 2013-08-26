@@ -34,9 +34,9 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         setTheme(Utils.getThemeInt(this));
+
+        super.onCreate(savedInstanceState);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Modifying these settings while connected to server can cause " +

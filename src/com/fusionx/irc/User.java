@@ -23,8 +23,6 @@ package com.fusionx.irc;
 
 import com.fusionx.common.Utils;
 
-import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

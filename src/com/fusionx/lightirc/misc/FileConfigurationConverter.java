@@ -28,8 +28,6 @@ import com.fusionx.common.PreferenceKeys;
 import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.misc.NickStorage;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 

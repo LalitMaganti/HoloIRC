@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.fusionx.lightirc.ui.preferences.DefaultNickPreference
+            android:key="pref_default_nick_storage"
+            android:title="@string/server_settings_nick_storage_title"
+            android:summary="@string/server_settings_nick_storage_summary"/>
+    <com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference
+            android:defaultValue="HoloIRCUser"
+            android:key="pref_default_realname"
+            android:title="Real Name"
+            android:singleLine="true"
+            android:lines="1"/>
+    <CheckBoxPreference
+            android:key="pref_default_auto_nick"
+            android:defaultValue="true"
+            android:title="@string/server_settings_auto_nick_title"
+            android:summary="@string/server_settings_auto_nick_summary"/>
+</PreferenceScreen>

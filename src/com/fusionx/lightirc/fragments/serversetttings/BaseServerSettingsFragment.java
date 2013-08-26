@@ -162,8 +162,7 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
         final Activity activity = getActivity();
         if (activity != null) {
             preference.setSummary(StringUtils.isEmpty(preference.getText())
-                    ? activity.getString(R.string.server_settings_no_password)
-                    : activity.getString(R.string.server_settings_password_set));
+                    ? activity.getString(R.string.server_settings_no_password) : activity.getString(R.string.server_settings_password_set));
         }
     }
 }

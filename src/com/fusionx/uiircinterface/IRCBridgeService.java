@@ -39,9 +39,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Setter;
-import lombok.Synchronized;
 
 /**
  * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend code
@@ -56,7 +54,7 @@ public class IRCBridgeService extends Service {
         }
     }
 
-    @Getter
+    //@Getter
     private ConnectionManager connectionManager = null;
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
@@ -118,14 +116,11 @@ public class IRCBridgeService extends Service {
         stopForeground(true);
     }
 
-    @Synchronized
-    public void onUnexpectedDisconnect(final String serverName) {
-        if (serverDisplayed == null) {
-            if (connectionManager.containsKey(serverName)) {
-                connectionManager.remove(serverName);
-                if (connectionManager.isEmpty()) {
-                    stopForeground(true);
-                }
+    public void onDisconnect(final String serverName) {
+        if (connectionManager.containsKey(serverName)) {
+            connectionManager.remove(serverName);
+            if (connectionManager.isEmpty()) {
+                stopForeground(true);
             }
         }
     }

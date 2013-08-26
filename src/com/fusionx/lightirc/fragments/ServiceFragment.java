@@ -23,8 +23,7 @@ public class ServiceFragment extends Fragment {
     private MessageSender sender;
 
     /**
-     * This method will only be called once when the retained
-     * Fragment is first created.
+     * This method will only be called once when the retained Fragment is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,11 +110,18 @@ public class ServiceFragment extends Fragment {
         mService = null;
     }
 
+    /**
+     * This is a worker fragment so return null for the view always
+     */
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         return null;
     }
 
+    /**
+     *
+     */
     public void setUpService() {
         final Intent service = new Intent(getActivity(), IRCBridgeService.class);
         service.putExtra("server", true);
@@ -167,7 +173,7 @@ public class ServiceFragment extends Fragment {
 
     public void removeServiceReference() {
         mService.setServerDisplayed(null);
-        mService.onUnexpectedDisconnect(mCallback.getServerTitle());
+        mService.onDisconnect(mCallback.getServerTitle());
         mService = null;
     }
 

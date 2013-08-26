@@ -10,6 +10,10 @@
             android:title="@string/server_channel_settings_title"
             android:summary="@string/server_channel_settings_summary"/>
     <header
+            android:fragment="com.fusionx.lightirc.fragments.settings.DefaultUserFragment"
+            android:title="Default User Settings"
+            android:summary="The user settings that will be used as a base when creating new servers"/>
+    <header
             android:fragment="com.fusionx.lightirc.fragments.settings.AboutFragment"
             android:title="@string/about"
             android:summary="@string/settings_about_fragment_summary"/>

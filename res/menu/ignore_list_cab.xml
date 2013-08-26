@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/ignore_list_cab_add"
-          android:icon="@android:drawable/ic_menu_add"
-          android:title="@string/add"/>
-    <item android:id="@+id/ignore_list_cab_remove"
-          android:icon="@android:drawable/ic_menu_delete"
-          android:title="@string/remove"/>
+    <item
+            android:id="@+id/ignore_list_cab_add"
+            android:icon="@android:drawable/ic_menu_add"
+            android:title="@string/add"/>
+    <item
+            android:id="@+id/ignore_list_cab_remove"
+            android:icon="@android:drawable/ic_menu_delete"
+            android:title="@string/remove"/>
 </menu>

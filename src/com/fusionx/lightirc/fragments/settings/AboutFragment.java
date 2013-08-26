@@ -37,8 +37,8 @@ public class AboutFragment extends PreferenceFragment {
 
         final Preference appVersionPreference = getPreferenceScreen().findPreference
                 (PreferenceKeys.AppVersion);
-            if (appVersionPreference != null) {
-                appVersionPreference.setSummary(Utils.getAppVersion(getActivity()));
-            }
+        if (appVersionPreference != null) {
+            appVersionPreference.setSummary(Utils.getAppVersion(getActivity()));
+        }
     }
 }

@@ -63,6 +63,11 @@ public class PreferenceKeys {
     public final static String HideMessages = "pref_hide_messages";
     public final static String PartReason = "pref_part_reason";
 
+    // Default user profile
+    public final static String DefaultFirstNick = "pref_default_first_nick";
+    public final static String DefaultSecondNick = "pref_default_second_nick";
+    public final static String DefaultThirdNick = "pref_default_third_nick";
+
     // About settings
     public final static String AppVersion = "pref_app_version";
 }

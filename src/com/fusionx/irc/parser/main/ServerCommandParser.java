@@ -146,7 +146,7 @@ public class ServerCommandParser {
         final String recipient = parsedArray.get(2);
         final String message = parsedArray.get(3);
 
-        if(Utils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
+        if (!Utils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
             if (Utils.isChannel(recipient)) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
@@ -163,12 +163,14 @@ public class ServerCommandParser {
         final String recipient = parsedArray.get(2);
         final String action = parsedArray.get(3).replace("ACTION ", "");
 
-        if (Utils.isChannel(recipient)) {
-            final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
-            mSender.sendChannelAction(recipient, sendingUser, action);
-        } else {
-            final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
-            mServer.privateActionSent(sendingUser, action, false);
+        if (!Utils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
+            if (Utils.isChannel(recipient)) {
+                final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
+                mSender.sendChannelAction(recipient, sendingUser, action);
+            } else {
+                final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
+                mServer.privateActionSent(sendingUser, action, false);
+            }
         }
     }
 
