@@ -1,11 +1,9 @@
-package com.fusionx.lightirc.ui.preferences;
+package com.fusionx.lightirc.preferences.edittext;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.AttributeSet;
-
-import com.fusionx.lightlibrary.ui.NonEmptyEditTextPreference;
 
 import java.util.ArrayList;
 

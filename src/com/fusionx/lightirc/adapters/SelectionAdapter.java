@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightlibrary.adapters.TreeSetAdapter;
+import com.fusionx.lightirc.adapters.base.TreeSetAdapter;
 
 import java.util.ArrayList;
 import java.util.SortedSet;

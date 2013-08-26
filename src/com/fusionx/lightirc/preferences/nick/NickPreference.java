@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.ui.preferences;
+package com.fusionx.lightirc.preferences.nick;
 
 import android.content.Context;
 import android.content.SharedPreferences;

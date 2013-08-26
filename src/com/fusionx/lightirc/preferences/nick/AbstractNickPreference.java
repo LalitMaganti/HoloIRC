@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.ui.preferences;
+package com.fusionx.lightirc.preferences.nick;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

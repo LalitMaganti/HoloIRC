@@ -29,7 +29,7 @@ import android.preference.PreferenceFragment;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightlibrary.preferences.NumberPickerDialogPreference;
+import com.fusionx.lightirc.preferences.NumberPickerDialogPreference;
 
 public class ServerChannelSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {

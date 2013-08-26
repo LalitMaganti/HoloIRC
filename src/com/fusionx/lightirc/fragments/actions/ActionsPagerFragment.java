@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 
 import com.fusionx.irc.Server;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.ActionPagerAdapter;
+import com.fusionx.lightirc.adapters.actions.ActionPagerAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightlibrary.ui.NonSwipableViewPager;
+import com.fusionx.lightirc.views.NonSwipableViewPager;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment

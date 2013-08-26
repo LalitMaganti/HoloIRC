@@ -15,13 +15,12 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="listviewanimations" />
     <orderEntry type="library" name="holoirc-libs" level="project" />
-    <orderEntry type="module" module-name="LightLibrary" />
     <orderEntry type="module" module-name="SlidingMenu" />
-    <orderEntry type="library" name="android-support-v4" level="project" />
     <orderEntry type="module" module-name="UpdateableTreeSet" />
     <orderEntry type="module" module-name="SlidingTabs" />
     <orderEntry type="module" module-name="cwac-merge" />
     <orderEntry type="module" module-name="ShowcaseView" />
+    <orderEntry type="library" name="android-support-v4" level="project" />
   </component>
 </module>
 

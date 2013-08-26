@@ -4,7 +4,7 @@
                   xmlns:custom="http://schemas.android.com/apk/lib/com.fusionx.lightlibrary">
 
     <PreferenceCategory android:title="Server Settings">
-        <com.fusionx.lightlibrary.preferences.NumberPickerDialogPreference
+        <com.fusionx.lightirc.preferences.NumberPickerDialogPreference
                 android:key="pref_reconnect_tries"
                 android:defaultValue="3"
                 android:dialogMessage="The number of times the app should try to reconnect to the server"

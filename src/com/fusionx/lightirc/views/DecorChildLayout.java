@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.ui;
+package com.fusionx.lightirc.views;
 
 import android.content.Context;
 import android.graphics.Rect;

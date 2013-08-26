@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.adapters.actions;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
