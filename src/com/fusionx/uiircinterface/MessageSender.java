@@ -285,6 +285,12 @@ public class MessageSender {
         sendServerChannelMessage(event);
     }
 
+    public void userListReceived(final String channelName) {
+        final Bundle event = Utils.parcelDataForBroadcast(channelName,
+                ChannelEventType.UserListReceived);
+        sendChannelMessage(event);
+    }
+
     public void mention(final String messageDestination) {
         final NotificationManager mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -303,7 +309,7 @@ public class MessageSender {
             mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    fragmentSideHandlerInterface.mention(messageDestination);
+                    fragmentSideHandlerInterface.onMention(messageDestination);
                 }
             });
         } else {

@@ -36,7 +36,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationSet;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
@@ -75,18 +74,21 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
     private ServiceFragment mServiceFragment = null;
-    private UserListFragment mUserFragment = null;
+    private UserListFragment mUserListFragment = null;
     private IRCPagerFragment mIRCPagerFragment = null;
     private ActionsPagerFragment mActionsPagerFragment = null;
 
-    private String mServerTitle = null;
     private final ViewPagerOnPagerListener mListener = new ViewPagerOnPagerListener();
 
+    // Sliding menus
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
 
-    private final Handler handler = new Handler();
-    private View mHeaderView;
+    // Mention things
+    private final Handler mMentionHandler = new Handler();
+    private View mMentionView;
+
+    private String mServerTitle = null;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -123,14 +125,14 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                 .getDecorView();
 
         // Create Header view and then add to Decor View
-        mHeaderView = LayoutInflater.from(this.getActionBar().getThemedContext()).inflate(R
+        mMentionView = LayoutInflater.from(this.getActionBar().getThemedContext()).inflate(R
                 .layout.toast_mention, decorView, false);
-        mHeaderView.setVisibility(View.GONE);
+        mMentionView.setVisibility(View.GONE);
 
         // Create DecorChildLayout which will move all of the system's decor
         // view's children + the
         // Header View to itself. See DecorChildLayout for more info.
-        final DecorChildLayout decorContents = new DecorChildLayout(this, decorView, mHeaderView);
+        final DecorChildLayout decorContents = new DecorChildLayout(this, decorView, mMentionView);
 
         // Now add the DecorChildLayout to the decor view
         decorView.addView(decorContents, ViewGroup.LayoutParams.MATCH_PARENT,
@@ -149,12 +151,12 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
             mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
         }
 
-        mUserFragment = (UserListFragment) getSupportFragmentManager()
+        mUserListFragment = (UserListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.userlist_fragment);
 
         if (tabletSize) {
             final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.hide(mUserFragment);
+            ft.hide(mUserListFragment);
             ft.commit();
         }
 
@@ -172,7 +174,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     public void setUpViewPager() {
         mIRCPagerFragment = (IRCPagerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.pager_fragment);
-        mIRCPagerFragment.createServerFragment();
+        mIRCPagerFragment.createServerFragment(mServerTitle);
 
         final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         mIRCPagerFragment.setTabStrip(tabs);
@@ -210,7 +212,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                     mIRCPagerFragment.selectServerFragment();
                     break;
             }
-            mIRCPagerFragment.writeMessageToServer(message);
+            mIRCPagerFragment.writeMessageToServer(mServerTitle, message);
         }
     };
 
@@ -218,7 +220,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
      * Method called when the server reports that it has been connected to
      */
     private void connectedToServer() {
-        mIRCPagerFragment.connectedToServer();
+        mIRCPagerFragment.connectedToServer(mServerTitle);
         mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
     }
 
@@ -244,7 +246,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                 return true;
             case R.id.activity_server_channel_ab_users:
                 if (!mUserSlidingMenu.isMenuShowing()) {
-                    mUserFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
+                    mUserListFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
                 }
                 mUserSlidingMenu.toggle();
                 return true;
@@ -273,7 +275,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     // CommonIRCListener Callbacks
     @Override
     public Server getServer(final boolean nullAllowed) {
-        return mServiceFragment.getServer(nullAllowed);
+        return mServiceFragment.getServer(nullAllowed, mServerTitle);
     }
 
     /**
@@ -324,9 +326,9 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
      * @param channelName - name of channel which was updated
      */
     @Override
-    public void updateUserList(final String channelName) {
+    public void onUserListChanged(final String channelName) {
         if (channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
-            mUserFragment.updateUserList();
+            mUserListFragment.onUserListUpdated();
         }
     }
 
@@ -353,7 +355,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                         Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... voids) {
-                        mServiceFragment.removeServiceReference();
+                        mServiceFragment.removeServiceReference(mServerTitle);
                         return null;
                     }
                 };
@@ -375,7 +377,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                         Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... voids) {
-                        mServiceFragment.removeServiceReference();
+                        mServiceFragment.removeServiceReference(mServerTitle);
                         return null;
                     }
 
@@ -447,31 +449,28 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
 
     @Override
     public Handler getFragmentHandler(String destination, FragmentType type) {
-        return mIRCPagerFragment.getFragmentHandler(destination, type);
+        return mIRCPagerFragment.getFragmentHandler(destination, type, mServerTitle);
     }
 
-    public void mention(final String destination) {
-        final int offset = -getActionBar().getHeight();
+    /**
+     * Method called when the user nick is mentioned by another user
+     * @param destination - the place from which the mention originated
+     */
+    public void onMention(final String destination) {
         final String message = String.format(getString(R.string.activity_mentioned), destination);
 
-        AnimationSet set = (AnimationSet) AnimationUtils.loadAnimation(this, R.anim.action_bar_in);
-
-
-        final TextView textView = (TextView) mHeaderView.findViewById(R.id.toast_text);
+        final TextView textView = (TextView) mMentionView.findViewById(R.id.toast_text);
         textView.setText(message);
 
-        mHeaderView.startAnimation(set);
-        mHeaderView.setVisibility(View.VISIBLE);
+        mMentionView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.action_bar_in));
+        mMentionView.setVisibility(View.VISIBLE);
 
-        handler.postDelayed(new Runnable() {
+        mMentionHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                AnimationSet set1 = (AnimationSet) AnimationUtils.loadAnimation
-                        (IRCFragmentActivity.this, R.anim.action_bar_out);
-
-                mHeaderView.startAnimation(set1);
-                mHeaderView.setVisibility(View.INVISIBLE);
+                mMentionView.startAnimation(AnimationUtils.loadAnimation
+                        (IRCFragmentActivity.this, R.anim.action_bar_out));
+                mMentionView.setVisibility(View.GONE);
             }
         }, 2500);
     }
@@ -482,18 +481,13 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     private class ViewPagerOnPagerListener extends ViewPager.SimpleOnPageChangeListener {
         @Override
         public void onPageSelected(final int position) {
-            supportInvalidateOptionsMenu();
             invalidateOptionsMenu();
             closeAllSlidingMenus();
 
             mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
 
-            if (getResources().getBoolean(R.bool.isTablet)) {
-                mUserFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
-            }
-
-            if (mUserFragment.getMode() != null) {
-                mUserFragment.getMode().finish();
+            if (mUserListFragment.getMode() != null) {
+                mUserListFragment.getMode().finish();
             }
 
             mIRCPagerFragment.setCurrentItemIndex(position);

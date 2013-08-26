@@ -75,10 +75,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     /**
      * Creates the ServerFragment object
      */
-    public void createServerFragment() {
+    public void createServerFragment(final String serverTitle) {
         if (mAdapter == null) {
             mAdapter = new IRCPagerAdapter(getChildFragmentManager());
-            mAdapter.addServerFragment(mCallback.getServerTitle());
+            mAdapter.addServerFragment(serverTitle);
         }
         final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
                 {android.R.attr.windowBackground});
@@ -164,9 +164,9 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * @param type        - the type of the fragment we are trying to get the handler from
      * @return - the handler object we are trying to get
      */
-    public Handler getFragmentHandler(final String destination, final FragmentType type) {
-        final String nonNullDestination = destination != null ? destination : mCallback
-                .getServerTitle();
+    public Handler getFragmentHandler(final String destination, final FragmentType type,
+                                      final String serverTitle) {
+        final String nonNullDestination = destination != null ? destination : serverTitle;
         if (mAdapter != null) {
             final IRCFragment fragment = mAdapter.getFragment(nonNullDestination,
                     type);
@@ -209,7 +209,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Override
     public void updateUserList(String channelName) {
-        mCallback.updateUserList(channelName);
+        mCallback.onUserListChanged(channelName);
     }
 
     @Override
@@ -217,24 +217,22 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return mCallback.getServer(nullAllowed);
     }
 
-    public void connectedToServer() {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(mCallback
-                .getServerTitle(), FragmentType.Server);
+    public void connectedToServer(final String serverTitle) {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
+                FragmentType.Server);
         fragment.onConnectedToServer();
     }
 
-    public void writeMessageToServer(final String message) {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(mCallback
-                .getServerTitle(), FragmentType.Server);
+    public void writeMessageToServer(final String serverTitle, final String message) {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
+                FragmentType.Server);
         if (fragment != null) {
             fragment.appendToTextView(message + "\n");
         }
     }
 
     public interface IRCPagerInterface {
-        public String getServerTitle();
-
-        public void updateUserList(String channelName);
+        public void onUserListChanged(String channelName);
 
         public Server getServer(boolean nullAllowed);
     }

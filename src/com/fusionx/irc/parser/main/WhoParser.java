@@ -25,6 +25,7 @@ import com.fusionx.common.Utils;
 import com.fusionx.irc.Channel;
 import com.fusionx.irc.ChannelUser;
 import com.fusionx.irc.UserChannelInterface;
+import com.fusionx.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,9 +34,11 @@ import java.util.ArrayList;
 public class WhoParser {
     private final UserChannelInterface mUserChannelInterface;
     private Channel whoChannel;
+    private final String mServerTitle;
 
-    WhoParser(UserChannelInterface userChannelInterface) {
-        this.mUserChannelInterface = userChannelInterface;
+    WhoParser(UserChannelInterface userChannelInterface, final String serverTitle) {
+        mUserChannelInterface = userChannelInterface;
+        mServerTitle = serverTitle;
     }
 
     void parseWhoReply(final ArrayList<String> parsedArray) {
@@ -58,6 +61,7 @@ public class WhoParser {
 
     void parseWhoFinished() {
         whoChannel.getUsers().addMarked();
+        MessageSender.getSender(mServerTitle).userListReceived(whoChannel.getName());
         whoChannel = null;
     }
 }

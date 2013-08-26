@@ -119,9 +119,6 @@ public class ServiceFragment extends Fragment {
         return null;
     }
 
-    /**
-     *
-     */
     public void setUpService() {
         final Intent service = new Intent(getActivity(), IRCBridgeService.class);
         service.putExtra("server", true);
@@ -141,7 +138,7 @@ public class ServiceFragment extends Fragment {
 
             mService.setServerDisplayed(mCallback.getServerTitle());
 
-            if (getServer(true) != null) {
+            if (getServer(true, mCallback.getServerTitle()) != null) {
                 mCallback.repopulateFragmentsInPager();
             } else {
                 final ServerConfiguration.Builder builder =
@@ -158,9 +155,9 @@ public class ServiceFragment extends Fragment {
         }
     };
 
-    public Server getServer(final boolean nullAllowed) {
+    public Server getServer(final boolean nullAllowed, final String serverTitle) {
         Server server;
-        if (mService == null || (server = mService.getServer(mCallback.getServerTitle())) == null) {
+        if (mService == null || (server = mService.getServer(serverTitle)) == null) {
             if (nullAllowed) {
                 return null;
             } else {
@@ -171,18 +168,18 @@ public class ServiceFragment extends Fragment {
         }
     }
 
-    public void removeServiceReference() {
+    public void removeServiceReference(final String serverTitle) {
         mService.setServerDisplayed(null);
-        mService.onDisconnect(mCallback.getServerTitle());
+        mService.onDisconnect(serverTitle);
         mService = null;
     }
 
     public interface ServiceFragmentCallback extends FragmentSideHandlerInterface {
         public void setUpViewPager();
 
-        public void repopulateFragmentsInPager();
-
         public String getServerTitle();
+
+        public void repopulateFragmentsInPager();
 
         public void onDisconnect(final boolean expected, final boolean retryPending);
     }

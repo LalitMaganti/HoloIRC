@@ -87,15 +87,15 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         if (!channelName.equals(mChannelName)) {
             final TreeSet<ChannelUser> userList = getUserList(channelName);
             if (userList != null) {
+                mChannelName = channelName;
                 getUserListAdapter().setInternalSet(userList);
                 getUserListAdapter().setChannelName(channelName);
-                mChannelName = channelName;
             }
         }
 
         getListView().smoothScrollToPosition(0);
         getListAdapter().reset();
-        getListAdapter().notifyDataSetInvalidated();
+        getListAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -213,10 +213,11 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         return (AlphaInAnimationAdapter) super.getListAdapter();
     }
 
-    public void updateUserList() {
+    public void onUserListUpdated() {
         if (mode != null) {
             mode.finish();
         }
+        getListAdapter().reset();
         getListAdapter().notifyDataSetChanged();
     }
 

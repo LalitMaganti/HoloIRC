@@ -9,5 +9,5 @@ public interface FragmentSideHandlerInterface {
 
     public Handler getFragmentHandler(final String destination, final FragmentType type);
 
-    public void mention(final String destination);
+    public void onMention(final String destination);
 }

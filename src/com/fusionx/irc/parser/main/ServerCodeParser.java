@@ -59,7 +59,7 @@ public class ServerCodeParser {
     ServerCodeParser(final Context context, final ServerLineParser parser) {
         mServer = parser.getServer();
         mUserChannelInterface = mServer.getUserChannelInterface();
-        mWhoParser = new WhoParser(mUserChannelInterface);
+        mWhoParser = new WhoParser(mUserChannelInterface, mServer.getTitle());
         mContext = context;
         mSender = MessageSender.getSender(mServer.getTitle());
     }

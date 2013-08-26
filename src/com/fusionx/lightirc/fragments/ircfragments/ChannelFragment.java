@@ -53,6 +53,9 @@ public class ChannelFragment extends IRCFragment {
                     if (!Utils.isMessagesFromChannelShown(getActivity())) {
                         break;
                     }
+                case UserListReceived:
+                    callback.updateUserList(title);
+                    break;
                 case Generic:
                     appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
                     break;
