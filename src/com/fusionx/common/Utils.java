@@ -160,7 +160,7 @@ public class Utils {
             event.putString(EventBundleKeys.destination, destination);
         }
         event.putSerializable(EventBundleKeys.eventType, type);
-        if(message.length > 0) {
+        if (message.length > 0) {
             event.putString(EventBundleKeys.message, message[0]);
         }
 

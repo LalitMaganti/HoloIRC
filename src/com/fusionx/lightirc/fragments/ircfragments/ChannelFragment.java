@@ -105,7 +105,7 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        ChannelFragmentCallback callback = FragmentUtils.getParent(this,
+        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
                 ChannelFragmentCallback.class);
         MessageParser.channelMessageToParse(getActivity(), callback.getServer(false), title,
                 message);

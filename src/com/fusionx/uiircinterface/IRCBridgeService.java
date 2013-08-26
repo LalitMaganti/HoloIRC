@@ -21,13 +21,11 @@
 
 package com.fusionx.uiircinterface;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
@@ -54,7 +52,6 @@ public class IRCBridgeService extends Service {
         }
     }
 
-    //@Getter
     private ConnectionManager connectionManager = null;
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
@@ -66,18 +63,20 @@ public class IRCBridgeService extends Service {
             connectionManager = new ConnectionManager(this);
         }
 
-        setupNotification();
-
         final ServerConfiguration configuration = server.build();
 
         MessageSender.getSender(server.getTitle()).initialSetup(this);
         final ConnectionWrapper thread = new ConnectionWrapper(configuration, this);
         connectionManager.put(server.getTitle(), thread);
+
+        updateNotification();
+
         thread.start();
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    private void setupNotification() {
+    private void updateNotification() {
+        final String text = String.format(getResources().getQuantityString(R.plurals
+                .server_connection, connectionManager.size()), connectionManager.size());
         final Intent intent = new Intent(this, MainServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCBridgeService.class);
         intent2.putExtra("stop", true);
@@ -85,8 +84,8 @@ public class IRCBridgeService extends Service {
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText(getString(R.string.service_holoirc_running))
-                .setTicker(getString(R.string.service_holoirc_running))
+                .setContentText(text)
+                .setTicker(text)
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
@@ -121,6 +120,8 @@ public class IRCBridgeService extends Service {
             connectionManager.remove(serverName);
             if (connectionManager.isEmpty()) {
                 stopForeground(true);
+            } else {
+                updateNotification();
             }
         }
     }

@@ -29,4 +29,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item quantity="one">1 channel selected</item>
         <item quantity="other">%d channels selected</item>
     </plurals>
+
+    <plurals name="server_connection">
+        <item quantity="one">1 server connected</item>
+        <item quantity="other">%d servers connected</item>
+    </plurals>
 </resources>

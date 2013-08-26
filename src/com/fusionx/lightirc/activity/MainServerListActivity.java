@@ -179,7 +179,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         mBuilder = (ServerConfiguration.Builder) view.getTag();
         popup.inflate(R.menu.activity_server_list_popup);
 
-        if (serverIsConnected(mBuilder.getTitle())) {
+        if (serverIsAvailable(mBuilder.getTitle())) {
             popup.getMenu().getItem(1).setEnabled(false);
             popup.getMenu().getItem(2).setEnabled(false);
         } else {
@@ -218,6 +218,7 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
 
     private void disconnectFromServer(final ServerConfiguration.Builder builder) {
         ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
+        mService.onDisconnect(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
@@ -257,10 +258,10 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         setUpServers(servers);
     }
 
-    private boolean serverIsConnected(final String title) {
+    private boolean serverIsAvailable(final String title) {
         final Server server = getServer(title);
-        return mService != null && server != null &&
-                server.getStatus().equals(getString(R.string.status_connected));
+        return mService != null && server != null && !server.getStatus().equals(getString(R
+                .string.status_disconnected));
     }
 
     // BuilderAdapter callbacks

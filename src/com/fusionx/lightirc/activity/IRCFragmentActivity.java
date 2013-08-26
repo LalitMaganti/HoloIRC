@@ -454,6 +454,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
 
     /**
      * Method called when the user nick is mentioned by another user
+     *
      * @param destination - the place from which the mention originated
      */
     public void onMention(final String destination) {
