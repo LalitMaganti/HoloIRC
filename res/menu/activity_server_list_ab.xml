@@ -22,12 +22,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
             android:id="@+id/activity_server_list_ab_add"
-            android:showAsAction="ifRoom"
+            android:showAsAction="withText|ifRoom"
             android:icon="@android:drawable/ic_menu_add"
             android:title="@string/add"/>
     <item
             android:id="@+id/activity_server_list_ab_settings"
-            android:showAsAction="ifRoom"
+            android:showAsAction="withText|ifRoom"
             android:icon="@android:drawable/ic_menu_manage"
             android:title="@string/settings_title"/>
 </menu>
