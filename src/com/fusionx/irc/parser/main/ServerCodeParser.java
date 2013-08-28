@@ -26,12 +26,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.Server;
-import com.fusionx.irc.UserChannelInterface;
+import com.fusionx.irc.core.Channel;
+import com.fusionx.irc.core.Server;
+import com.fusionx.irc.core.UserChannelInterface;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.uiircinterface.core.MessageSender;
 
 import java.util.ArrayList;
 

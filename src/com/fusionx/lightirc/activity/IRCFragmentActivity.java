@@ -41,12 +41,12 @@ import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.ChannelUser;
-import com.fusionx.irc.PrivateMessageUser;
-import com.fusionx.irc.Server;
-import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.core.Channel;
+import com.fusionx.irc.core.ChannelUser;
+import com.fusionx.irc.core.PrivateMessageUser;
+import com.fusionx.irc.core.Server;
+import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.fragments.ServiceFragment;
@@ -56,7 +56,7 @@ import com.fusionx.lightirc.fragments.ircfragments.IRCPagerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.views.ActionsSlidingMenu;
 import com.fusionx.lightirc.views.DecorChildLayout;
-import com.fusionx.uiircinterface.ServerCommandSender;
+import com.fusionx.uiircinterface.core.ServerCommandSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 

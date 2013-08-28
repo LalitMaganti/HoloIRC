@@ -66,7 +66,7 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
         mUrl = (EditTextPreference) findPreference(URL);
         mUrl.setOnPreferenceChangeListener(this);
 
-        if(!mCallback.canSaveChanges()) {
+        if (!mCallback.canSaveChanges()) {
             setupNewServer();
         }
 

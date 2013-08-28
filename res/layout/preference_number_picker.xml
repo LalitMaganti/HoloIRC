@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical" >
+              android:orientation="vertical">
 
     <TextView
             android:id="@+id/text_dialog_message"
@@ -11,7 +11,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dip"
             android:paddingLeft="12dip"
-            android:paddingRight="12dip" >
+            android:paddingRight="12dip">
     </TextView>
 
     <NumberPicker
@@ -19,6 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dip"
-            android:layout_marginTop="6dip" />
+            android:layout_marginTop="6dip"/>
 
 </LinearLayout>

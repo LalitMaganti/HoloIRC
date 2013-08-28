@@ -25,7 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.fusionx.common.PreferenceKeys;
-import com.fusionx.irc.ServerConfiguration;
+import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.misc.NickStorage;
 
 import java.util.ArrayList;

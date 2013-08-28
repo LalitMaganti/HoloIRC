@@ -49,7 +49,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.fusionx.uiircinterface.IRCBridgeService"/>
+        <service android:name="com.fusionx.uiircinterface.core.IRCBridgeService"/>
     </application>
 
 </manifest>

@@ -26,15 +26,15 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Server;
-import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.constants.ServerCommands;
+import com.fusionx.irc.core.Server;
+import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.listeners.CoreListener;
 import com.fusionx.irc.misc.NickStorage;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.uiircinterface.core.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 

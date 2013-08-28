@@ -21,7 +21,7 @@
 
 package com.fusionx.irc.writers;
 
-import com.fusionx.irc.Channel;
+import com.fusionx.irc.core.Channel;
 
 import org.apache.commons.lang3.StringUtils;
 

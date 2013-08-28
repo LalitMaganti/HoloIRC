@@ -1,4 +1,4 @@
-package com.fusionx.irc;
+package com.fusionx.irc.core;
 
 import android.os.Bundle;
 import android.os.Handler;

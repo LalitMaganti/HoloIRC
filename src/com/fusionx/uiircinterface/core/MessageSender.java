@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.uiircinterface;
+package com.fusionx.uiircinterface.core;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -33,10 +33,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.ChannelUser;
-import com.fusionx.irc.User;
 import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.core.Channel;
+import com.fusionx.irc.core.ChannelUser;
+import com.fusionx.irc.core.User;
 import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;

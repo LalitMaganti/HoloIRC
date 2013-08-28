@@ -19,12 +19,12 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.uiircinterface;
+package com.fusionx.uiircinterface.core;
 
 import android.content.Context;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Server;
+import com.fusionx.irc.core.Server;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.collections;
 
-import com.fusionx.irc.ServerConfiguration;
+import com.fusionx.irc.core.ServerConfiguration;
 
 import java.util.ArrayList;
 

@@ -35,7 +35,7 @@ import android.preference.PreferenceScreen;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.IRCBridgeService;
+import com.fusionx.uiircinterface.core.IRCBridgeService;
 
 public class AppearanceSettingsFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {

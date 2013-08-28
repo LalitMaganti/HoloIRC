@@ -25,7 +25,7 @@
     <attr name="overflow_menu_drawable" format="reference"/>
 
     <declare-styleable name="NumberPickerDialogPreference">
-        <attr name="android:max" />
-        <attr name="min" format="integer" />
+        <attr name="android:max"/>
+        <attr name="min" format="integer"/>
     </declare-styleable>
 </resources>

@@ -25,15 +25,15 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.AppUser;
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.ChannelUser;
-import com.fusionx.irc.PrivateMessageUser;
-import com.fusionx.irc.Server;
-import com.fusionx.irc.UserChannelInterface;
 import com.fusionx.irc.constants.ServerCommands;
+import com.fusionx.irc.core.AppUser;
+import com.fusionx.irc.core.Channel;
+import com.fusionx.irc.core.ChannelUser;
+import com.fusionx.irc.core.PrivateMessageUser;
+import com.fusionx.irc.core.Server;
+import com.fusionx.irc.core.UserChannelInterface;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.uiircinterface.core.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 

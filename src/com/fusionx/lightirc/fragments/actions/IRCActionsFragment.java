@@ -30,7 +30,7 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.commonsware.cwac.merge.MergeAdapter;
-import com.fusionx.irc.Server;
+import com.fusionx.irc.core.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
 import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
@@ -38,7 +38,7 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
-import com.fusionx.uiircinterface.ServerCommandSender;
+import com.fusionx.uiircinterface.core.ServerCommandSender;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 

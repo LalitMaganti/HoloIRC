@@ -1,10 +1,10 @@
 package com.fusionx.irc.parser.connection;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.constants.ServerReplyCodes;
+import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.writers.ServerWriter;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.uiircinterface.core.MessageSender;
 
 import java.util.ArrayList;
 

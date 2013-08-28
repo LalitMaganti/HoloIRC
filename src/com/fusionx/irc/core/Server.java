@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc;
+package com.fusionx.irc.core;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -33,7 +33,7 @@ import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.uiircinterface.core.MessageSender;
 import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
 
 import org.apache.commons.lang3.StringUtils;

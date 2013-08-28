@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc;
+package com.fusionx.irc.core;
 
 import android.os.Parcel;
 import android.os.Parcelable;

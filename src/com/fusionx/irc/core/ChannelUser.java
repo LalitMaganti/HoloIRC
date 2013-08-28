@@ -1,4 +1,4 @@
-package com.fusionx.irc;
+package com.fusionx.irc.core;
 
 import android.content.Context;
 

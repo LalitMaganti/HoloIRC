@@ -11,10 +11,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fusionx.irc.Server;
-import com.fusionx.irc.ServerConfiguration;
-import com.fusionx.uiircinterface.IRCBridgeService;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.irc.core.Server;
+import com.fusionx.irc.core.ServerConfiguration;
+import com.fusionx.uiircinterface.core.IRCBridgeService;
+import com.fusionx.uiircinterface.core.MessageSender;
 import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
 
 public class ServiceFragment extends Fragment {

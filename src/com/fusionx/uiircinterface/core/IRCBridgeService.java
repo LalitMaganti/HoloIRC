@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.uiircinterface;
+package com.fusionx.uiircinterface.core;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -29,10 +29,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import com.fusionx.irc.Server;
-import com.fusionx.irc.ServerConfiguration;
 import com.fusionx.irc.connection.ConnectionManager;
 import com.fusionx.irc.connection.ConnectionWrapper;
+import com.fusionx.irc.core.Server;
+import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.activity.MainServerListActivity;
 

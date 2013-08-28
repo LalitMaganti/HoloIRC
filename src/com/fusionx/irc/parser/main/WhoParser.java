@@ -22,10 +22,10 @@
 package com.fusionx.irc.parser.main;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.ChannelUser;
-import com.fusionx.irc.UserChannelInterface;
-import com.fusionx.uiircinterface.MessageSender;
+import com.fusionx.irc.core.Channel;
+import com.fusionx.irc.core.ChannelUser;
+import com.fusionx.irc.core.UserChannelInterface;
+import com.fusionx.uiircinterface.core.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 

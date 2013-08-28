@@ -19,15 +19,15 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.uiircinterface;
+package com.fusionx.uiircinterface.core;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
 import com.fusionx.common.Utils;
-import com.fusionx.irc.Channel;
-import com.fusionx.irc.PrivateMessageUser;
-import com.fusionx.irc.Server;
+import com.fusionx.irc.core.Channel;
+import com.fusionx.irc.core.PrivateMessageUser;
+import com.fusionx.irc.core.Server;
 
 import org.apache.commons.lang3.StringUtils;
 
