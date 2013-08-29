@@ -23,13 +23,16 @@ package com.fusionx.lightirc.adapters.actions;
 
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import lombok.Getter;
 
 public class ServerActionsAdapter extends ActionsArrayAdapter {
     @Getter
     private boolean connected = false;
 
-    public ServerActionsAdapter(final Context context, final String[] objects) {
+    public ServerActionsAdapter(final Context context, final List<String> objects) {
         super(context, objects);
     }
 
@@ -40,6 +43,6 @@ public class ServerActionsAdapter extends ActionsArrayAdapter {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
-        mObjects.set(2, connected ? "Disconnect" : "Close");
+        mList.set(2, connected ? "Disconnect" : "Close");
     }
 }

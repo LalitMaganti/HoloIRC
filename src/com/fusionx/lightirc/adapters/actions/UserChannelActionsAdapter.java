@@ -30,15 +30,16 @@ import java.util.Arrays;
 
 public class UserChannelActionsAdapter extends ActionsArrayAdapter {
     public UserChannelActionsAdapter(Context context) {
-        super(context, context.getResources().getStringArray(R.array.channel_actions));
+        super(context, Arrays.asList(context.getResources().getStringArray(R.array
+                .channel_actions)));
     }
 
-    public void setServerVisible() {
-        mObjects = new ArrayList<>();
-    }
+    //public void setServerVisible() {
+    //    mObjects = new ArrayList<>();
+    //}
 
     public void setChannelVisible(boolean visible) {
-        mObjects = visible ? Arrays.asList(mContext.getResources()
+        mList = visible ? Arrays.asList(mContext.getResources()
                 .getStringArray(R.array.channel_actions)) :
                 Arrays.asList(mContext.getResources().getStringArray(R.array.user_actions));
     }

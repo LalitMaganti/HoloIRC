@@ -26,20 +26,26 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.base.HackedArrayAdapter;
 
-public abstract class ActionsArrayAdapter extends HackedArrayAdapter<String> {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class ActionsArrayAdapter extends ArrayAdapter<String> {
     private final LayoutInflater inflater;
     protected Context mContext;
+    protected List<String> mList;
 
-    public ActionsArrayAdapter(final Context context, final String[] objects) {
+    public ActionsArrayAdapter(final Context context, final List<String> objects) {
         super(context, android.R.layout.simple_list_item_1, objects);
         mContext = context;
         inflater = LayoutInflater.from(mContext);
+        mList = objects;
     }
 
     @Override

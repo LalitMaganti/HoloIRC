@@ -42,6 +42,8 @@ import com.fusionx.uiircinterface.core.ServerCommandSender;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import java.util.Arrays;
+
 public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
     private FragmentType type;
@@ -58,7 +60,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
                              final Bundle savedInstanceState) {
         final MergeAdapter mergeAdapter = new MergeAdapter();
         final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),
-                getResources().getStringArray(R.array.server_actions));
+                Arrays.asList(getResources().getStringArray(R.array.server_actions)));
         final UserChannelActionsAdapter channelAdapter = new UserChannelActionsAdapter
                 (getActivity());
 
