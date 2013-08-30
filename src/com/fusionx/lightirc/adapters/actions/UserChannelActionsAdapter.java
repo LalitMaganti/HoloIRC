@@ -34,13 +34,16 @@ public class UserChannelActionsAdapter extends ActionsArrayAdapter {
                 .channel_actions)));
     }
 
-    //public void setServerVisible() {
-    //    mObjects = new ArrayList<>();
-    //}
+    public void setServerVisible() {
+        mList.clear();
+        mList.addAll(Arrays.asList(mContext.getResources().getStringArray(R.array
+                .channel_actions)));
+    }
 
     public void setChannelVisible(boolean visible) {
-        mList = visible ? Arrays.asList(mContext.getResources()
-                .getStringArray(R.array.channel_actions)) :
-                Arrays.asList(mContext.getResources().getStringArray(R.array.user_actions));
+        mList.clear();
+        mList.addAll(visible ? Arrays.asList(mContext.getResources().getStringArray(R.array
+                .channel_actions)) : Arrays.asList(mContext.getResources().getStringArray(R.array
+                .user_actions)));
     }
 }
