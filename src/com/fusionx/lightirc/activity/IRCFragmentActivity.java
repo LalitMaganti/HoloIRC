@@ -119,8 +119,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
         }
 
         // Get Window Decor View
-        final ViewGroup decorView = (ViewGroup) getWindow()
-                .getDecorView();
+        final ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
 
         // Create Header view and then add to Decor View
         mMentionView = LayoutInflater.from(this.getActionBar().getThemedContext()).inflate(R

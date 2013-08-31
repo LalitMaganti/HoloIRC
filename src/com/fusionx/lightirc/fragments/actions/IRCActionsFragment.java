@@ -192,7 +192,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public void onTabChanged(final FragmentType selectedType) {
         if (selectedType != type) {
             type = selectedType;
-            if (getListAdapter() != null) {
+            if (getAlphaAdapter() != null && getListAdapter() != null) {
                 final View view = (View) getListAdapter().getItem(5);
                 final TextView textView = (TextView) view.findViewById(R.id
                         .sliding_menu_heading_textview);
