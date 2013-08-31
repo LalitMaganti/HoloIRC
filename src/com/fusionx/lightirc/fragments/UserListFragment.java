@@ -90,12 +90,11 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
                 mChannelName = channelName;
                 getUserListAdapter().setInternalSet(userList);
                 getUserListAdapter().setChannelName(channelName);
+                getListAdapter().notifyDataSetChanged();
             }
         }
 
         getListView().smoothScrollToPosition(0);
-        getListAdapter().reset();
-        getListAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -217,7 +216,6 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         if (mode != null) {
             mode.finish();
         }
-        getListAdapter().reset();
         getListAdapter().notifyDataSetChanged();
     }
 

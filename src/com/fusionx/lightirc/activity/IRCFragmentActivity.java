@@ -78,8 +78,6 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     private IRCPagerFragment mIRCPagerFragment = null;
     private ActionsPagerFragment mActionsPagerFragment = null;
 
-    private final ViewPagerOnPagerListener mListener = new ViewPagerOnPagerListener();
-
     // Sliding menus
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
@@ -130,8 +128,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
         mMentionView.setVisibility(View.GONE);
 
         // Create DecorChildLayout which will move all of the system's decor
-        // view's children + the
-        // Header View to itself. See DecorChildLayout for more info.
+        // view's children + the  Header View to itself. See DecorChildLayout for more info.
         final DecorChildLayout decorContents = new DecorChildLayout(this, decorView, mMentionView);
 
         // Now add the DecorChildLayout to the decor view
@@ -479,7 +476,8 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
     /**
      * Listener used when the view pages changes pages
      */
-    private class ViewPagerOnPagerListener extends ViewPager.SimpleOnPageChangeListener {
+    final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
+            .SimpleOnPageChangeListener() {
         @Override
         public void onPageSelected(final int position) {
             invalidateOptionsMenu();
@@ -491,7 +489,10 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
                 mUserListFragment.getMode().finish();
             }
 
+            mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
+                    .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
+
             mIRCPagerFragment.setCurrentItemIndex(position);
         }
-    }
+    };
 }

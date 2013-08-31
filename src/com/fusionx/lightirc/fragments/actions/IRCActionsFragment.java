@@ -163,8 +163,6 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
             getServerAdapter().setConnected(callback.isConnectedToServer());
             getServerAdapter().notifyDataSetChanged();
         }
-        getAlphaAdapter().reset();
-        getAlphaAdapter().notifyDataSetChanged();
 
         callback.switchToIRCActionFragment();
     }

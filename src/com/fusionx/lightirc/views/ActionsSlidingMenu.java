@@ -11,7 +11,7 @@ public class ActionsSlidingMenu extends SlidingMenu {
         setShadowDrawable(R.drawable.shadow);
         setMode(SlidingMenu.LEFT);
         setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        setTouchmodeMarginThreshold(5);
+        setTouchmodeMarginThreshold(10);
         setMenu(R.layout.sliding_menu_fragment_actions);
         setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
     }

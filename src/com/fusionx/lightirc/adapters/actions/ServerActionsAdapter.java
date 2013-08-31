@@ -23,7 +23,6 @@ package com.fusionx.lightirc.adapters.actions;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;

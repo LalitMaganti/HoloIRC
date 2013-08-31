@@ -31,9 +31,7 @@ import android.widget.TextView;
 
 import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.base.HackedArrayAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ActionsArrayAdapter extends ArrayAdapter<String> {
