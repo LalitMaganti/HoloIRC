@@ -31,7 +31,6 @@ import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.listeners.CoreListener;
-import com.fusionx.irc.misc.NickStorage;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.core.MessageSender;
@@ -42,7 +41,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.fusionx.irc.constants.Constants.LOG_TAG;
+import static com.fusionx.common.Constants.LOG_TAG;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.irc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
 import static com.fusionx.irc.constants.ServerReplyCodes.RPL_WELCOME;
@@ -99,7 +98,8 @@ public class ServerConnectionParser {
                                               final ArrayList<String> parsedArray,
                                               final MessageSender sender,
                                               final ServerWriter writer, final Context context,
-                                              final NickStorage nickStorage, final String line) {
+                                              final ServerConfiguration.NickStorage nickStorage,
+                                              final String line) {
         final int code = Integer.parseInt(parsedArray.get(1));
         switch (code) {
             case RPL_WELCOME:

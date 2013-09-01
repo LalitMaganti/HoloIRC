@@ -25,11 +25,13 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item name="server_card_background">@color/server_card_background_light</item>
         <item name="server_card_text">@android:color/black</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
+        <item name="showcaseViewStyle">@style/ShowcaseView.Light</item>
     </style>
 
     <style name="Dark" parent="@android:style/Theme.Holo">
         <item name="server_card_background">@color/server_card_background_dark</item>
         <item name="server_card_text">@android:color/white</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
+        <item name="showcaseViewStyle">@style/ShowcaseView</item>
     </style>
 </resources>

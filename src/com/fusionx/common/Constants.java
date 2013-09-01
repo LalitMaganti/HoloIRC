@@ -19,12 +19,22 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc.misc;
+package com.fusionx.common;
 
-import com.fusionx.irc.enums.UserLevel;
+import com.google.common.collect.ImmutableList;
 
-public class IRCUtils {
-    public static boolean isUserOwnerOrVoice(final UserLevel level) {
-        return level.equals(UserLevel.OP) || level.equals(UserLevel.VOICE);
+/**
+ * Class containing generic constants
+ */
+public class Constants {
+    // Non final to prevent warnings
+    public static boolean DEBUG = false;
+
+    public final static String LOG_TAG = "HoloIRC";
+
+    public final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
+            '+', '!');
+
+    private Constants() {
     }
 }

@@ -39,7 +39,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.fusionx.irc.constants.Constants.LOG_TAG;
+import static com.fusionx.common.Constants.LOG_TAG;
 
 public class ServerLineParser {
     @Getter(AccessLevel.PACKAGE)

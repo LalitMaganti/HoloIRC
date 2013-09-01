@@ -26,7 +26,6 @@ import android.content.SharedPreferences;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.irc.core.ServerConfiguration;
-import com.fusionx.irc.misc.NickStorage;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,7 +48,8 @@ public class FileConfigurationConverter {
                 "HoloIRCUser");
         final String secondChoice = serverSettings.getString(PreferenceKeys.SecondNick, "");
         final String thirdChoice = serverSettings.getString(PreferenceKeys.ThirdNick, "");
-        final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
+        final ServerConfiguration.NickStorage nickStorage = new ServerConfiguration.NickStorage
+                (firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
         builder.setRealName(serverSettings.getString(PreferenceKeys.RealName, "HoloIRC"));
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));

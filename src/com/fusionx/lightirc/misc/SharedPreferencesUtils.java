@@ -78,8 +78,8 @@ public class SharedPreferencesUtils {
         for (final String fileName : folder.list()) {
             if (fileName.startsWith("server_")) {
                 array.add(migrateFileToNewSystem(context, fileName));
-            } else if (!fileName.equals("main.xml") &&
-                    !fileName.equals("com.fusionx.lightirc_preferences.xml")) {
+            } else if (!fileName.equals("main.xml") && !fileName.equals("com.fusionx" +
+                    ".lightirc_preferences.xml") && !fileName.equals("showcase_internal.xml")) {
                 array.add(fileName.replace(".xml", ""));
             }
         }

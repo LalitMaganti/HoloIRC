@@ -41,7 +41,7 @@ import java.util.ArrayList;
 
 import de.scrum_master.util.UpdateableTreeSet;
 
-import static com.fusionx.irc.constants.Constants.LOG_TAG;
+import static com.fusionx.common.Constants.LOG_TAG;
 
 public class ServerCommandParser {
     private final Context mContext;

@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.adapters;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,52 +29,80 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.fusionx.common.Constants;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.lightirc.R;
+import com.github.espiandev.showcaseview.ShowcaseView;
 
 public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
-    private final Context mContext;
+    private final Activity mActivity;
     private final BuilderAdapterCallback mCallback;
 
-    public BuilderAdapter(final Context context) {
-        super(context, android.R.layout.simple_list_item_1);
-        mContext = context;
+    public BuilderAdapter(final Activity activity) {
+        super(activity, android.R.layout.simple_list_item_1);
+        mActivity = activity;
 
         try {
-            mCallback = (BuilderAdapterCallback) context;
+            mCallback = (BuilderAdapterCallback) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement BuilderAdapterCallback");
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "BuilderAdapterCallback");
         }
     }
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         View view = convertView;
+        final ServerConfiguration.Builder builder = getItem(position);
         if (view == null) {
-            final LayoutInflater vi = LayoutInflater.from(mContext);
+            final LayoutInflater vi = LayoutInflater.from(mActivity);
             view = vi.inflate(R.layout.item_server_card, parent, false);
         }
 
         final TextView textView = (TextView) view.findViewById(R.id.title);
         final TextView description = (TextView) view.findViewById(R.id.description);
         if (textView != null) {
-            textView.setText(getItem(position).getTitle());
+            textView.setText(builder.getTitle());
         }
         if (description != null) {
-            final Server server = mCallback.getServer(getItem(position).getTitle());
+            final Server server = mCallback.getServer(builder.getTitle());
             if (server != null) {
                 description.setText(server.getStatus());
             } else {
-                description.setText(mContext.getString(R.string.status_disconnected));
+                description.setText(mActivity.getString(R.string.status_disconnected));
             }
         }
 
-        LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.overflow_menu);
-        linearLayout.setTag(getItem(position));
+        final LinearLayout contentLayout = (LinearLayout) view.findViewById(R.id.contentLayout);
+        contentLayout.setTag(builder);
 
-        linearLayout = (LinearLayout) view.findViewById(R.id.contentLayout);
-        linearLayout.setTag(getItem(position));
+        final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.overflow_menu);
+        linearLayout.setTag(builder);
+
+        if(position == 0 && Constants.DEBUG) {
+            final ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+            co.hideOnClickOutside = true;
+            co.insert = ShowcaseView.INSERT_TO_VIEW;
+            co.shotType = ShowcaseView.TYPE_ONE_SHOT;
+            final ShowcaseView sv = ShowcaseView.insertShowcaseView(contentLayout, mActivity,
+                    "Test12345", "Test1234", co);
+
+            sv.setOnShowcaseEventListener(new ShowcaseView.OnShowcaseEventListener() {
+                @Override
+                public void onShowcaseViewHide(ShowcaseView showcaseView) {
+                    final ShowcaseView.ConfigOptions options = new ShowcaseView.ConfigOptions();
+                    options.hideOnClickOutside = true;
+                    options.insert = ShowcaseView.INSERT_TO_VIEW;
+                    //options.shotType = ShowcaseView.TYPE_ONE_SHOT;
+                    final ShowcaseView showcase = ShowcaseView.insertShowcaseView(linearLayout,
+                            mActivity, "Test12345", "Test1234", options);
+                }
+                @Override
+                public void onShowcaseViewShow(ShowcaseView showcaseView) {
+                }
+            });
+        }
 
         return view;
     }

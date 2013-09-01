@@ -37,6 +37,11 @@ public class SettingsActivity extends PreferenceActivity {
         setTheme(Utils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.main_settings_headers, target);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Modifying these settings while connected to server can cause " +
@@ -46,10 +51,5 @@ public class SettingsActivity extends PreferenceActivity {
                 .setPositiveButton(getString(android.R.string.ok), null);
         final AlertDialog alert = builder.create();
         alert.show();
-    }
-
-    @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.main_settings_headers, target);
     }
 }

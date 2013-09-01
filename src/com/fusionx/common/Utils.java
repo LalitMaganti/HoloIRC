@@ -31,8 +31,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 
-import com.fusionx.irc.constants.Constants;
 import com.fusionx.irc.constants.EventBundleKeys;
+import com.fusionx.irc.enums.UserLevel;
 import com.fusionx.lightirc.R;
 
 import org.apache.commons.lang3.StringUtils;
@@ -233,6 +233,10 @@ public class Utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isUserOwnerOrVoice(final UserLevel level) {
+        return level.equals(UserLevel.OP) || level.equals(UserLevel.VOICE);
     }
 
     /**

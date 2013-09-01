@@ -30,15 +30,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Server settings -->
     <string name="server_settings_title">Server Settings</string>
-    <string name="server_settings_save_question_title">Are you sure you want to exit?</string>
-    <string name="server_settings_save_question_message">Changes have been made - discard?</string>
     <string name="server_settings_changes_saved">Changes have been saved</string>
-    <string name="server_settings_not_empty">This field should NOT be empty!</string>
-    <string name="server_settings_not_empty_port">Usually 6667 - This field should NOT be empty!
-    </string>
     <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick
-        another will
-        automatically be used
+        another will automatically be used
     </string>
     <string name="server_settings_auto_nick_title">Auto-change nick name</string>
     <string name="server_settings_server_password_title">NickServ password</string>
@@ -94,7 +88,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_nick_in_use">Nickname is already in use.</string>
     <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
     <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
-    <string name="parser_action">* %1$s %2$s</string>
+    <string name="parser_action" translatable="false">* %1$s %2$s</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -103,7 +97,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Service/notification -->
     <string name="service_disconnect_all">Disconnect all</string>
     <string name="service_you_mentioned">You have been mentioned on</string>
-    <string name="service_holoirc_running">HoloIRC running</string>
     <string name="activity_mentioned">You have been mentioned on %1$s</string>
 
     <!-- User list fragment -->
@@ -112,12 +105,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- One word generics -->
     <string name="edit">Edit</string>
-    <string name="save">Save</string>
     <string name="add">Add</string>
     <string name="delete">Delete</string>
-    <string name="part">Part</string>
     <string name="users">Users</string>
-    <string name="close">Close</string>
     <string name="disconnect">Disconnect</string>
     <string name="description">Description</string>
     <string name="overflow">Overflow</string>
@@ -126,7 +116,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="appearance">Appearance</string>
     <string name="theme">Theme</string>
     <string name="private_message_short_form">PM</string>
-    <string name="discard">Discard</string>
     <string name="cancel">Cancel</string>
     <string name="restart">Restart</string>
     <string name="nickname">Nickname</string>
@@ -135,7 +124,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="message">Message</string>
     <string name="password">Password</string>
     <string name="username">Username</string>
-    <string name="mode">Mode</string>
     <string name="about">About</string>
     <string name="whois" translatable="false">WHOIS</string>
     <string name="server">Server</string>
@@ -145,7 +133,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_password_set">Password is set</string>
     <string name="channel">Channel</string>
     <string name="user">User</string>
-    <string name="done">Done</string>
     <string name="add_channel">Add channel</string>
     <string name="server_settings_changes_discarded">Changes discarded</string>
     <string name="remove">Remove</string>
