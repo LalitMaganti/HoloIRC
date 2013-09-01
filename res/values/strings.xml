@@ -136,5 +136,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="add_channel">Add channel</string>
     <string name="server_settings_changes_discarded">Changes discarded</string>
     <string name="remove">Remove</string>
+    <string name="default_user_settings_header">Default User Settings</string>
+    <string name="default_user_settings_summary">The user settings that will be used as a base when
+        creating new servers
+    </string>
 
 </resources>

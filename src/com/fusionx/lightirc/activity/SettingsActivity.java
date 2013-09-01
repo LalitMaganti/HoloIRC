@@ -31,7 +31,6 @@ import com.fusionx.lightirc.R;
 import java.util.List;
 
 public class SettingsActivity extends PreferenceActivity {
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Utils.getThemeInt(this));
@@ -40,15 +39,14 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     @Override
-    public void onBuildHeaders(List<Header> target) {
+    public void onBuildHeaders(final List<Header> target) {
         loadHeadersFromResource(R.xml.main_settings_headers, target);
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Modifying these settings while connected to server can cause " +
                 "unexpected behaviour - this is not a bug. It is strongly recommended that you " +
                 "close any connections before modifying these settings.").setTitle("Warning")
-                .setCancelable(false)
-                .setPositiveButton(getString(android.R.string.ok), null);
+                .setCancelable(false).setPositiveButton(getString(android.R.string.ok), null);
         final AlertDialog alert = builder.create();
         alert.show();
     }
