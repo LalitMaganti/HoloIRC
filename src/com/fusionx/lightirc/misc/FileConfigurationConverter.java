@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.fusionx.common.PreferenceKeys;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.core.ServerConfiguration;
 
 import java.util.ArrayList;
@@ -55,8 +56,8 @@ public class FileConfigurationConverter {
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
         // Autojoin channels
-        final ArrayList<String> auto = new ArrayList<>(serverSettings.getStringSet(PreferenceKeys
-                .AutoJoin, new HashSet<String>()));
+        final ArrayList<String> auto = new ArrayList<>(Utils.getStringSet(serverSettings,
+                PreferenceKeys.AutoJoin, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
         }

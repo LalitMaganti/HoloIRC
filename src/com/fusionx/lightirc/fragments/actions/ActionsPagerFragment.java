@@ -3,6 +3,7 @@ package com.fusionx.lightirc.fragments.actions;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,19 +13,17 @@ import com.fusionx.irc.core.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ActionPagerAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.views.NonSwipableViewPager;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         .IgnoreListCallback, IRCActionsFragment.IRCActionsCallback {
-    private NonSwipableViewPager mActionViewPager;
+    private ViewPager mActionViewPager;
     private ActionPagerAdapter mActionsPagerAdapter = null;
     private ActionsPagerFragmentCallback mCallback;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         try {
             mCallback = (ActionsPagerFragmentCallback) activity;
         } catch (ClassCastException ex) {
@@ -42,10 +41,11 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.non_scrollable_view_pager, container);
 
-        mActionViewPager = (NonSwipableViewPager) view;
+        mActionViewPager = (ViewPager) view;
         mActionViewPager.setAdapter(mActionsPagerAdapter);
 
         return view;
@@ -60,13 +60,13 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public void switchToIgnoreFragment() {
-        mActionViewPager.setCurrentItem(1);
         ((ActionBarActivity) getActivity()).startSupportActionMode(getIgnoreFragment());
+        mActionViewPager.setCurrentItem(1, true);
     }
 
     @Override
     public void switchToIRCActionFragment() {
-        mActionViewPager.setCurrentItem(0);
+        mActionViewPager.setCurrentItem(0, true);
     }
 
     @Override

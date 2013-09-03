@@ -33,7 +33,8 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     private ActionMode mMode;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+                             final Bundle savedInstanceState) {
         final IgnoreListCallback callback = FragmentUtil.getParent(this,
                 IgnoreListCallback.class);
 
@@ -51,7 +52,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         getListAdapter().setAbsListView(getListView());
@@ -79,13 +80,10 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+    public boolean onCreateActionMode(final ActionMode actionMode, final Menu menu) {
         // Inflate a menu resource providing context menu items
         final MenuInflater inflater = actionMode.getMenuInflater();
         inflater.inflate(R.menu.ignore_list_cab, menu);
-
-        getListAdapter().reset();
-        getListAdapter().notifyDataSetChanged();
 
         mMode = actionMode;
 
@@ -147,12 +145,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        final boolean checked = getIgnoreAdapter().isItemAtPositionChecked(i);
-        if (checked) {
-            getIgnoreAdapter().removeSelection(i);
-        } else {
-            getIgnoreAdapter().addSelection(i);
-        }
+        getIgnoreAdapter().toggleSelection(i);
 
         mMode.invalidate();
     }
@@ -168,6 +161,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         for (int position : reverseSortedPositions) {
             getIgnoreAdapter().remove(position);
         }
+
         getIgnoreAdapter().clearSelection();
         mMode.invalidate();
     }

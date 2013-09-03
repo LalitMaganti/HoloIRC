@@ -22,19 +22,23 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 package com.fusionx.lightirc.activity;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.preference.PreferenceScreen;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
 import com.fusionx.common.utils.SharedPreferencesUtil;
 import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.fragments.PreferenceListFragment;
 import com.fusionx.lightirc.fragments.serversetttings.BaseServerSettingsFragment;
 import com.fusionx.lightirc.fragments.serversetttings.ListViewSettingsFragment;
 import com.fusionx.lightirc.misc.ServerSettingsCallbacks;
 
 import java.io.File;
 
-public class ServerSettingsActivity extends FragmentActivity implements ServerSettingsCallbacks {
+public class ServerSettingsActivity extends ActionBarActivity implements ServerSettingsCallbacks,
+        PreferenceListFragment.OnPreferenceAttachedListener  {
     private boolean mCanSaveChanges = true;
     private boolean mNewServer = false;
     private String mFileName = null;
@@ -49,15 +53,15 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
 
         super.onCreate(savedInstanceState);
 
-        mBaseFragment = new BaseServerSettingsFragment();
-        mListFragment = new ListViewSettingsFragment();
-
         mFileName = getIntent().getStringExtra("file");
         mNewServer = getIntent().getBooleanExtra("new", false);
         mCanSaveChanges = !mNewServer;
 
-        //getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
-        //        mBaseFragment).commit();
+        mBaseFragment = new BaseServerSettingsFragment();
+        mListFragment = new ListViewSettingsFragment();
+
+        getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+                mBaseFragment).commit();
     }
 
     @Override
@@ -113,15 +117,15 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
 
     @Override
     public void openAutoJoinList() {
-        //final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        //ft.replace(android.R.id.content, mListFragment).commit();
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(android.R.id.content, mListFragment).commit();
         mListDisplayed = true;
     }
 
     @Override
     public void openBaseFragment() {
-        //final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        //ft.replace(android.R.id.content, mBaseFragment).commit();
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(android.R.id.content, mBaseFragment).commit();
         mListDisplayed = false;
     }
 
@@ -133,5 +137,10 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
     @Override
     public void setCanSaveChanges(boolean canSave) {
         mCanSaveChanges = canSave;
+    }
+
+    @Override
+    public void onPreferenceAttached(PreferenceScreen root, int xmlId) {
+
     }
 }

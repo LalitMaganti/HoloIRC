@@ -30,7 +30,11 @@ import android.preference.PreferenceFragment;
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.fragments.PreferenceListFragment;
 
+/**
+ * KEEP THIS CODE SYNCED WITH THE CODE IN SettingsActivity
+ */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class AboutFragment extends PreferenceFragment {
     @Override

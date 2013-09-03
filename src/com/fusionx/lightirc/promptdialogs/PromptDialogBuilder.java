@@ -45,7 +45,7 @@ public abstract class PromptDialogBuilder extends AlertDialog.Builder implements
         setTitle(title);
 
         input = (EditText) LayoutInflater.from(context).inflate(R.layout.prompt_dialog, null);
-        Utils.setTypeface(getContext(), input);
+        Utils.setTypeface(context, input);
         input.setHint(hint);
         input.setText(defaultText);
         input.getText().clear();

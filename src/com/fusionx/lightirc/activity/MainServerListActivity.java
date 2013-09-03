@@ -62,9 +62,10 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        setTheme(Utils.getThemeInt(this));
+
         super.onCreate(savedInstanceState);
 
-        setTheme(Utils.getThemeInt(this));
         setContentView(R.layout.activity_server_list);
 
         mServerCardsAdapter = new BuilderAdapter(this);
@@ -148,7 +149,7 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        setUpServers(SharedPreferencesUtil.getServersFromPreferences(getApplicationContext()));
+        setUpServers(SharedPreferencesUtil.getServersFromPreferences(this));
     }
 
     private void setUpServers(final ArrayList<String> serverFiles) {

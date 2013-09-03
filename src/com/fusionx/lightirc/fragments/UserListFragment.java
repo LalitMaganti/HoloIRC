@@ -52,12 +52,11 @@ import java.util.TreeSet;
 import lombok.Getter;
 
 public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
-        MultiSelectionUtil.MultiChoiceModeListener {
+        ActionMode.Callback {
     @Getter
     private ActionMode mode;
     private UserListCallback mCallback;
     private String mChannelName;
-    private MultiSelectionUtil.Controller mMultiSelectionController;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -79,46 +78,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
         setListAdapter(alphaInAnimationAdapter);
 
-        mMultiSelectionController = MultiSelectionUtil.attachMultiSelectionController(
-                (ListView) rootView.findViewById(android.R.id.list),
-                (ActionBarActivity) getActivity(), this);
-
         return rootView;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.finish();
-        }
-        mMultiSelectionController = null;
-    }
-
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.saveInstanceState(outState);
-        }
-    }
-
-    @Override
-    public void setMenuVisibility(boolean menuVisible) {
-        super.setMenuVisibility(menuVisible);
-
-        if (mMultiSelectionController == null) {
-            return;
-        }
-
-        // Hide the action mode when the fragment becomes invisible
-        if (!menuVisible) {
-            Bundle bundle = new Bundle();
-            if (mMultiSelectionController.saveInstanceState(bundle)) {
-                mMultiSelectionController.finish();
-            }
-        }
     }
 
     @Override
@@ -146,20 +106,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setOnItemClickListener(this);
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id,
-                                          final boolean checked) {
-        if (checked) {
-            getUserListAdapter().addSelection(position);
-        } else {
-            getUserListAdapter().removeSelection(position);
-        }
-
-        mode.invalidate();
     }
 
     @Override
@@ -222,14 +169,15 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
         int selectedItemCount = getUserListAdapter().getSelectedItemCount();
 
-        if (selectedItemCount != 0) {
+        if (selectedItemCount == 0) {
+            mode.finish();
+        } else {
             final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
                     selectedItemCount, selectedItemCount);
 
             mode.setTitle(quantityString);
 
             mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-
             mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
         }
 
@@ -241,10 +189,11 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
                             final long l) {
         if (mode == null) {
             ((ActionBarActivity) getActivity()).startSupportActionMode(this);
-
-            final boolean checked = getUserListAdapter().isItemAtPositionChecked(i);
-            getListView().setItemChecked(i, !checked);
         }
+
+        getUserListAdapter().toggleSelection(i);
+
+        mode.invalidate();
     }
 
     public UserListAdapter getUserListAdapter() {

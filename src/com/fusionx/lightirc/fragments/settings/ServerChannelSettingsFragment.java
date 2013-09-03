@@ -31,8 +31,11 @@ import android.preference.PreferenceFragment;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.preferences.NumberPickerDialogPreference;
+import com.michaelnovakjr.numberpicker.NumberPickerPreference;
 
+/**
+ * KEEP THIS CODE SYNCED WITH THE CODE IN SettingsActivity
+ */
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class ServerChannelSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {
@@ -41,12 +44,12 @@ public class ServerChannelSettingsFragment extends PreferenceFragment implements
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.server_channel_settings_fragment);
 
-        final NumberPickerDialogPreference numberPickerDialogPreference =
-                (NumberPickerDialogPreference) getPreferenceScreen().findPreference
+        final NumberPickerPreference numberPickerDialogPreference =
+                (NumberPickerPreference) getPreferenceScreen().findPreference
                         (PreferenceKeys.ReconnectTries);
         numberPickerDialogPreference.setOnPreferenceChangeListener(this);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
-                .getValue()));
+                .getCurrent()));
 
         final EditTextPreference partReason = (EditTextPreference) getPreferenceScreen()
                 .findPreference(PreferenceKeys.PartReason);

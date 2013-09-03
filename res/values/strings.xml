@@ -140,5 +140,8 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="default_user_settings_summary">The user settings that will be used as a base when
         creating new servers
     </string>
+    <string name="nick_first_choice">First choice nick name</string>
+    <string name="nick_second_choice">Second choice nick name</string>
+    <string name="nick_third_choice">Third choice nick name</string>
 
 </resources>

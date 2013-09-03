@@ -12,7 +12,7 @@
             android:layout_marginRight="10dip"
             android:layout_marginTop="10dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="First choice nick name"
+            android:text="@string/nick_first_choice"
             android:id="@+id/textView"
             android:layout_gravity="start"/>
 
@@ -32,7 +32,7 @@
             android:layout_marginRight="10dip"
             android:layout_marginTop="10dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Second choice nick name"
+            android:text="@string/nick_second_choice"
             android:id="@+id/textView2"
             android:layout_gravity="start"/>
 
@@ -53,7 +53,7 @@
             android:layout_marginRight="10dip"
             android:layout_marginTop="10dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="Third choice nick name"
+            android:text="@string/nick_third_choice"
             android:id="@+id/textView3"
             android:layout_gravity="start"/>
 

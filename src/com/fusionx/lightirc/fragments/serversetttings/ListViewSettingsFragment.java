@@ -31,8 +31,8 @@ import java.util.TreeSet;
 
 import static com.fusionx.common.PreferenceKeys.AutoJoin;
 
-public class ListViewSettingsFragment extends ListFragment implements
-        AdapterView.OnItemClickListener, MultiSelectionUtil.MultiChoiceModeListener {
+public class ListViewSettingsFragment extends ListFragment implements AdapterView
+        .OnItemClickListener, MultiSelectionUtil.MultiChoiceModeListener {
     private SelectionAdapter<String> adapter;
     private boolean modeStarted = false;
     private MultiSelectionUtil.Controller mMultiSelectionController;

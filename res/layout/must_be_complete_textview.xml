@@ -6,7 +6,7 @@
         android:layout_height="match_parent"
         android:textColor="@android:color/white"
         android:textAppearance="?android:textAppearanceSmall"
-        android:background="@android:color/holo_blue_light"
+        android:background="@color/holo_blue_light"
         android:textAlignment="center"
         android:gravity="center"
         android:paddingTop="5dip"

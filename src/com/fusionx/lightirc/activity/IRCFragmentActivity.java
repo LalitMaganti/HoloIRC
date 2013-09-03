@@ -22,7 +22,9 @@
 package com.fusionx.lightirc.activity;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -122,7 +124,7 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
         final ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
 
         // Create Header view and then add to Decor View
-        mMentionView = LayoutInflater.from(this.getActionBar().getThemedContext()).inflate(R
+        mMentionView = LayoutInflater.from(this.getSupportActionBar().getThemedContext()).inflate(R
                 .layout.toast_mention, decorView, false);
         mMentionView.setVisibility(View.GONE);
 
@@ -162,7 +164,26 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
                 .findFragmentById(R.id.actions_fragment);
 
         mActionsSlidingMenu.setOnOpenListener(mActionsPagerFragment.getActionFragmentListener());
-        mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        } else {
+            // get the window background
+            TypedArray a = getTheme().obtainStyledAttributes(new int[] {android.R.attr.windowBackground});
+            int background = a.getResourceId(0, 0);
+            a.recycle();
+
+            // take the above view out of
+            final ViewGroup contentParent = (ViewGroup) ((ViewGroup) findViewById(android.R.id
+                    .content)).getChildAt(0);
+            View content = contentParent.getChildAt(1);
+            contentParent.removeView(content);
+            contentParent.addView(mActionsSlidingMenu);
+            mActionsSlidingMenu.setContent(content);
+            if (content.getBackground() == null) {
+                content.setBackgroundResource(background);
+            }
+        }
         mActionsSlidingMenu.setOnCloseListener(mActionsPagerFragment.getIgnoreFragmentListener());
     }
 
@@ -479,7 +500,7 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
             .SimpleOnPageChangeListener() {
         @Override
         public void onPageSelected(final int position) {
-            invalidateOptionsMenu();
+            supportInvalidateOptionsMenu();
             closeAllSlidingMenus();
 
             mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());

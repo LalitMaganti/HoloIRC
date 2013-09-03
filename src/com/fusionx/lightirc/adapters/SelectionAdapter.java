@@ -100,6 +100,14 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         }
     }
 
+    public void toggleSelection(final int position) {
+        if (!isItemAtPositionChecked(position)) {
+            addSelection(position);
+        } else {
+            removeSelection(position);
+        }
+    }
+
     /**
      * Returns the list of selected items in the adapter
      *

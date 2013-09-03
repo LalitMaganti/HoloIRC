@@ -11,12 +11,14 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.fragments.PreferenceListFragment;
 import com.fusionx.lightirc.misc.ServerSettingsCallbacks;
 import com.fusionx.lightirc.preferences.edittext.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.preferences.nick.NickPreference;
@@ -28,7 +30,7 @@ import static com.fusionx.common.PreferenceKeys.Title;
 import static com.fusionx.common.PreferenceKeys.URL;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class BaseServerSettingsFragment extends PreferenceFragment implements Preference
+public class BaseServerSettingsFragment extends PreferenceListFragment implements Preference
         .OnPreferenceChangeListener {
 
     private ServerTitleEditTextPreference mTitle;
@@ -59,8 +61,7 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
 
         addPreferencesFromResource(R.xml.activty_server_settings_prefs);
 
-        mTitle = (ServerTitleEditTextPreference)
-                findPreference(Title);
+        mTitle = (ServerTitleEditTextPreference) findPreference(Title);
         mTitle.setOnPreferenceChangeListener(this);
         mTitle.setListOfExistingServers(bundle.getStringArrayList("list"));
 
