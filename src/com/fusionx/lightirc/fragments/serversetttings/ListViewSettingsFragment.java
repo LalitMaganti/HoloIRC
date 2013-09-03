@@ -2,11 +2,11 @@ package com.fusionx.lightirc.fragments.serversetttings;
 
 import android.animation.LayoutTransition;
 import android.app.Activity;
-import android.app.ListFragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.ActionMode;
+import android.support.v4.app.ListFragment;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
+import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
@@ -28,8 +29,7 @@ import java.util.TreeSet;
 
 import static com.fusionx.common.PreferenceKeys.AutoJoin;
 
-public class ListViewSettingsFragment extends ListFragment implements AbsListView
-        .MultiChoiceModeListener, android.view.ActionMode.Callback,
+public class ListViewSettingsFragment extends ListFragment implements ActionMode.Callback,
         AdapterView.OnItemClickListener {
     private SelectionAdapter<String> adapter;
     private boolean modeStarted = false;
@@ -46,6 +46,7 @@ public class ListViewSettingsFragment extends ListFragment implements AbsListVie
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if()
         getListView().setLayoutTransition(new LayoutTransition());
     }
 
@@ -95,7 +96,6 @@ public class ListViewSettingsFragment extends ListFragment implements AbsListVie
         }
     }
 
-    @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position,
                                           long id, boolean checked) {
         mode.invalidate();
@@ -127,7 +127,7 @@ public class ListViewSettingsFragment extends ListFragment implements AbsListVie
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getListView().setMultiChoiceModeListener(this);
+        //getListView().setMultiChoiceModeListener(this);
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
     }
 
@@ -144,7 +144,7 @@ public class ListViewSettingsFragment extends ListFragment implements AbsListVie
 
         final SharedPreferences settings = getActivity()
                 .getSharedPreferences(mCallbacks.getFileName(), Context.MODE_PRIVATE);
-        final Set<String> set = settings.getStringSet(AutoJoin, new HashSet<String>());
+        final Set<String> set = Utils.getStringSet(settings, AutoJoin, new HashSet<String>());
         for (final String channel : set) {
             adapter.add(channel);
         }

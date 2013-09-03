@@ -1,9 +1,6 @@
 package com.fusionx.lightirc.adapters;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
+import android.annotation.TargetApi;
 import android.os.Build;
 import android.util.SparseArray;
 import android.view.View;
@@ -13,6 +10,10 @@ import android.widget.GridView;
 
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.ValueAnimator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -148,6 +149,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         return allAnimators;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private long calculateAnimationDelay() {
         long delay;
         int numberOfItems = getAbsListView().getLastVisiblePosition()

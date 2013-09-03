@@ -21,12 +21,14 @@
 
 package com.fusionx.common;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
@@ -38,6 +40,7 @@ import com.fusionx.lightirc.R;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -237,6 +240,52 @@ public class Utils {
 
     public static boolean isUserOwnerOrVoice(final UserLevel level) {
         return level.equals(UserLevel.OP) || level.equals(UserLevel.VOICE);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static void putStringSet(SharedPreferences preferences, final String key,
+                                    final Set<String> set) {
+        final SharedPreferences.Editor editor = preferences.edit();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            editor.putStringSet(key, set);
+        } else {
+            // removes old occurences of key
+            for (String k : preferences.getAll().keySet()) {
+                if (k.startsWith(key)) {
+                    editor.remove(k);
+                }
+            }
+
+            int i = 0;
+            for (String value : set) {
+                editor.putString(key + i++, value);
+            }
+        }
+        editor.commit();
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static Set<String> getStringSet(final SharedPreferences pref, final String key,
+                                           final Set<String> defaultValue) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            return pref.getStringSet(key, defaultValue);
+        } else {
+            final Set<String> set = new HashSet<String>();
+
+            int i = 0;
+
+            Set<String> keySet = pref.getAll().keySet();
+            while (keySet.contains(key + i)) {
+                set.add(pref.getString(key + i, ""));
+                i++;
+            }
+
+            if (set.isEmpty()) {
+                return defaultValue;
+            } else {
+                return set;
+            }
+        }
     }
 
     /**

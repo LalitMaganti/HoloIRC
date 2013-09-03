@@ -21,7 +21,9 @@
 
 package com.fusionx.lightirc.activity;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
@@ -38,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBuildHeaders(final List<Header> target) {
         loadHeadersFromResource(R.xml.main_settings_headers, target);

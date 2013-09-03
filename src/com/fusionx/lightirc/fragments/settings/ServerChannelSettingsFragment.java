@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.fragments.settings;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.DialogPreference;
 import android.preference.EditTextPreference;
@@ -31,6 +33,7 @@ import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.preferences.NumberPickerDialogPreference;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class ServerChannelSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {
     @Override

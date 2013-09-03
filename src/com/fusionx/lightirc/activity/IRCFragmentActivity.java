@@ -21,16 +21,16 @@
 
 package com.fusionx.lightirc.activity;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -69,7 +69,7 @@ import java.util.Iterator;
  *
  * @author Lalit Maganti
  */
-public class IRCFragmentActivity extends FragmentActivity implements UserListFragment
+public class IRCFragmentActivity extends ActionBarActivity implements UserListFragment
         .UserListCallback, FragmentSideHandlerInterface, ServiceFragment.ServiceFragmentCallback,
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
@@ -112,7 +112,7 @@ public class IRCFragmentActivity extends FragmentActivity implements UserListFra
             setUpViewPager();
         }
 
-        final ActionBar actionBar = getActionBar();
+        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(mServerTitle);

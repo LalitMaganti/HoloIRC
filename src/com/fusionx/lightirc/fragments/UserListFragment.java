@@ -48,8 +48,7 @@ import java.util.TreeSet;
 
 import lombok.Getter;
 
-public class UserListFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
-        AdapterView.OnItemClickListener {
+public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener {
     @Getter
     private ActionMode mode;
     private UserListCallback mCallback;
@@ -102,11 +101,11 @@ public class UserListFragment extends ListFragment implements AbsListView.MultiC
         super.onActivityCreated(savedInstanceState);
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        getListView().setMultiChoiceModeListener(this);
+        //getListView().setMultiChoiceModeListener(this);
         getListView().setOnItemClickListener(this);
     }
 
-    @Override
+    //@Override
     public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id,
                                           final boolean checked) {
         if (checked) {

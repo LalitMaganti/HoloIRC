@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.ActionMode;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -135,11 +135,11 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
 
         callback.switchToIRCActionFragment();
 
-        final SharedPreferences.Editor preferences = getActivity().getSharedPreferences
-                (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE).edit();
-        preferences.putStringSet(PreferenceKeys.IgnoreList,
+        final SharedPreferences preferences = getActivity().getSharedPreferences
+                (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
+
+        Utils.putStringSet(preferences, PreferenceKeys.IgnoreList,
                 getIgnoreAdapter().getCopyOfItems());
-        preferences.commit();
 
         mMode = null;
     }

@@ -1,15 +1,19 @@
 package com.fusionx.lightirc.fragments.serversetttings;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
@@ -23,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import static com.fusionx.common.PreferenceKeys.Title;
 import static com.fusionx.common.PreferenceKeys.URL;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class BaseServerSettingsFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {
 
@@ -107,15 +112,17 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
         autoNickPref.setChecked(autoNick);
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         if (mCallback.canSaveChanges()) {
             getPreferenceScreen().removePreference(mCompleteView);
         } else {
             mCompleteView.setInitialText(mTitle.getTitle().toString());
         }
+
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override

@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.fragments.settings;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -29,6 +31,7 @@ import com.fusionx.common.PreferenceKeys;
 import com.fusionx.common.Utils;
 import com.fusionx.lightirc.R;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class AboutFragment extends PreferenceFragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {

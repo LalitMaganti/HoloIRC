@@ -21,11 +21,13 @@
 
 package com.fusionx.lightirc.fragments.settings;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.ListPreference;
@@ -37,6 +39,7 @@ import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.core.IRCBridgeService;
 
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class AppearanceSettingsFragment extends PreferenceFragment
         implements Preference.OnPreferenceChangeListener {
     private ListPreference mChooseTheme = null;

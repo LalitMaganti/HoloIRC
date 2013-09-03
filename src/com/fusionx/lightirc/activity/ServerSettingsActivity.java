@@ -24,6 +24,7 @@ package com.fusionx.lightirc.activity;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.fusionx.common.Utils;
@@ -35,7 +36,7 @@ import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 
 import java.io.File;
 
-public class ServerSettingsActivity extends PreferenceActivity implements ServerSettingsCallbacks {
+public class ServerSettingsActivity extends FragmentActivity implements ServerSettingsCallbacks {
     private boolean mCanSaveChanges = true;
     private boolean mNewServer = false;
     private String mFileName = null;
@@ -57,7 +58,8 @@ public class ServerSettingsActivity extends PreferenceActivity implements Server
         mNewServer = getIntent().getBooleanExtra("new", false);
         mCanSaveChanges = !mNewServer;
 
-        getFragmentManager().beginTransaction().replace(android.R.id.content, mBaseFragment).commit();
+        //getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
+        //        mBaseFragment).commit();
     }
 
     @Override
@@ -113,15 +115,15 @@ public class ServerSettingsActivity extends PreferenceActivity implements Server
 
     @Override
     public void openAutoJoinList() {
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(android.R.id.content, mListFragment).commit();
+        //final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        //ft.replace(android.R.id.content, mListFragment).commit();
         mListDisplayed = true;
     }
 
     @Override
     public void openBaseFragment() {
-        final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.replace(android.R.id.content, mBaseFragment).commit();
+        //final FragmentTransaction ft = getFragmentManager().beginTransaction();
+        //ft.replace(android.R.id.content, mBaseFragment).commit();
         mListDisplayed = false;
     }
 
