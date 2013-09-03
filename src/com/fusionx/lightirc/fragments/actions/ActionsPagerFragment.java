@@ -3,6 +3,7 @@ package com.fusionx.lightirc.fragments.actions;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     public void switchToIgnoreFragment() {
         mActionViewPager.setCurrentItem(1);
-        getActivity().startActionMode(getIgnoreFragment());
+        ((ActionBarActivity) getActivity()).startSupportActionMode(getIgnoreFragment());
     }
 
     @Override

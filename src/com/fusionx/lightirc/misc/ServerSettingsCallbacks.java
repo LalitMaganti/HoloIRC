@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.interfaces;
+package com.fusionx.lightirc.misc;
 
 public interface ServerSettingsCallbacks {
     public String getFileName();

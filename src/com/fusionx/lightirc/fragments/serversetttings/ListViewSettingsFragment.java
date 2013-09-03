@@ -1,11 +1,11 @@
 package com.fusionx.lightirc.fragments.serversetttings;
 
-import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,11 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
+import com.fusionx.lightirc.misc.ServerSettingsCallbacks;
+import com.fusionx.common.utils.MultiSelectionUtil;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 
 import java.util.ArrayList;
@@ -29,10 +31,11 @@ import java.util.TreeSet;
 
 import static com.fusionx.common.PreferenceKeys.AutoJoin;
 
-public class ListViewSettingsFragment extends ListFragment implements ActionMode.Callback,
-        AdapterView.OnItemClickListener {
+public class ListViewSettingsFragment extends ListFragment implements
+        AdapterView.OnItemClickListener, MultiSelectionUtil.MultiChoiceModeListener {
     private SelectionAdapter<String> adapter;
     private boolean modeStarted = false;
+    private MultiSelectionUtil.Controller mMultiSelectionController;
     private ServerSettingsCallbacks mCallbacks;
 
     @Override
@@ -46,13 +49,12 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if()
-        getListView().setLayoutTransition(new LayoutTransition());
+        //getListView().setLayoutTransition(new LayoutTransition());
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        MenuInflater inflate = mode.getMenuInflater();
+    public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
+        final MenuInflater inflate = mode.getMenuInflater();
         inflate.inflate(R.menu.activty_server_settings_cab, menu);
 
         modeStarted = true;
@@ -96,6 +98,7 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
         }
     }
 
+    @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position,
                                           long id, boolean checked) {
         mode.invalidate();
@@ -106,12 +109,11 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
             adapter.removeSelection(position);
         }
 
-        int selectedItemCount = getListView().getCheckedItemCount();
+        int selectedItemCount = adapter.getSelectedItemCount();
 
         if (selectedItemCount != 0) {
-            final String quantityString = getResources()
-                    .getQuantityString(R.plurals.channel_selection,
-                            selectedItemCount, selectedItemCount);
+            final String quantityString = getResources().getQuantityString(R.plurals
+                    .channel_selection, selectedItemCount, selectedItemCount);
             mode.setTitle(quantityString);
         }
     }
@@ -127,7 +129,6 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //getListView().setMultiChoiceModeListener(this);
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
     }
 
@@ -140,6 +141,7 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        final View rootView = super.onCreateView(inflate, container, savedInstanceState);
         adapter = new SelectionAdapter<>(getActivity(), new TreeSet<String>());
 
         final SharedPreferences settings = getActivity()
@@ -152,7 +154,46 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
         setListAdapter(adapter);
         setHasOptionsMenu(true);
 
-        return super.onCreateView(inflate, container, savedInstanceState);
+        mMultiSelectionController = MultiSelectionUtil.attachMultiSelectionController(
+                (ListView) rootView.findViewById(android.R.id.list),
+                (ActionBarActivity) getActivity(), this);
+
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.finish();
+        }
+        mMultiSelectionController = null;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.saveInstanceState(outState);
+        }
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+
+        if (mMultiSelectionController == null) {
+            return;
+        }
+
+        // Hide the action mode when the fragment becomes invisible
+        if (!menuVisible) {
+            Bundle bundle = new Bundle();
+            if (mMultiSelectionController.saveInstanceState(bundle)) {
+                mMultiSelectionController.finish();
+            }
+        }
     }
 
     @Override
@@ -188,7 +229,7 @@ public class ListViewSettingsFragment extends ListFragment implements ActionMode
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
                             final long l) {
         if (!modeStarted) {
-            getActivity().startActionMode(this);
+            ((ActionBarActivity) getActivity()).startSupportActionMode(this);
         }
 
         final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));

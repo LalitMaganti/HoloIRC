@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 
 import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
+import com.fusionx.lightirc.misc.ServerSettingsCallbacks;
 import com.fusionx.lightirc.preferences.edittext.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.preferences.nick.NickPreference;
 import com.fusionx.lightirc.views.MustBeCompleteView;

@@ -22,6 +22,8 @@
     <orderEntry type="module" module-name="ShowcaseView" />
     <orderEntry type="library" name="android-support-v4" level="project" />
     <orderEntry type="library" name="nineoldandroids-2.4.01" level="project" />
+    <orderEntry type="library" name="android-support-v7-appcompat" level="project" />
+    <orderEntry type="module" module-name="appcompat" />
   </component>
 </module>
 

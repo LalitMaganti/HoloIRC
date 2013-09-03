@@ -21,18 +21,16 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
 package com.fusionx.lightirc.activity;
 
-import android.app.FragmentTransaction;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.SharedPreferencesUtil;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.fragments.serversetttings.BaseServerSettingsFragment;
 import com.fusionx.lightirc.fragments.serversetttings.ListViewSettingsFragment;
-import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
-import com.fusionx.lightirc.misc.SharedPreferencesUtils;
+import com.fusionx.lightirc.misc.ServerSettingsCallbacks;
 
 import java.io.File;
 
@@ -68,7 +66,7 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
             openBaseFragment();
         } else {
             if (!mCanSaveChanges) {
-                final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
+                final File folder = new File(SharedPreferencesUtil.getSharedPreferencesPath
                         (getApplicationContext()) + "server.xml");
                 if (folder.exists()) {
                     folder.delete();
@@ -77,7 +75,7 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
                         Toast.LENGTH_SHORT).show();
                 backPressed = true;
             } else if (mNewServer) {
-                SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
+                SharedPreferencesUtil.migrateFileToNewSystem(this, "server.xml");
                 Toast.makeText(this, getString(R.string.server_settings_changes_saved),
                         Toast.LENGTH_SHORT).show();
                 backPressed = true;
@@ -91,7 +89,7 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
         super.onDestroy();
 
         if (!mCanSaveChanges && !backPressed) {
-            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
+            final File folder = new File(SharedPreferencesUtil.getSharedPreferencesPath
                     (getApplicationContext()) + "server.xml");
             if (folder.exists()) {
                 folder.delete();
@@ -99,7 +97,7 @@ public class ServerSettingsActivity extends FragmentActivity implements ServerSe
             Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
                     Toast.LENGTH_SHORT).show();
         } else if (mNewServer && !backPressed) {
-            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
+            SharedPreferencesUtil.migrateFileToNewSystem(this, "server.xml");
             Toast.makeText(this, getString(R.string.server_settings_changes_saved),
                     Toast.LENGTH_SHORT).show();
         } else {

@@ -28,7 +28,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 import com.fusionx.common.PreferenceKeys;
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)

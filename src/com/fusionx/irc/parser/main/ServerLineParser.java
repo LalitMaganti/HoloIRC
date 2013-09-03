@@ -24,7 +24,7 @@ package com.fusionx.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.listeners.CoreListener;

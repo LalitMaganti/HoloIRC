@@ -40,7 +40,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.core.Channel;
 import com.fusionx.irc.core.ChannelUser;

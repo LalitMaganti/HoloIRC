@@ -26,7 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.connection.ConnectionWrapper;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.ServerChannelEventType;

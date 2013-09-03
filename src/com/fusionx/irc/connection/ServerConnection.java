@@ -24,7 +24,7 @@ package com.fusionx.irc.connection;
 import android.content.Context;
 import android.os.Bundle;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.core.AppUser;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;

@@ -26,14 +26,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.FragmentUtil;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.core.Channel;
 import com.fusionx.irc.core.ChannelUser;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.uiircinterface.core.MessageParser;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class ChannelFragment extends IRCFragment {
             final Bundle bundle = msg.getData();
             final ChannelEventType type = (ChannelEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
-            final ChannelFragmentCallback callback = FragmentUtils.getParent(ChannelFragment.this,
+            final ChannelFragmentCallback callback = FragmentUtil.getParent(ChannelFragment.this,
                     ChannelFragmentCallback.class);
             switch (type) {
                 case UserListChanged:
@@ -70,7 +70,7 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
+        final ChannelFragmentCallback callback = FragmentUtil.getParent(this,
                 ChannelFragmentCallback.class);
         final Server server = callback.getServer(true);
         if (server != null) {
@@ -105,7 +105,7 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
+        final ChannelFragmentCallback callback = FragmentUtil.getParent(this,
                 ChannelFragmentCallback.class);
         MessageParser.channelMessageToParse(getActivity(), callback.getServer(false), title,
                 message);

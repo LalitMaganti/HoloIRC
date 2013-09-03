@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.common;
+package com.fusionx.common.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -33,6 +33,8 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 
+import com.fusionx.common.Constants;
+import com.fusionx.common.PreferenceKeys;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.enums.UserLevel;
 import com.fusionx.lightirc.R;
@@ -218,7 +220,7 @@ public class Utils {
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
         final SharedPreferences preferences = context.getSharedPreferences(fileName,
                 Context.MODE_PRIVATE);
-        return preferences.getStringSet(PreferenceKeys.IgnoreList, new TreeSet<String>());
+        return getStringSet(preferences, PreferenceKeys.IgnoreList, new HashSet<String>());
     }
 
     public static boolean areNicksEqual(final String firstNick, final String secondNick) {
@@ -249,7 +251,7 @@ public class Utils {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
             editor.putStringSet(key, set);
         } else {
-            // removes old occurences of key
+            // removes old occurrences of key
             for (String k : preferences.getAll().keySet()) {
                 if (k.startsWith(key)) {
                     editor.remove(k);
@@ -270,7 +272,7 @@ public class Utils {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
             return pref.getStringSet(key, defaultValue);
         } else {
-            final Set<String> set = new HashSet<String>();
+            final Set<String> set = new HashSet<>();
 
             int i = 0;
 

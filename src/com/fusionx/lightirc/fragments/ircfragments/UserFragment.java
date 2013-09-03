@@ -25,12 +25,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.fusionx.common.utils.FragmentUtil;
 import com.fusionx.irc.constants.EventBundleKeys;
 import com.fusionx.irc.core.PrivateMessageUser;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.uiircinterface.core.MessageParser;
 
 public class UserFragment extends IRCFragment {
@@ -51,7 +51,7 @@ public class UserFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
+        final UserFragmentCallbacks callback = FragmentUtil.getParent(this,
                 UserFragmentCallbacks.class);
         final Server server = callback.getServer(true);
         if (server != null) {
@@ -74,7 +74,7 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        UserFragmentCallbacks callback = FragmentUtils.getParent(this,
+        UserFragmentCallbacks callback = FragmentUtil.getParent(this,
                 UserFragmentCallbacks.class);
         MessageParser.userMessageToParse(getActivity(), callback.getServer(false), title,
                 message);

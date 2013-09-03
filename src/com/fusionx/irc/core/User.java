@@ -21,7 +21,7 @@
 
 package com.fusionx.irc.core;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 
 import lombok.Getter;
 import lombok.NonNull;

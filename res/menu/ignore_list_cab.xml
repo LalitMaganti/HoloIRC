@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
+      xmlns:android="http://schemas.android.com/apk/res/android">
     <item
             android:id="@+id/ignore_list_cab_add"
             android:icon="@android:drawable/ic_menu_add"
-            android:showAsAction="withText|ifRoom"
+            holoirc:showAsAction="withText|ifRoom"
             android:title="@string/add"/>
     <item
             android:id="@+id/ignore_list_cab_remove"
             android:icon="@android:drawable/ic_menu_delete"
-            android:showAsAction="withText|ifRoom"
+            holoirc:showAsAction="withText|ifRoom"
             android:title="@string/remove"/>
 </menu>

@@ -30,12 +30,12 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.commonsware.cwac.merge.MergeAdapter;
+import com.fusionx.common.utils.FragmentUtil;
 import com.fusionx.irc.core.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
 import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
 import com.fusionx.uiircinterface.core.ServerCommandSender;
@@ -104,7 +104,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
                             final long l) {
-        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+        final IRCActionsCallback callback = FragmentUtil.getParent(this, IRCActionsCallback.class);
 
         switch (i) {
             case 1:
@@ -133,7 +133,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void nickChangeDialog() {
-        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+        final IRCActionsCallback callback = FragmentUtil.getParent(this, IRCActionsCallback.class);
         final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(),
                 callback.getNick()) {
             @Override
@@ -145,7 +145,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     }
 
     private void channelNameDialog() {
-        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+        final IRCActionsCallback callback = FragmentUtil.getParent(this, IRCActionsCallback.class);
         final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder
                 (getActivity()) {
             @Override
@@ -158,7 +158,7 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
 
     @Override
     public void onOpen() {
-        final IRCActionsCallback callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+        final IRCActionsCallback callback = FragmentUtil.getParent(this, IRCActionsCallback.class);
         if (callback.isConnectedToServer() != getServerAdapter().isConnected()) {
             getServerAdapter().setConnected(callback.isConnectedToServer());
             getServerAdapter().notifyDataSetChanged();

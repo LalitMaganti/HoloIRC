@@ -1,6 +1,6 @@
 package com.fusionx.irc.parser.connection;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.constants.ServerReplyCodes;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.writers.ServerWriter;

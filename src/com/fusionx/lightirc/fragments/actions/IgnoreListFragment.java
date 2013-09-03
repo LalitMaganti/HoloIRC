@@ -16,11 +16,11 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fusionx.common.PreferenceKeys;
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.FragmentUtil;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.misc.FragmentUtils;
 import com.fusionx.lightirc.promptdialogs.IgnoreNickPromptDialogBuilder;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -28,12 +28,13 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import java.util.TreeSet;
 
 public class IgnoreListFragment extends ListFragment implements ActionMode.Callback,
-        SlidingMenu.OnCloseListener, ListView.OnItemClickListener, AdapterView.OnItemLongClickListener, OnDismissCallback {
+        SlidingMenu.OnCloseListener, ListView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener, OnDismissCallback {
     private ActionMode mMode;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final IgnoreListCallback callback = FragmentUtils.getParent(this,
+        final IgnoreListCallback callback = FragmentUtil.getParent(this,
                 IgnoreListCallback.class);
 
         final TreeSet<String> arrayList = new TreeSet<>(Utils.getIgnoreList(getActivity(),
@@ -129,7 +130,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
-        final IgnoreListCallback callback = FragmentUtils.getParent(this,
+        final IgnoreListCallback callback = FragmentUtil.getParent(this,
                 IgnoreListCallback.class);
         getIgnoreAdapter().clearSelection();
 

@@ -23,7 +23,7 @@ package com.fusionx.uiircinterface.core;
 
 import android.content.Context;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.core.Server;
 
 import java.util.ArrayList;

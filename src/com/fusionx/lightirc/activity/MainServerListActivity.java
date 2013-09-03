@@ -21,13 +21,13 @@
 
 package com.fusionx.lightirc.activity;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,14 +35,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.SharedPreferencesUtil;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;
-import com.fusionx.lightirc.misc.SharedPreferencesUtils;
 import com.fusionx.uiircinterface.core.IRCBridgeService;
 import com.fusionx.uiircinterface.core.ServerCommandSender;
 import com.github.espiandev.showcaseview.ShowcaseView;
@@ -52,9 +52,9 @@ import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnim
 import java.io.File;
 import java.util.ArrayList;
 
-public class MainServerListActivity extends Activity implements PopupMenu.OnMenuItemClickListener,
-        PopupMenu.OnDismissListener, BuilderAdapter.BuilderAdapterCallback,
-        ShowcaseView.OnShowcaseEventListener {
+public class MainServerListActivity extends ActionBarActivity implements PopupMenu
+        .OnMenuItemClickListener, PopupMenu.OnDismissListener,
+        BuilderAdapter.BuilderAdapterCallback, ShowcaseView.OnShowcaseEventListener {
     private IRCBridgeService mService = null;
     private BuilderList mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
@@ -144,11 +144,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
 
         if (firstRun) {
-            SharedPreferencesUtils.firstTimeServerSetup(this);
+            SharedPreferencesUtil.firstTimeServerSetup(this);
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        setUpServers(SharedPreferencesUtils.getServersFromPreferences(getApplicationContext()));
+        setUpServers(SharedPreferencesUtil.getServersFromPreferences(getApplicationContext()));
     }
 
     private void setUpServers(final ArrayList<String> serverFiles) {
@@ -247,11 +247,11 @@ public class MainServerListActivity extends Activity implements PopupMenu.OnMenu
     }
 
     private void deleteServer(final String fileName) {
-        final ArrayList<String> servers = SharedPreferencesUtils
+        final ArrayList<String> servers = SharedPreferencesUtil
                 .getServersFromPreferences(getApplicationContext());
         servers.remove(fileName);
 
-        final File folder = new File(SharedPreferencesUtils
+        final File folder = new File(SharedPreferencesUtil
                 .getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");
         folder.delete();
 

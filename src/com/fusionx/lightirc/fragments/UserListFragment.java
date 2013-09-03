@@ -26,7 +26,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.view.ActionMode;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,7 +36,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ListView;
 
+import com.fusionx.common.utils.MultiSelectionUtil;
 import com.fusionx.irc.core.ChannelUser;
 import com.fusionx.irc.core.Server;
 import com.fusionx.lightirc.R;
@@ -48,11 +51,13 @@ import java.util.TreeSet;
 
 import lombok.Getter;
 
-public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener {
+public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
+        MultiSelectionUtil.MultiChoiceModeListener {
     @Getter
     private ActionMode mode;
     private UserListCallback mCallback;
     private String mChannelName;
+    private MultiSelectionUtil.Controller mMultiSelectionController;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -67,12 +72,53 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
+
         final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
                 new TreeSet<ChannelUser>());
         AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
         setListAdapter(alphaInAnimationAdapter);
 
-        return super.onCreateView(inflater, container, savedInstanceState);
+        mMultiSelectionController = MultiSelectionUtil.attachMultiSelectionController(
+                (ListView) rootView.findViewById(android.R.id.list),
+                (ActionBarActivity) getActivity(), this);
+
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.finish();
+        }
+        mMultiSelectionController = null;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.saveInstanceState(outState);
+        }
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+
+        if (mMultiSelectionController == null) {
+            return;
+        }
+
+        // Hide the action mode when the fragment becomes invisible
+        if (!menuVisible) {
+            Bundle bundle = new Bundle();
+            if (mMultiSelectionController.saveInstanceState(bundle)) {
+                mMultiSelectionController.finish();
+            }
+        }
     }
 
     @Override
@@ -101,11 +147,10 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         super.onActivityCreated(savedInstanceState);
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        //getListView().setMultiChoiceModeListener(this);
         getListView().setOnItemClickListener(this);
     }
 
-    //@Override
+    @Override
     public void onItemCheckedStateChanged(final ActionMode mode, final int position, final long id,
                                           final boolean checked) {
         if (checked) {
@@ -175,7 +220,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
 
     @Override
     public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        int selectedItemCount = getListView().getCheckedItemCount();
+        int selectedItemCount = getUserListAdapter().getSelectedItemCount();
 
         if (selectedItemCount != 0) {
             final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
@@ -195,7 +240,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
                             final long l) {
         if (mode == null) {
-            getActivity().startActionMode(this);
+            ((ActionBarActivity) getActivity()).startSupportActionMode(this);
 
             final boolean checked = getUserListAdapter().isItemAtPositionChecked(i);
             getListView().setItemChecked(i, !checked);

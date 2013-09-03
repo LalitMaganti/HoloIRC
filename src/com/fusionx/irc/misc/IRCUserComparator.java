@@ -21,7 +21,7 @@
 
 package com.fusionx.irc.misc;
 
-import com.fusionx.common.Utils;
+import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.core.Channel;
 import com.fusionx.irc.core.ChannelUser;
 import com.fusionx.irc.enums.UserLevel;
