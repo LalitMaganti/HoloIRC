@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.promptdialogs;
+package com.fusionx.lightirc.ui.dialogbuilder;
 
 import android.content.Context;
 

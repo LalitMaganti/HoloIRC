@@ -23,10 +23,10 @@ package com.fusionx.lightirc.irc;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.collections.TwoWayHashSet;
 import com.fusionx.lightirc.irc.enums.UserLevel;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
-import com.fusionx.lightirc.collections.TwoWayHashSet;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.io.OutputStreamWriter;
 import java.util.Set;

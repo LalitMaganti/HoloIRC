@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.IRCFragmentActivity"
+                android:name=".ui.IRCActivity"
                 android:parentActivityName=".activity.MainServerListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -35,14 +35,14 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.ServerSettingsActivityHC"
+                android:name=".ui.ServerPreferenceActivityHC"
                 android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.ServerSettingsActivityCompat"
+                android:name=".ui.ServerPreferenceActivityCompat"
                 android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -56,7 +56,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.SettingsActivity"
+                android:name=".ui.AppPreferenceActivity"
                 android:label="@string/settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

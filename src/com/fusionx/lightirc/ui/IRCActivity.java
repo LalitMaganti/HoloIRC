@@ -42,21 +42,21 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.ircfragments.IRCPagerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DecorChildLayout;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
-import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ import java.util.Iterator;
  *
  * @author Lalit Maganti
  */
-public class IRCFragmentActivity extends ActionBarActivity implements UserListFragment
+public class IRCActivity extends ActionBarActivity implements UserListFragment
         .UserListCallback, IFragmentSideHandler, ServiceFragment.ServiceFragmentCallback,
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
@@ -424,7 +424,7 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
         closeAllSlidingMenus();
     }
 
-    // IRCActionsFragment Listener Callbacks
+    // ActionsFragment Listener Callbacks
 
     /**
      * Method which returns the nick of the user
@@ -484,7 +484,7 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
             @Override
             public void run() {
                 mMentionView.startAnimation(AnimationUtils.loadAnimation
-                        (IRCFragmentActivity.this, R.anim.action_bar_out));
+                        (IRCActivity.this, R.anim.action_bar_out));
                 mMentionView.setVisibility(View.GONE);
             }
         }, 2500);

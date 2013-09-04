@@ -19,20 +19,29 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.promptdialogs;
+package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
 
 import com.fusionx.lightirc.R;
 
-public abstract class ChannelNamePromptDialogBuilder extends PromptDialogBuilder {
-    public ChannelNamePromptDialogBuilder(final Context context) {
-        super(context, context.getString(R.string.prompt_dialog_channel_name),
-                context.getString(R.string.prompt_dialog_including_starting), "");
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class ActionsUserChannelAdapter extends ActionsArrayAdapter {
+    public ActionsUserChannelAdapter(Context context) {
+        super(context, new ArrayList<>(Arrays.asList(context.getResources().getStringArray(R.array
+                .channel_actions))));
     }
 
-    public ChannelNamePromptDialogBuilder(final Context context, final String channelName) {
-        super(context, context.getString(R.string.prompt_dialog_channel_name),
-                context.getString(R.string.prompt_dialog_including_starting), channelName);
+    public void setServerVisible() {
+        mList.clear();
+    }
+
+    public void setChannelVisible(boolean visible) {
+        mList.clear();
+        mList.addAll(visible ? Arrays.asList(mContext.getResources().getStringArray(R.array
+                .channel_actions)) : Arrays.asList(mContext.getResources().getStringArray(R.array
+                .user_actions)));
     }
 }

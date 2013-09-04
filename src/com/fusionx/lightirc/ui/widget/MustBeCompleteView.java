@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.MiscUtils;
 
 /**
  * Hacky way to add a view to a settings fragment
@@ -41,9 +41,5 @@ public class MustBeCompleteView extends Preference {
         if (mTextView != null) {
             mTextView.setText(mText);
         }
-    }
-
-    public void setVisibility(int visibility) {
-        mTextView.setVisibility(visibility);
     }
 }

@@ -24,10 +24,10 @@ package com.fusionx.lightirc.uiircinterface;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

@@ -24,8 +24,8 @@ package com.fusionx.lightirc.misc;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -31,19 +31,19 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
+import com.fusionx.lightirc.interfaces.IIRCSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.User;
+import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.irc.enums.ServerEventType;
 import com.fusionx.lightirc.irc.enums.UserEventType;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.ui.IRCFragmentActivity;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
-import com.fusionx.lightirc.interfaces.IIRCSideHandler;
+import com.fusionx.lightirc.ui.IRCActivity;
 
 import java.util.LinkedHashMap;
 
@@ -313,8 +313,8 @@ public class MessageSender {
     }
 
     public Bundle parcelDataForBroadcast(final String destination,
-                                                @NonNull final Enum type,
-                                                @NonNull final String... message) {
+                                         @NonNull final Enum type,
+                                         @NonNull final String... message) {
         final Bundle event = new Bundle();
         if (destination != null) {
             event.putString(EventBundleKeys.destination, destination);
@@ -347,11 +347,11 @@ public class MessageSender {
                     .setAutoCancel(true)
                     .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
                             messageDestination);
-            final Intent mIntent = new Intent(mContext, IRCFragmentActivity.class);
+            final Intent mIntent = new Intent(mContext, IRCActivity.class);
             mIntent.putExtra("serverTitle", ircSideHandlerInterface.getTitle());
             mIntent.putExtra("mention", messageDestination);
             final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
-            taskStackBuilder.addParentStack(IRCFragmentActivity.class);
+            taskStackBuilder.addParentStack(IRCActivity.class);
             taskStackBuilder.addNextIntent(mIntent);
             final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
                     PendingIntent.FLAG_UPDATE_CURRENT);

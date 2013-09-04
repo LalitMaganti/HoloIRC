@@ -26,15 +26,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
+import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 

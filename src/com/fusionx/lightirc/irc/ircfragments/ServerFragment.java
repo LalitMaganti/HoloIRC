@@ -25,12 +25,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ServerEventType;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
+import com.fusionx.lightirc.util.FragmentUtils;
 
 import lombok.Getter;
 

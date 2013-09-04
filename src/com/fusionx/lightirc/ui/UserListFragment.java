@@ -36,10 +36,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.fusionx.lightirc.irc.ChannelUser;
-import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 

@@ -9,14 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.actions.ActionPagerAdapter;
+import com.fusionx.lightirc.adapters.ActionPagerAdapter;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
-        .IgnoreListCallback, IRCActionsFragment.IRCActionsCallback {
+        .IgnoreListCallback, ActionsFragment.IRCActionsCallback {
     private ViewPager mActionViewPager;
     private ActionPagerAdapter mActionsPagerAdapter = null;
     private ActionsPagerFragmentCallback mCallback;
@@ -51,8 +51,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         return view;
     }
 
-    private IRCActionsFragment getActionFragment() {
-        return (IRCActionsFragment) mActionsPagerAdapter.getItem(0);
+    private ActionsFragment getActionFragment() {
+        return (ActionsFragment) mActionsPagerAdapter.getItem(0);
     }
 
     private IgnoreListFragment getIgnoreFragment() {

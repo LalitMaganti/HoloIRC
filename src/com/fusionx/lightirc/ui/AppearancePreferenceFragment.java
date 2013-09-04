@@ -31,7 +31,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ISettings;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class ServerChannelSettingsFragment extends PreferenceFragment  {
+public class AppearancePreferenceFragment extends PreferenceFragment {
     private ISettings mCallback;
 
     @Override
@@ -47,8 +47,8 @@ public class ServerChannelSettingsFragment extends PreferenceFragment  {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.server_channel_settings_fragment);
+        addPreferencesFromResource(R.xml.appearance_settings_fragment);
 
-        mCallback.setupNumberPicker(getPreferenceScreen());
+        mCallback.setupThemePreference(getPreferenceScreen());
     }
 }

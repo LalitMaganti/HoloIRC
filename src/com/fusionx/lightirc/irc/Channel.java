@@ -25,11 +25,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
-import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import de.scrum_master.util.UpdateableTreeSet;
 import lombok.AccessLevel;

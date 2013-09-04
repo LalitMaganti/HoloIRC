@@ -24,17 +24,15 @@ package com.fusionx.lightirc.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 
-import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
-import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_ENDOFWHO;
@@ -45,6 +43,8 @@ import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_TOPICINFO;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_WHOREPLY;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.genericCodes;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.whoisCodes;
+import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
+import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
 public class ServerCodeParser {
     private final StringBuilder mStringBuilder = new StringBuilder();

@@ -32,10 +32,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.ircfragments.IRCFragment;
 import com.fusionx.lightirc.irc.ircfragments.ServerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;

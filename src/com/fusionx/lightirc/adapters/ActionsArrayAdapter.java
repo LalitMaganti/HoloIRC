@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.adapters.actions;
+package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -29,8 +29,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.List;
 

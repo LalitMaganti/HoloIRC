@@ -11,11 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
-import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 
 public class ServiceFragment extends Fragment {
     private IRCBridgeService mService;
@@ -49,7 +49,12 @@ public class ServiceFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        mCallback = (ServiceFragmentCallback) activity;
+        try {
+            mCallback = (ServiceFragmentCallback) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "ServiceFragmentCallback");
+        }
         if (sender == null) {
             sender = MessageSender.getSender(mCallback.getServerTitle());
         }

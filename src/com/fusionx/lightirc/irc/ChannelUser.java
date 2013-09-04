@@ -2,8 +2,8 @@ package com.fusionx.lightirc.irc;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.irc.enums.UserLevel;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.enums.UserLevel;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;

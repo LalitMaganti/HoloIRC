@@ -21,11 +21,11 @@
 
 package com.fusionx.lightirc.irc.parser.main;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

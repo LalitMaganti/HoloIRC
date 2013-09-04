@@ -21,10 +21,10 @@
 
 package com.fusionx.lightirc.irc.misc;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.enums.UserLevel;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.Comparator;
 

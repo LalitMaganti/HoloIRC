@@ -15,7 +15,7 @@ public class ChannelListActivity extends ActionBarActivity implements IServerSet
         mFileName = getIntent().getStringExtra("filename");
 
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
-                new ListViewSettingsFragment()).commit();
+                new ChannelListFragment()).commit();
     }
 
     @Override

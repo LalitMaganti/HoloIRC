@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.adapters.actions;
+package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
 
@@ -27,11 +27,11 @@ import java.util.List;
 
 import lombok.Getter;
 
-public class ServerActionsAdapter extends ActionsArrayAdapter {
+public class ActionsServerAdapter extends ActionsArrayAdapter {
     @Getter
     private boolean connected = false;
 
-    public ServerActionsAdapter(final Context context, final List<String> objects) {
+    public ActionsServerAdapter(final Context context, final List<String> objects) {
         super(context, objects);
     }
 

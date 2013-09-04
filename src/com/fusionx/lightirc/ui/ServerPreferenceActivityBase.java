@@ -4,14 +4,14 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.IServerSettings;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.fusionx.lightirc.R;
 
 import java.io.File;
 
-class ServerSettingsActivityBase extends PreferenceActivity implements IServerSettings {
+class ServerPreferenceActivityBase extends PreferenceActivity implements IServerSettings {
     protected boolean mCanSaveChanges = true;
     protected boolean mNewServer = false;
     protected String mFileName = null;
@@ -23,9 +23,9 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
 
         super.onCreate(savedInstanceState);
 
-            mFileName = getIntent().getStringExtra("file");
-            mNewServer = getIntent().getBooleanExtra("new", false);
-            mCanSaveChanges = !mNewServer;
+        mFileName = getIntent().getStringExtra("file");
+        mNewServer = getIntent().getBooleanExtra("new", false);
+        mCanSaveChanges = !mNewServer;
     }
 
     @Override

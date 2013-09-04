@@ -16,21 +16,21 @@
 
 package com.fusionx.lightirc.util;
 
-        import android.os.Bundle;
-        import android.os.Handler;
-        import android.support.v7.app.ActionBarActivity;
-        import android.support.v7.view.ActionMode;
-        import android.util.Pair;
-        import android.util.SparseBooleanArray;
-        import android.view.Menu;
-        import android.view.MenuItem;
-        import android.view.View;
-        import android.widget.AbsListView;
-        import android.widget.Adapter;
-        import android.widget.AdapterView;
-        import android.widget.ListView;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.util.Pair;
+import android.util.SparseBooleanArray;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
-        import java.util.HashSet;
+import java.util.HashSet;
 
 /**
  * Utilities for handling multiple selection in list views. Contains functionality similar to
@@ -228,7 +228,7 @@ public class MultiSelectionUtils {
     public static interface MultiChoiceModeListener extends ActionMode.Callback {
         /**
          * @see android.widget.AbsListView.MultiChoiceModeListener#onItemCheckedStateChanged(
-         * android.view.ActionMode, int, long, boolean)
+         *android.view.ActionMode, int, long, boolean)
          */
         public void onItemCheckedStateChanged(ActionMode mode,
                                               int position, long id, boolean checked);

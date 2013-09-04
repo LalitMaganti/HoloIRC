@@ -20,12 +20,12 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,7 +34,7 @@ import java.util.TreeSet;
 
 import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
 
-public class ListViewSettingsFragment extends ListFragment implements AdapterView
+public class ChannelListFragment extends ListFragment implements AdapterView
         .OnItemClickListener, MultiSelectionUtils.MultiChoiceModeListener {
     private SelectionAdapter<String> adapter;
     private boolean modeStarted = false;
@@ -55,7 +55,7 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             getListView().setLayoutTransition(new LayoutTransition());
         }
     }

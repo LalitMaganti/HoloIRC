@@ -15,13 +15,13 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.fusionx.lightirc.misc.PreferenceKeys;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.promptdialogs.IgnoreNickPromptDialogBuilder;
+import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
+import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 

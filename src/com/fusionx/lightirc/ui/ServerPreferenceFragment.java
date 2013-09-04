@@ -1,17 +1,23 @@
 package com.fusionx.lightirc.ui;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
+import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
+import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
+import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.widget.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,26 +25,38 @@ import org.apache.commons.lang3.StringUtils;
 import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
 import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
-@SuppressWarnings("deprecation")
-public class ServerSettingsActivityCompat extends ServerSettingsActivityBase implements
-        Preference.OnPreferenceChangeListener {
-    // View which notifies user that some fields must be complete
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class ServerPreferenceFragment extends PreferenceFragment implements Preference
+        .OnPreferenceChangeListener {
     private MustBeCompleteView mCompleteView = null;
-    private ServerTitleEditTextPreference mTitle;
-    private EditTextPreference mUrl;
+    private ServerTitleEditTextPreference mTitle = null;
+    private EditTextPreference mUrl = null;
+    private IServerSettings mCallback = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mCallback = (IServerSettings) activity;
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getPreferenceManager().setSharedPreferencesMode(MODE_MULTI_PROCESS);
-        getPreferenceManager().setSharedPreferencesName(mFileName);
+        setHasOptionsMenu(true);
+
+        getPreferenceManager().setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
+        getPreferenceManager().setSharedPreferencesName(mCallback.getFileName());
 
         addPreferencesFromResource(R.xml.activty_server_settings_prefs);
 
         mTitle = (ServerTitleEditTextPreference) findPreference(Title);
         mTitle.setOnPreferenceChangeListener(this);
-        mTitle.setListOfExistingServers(getIntent().getStringArrayListExtra("list"));
+        mTitle.setListOfExistingServers(getActivity().getIntent().getStringArrayListExtra("list"));
 
         // URL of server
         mCompleteView = (MustBeCompleteView) findPreference("must_be_complete");
@@ -52,15 +70,15 @@ public class ServerSettingsActivityCompat extends ServerSettingsActivityBase imp
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
-                final Intent intent = new Intent(ServerSettingsActivityCompat.this,
+                final Intent intent = new Intent(getActivity(),
                         ChannelListActivity.class);
-                intent.putExtra("filename", getFileName());
+                intent.putExtra("filename", mCallback.getFileName());
                 startActivity(intent);
                 return false;
             }
         });
 
-        if (!canSaveChanges()) {
+        if (!mCallback.canSaveChanges()) {
             setupNewServer();
             mCompleteView.setInitialText(mTitle.getTitle().toString());
         } else {
@@ -70,7 +88,7 @@ public class ServerSettingsActivityCompat extends ServerSettingsActivityBase imp
 
     private void setupNewServer() {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
-                (this);
+                (getActivity());
         final String firstNick = preferences.getString(PreferenceKeys.DefaultFirstNick, "holoirc");
         final String secondNick = preferences.getString(PreferenceKeys.DefaultSecondNick, "");
         final String thirdNick = preferences.getString(PreferenceKeys.DefaultThirdNick, "");
@@ -94,16 +112,16 @@ public class ServerSettingsActivityCompat extends ServerSettingsActivityBase imp
     }
 
     @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (!canSaveChanges()) {
+    public boolean onPreferenceChange(final Preference preference, final Object newValue) {
+        if (!mCallback.canSaveChanges()) {
             if (StringUtils.isEmpty(mTitle.getText())) {
                 mCompleteView.setInitialText(mTitle.getTitle().toString());
-                setCanSaveChanges(false);
+                mCallback.setCanSaveChanges(false);
             } else if (StringUtils.isEmpty(mTitle.getText())) {
                 mCompleteView.setInitialText(mUrl.getTitle().toString());
-                setCanSaveChanges(false);
+                mCallback.setCanSaveChanges(false);
             } else {
-                setCanSaveChanges(true);
+                mCallback.setCanSaveChanges(true);
                 getPreferenceScreen().removePreference(mCompleteView);
             }
         }

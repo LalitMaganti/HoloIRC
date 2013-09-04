@@ -29,11 +29,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 
-import com.fusionx.lightirc.irc.connection.ConnectionManager;
-import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.connection.ConnectionManager;
+import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.ui.MainServerListActivity;
 
 import lombok.AccessLevel;

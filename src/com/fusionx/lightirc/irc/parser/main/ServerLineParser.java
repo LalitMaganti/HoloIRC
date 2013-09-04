@@ -24,10 +24,10 @@ package com.fusionx.lightirc.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.irc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.misc.CoreListener;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

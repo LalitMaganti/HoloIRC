@@ -23,7 +23,7 @@ package com.fusionx.lightirc.irc.connection;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -31,8 +31,8 @@ import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.parser.connection.ServerConnectionParser;
 import com.fusionx.lightirc.irc.parser.main.ServerLineParser;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

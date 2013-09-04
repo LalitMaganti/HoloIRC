@@ -26,33 +26,44 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.base.TreeSetAdapter;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class SelectionAdapter<T> extends TreeSetAdapter<T> {
-    private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
-
+    /**
+     * Lock for any operation invlolving the mSelectedItems
+     */
     private final Object mLock = new Object();
+
+    /**
+     * The ArrayList which contains all the items considered selected
+     */
+    private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
 
     public SelectionAdapter(final Context context, final SortedSet<T> objects) {
         super(context, R.layout.default_listview_textview, (TreeSet<T>) objects);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
         MiscUtils.setTypeface(getContext(), view);
 
-        if (mSelectedItems.contains(position)) {
-            view.setBackgroundColor(getContext().getResources().getColor(android.R.color
-                    .holo_blue_light));
-        } else {
-            view.setBackgroundResource(R.drawable.default_item_selector);
+        synchronized (mLock) {
+            if (mSelectedItems.contains(position)) {
+                view.setBackgroundColor(getContext().getResources().getColor(android.R.color
+                        .holo_blue_light));
+            } else {
+                view.setBackgroundResource(R.drawable.default_item_selector);
+            }
         }
 
         return view;
@@ -94,7 +105,9 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * Clears the selected items in the adapter
      */
     public void clearSelection() {
-        mSelectedItems.clear();
+        synchronized (mLock) {
+            mSelectedItems.clear();
+        }
         if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
@@ -115,8 +128,10 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      */
     public ArrayList<T> getSelectedItems() {
         final ArrayList<T> list = new ArrayList<>();
-        for (int i : mSelectedItems) {
-            list.add(getItem(i));
+        synchronized (mLock) {
+            for (int i : mSelectedItems) {
+                list.add(getItem(i));
+            }
         }
         return list;
     }
@@ -130,11 +145,20 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     }
 
     public boolean isItemAtPositionChecked(final int position) {
-        return mSelectedItems.contains(position);
+        synchronized (mLock) {
+            return mSelectedItems.contains(position);
+        }
     }
 
+    /**
+     * Gets the number of items which are considered to be selected
+     *
+     * @return - the number of selected items
+     */
     public int getSelectedItemCount() {
-        return mSelectedItems.size();
+        synchronized (mLock) {
+            return mSelectedItems.size();
+        }
     }
 
     public void setInternalSet(SortedSet<T> set) {

@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.promptdialogs;
+package com.fusionx.lightirc.ui.dialogbuilder;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -30,8 +30,8 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.MiscUtils;
 
 public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {

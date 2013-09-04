@@ -8,7 +8,7 @@ import android.preference.PreferenceFragment;
 import com.fusionx.lightirc.R;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class DefaultUserFragment extends PreferenceFragment {
+public class DefaultUserPreferenceFragment extends PreferenceFragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

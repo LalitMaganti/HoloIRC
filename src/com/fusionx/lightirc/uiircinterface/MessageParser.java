@@ -23,8 +23,8 @@ package com.fusionx.lightirc.uiircinterface;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 

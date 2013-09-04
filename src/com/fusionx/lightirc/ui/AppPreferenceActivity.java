@@ -15,16 +15,16 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 
-import com.fusionx.lightirc.misc.PreferenceKeys;
-import com.fusionx.lightirc.interfaces.ISettings;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.interfaces.ISettings;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.michaelnovakjr.numberpicker.NumberPickerPreference;
 
 import java.util.List;
 
-public class SettingsActivity extends PreferenceActivity implements ISettings {
+public class AppPreferenceActivity extends PreferenceActivity implements ISettings {
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,7 @@ public class SettingsActivity extends PreferenceActivity implements ISettings {
 
         super.onCreate(savedInstanceState);
 
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             final PreferenceScreen preferenceScreen = getPreferenceScreen();
 
             // Appearance settings
@@ -103,6 +103,7 @@ public class SettingsActivity extends PreferenceActivity implements ISettings {
 
     static class ThemeChangeListener implements Preference.OnPreferenceChangeListener {
         private final Activity mActivity;
+
         ThemeChangeListener(final Activity context) {
             mActivity = context;
         }
@@ -136,6 +137,7 @@ public class SettingsActivity extends PreferenceActivity implements ISettings {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 mActivity.startActivity(intent);
             }
+
             @Override
             public void onServiceDisconnected(final ComponentName name) {
             }

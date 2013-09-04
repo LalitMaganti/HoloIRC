@@ -2,19 +2,19 @@
 
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
     <header
-            android:fragment="com.fusionx.lightirc.ui.AppearanceSettingsFragment"
+            android:fragment="com.fusionx.lightirc.ui.AppearancePreferenceFragment"
             android:title="@string/appearance"
             android:summary="@string/settings_appearance_summary"/>
     <header
-            android:fragment="com.fusionx.lightirc.ui.ServerChannelSettingsFragment"
+            android:fragment="com.fusionx.lightirc.ui.ServerChannelPreferenceFragment"
             android:title="@string/server_channel_settings_title"
             android:summary="@string/server_channel_settings_summary"/>
     <header
-            android:fragment="com.fusionx.lightirc.ui.DefaultUserFragment"
+            android:fragment="com.fusionx.lightirc.ui.DefaultUserPreferenceFragment"
             android:title="@string/default_user_settings_header"
             android:summary="@string/default_user_settings_summary"/>
     <header
-            android:fragment="com.fusionx.lightirc.ui.AboutFragment"
+            android:fragment="com.fusionx.lightirc.ui.AboutPreferenceFragment"
             android:title="@string/about"
             android:summary="@string/settings_about_fragment_summary"/>
 </preference-headers>

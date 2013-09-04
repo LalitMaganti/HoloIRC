@@ -36,16 +36,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
+import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
@@ -137,7 +137,7 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
 
     private void displaySettings() {
         final Intent intent = new Intent(MainServerListActivity.this,
-                SettingsActivity.class);
+                AppPreferenceActivity.class);
         startActivity(intent);
     }
 
@@ -169,7 +169,7 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
 
     // Connect to server
     public void onCardClick(final View view) {
-        final Intent intent = new Intent(MainServerListActivity.this, IRCFragmentActivity.class);
+        final Intent intent = new Intent(MainServerListActivity.this, IRCActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("server", (ServerConfiguration.Builder) view.getTag());
         startActivity(intent);
@@ -226,8 +226,8 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
 
     private void addNewServer() {
         final Intent intent = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new Intent
-                (MainServerListActivity.this, ServerSettingsActivityCompat.class) : new Intent
-                (MainServerListActivity.this, ServerSettingsActivityHC.class);
+                (MainServerListActivity.this, ServerPreferenceActivityCompat.class) : new Intent
+                (MainServerListActivity.this, ServerPreferenceActivityHC.class);
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
@@ -238,8 +238,8 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
 
     private void editServer(final ServerConfiguration.Builder builder) {
         final Intent intent = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new Intent
-                (MainServerListActivity.this, ServerSettingsActivityCompat.class) : new Intent
-                (MainServerListActivity.this, ServerSettingsActivityHC.class);
+                (MainServerListActivity.this, ServerPreferenceActivityCompat.class) : new Intent
+                (MainServerListActivity.this, ServerPreferenceActivityHC.class);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("file", builder.getFile());

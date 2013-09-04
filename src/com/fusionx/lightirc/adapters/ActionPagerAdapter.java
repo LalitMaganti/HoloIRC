@@ -1,19 +1,20 @@
-package com.fusionx.lightirc.adapters.actions;
+package com.fusionx.lightirc.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.fusionx.lightirc.ui.IRCActionsFragment;
+import com.fusionx.lightirc.ui.ActionsFragment;
 import com.fusionx.lightirc.ui.IgnoreListFragment;
 
 public class ActionPagerAdapter extends FragmentPagerAdapter {
-    private final IRCActionsFragment mActionFragment;
+    private final ActionsFragment mActionFragment;
     private final IgnoreListFragment mIgnoreListFragment;
 
     public ActionPagerAdapter(final FragmentManager fm) {
         super(fm);
-        mActionFragment = new IRCActionsFragment();
+
+        mActionFragment = new ActionsFragment();
         mIgnoreListFragment = new IgnoreListFragment();
     }
 

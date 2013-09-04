@@ -29,10 +29,10 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.Constants;
 import com.github.espiandev.showcaseview.ShowcaseView;
 
 public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
@@ -80,7 +80,7 @@ public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
         final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.overflow_menu);
         linearLayout.setTag(builder);
 
-        if(position == 0 && Constants.DEBUG) {
+        if (position == 0 && Constants.DEBUG) {
             final ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
             co.hideOnClickOutside = true;
             co.insert = ShowcaseView.INSERT_TO_VIEW;
@@ -98,6 +98,7 @@ public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
                     final ShowcaseView showcase = ShowcaseView.insertShowcaseView(linearLayout,
                             mActivity, "Test12345", "Test1234", options);
                 }
+
                 @Override
                 public void onShowcaseViewShow(ShowcaseView showcaseView) {
                 }

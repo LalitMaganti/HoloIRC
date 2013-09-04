@@ -1,10 +1,10 @@
 package com.fusionx.lightirc.irc.parser.connection;
 
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.irc.constants.ServerReplyCodes;
 import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.irc.constants.ServerReplyCodes;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 

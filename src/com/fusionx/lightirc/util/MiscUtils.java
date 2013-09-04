@@ -32,10 +32,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.enums.UserLevel;
 import com.fusionx.lightirc.misc.Constants;
 import com.fusionx.lightirc.misc.PreferenceKeys;
-import com.fusionx.lightirc.irc.enums.UserLevel;
-import com.fusionx.lightirc.R;
 
 import org.apache.commons.lang3.StringUtils;
 

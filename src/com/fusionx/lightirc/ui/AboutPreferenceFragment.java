@@ -31,7 +31,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ISettings;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-public class AppearanceSettingsFragment extends PreferenceFragment {
+public class AboutPreferenceFragment extends PreferenceFragment {
     private ISettings mCallback;
 
     @Override
@@ -47,8 +47,8 @@ public class AppearanceSettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.appearance_settings_fragment);
+        addPreferencesFromResource(R.xml.about_settings_fragment);
 
-        mCallback.setupThemePreference(getPreferenceScreen());
+        mCallback.setupAppVersionPreference(getPreferenceScreen());
     }
 }

@@ -30,21 +30,21 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.commonsware.cwac.merge.MergeAdapter;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.actions.ServerActionsAdapter;
-import com.fusionx.lightirc.adapters.actions.UserChannelActionsAdapter;
+import com.fusionx.lightirc.adapters.ActionsServerAdapter;
+import com.fusionx.lightirc.adapters.ActionsUserChannelAdapter;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightirc.promptdialogs.NickPromptDialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.Arrays;
 
-public class IRCActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
+public class ActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
     private FragmentType type;
 
@@ -59,9 +59,9 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
         final MergeAdapter mergeAdapter = new MergeAdapter();
-        final ServerActionsAdapter adapter = new ServerActionsAdapter(getActivity(),
+        final ActionsServerAdapter adapter = new ActionsServerAdapter(getActivity(),
                 Arrays.asList(getResources().getStringArray(R.array.server_actions)));
-        final UserChannelActionsAdapter channelAdapter = new UserChannelActionsAdapter
+        final ActionsUserChannelAdapter channelAdapter = new ActionsUserChannelAdapter
                 (getActivity());
 
         final View serverHeader = inflater.inflate(R.layout.sliding_menu_header, null);
@@ -174,12 +174,12 @@ public class IRCActionsFragment extends ListFragment implements AdapterView.OnIt
         return (MergeAdapter) getAlphaAdapter().getDecoratedBaseAdapter();
     }
 
-    private ServerActionsAdapter getServerAdapter() {
-        return (ServerActionsAdapter) getListAdapter().getAdapter(1);
+    private ActionsServerAdapter getServerAdapter() {
+        return (ActionsServerAdapter) getListAdapter().getAdapter(1);
     }
 
-    private UserChannelActionsAdapter getUserChannelAdapter() {
-        return (UserChannelActionsAdapter) getListAdapter().getAdapter(3);
+    private ActionsUserChannelAdapter getUserChannelAdapter() {
+        return (ActionsUserChannelAdapter) getListAdapter().getAdapter(3);
     }
 
     public void updateConnectionStatus(final boolean isConnected) {
