@@ -41,8 +41,28 @@
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
+        <activity
+                android:name=".serversettings.ServerSettingsActivityCompat"
+                android:label="@string/server_settings_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+        <activity
+                android:name=".serversettings.ChannelListActivity"
+                android:label="@string/server_settings_auto_join_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+        <activity
+                android:name=".settings.SettingsActivity"
+                android:label="@string/settings_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
 
         <service android:name="com.fusionx.uiircinterface.core.IRCBridgeService"/>
     </application>
-
 </manifest>

@@ -34,9 +34,7 @@ public class ServerSettingsActivityHC extends ServerSettingsActivityBase {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!mListDisplayed) {
-            getFragmentManager().beginTransaction().replace(android.R.id.content,
-                    new BaseServerSettingsFragment()).commit();
-        }
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                new BaseServerSettingsFragment()).commit();
     }
 }

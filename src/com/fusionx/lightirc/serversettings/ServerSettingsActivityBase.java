@@ -11,7 +11,6 @@ import com.fusionx.lightirc.R;
 import java.io.File;
 
 class ServerSettingsActivityBase extends PreferenceActivity implements IServerSettings {
-    protected boolean mListDisplayed = false;
     protected boolean mCanSaveChanges = true;
     protected boolean mNewServer = false;
     protected String mFileName = null;
@@ -23,17 +22,14 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
 
         super.onCreate(savedInstanceState);
 
-        mListDisplayed = getIntent().getBooleanExtra("listview", false);
-        if (!mListDisplayed) {
             mFileName = getIntent().getStringExtra("file");
             mNewServer = getIntent().getBooleanExtra("new", false);
             mCanSaveChanges = !mNewServer;
-        }
     }
 
     @Override
     public void onBackPressed() {
-        if (!mListDisplayed && !mCanSaveChanges) {
+        if (!mCanSaveChanges) {
             final File folder = new File(SharedPreferencesUtil.getSharedPreferencesPath
                     (this) + "server.xml");
             if (folder.exists()) {
