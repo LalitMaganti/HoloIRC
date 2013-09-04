@@ -34,7 +34,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
+import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
 
 public class SharedPreferencesUtils {
     public static String getSharedPreferencesPath(final Context context) {

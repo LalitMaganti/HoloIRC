@@ -31,7 +31,7 @@ import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
-import com.fusionx.lightirc.irc.constants.ServerCommands;
+import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 
 import de.scrum_master.util.UpdateableTreeSet;
 
-import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
+import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 
 public class ServerCommandParser {
     private final Context mContext;

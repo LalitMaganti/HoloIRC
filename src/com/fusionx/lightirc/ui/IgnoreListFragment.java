@@ -18,7 +18,7 @@ import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -137,7 +137,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         final SharedPreferences preferences = getActivity().getSharedPreferences
                 (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
 
-        MiscUtils.putStringSet(preferences, PreferenceKeys.IgnoreList,
+        MiscUtils.putStringSet(preferences, PreferenceConstants.IgnoreList,
                 getIgnoreAdapter().getCopyOfItems());
 
         mMode = null;

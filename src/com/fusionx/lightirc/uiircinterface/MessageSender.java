@@ -37,12 +37,12 @@ import com.fusionx.lightirc.interfaces.IIRCSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.User;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.ChannelEventType;
-import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
-import com.fusionx.lightirc.irc.enums.ServerEventType;
-import com.fusionx.lightirc.irc.enums.UserEventType;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.ServerEventTypeEnum;
+import com.fusionx.lightirc.constants.UserEventTypeEnum;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.IRCActivity;
 
 import java.util.LinkedHashMap;
@@ -122,7 +122,7 @@ public class MessageSender {
 
         if (fragmentSideHandlerInterface != null) {
             final Handler handler = fragmentSideHandlerInterface.getFragmentHandler(null,
-                    FragmentType.Server);
+                    FragmentTypeEnum.Server);
             if (handler != null) {
                 final Message fragmentMessage = Message.obtain();
                 fragmentMessage.setData(event);
@@ -141,7 +141,7 @@ public class MessageSender {
 
         if (fragmentSideHandlerInterface != null) {
             final Handler fragmentHandler = fragmentSideHandlerInterface.getFragmentHandler
-                    (destination, FragmentType.Channel);
+                    (destination, FragmentTypeEnum.Channel);
             if (fragmentHandler != null) {
                 final Message fragmentMessage = Message.obtain();
                 fragmentMessage.setData(event);
@@ -160,7 +160,7 @@ public class MessageSender {
 
         if (fragmentSideHandlerInterface != null) {
             final Handler fragmentHandler = fragmentSideHandlerInterface.getFragmentHandler
-                    (destination, FragmentType.User);
+                    (destination, FragmentTypeEnum.User);
             if (fragmentHandler != null) {
                 final Message fragmentMessage = Message.obtain();
                 fragmentMessage.setData(event);
@@ -176,24 +176,24 @@ public class MessageSender {
     // Generic events start
     public void sendGenericServerEvent(final String message) {
         final Bundle joinEvent = parcelDataForBroadcast(null,
-                ServerEventType.Generic, message);
+                ServerEventTypeEnum.Generic, message);
         sendServerMessage(joinEvent);
     }
 
     public void sendGenericChannelEvent(final String channelName, final String message) {
         final Bundle privateMessageEvent = parcelDataForBroadcast(channelName,
-                ChannelEventType.Generic, message);
+                ChannelEventTypeEnum.Generic, message);
         sendChannelMessage(privateMessageEvent);
     }
 
     public void sendGenericUserListChangedEvent(final String channelName, final String message) {
         final Bundle genericEvent = parcelDataForBroadcast(channelName,
-                ChannelEventType.UserListChanged, message);
+                ChannelEventTypeEnum.UserListChanged, message);
         sendChannelMessage(genericEvent);
     }
 
     private void sendGenericUserEvent(final String nick, final String message) {
-        final Bundle privateMessageEvent = parcelDataForBroadcast(nick, UserEventType.Generic,
+        final Bundle privateMessageEvent = parcelDataForBroadcast(nick, UserEventTypeEnum.Generic,
                 message);
         sendUserMessage(privateMessageEvent);
     }
@@ -201,33 +201,33 @@ public class MessageSender {
 
     public void sendServerConnection(final String connectionLine) {
         final Bundle connectEvent = parcelDataForBroadcast(null,
-                ServerChannelEventType.Connected, connectionLine);
+                ServerChannelEventTypeEnum.Connected, connectionLine);
         sendServerChannelMessage(connectEvent);
     }
 
     public void sendFinalDisconnection(final String disconnectLine,
                                        final boolean expectedDisconnect) {
         final Bundle disconnectEvent = parcelDataForBroadcast(null,
-                ServerChannelEventType.FinalDisconnected, disconnectLine);
+                ServerChannelEventTypeEnum.FinalDisconnected, disconnectLine);
         disconnectEvent.putBoolean(EventBundleKeys.disconnectSentByUser, expectedDisconnect);
         sendServerChannelMessage(disconnectEvent);
     }
 
     public void sendRetryPendingServerDisconnection(final String disconnectLine) {
         final Bundle disconnectEvent = parcelDataForBroadcast(null,
-                ServerChannelEventType.RetryPendingDisconnected, disconnectLine);
+                ServerChannelEventTypeEnum.RetryPendingDisconnected, disconnectLine);
         sendServerChannelMessage(disconnectEvent);
     }
 
     public void sendChanelJoined(final String channelName) {
         final Bundle joinEvent = parcelDataForBroadcast(null,
-                ServerChannelEventType.Join, channelName);
+                ServerChannelEventTypeEnum.Join, channelName);
         sendServerChannelMessage(joinEvent);
     }
 
     public void sendChanelParted(final String channelName) {
         final Bundle partEvent = parcelDataForBroadcast(channelName,
-                ChannelEventType.UserParted, channelName);
+                ChannelEventTypeEnum.UserParted, channelName);
         sendChannelMessage(partEvent);
     }
 
@@ -283,31 +283,31 @@ public class MessageSender {
 
     public void sendNickInUseMessage() {
         final Bundle event = parcelDataForBroadcast(null,
-                ServerEventType.NickInUse, mContext.getString(R.string.parser_nick_in_use));
+                ServerEventTypeEnum.NickInUse, mContext.getString(R.string.parser_nick_in_use));
         sendServerMessage(event);
     }
 
     public void switchToServerMessage(final String message) {
         final Bundle event = parcelDataForBroadcast(null,
-                ServerChannelEventType.SwitchToServerMessage, message);
+                ServerChannelEventTypeEnum.SwitchToServerMessage, message);
         sendServerChannelMessage(event);
     }
 
     public void userListReceived(final String channelName) {
         final Bundle event = parcelDataForBroadcast(channelName,
-                ChannelEventType.UserListReceived);
+                ChannelEventTypeEnum.UserListReceived);
         sendChannelMessage(event);
     }
 
     public void sendNewPrivateMessage(final String nick) {
         final Bundle event = parcelDataForBroadcast(null,
-                ServerChannelEventType.NewPrivateMessage, nick);
+                ServerChannelEventTypeEnum.NewPrivateMessage, nick);
         sendServerChannelMessage(event);
     }
 
     public void setConnected(final String url) {
         final Bundle event = parcelDataForBroadcast(null,
-                ServerChannelEventType.Connected, String.format(mContext
+                ServerChannelEventTypeEnum.Connected, String.format(mContext
                 .getString(R.string.parser_connected), url));
         sendServerChannelMessage(event);
     }

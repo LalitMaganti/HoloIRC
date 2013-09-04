@@ -19,8 +19,14 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.enums;
+package com.fusionx.lightirc.constants;
 
-public enum UserEventType {
-    Generic,
+public enum ServerChannelEventTypeEnum {
+    Join,
+    SocketConnected,
+    NewPrivateMessage,
+    Connected,
+    RetryPendingDisconnected,
+    FinalDisconnected,
+    SwitchToServerMessage,
 }

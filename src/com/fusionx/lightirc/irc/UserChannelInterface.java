@@ -24,7 +24,7 @@ package com.fusionx.lightirc.irc;
 import android.content.Context;
 
 import com.fusionx.lightirc.collections.TwoWayHashSet;
-import com.fusionx.lightirc.irc.enums.UserLevel;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -51,7 +51,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized void coupleUserAndChannel(@NonNull final ChannelUser user,
                                                   @NonNull final Channel channel) {
-        user.getUserLevelMap().put(channel, UserLevel.NONE);
+        user.getUserLevelMap().put(channel, UserLevelEnum.NONE);
         addChannelToUser(user, channel);
         addUserToChannel(user, channel);
     }

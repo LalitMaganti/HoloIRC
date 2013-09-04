@@ -19,14 +19,14 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.misc;
+package com.fusionx.lightirc.constants;
 
 /**
  * Contains the keys for retrieving settings from the SharedPreferences
  *
  * @author Lalit Maganti
  */
-public class PreferenceKeys {
+public class PreferenceConstants {
 
     // Server settings
     public final static String IgnoreList = "pref_ignore_list";

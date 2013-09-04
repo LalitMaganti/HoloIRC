@@ -19,14 +19,16 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.enums;
+package com.fusionx.lightirc.constants;
 
-public enum ServerChannelEventType {
-    Join,
-    SocketConnected,
-    NewPrivateMessage,
-    Connected,
-    RetryPendingDisconnected,
-    FinalDisconnected,
-    SwitchToServerMessage,
+public class EventBundleKeys {
+    public final static String destination = "destination";
+    public final static String eventType = "eventType";
+    public final static String message = "message";
+
+    // Only used by disconnect event
+    public final static String disconnectSentByUser = "disconnectExpected";
+
+    private EventBundleKeys() {
+    }
 }

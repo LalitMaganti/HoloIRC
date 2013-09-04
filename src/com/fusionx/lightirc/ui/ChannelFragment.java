@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.ircfragments;
+package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,9 +29,9 @@ import android.text.Html;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.ChannelEventType;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -43,7 +43,7 @@ public class ChannelFragment extends IRCFragment {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-            final ChannelEventType type = (ChannelEventType) bundle.getSerializable(EventBundleKeys
+            final ChannelEventTypeEnum type = (ChannelEventTypeEnum) bundle.getSerializable(EventBundleKeys
                     .eventType);
             final ChannelFragmentCallback callback = FragmentUtils.getParent(ChannelFragment.this,
                     ChannelFragmentCallback.class);
@@ -94,8 +94,8 @@ public class ChannelFragment extends IRCFragment {
     }
 
     @Override
-    public FragmentType getType() {
-        return FragmentType.Channel;
+    public FragmentTypeEnum getType() {
+        return FragmentTypeEnum.Channel;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.irc.ircfragments;
+package com.fusionx.lightirc.ui;
 
 import android.app.Activity;
 import android.content.res.TypedArray;
@@ -15,7 +15,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 
 import java.util.ArrayList;
 
@@ -164,7 +164,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * @param type        - the type of the fragment we are trying to get the handler from
      * @return - the handler object we are trying to get
      */
-    public Handler getFragmentHandler(final String destination, final FragmentType type,
+    public Handler getFragmentHandler(final String destination, final FragmentTypeEnum type,
                                       final String serverTitle) {
         final String nonNullDestination = destination != null ? destination : serverTitle;
         if (mAdapter != null) {
@@ -177,7 +177,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public void onMentionRequested(final ArrayList<ChannelUser> users) {
-        if (getCurrentType().equals(FragmentType.Channel)) {
+        if (getCurrentType().equals(FragmentTypeEnum.Channel)) {
             final ChannelFragment channel = (ChannelFragment) getCurrentItem();
             channel.onUserMention(users);
         }
@@ -194,7 +194,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return getCurrentItem().getTitle();
     }
 
-    public FragmentType getCurrentType() {
+    public FragmentTypeEnum getCurrentType() {
         return getCurrentItem().getType();
     }
 
@@ -219,13 +219,13 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     public void connectedToServer(final String serverTitle) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
-                FragmentType.Server);
+                FragmentTypeEnum.Server);
         fragment.onConnectedToServer();
     }
 
     public void writeMessageToServer(final String serverTitle, final String message) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
-                FragmentType.Server);
+                FragmentTypeEnum.Server);
         if (fragment != null) {
             fragment.appendToTextView(message + "\n");
         }

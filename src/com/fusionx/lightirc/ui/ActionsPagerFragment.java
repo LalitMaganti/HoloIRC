@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionPagerAdapter;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
@@ -86,7 +86,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         getActionFragment().updateConnectionStatus(isConnected);
     }
 
-    public void onPageChanged(FragmentType type) {
+    public void onPageChanged(FragmentTypeEnum type) {
         getActionFragment().onTabChanged(type);
     }
 

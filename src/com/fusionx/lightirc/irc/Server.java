@@ -29,9 +29,9 @@ import android.os.Message;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.IIRCSideHandler;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
-import com.fusionx.lightirc.irc.enums.ServerEventType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.ServerEventTypeEnum;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -68,16 +68,16 @@ public class Server implements IIRCSideHandler {
             final Bundle bundle = msg.getData();
             final Serializable serializable = bundle.getSerializable
                     (EventBundleKeys.eventType);
-            if (serializable instanceof ServerEventType) {
-                final ServerEventType type = (ServerEventType) serializable;
+            if (serializable instanceof ServerEventTypeEnum) {
+                final ServerEventTypeEnum type = (ServerEventTypeEnum) serializable;
                 switch (type) {
                     case NickInUse:
                     case Generic:
                         buffer += bundle.getString(EventBundleKeys.message) + "\n";
                         break;
                 }
-            } else if (serializable instanceof ServerChannelEventType) {
-                final ServerChannelEventType type = (ServerChannelEventType) serializable;
+            } else if (serializable instanceof ServerChannelEventTypeEnum) {
+                final ServerChannelEventTypeEnum type = (ServerChannelEventTypeEnum) serializable;
                 switch (type) {
                     case FinalDisconnected:
                         MessageSender.getSender(title).unregisterIRCSideHandlerInterface(title);

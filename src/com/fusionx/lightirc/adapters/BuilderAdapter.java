@@ -32,7 +32,7 @@ import android.widget.TextView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.constants.Constants;
 import com.github.espiandev.showcaseview.ShowcaseView;
 
 public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {

@@ -9,15 +9,15 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.widget.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
-import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
+import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
+import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
 
 @SuppressWarnings("deprecation")
 public class ServerPreferenceActivityCompat extends ServerPreferenceActivityBase implements
@@ -71,13 +71,13 @@ public class ServerPreferenceActivityCompat extends ServerPreferenceActivityBase
     private void setupNewServer() {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (this);
-        final String firstNick = preferences.getString(PreferenceKeys.DefaultFirstNick, "holoirc");
-        final String secondNick = preferences.getString(PreferenceKeys.DefaultSecondNick, "");
-        final String thirdNick = preferences.getString(PreferenceKeys.DefaultThirdNick, "");
+        final String firstNick = preferences.getString(PreferenceConstants.DefaultFirstNick, "holoirc");
+        final String secondNick = preferences.getString(PreferenceConstants.DefaultSecondNick, "");
+        final String thirdNick = preferences.getString(PreferenceConstants.DefaultThirdNick, "");
 
-        final String realName = preferences.getString(PreferenceKeys.DefaultRealName,
+        final String realName = preferences.getString(PreferenceConstants.DefaultRealName,
                 "HoloIRCUser");
-        final boolean autoNick = preferences.getBoolean(PreferenceKeys.DefaultAutoNickChange, true);
+        final boolean autoNick = preferences.getBoolean(PreferenceConstants.DefaultAutoNickChange, true);
 
         final NickPreference nickPreference = (NickPreference) getPreferenceManager()
                 .findPreference("pref_nick_storage");
@@ -86,10 +86,10 @@ public class ServerPreferenceActivityCompat extends ServerPreferenceActivityBase
         nickPreference.setThirdChoice(thirdNick);
 
         final EditTextPreference realNamePref = (EditTextPreference) getPreferenceManager()
-                .findPreference(PreferenceKeys.RealName);
+                .findPreference(PreferenceConstants.RealName);
         realNamePref.setText(realName);
         final CheckBoxPreference autoNickPref = (CheckBoxPreference) getPreferenceManager()
-                .findPreference(PreferenceKeys.AutoNickChange);
+                .findPreference(PreferenceConstants.AutoNickChange);
         autoNickPref.setChecked(autoNick);
     }
 

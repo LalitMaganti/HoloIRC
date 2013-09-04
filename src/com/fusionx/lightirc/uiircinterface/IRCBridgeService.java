@@ -34,7 +34,7 @@ import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.connection.ConnectionManager;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
-import com.fusionx.lightirc.ui.MainServerListActivity;
+import com.fusionx.lightirc.ui.ServerListActivity;
 
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -77,7 +77,7 @@ public class IRCBridgeService extends Service {
     private void updateNotification() {
         final String text = String.format(getResources().getQuantityString(R.plurals
                 .server_connection, connectionManager.size()), connectionManager.size());
-        final Intent intent = new Intent(this, MainServerListActivity.class);
+        final Intent intent = new Intent(this, ServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCBridgeService.class);
         intent2.putExtra("stop", true);
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -103,7 +103,7 @@ public class IRCBridgeService extends Service {
 
         if (serverDisplayed != null) {
             final Intent intent = new Intent(this,
-                    MainServerListActivity.class);
+                    ServerListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             serverDisplayed = null;

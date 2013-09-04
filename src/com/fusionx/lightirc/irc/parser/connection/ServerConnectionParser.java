@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.constants.ServerCommands;
+import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.misc.CoreListener;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
@@ -38,11 +38,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_WELCOME;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.saslCodes;
-import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_WELCOME;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.saslCodes;
+import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 
 public class ServerConnectionParser {
     private static boolean triedSecondNick = false;

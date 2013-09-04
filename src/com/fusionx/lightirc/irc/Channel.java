@@ -26,8 +26,8 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.ChannelEventType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -94,7 +94,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         @Override
         public void handleMessage(final Message msg) {
             final Bundle event = msg.getData();
-            final ChannelEventType type = (ChannelEventType) event
+            final ChannelEventTypeEnum type = (ChannelEventTypeEnum) event
                     .getSerializable(EventBundleKeys.eventType);
             switch (type) {
                 case UserListChanged:

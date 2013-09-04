@@ -23,7 +23,7 @@ package com.fusionx.lightirc.irc.misc;
 
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
-import com.fusionx.lightirc.irc.enums.UserLevel;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.Comparator;
@@ -37,8 +37,8 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
 
     @Override
     public int compare(final ChannelUser user1, final ChannelUser user2) {
-        final UserLevel firstUserMode = user1.getUserLevelMap().get(channel);
-        final UserLevel secondUserMode = user2.getUserLevelMap().get(channel);
+        final UserLevelEnum firstUserMode = user1.getUserLevelMap().get(channel);
+        final UserLevelEnum secondUserMode = user2.getUserLevelMap().get(channel);
 
         if (firstUserMode.equals(secondUserMode) &&
                 MiscUtils.isUserOwnerOrVoice(firstUserMode)) {
@@ -46,13 +46,13 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
             final String secondRemoved = user2.getNick();
 
             return firstRemoved.compareToIgnoreCase(secondRemoved);
-        } else if (firstUserMode.equals(UserLevel.OP)) {
+        } else if (firstUserMode.equals(UserLevelEnum.OP)) {
             return -1;
-        } else if (secondUserMode.equals(UserLevel.OP)) {
+        } else if (secondUserMode.equals(UserLevelEnum.OP)) {
             return 1;
-        } else if (firstUserMode.equals(UserLevel.VOICE)) {
+        } else if (firstUserMode.equals(UserLevelEnum.VOICE)) {
             return -1;
-        } else if (secondUserMode.equals(UserLevel.VOICE)) {
+        } else if (secondUserMode.equals(UserLevelEnum.VOICE)) {
             return 1;
         } else {
             final String firstRemoved = user1.getNick();

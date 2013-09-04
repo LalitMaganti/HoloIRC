@@ -19,10 +19,9 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.misc;
+package com.fusionx.lightirc.constants;
 
-public enum FragmentType {
-    Server,
-    Channel,
-    User
+public enum ServerEventTypeEnum {
+    NickInUse,
+    Generic,
 }

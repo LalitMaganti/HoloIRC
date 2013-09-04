@@ -49,10 +49,9 @@ import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
-import com.fusionx.lightirc.irc.ircfragments.IRCPagerFragment;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DecorChildLayout;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
@@ -202,7 +201,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-            final ServerChannelEventType type = (ServerChannelEventType)
+            final ServerChannelEventTypeEnum type = (ServerChannelEventTypeEnum)
                     bundle.getSerializable(EventBundleKeys.eventType);
             final String message = bundle.getString(EventBundleKeys.message);
             switch (type) {
@@ -247,7 +246,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(FragmentType.Channel
+        menu.getItem(0).setVisible(FragmentTypeEnum.Channel
                 .equals(mIRCPagerFragment.getCurrentType()) && mUserSlidingMenu != null);
         return true;
     }
@@ -375,7 +374,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
                 };
                 disconnect.execute();
             }
-            final Intent intent = new Intent(this, MainServerListActivity.class);
+            final Intent intent = new Intent(this, ServerListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         } else if (!expected && retryPending) {
@@ -442,7 +441,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
     @Override
     public void closeOrPartCurrentTab() {
         final Server server = getServer(false);
-        if (FragmentType.User.equals(mIRCPagerFragment.getCurrentType())) {
+        if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
             ServerCommandSender.sendClosePrivateMessage(server, mIRCPagerFragment.getCurrentTitle());
 
             mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
@@ -462,7 +461,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
     }
 
     @Override
-    public Handler getFragmentHandler(String destination, FragmentType type) {
+    public Handler getFragmentHandler(String destination, FragmentTypeEnum type) {
         return mIRCPagerFragment.getFragmentHandler(destination, type, mServerTitle);
     }
 

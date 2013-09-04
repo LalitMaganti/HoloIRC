@@ -33,9 +33,9 @@ import android.preference.PreferenceManager;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.enums.UserLevel;
-import com.fusionx.lightirc.misc.Constants;
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.constants.UserLevelEnum;
+import com.fusionx.lightirc.constants.Constants;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,7 +55,7 @@ public class MiscUtils {
 
     public static int getThemeInt(final Context context) {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        final int theme = Integer.parseInt(preferences.getString(PreferenceKeys.Theme, "1"));
+        final int theme = Integer.parseInt(preferences.getString(PreferenceConstants.Theme, "1"));
         return theme != 0 ? R.style.Light : R.style.Dark;
     }
 
@@ -71,13 +71,13 @@ public class MiscUtils {
     public static boolean isMotdAllowed(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        return preferences.getBoolean(PreferenceKeys.Motd, true);
+        return preferences.getBoolean(PreferenceConstants.Motd, true);
     }
 
     public static boolean isMessagesFromChannelShown(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        return !preferences.getBoolean(PreferenceKeys.HideMessages, false);
+        return !preferences.getBoolean(PreferenceConstants.HideMessages, false);
     }
 
     public static Typeface getRobotoLightTypeface(final Context context) {
@@ -95,7 +95,7 @@ public class MiscUtils {
     public static String getPartReason(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        return preferences.getString(PreferenceKeys.PartReason, "");
+        return preferences.getString(PreferenceConstants.PartReason, "");
     }
 
     /**
@@ -188,19 +188,19 @@ public class MiscUtils {
     public static String getQuitReason(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        return preferences.getString(PreferenceKeys.QuitReason, "");
+        return preferences.getString(PreferenceConstants.QuitReason, "");
     }
 
     public static int getNumberOfReconnectEvents(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
-        return preferences.getInt(PreferenceKeys.ReconnectTries, 3);
+        return preferences.getInt(PreferenceConstants.ReconnectTries, 3);
     }
 
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
         final SharedPreferences preferences = context.getSharedPreferences(fileName,
                 Context.MODE_PRIVATE);
-        return getStringSet(preferences, PreferenceKeys.IgnoreList, new HashSet<String>());
+        return getStringSet(preferences, PreferenceConstants.IgnoreList, new HashSet<String>());
     }
 
     public static boolean areNicksEqual(final String firstNick, final String secondNick) {
@@ -220,8 +220,8 @@ public class MiscUtils {
         return null;
     }
 
-    public static boolean isUserOwnerOrVoice(final UserLevel level) {
-        return level.equals(UserLevel.OP) || level.equals(UserLevel.VOICE);
+    public static boolean isUserOwnerOrVoice(final UserLevelEnum level) {
+        return level.equals(UserLevelEnum.OP) || level.equals(UserLevelEnum.VOICE);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

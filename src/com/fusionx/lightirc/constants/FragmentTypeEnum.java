@@ -19,23 +19,10 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.constants;
+package com.fusionx.lightirc.constants;
 
-public class ServerCommands {
-    public final static String Ping = "PING";
-    public final static String Error = "ERROR";
-    public final static String Notice = "NOTICE";
-    public final static String Privmsg = "PRIVMSG";
-    public final static String Part = "PART";
-    public final static String Join = "JOIN";
-    public final static String Quit = "QUIT";
-    public final static String Mode = "MODE";
-    public final static String Nick = "NICK";
-    public final static String Topic = "TOPIC";
-    public final static String Cap = "CAP";
-    public final static String Authenticate = "AUTHENTICATE";
-
-    private ServerCommands() {
-
-    }
+public enum FragmentTypeEnum {
+    Server,
+    Channel,
+    User
 }

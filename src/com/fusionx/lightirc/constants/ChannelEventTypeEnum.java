@@ -19,16 +19,11 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.constants;
+package com.fusionx.lightirc.constants;
 
-public class EventBundleKeys {
-    public final static String destination = "destination";
-    public final static String eventType = "eventType";
-    public final static String message = "message";
-
-    // Only used by disconnect event
-    public final static String disconnectSentByUser = "disconnectExpected";
-
-    private EventBundleKeys() {
-    }
+public enum ChannelEventTypeEnum {
+    Generic,
+    UserParted,
+    UserListChanged,
+    UserListReceived
 }

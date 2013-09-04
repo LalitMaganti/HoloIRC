@@ -25,7 +25,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.constants.ServerCommands;
+import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.misc.CoreListener;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -39,7 +39,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
+import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 
 public class ServerLineParser {
     @Getter(AccessLevel.PACKAGE)

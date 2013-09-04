@@ -34,7 +34,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsServerAdapter;
 import com.fusionx.lightirc.adapters.ActionsUserChannelAdapter;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
@@ -46,7 +46,7 @@ import java.util.Arrays;
 
 public class ActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
-    private FragmentType type;
+    private FragmentTypeEnum type;
 
     @Override
     public void onActivityCreated(final Bundle savedInstanceState) {
@@ -73,10 +73,10 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
         final TextView otherTextView = (TextView) otherHeader.findViewById(R.id
                 .sliding_menu_heading_textview);
 
-        if (type == null || type.equals(FragmentType.Server)) {
+        if (type == null || type.equals(FragmentTypeEnum.Server)) {
             otherHeader.setVisibility(View.GONE);
             channelAdapter.setServerVisible();
-        } else if (type.equals(FragmentType.Channel)) {
+        } else if (type.equals(FragmentTypeEnum.Channel)) {
             otherTextView.setText(getActivity().getString(R.string.channel));
         } else {
             otherTextView.setText(getActivity().getString(R.string.user));
@@ -187,7 +187,7 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
         getServerAdapter().notifyDataSetChanged();
     }
 
-    public void onTabChanged(final FragmentType selectedType) {
+    public void onTabChanged(final FragmentTypeEnum selectedType) {
         if (selectedType != type) {
             type = selectedType;
             if (getAlphaAdapter() != null && getListAdapter() != null) {

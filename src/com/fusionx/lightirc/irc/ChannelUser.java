@@ -3,7 +3,7 @@ package com.fusionx.lightirc.irc;
 import android.content.Context;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.enums.UserLevel;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
     protected String serverUrl;
     protected String realName;
 
-    protected final HashMap<Channel, UserLevel> userLevelMap = new HashMap<>();
+    protected final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<>();
 
     public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
@@ -34,10 +34,10 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
     }
 
     protected String getUserPrefix(final Channel channel) {
-        final UserLevel level = userLevelMap.get(channel);
-        if (UserLevel.OP.equals(level)) {
+        final UserLevelEnum level = userLevelMap.get(channel);
+        if (UserLevelEnum.OP.equals(level)) {
             return "@";
-        } else if (UserLevel.VOICE.equals(level)) {
+        } else if (UserLevelEnum.VOICE.equals(level)) {
             return "+";
         } else {
             return "";
@@ -49,17 +49,17 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
     }
 
     public void processWhoMode(final String rawMode, final Channel channel) {
-        UserLevel mode = UserLevel.NONE;
+        UserLevelEnum mode = UserLevelEnum.NONE;
         if (rawMode.contains("~")) {
-            mode = UserLevel.OWNER;
+            mode = UserLevelEnum.OWNER;
         } else if (rawMode.contains("&")) {
-            mode = UserLevel.SUPEROP;
+            mode = UserLevelEnum.SUPEROP;
         } else if (rawMode.contains("@")) {
-            mode = UserLevel.OP;
+            mode = UserLevelEnum.OP;
         } else if (rawMode.contains("%")) {
-            mode = UserLevel.HALFOP;
+            mode = UserLevelEnum.HALFOP;
         } else if (rawMode.contains("+")) {
-            mode = UserLevel.VOICE;
+            mode = UserLevelEnum.VOICE;
         }
         userLevelMap.put(channel, mode);
     }
@@ -77,18 +77,18 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     break;
                 case 'o':
                     if (addingMode) {
-                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevel.OP));
+                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevelEnum.OP));
                         break;
                     }
                 case 'v':
-                    if (addingMode && !userLevelMap.get(channel).equals(UserLevel.OP)) {
+                    if (addingMode && !userLevelMap.get(channel).equals(UserLevelEnum.OP)) {
                         channel.getUsers().update(this,
-                                ImmutableList.of(channel, UserLevel.VOICE));
+                                ImmutableList.of(channel, UserLevelEnum.VOICE));
                         break;
                     }
                 default:
                     if (!addingMode && (character == 'v' || character == 'o')) {
-                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevel.NONE));
+                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevelEnum.NONE));
                     }
                     break;
             }
@@ -116,8 +116,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
         if (newValue instanceof ImmutableList) {
             // ArrayList = mode change
             ImmutableList list = (ImmutableList) newValue;
-            if (list.get(0) instanceof Channel && list.get(1) instanceof UserLevel) {
-                userLevelMap.put((Channel) list.get(0), (UserLevel) list.get(1));
+            if (list.get(0) instanceof Channel && list.get(1) instanceof UserLevelEnum) {
+                userLevelMap.put((Channel) list.get(0), (UserLevelEnum) list.get(1));
             }
         }
     }

@@ -19,9 +19,22 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.enums;
+package com.fusionx.lightirc.constants;
 
-public enum ServerEventType {
-    NickInUse,
-    Generic,
+import com.google.common.collect.ImmutableList;
+
+/**
+ * Class containing generic constants
+ */
+public class Constants {
+    // Non final to prevent warnings
+    public static boolean DEBUG = false;
+
+    public final static String LOG_TAG = "HoloIRC";
+
+    public final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
+            '+', '!');
+
+    private Constants() {
+    }
 }

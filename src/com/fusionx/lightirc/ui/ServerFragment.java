@@ -19,16 +19,16 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.ircfragments;
+package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.ServerEventType;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.ServerEventTypeEnum;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
 import com.fusionx.lightirc.util.FragmentUtils;
 
@@ -40,7 +40,7 @@ public class ServerFragment extends IRCFragment {
         @Override
         public void handleMessage(final Message msg) {
             final Bundle bundle = msg.getData();
-            final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
+            final ServerEventTypeEnum type = (ServerEventTypeEnum) bundle.getSerializable(EventBundleKeys
                     .eventType);
             final String message = bundle.getString(EventBundleKeys.message);
             final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
@@ -87,8 +87,8 @@ public class ServerFragment extends IRCFragment {
     }
 
     @Override
-    public FragmentType getType() {
-        return FragmentType.Server;
+    public FragmentTypeEnum getType() {
+        return FragmentTypeEnum.Server;
     }
 
     @Override

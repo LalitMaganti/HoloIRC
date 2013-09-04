@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
+import static com.fusionx.lightirc.constants.PreferenceConstants.AutoJoin;
 
 public class ChannelListFragment extends ListFragment implements AdapterView
         .OnItemClickListener, MultiSelectionUtils.MultiChoiceModeListener {

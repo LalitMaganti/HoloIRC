@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.constants;
+package com.fusionx.lightirc.constants;
 
 import com.google.common.collect.ImmutableList;
 

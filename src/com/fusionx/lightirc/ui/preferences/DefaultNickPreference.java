@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.AttributeSet;
 
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 
 public class DefaultNickPreference extends AbstractNickPreference {
     public DefaultNickPreference(Context context, AttributeSet attrs) {
@@ -14,18 +14,18 @@ public class DefaultNickPreference extends AbstractNickPreference {
     @Override
     protected void retrieveNick() {
         final SharedPreferences preferences = getSharedPreferences();
-        mFirstChoice.setText(preferences.getString(PreferenceKeys.DefaultFirstNick,
+        mFirstChoice.setText(preferences.getString(PreferenceConstants.DefaultFirstNick,
                 "HoloIRCUser"));
-        mSecondChoice.setText(preferences.getString(PreferenceKeys.DefaultSecondNick, ""));
-        mThirdChoice.setText(preferences.getString(PreferenceKeys.DefaultThirdNick, ""));
+        mSecondChoice.setText(preferences.getString(PreferenceConstants.DefaultSecondNick, ""));
+        mThirdChoice.setText(preferences.getString(PreferenceConstants.DefaultThirdNick, ""));
     }
 
     @Override
     protected void persistNick() {
         final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PreferenceKeys.DefaultFirstNick, mFirstChoice.getText().toString());
-        editor.putString(PreferenceKeys.DefaultSecondNick, mSecondChoice.getText().toString());
-        editor.putString(PreferenceKeys.DefaultThirdNick, mThirdChoice.getText().toString());
+        editor.putString(PreferenceConstants.DefaultFirstNick, mFirstChoice.getText().toString());
+        editor.putString(PreferenceConstants.DefaultSecondNick, mSecondChoice.getText().toString());
+        editor.putString(PreferenceConstants.DefaultThirdNick, mThirdChoice.getText().toString());
         editor.commit();
     }
 }

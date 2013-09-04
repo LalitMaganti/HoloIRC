@@ -24,6 +24,7 @@ package com.fusionx.lightirc.misc;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -38,39 +39,39 @@ public class FileConfigurationConverter {
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
 
         // Server connection
-        builder.setTitle(serverSettings.getString(PreferenceKeys.Title, ""));
-        builder.setUrl(serverSettings.getString(PreferenceKeys.URL, "").trim());
-        builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceKeys.Port, "6667")));
-        builder.setSsl(serverSettings.getBoolean(PreferenceKeys.SSL, false));
+        builder.setTitle(serverSettings.getString(PreferenceConstants.Title, ""));
+        builder.setUrl(serverSettings.getString(PreferenceConstants.URL, "").trim());
+        builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceConstants.Port, "6667")));
+        builder.setSsl(serverSettings.getBoolean(PreferenceConstants.SSL, false));
 
         // User settings
-        final String firstChoice = serverSettings.getString(PreferenceKeys.FirstNick,
+        final String firstChoice = serverSettings.getString(PreferenceConstants.FirstNick,
                 "HoloIRCUser");
-        final String secondChoice = serverSettings.getString(PreferenceKeys.SecondNick, "");
-        final String thirdChoice = serverSettings.getString(PreferenceKeys.ThirdNick, "");
+        final String secondChoice = serverSettings.getString(PreferenceConstants.SecondNick, "");
+        final String thirdChoice = serverSettings.getString(PreferenceConstants.ThirdNick, "");
         final ServerConfiguration.NickStorage nickStorage = new ServerConfiguration.NickStorage
                 (firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
-        builder.setRealName(serverSettings.getString(PreferenceKeys.RealName, "HoloIRC"));
-        builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
+        builder.setRealName(serverSettings.getString(PreferenceConstants.RealName, "HoloIRC"));
+        builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.AutoNickChange, true));
 
         // Autojoin channels
         final ArrayList<String> auto = new ArrayList<>(MiscUtils.getStringSet(serverSettings,
-                PreferenceKeys.AutoJoin, new HashSet<String>()));
+                PreferenceConstants.AutoJoin, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
         }
 
         // Server authorisation
-        builder.setServerUserName(serverSettings.getString(PreferenceKeys.ServerUserName, "holoirc"));
-        builder.setServerPassword(serverSettings.getString(PreferenceKeys.ServerPassword, ""));
+        builder.setServerUserName(serverSettings.getString(PreferenceConstants.ServerUserName, "holoirc"));
+        builder.setServerPassword(serverSettings.getString(PreferenceConstants.ServerPassword, ""));
 
         // SASL authorisation
-        builder.setSaslUsername(serverSettings.getString(PreferenceKeys.SaslUsername, ""));
-        builder.setSaslPassword(serverSettings.getString(PreferenceKeys.SaslPassword, ""));
+        builder.setSaslUsername(serverSettings.getString(PreferenceConstants.SaslUsername, ""));
+        builder.setSaslPassword(serverSettings.getString(PreferenceConstants.SaslPassword, ""));
 
         // NickServ authorisation
-        builder.setNickservPassword(serverSettings.getString(PreferenceKeys.NickServPassword, ""));
+        builder.setNickservPassword(serverSettings.getString(PreferenceConstants.NickServPassword, ""));
 
         builder.setFile(filename);
         return builder;

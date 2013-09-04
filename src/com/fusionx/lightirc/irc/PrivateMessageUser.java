@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.enums.UserEventType;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.UserEventTypeEnum;
 import com.fusionx.lightirc.irc.writers.UserWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -30,7 +30,7 @@ public class PrivateMessageUser extends User {
         @Override
         public void handleMessage(Message msg) {
             final Bundle event = msg.getData();
-            final UserEventType type = (UserEventType) event
+            final UserEventTypeEnum type = (UserEventTypeEnum) event
                     .getSerializable(EventBundleKeys.eventType);
             final String message = event.getString(EventBundleKeys.message);
             switch (type) {

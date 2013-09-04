@@ -33,17 +33,17 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_ENDOFWHO;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_MOTD;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_MOTDSTART;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_TOPIC;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_TOPICINFO;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_WHOREPLY;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.genericCodes;
-import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.whoisCodes;
-import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFWHO;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_MOTD;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_MOTDSTART;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPIC;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPICINFO;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_WHOREPLY;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.genericCodes;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
+import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
 public class ServerCodeParser {

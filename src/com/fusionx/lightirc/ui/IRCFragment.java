@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.ircfragments;
+package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,7 +36,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -107,7 +107,7 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
 
     public abstract void sendMessage(final String message);
 
-    public abstract FragmentType getType();
+    public abstract FragmentTypeEnum getType();
 
     public abstract Handler getHandler();
 }

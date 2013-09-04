@@ -17,7 +17,7 @@ import android.preference.PreferenceScreen;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ISettings;
-import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.michaelnovakjr.numberpicker.NumberPickerPreference;
@@ -74,7 +74,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
     @Override
     public void setupNumberPicker(final PreferenceScreen screen) {
         final NumberPickerPreference numberPickerDialogPreference = (NumberPickerPreference)
-                screen.findPreference(PreferenceKeys.ReconnectTries);
+                screen.findPreference(PreferenceConstants.ReconnectTries);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
                 .getCurrent()));
     }
@@ -83,7 +83,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
     public void setupThemePreference(final PreferenceScreen screen) {
         final String[] themes_entries = {"0", "1"};
         final ListPreference themePreference = (ListPreference) screen.findPreference
-                (PreferenceKeys.Theme);
+                (PreferenceConstants.Theme);
         themePreference.setEntryValues(themes_entries);
         if (themePreference.getEntry() == null) {
             themePreference.setValue("1");
@@ -94,7 +94,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
 
     @Override
     public void setupAppVersionPreference(final PreferenceScreen screen) {
-        final Preference appVersionPreference = screen.findPreference(PreferenceKeys
+        final Preference appVersionPreference = screen.findPreference(PreferenceConstants
                 .AppVersion);
         if (appVersionPreference != null) {
             appVersionPreference.setSummary(MiscUtils.getAppVersion(this));
