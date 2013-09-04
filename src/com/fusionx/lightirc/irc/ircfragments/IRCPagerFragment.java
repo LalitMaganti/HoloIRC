@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.fragments.ircfragments;
+package com.fusionx.lightirc.irc.ircfragments;
 
 import android.app.Activity;
 import android.content.res.TypedArray;

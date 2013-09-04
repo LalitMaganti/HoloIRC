@@ -19,12 +19,13 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.activity;
+package com.fusionx.lightirc.serverlist;
 
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
@@ -40,9 +41,13 @@ import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.IRCFragmentActivity;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.misc.FileConfigurationConverter;
+import com.fusionx.lightirc.serversettings.ServerSettingsActivityCompat;
+import com.fusionx.lightirc.serversettings.ServerSettingsActivityHC;
+import com.fusionx.lightirc.settings.SettingsActivity;
 import com.fusionx.uiircinterface.core.IRCBridgeService;
 import com.fusionx.uiircinterface.core.ServerCommandSender;
 import com.github.espiandev.showcaseview.ShowcaseView;
@@ -224,9 +229,9 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
     }
 
     private void addNewServer() {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                ServerSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        final Intent intent = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new Intent
+                (MainServerListActivity.this, ServerSettingsActivityCompat.class) : new Intent
+                (MainServerListActivity.this, ServerSettingsActivityHC.class);
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
@@ -236,10 +241,11 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
     }
 
     private void editServer(final ServerConfiguration.Builder builder) {
-        final Intent intent = new Intent(MainServerListActivity.this,
-                ServerSettingsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        final Intent intent = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new Intent
+                (MainServerListActivity.this, ServerSettingsActivityCompat.class) : new Intent
+                (MainServerListActivity.this, ServerSettingsActivityHC.class);
 
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("file", builder.getFile());
         intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles(builder));
         intent.putExtra("server", builder);

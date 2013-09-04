@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.fragments.actions;
+package com.fusionx.lightirc.irc.actions;
 
 import android.app.Activity;
 import android.os.Bundle;

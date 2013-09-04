@@ -4,8 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.fusionx.lightirc.fragments.actions.IRCActionsFragment;
-import com.fusionx.lightirc.fragments.actions.IgnoreListFragment;
+import com.fusionx.lightirc.irc.actions.IRCActionsFragment;
+import com.fusionx.lightirc.irc.actions.IgnoreListFragment;
 
 public class ActionPagerAdapter extends FragmentPagerAdapter {
     private final IRCActionsFragment mActionFragment;

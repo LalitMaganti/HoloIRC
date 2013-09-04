@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.irc;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -34,11 +34,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
-import com.fusionx.common.utils.MultiSelectionUtil;
 import com.fusionx.irc.core.ChannelUser;
 import com.fusionx.irc.core.Server;
 import com.fusionx.lightirc.R;

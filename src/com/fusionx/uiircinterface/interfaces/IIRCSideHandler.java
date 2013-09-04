@@ -2,7 +2,7 @@ package com.fusionx.uiircinterface.interfaces;
 
 import android.os.Handler;
 
-public interface IRCSideHandlerInterface {
+public interface IIRCSideHandler {
     public Handler getServerHandler();
 
     public Handler getChannelHandler(final String channelName);

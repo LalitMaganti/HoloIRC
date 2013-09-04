@@ -34,7 +34,7 @@ import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.core.MessageSender;
-import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
+import com.fusionx.uiircinterface.interfaces.IIRCSideHandler;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,7 +47,7 @@ import lombok.NonNull;
 import lombok.Setter;
 
 @Data
-public class Server implements IRCSideHandlerInterface {
+public class Server implements IIRCSideHandler {
     private ServerWriter writer;
     private UserChannelInterface userChannelInterface;
 

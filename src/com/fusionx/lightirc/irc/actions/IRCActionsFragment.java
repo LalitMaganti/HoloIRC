@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.fragments.actions;
+package com.fusionx.lightirc.irc.actions;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;

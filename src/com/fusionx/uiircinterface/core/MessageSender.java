@@ -42,10 +42,10 @@ import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.irc.enums.ServerEventType;
 import com.fusionx.irc.enums.UserEventType;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.IRCFragmentActivity;
+import com.fusionx.lightirc.irc.IRCFragmentActivity;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
-import com.fusionx.uiircinterface.interfaces.IRCSideHandlerInterface;
+import com.fusionx.uiircinterface.interfaces.IFragmentSideHandler;
+import com.fusionx.uiircinterface.interfaces.IIRCSideHandler;
 
 import java.util.LinkedHashMap;
 
@@ -70,17 +70,17 @@ public class MessageSender {
         return handler;
     }
 
-    private IRCSideHandlerInterface ircSideHandlerInterface;
-    private FragmentSideHandlerInterface fragmentSideHandlerInterface;
+    private IIRCSideHandler ircSideHandlerInterface;
+    private IFragmentSideHandler fragmentSideHandlerInterface;
 
     /*
     Start of registers
      */
-    public void registerIRCSideHandlerInterface(final IRCSideHandlerInterface handlerInterface) {
+    public void registerIRCSideHandlerInterface(final IIRCSideHandler handlerInterface) {
         ircSideHandlerInterface = handlerInterface;
     }
 
-    public void registerServerChannelHandler(final FragmentSideHandlerInterface handlerInterface) {
+    public void registerServerChannelHandler(final IFragmentSideHandler handlerInterface) {
         fragmentSideHandlerInterface = handlerInterface;
     }
 

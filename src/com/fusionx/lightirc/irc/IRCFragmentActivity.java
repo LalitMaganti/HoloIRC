@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.activity;
+package com.fusionx.lightirc.irc;
 
 import android.content.Intent;
 import android.content.res.TypedArray;
@@ -51,15 +51,14 @@ import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.fragments.ServiceFragment;
-import com.fusionx.lightirc.fragments.UserListFragment;
-import com.fusionx.lightirc.fragments.actions.ActionsPagerFragment;
-import com.fusionx.lightirc.fragments.ircfragments.IRCPagerFragment;
+import com.fusionx.lightirc.irc.actions.ActionsPagerFragment;
+import com.fusionx.lightirc.irc.ircfragments.IRCPagerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.serverlist.MainServerListActivity;
 import com.fusionx.lightirc.views.ActionsSlidingMenu;
 import com.fusionx.lightirc.views.DecorChildLayout;
 import com.fusionx.uiircinterface.core.ServerCommandSender;
-import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
+import com.fusionx.uiircinterface.interfaces.IFragmentSideHandler;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
@@ -72,7 +71,7 @@ import java.util.Iterator;
  * @author Lalit Maganti
  */
 public class IRCFragmentActivity extends ActionBarActivity implements UserListFragment
-        .UserListCallback, FragmentSideHandlerInterface, ServiceFragment.ServiceFragmentCallback,
+        .UserListCallback, IFragmentSideHandler, ServiceFragment.ServiceFragmentCallback,
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
     private ServiceFragment mServiceFragment = null;
@@ -169,7 +168,7 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
             mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         } else {
             // get the window background
-            TypedArray a = getTheme().obtainStyledAttributes(new int[] {android.R.attr.windowBackground});
+            TypedArray a = getTheme().obtainStyledAttributes(new int[]{android.R.attr.windowBackground});
             int background = a.getResourceId(0, 0);
             a.recycle();
 

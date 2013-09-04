@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.fragments;
+package com.fusionx.lightirc.irc;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -15,7 +15,7 @@ import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.uiircinterface.core.IRCBridgeService;
 import com.fusionx.uiircinterface.core.MessageSender;
-import com.fusionx.uiircinterface.interfaces.FragmentSideHandlerInterface;
+import com.fusionx.uiircinterface.interfaces.IFragmentSideHandler;
 
 public class ServiceFragment extends Fragment {
     private IRCBridgeService mService;
@@ -174,7 +174,7 @@ public class ServiceFragment extends Fragment {
         mService = null;
     }
 
-    public interface ServiceFragmentCallback extends FragmentSideHandlerInterface {
+    public interface ServiceFragmentCallback extends IFragmentSideHandler {
         public void setUpViewPager();
 
         public String getServerTitle();

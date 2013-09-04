@@ -16,7 +16,7 @@
             android:label="@string/app_name"
             android:theme="@style/Light">
         <activity
-                android:name=".activity.MainServerListActivity"
+                android:name=".serverlist.MainServerListActivity"
                 android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".activity.IRCFragmentActivity"
+                android:name=".irc.IRCFragmentActivity"
                 android:parentActivityName=".activity.MainServerListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -35,15 +35,8 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".activity.ServerSettingsActivity"
+                android:name=".serversettings.ServerSettingsActivityHC"
                 android:label="@string/server_settings_title">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-            </intent-filter>
-        </activity>
-        <activity
-                android:name=".activity.SettingsActivity"
-                android:label="@string/settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>

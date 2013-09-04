@@ -71,9 +71,14 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Channels">
-        <Preference
-                android:key="pref_autojoin_intent"
-                android:title="@string/server_settings_auto_join_title"/>
+        <PreferenceScreen
+            android:fragment="com.fusionx.lightirc.serversettings.ListViewSettingsFragment"
+            android:key="pref_autojoin_intent"
+            android:title="@string/server_settings_auto_join_title">
+            <intent>
+                <extra android:name="listview" android:value="true" />
+            </intent>
+        </PreferenceScreen>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Credentials">

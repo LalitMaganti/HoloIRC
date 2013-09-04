@@ -4,7 +4,7 @@ import android.os.Handler;
 
 import com.fusionx.lightirc.misc.FragmentType;
 
-public interface FragmentSideHandlerInterface {
+public interface IFragmentSideHandler {
     public Handler getServerChannelHandler();
 
     public Handler getFragmentHandler(final String destination, final FragmentType type);

@@ -34,7 +34,7 @@ import com.fusionx.irc.connection.ConnectionWrapper;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.activity.MainServerListActivity;
+import com.fusionx.lightirc.serverlist.MainServerListActivity;
 
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -83,16 +83,13 @@ public class IRCBridgeService extends Service {
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(text)
-                .setTicker(text)
+                .setContentTitle(getString(R.string.app_name)).setContentText(text).setTicker(text)
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
 
         final Notification notification = builder.addAction(android.R.drawable
-                .ic_menu_close_clear_cancel,
-                getString(R.string.service_disconnect_all), pIntent2).build();
+                .ic_menu_close_clear_cancel, getString(R.string.service_disconnect_all), pIntent2).build();
 
         // Just a random number
         // TODO - maybe static int this?
@@ -154,7 +151,6 @@ public class IRCBridgeService extends Service {
     @Override
     public boolean onUnbind(final Intent intent) {
         serverDisplayed = null;
-
         return true;
     }
 }

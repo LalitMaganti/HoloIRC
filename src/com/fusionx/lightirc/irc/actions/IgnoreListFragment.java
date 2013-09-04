@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.fragments.actions;
+package com.fusionx.lightirc.irc.actions;
 
 import android.content.Context;
 import android.content.SharedPreferences;

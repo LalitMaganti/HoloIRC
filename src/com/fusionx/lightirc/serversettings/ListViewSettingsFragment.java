@@ -1,8 +1,11 @@
-package com.fusionx.lightirc.fragments.serversetttings;
+package com.fusionx.lightirc.serversettings;
 
+import android.animation.LayoutTransition;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -20,7 +23,6 @@ import android.widget.ListView;
 import com.fusionx.common.utils.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.misc.ServerSettingsCallbacks;
 import com.fusionx.common.utils.MultiSelectionUtil;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 
@@ -36,20 +38,23 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
     private SelectionAdapter<String> adapter;
     private boolean modeStarted = false;
     private MultiSelectionUtil.Controller mMultiSelectionController;
-    private ServerSettingsCallbacks mCallbacks;
+    private IServerSettings mCallbacks;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
-        mCallbacks = (ServerSettingsCallbacks) activity;
+        try {
+            mCallbacks = (IServerSettings) activity;
+        } catch (ClassCastException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        //getListView().setLayoutTransition(new LayoutTransition());
+        getListView().setLayoutTransition(new LayoutTransition());
     }
 
     @Override
@@ -179,6 +184,7 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
