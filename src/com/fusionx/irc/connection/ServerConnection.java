@@ -160,12 +160,7 @@ class ServerConnection {
 
             // We are connected
             server.setStatus(mContext.getString(R.string.status_connected));
-
-            final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerChannelEventType.Connected, String.format(mContext
-                    .getString(R.string.parser_connected),
-                    serverConfiguration.getUrl()));
-            sender.sendServerChannelMessage(event);
+            sender.setConnected(serverConfiguration.getUrl());
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it

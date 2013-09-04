@@ -27,7 +27,7 @@ import android.util.Log;
 import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.core.Server;
-import com.fusionx.irc.listeners.CoreListener;
+import com.fusionx.irc.misc.CoreListener;
 
 import org.apache.commons.lang3.StringUtils;
 

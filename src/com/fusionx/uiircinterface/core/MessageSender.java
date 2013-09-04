@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.text.format.Time;
 
 import com.fusionx.common.utils.Utils;
 import com.fusionx.irc.constants.EventBundleKeys;
@@ -48,6 +49,8 @@ import com.fusionx.uiircinterface.interfaces.IFragmentSideHandler;
 import com.fusionx.uiircinterface.interfaces.IIRCSideHandler;
 
 import java.util.LinkedHashMap;
+
+import lombok.NonNull;
 
 public class MessageSender {
     private static LinkedHashMap<String, MessageSender> mHashMap = new LinkedHashMap<>();
@@ -103,7 +106,7 @@ public class MessageSender {
     /*
     Start of sending messages
      */
-    public void sendServerChannelMessage(final Bundle event) {
+    private void sendServerChannelMessage(final Bundle event) {
         final Message message = Message.obtain();
         message.setData(event);
         ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
@@ -115,7 +118,7 @@ public class MessageSender {
         }
     }
 
-    public void sendServerMessage(final Bundle event) {
+    private void sendServerMessage(final Bundle event) {
         final Message message = Message.obtain();
         message.setData(event);
         ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
@@ -175,58 +178,58 @@ public class MessageSender {
 
     // Generic events start
     public void sendGenericServerEvent(final String message) {
-        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
+        final Bundle joinEvent = parcelDataForBroadcast(null,
                 ServerEventType.Generic, message);
         sendServerMessage(joinEvent);
     }
 
     public void sendGenericChannelEvent(final String channelName, final String message) {
-        final Bundle privateMessageEvent = Utils.parcelDataForBroadcast(channelName,
+        final Bundle privateMessageEvent = parcelDataForBroadcast(channelName,
                 ChannelEventType.Generic, message);
         sendChannelMessage(privateMessageEvent);
     }
 
     public void sendGenericUserListChangedEvent(final String channelName, final String message) {
-        final Bundle genericEvent = Utils.parcelDataForBroadcast(channelName,
+        final Bundle genericEvent = parcelDataForBroadcast(channelName,
                 ChannelEventType.UserListChanged, message);
         sendChannelMessage(genericEvent);
     }
 
     private void sendGenericUserEvent(final String nick, final String message) {
-        final Bundle privateMessageEvent = Utils.parcelDataForBroadcast(nick, UserEventType.Generic,
+        final Bundle privateMessageEvent = parcelDataForBroadcast(nick, UserEventType.Generic,
                 message);
         sendUserMessage(privateMessageEvent);
     }
     // Generic events end
 
     public void sendServerConnection(final String connectionLine) {
-        final Bundle connectEvent = Utils.parcelDataForBroadcast(null,
+        final Bundle connectEvent = parcelDataForBroadcast(null,
                 ServerChannelEventType.Connected, connectionLine);
         sendServerChannelMessage(connectEvent);
     }
 
     public void sendFinalDisconnection(final String disconnectLine,
                                        final boolean expectedDisconnect) {
-        final Bundle disconnectEvent = Utils.parcelDataForBroadcast(null,
+        final Bundle disconnectEvent = parcelDataForBroadcast(null,
                 ServerChannelEventType.FinalDisconnected, disconnectLine);
         disconnectEvent.putBoolean(EventBundleKeys.disconnectSentByUser, expectedDisconnect);
         sendServerChannelMessage(disconnectEvent);
     }
 
     public void sendRetryPendingServerDisconnection(final String disconnectLine) {
-        final Bundle disconnectEvent = Utils.parcelDataForBroadcast(null,
+        final Bundle disconnectEvent = parcelDataForBroadcast(null,
                 ServerChannelEventType.RetryPendingDisconnected, disconnectLine);
         sendServerChannelMessage(disconnectEvent);
     }
 
     public void sendChanelJoined(final String channelName) {
-        final Bundle joinEvent = Utils.parcelDataForBroadcast(null,
+        final Bundle joinEvent = parcelDataForBroadcast(null,
                 ServerChannelEventType.Join, channelName);
         sendServerChannelMessage(joinEvent);
     }
 
     public void sendChanelParted(final String channelName) {
-        final Bundle partEvent = Utils.parcelDataForBroadcast(channelName,
+        final Bundle partEvent = parcelDataForBroadcast(channelName,
                 ChannelEventType.UserParted, channelName);
         sendChannelMessage(partEvent);
     }
@@ -235,6 +238,7 @@ public class MessageSender {
                                   final String rawAction) {
         String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
+        // TODO - change this to be specific for PMs
         mention(actionDestination);
         sendGenericUserEvent(actionDestination, message);
     }
@@ -256,14 +260,15 @@ public class MessageSender {
      * Method should not be used from anywhere but the Server class.
      *
      * @param messageDestination - the nick name of the destination user
-     * @param sending            - the user who is sending the message - it may be us or it may be the other
-     *                           user
+     * @param sending            - the user who is sending the message - it may be us or it may
+     *                           be the other user
      * @param rawMessage         - the message being sent
      */
     public void sendPrivateMessage(final String messageDestination, final User sending,
                                    final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getColorfulNick(), rawMessage);
+        // TODO - change this to be specific for PMs
         mention(messageDestination);
         sendGenericUserEvent(messageDestination, message);
     }
@@ -279,31 +284,53 @@ public class MessageSender {
         sendGenericChannelEvent(channel.getName(), preMessage);
     }
 
+    public void sendNickInUseMessage() {
+        final Bundle event = parcelDataForBroadcast(null,
+                ServerEventType.NickInUse, mContext.getString(R.string.parser_nick_in_use));
+        sendServerMessage(event);
+    }
+
     public void switchToServerMessage(final String message) {
-        final Bundle event = Utils.parcelDataForBroadcast(null,
+        final Bundle event = parcelDataForBroadcast(null,
                 ServerChannelEventType.SwitchToServerMessage, message);
         sendServerChannelMessage(event);
     }
 
     public void userListReceived(final String channelName) {
-        final Bundle event = Utils.parcelDataForBroadcast(channelName,
+        final Bundle event = parcelDataForBroadcast(channelName,
                 ChannelEventType.UserListReceived);
         sendChannelMessage(event);
     }
 
-    public void mention(final String messageDestination) {
-        final NotificationManager mNotificationManager =
-                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        Notification notification;
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
-                .setContentTitle(mContext.getString(R.string.app_name))
-                .setContentText(mContext.getString(R.string.service_you_mentioned) + " " +
-                        messageDestination)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setAutoCancel(true)
-                .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
-                        messageDestination);
+    public void sendNewPrivateMessage(final String nick) {
+        final Bundle event = parcelDataForBroadcast(null,
+                ServerChannelEventType.NewPrivateMessage, nick);
+        sendServerChannelMessage(event);
+    }
 
+    public void setConnected(final String url) {
+        final Bundle event = parcelDataForBroadcast(null,
+                ServerChannelEventType.Connected, String.format(mContext
+                .getString(R.string.parser_connected), url));
+        sendServerChannelMessage(event);
+    }
+
+    public Bundle parcelDataForBroadcast(final String destination,
+                                                @NonNull final Enum type,
+                                                @NonNull final String... message) {
+        final Bundle event = new Bundle();
+        if (destination != null) {
+            event.putString(EventBundleKeys.destination, destination);
+        }
+        event.putSerializable(EventBundleKeys.eventType, type);
+        if (message.length > 0) {
+            event.putString(EventBundleKeys.message, message[0]);
+        }
+
+        return event;
+    }
+
+    public void mention(final String messageDestination) {
         if (mToast && fragmentSideHandlerInterface != null) {
             final Handler mainHandler = new Handler(mContext.getMainLooper());
             mainHandler.post(new Runnable() {
@@ -313,6 +340,16 @@ public class MessageSender {
                 }
             });
         } else {
+            final NotificationManager mNotificationManager =
+                    (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+                    .setContentTitle(mContext.getString(R.string.app_name))
+                    .setContentText(mContext.getString(R.string.service_you_mentioned) + " " +
+                            messageDestination)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setAutoCancel(true)
+                    .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
+                            messageDestination);
             final Intent mIntent = new Intent(mContext, IRCFragmentActivity.class);
             mIntent.putExtra("serverTitle", ircSideHandlerInterface.getTitle());
             mIntent.putExtra("mention", messageDestination);
@@ -321,8 +358,7 @@ public class MessageSender {
             taskStackBuilder.addNextIntent(mIntent);
             final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
                     PendingIntent.FLAG_UPDATE_CURRENT);
-            notification = builder.setContentIntent(pIntent).build();
-            mNotificationManager.notify(345, notification);
+            mNotificationManager.notify(345, builder.setContentIntent(pIntent).build());
         }
     }
 }

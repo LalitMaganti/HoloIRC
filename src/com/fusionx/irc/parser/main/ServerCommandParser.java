@@ -279,7 +279,8 @@ public class ServerCommandParser {
             for (final Channel channel : mUserChannelInterface.removeUser(user)) {
                 final String message = String.format(mContext.getString(R.string.parser_quit_server),
                         user.getPrettyNick(channel)) +
-                        // If you have 3 strings in the array, the last must be the reason for quitting
+                        // If you have 3 strings in the array, the last must be the reason for
+                        // quitting
                         ((parsedArray.size() == 3) ? " " +
                                 String.format(mContext.getString(R.string.parser_reason),
                                         StringUtils.remove(parsedArray.get(2), "\"")) : "");

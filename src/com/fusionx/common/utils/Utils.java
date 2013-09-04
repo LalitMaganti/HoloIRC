@@ -157,21 +157,6 @@ public class Utils {
         }
     }
 
-    public static Bundle parcelDataForBroadcast(final String destination,
-                                                @NonNull final Enum type,
-                                                @NonNull final String... message) {
-        final Bundle event = new Bundle();
-        if (destination != null) {
-            event.putString(EventBundleKeys.destination, destination);
-        }
-        event.putSerializable(EventBundleKeys.eventType, type);
-        if (message.length > 0) {
-            event.putString(EventBundleKeys.message, message[0]);
-        }
-
-        return event;
-    }
-
     public static String getNickFromRaw(final String rawSource) {
         String nick;
         if (rawSource.contains("!") && rawSource.contains("@")) {

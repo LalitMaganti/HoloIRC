@@ -110,9 +110,7 @@ public class Server implements IIRCSideHandler {
                 sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
             }
 
-            final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerChannelEventType.NewPrivateMessage, userWhoIsNotUs.getNick());
-            sender.sendServerChannelMessage(event);
+            sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(message)) {
                 sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
@@ -131,9 +129,7 @@ public class Server implements IIRCSideHandler {
                 sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);
             }
 
-            final Bundle event = Utils.parcelDataForBroadcast(null,
-                    ServerChannelEventType.NewPrivateMessage, userWhoIsNotUs.getNick());
-            sender.sendServerMessage(event);
+            sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(action)) {
                 sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);

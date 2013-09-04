@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.irc.listeners;
+package com.fusionx.irc.misc;
 
 import com.fusionx.irc.writers.ServerWriter;
 

@@ -100,9 +100,7 @@ public class ServerCodeParser {
                 return;
             case ERR_NICKNAMEINUSE: {
                 final MessageSender sender = MessageSender.getSender(mServer.getTitle());
-                final Bundle event = Utils.parcelDataForBroadcast(null,
-                        ServerEventType.NickInUse, mContext.getString(R.string.parser_nick_in_use));
-                sender.sendServerMessage(event);
+                sender.sendNickInUseMessage();
                 return;
             }
             default: {
@@ -138,8 +136,7 @@ public class ServerCodeParser {
 
     private void parseFallThroughCode(int code, String message) {
         if (genericCodes.contains(code)) {
-            final Bundle event = Utils.parcelDataForBroadcast(null, ServerEventType.Generic, message);
-            mSender.sendServerMessage(event);
+            mSender.sendGenericServerEvent(message);
         } else {
             // Not sure what to do here - TODO
             Log.v(LOG_TAG, message);
@@ -158,8 +155,7 @@ public class ServerCodeParser {
         mServer.setMOTD(MOTD);
 
         if (isMotdAllowed(mContext)) {
-            final Bundle event = Utils.parcelDataForBroadcast(null, ServerEventType.Generic, MOTD);
-            mSender.sendServerMessage(event);
+            mSender.sendGenericServerEvent(MOTD);
         }
     }
 }

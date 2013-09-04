@@ -30,7 +30,7 @@ import com.fusionx.irc.constants.ServerCommands;
 import com.fusionx.irc.core.Server;
 import com.fusionx.irc.core.ServerConfiguration;
 import com.fusionx.irc.enums.ServerEventType;
-import com.fusionx.irc.listeners.CoreListener;
+import com.fusionx.irc.misc.CoreListener;
 import com.fusionx.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
 import com.fusionx.uiircinterface.core.MessageSender;
@@ -121,10 +121,7 @@ public class ServerConnectionParser {
                         ++suffix;
                         writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
                     } else {
-                        final Bundle event = Utils.parcelDataForBroadcast(null,
-                                ServerEventType.NickInUse,
-                                context.getString(R.string.parser_nick_in_use));
-                        sender.sendServerMessage(event);
+                        sender.sendNickInUseMessage();
                     }
                 }
                 break;
