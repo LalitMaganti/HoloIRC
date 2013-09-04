@@ -73,11 +73,7 @@
     <PreferenceCategory android:title="Channels">
         <Preference
             android:key="pref_autojoin_intent"
-            android:title="@string/server_settings_auto_join_title">
-            <intent android:targetPackage="com.fusionx.lightirc.serversettings"
-                    android:targetClass="com.fusionx.lightirc.serversettings.ChannelListActivity"
-                    />
-        </Preference>
+            android:title="@string/server_settings_auto_join_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Credentials">

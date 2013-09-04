@@ -3,6 +3,7 @@ package com.fusionx.lightirc.serversettings;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,6 +63,19 @@ public class BaseServerSettingsFragment extends PreferenceFragment implements Pr
         // URL of server
         mUrl = (EditTextPreference) findPreference(URL);
         mUrl.setOnPreferenceChangeListener(this);
+
+        Preference preference = findPreference("pref_autojoin_intent");
+        assert preference != null;
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+                final Intent intent = new Intent(getActivity(),
+                        ChannelListActivity.class);
+                intent.putExtra("filename", mCallback.getFileName());
+                startActivity(intent);
+                return false;
+            }
+        });
 
         if (!mCallback.canSaveChanges()) {
             setupNewServer();
