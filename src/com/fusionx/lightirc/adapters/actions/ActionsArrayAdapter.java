@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.fusionx.common.utils.Utils;
+import com.fusionx.lightirc.utils.Utils;
 import com.fusionx.lightirc.R;
 
 import java.util.List;

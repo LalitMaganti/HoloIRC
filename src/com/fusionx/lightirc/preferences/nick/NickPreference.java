@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.AttributeSet;
 
-import com.fusionx.common.PreferenceKeys;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 
 public class NickPreference extends AbstractNickPreference {
     public NickPreference(Context context, AttributeSet attrs) {

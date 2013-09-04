@@ -9,17 +9,16 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 
-import com.fusionx.common.PreferenceKeys;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.preferences.edittext.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.preferences.nick.NickPreference;
-import com.fusionx.lightirc.serversettings.ServerSettingsActivityBase;
 import com.fusionx.lightirc.views.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static com.fusionx.common.PreferenceKeys.Title;
-import static com.fusionx.common.PreferenceKeys.URL;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
+import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
 @SuppressWarnings("deprecation")
 public class ServerSettingsActivityCompat extends ServerSettingsActivityBase implements

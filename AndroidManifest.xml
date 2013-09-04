@@ -63,6 +63,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.fusionx.uiircinterface.core.IRCBridgeService"/>
+        <service android:name=".uiircinterface.core.IRCBridgeService"/>
     </application>
 </manifest>

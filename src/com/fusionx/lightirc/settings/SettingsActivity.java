@@ -15,10 +15,10 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 
-import com.fusionx.common.PreferenceKeys;
-import com.fusionx.common.utils.Utils;
+import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.utils.Utils;
 import com.fusionx.lightirc.R;
-import com.fusionx.uiircinterface.core.IRCBridgeService;
+import com.fusionx.lightirc.uiircinterface.core.IRCBridgeService;
 import com.michaelnovakjr.numberpicker.NumberPickerPreference;
 
 import java.util.List;

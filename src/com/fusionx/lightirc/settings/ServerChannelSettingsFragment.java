@@ -25,14 +25,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.DialogPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
-import com.fusionx.common.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.michaelnovakjr.numberpicker.NumberPickerPreference;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class ServerChannelSettingsFragment extends PreferenceFragment  {

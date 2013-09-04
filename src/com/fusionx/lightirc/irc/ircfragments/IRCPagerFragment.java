@@ -11,8 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.irc.core.ChannelUser;
-import com.fusionx.irc.core.Server;
+import com.fusionx.lightirc.irc.core.ChannelUser;
+import com.fusionx.lightirc.irc.core.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.misc.FragmentType;

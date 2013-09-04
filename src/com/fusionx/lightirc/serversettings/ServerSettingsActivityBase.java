@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
-import com.fusionx.common.utils.SharedPreferencesUtil;
-import com.fusionx.common.utils.Utils;
+import com.fusionx.lightirc.utils.SharedPreferencesUtil;
+import com.fusionx.lightirc.utils.Utils;
 import com.fusionx.lightirc.R;
 
 import java.io.File;

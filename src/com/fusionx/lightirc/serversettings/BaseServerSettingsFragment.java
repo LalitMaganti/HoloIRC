@@ -13,7 +13,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import com.fusionx.common.PreferenceKeys;
+import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.preferences.edittext.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.preferences.nick.NickPreference;
@@ -21,8 +21,8 @@ import com.fusionx.lightirc.views.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static com.fusionx.common.PreferenceKeys.Title;
-import static com.fusionx.common.PreferenceKeys.URL;
+import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
+import static com.fusionx.lightirc.misc.PreferenceKeys.URL;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class BaseServerSettingsFragment extends PreferenceFragment implements Preference

@@ -20,10 +20,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.fusionx.common.utils.Utils;
+import com.fusionx.lightirc.utils.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.common.utils.MultiSelectionUtil;
+import com.fusionx.lightirc.utils.MultiSelectionUtil;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.fusionx.common.PreferenceKeys.AutoJoin;
+import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
 
 public class ListViewSettingsFragment extends ListFragment implements AdapterView
         .OnItemClickListener, MultiSelectionUtil.MultiChoiceModeListener {

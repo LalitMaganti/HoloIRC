@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fusionx.irc.core.Server;
+import com.fusionx.lightirc.irc.core.Server;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.actions.ActionPagerAdapter;
 import com.fusionx.lightirc.misc.FragmentType;

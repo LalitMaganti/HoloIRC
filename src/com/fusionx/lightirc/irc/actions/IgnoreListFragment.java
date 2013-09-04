@@ -15,9 +15,9 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.fusionx.common.PreferenceKeys;
-import com.fusionx.common.utils.FragmentUtil;
-import com.fusionx.common.utils.Utils;
+import com.fusionx.lightirc.misc.PreferenceKeys;
+import com.fusionx.lightirc.utils.FragmentUtil;
+import com.fusionx.lightirc.utils.Utils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;

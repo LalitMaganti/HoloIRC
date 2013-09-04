@@ -25,13 +25,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.common.utils.FragmentUtil;
-import com.fusionx.irc.constants.EventBundleKeys;
-import com.fusionx.irc.core.PrivateMessageUser;
-import com.fusionx.irc.core.Server;
-import com.fusionx.irc.enums.UserEventType;
+import com.fusionx.lightirc.utils.FragmentUtil;
+import com.fusionx.lightirc.irc.constants.EventBundleKeys;
+import com.fusionx.lightirc.irc.core.PrivateMessageUser;
+import com.fusionx.lightirc.irc.core.Server;
+import com.fusionx.lightirc.irc.enums.UserEventType;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.uiircinterface.core.MessageParser;
+import com.fusionx.lightirc.uiircinterface.core.MessageParser;
 
 public class UserFragment extends IRCFragment {
     private final Handler userFragmentHandler = new Handler() {

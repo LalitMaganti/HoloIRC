@@ -29,9 +29,9 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.fusionx.common.Constants;
-import com.fusionx.irc.core.Server;
-import com.fusionx.irc.core.ServerConfiguration;
+import com.fusionx.lightirc.misc.Constants;
+import com.fusionx.lightirc.irc.core.Server;
+import com.fusionx.lightirc.irc.core.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.github.espiandev.showcaseview.ShowcaseView;
 
