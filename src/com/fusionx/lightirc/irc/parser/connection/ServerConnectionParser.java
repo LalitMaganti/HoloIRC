@@ -24,7 +24,7 @@ package com.fusionx.lightirc.irc.parser.connection;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -60,7 +60,7 @@ public class ServerConnectionParser {
         final MessageSender sender = MessageSender.getSender(server.getTitle());
 
         while ((line = reader.readLine()) != null) {
-            final ArrayList<String> parsedArray = Util.splitRawLine(line, true);
+            final ArrayList<String> parsedArray = MiscUtils.splitRawLine(line, true);
             switch (parsedArray.get(0)) {
                 case ServerCommands.Ping:
                     // Immediately return
@@ -102,7 +102,7 @@ public class ServerConnectionParser {
             case RPL_WELCOME:
                 // We are now logged in.
                 final String nick = parsedArray.get(2);
-                Util.removeFirstElementFromList(parsedArray, 3);
+                MiscUtils.removeFirstElementFromList(parsedArray, 3);
                 sender.sendServerConnection(parsedArray.get(0));
                 return nick;
             case ERR_NICKNAMEINUSE:
@@ -142,11 +142,11 @@ public class ServerConnectionParser {
                                                final String line) {
         switch (parsedArray.get(1).toUpperCase()) {
             case ServerCommands.Notice:
-                Util.removeFirstElementFromList(parsedArray, 3);
+                MiscUtils.removeFirstElementFromList(parsedArray, 3);
                 sender.sendGenericServerEvent(parsedArray.get(0));
                 break;
             case ServerCommands.Cap:
-                Util.removeFirstElementFromList(parsedArray, 3);
+                MiscUtils.removeFirstElementFromList(parsedArray, 3);
                 CapParser.parseCommand(parsedArray, configuration, writer, sender);
                 break;
             default:

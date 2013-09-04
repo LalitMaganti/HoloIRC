@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fusionx.lightirc.utils;
+package com.fusionx.lightirc.util;
 
         import android.os.Bundle;
         import android.os.Handler;
@@ -37,7 +37,7 @@ package com.fusionx.lightirc.utils;
  * {@link AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link ActionBarActivity} and
  * backward-compatible action bars.
  */
-public class MultiSelectionUtil {
+public class MultiSelectionUtils {
     public static Controller attachMultiSelectionController(final ListView listView,
                                                             final ActionBarActivity activity, final MultiChoiceModeListener listener) {
         return Controller.attach(listView, activity, listener);
@@ -131,7 +131,7 @@ public class MultiSelectionUtil {
         }
 
         private String getStateKey() {
-            return MultiSelectionUtil.class.getSimpleName() + "_" + mListView.getId();
+            return MultiSelectionUtils.class.getSimpleName() + "_" + mListView.getId();
         }
 
         @Override

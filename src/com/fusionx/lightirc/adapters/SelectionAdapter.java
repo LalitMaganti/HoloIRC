@@ -26,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.base.TreeSetAdapter;
 
@@ -46,7 +46,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
-        Util.setTypeface(getContext(), view);
+        MiscUtils.setTypeface(getContext(), view);
 
         if (mSelectedItems.contains(position)) {
             view.setBackgroundColor(getContext().getResources().getColor(android.R.color

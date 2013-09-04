@@ -42,7 +42,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -53,8 +53,8 @@ import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.ircfragments.IRCPagerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.views.ActionsSlidingMenu;
-import com.fusionx.lightirc.views.DecorChildLayout;
+import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
+import com.fusionx.lightirc.ui.widget.DecorChildLayout;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -89,7 +89,7 @@ public class IRCFragmentActivity extends ActionBarActivity implements UserListFr
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        setTheme(Util.getThemeInt(this));
+        setTheme(MiscUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 

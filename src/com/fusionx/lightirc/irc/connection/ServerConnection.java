@@ -23,7 +23,7 @@ package com.fusionx.lightirc.irc.connection;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -90,7 +90,7 @@ class ServerConnection {
      * the user has not explicitly tried to disconnect
      */
     void connectToServer() {
-        timesToTry = Util.getNumberOfReconnectEvents(mContext);
+        timesToTry = MiscUtils.getNumberOfReconnectEvents(mContext);
         reconnectAttempts = 0;
 
         connect();
@@ -216,7 +216,7 @@ class ServerConnection {
         disconnectSent = true;
         server.setStatus(mContext.getString(R.string.status_disconnected));
         parser.setDisconnectSent(true);
-        server.getWriter().quitServer(Util.getQuitReason(mContext));
+        server.getWriter().quitServer(MiscUtils.getQuitReason(mContext));
     }
 
     /**

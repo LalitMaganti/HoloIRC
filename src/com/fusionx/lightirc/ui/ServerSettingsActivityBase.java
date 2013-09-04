@@ -5,8 +5,8 @@ import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
 import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.utils.SharedPreferencesUtil;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.R;
 
 import java.io.File;
@@ -19,7 +19,7 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(Util.getThemeInt(this));
+        setTheme(MiscUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
@@ -31,7 +31,7 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
     @Override
     public void onBackPressed() {
         if (!mCanSaveChanges) {
-            final File folder = new File(SharedPreferencesUtil.getSharedPreferencesPath
+            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
                     (this) + "server.xml");
             if (folder.exists()) {
                 folder.delete();
@@ -40,7 +40,7 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
                     Toast.LENGTH_SHORT).show();
             backPressed = true;
         } else if (mNewServer) {
-            SharedPreferencesUtil.migrateFileToNewSystem(this, "server.xml");
+            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
             Toast.makeText(this, getString(R.string.server_settings_changes_saved),
                     Toast.LENGTH_SHORT).show();
             backPressed = true;
@@ -53,7 +53,7 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
         super.onDestroy();
 
         if (!mCanSaveChanges && !backPressed) {
-            final File folder = new File(SharedPreferencesUtil.getSharedPreferencesPath
+            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
                     (getApplicationContext()) + "server.xml");
             if (folder.exists()) {
                 folder.delete();
@@ -61,7 +61,7 @@ class ServerSettingsActivityBase extends PreferenceActivity implements IServerSe
             Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
                     Toast.LENGTH_SHORT).show();
         } else if (mNewServer && !backPressed) {
-            SharedPreferencesUtil.migrateFileToNewSystem(this, "server.xml");
+            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
             Toast.makeText(this, getString(R.string.server_settings_changes_saved),
                     Toast.LENGTH_SHORT).show();
         } else {

@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.utils;
+package com.fusionx.lightirc.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -36,7 +36,7 @@ import java.util.Collections;
 
 import static com.fusionx.lightirc.misc.PreferenceKeys.Title;
 
-public class SharedPreferencesUtil {
+public class SharedPreferencesUtils {
     public static String getSharedPreferencesPath(final Context context) {
         return context.getFilesDir().getAbsolutePath().replace("files", "shared_prefs/");
     }

@@ -23,7 +23,7 @@ package com.fusionx.lightirc.uiircinterface;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Server;
 
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ import java.util.ArrayList;
 public class MessageParser {
     public static void channelMessageToParse(final Context context, final Server server,
                                              final String channelName, final String message) {
-        final ArrayList<String> parsedArray = Util.splitRawLine(message, false);
+        final ArrayList<String> parsedArray = MiscUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
 
         if (command.startsWith("/")) {
             switch (command) {
                 case "/me":
-                    final String action = Util.convertArrayListToString(parsedArray);
+                    final String action = MiscUtils.convertArrayListToString(parsedArray);
                     ServerCommandSender.sendActionToChannel(server, channelName, action);
                     break;
                 case "/part":
@@ -71,13 +71,13 @@ public class MessageParser {
 
     public static void userMessageToParse(final Context context, final Server server,
                                           final String userNick, final String message) {
-        final ArrayList<String> parsedArray = Util.splitRawLine(message, false);
+        final ArrayList<String> parsedArray = MiscUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
 
         if (command.startsWith("/")) {
             switch (command) {
                 case "/me":
-                    final String action = Util.convertArrayListToString(parsedArray);
+                    final String action = MiscUtils.convertArrayListToString(parsedArray);
                     ServerCommandSender.sendActionToUser(server, userNick, action);
                     break;
                 case "/close":
@@ -109,7 +109,7 @@ public class MessageParser {
 
     private static void serverCommandToParse(final Context context, final Server server,
                                              final String rawLine) {
-        final ArrayList<String> parsedArray = Util.splitRawLine(rawLine, false);
+        final ArrayList<String> parsedArray = MiscUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
 
         switch (command) {
@@ -126,7 +126,7 @@ public class MessageParser {
                 if (parsedArray.size() >= 1) {
                     final String nick = parsedArray.remove(0);
                     final String message = parsedArray.size() >= 1 ?
-                            Util.convertArrayListToString(parsedArray) : "";
+                            MiscUtils.convertArrayListToString(parsedArray) : "";
                     ServerCommandSender.sendMessageToUser(server, nick, message);
                 } else {
                     sendUnknownEvent(server, rawLine);

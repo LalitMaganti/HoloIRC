@@ -15,10 +15,10 @@ import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.preferences.edittext.ServerTitleEditTextPreference;
-import com.fusionx.lightirc.preferences.nick.NickPreference;
+import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
+import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.views.MustBeCompleteView;
+import com.fusionx.lightirc.ui.widget.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
 

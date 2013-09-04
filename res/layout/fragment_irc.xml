@@ -34,7 +34,7 @@
             android:layout_marginTop="10dip"
             android:lineSpacingExtra="3dip">
 
-        <com.fusionx.lightirc.views.HoloTextView
+        <com.fusionx.lightirc.ui.widget.HoloTextView
                 android:id="@+id/textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

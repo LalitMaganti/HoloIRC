@@ -32,7 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.ircfragments.IRCFragment;
 import com.fusionx.lightirc.irc.ircfragments.ServerFragment;
 import com.fusionx.lightirc.misc.FragmentType;
@@ -257,7 +257,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     public IRCFragment getFragment(@NonNull final String title, @NonNull final FragmentType type) {
         for (final IRCFragment fragment : views) {
             if (fragment.getType().equals(type) && (title.equals(fragment.getTitle()) ||
-                    (type.equals(FragmentType.User) && Util.areNicksEqual(fragment.getTitle(), title)))) {
+                    (type.equals(FragmentType.User) && MiscUtils.areNicksEqual(fragment.getTitle(), title)))) {
                 int indexOfFragment = views.indexOf(fragment);
                 if ((indexOfFragment == currentItemIndex || indexOfFragment == (currentItemIndex
                         - 1) || indexOfFragment == (currentItemIndex + 1))) {

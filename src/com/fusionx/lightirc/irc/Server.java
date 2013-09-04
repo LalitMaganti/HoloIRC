@@ -26,7 +26,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ServerChannelEventType;
@@ -141,7 +141,7 @@ public class Server implements IIRCSideHandler {
         final Iterator<PrivateMessageUser> iterator = user.getPrivateMessageIterator();
         while (iterator.hasNext()) {
             final PrivateMessageUser privateMessageUser = iterator.next();
-            if (Util.areNicksEqual(privateMessageUser.getNick(), nick)) {
+            if (MiscUtils.areNicksEqual(privateMessageUser.getNick(), nick)) {
                 return privateMessageUser;
             }
         }
@@ -173,6 +173,6 @@ public class Server implements IIRCSideHandler {
 
     @Override
     public String toString() {
-        return "HoloIRC " + Util.getAppVersion(mContext) + " Android IRC client";
+        return "HoloIRC " + MiscUtils.getAppVersion(mContext) + " Android IRC client";
     }
 }

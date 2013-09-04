@@ -24,7 +24,7 @@ package com.fusionx.lightirc.misc;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class FileConfigurationConverter {
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceKeys.AutoNickChange, true));
 
         // Autojoin channels
-        final ArrayList<String> auto = new ArrayList<>(Util.getStringSet(serverSettings,
+        final ArrayList<String> auto = new ArrayList<>(MiscUtils.getStringSet(serverSettings,
                 PreferenceKeys.AutoJoin, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);

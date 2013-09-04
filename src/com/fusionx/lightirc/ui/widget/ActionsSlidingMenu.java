@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.views;
+package com.fusionx.lightirc.ui.widget;
 
 import android.content.Context;
 

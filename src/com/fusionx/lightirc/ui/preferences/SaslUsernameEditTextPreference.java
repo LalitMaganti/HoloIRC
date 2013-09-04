@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.preferences.edittext;
+package com.fusionx.lightirc.ui.preferences;
 
 import android.content.Context;
 import android.preference.EditTextPreference;

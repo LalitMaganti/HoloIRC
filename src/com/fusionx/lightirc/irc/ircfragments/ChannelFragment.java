@@ -26,8 +26,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 
-import com.fusionx.lightirc.utils.FragmentUtil;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -45,12 +45,12 @@ public class ChannelFragment extends IRCFragment {
             final Bundle bundle = msg.getData();
             final ChannelEventType type = (ChannelEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
-            final ChannelFragmentCallback callback = FragmentUtil.getParent(ChannelFragment.this,
+            final ChannelFragmentCallback callback = FragmentUtils.getParent(ChannelFragment.this,
                     ChannelFragmentCallback.class);
             switch (type) {
                 case UserListChanged:
                     callback.updateUserList(title);
-                    if (!Util.isMessagesFromChannelShown(getActivity())) {
+                    if (!MiscUtils.isMessagesFromChannelShown(getActivity())) {
                         break;
                     }
                 case UserListReceived:
@@ -70,7 +70,7 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final ChannelFragmentCallback callback = FragmentUtil.getParent(this,
+        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
                 ChannelFragmentCallback.class);
         final Server server = callback.getServer(true);
         if (server != null) {
@@ -105,7 +105,7 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        final ChannelFragmentCallback callback = FragmentUtil.getParent(this,
+        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
                 ChannelFragmentCallback.class);
         MessageParser.channelMessageToParse(getActivity(), callback.getServer(false), title,
                 message);

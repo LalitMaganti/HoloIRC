@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.views;
+package com.fusionx.lightirc.ui.widget;
 
 import android.content.Context;
 import android.preference.Preference;
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
 
 /**
@@ -29,7 +29,7 @@ public class MustBeCompleteView extends Preference {
         if (convertView == null) {
             mTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
                     .must_be_complete_textview, null);
-            mTextView.setTypeface(Util.getRobotoLightTypeface(getContext()));
+            mTextView.setTypeface(MiscUtils.getRobotoLightTypeface(getContext()));
             mTextView.setText(mText);
             return mTextView;
         }

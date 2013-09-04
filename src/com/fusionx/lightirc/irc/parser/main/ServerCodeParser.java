@@ -24,7 +24,7 @@ package com.fusionx.lightirc.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
@@ -33,7 +33,7 @@ import com.fusionx.lightirc.uiircinterface.MessageSender;
 
 import java.util.ArrayList;
 
-import static com.fusionx.lightirc.utils.Util.isMotdAllowed;
+import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 import static com.fusionx.lightirc.misc.Constants.LOG_TAG;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.lightirc.irc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
@@ -71,7 +71,7 @@ public class ServerCodeParser {
         final int code = Integer.parseInt(parsedArray.get(1));
 
         // Pretty common across all the codes
-        Util.removeFirstElementFromList(parsedArray, 3);
+        MiscUtils.removeFirstElementFromList(parsedArray, 3);
         final String message = parsedArray.get(0);
 
         switch (code) {
@@ -103,7 +103,7 @@ public class ServerCodeParser {
             }
             default: {
                 if (whoisCodes.contains(code)) {
-                    mSender.switchToServerMessage(Util.convertArrayListToString(parsedArray));
+                    mSender.switchToServerMessage(MiscUtils.convertArrayListToString(parsedArray));
                 } else {
                     parseFallThroughCode(code, message);
                 }
@@ -123,7 +123,7 @@ public class ServerCodeParser {
     // Allows reduced overhead of retrieving channel from interface
     private void parseTopicInfo(final ArrayList<String> parsedArray) {
         final String channelName = parsedArray.get(0);
-        final String nick = Util.getNickFromRaw(parsedArray.get(1));
+        final String nick = MiscUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         channel.setTopicSetter(nick);
 

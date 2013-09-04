@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
@@ -98,7 +98,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
                     .getSerializable(EventBundleKeys.eventType);
             switch (type) {
                 case UserListChanged:
-                    if (!Util.isMessagesFromChannelShown(mUserChannelInterface.getContext())) {
+                    if (!MiscUtils.isMessagesFromChannelShown(mUserChannelInterface.getContext())) {
                         break;
                     }
                 case Generic:

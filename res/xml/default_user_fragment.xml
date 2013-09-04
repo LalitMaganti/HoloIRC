@@ -2,11 +2,11 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
         android:title="@string/default_user_settings_header">
-    <com.fusionx.lightirc.preferences.nick.DefaultNickPreference
+    <com.fusionx.lightirc.ui.preferences.DefaultNickPreference
             android:key="pref_default_nick_storage"
             android:title="@string/server_settings_nick_storage_title"
             android:summary="@string/server_settings_nick_storage_summary"/>
-    <com.fusionx.lightirc.preferences.edittext.SummaryEditTextPreference
+    <com.fusionx.lightirc.ui.preferences.SummaryEditTextPreference
             android:defaultValue="HoloIRCUser"
             android:key="pref_default_realname"
             android:title="Real Name"

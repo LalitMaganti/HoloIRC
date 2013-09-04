@@ -19,7 +19,7 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.preferences.edittext;
+package com.fusionx.lightirc.ui.preferences;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

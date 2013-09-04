@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.utils.FragmentUtil;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.enums.ServerEventType;
@@ -43,7 +43,7 @@ public class ServerFragment extends IRCFragment {
             final ServerEventType type = (ServerEventType) bundle.getSerializable(EventBundleKeys
                     .eventType);
             final String message = bundle.getString(EventBundleKeys.message);
-            final ServerFragmentCallback callback = FragmentUtil.getParent(ServerFragment.this,
+            final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                     ServerFragmentCallback.class);
             switch (type) {
                 case NickInUse:
@@ -58,7 +58,7 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final ServerFragmentCallback callback = FragmentUtil.getParent(ServerFragment.this,
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
         final Server server = callback.getServer(true);
         mEditText.setEnabled(server != null && server.isConnected(getActivity()));
@@ -70,7 +70,7 @@ public class ServerFragment extends IRCFragment {
 
     @Override
     public void sendMessage(String message) {
-        final ServerFragmentCallback callback = FragmentUtil.getParent(ServerFragment.this,
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
         final Server server = callback.getServer(true);
         MessageParser.serverMessageToParse(getActivity(), server, message);

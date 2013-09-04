@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.utils;
+package com.fusionx.lightirc.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -50,7 +50,7 @@ import java.util.Set;
  *
  * @author Lalit Maganti
  */
-public class Util {
+public class MiscUtils {
     private static Typeface robotoTypeface = null;
 
     public static int getThemeInt(final Context context) {
@@ -273,7 +273,7 @@ public class Util {
     /**
      * Static utility methods only - can't instantiate this class
      */
-    private Util() {
+    private MiscUtils() {
 
     }
 }

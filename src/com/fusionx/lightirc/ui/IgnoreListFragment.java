@@ -16,8 +16,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fusionx.lightirc.misc.PreferenceKeys;
-import com.fusionx.lightirc.utils.FragmentUtil;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
@@ -35,10 +35,10 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        final IgnoreListCallback callback = FragmentUtil.getParent(this,
+        final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
 
-        final TreeSet<String> arrayList = new TreeSet<>(Util.getIgnoreList(getActivity(),
+        final TreeSet<String> arrayList = new TreeSet<>(MiscUtils.getIgnoreList(getActivity(),
                 callback.getServerTitle().toLowerCase()));
 
         final SelectionAdapter<String> ignoreAdapter = new SelectionAdapter<>(getActivity(),
@@ -128,7 +128,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
 
     @Override
     public void onDestroyActionMode(ActionMode actionMode) {
-        final IgnoreListCallback callback = FragmentUtil.getParent(this,
+        final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
         getIgnoreAdapter().clearSelection();
 
@@ -137,7 +137,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         final SharedPreferences preferences = getActivity().getSharedPreferences
                 (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
 
-        Util.putStringSet(preferences, PreferenceKeys.IgnoreList,
+        MiscUtils.putStringSet(preferences, PreferenceKeys.IgnoreList,
                 getIgnoreAdapter().getCopyOfItems());
 
         mMode = null;

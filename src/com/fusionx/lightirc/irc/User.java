@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.irc;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -40,7 +40,7 @@ public abstract class User {
         this.nick = nick;
         this.userChannelInterface = userChannelInterface;
 
-        nickHTML = "<font color=\"" + Util.generateRandomColor(Util
+        nickHTML = "<font color=\"" + MiscUtils.generateRandomColor(MiscUtils
                 .getUserColorOffset(userChannelInterface.getContext())) + "\">%1$s</font>";
     }
 

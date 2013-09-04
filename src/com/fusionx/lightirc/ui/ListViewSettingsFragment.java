@@ -21,10 +21,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
-import com.fusionx.lightirc.utils.MultiSelectionUtil;
 import com.fusionx.lightirc.promptdialogs.ChannelNamePromptDialogBuilder;
 
 import java.util.ArrayList;
@@ -35,10 +35,10 @@ import java.util.TreeSet;
 import static com.fusionx.lightirc.misc.PreferenceKeys.AutoJoin;
 
 public class ListViewSettingsFragment extends ListFragment implements AdapterView
-        .OnItemClickListener, MultiSelectionUtil.MultiChoiceModeListener {
+        .OnItemClickListener, MultiSelectionUtils.MultiChoiceModeListener {
     private SelectionAdapter<String> adapter;
     private boolean modeStarted = false;
-    private MultiSelectionUtil.Controller mMultiSelectionController;
+    private MultiSelectionUtils.Controller mMultiSelectionController;
     private IServerSettings mCallbacks;
 
     @Override
@@ -145,7 +145,7 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
 
         final SharedPreferences settings = getActivity()
                 .getSharedPreferences(mCallbacks.getFileName(), Context.MODE_PRIVATE);
-        final Set<String> set = Util.getStringSet(settings, AutoJoin, new HashSet<String>());
+        final Set<String> set = MiscUtils.getStringSet(settings, AutoJoin, new HashSet<String>());
         for (final String channel : set) {
             adapter.add(channel);
         }
@@ -153,7 +153,7 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
         setListAdapter(adapter);
         setHasOptionsMenu(true);
 
-        mMultiSelectionController = MultiSelectionUtil.attachMultiSelectionController(
+        mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
                 (ListView) rootView.findViewById(android.R.id.list),
                 (ActionBarActivity) getActivity(), this);
 

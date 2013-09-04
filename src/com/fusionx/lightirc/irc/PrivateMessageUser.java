@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.enums.UserEventType;
 import com.fusionx.lightirc.irc.writers.UserWriter;
@@ -51,6 +51,6 @@ public class PrivateMessageUser extends User {
         } else {
             return false;
         }
-        return Util.areNicksEqual(nick, otherNick);
+        return MiscUtils.areNicksEqual(nick, otherNick);
     }
 }

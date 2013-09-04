@@ -24,7 +24,7 @@ package com.fusionx.lightirc.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.misc.CoreListener;
@@ -85,7 +85,7 @@ public class ServerLineParser {
      * @return - returns a boolean which indicates whether the server has disconnected
      */
     boolean parseLine(final String line) {
-        final ArrayList<String> parsedArray = Util.splitRawLine(line, true);
+        final ArrayList<String> parsedArray = MiscUtils.splitRawLine(line, true);
         switch (parsedArray.get(0)) {
             case ServerCommands.Ping:
                 // Immediately return

@@ -1,9 +1,9 @@
-package com.fusionx.lightirc.utils;
+package com.fusionx.lightirc.util;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-public class FragmentUtil {
+public class FragmentUtils {
     /**
      * @param frag The Fragment whose parent is to be found
      * @param callbackInterface The interface class that the parent should implement

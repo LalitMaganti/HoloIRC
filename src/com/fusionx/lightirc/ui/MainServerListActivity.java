@@ -36,8 +36,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.fusionx.lightirc.utils.SharedPreferencesUtil;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
@@ -63,7 +63,7 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(Util.getThemeInt(this));
+        setTheme(MiscUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
@@ -146,11 +146,11 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
 
         if (firstRun) {
-            SharedPreferencesUtil.firstTimeServerSetup(this);
+            SharedPreferencesUtils.firstTimeServerSetup(this);
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        setUpServers(SharedPreferencesUtil.getServersFromPreferences(this));
+        setUpServers(SharedPreferencesUtils.getServersFromPreferences(this));
     }
 
     private void setUpServers(final ArrayList<String> serverFiles) {
@@ -250,11 +250,11 @@ public class MainServerListActivity extends ActionBarActivity implements PopupMe
     }
 
     private void deleteServer(final String fileName) {
-        final ArrayList<String> servers = SharedPreferencesUtil
+        final ArrayList<String> servers = SharedPreferencesUtils
                 .getServersFromPreferences(getApplicationContext());
         servers.remove(fileName);
 
-        final File folder = new File(SharedPreferencesUtil
+        final File folder = new File(SharedPreferencesUtils
                 .getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");
         folder.delete();
 

@@ -24,7 +24,7 @@ package com.fusionx.lightirc.uiircinterface;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
@@ -128,7 +128,7 @@ public class ServerCommandSender {
         final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                channel.getWriter().partChannel(Util.getPartReason(applicationContext));
+                channel.getWriter().partChannel(MiscUtils.getPartReason(applicationContext));
                 return null;
             }
         };

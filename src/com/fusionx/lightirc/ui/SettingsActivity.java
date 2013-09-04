@@ -17,7 +17,7 @@ import android.preference.PreferenceScreen;
 
 import com.fusionx.lightirc.misc.PreferenceKeys;
 import com.fusionx.lightirc.interfaces.ISettings;
-import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.michaelnovakjr.numberpicker.NumberPickerPreference;
@@ -28,7 +28,7 @@ public class SettingsActivity extends PreferenceActivity implements ISettings {
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Util.getThemeInt(this));
+        setTheme(MiscUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
@@ -97,7 +97,7 @@ public class SettingsActivity extends PreferenceActivity implements ISettings {
         final Preference appVersionPreference = screen.findPreference(PreferenceKeys
                 .AppVersion);
         if (appVersionPreference != null) {
-            appVersionPreference.setSummary(Util.getAppVersion(this));
+            appVersionPreference.setSummary(MiscUtils.getAppVersion(this));
         }
     }
 

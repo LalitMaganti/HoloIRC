@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.fusionx.lightirc.views.NonSwipableViewPager
+<com.fusionx.lightirc.ui.widget.NonSwipableViewPager
         android:id="@+id/non_scrollable_pager"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
