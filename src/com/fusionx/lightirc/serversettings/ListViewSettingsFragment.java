@@ -54,16 +54,16 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getListView().setLayoutTransition(new LayoutTransition());
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            getListView().setLayoutTransition(new LayoutTransition());
+        }
     }
 
     @Override
     public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
         final MenuInflater inflate = mode.getMenuInflater();
         inflate.inflate(R.menu.activty_server_settings_cab, menu);
-
         modeStarted = true;
-
         return true;
     }
 
@@ -108,14 +108,9 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
                                           long id, boolean checked) {
         mode.invalidate();
 
-        if (checked) {
-            adapter.addSelection(position);
-        } else {
-            adapter.removeSelection(position);
-        }
+        adapter.toggleSelection(position);
 
         int selectedItemCount = adapter.getSelectedItemCount();
-
         if (selectedItemCount != 0) {
             final String quantityString = getResources().getQuantityString(R.plurals
                     .channel_selection, selectedItemCount, selectedItemCount);
@@ -126,14 +121,12 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
     @Override
     public void onDestroyActionMode(ActionMode arg0) {
         adapter.clearSelection();
-
         modeStarted = false;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
     }
 
@@ -171,8 +164,8 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
         super.onDestroyView();
         if (mMultiSelectionController != null) {
             mMultiSelectionController.finish();
+            mMultiSelectionController = null;
         }
-        mMultiSelectionController = null;
     }
 
 
@@ -205,7 +198,6 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-
         switch (item.getItemId()) {
             case R.id.activity_server_settings_ab_add:
                 final ChannelNamePromptDialogBuilder dialog =
@@ -237,7 +229,6 @@ public class ListViewSettingsFragment extends ListFragment implements AdapterVie
         if (!modeStarted) {
             ((ActionBarActivity) getActivity()).startSupportActionMode(this);
         }
-
         final boolean checked = adapter.getSelectedItems().contains(adapter.getItem(i));
         getListView().setItemChecked(i, !checked);
     }
