@@ -41,7 +41,6 @@ import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.misc.FileConfigurationConverter;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -156,7 +155,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     private void setUpServers(final ArrayList<String> serverFiles) {
         mBuilderList.clear();
         for (final String file : serverFiles) {
-            mBuilderList.add(FileConfigurationConverter.convertFileToBuilder(this, file));
+            mBuilderList.add(SharedPreferencesUtils.convertPrefsToBuilder(this, file));
         }
 
         mServerCardsAdapter.clear();
