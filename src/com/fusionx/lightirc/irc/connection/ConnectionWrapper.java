@@ -24,8 +24,8 @@ package com.fusionx.lightirc.irc.connection;
 import android.content.Context;
 import android.os.Looper;
 
-import com.fusionx.lightirc.irc.core.Server;
-import com.fusionx.lightirc.irc.core.ServerConfiguration;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 
 import lombok.Getter;

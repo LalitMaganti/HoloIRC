@@ -21,9 +21,9 @@
 
 package com.fusionx.lightirc.irc.misc;
 
-import com.fusionx.lightirc.utils.Utils;
-import com.fusionx.lightirc.irc.core.Channel;
-import com.fusionx.lightirc.irc.core.ChannelUser;
+import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.irc.Channel;
+import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.enums.UserLevel;
 
 import java.util.Comparator;
@@ -41,7 +41,7 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
         final UserLevel secondUserMode = user2.getUserLevelMap().get(channel);
 
         if (firstUserMode.equals(secondUserMode) &&
-                Utils.isUserOwnerOrVoice(firstUserMode)) {
+                Util.isUserOwnerOrVoice(firstUserMode)) {
             final String firstRemoved = user1.getNick();
             final String secondRemoved = user2.getNick();
 

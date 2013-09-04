@@ -23,16 +23,16 @@ package com.fusionx.lightirc.irc.connection;
 
 import android.content.Context;
 
-import com.fusionx.lightirc.utils.Utils;
-import com.fusionx.lightirc.irc.core.AppUser;
-import com.fusionx.lightirc.irc.core.Server;
-import com.fusionx.lightirc.irc.core.ServerConfiguration;
-import com.fusionx.lightirc.irc.core.UserChannelInterface;
+import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.irc.AppUser;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.parser.connection.ServerConnectionParser;
 import com.fusionx.lightirc.irc.parser.main.ServerLineParser;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.uiircinterface.core.MessageSender;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,7 +90,7 @@ class ServerConnection {
      * the user has not explicitly tried to disconnect
      */
     void connectToServer() {
-        timesToTry = Utils.getNumberOfReconnectEvents(mContext);
+        timesToTry = Util.getNumberOfReconnectEvents(mContext);
         reconnectAttempts = 0;
 
         connect();
@@ -216,7 +216,7 @@ class ServerConnection {
         disconnectSent = true;
         server.setStatus(mContext.getString(R.string.status_disconnected));
         parser.setDisconnectSent(true);
-        server.getWriter().quitServer(Utils.getQuitReason(mContext));
+        server.getWriter().quitServer(Util.getQuitReason(mContext));
     }
 
     /**

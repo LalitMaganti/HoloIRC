@@ -1,10 +1,10 @@
 package com.fusionx.lightirc.irc.parser.connection;
 
-import com.fusionx.lightirc.utils.Utils;
+import com.fusionx.lightirc.utils.Util;
 import com.fusionx.lightirc.irc.constants.ServerReplyCodes;
-import com.fusionx.lightirc.irc.core.ServerConfiguration;
+import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.uiircinterface.core.MessageSender;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class CapParser {
             writer.sendSaslAuthentication(configuration.getSaslUsername(),
                     configuration.getSaslPassword());
         } else {
-            final ArrayList<String> capabilities = Utils.splitRawLine(parsedArray.get(1),
+            final ArrayList<String> capabilities = Util.splitRawLine(parsedArray.get(1),
                     true);
             if (capabilities.contains("sasl")) {
                 if (command.equals("LS")) {

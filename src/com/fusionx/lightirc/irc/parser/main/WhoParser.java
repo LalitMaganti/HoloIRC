@@ -21,11 +21,11 @@
 
 package com.fusionx.lightirc.irc.parser.main;
 
-import com.fusionx.lightirc.utils.Utils;
-import com.fusionx.lightirc.irc.core.Channel;
-import com.fusionx.lightirc.irc.core.ChannelUser;
-import com.fusionx.lightirc.irc.core.UserChannelInterface;
-import com.fusionx.lightirc.uiircinterface.core.MessageSender;
+import com.fusionx.lightirc.utils.Util;
+import com.fusionx.lightirc.irc.Channel;
+import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.lightirc.irc.UserChannelInterface;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,9 +51,9 @@ public class WhoParser {
             user.setLogin(parsedArray.get(1));
             user.setHost(parsedArray.get(2));
             user.setServerUrl(parsedArray.get(3));
-            final ArrayList<String> secondParse = Utils.splitRawLine(parsedArray.get(6)
+            final ArrayList<String> secondParse = Util.splitRawLine(parsedArray.get(6)
                     .substring(2), true);
-            user.setRealName(Utils.convertArrayListToString(secondParse));
+            user.setRealName(Util.convertArrayListToString(secondParse));
         }
         mUserChannelInterface.addChannelToUser(user, whoChannel);
         whoChannel.getUsers().markForAddition(user);

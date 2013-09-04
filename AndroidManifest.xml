@@ -16,7 +16,7 @@
             android:label="@string/app_name"
             android:theme="@style/Light">
         <activity
-                android:name=".serverlist.MainServerListActivity"
+                android:name=".ui.MainServerListActivity"
                 android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".irc.IRCFragmentActivity"
+                android:name=".ui.IRCFragmentActivity"
                 android:parentActivityName=".activity.MainServerListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
@@ -35,34 +35,34 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".serversettings.ServerSettingsActivityHC"
+                android:name=".ui.ServerSettingsActivityHC"
                 android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
         <activity
-                android:name=".serversettings.ServerSettingsActivityCompat"
+                android:name=".ui.ServerSettingsActivityCompat"
                 android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
         <activity
-                android:name=".serversettings.ChannelListActivity"
+                android:name=".ui.ChannelListActivity"
                 android:label="@string/server_settings_auto_join_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
         <activity
-                android:name=".settings.SettingsActivity"
+                android:name=".ui.SettingsActivity"
                 android:label="@string/settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
 
-        <service android:name=".uiircinterface.core.IRCBridgeService"/>
+        <service android:name=".uiircinterface.IRCBridgeService"/>
     </application>
 </manifest>

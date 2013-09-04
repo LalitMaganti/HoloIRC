@@ -24,16 +24,16 @@ package com.fusionx.lightirc.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.utils.Utils;
+import com.fusionx.lightirc.utils.Util;
 import com.fusionx.lightirc.irc.constants.ServerCommands;
-import com.fusionx.lightirc.irc.core.AppUser;
-import com.fusionx.lightirc.irc.core.Channel;
-import com.fusionx.lightirc.irc.core.ChannelUser;
-import com.fusionx.lightirc.irc.core.PrivateMessageUser;
-import com.fusionx.lightirc.irc.core.Server;
-import com.fusionx.lightirc.irc.core.UserChannelInterface;
+import com.fusionx.lightirc.irc.AppUser;
+import com.fusionx.lightirc.irc.Channel;
+import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.lightirc.irc.PrivateMessageUser;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.uiircinterface.core.MessageSender;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -107,13 +107,13 @@ public class ServerCommandParser {
     }
 
     private void parseNotice(final ArrayList<String> parsedArray, final String rawSource) {
-        final String sendingUser = Utils.getNickFromRaw(rawSource);
+        final String sendingUser = Util.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String notice = parsedArray.get(3);
 
         final String formattedNotice = String.format(mContext.getString(R.string
                 .parser_message), sendingUser, notice);
-        if (Utils.isChannel(recipient)) {
+        if (Util.isChannel(recipient)) {
             mSender.sendGenericChannelEvent(recipient, formattedNotice);
         } else if (recipient.equals(mServer.getUser().getNick())) {
             final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
@@ -132,7 +132,7 @@ public class ServerCommandParser {
         if (message.startsWith("ACTION")) {
             parseAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
-            final String nick = Utils.getNickFromRaw(rawSource);
+            final String nick = Util.getNickFromRaw(rawSource);
             mServer.getWriter().sendVersion(nick, mServer.toString());
             // TODO - figure out what should be done here
         } else {
@@ -142,12 +142,12 @@ public class ServerCommandParser {
     }
 
     private void parsePRIVMSGCommand(final ArrayList<String> parsedArray, final String rawSource) {
-        final String nick = Utils.getNickFromRaw(rawSource);
+        final String nick = Util.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String message = parsedArray.get(3);
 
-        if (!Utils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
-            if (Utils.isChannel(recipient)) {
+        if (!Util.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
+            if (Util.isChannel(recipient)) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
                 mSender.sendMessageToChannel(channel, sendingUser, message);
@@ -159,12 +159,12 @@ public class ServerCommandParser {
     }
 
     private void parseAction(ArrayList<String> parsedArray, String rawSource) {
-        final String nick = Utils.getNickFromRaw(rawSource);
+        final String nick = Util.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String action = parsedArray.get(3).replace("ACTION ", "");
 
-        if (!Utils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
-            if (Utils.isChannel(recipient)) {
+        if (!Util.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
+            if (Util.isChannel(recipient)) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 mSender.sendChannelAction(recipient, sendingUser, action);
             } else {
@@ -207,10 +207,10 @@ public class ServerCommandParser {
     }
 
     private void parseModeChange(final ArrayList<String> parsedArray, final String rawSource) {
-        final String sendingUser = Utils.getNickFromRaw(rawSource);
+        final String sendingUser = Util.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String mode = parsedArray.get(3);
-        if (Utils.isChannel(recipient)) {
+        if (Util.isChannel(recipient)) {
             // The recipient is a channel (i.e. the mode of a user in the channel is being changed
             // or possibly the mode of the channel itself)
             if (parsedArray.size() == 4) {

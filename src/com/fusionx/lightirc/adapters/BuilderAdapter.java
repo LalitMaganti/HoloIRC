@@ -30,8 +30,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.misc.Constants;
-import com.fusionx.lightirc.irc.core.Server;
-import com.fusionx.lightirc.irc.core.ServerConfiguration;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.R;
 import com.github.espiandev.showcaseview.ShowcaseView;
 

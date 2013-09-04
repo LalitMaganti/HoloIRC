@@ -30,7 +30,7 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.fusionx.lightirc.utils.Utils;
+import com.fusionx.lightirc.utils.Util;
 import com.fusionx.lightirc.R;
 
 public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface
@@ -45,7 +45,7 @@ public abstract class PromptDialogBuilder extends AlertDialog.Builder implements
         setTitle(title);
 
         input = (EditText) LayoutInflater.from(context).inflate(R.layout.prompt_dialog, null);
-        Utils.setTypeface(context, input);
+        Util.setTypeface(context, input);
         input.setHint(hint);
         input.setText(defaultText);
         input.getText().clear();

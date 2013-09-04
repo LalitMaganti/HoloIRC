@@ -27,14 +27,14 @@ import android.os.Message;
 import android.text.Html;
 
 import com.fusionx.lightirc.utils.FragmentUtil;
-import com.fusionx.lightirc.utils.Utils;
+import com.fusionx.lightirc.utils.Util;
 import com.fusionx.lightirc.irc.constants.EventBundleKeys;
-import com.fusionx.lightirc.irc.core.Channel;
-import com.fusionx.lightirc.irc.core.ChannelUser;
-import com.fusionx.lightirc.irc.core.Server;
+import com.fusionx.lightirc.irc.Channel;
+import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.enums.ChannelEventType;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.uiircinterface.core.MessageParser;
+import com.fusionx.lightirc.uiircinterface.MessageParser;
 
 import java.util.ArrayList;
 
@@ -50,7 +50,7 @@ public class ChannelFragment extends IRCFragment {
             switch (type) {
                 case UserListChanged:
                     callback.updateUserList(title);
-                    if (!Utils.isMessagesFromChannelShown(getActivity())) {
+                    if (!Util.isMessagesFromChannelShown(getActivity())) {
                         break;
                     }
                 case UserListReceived:

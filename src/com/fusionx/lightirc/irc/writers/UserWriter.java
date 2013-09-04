@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.irc.writers;
 
-import com.fusionx.lightirc.irc.core.PrivateMessageUser;
+import com.fusionx.lightirc.irc.PrivateMessageUser;
 
 import java.io.OutputStreamWriter;
 
