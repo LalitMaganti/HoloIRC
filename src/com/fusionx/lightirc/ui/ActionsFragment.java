@@ -39,7 +39,6 @@ import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.Arrays;

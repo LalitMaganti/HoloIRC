@@ -25,9 +25,6 @@ import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
-import com.fusionx.lightirc.util.MiscUtils;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -48,14 +45,14 @@ public class WhoParser {
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
         user.processWhoMode(parsedArray.get(5), whoChannel);
         /** KEPT FOR REFERENCE
-        if (StringUtils.isEmpty(user.getLogin())) {
-            user.setLogin(parsedArray.get(1));
-            user.setHost(parsedArray.get(2));
-            user.setServerUrl(parsedArray.get(3));
-            final ArrayList<String> secondParse = MiscUtils.splitRawLine(parsedArray.get(6)
-                    .substring(2), true);
-            user.setRealName(MiscUtils.convertArrayListToString(secondParse));
-        }
+         if (StringUtils.isEmpty(user.getLogin())) {
+         user.setLogin(parsedArray.get(1));
+         user.setHost(parsedArray.get(2));
+         user.setServerUrl(parsedArray.get(3));
+         final ArrayList<String> secondParse = MiscUtils.splitRawLine(parsedArray.get(6)
+         .substring(2), true);
+         user.setRealName(MiscUtils.convertArrayListToString(secondParse));
+         }
          */
         mUserChannelInterface.addChannelToUser(user, whoChannel);
         whoChannel.getUsers().markForAddition(user);

@@ -33,8 +33,6 @@ import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.google.common.base.CharMatcher;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -68,7 +66,7 @@ public class MiscUtils {
     /**
      * Split the line received from the server into it's components
      *
-     * @param input        the line received from the server
+     * @param input          the line received from the server
      * @param careAboutColon - whether a colon means the rest of the line should be added in one go
      * @return the parsed list
      */

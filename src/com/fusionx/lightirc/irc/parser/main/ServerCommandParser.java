@@ -202,7 +202,7 @@ public class ServerCommandParser {
                 String.format(mContext.getString(R.string.parser_other_user_nick_change),
                         oldNick, user.getColorfulNick());
 
-        if(channels != null) {
+        if (channels != null) {
             for (final Channel channel : channels) {
                 mSender.sendGenericChannelEvent(channel.getName(), message);
                 channel.getUsers().update(user);
@@ -281,7 +281,7 @@ public class ServerCommandParser {
             return true;
         } else {
             final Set<Channel> list = mUserChannelInterface.removeUser(user);
-            if(list != null) {
+            if (list != null) {
                 for (final Channel channel : list) {
                     final String message = String.format(mContext.getString(R.string
                             .parser_quit_server), user.getPrettyNick(channel)) +

@@ -47,8 +47,6 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-import lombok.Getter;
-
 public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
         ActionMode.Callback, AdapterView.OnItemLongClickListener, SlidingMenu.OnCloseListener {
     private ActionMode mode;

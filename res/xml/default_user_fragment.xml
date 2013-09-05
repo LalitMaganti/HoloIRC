@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-        android:title="@string/default_user_settings_header">
+                  android:title="@string/default_user_settings_header">
 
     <PreferenceCategory android:title="@string/default_user_settings_header">
         <com.fusionx.lightirc.ui.preferences.DefaultNickPreference
