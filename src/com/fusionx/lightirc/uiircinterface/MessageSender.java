@@ -32,17 +32,17 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.ServerEventTypeEnum;
+import com.fusionx.lightirc.constants.UserEventTypeEnum;
 import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.fusionx.lightirc.interfaces.IIRCSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.User;
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.ServerEventTypeEnum;
-import com.fusionx.lightirc.constants.UserEventTypeEnum;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.IRCActivity;
 
 import java.util.LinkedHashMap;

@@ -130,7 +130,7 @@ public final class ServerReplyCodes {
     public static final int RPL_SUMMONING = 342;
     public static final int RPL_VERSION = 351;
     public static final int RPL_WHOREPLY = 352;
-    public static final int RPL_NAMREPLY = 353;
+    public static final int RPL_NAMEREPLY = 353;
     public static final int RPL_LINKS = 364;
     public static final int RPL_ENDOFLINKS = 365;
     public static final int RPL_ENDOFNAMES = 366;

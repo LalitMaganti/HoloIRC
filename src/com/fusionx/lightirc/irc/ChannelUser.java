@@ -14,11 +14,6 @@ import lombok.NonNull;
 
 @Data
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
-    protected String login;
-    protected String host;
-    protected String serverUrl;
-    protected String realName;
-
     protected final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<>();
 
     public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
@@ -77,7 +72,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     break;
                 case 'o':
                     if (addingMode) {
-                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevelEnum.OP));
+                        channel.getUsers().update(this, ImmutableList.of(channel,
+                                UserLevelEnum.OP));
                         break;
                     }
                 case 'v':
@@ -88,7 +84,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     }
                 default:
                     if (!addingMode && (character == 'v' || character == 'o')) {
-                        channel.getUsers().update(this, ImmutableList.of(channel, UserLevelEnum.NONE));
+                        channel.getUsers().update(this, ImmutableList.of(channel,
+                                UserLevelEnum.NONE));
                     }
                     break;
             }

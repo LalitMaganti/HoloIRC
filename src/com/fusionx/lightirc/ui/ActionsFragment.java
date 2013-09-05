@@ -33,8 +33,8 @@ import com.commonsware.cwac.merge.MergeAdapter;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsServerAdapter;
 import com.fusionx.lightirc.adapters.ActionsUserChannelAdapter;
-import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
@@ -87,18 +87,9 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
         mergeAdapter.addView(otherHeader);
         mergeAdapter.addAdapter(channelAdapter);
 
-        final AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter
-                (mergeAdapter);
-        setListAdapter(alphaInAnimationAdapter);
+        setListAdapter(mergeAdapter);
 
         return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        getAlphaAdapter().setAbsListView(getListView());
     }
 
     @Override
@@ -165,13 +156,9 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
         }
     }
 
-    public AlphaInAnimationAdapter getAlphaAdapter() {
-        return (AlphaInAnimationAdapter) super.getListAdapter();
-    }
-
     @Override
     public MergeAdapter getListAdapter() {
-        return (MergeAdapter) getAlphaAdapter().getDecoratedBaseAdapter();
+        return (MergeAdapter) super.getListAdapter();
     }
 
     private ActionsServerAdapter getServerAdapter() {
@@ -190,22 +177,25 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
     public void onTabChanged(final FragmentTypeEnum selectedType) {
         if (selectedType != type) {
             type = selectedType;
-            if (getAlphaAdapter() != null && getListAdapter() != null) {
+            if (getListAdapter() != null) {
                 final View view = (View) getListAdapter().getItem(5);
                 final TextView textView = (TextView) view.findViewById(R.id
                         .sliding_menu_heading_textview);
                 switch (type) {
                     case Server:
                         view.setVisibility(View.GONE);
+                        textView.setVisibility(View.GONE);
                         getUserChannelAdapter().setServerVisible();
                         break;
                     case Channel:
                         view.setVisibility(View.VISIBLE);
+                        textView.setVisibility(View.VISIBLE);
                         textView.setText(getActivity().getString(R.string.channel));
                         getUserChannelAdapter().setChannelVisible(true);
                         break;
                     case User:
                         view.setVisibility(View.VISIBLE);
+                        textView.setVisibility(View.VISIBLE);
                         textView.setText(getActivity().getString(R.string.user));
                         getUserChannelAdapter().setChannelVisible(false);
                         break;
@@ -227,7 +217,5 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
         public void closeAllSlidingMenus();
 
         public void onDisconnect(boolean expected, boolean retryPending);
-
-        public void switchToIRCActionFragment();
     }
 }

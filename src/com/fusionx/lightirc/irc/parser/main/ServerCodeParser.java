@@ -29,21 +29,24 @@ import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 
+import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFNAMES;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFWHO;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_MOTD;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_MOTDSTART;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_NAMEREPLY;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPIC;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPICINFO;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_WHOREPLY;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.genericCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
-import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
 public class ServerCodeParser {
@@ -75,6 +78,10 @@ public class ServerCodeParser {
         final String message = parsedArray.get(0);
 
         switch (code) {
+            case RPL_NAMEREPLY:
+            case RPL_ENDOFNAMES:
+                // TODO - maybe try to use this rather than WHO replies in the future?
+                return;
             case RPL_MOTDSTART:
                 mStringBuilder.setLength(0);
                 // Fall through here to RPL_MOTD case is intentional
@@ -96,18 +103,16 @@ public class ServerCodeParser {
             case RPL_ENDOFWHO:
                 mWhoParser.parseWhoFinished();
                 return;
-            case ERR_NICKNAMEINUSE: {
+            case ERR_NICKNAMEINUSE:
                 final MessageSender sender = MessageSender.getSender(mServer.getTitle());
                 sender.sendNickInUseMessage();
                 return;
-            }
-            default: {
+            default:
                 if (whoisCodes.contains(code)) {
                     mSender.switchToServerMessage(MiscUtils.convertArrayListToString(parsedArray));
                 } else {
                     parseFallThroughCode(code, message);
                 }
-            }
         }
     }
 
@@ -123,7 +128,7 @@ public class ServerCodeParser {
     // Allows reduced overhead of retrieving channel from interface
     private void parseTopicInfo(final ArrayList<String> parsedArray) {
         final String channelName = parsedArray.get(0);
-        final String nick = MiscUtils.getNickFromRaw(parsedArray.get(1));
+        final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         channel.setTopicSetter(nick);
 

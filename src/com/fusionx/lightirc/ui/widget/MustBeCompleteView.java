@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 
 /**
  * Hacky way to add a view to a settings fragment
@@ -29,7 +29,7 @@ public class MustBeCompleteView extends Preference {
         if (convertView == null) {
             mTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
                     .must_be_complete_textview, null);
-            mTextView.setTypeface(MiscUtils.getRobotoLightTypeface(getContext()));
+            mTextView.setTypeface(UIUtils.getRobotoLight(getContext()));
             mTextView.setText(mText);
             return mTextView;
         }

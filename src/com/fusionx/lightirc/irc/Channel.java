@@ -26,8 +26,8 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.EventBundleKeys;
 import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.EventBundleKeys;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 

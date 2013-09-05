@@ -35,7 +35,7 @@ import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.IRCFragment;
 import com.fusionx.lightirc.ui.ServerFragment;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.IRCUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -257,7 +257,8 @@ public class IRCPagerAdapter extends PagerAdapter {
     public IRCFragment getFragment(@NonNull final String title, @NonNull final FragmentTypeEnum type) {
         for (final IRCFragment fragment : views) {
             if (fragment.getType().equals(type) && (title.equals(fragment.getTitle()) ||
-                    (type.equals(FragmentTypeEnum.User) && MiscUtils.areNicksEqual(fragment.getTitle(), title)))) {
+                    (type.equals(FragmentTypeEnum.User) && IRCUtils.areNicksEqual(fragment
+                            .getTitle(), title)))) {
                 int indexOfFragment = views.indexOf(fragment);
                 if ((indexOfFragment == currentItemIndex || indexOfFragment == (currentItemIndex
                         - 1) || indexOfFragment == (currentItemIndex + 1))) {

@@ -26,7 +26,7 @@ import android.content.Context;
 import com.fusionx.lightirc.collections.TwoWayHashSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.IRCUtils;
 
 import java.io.OutputStreamWriter;
 import java.util.Set;
@@ -99,7 +99,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
     }
 
     public synchronized ChannelUser getUserFromRaw(@NonNull final String rawSource) {
-        final String nick = MiscUtils.getNickFromRaw(rawSource);
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
         return getUser(nick);
     }
 

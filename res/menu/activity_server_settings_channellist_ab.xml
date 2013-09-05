@@ -25,7 +25,7 @@
     <item
             android:id="@+id/activity_server_settings_ab_add"
             holoirc:showAsAction="withText|ifRoom"
-            android:icon="@android:drawable/ic_menu_add"
+            android:icon="@drawable/ic_menu_add"
             android:title="@string/add_channel"/>
 
 </menu>

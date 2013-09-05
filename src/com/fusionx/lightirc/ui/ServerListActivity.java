@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -39,12 +40,14 @@ import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BuilderAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
+import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
@@ -62,7 +65,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(MiscUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 

@@ -34,12 +34,13 @@
             android:layout_marginTop="10dip"
             android:lineSpacingExtra="3dip">
 
-        <com.fusionx.lightirc.ui.widget.HoloTextView
+        <com.fusionx.lightirc.ui.widget.RobotoLightTextView
                 android:id="@+id/textview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textIsSelectable="true"/>
+        <requestFocus/>
     </ScrollView>
 
     <EditText
@@ -52,7 +53,6 @@
             android:inputType="textCapSentences|textAutoCorrect"
             android:ems="10"
             android:hint="@string/message"
-            android:imeOptions="actionDone">
-    </EditText>
+            android:imeOptions="actionSend"/>
 
 </RelativeLayout>

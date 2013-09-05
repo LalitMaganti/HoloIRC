@@ -24,8 +24,9 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
 import com.fusionx.lightirc.interfaces.IServerSettings;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -55,7 +56,7 @@ public class ChannelListFragment extends ListFragment implements AdapterView
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+        if (UIUtils.hasHoneycomb()) {
             getListView().setLayoutTransition(new LayoutTransition());
         }
     }
@@ -145,7 +146,8 @@ public class ChannelListFragment extends ListFragment implements AdapterView
 
         final SharedPreferences settings = getActivity()
                 .getSharedPreferences(mCallbacks.getFileName(), Context.MODE_PRIVATE);
-        final Set<String> set = MiscUtils.getStringSet(settings, AutoJoin, new HashSet<String>());
+        final Set<String> set = SharedPreferencesUtils.getStringSet(settings, AutoJoin,
+                new HashSet<String>());
         for (final String channel : set) {
             adapter.add(channel);
         }
@@ -168,7 +170,6 @@ public class ChannelListFragment extends ListFragment implements AdapterView
             mMultiSelectionController = null;
         }
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -217,9 +218,8 @@ public class ChannelListFragment extends ListFragment implements AdapterView
 
     @Override
     public void onPause() {
-        final SharedPreferences settings = getActivity().getSharedPreferences(mCallbacks
-                .getFileName(), Context.MODE_PRIVATE);
-        settings.edit().putStringSet(AutoJoin, adapter.getCopyOfItems()).commit();
+        SharedPreferencesUtils.putStringSet(getActivity().getSharedPreferences(mCallbacks
+                .getFileName(), Context.MODE_PRIVATE), AutoJoin, adapter.getCopyOfItems());
 
         super.onPause();
     }

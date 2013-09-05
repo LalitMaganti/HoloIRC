@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.base.TreeSetAdapter;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.ArrayList;
 import java.util.SortedSet;
@@ -55,7 +55,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
-        MiscUtils.setTypeface(getContext(), view);
+        UIUtils.setRobotoLight(getContext(), view);
 
         synchronized (mLock) {
             if (mSelectedItems.contains(position)) {

@@ -24,8 +24,8 @@ package com.fusionx.lightirc.irc.parser.main;
 import android.content.Context;
 import android.util.Log;
 
-import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.constants.ServerCommands;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.misc.CoreListener;
 import com.fusionx.lightirc.util.MiscUtils;
 

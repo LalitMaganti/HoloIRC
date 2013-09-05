@@ -6,8 +6,8 @@ import android.widget.Toast;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.UIUtils;
 
 import java.io.File;
 
@@ -19,7 +19,7 @@ class ServerPreferenceActivityBase extends PreferenceActivity implements IServer
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(MiscUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
@@ -49,6 +49,16 @@ class ServerPreferenceActivityBase extends PreferenceActivity implements IServer
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mCanSaveChanges || !mNewServer) {
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
@@ -62,9 +72,6 @@ class ServerPreferenceActivityBase extends PreferenceActivity implements IServer
                     Toast.LENGTH_SHORT).show();
         } else if (mNewServer && !backPressed) {
             SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-        } else {
             Toast.makeText(this, getString(R.string.server_settings_changes_saved),
                     Toast.LENGTH_SHORT).show();
         }

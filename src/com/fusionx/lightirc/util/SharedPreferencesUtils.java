@@ -21,9 +21,11 @@
 
 package com.fusionx.lightirc.util;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.os.Build;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -37,6 +39,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
 
@@ -125,7 +128,7 @@ public class SharedPreferencesUtils {
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.AutoNickChange, true));
 
         // Autojoin channels
-        final ArrayList<String> auto = new ArrayList<>(MiscUtils.getStringSet(serverSettings,
+        final ArrayList<String> auto = new ArrayList<>(getStringSet(serverSettings,
                 PreferenceConstants.AutoJoin, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
@@ -144,5 +147,51 @@ public class SharedPreferencesUtils {
 
         builder.setFile(filename);
         return builder;
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static void putStringSet(SharedPreferences preferences, final String key,
+                                    final Set<String> set) {
+        final SharedPreferences.Editor editor = preferences.edit();
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+            editor.putStringSet(key, set);
+        } else {
+            // removes old occurrences of key
+            for (String k : preferences.getAll().keySet()) {
+                if (k.startsWith(key)) {
+                    editor.remove(k);
+                }
+            }
+
+            int i = 0;
+            for (String value : set) {
+                editor.putString(key + i++, value);
+            }
+        }
+        editor.commit();
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static Set<String> getStringSet(final SharedPreferences pref, final String key,
+                                           final Set<String> defaultValue) {
+        if (UIUtils.hasHoneycomb()) {
+            return pref.getStringSet(key, defaultValue);
+        } else {
+            final Set<String> set = new HashSet<>();
+
+            int i = 0;
+
+            Set<String> keySet = pref.getAll().keySet();
+            while (keySet.contains(key + i)) {
+                set.add(pref.getString(key + i, ""));
+                i++;
+            }
+
+            if (set.isEmpty()) {
+                return defaultValue;
+            } else {
+                return set;
+            }
+        }
     }
 }

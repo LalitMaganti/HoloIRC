@@ -31,7 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 
 public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {
@@ -45,7 +45,7 @@ public abstract class PromptDialogBuilder extends AlertDialog.Builder implements
         setTitle(title);
 
         input = (EditText) LayoutInflater.from(context).inflate(R.layout.prompt_dialog, null);
-        MiscUtils.setTypeface(context, input);
+        UIUtils.setRobotoLight(context, input);
         input.setHint(hint);
         input.setText(defaultText);
         input.getText().clear();

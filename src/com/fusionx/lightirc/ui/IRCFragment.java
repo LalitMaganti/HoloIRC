@@ -96,7 +96,8 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
+                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) &&
+                StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
             mEditText.setText("");
 

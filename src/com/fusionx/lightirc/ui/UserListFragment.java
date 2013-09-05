@@ -42,6 +42,7 @@ import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
 import java.util.TreeSet;
@@ -49,8 +50,7 @@ import java.util.TreeSet;
 import lombok.Getter;
 
 public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
-        ActionMode.Callback {
-    @Getter
+        ActionMode.Callback, AdapterView.OnItemLongClickListener, SlidingMenu.OnCloseListener {
     private ActionMode mode;
     private UserListCallback mCallback;
     private String mChannelName;
@@ -93,9 +93,10 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
                 getUserListAdapter().setInternalSet(userList);
                 getUserListAdapter().setChannelName(channelName);
                 getListAdapter().notifyDataSetChanged();
+            } else {
+                getUserListAdapter().clear();
             }
         }
-
         getListView().smoothScrollToPosition(0);
     }
 
@@ -104,6 +105,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         super.onActivityCreated(savedInstanceState);
 
         getListView().setOnItemClickListener(this);
+        getListView().setOnItemLongClickListener(this);
     }
 
     @Override
@@ -181,18 +183,6 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         return true;
     }
 
-    @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
-                            final long l) {
-        if (mode == null) {
-            ((ActionBarActivity) getActivity()).startSupportActionMode(this);
-        }
-
-        getUserListAdapter().toggleSelection(i);
-
-        mode.invalidate();
-    }
-
     public UserListAdapter getUserListAdapter() {
         return (UserListAdapter) getListAdapter().getDecoratedBaseAdapter();
     }
@@ -216,6 +206,34 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
 
     public boolean isNickOtherUsers(final String nick) {
         return !mCallback.getServer(false).getUser().getNick().equals(nick);
+    }
+
+    @Override
+    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
+                            final long l) {
+        if (mode == null) {
+            ((ActionBarActivity) getActivity()).startSupportActionMode(this);
+        }
+        getUserListAdapter().toggleSelection(i);
+        mode.invalidate();
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+        onItemClick(adapterView, view, i, l);
+        return true;
+    }
+
+    @Override
+    public void onClose() {
+        if (mode != null) {
+            mode.finish();
+        }
+    }
+
+    public void part() {
+        mChannelName = "null";
+        getUserListAdapter().clear();
     }
 
     public interface UserListCallback {

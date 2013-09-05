@@ -24,7 +24,6 @@ package com.fusionx.lightirc.ui;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -43,19 +42,19 @@ import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
 import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DecorChildLayout;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
@@ -88,7 +87,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        setTheme(MiscUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
@@ -152,6 +151,8 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
             final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.hide(mUserListFragment);
             ft.commit();
+        } else {
+            mUserSlidingMenu.setOnCloseListener(mUserListFragment);
         }
 
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
@@ -161,11 +162,12 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
 
         mActionsSlidingMenu.setOnOpenListener(mActionsPagerFragment.getActionFragmentListener());
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+        if (UIUtils.hasHoneycomb()) {
             mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         } else {
             // get the window background
-            TypedArray a = getTheme().obtainStyledAttributes(new int[]{android.R.attr.windowBackground});
+            final TypedArray a = getTheme().obtainStyledAttributes(new int[]{android.R.attr
+                    .windowBackground});
             int background = a.getResourceId(0, 0);
             a.recycle();
 
@@ -442,7 +444,8 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
     public void closeOrPartCurrentTab() {
         final Server server = getServer(false);
         if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
-            ServerCommandSender.sendClosePrivateMessage(server, mIRCPagerFragment.getCurrentTitle());
+            ServerCommandSender.sendClosePrivateMessage(server,
+                    mIRCPagerFragment.getCurrentTitle());
 
             mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
         } else {
@@ -484,7 +487,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
             public void run() {
                 mMentionView.startAnimation(AnimationUtils.loadAnimation
                         (IRCActivity.this, R.anim.action_bar_out));
-                mMentionView.setVisibility(View.GONE);
+                mMentionView.setVisibility(View.INVISIBLE);
             }
         }, 2500);
     }
@@ -500,10 +503,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
             closeAllSlidingMenus();
 
             mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
-
-            if (mUserListFragment.getMode() != null) {
-                mUserListFragment.getMode().finish();
-            }
 
             mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
                     .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);

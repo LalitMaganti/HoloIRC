@@ -20,7 +20,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-    <dimen name="server_channel_sliding_actions_menu_width">300dp</dimen>
+    <dimen name="server_channel_sliding_actions_menu_width">250dp</dimen>
 
     <!-- Define standard dimensions to comply with Holo-style grids and rhythm. -->
     <dimen name="margin_tiny">4dp</dimen>

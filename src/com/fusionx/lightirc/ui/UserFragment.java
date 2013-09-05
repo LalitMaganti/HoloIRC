@@ -25,11 +25,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.UserEventTypeEnum;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.UserEventTypeEnum;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
 import com.fusionx.lightirc.util.FragmentUtils;
 

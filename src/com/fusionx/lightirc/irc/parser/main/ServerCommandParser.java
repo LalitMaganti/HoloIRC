@@ -25,19 +25,21 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
-import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import de.scrum_master.util.UpdateableTreeSet;
 
@@ -107,7 +109,7 @@ public class ServerCommandParser {
     }
 
     private void parseNotice(final ArrayList<String> parsedArray, final String rawSource) {
-        final String sendingUser = MiscUtils.getNickFromRaw(rawSource);
+        final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String notice = parsedArray.get(3);
 
@@ -132,7 +134,7 @@ public class ServerCommandParser {
         if (message.startsWith("ACTION")) {
             parseAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
-            final String nick = MiscUtils.getNickFromRaw(rawSource);
+            final String nick = IRCUtils.getNickFromRaw(rawSource);
             mServer.getWriter().sendVersion(nick, mServer.toString());
             // TODO - figure out what should be done here
         } else {
@@ -142,7 +144,7 @@ public class ServerCommandParser {
     }
 
     private void parsePRIVMSGCommand(final ArrayList<String> parsedArray, final String rawSource) {
-        final String nick = MiscUtils.getNickFromRaw(rawSource);
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String message = parsedArray.get(3);
 
@@ -159,7 +161,7 @@ public class ServerCommandParser {
     }
 
     private void parseAction(ArrayList<String> parsedArray, String rawSource) {
-        final String nick = MiscUtils.getNickFromRaw(rawSource);
+        final String nick = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String action = parsedArray.get(3).replace("ACTION ", "");
 
@@ -200,14 +202,16 @@ public class ServerCommandParser {
                 String.format(mContext.getString(R.string.parser_other_user_nick_change),
                         oldNick, user.getColorfulNick());
 
-        for (final Channel channel : channels) {
-            mSender.sendGenericChannelEvent(channel.getName(), message);
-            channel.getUsers().update(user);
+        if(channels != null) {
+            for (final Channel channel : channels) {
+                mSender.sendGenericChannelEvent(channel.getName(), message);
+                channel.getUsers().update(user);
+            }
         }
     }
 
     private void parseModeChange(final ArrayList<String> parsedArray, final String rawSource) {
-        final String sendingUser = MiscUtils.getNickFromRaw(rawSource);
+        final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String mode = parsedArray.get(3);
         if (MiscUtils.isChannel(recipient)) {
@@ -276,15 +280,18 @@ public class ServerCommandParser {
             // TODO - improve this
             return true;
         } else {
-            for (final Channel channel : mUserChannelInterface.removeUser(user)) {
-                final String message = String.format(mContext.getString(R.string.parser_quit_server),
-                        user.getPrettyNick(channel)) +
-                        // If you have 3 strings in the array, the last must be the reason for
-                        // quitting
-                        ((parsedArray.size() == 3) ? " " +
-                                String.format(mContext.getString(R.string.parser_reason),
-                                        StringUtils.remove(parsedArray.get(2), "\"")) : "");
-                mSender.sendGenericUserListChangedEvent(channel.getName(), message);
+            final Set<Channel> list = mUserChannelInterface.removeUser(user);
+            if(list != null) {
+                for (final Channel channel : list) {
+                    final String message = String.format(mContext.getString(R.string
+                            .parser_quit_server), user.getPrettyNick(channel)) +
+                            // If you have 3 strings in the array, the last must be the reason for
+                            // quitting
+                            ((parsedArray.size() == 3) ? " " +
+                                    String.format(mContext.getString(R.string.parser_reason),
+                                            StringUtils.remove(parsedArray.get(2), "\"")) : "");
+                    mSender.sendGenericUserListChangedEvent(channel.getName(), message);
+                }
             }
             return false;
         }

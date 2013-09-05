@@ -11,8 +11,8 @@ import android.view.ViewGroup;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionPagerAdapter;
-import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.irc.Server;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment

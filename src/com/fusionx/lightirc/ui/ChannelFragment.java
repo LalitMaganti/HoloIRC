@@ -26,12 +26,12 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
 
+import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
+import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -48,14 +48,14 @@ public class ChannelFragment extends IRCFragment {
             final ChannelFragmentCallback callback = FragmentUtils.getParent(ChannelFragment.this,
                     ChannelFragmentCallback.class);
             switch (type) {
-                case UserListChanged:
-                    callback.updateUserList(title);
-                    if (!MiscUtils.isMessagesFromChannelShown(getActivity())) {
-                        break;
-                    }
                 case UserListReceived:
                     callback.updateUserList(title);
                     break;
+                case UserListChanged:
+                    callback.updateUserList(title);
+                    if (!MiscUtils.isMessagesFromChannelShown(getActivity().getApplicationContext())) {
+                        break;
+                    }
                 case Generic:
                     appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
                     break;
@@ -90,7 +90,6 @@ public class ChannelFragment extends IRCFragment {
 
         mEditText.clearComposingText();
         mEditText.setText(nicks + text);
-        mEditText.requestFocus();
     }
 
     @Override

@@ -16,10 +16,11 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.ISettings;
 import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.interfaces.ISettings;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.michaelnovakjr.numberpicker.NumberPickerPreference;
 
 import java.util.List;
@@ -28,27 +29,25 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(MiscUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            final PreferenceScreen preferenceScreen = getPreferenceScreen();
-
+        if (!UIUtils.hasHoneycomb()) {
             // Appearance settings
             addPreferencesFromResource(R.xml.appearance_settings_fragment);
-            setupThemePreference(preferenceScreen);
+            setupThemePreference(getPreferenceScreen());
 
             // Server Channel Settings
             addPreferencesFromResource(R.xml.server_channel_settings_fragment);
-            setupNumberPicker(preferenceScreen);
+            setupNumberPicker(getPreferenceScreen());
 
             // Default User Settings
             addPreferencesFromResource(R.xml.default_user_fragment);
 
             // About settings
             addPreferencesFromResource(R.xml.about_settings_fragment);
-            setupAppVersionPreference(preferenceScreen);
+            setupAppVersionPreference(getPreferenceScreen());
 
             showAlertDialog();
         }

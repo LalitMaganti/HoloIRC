@@ -21,21 +21,17 @@
 
 package com.fusionx.lightirc.util;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.constants.UserLevelEnum;
+import com.google.common.base.CharMatcher;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,23 +47,6 @@ import java.util.Set;
  * @author Lalit Maganti
  */
 public class MiscUtils {
-    private static Typeface robotoTypeface = null;
-
-    public static int getThemeInt(final Context context) {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        final int theme = Integer.parseInt(preferences.getString(PreferenceConstants.Theme, "1"));
-        return theme != 0 ? R.style.Light : R.style.Dark;
-    }
-
-    public static int getThemedTextColor(final Context context) {
-        return isThemeLight(context) ? context.getResources().getColor(android.R.color.black) :
-                context.getResources().getColor(android.R.color.white);
-    }
-
-    public static boolean isThemeLight(final Context context) {
-        return getThemeInt(context) == R.style.Light;
-    }
-
     public static boolean isMotdAllowed(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
@@ -80,18 +59,6 @@ public class MiscUtils {
         return !preferences.getBoolean(PreferenceConstants.HideMessages, false);
     }
 
-    public static Typeface getRobotoLightTypeface(final Context context) {
-        if (robotoTypeface == null) {
-            robotoTypeface = Typeface.createFromAsset(context.getAssets(), "Roboto-Light.ttf");
-        }
-        return robotoTypeface;
-    }
-
-    public static void setTypeface(final Context context, final TextView textView) {
-        final Typeface font = getRobotoLightTypeface(context);
-        textView.setTypeface(font);
-    }
-
     public static String getPartReason(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
@@ -101,42 +68,35 @@ public class MiscUtils {
     /**
      * Split the line received from the server into it's components
      *
-     * @param rawLine        the line received from the server
+     * @param input        the line received from the server
      * @param careAboutColon - whether a colon means the rest of the line should be added in one go
      * @return the parsed list
      */
-    public static ArrayList<String> splitRawLine(final String rawLine,
+    public static ArrayList<String> splitRawLine(final String input,
                                                  final boolean careAboutColon) {
-        if (rawLine != null) {
-            final ArrayList<String> list = new ArrayList<>();
-            String buffer = "";
-            final String colonLessLine = rawLine.charAt(0) == ':' ? rawLine.substring(1) : rawLine;
+        ArrayList<String> stringParts = new ArrayList<>();
+        if (input == null || input.length() == 0)
+            return stringParts;
 
-            for (int i = 0; i < colonLessLine.length(); i++) {
-                final char c = colonLessLine.charAt(i);
-                if (c == ' ') {
-                    list.add(buffer);
-                    buffer = "";
-                } else if (c == ':' && StringUtils.isEmpty(buffer) && careAboutColon) {
-                    // A colon can occur in an IPv6 address so that is why the buffer check
-                    // is necessary - the final colon can only occur with an empty buffer
-                    // Add all the stuff after the last colon as a single item
-                    // Essentially the first colon that occurs when the buffer is empty
-                    list.add(colonLessLine.substring(i + 1));
-                    break;
-                } else {
-                    buffer += c;
-                }
+        final String colonLessLine = input.charAt(0) == ':' ? input.substring(1) : input;
+        //Heavily optimized version string split by space with all characters after :
+        //added as a single entry. Under benchmarks, its faster than StringTokenizer,
+        //String.split, toCharArray, and charAt
+        String trimmedInput = CharMatcher.WHITESPACE.trimFrom(colonLessLine);
+        int pos = 0, end;
+        while ((end = trimmedInput.indexOf(' ', pos)) >= 0) {
+            stringParts.add(trimmedInput.substring(pos, end));
+            pos = end + 1;
+            if (trimmedInput.charAt(pos) == ':' && careAboutColon) {
+                stringParts.add(trimmedInput.substring(pos + 1));
+                return stringParts;
             }
-
-            if (!StringUtils.isEmpty(buffer)) {
-                list.add(buffer);
-            }
-            return list;
-        } else {
-            return null;
         }
+        //No more spaces, add last part of line
+        stringParts.add(trimmedInput.substring(pos));
+        return stringParts;
     }
+
 
     public static String convertArrayListToString(final ArrayList<String> list) {
         final StringBuilder builder = new StringBuilder();
@@ -150,17 +110,6 @@ public class MiscUtils {
         for (int i = 1; i <= noOfTimes; i++) {
             list.remove(0);
         }
-    }
-
-    public static String getNickFromRaw(final String rawSource) {
-        String nick;
-        if (rawSource.contains("!") && rawSource.contains("@")) {
-            final int indexOfExclamation = rawSource.indexOf('!');
-            nick = StringUtils.left(rawSource, indexOfExclamation);
-        } else {
-            nick = rawSource;
-        }
-        return nick;
     }
 
     public static int generateRandomColor(final int colorOffset) {
@@ -178,7 +127,7 @@ public class MiscUtils {
     }
 
     public static int getUserColorOffset(final Context context) {
-        return isThemeLight(context) ? 0 : 255;
+        return UIUtils.isThemeLight(context) ? 0 : 255;
     }
 
     public static boolean isChannel(String rawName) {
@@ -200,13 +149,8 @@ public class MiscUtils {
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
         final SharedPreferences preferences = context.getSharedPreferences(fileName,
                 Context.MODE_PRIVATE);
-        return getStringSet(preferences, PreferenceConstants.IgnoreList, new HashSet<String>());
-    }
-
-    public static boolean areNicksEqual(final String firstNick, final String secondNick) {
-        return firstNick.equals(secondNick) || (firstNick.equalsIgnoreCase(secondNick) &&
-                (firstNick.equalsIgnoreCase("nickserv") || firstNick.equalsIgnoreCase
-                        ("chanserv")));
+        return SharedPreferencesUtils.getStringSet(preferences, PreferenceConstants.IgnoreList,
+                new HashSet<String>());
     }
 
     public static String getAppVersion(final Context context) {
@@ -224,56 +168,9 @@ public class MiscUtils {
         return level.equals(UserLevelEnum.OP) || level.equals(UserLevelEnum.VOICE);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static void putStringSet(SharedPreferences preferences, final String key,
-                                    final Set<String> set) {
-        final SharedPreferences.Editor editor = preferences.edit();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-            editor.putStringSet(key, set);
-        } else {
-            // removes old occurrences of key
-            for (String k : preferences.getAll().keySet()) {
-                if (k.startsWith(key)) {
-                    editor.remove(k);
-                }
-            }
-
-            int i = 0;
-            for (String value : set) {
-                editor.putString(key + i++, value);
-            }
-        }
-        editor.commit();
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static Set<String> getStringSet(final SharedPreferences pref, final String key,
-                                           final Set<String> defaultValue) {
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-            return pref.getStringSet(key, defaultValue);
-        } else {
-            final Set<String> set = new HashSet<>();
-
-            int i = 0;
-
-            Set<String> keySet = pref.getAll().keySet();
-            while (keySet.contains(key + i)) {
-                set.add(pref.getString(key + i, ""));
-                i++;
-            }
-
-            if (set.isEmpty()) {
-                return defaultValue;
-            } else {
-                return set;
-            }
-        }
-    }
-
     /**
      * Static utility methods only - can't instantiate this class
      */
     private MiscUtils() {
-
     }
 }

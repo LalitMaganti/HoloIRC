@@ -47,6 +47,7 @@ public class WhoParser {
         }
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
         user.processWhoMode(parsedArray.get(5), whoChannel);
+        /** KEPT FOR REFERENCE
         if (StringUtils.isEmpty(user.getLogin())) {
             user.setLogin(parsedArray.get(1));
             user.setHost(parsedArray.get(2));
@@ -55,6 +56,7 @@ public class WhoParser {
                     .substring(2), true);
             user.setRealName(MiscUtils.convertArrayListToString(secondParse));
         }
+         */
         mUserChannelInterface.addChannelToUser(user, whoChannel);
         whoChannel.getUsers().markForAddition(user);
     }

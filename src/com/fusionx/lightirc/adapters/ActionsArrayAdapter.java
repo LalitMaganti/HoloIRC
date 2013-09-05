@@ -30,7 +30,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.List;
 
@@ -52,13 +52,13 @@ public abstract class ActionsArrayAdapter extends ArrayAdapter<String> {
         if (row == null) {
             row = (TextView) inflater.inflate(R.layout.default_listview_textview, parent, false);
         }
-        MiscUtils.setTypeface(getContext(), row);
+        UIUtils.setRobotoLight(getContext(), row);
         row.setText(getItem(position));
 
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
         } else {
-            row.setTextColor(MiscUtils.getThemedTextColor(row.getContext()));
+            row.setTextColor(UIUtils.getThemedTextColor(row.getContext()));
         }
 
         return row;

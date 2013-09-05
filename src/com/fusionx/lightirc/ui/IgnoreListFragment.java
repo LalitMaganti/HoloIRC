@@ -22,6 +22,7 @@ import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -137,7 +138,7 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         final SharedPreferences preferences = getActivity().getSharedPreferences
                 (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
 
-        MiscUtils.putStringSet(preferences, PreferenceConstants.IgnoreList,
+        SharedPreferencesUtils.putStringSet(preferences, PreferenceConstants.IgnoreList,
                 getIgnoreAdapter().getCopyOfItems());
 
         mMode = null;
