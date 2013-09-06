@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.irc.parser.connection;
+package com.fusionx.lightirc.irc.parser;
 
 import com.fusionx.lightirc.constants.ServerReplyCodes;
 import com.fusionx.lightirc.irc.Server;

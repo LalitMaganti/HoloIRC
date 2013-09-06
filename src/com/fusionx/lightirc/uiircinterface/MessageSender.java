@@ -58,7 +58,7 @@ public class MessageSender {
 
     private Context mContext;
     private boolean mDisplayed;
-    private Bus mBus;
+    private IRCBus mBus;
     private String mServerName;
 
     private MessageSender() {
@@ -107,34 +107,36 @@ public class MessageSender {
         mDisplayed = toast;
     }
 
-    /*
+    /**
     Start of sending messages
      */
-
     private void sendServerEvent(final Server server, final ServerEvent event) {
-        // Append to buffer in the channel
-        server.onServerEvent(event);
-        // Send message to the fragment if it exists
         if(mDisplayed) {
-            mBus.post(event);
+            // Send message to the fragment if it exists
+            mBus.post(server, event);
+        } else {
+            // Append to buffer in the channel
+            server.onServerEvent(event);
         }
     }
 
     private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
-        // Append to buffer in the channel
-        channel.onChannelEvent(event);
-        // Send message to the fragment if it exists
         if(mDisplayed) {
-            mBus.post(event);
+            // Send message to the fragment if it exists
+            mBus.post(channel, event);
+        } else {
+            // Append to buffer in the channel
+            channel.onChannelEvent(event);
         }
     }
 
     private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
-        // Append to buffer in the channel
-        user.onUserEvent(event);
-        // Send message to the fragment if it exists
         if(mDisplayed) {
-            mBus.post(event);
+            // Send message to the fragment if it exists
+            mBus.post(user, event);
+        } else {
+            // Append to buffer in the channel
+            user.onUserEvent(event);
         }
     }
 
@@ -165,19 +167,15 @@ public class MessageSender {
                                        final boolean expectedDisconnect) {
         final FinalDisconnectEvent event = new FinalDisconnectEvent(expectedDisconnect,
                 disconnectLine);
-        // Append to buffer in the channel
-        server.onServerEvent(event);
         // Send message to the fragment if it exists
-        mBus.post(event);
+        mBus.post(server, event);
     }
 
     public void sendRetryPendingServerDisconnection(final Server server,
                                                     final String disconnectLine) {
         final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
-        // Append to buffer in the channel
-        server.onServerEvent(event);
         // Send message to the fragment if it exists
-        mBus.post(event);
+        mBus.post(server, event);
     }
 
     public void sendNewPrivateMessage(final String nick) {
@@ -255,8 +253,9 @@ public class MessageSender {
     }
 
     public void sendUserListReceived(final Channel channel) {
-        final UserListReceivedEvent event = new UserListReceivedEvent(channel.getName());
-        sendChannelEvent(channel, event);
+        if (mDisplayed) {
+            mBus.post(new UserListReceivedEvent(channel.getName()));
+        }
     }
 
     public void sendConnected(final Server server, final String url) {

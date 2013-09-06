@@ -1,7 +1,9 @@
 package com.fusionx.lightirc.irc.event;
 
-public class UserListReceivedEvent extends ChannelEvent {
+public class UserListReceivedEvent {
+    public final String channelName;
+
     public UserListReceivedEvent(String channelName) {
-        super(channelName, "", false);
+        this.channelName = channelName;
     }
 }

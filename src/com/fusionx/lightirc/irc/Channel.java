@@ -21,6 +21,9 @@
 
 package com.fusionx.lightirc.irc;
 
+import android.text.Html;
+import android.text.Spanned;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
@@ -39,7 +42,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     @Getter
     protected final String name;
     @Getter
-    protected ArrayList<String> buffer = new ArrayList<>();
+    protected final ArrayList<Spanned> buffer = new ArrayList<>();
 
     @Getter
     protected final ChannelWriter writer;
@@ -60,7 +63,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         final String message = String.format(userChannelInterface.getContext().getString(R.string
                 .parser_joined_channel), userChannelInterface
                 .getServer().getUser().getColorfulNick());
-        buffer.add(message);
+        buffer.add(Html.fromHtml(message));
 
         mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(mUserChannelInterface
                 .getContext());
@@ -93,7 +96,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public void onChannelEvent(final ChannelEvent event) {
         if((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
                 .message)) {
-            buffer.add(event.message);
+            buffer.add(Html.fromHtml(event.message));
         }
     }
 }

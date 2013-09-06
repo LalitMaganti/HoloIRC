@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.parser.main;
+package com.fusionx.lightirc.irc.parser;
 
 import android.content.Context;
 import android.util.Log;
@@ -101,7 +101,7 @@ public class ServerLineParser {
                     codeParser.parseCode(parsedArray);
                     return false;
                 } else {
-                    return commandParser.parseCommand(parsedArray, line);
+                    return commandParser.parseCommand(parsedArray, line, disconnectSent);
                 }
         }
     }

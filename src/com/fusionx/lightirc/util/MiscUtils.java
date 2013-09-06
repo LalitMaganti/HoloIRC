@@ -45,6 +45,8 @@ import java.util.Set;
  * @author Lalit Maganti
  */
 public class MiscUtils {
+    private static Set<String> ignoreList = null;
+
     public static boolean isMotdAllowed(final Context context) {
         final SharedPreferences preferences = PreferenceManager
                 .getDefaultSharedPreferences(context);
@@ -145,10 +147,17 @@ public class MiscUtils {
     }
 
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
-        final SharedPreferences preferences = context.getSharedPreferences(fileName,
-                Context.MODE_PRIVATE);
-        return SharedPreferencesUtils.getStringSet(preferences, PreferenceConstants.IgnoreList,
-                new HashSet<String>());
+        if(ignoreList == null) {
+            final SharedPreferences preferences = context.getSharedPreferences(fileName,
+                    Context.MODE_PRIVATE);
+            ignoreList = SharedPreferencesUtils.getStringSet(preferences,
+                    PreferenceConstants.IgnoreList, new HashSet<String>());
+        }
+        return ignoreList;
+    }
+
+    public static void forceUpdateIgnoreList(final Set<String> set) {
+        ignoreList = set;
     }
 
     public static String getAppVersion(final Context context) {

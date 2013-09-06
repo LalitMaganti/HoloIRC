@@ -28,8 +28,8 @@ import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.UserChannelInterface;
-import com.fusionx.lightirc.irc.parser.connection.ServerConnectionParser;
-import com.fusionx.lightirc.irc.parser.main.ServerLineParser;
+import com.fusionx.lightirc.irc.parser.ServerConnectionParser;
+import com.fusionx.lightirc.irc.parser.ServerLineParser;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -62,7 +62,7 @@ class ServerConnection {
     private final ServerConfiguration serverConfiguration;
     private Socket mSocket;
 
-    private ServerLineParser parser;
+    private ServerLineParser mParser;
 
     @Setter(AccessLevel.PACKAGE)
     private boolean disconnectSent = false;
@@ -93,24 +93,24 @@ class ServerConnection {
         timesToTry = MiscUtils.getNumberOfReconnectEvents(mContext);
         reconnectAttempts = 0;
 
+        final MessageSender sender = MessageSender.getSender(server.getTitle());
         connect();
 
-        final MessageSender sender = MessageSender.getSender(server.getTitle());
         while (!disconnectSent && reconnectAttempts < timesToTry) {
-            sender.sendGenericServerEvent(server, "Trying to " +
-                    "reconnect to the server in 5 seconds.");
+            sender.sendGenericServerEvent(server, "Trying to reconnect to the server in 5 " +
+                    "seconds.");
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 // This interrupt will *should* only ever occur if the user explicitly kills
                 // reconnection
-                sender.sendFinalDisconnection(server, "Disconnected from the server",
-                        disconnectSent);
                 break;
             }
             connect();
             ++reconnectAttempts;
         }
+
+        sender.sendFinalDisconnection(server, "Disconnected from the server", true);
     }
 
     /**
@@ -182,17 +182,14 @@ class ServerConnection {
                 }
 
                 // Initialise the parser used to parse any lines from the server
-                parser = new ServerLineParser(mContext, server);
+                mParser = new ServerLineParser(mContext, server);
                 // Loops forever until broken
-                parser.parseMain(reader);
+                mParser.parseMain(reader);
 
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
-                if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
-                    sender.sendFinalDisconnection(server, "Disconnected from the server",
-                            disconnectSent);
-                } else {
+                if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
                     sender.sendRetryPendingServerDisconnection(server,
                             "Disconnected from the server");
                 }
@@ -200,10 +197,7 @@ class ServerConnection {
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
-            if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
-                sender.sendFinalDisconnection(server, ex.getMessage() + "<br/>" + "Disconnected" +
-                        " from the server", disconnectSent);
-            } else {
+            if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
                 sender.sendRetryPendingServerDisconnection(server, ex.getMessage());
             }
         }
@@ -219,7 +213,7 @@ class ServerConnection {
     public void disconnectFromServer() {
         disconnectSent = true;
         server.setStatus(mContext.getString(R.string.status_disconnected));
-        parser.setDisconnectSent(true);
+        mParser.setDisconnectSent(true);
         server.getWriter().quitServer(MiscUtils.getQuitReason(mContext));
     }
 

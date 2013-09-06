@@ -65,11 +65,12 @@ public class ChannelFragment extends IRCFragment {
             final Server server = callback.getServer(true);
             final Channel channel = server.getUserChannelInterface().getChannel(title);
             final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new IRCMessageAdapter
-                    (getActivity(), R.layout.irc_listview_textview, channel.getBuffer()));
+                    (getActivity(), channel.getBuffer()));
 
             adapter.setAbsListView(getListView());
             setListAdapter(adapter);
         }
+        getListAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -90,9 +91,9 @@ public class ChannelFragment extends IRCFragment {
 
         final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
                 ChannelFragmentCallback.class);
+        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
 
         getListAdapter().notifyDataSetChanged();
-        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
     }
 
     public void onUserMention(final ArrayList<ChannelUser> users) {

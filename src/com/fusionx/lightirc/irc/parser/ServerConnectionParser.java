@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.parser.connection;
+package com.fusionx.lightirc.irc.parser;
 
 import android.content.Context;
 import android.util.Log;

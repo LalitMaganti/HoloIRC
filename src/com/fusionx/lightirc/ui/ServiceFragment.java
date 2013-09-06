@@ -19,7 +19,7 @@ import com.fusionx.lightirc.uiircinterface.MessageSender;
 public class ServiceFragment extends Fragment {
     private IRCBridgeService mService;
     private ServiceFragmentCallback mCallback;
-    private MessageSender sender;
+    private MessageSender mSender;
 
     /**
      * This method will only be called once when the retained Fragment is first created.
@@ -31,7 +31,7 @@ public class ServiceFragment extends Fragment {
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
-        sender = MessageSender.getSender(mCallback.getServerTitle());
+        mSender = MessageSender.getSender(mCallback.getServerTitle());
 
         if (mService == null) {
             setUpService();
@@ -54,10 +54,10 @@ public class ServiceFragment extends Fragment {
             throw new ClassCastException(activity.toString() + " must implement " +
                     "ServiceFragmentCallback");
         }
-        if (sender == null) {
-            sender = MessageSender.getSender(mCallback.getServerTitle());
+        if (mSender == null) {
+            mSender = MessageSender.getSender(mCallback.getServerTitle());
         }
-        sender.getBus().register(getActivity());
+        mSender.getBus().register(getActivity());
     }
 
     @Override
@@ -67,7 +67,6 @@ public class ServiceFragment extends Fragment {
         if (mService != null) {
             mService.setServerDisplayed(mCallback.getServerTitle());
         }
-        sender.setDisplayed(true);
     }
 
     @Override
@@ -77,7 +76,6 @@ public class ServiceFragment extends Fragment {
         if (mService != null) {
             mService.setServerDisplayed(null);
         }
-        sender.setDisplayed(false);
     }
 
     /**
@@ -88,7 +86,7 @@ public class ServiceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        sender.getBus().unregister(getActivity());
+        mSender.getBus().unregister(getActivity());
         mCallback = null;
     }
 
@@ -163,6 +161,10 @@ public class ServiceFragment extends Fragment {
         mService.setServerDisplayed(null);
         mService.onDisconnect(serverTitle);
         mService = null;
+    }
+
+    public MessageSender getSender() {
+        return mSender;
     }
 
     public interface ServiceFragmentCallback {

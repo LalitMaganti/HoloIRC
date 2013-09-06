@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -219,12 +220,12 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         }
     }
 
-    public void serverisAvailable(final String serverTitle, final ArrayList<String> buffer) {
+    public void serverisAvailable(final String serverTitle, final ArrayList<Spanned> buffer) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
                 FragmentTypeEnum.Server);
         if (fragment != null && fragment.getListAdapter() == null) {
             final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
-                    IRCMessageAdapter(getActivity(), R.layout.irc_listview_textview, buffer));
+                    IRCMessageAdapter(getActivity(), buffer));
             adapter.setAbsListView(fragment.getListView());
             fragment.setListAdapter(adapter);
         }

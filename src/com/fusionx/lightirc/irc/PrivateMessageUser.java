@@ -1,5 +1,8 @@
 package com.fusionx.lightirc.irc;
 
+import android.text.Html;
+import android.text.Spanned;
+
 import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.irc.writers.UserWriter;
 import com.fusionx.lightirc.util.IRCUtils;
@@ -10,10 +13,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 
-@Data
 public class PrivateMessageUser extends User {
     @Getter
-    protected ArrayList<String> buffer = new ArrayList<>();
+    protected final ArrayList<Spanned> buffer = new ArrayList<>();
 
     @Getter
     protected final UserWriter writer;
@@ -26,7 +28,7 @@ public class PrivateMessageUser extends User {
 
     public void onUserEvent(UserEvent event) {
         if(nick.equals(event.userNick)) {
-            buffer.add(event.message);
+            buffer.add(Html.fromHtml(event.message));
         }
     }
 

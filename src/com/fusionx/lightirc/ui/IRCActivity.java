@@ -205,6 +205,18 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
         tabs.setIndicatorColorResource(android.R.color.white);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mServiceFragment.getSender().setDisplayed(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mServiceFragment.getSender().setDisplayed(true);
+    }
+
     @Subscribe
     public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
         mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
@@ -234,8 +246,9 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
 
     @Subscribe
     public void onSwitchToServer(final SwitchToServerEvent event) {
-        mIRCPagerFragment.selectServerFragment();
         mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
+
+        mIRCPagerFragment.selectServerFragment();
     }
 
     /**
@@ -243,10 +256,10 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
      */
     @Subscribe
     public void onServerConnected(final ConnectedEvent event) {
+        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
+
         mIRCPagerFragment.connectedToServer(mServerTitle);
         mActionsPagerFragment.updateConnectionStatus(true);
-
-        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
     }
 
     // Options Menu stuff

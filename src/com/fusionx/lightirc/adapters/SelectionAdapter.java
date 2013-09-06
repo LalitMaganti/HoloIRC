@@ -38,7 +38,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     /**
      * Lock for any operation invlolving the mSelectedItems
      */
-    private final Object mLock = new Object();
+    private final Object mSelectedLock = new Object();
 
     /**
      * The ArrayList which contains all the items considered selected
@@ -57,7 +57,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
         final TextView view = (TextView) super.getView(position, convertView, parent);
         UIUtils.setRobotoLight(getContext(), view);
 
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             if (mSelectedItems.contains(position)) {
                 view.setBackgroundColor(getContext().getResources().getColor(android.R.color
                         .holo_blue_light));
@@ -79,7 +79,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * @param position position of item in adapter to add to the list of selected items
      */
     public void addSelection(final int position) {
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             mSelectedItems.add(position);
         }
         if (mNotifyOnChange) {
@@ -93,7 +93,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * @param position position of item in adapter to remove from the list of selected items
      */
     public void removeSelection(final Integer position) {
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             mSelectedItems.remove(position);
         }
         if (mNotifyOnChange) {
@@ -105,7 +105,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * Clears the selected items in the adapter
      */
     public void clearSelection() {
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             mSelectedItems.clear();
         }
         if (mNotifyOnChange) {
@@ -128,7 +128,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      */
     public ArrayList<T> getSelectedItems() {
         final ArrayList<T> list = new ArrayList<>();
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             for (int i : mSelectedItems) {
                 list.add(getItem(i));
             }
@@ -141,11 +141,13 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     }
 
     public TreeSet<T> getCopyOfItems() {
-        return new TreeSet<>(mObjects);
+        synchronized (mLock) {
+            return new TreeSet<>(mObjects);
+        }
     }
 
     public boolean isItemAtPositionChecked(final int position) {
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             return mSelectedItems.contains(position);
         }
     }
@@ -156,18 +158,20 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
      * @return - the number of selected items
      */
     public int getSelectedItemCount() {
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             return mSelectedItems.size();
         }
     }
 
     public void setInternalSet(SortedSet<T> set) {
-        mObjects = (TreeSet<T>) set;
+        synchronized (mLock) {
+            mObjects = (TreeSet<T>) set;
+        }
         if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
 
-        synchronized (mLock) {
+        synchronized (mSelectedLock) {
             mSelectedItems.clear();
         }
     }

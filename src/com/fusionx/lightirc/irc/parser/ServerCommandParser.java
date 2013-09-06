@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.irc.parser.main;
+package com.fusionx.lightirc.irc.parser;
 
 import android.content.Context;
 import android.util.Log;
@@ -62,7 +62,8 @@ public class ServerCommandParser {
     }
 
     // The server is sending a command to us - parse what it is
-    boolean parseCommand(final ArrayList<String> parsedArray, final String rawLine) {
+    boolean parseCommand(final ArrayList<String> parsedArray, final String rawLine,
+                         final boolean disconnectSent) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -90,7 +91,7 @@ public class ServerCommandParser {
                 }
                 return false;
             case ServerCommands.Part:
-                parseChannelPart(parsedArray, rawSource);
+                parseChannelPart(parsedArray, rawSource, disconnectSent);
                 return false;
             case ServerCommands.Mode:
                 parseModeChange(parsedArray, rawSource);
@@ -154,7 +155,7 @@ public class ServerCommandParser {
         final String message = parsedArray.get(3);
 
         // TODO - optimize this
-        //if (!MiscUtils.getIgnoreList(mContext, mServerTitle.toLowerCase()).contains(nick)) {
+        if (!MiscUtils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
             if (MiscUtils.isChannel(recipient.charAt(0))) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
@@ -164,7 +165,7 @@ public class ServerCommandParser {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
                 mServer.privateMessageSent(sendingUser, message, false);
             }
-        //}
+        }
     }
 
     private void parseAction(ArrayList<String> parsedArray, String rawSource) {
@@ -172,8 +173,7 @@ public class ServerCommandParser {
         final String recipient = parsedArray.get(2);
         final String action = parsedArray.get(3).replace("ACTION ", "");
 
-        //if (!MiscUtils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)
-        // ) {
+        if (!MiscUtils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
             if (MiscUtils.isChannel(recipient.charAt(0))) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 mSender.sendChannelAction(mServer.getUser().getNick(),
@@ -182,7 +182,7 @@ public class ServerCommandParser {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
                 mServer.privateActionSent(sendingUser, action, false);
             }
-        //}
+        }
     }
 
     private void parseTopicChange(final ArrayList<String> parsedArray, final String rawSource) {
@@ -258,13 +258,18 @@ public class ServerCommandParser {
         }
     }
 
-    private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
+    private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource,
+                                  final boolean disconnectSent) {
         final String channelName = parsedArray.get(2);
 
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         if (user.equals(mServer.getUser())) {
-            mSender.sendChanelParted(channel.getName());
+            // This is a caveat of ZNC where it decides weirdly to tell the client to part all
+            // the channels before closing to socket - don't do that
+            if(!disconnectSent) {
+                mSender.sendChanelParted(channel.getName());
+            }
             mUserChannelInterface.removeChannel(channel);
         } else {
             String message = String.format(mContext.getString(R.string.parser_parted_channel),

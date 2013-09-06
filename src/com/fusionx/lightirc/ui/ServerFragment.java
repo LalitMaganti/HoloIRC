@@ -37,7 +37,6 @@ import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationA
 import com.squareup.otto.Subscribe;
 
 public class ServerFragment extends IRCFragment {
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -47,10 +46,12 @@ public class ServerFragment extends IRCFragment {
         final Server server = callback.getServer(true);
         if(server != null && getListAdapter() == null) {
             final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
-                    IRCMessageAdapter(getActivity(), R.layout.irc_listview_textview,
-                    server.getBuffer()));
+                    IRCMessageAdapter(getActivity(), server.getBuffer()));
             adapter.setAbsListView(getListView());
             setListAdapter(adapter);
+        }
+        if(getListAdapter() != null) {
+            getListAdapter().notifyDataSetChanged();
         }
     }
 
@@ -62,7 +63,7 @@ public class ServerFragment extends IRCFragment {
                 ServerFragmentCallback.class);
         final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
         if(sender != null) {
-            sender.getBus().unregister(eventHandler);
+            sender.getBus().unregister(this);
         }
     }
 
@@ -70,12 +71,12 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                ServerFragmentCallback.class);
+        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
         if(getListAdapter() != null) {
             getListAdapter().notifyDataSetChanged();
         }
-        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                ServerFragmentCallback.class);
-        MessageSender.getSender(callback.getServerTitle()).getBus().register(eventHandler);
     }
 
     @Override
@@ -103,18 +104,16 @@ public class ServerFragment extends IRCFragment {
         return FragmentTypeEnum.Server;
     }
 
-    public Object eventHandler = new Object() {
-        @Subscribe
-        public void onNickInUse(NickInUseEvent event) {
-            final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                    ServerFragmentCallback.class);
-            callback.selectServerFragment();
-            getListAdapter().notifyDataSetChanged();
-        }
+    @Subscribe
+    public void onNickInUse(NickInUseEvent event) {
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                ServerFragmentCallback.class);
+        callback.selectServerFragment();
+        getListAdapter().notifyDataSetChanged();
+    }
 
-        @Subscribe
-        public void onServerEvent(ServerEvent event) {
-            getListAdapter().notifyDataSetChanged();
-        }
-    };
+    @Subscribe
+    public void onServerEvent(ServerEvent event) {
+        getListAdapter().notifyDataSetChanged();
+    }
 }
