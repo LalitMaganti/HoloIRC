@@ -34,6 +34,7 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 
+import static com.fusionx.lightirc.constants.Constants.DEBUG;
 import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFMOTD;
@@ -56,6 +57,7 @@ public class ServerCodeParser {
     private final Context mContext;
     private final Server mServer;
     private final MessageSender mSender;
+    private boolean motdAllowed;
 
     ServerCodeParser(final Context context, final ServerLineParser parser) {
         mServer = parser.getServer();
@@ -63,6 +65,7 @@ public class ServerCodeParser {
         mWhoParser = new WhoParser(mUserChannelInterface, mServer.getTitle());
         mContext = context;
         mSender = MessageSender.getSender(mServer.getTitle());
+        motdAllowed = isMotdAllowed(mContext);
     }
 
     /**
@@ -86,16 +89,20 @@ public class ServerCodeParser {
                 mStringBuilder.setLength(0);
                 // Fall through here to RPL_MOTD case is intentional
             case RPL_MOTD:
-                mStringBuilder.append(message.substring(1).trim()).append("\n");
+                final String motdline = message.substring(1).trim();
+                if (motdAllowed) {
+                    mSender.sendGenericServerEvent(mServer, motdline);
+                }
+                mStringBuilder.append(motdline).append("<br/>");
+                return;
+            case RPL_ENDOFMOTD:
+                parseMOTDFinished(message);
                 return;
             case RPL_TOPIC:
                 parseTopicReply(parsedArray);
                 return;
             case RPL_TOPICINFO:
                 parseTopicInfo(parsedArray);
-                return;
-            case RPL_ENDOFMOTD:
-                parseMOTDFinished(message);
                 return;
             case RPL_WHOREPLY:
                 mWhoParser.parseWhoReply(parsedArray);
@@ -105,11 +112,12 @@ public class ServerCodeParser {
                 return;
             case ERR_NICKNAMEINUSE:
                 final MessageSender sender = MessageSender.getSender(mServer.getTitle());
-                sender.sendNickInUseMessage();
+                sender.sendNickInUseMessage(mServer);
                 return;
             default:
                 if (whoisCodes.contains(code)) {
-                    mSender.switchToServerMessage(MiscUtils.convertArrayListToString(parsedArray));
+                    mSender.switchToServerMessage(mServer, MiscUtils.convertArrayListToString
+                            (parsedArray));
                 } else {
                     parseFallThroughCode(code, message);
                 }
@@ -130,17 +138,18 @@ public class ServerCodeParser {
         final String channelName = parsedArray.get(0);
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        channel.setTopicSetter(nick);
+        //channel.setTopicSetter(nick);
 
-        mSender.sendGenericChannelEvent(channel.getName(),
-                String.format(mContext.getString(R.string.parser_new_topic),
-                        channel.getTopic(), nick));
+        mSender.sendGenericChannelEvent(channel,
+                String.format(mContext.getString(R
+                        .string.parser_new_topic), channel.getTopic(),
+                        nick), false);
     }
 
     private void parseFallThroughCode(int code, String message) {
         if (genericCodes.contains(code)) {
-            mSender.sendGenericServerEvent(message);
-        } else {
+            mSender.sendGenericServerEvent(mServer, message);
+        } else if(DEBUG) {
             // Not sure what to do here - TODO
             Log.v(LOG_TAG, message);
         }
@@ -157,8 +166,8 @@ public class ServerCodeParser {
         final String MOTD = mStringBuilder.toString().trim();
         mServer.setMOTD(MOTD);
 
-        if (isMotdAllowed(mContext)) {
-            mSender.sendGenericServerEvent(MOTD);
+        if (motdAllowed) {
+            mSender.sendGenericServerEvent(mServer, message);
         }
     }
 }

@@ -23,26 +23,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <ScrollView
-            android:id="@+id/scrollview"
+    <ListView
+            android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/editText1"
             android:layout_marginBottom="10dip"
             android:layout_marginLeft="10dip"
             android:layout_marginRight="10dip"
+            android:transcriptMode="normal"
+            android:dividerHeight="0dp"
+            android:divider="@null"
             android:layout_marginTop="10dip"
-            android:lineSpacingExtra="3dip">
-
-        <com.fusionx.lightirc.ui.widget.RobotoLightTextView
-                android:id="@+id/textview"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textIsSelectable="true"/>
-
-        <requestFocus/>
-    </ScrollView>
+            android:lineSpacingExtra="3dip"/>
 
     <EditText
             android:id="@+id/editText1"

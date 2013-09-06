@@ -1,13 +1,10 @@
 package com.fusionx.lightirc.irc;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.UserEventTypeEnum;
+import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.irc.writers.UserWriter;
 import com.fusionx.lightirc.util.IRCUtils;
+
+import java.util.ArrayList;
 
 import lombok.Data;
 import lombok.Getter;
@@ -15,7 +12,8 @@ import lombok.NonNull;
 
 @Data
 public class PrivateMessageUser extends User {
-    protected String buffer = "";
+    @Getter
+    protected ArrayList<String> buffer = new ArrayList<>();
 
     @Getter
     protected final UserWriter writer;
@@ -26,20 +24,11 @@ public class PrivateMessageUser extends User {
         writer = new UserWriter(userChannelInterface.getOutputStream(), this);
     }
 
-    private Handler userHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            final Bundle event = msg.getData();
-            final UserEventTypeEnum type = (UserEventTypeEnum) event
-                    .getSerializable(EventBundleKeys.eventType);
-            final String message = event.getString(EventBundleKeys.message);
-            switch (type) {
-                case Generic:
-                    buffer += message + "\n";
-                    break;
-            }
+    public void onUserEvent(UserEvent event) {
+        if(nick.equals(event.userNick)) {
+            buffer.add(event.message);
         }
-    };
+    }
 
     @Override
     public boolean equals(final Object o) {
@@ -51,6 +40,6 @@ public class PrivateMessageUser extends User {
         } else {
             return false;
         }
-        return IRCUtils.areNicksEqual(nick, otherNick);
+        return IRCUtils.areNicksEqual(nick.toString(), otherNick);
     }
 }

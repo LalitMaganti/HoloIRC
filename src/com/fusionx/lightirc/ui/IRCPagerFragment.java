@@ -12,10 +12,12 @@ import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import java.util.ArrayList;
 
@@ -134,6 +136,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         mAdapter.removeFragment(index);
     }
 
+    @Override
+    public String getServerTitle() {
+        return mCallback.getServerTitle();
+    }
+
     /**
      * Method called when a new ChannelFragment is to be created
      *
@@ -154,25 +161,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
         if (switchToTab) {
             mViewPager.setCurrentItem(position, true);
-        }
-    }
-
-    /**
-     * Get the handler object to send the message to.
-     *
-     * @param destination - the title of the tab we are trying to get
-     * @param type        - the type of the fragment we are trying to get the handler from
-     * @return - the handler object we are trying to get
-     */
-    public Handler getFragmentHandler(final String destination, final FragmentTypeEnum type,
-                                      final String serverTitle) {
-        final String nonNullDestination = destination != null ? destination : serverTitle;
-        if (mAdapter != null) {
-            final IRCFragment fragment = mAdapter.getFragment(nonNullDestination,
-                    type);
-            return fragment == null ? null : fragment.getHandler();
-        } else {
-            return null;
         }
     }
 
@@ -223,11 +211,22 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         fragment.onConnectedToServer();
     }
 
-    public void writeMessageToServer(final String serverTitle, final String message) {
+    public void notifyDataSetChanged(final String serverTitle) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
                 FragmentTypeEnum.Server);
         if (fragment != null) {
-            fragment.appendToTextView(message + "\n");
+            fragment.getListAdapter().notifyDataSetChanged();
+        }
+    }
+
+    public void serverisAvailable(final String serverTitle, final ArrayList<String> buffer) {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
+                FragmentTypeEnum.Server);
+        if (fragment != null && fragment.getListAdapter() == null) {
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
+                    IRCMessageAdapter(getActivity(), R.layout.irc_listview_textview, buffer));
+            adapter.setAbsListView(fragment.getListView());
+            fragment.setListAdapter(adapter);
         }
     }
 
@@ -235,5 +234,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         public void onUserListChanged(String channelName);
 
         public Server getServer(boolean nullAllowed);
+
+        public String getServerTitle();
     }
 }

@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.irc.parser.connection;
 
 import com.fusionx.lightirc.constants.ServerReplyCodes;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
@@ -10,7 +11,8 @@ import java.util.ArrayList;
 
 public class CapParser {
     static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
-            configuration, final ServerWriter writer, final MessageSender sender) {
+            configuration, final Server server, final MessageSender sender) {
+        final ServerWriter writer = server.getWriter();
         final String command = parsedArray.get(0);
         if (command.equals("AUTHENTICATE")) {
             writer.sendSaslAuthentication(configuration.getSaslUsername(),
@@ -25,29 +27,30 @@ public class CapParser {
                     writer.sendPlainSaslAuthentication();
                 }
             } else {
-                sender.sendGenericServerEvent("SASL not supported by server");
+                sender.sendGenericServerEvent(server, "SASL not supported by server");
                 writer.sendEndCap();
             }
         }
     }
 
     static boolean parseCode(final int code, final ArrayList<String> parsedArray,
-                             final MessageSender sender, final ServerWriter writer) {
+                             final MessageSender sender, final Server server) {
+        final ServerWriter writer = server.getWriter();
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(3);
-                sender.sendGenericServerEvent(successful);
+                sender.sendGenericServerEvent(server, successful);
                 writer.sendEndCap();
                 return true;
             case ServerReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(5);
-                sender.sendGenericServerEvent(loginMessage);
+                sender.sendGenericServerEvent(server, loginMessage);
                 writer.sendEndCap();
                 return true;
             case ServerReplyCodes.ERR_SASL_FAILED:
             case ServerReplyCodes.ERR_SASL_FAILED_2:
                 final String error = parsedArray.get(3);
-                sender.sendGenericServerEvent(error);
+                sender.sendGenericServerEvent(server, error);
                 writer.sendEndCap();
                 return false;
             default:

@@ -21,38 +21,35 @@
 
 package com.fusionx.lightirc.irc;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+
 import de.scrum_master.util.UpdateableTreeSet;
-import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
-@Data
-@Setter(AccessLevel.PACKAGE)
 public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
+    @Getter
     protected final String name;
-    protected String buffer = "";
-
-    @Setter(AccessLevel.PUBLIC)
-    protected String topic;
-    @Setter(AccessLevel.PUBLIC)
-    protected String topicSetter;
+    @Getter
+    protected ArrayList<String> buffer = new ArrayList<>();
 
     @Getter
     protected final ChannelWriter writer;
-    @Getter(AccessLevel.NONE)
     protected final UserChannelInterface mUserChannelInterface;
+
+    @Getter
+    @Setter
+    protected String topic;
+
+    private boolean mUserListMessagesShown;
 
     protected Channel(@NonNull final String channelName,
                       @NonNull final UserChannelInterface userChannelInterface) {
@@ -63,12 +60,15 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         final String message = String.format(userChannelInterface.getContext().getString(R.string
                 .parser_joined_channel), userChannelInterface
                 .getServer().getUser().getColorfulNick());
-        buffer += message + "\n";
+        buffer.add(message);
+
+        mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(mUserChannelInterface
+                .getContext());
     }
 
     @Override
     public int compareTo(final Channel channel) {
-        return this.getName().compareTo(channel.getName());
+        return name.compareTo(channel.name);
     }
 
     public UpdateableTreeSet<ChannelUser> getUsers() {
@@ -77,7 +77,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
 
     @Override
     public boolean equals(final Object o) {
-        return o instanceof Channel && ((Channel) o).getName().equals(name);
+        return o instanceof Channel && ((Channel) o).name.equals(name);
     }
 
     @Override
@@ -90,20 +90,10 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         throw new IllegalArgumentException();
     }
 
-    private Handler channelHandler = new Handler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle event = msg.getData();
-            final ChannelEventTypeEnum type = (ChannelEventTypeEnum) event
-                    .getSerializable(EventBundleKeys.eventType);
-            switch (type) {
-                case UserListChanged:
-                    if (!MiscUtils.isMessagesFromChannelShown(mUserChannelInterface.getContext())) {
-                        break;
-                    }
-                case Generic:
-                    buffer += event.getString(EventBundleKeys.message) + "\n";
-            }
+    public void onChannelEvent(final ChannelEvent event) {
+        if((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
+                .message)) {
+            buffer.add(event.message);
         }
-    };
+    }
 }

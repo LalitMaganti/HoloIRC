@@ -22,16 +22,10 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.ServerEventTypeEnum;
-import com.fusionx.lightirc.interfaces.IIRCSideHandler;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.IRCUtils;
@@ -39,65 +33,41 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 
-import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 @Data
-public class Server implements IIRCSideHandler {
+public class Server {
     private ServerWriter writer;
     private UserChannelInterface userChannelInterface;
 
     private final String title;
     private AppUser user;
 
-    @Setter(AccessLevel.NONE)
-    private String buffer = "";
+    @Getter
+    protected ArrayList<String> buffer = new ArrayList<>();
+
     private String status = "Disconnected";
     private String MOTD = "";
 
     private final ConnectionWrapper mWrapper;
     private final Context mContext;
 
-    private final Handler serverHandler = new Handler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final Serializable serializable = bundle.getSerializable
-                    (EventBundleKeys.eventType);
-            if (serializable instanceof ServerEventTypeEnum) {
-                final ServerEventTypeEnum type = (ServerEventTypeEnum) serializable;
-                switch (type) {
-                    case NickInUse:
-                    case Generic:
-                        buffer += bundle.getString(EventBundleKeys.message) + "\n";
-                        break;
-                }
-            } else if (serializable instanceof ServerChannelEventTypeEnum) {
-                final ServerChannelEventTypeEnum type = (ServerChannelEventTypeEnum) serializable;
-                switch (type) {
-                    case FinalDisconnected:
-                        MessageSender.getSender(title).unregisterIRCSideHandlerInterface(title);
-                    case RetryPendingDisconnected:
-                    case Connected:
-                    case SwitchToServerMessage:
-                        buffer += bundle.getString(EventBundleKeys.message) + "\n";
-                        break;
-                }
-            }
-        }
-    };
-
-    public Server(final String serverTitle, final ConnectionWrapper wrapper, final Context context) {
+    public Server(final String serverTitle, final ConnectionWrapper wrapper,
+                  final Context context) {
         title = serverTitle;
         mWrapper = wrapper;
         mContext = context;
+    }
 
-        MessageSender.getSender(serverTitle).registerIRCSideHandlerInterface(this);
+    public void onServerEvent(final ServerEvent event) {
+        if(StringUtils.isNotEmpty(event.message)) {
+            buffer.add(event.message);
+        }
     }
 
     public void privateMessageSent(final PrivateMessageUser userWhoIsNotUs, final String message,
@@ -108,13 +78,13 @@ public class Server implements IIRCSideHandler {
             user.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
+                sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
             }
 
             sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(userWhoIsNotUs.getNick(), sendingUser, message);
+                sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
             }
         }
     }
@@ -127,13 +97,13 @@ public class Server implements IIRCSideHandler {
             user.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);
+                sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
             }
 
             sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(userWhoIsNotUs.getNick(), sendingUser, action);
+                sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
             }
         }
     }
@@ -147,21 +117,6 @@ public class Server implements IIRCSideHandler {
             }
         }
         return new PrivateMessageUser(nick, userChannelInterface);
-    }
-
-    @Override
-    public Handler getChannelHandler(String channelName) {
-        return userChannelInterface.getChannel(channelName).getChannelHandler();
-    }
-
-    @Override
-    public Handler getUserHandler(String userNick) {
-        return getPrivateMessageUser(userNick).getUserHandler();
-    }
-
-    @Override
-    public String getNick() {
-        return getUser().getNick();
     }
 
     public boolean isConnected(final Context context) {

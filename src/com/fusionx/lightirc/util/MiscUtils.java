@@ -128,8 +128,8 @@ public class MiscUtils {
         return UIUtils.isThemeLight(context) ? 0 : 255;
     }
 
-    public static boolean isChannel(String rawName) {
-        return Constants.channelPrefixes.contains(rawName.charAt(0));
+    public static boolean isChannel(char firstCharacter) {
+        return Constants.channelPrefixes.contains(firstCharacter);
     }
 
     public static String getQuitReason(final Context context) {

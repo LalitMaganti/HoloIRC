@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
@@ -58,14 +57,7 @@ public class ServiceFragment extends Fragment {
         if (sender == null) {
             sender = MessageSender.getSender(mCallback.getServerTitle());
         }
-        sender.registerServerChannelHandler(mCallback);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        sender.registerServerChannelHandler(mCallback);
+        sender.getBus().register(getActivity());
     }
 
     @Override
@@ -75,7 +67,7 @@ public class ServiceFragment extends Fragment {
         if (mService != null) {
             mService.setServerDisplayed(mCallback.getServerTitle());
         }
-        sender.receiveMentionAsToast(true);
+        sender.setDisplayed(true);
     }
 
     @Override
@@ -85,14 +77,7 @@ public class ServiceFragment extends Fragment {
         if (mService != null) {
             mService.setServerDisplayed(null);
         }
-        sender.receiveMentionAsToast(false);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        sender.unregisterFragmentSideHandlerInterface();
+        sender.setDisplayed(false);
     }
 
     /**
@@ -103,7 +88,7 @@ public class ServiceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        sender.unregisterFragmentSideHandlerInterface();
+        sender.getBus().unregister(getActivity());
         mCallback = null;
     }
 
@@ -150,6 +135,7 @@ public class ServiceFragment extends Fragment {
                         getActivity().getIntent().getParcelableExtra("server");
                 mService.connectToServer(builder);
             }
+            mCallback.serverIsAvailable();
         }
 
         // Should never occur
@@ -179,7 +165,7 @@ public class ServiceFragment extends Fragment {
         mService = null;
     }
 
-    public interface ServiceFragmentCallback extends IFragmentSideHandler {
+    public interface ServiceFragmentCallback {
         public void setUpViewPager();
 
         public String getServerTitle();
@@ -187,5 +173,7 @@ public class ServiceFragment extends Fragment {
         public void repopulateFragmentsInPager();
 
         public void onDisconnect(final boolean expected, final boolean retryPending);
+
+        public void serverIsAvailable();
     }
 }

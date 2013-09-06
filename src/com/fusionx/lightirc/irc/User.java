@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.irc;
 
+import android.text.style.ForegroundColorSpan;
+
 import com.fusionx.lightirc.util.MiscUtils;
 
 import lombok.Getter;
@@ -33,12 +35,15 @@ public abstract class User {
     protected String nick;
 
     protected final String nickHTML;
+    protected final ForegroundColorSpan span;
     protected final UserChannelInterface userChannelInterface;
 
     public User(@NonNull final String nick,
                 @NonNull final UserChannelInterface userChannelInterface) {
         this.nick = nick;
         this.userChannelInterface = userChannelInterface;
+        span = new ForegroundColorSpan(MiscUtils.generateRandomColor(MiscUtils
+                .getUserColorOffset(userChannelInterface.getContext())));
 
         nickHTML = "<font color=\"" + MiscUtils.generateRandomColor(MiscUtils
                 .getUserColorOffset(userChannelInterface.getContext())) + "\">%1$s</font>";

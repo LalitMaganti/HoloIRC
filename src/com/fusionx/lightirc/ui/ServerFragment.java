@@ -22,50 +22,60 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.view.View;
 
-import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.constants.ServerEventTypeEnum;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.NickInUseEvent;
+import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.FragmentUtils;
-
-import lombok.Getter;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.squareup.otto.Subscribe;
 
 public class ServerFragment extends IRCFragment {
-    @Getter
-    private final Handler serverFragHandler = new Handler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final ServerEventTypeEnum type = (ServerEventTypeEnum) bundle.getSerializable(EventBundleKeys
-                    .eventType);
-            final String message = bundle.getString(EventBundleKeys.message);
-            final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                    ServerFragmentCallback.class);
-            switch (type) {
-                case NickInUse:
-                    callback.selectServerFragment();
-                    break;
-            }
-            appendToTextView(message + "\n");
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final ServerFragmentCallback callback = FragmentUtils.getParent(this,
+                ServerFragmentCallback.class);
+        final Server server = callback.getServer(true);
+        if(server != null && getListAdapter() == null) {
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
+                    IRCMessageAdapter(getActivity(), R.layout.irc_listview_textview,
+                    server.getBuffer()));
+            adapter.setAbsListView(getListView());
+            setListAdapter(adapter);
         }
-    };
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                ServerFragmentCallback.class);
+        final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
+        if(sender != null) {
+            sender.getBus().unregister(eventHandler);
+        }
+    }
 
     @Override
     public void onResume() {
         super.onResume();
 
+        if(getListAdapter() != null) {
+            getListAdapter().notifyDataSetChanged();
+        }
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
-        final Server server = callback.getServer(true);
-        mEditText.setEnabled(server != null && server.isConnected(getActivity()));
-
-        if (server != null) {
-            writeToTextView(server.getBuffer());
-        }
+        MessageSender.getSender(callback.getServerTitle()).getBus().register(eventHandler);
     }
 
     @Override
@@ -84,6 +94,8 @@ public class ServerFragment extends IRCFragment {
         public Server getServer(boolean nullable);
 
         public void selectServerFragment();
+
+        public String getServerTitle();
     }
 
     @Override
@@ -91,8 +103,18 @@ public class ServerFragment extends IRCFragment {
         return FragmentTypeEnum.Server;
     }
 
-    @Override
-    public Handler getHandler() {
-        return serverFragHandler;
-    }
+    public Object eventHandler = new Object() {
+        @Subscribe
+        public void onNickInUse(NickInUseEvent event) {
+            final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+                    ServerFragmentCallback.class);
+            callback.selectServerFragment();
+            getListAdapter().notifyDataSetChanged();
+        }
+
+        @Subscribe
+        public void onServerEvent(ServerEvent event) {
+            getListAdapter().notifyDataSetChanged();
+        }
+    };
 }

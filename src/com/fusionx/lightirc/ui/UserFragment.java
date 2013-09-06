@@ -24,28 +24,42 @@ package com.fusionx.lightirc.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 
-import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.constants.UserEventTypeEnum;
+import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.squareup.otto.Subscribe;
 
 public class UserFragment extends IRCFragment {
-    private final Handler userFragmentHandler = new Handler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final UserEventTypeEnum type = (UserEventTypeEnum) bundle.getSerializable(EventBundleKeys.eventType);
-            final String message = bundle.getString(EventBundleKeys.message);
-            switch (type) {
-                case Generic:
-                    appendToTextView(message + "\n");
-            }
+    @Subscribe
+    public void onUserEvent(final UserEvent event) {
+        getListAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if(getListAdapter() == null) {
+            final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
+                    UserFragmentCallbacks.class);
+            final Server server = callback.getServer(true);
+            final PrivateMessageUser channel = server.getPrivateMessageUser(title);
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new IRCMessageAdapter
+                    (getActivity(), R.layout.irc_listview_textview, channel.getBuffer()));
+            adapter.setAbsListView(getListView());
+            setListAdapter(adapter);
         }
-    };
+    }
 
     @Override
     public void onResume() {
@@ -53,23 +67,26 @@ public class UserFragment extends IRCFragment {
 
         final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                 UserFragmentCallbacks.class);
-        final Server server = callback.getServer(true);
-        if (server != null) {
-            final PrivateMessageUser user = server.getPrivateMessageUser(title);
-            if (user != null) {
-                writeToTextView(user.getBuffer());
-            }
+
+        getListAdapter().notifyDataSetChanged();
+        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
+                UserFragmentCallbacks.class);
+        final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
+        if(sender != null) {
+            sender.getBus().unregister(this);
         }
     }
 
     @Override
     public FragmentTypeEnum getType() {
         return FragmentTypeEnum.User;
-    }
-
-    @Override
-    public Handler getHandler() {
-        return userFragmentHandler;
     }
 
     @Override
@@ -82,5 +99,7 @@ public class UserFragment extends IRCFragment {
 
     public interface UserFragmentCallbacks {
         public Server getServer(boolean nullable);
+
+        public String getServerTitle();
     }
 }

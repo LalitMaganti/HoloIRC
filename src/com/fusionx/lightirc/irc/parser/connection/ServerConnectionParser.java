@@ -71,19 +71,19 @@ public class ServerConnectionParser {
                     // We are finished - the server has kicked us out for some reason
                     return null;
                 case ServerCommands.Authenticate:
-                    CapParser.parseCommand(parsedArray, configuration, server.getWriter(), sender);
+                    CapParser.parseCommand(parsedArray, configuration, server, sender);
                     break;
                 default:
                     if (StringUtils.isNumeric(parsedArray.get(1))) {
                         final String nick = parseConnectionCode(configuration.isNickChangable(),
-                                parsedArray, sender, server.getWriter(), context,
+                                parsedArray, sender, server,
                                 configuration.getNickStorage(), line);
                         if (nick != null) {
                             return nick;
                         }
                     } else {
                         parseConnectionCommand(parsedArray, configuration, sender,
-                                server.getWriter(), line);
+                                server, line);
                     }
                     break;
             }
@@ -94,16 +94,16 @@ public class ServerConnectionParser {
     private static String parseConnectionCode(final boolean canChangeNick,
                                               final ArrayList<String> parsedArray,
                                               final MessageSender sender,
-                                              final ServerWriter writer, final Context context,
+                                              final Server server,
                                               final ServerConfiguration.NickStorage nickStorage,
                                               final String line) {
         final int code = Integer.parseInt(parsedArray.get(1));
+        final ServerWriter writer = server.getWriter();
         switch (code) {
             case RPL_WELCOME:
                 // We are now logged in.
                 final String nick = parsedArray.get(2);
                 MiscUtils.removeFirstElementFromList(parsedArray, 3);
-                sender.sendServerConnection(parsedArray.get(0));
                 return nick;
             case ERR_NICKNAMEINUSE:
                 if (!triedSecondNick && StringUtils.isNotEmpty(nickStorage.getSecondChoiceNick())) {
@@ -118,7 +118,7 @@ public class ServerConnectionParser {
                         ++suffix;
                         writer.changeNick(nickStorage.getFirstChoiceNick() + suffix);
                     } else {
-                        sender.sendNickInUseMessage();
+                        sender.sendNickInUseMessage(server);
                     }
                 }
                 break;
@@ -127,7 +127,7 @@ public class ServerConnectionParser {
                 break;
             default:
                 if (saslCodes.contains(code)) {
-                    CapParser.parseCode(code, parsedArray, sender, writer);
+                    CapParser.parseCode(code, parsedArray, sender, server);
                 } else {
                     Log.v(LOG_TAG, line);
                 }
@@ -138,16 +138,16 @@ public class ServerConnectionParser {
 
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
                                                final ServerConfiguration configuration,
-                                               final MessageSender sender, final ServerWriter writer,
+                                               final MessageSender sender, final Server server,
                                                final String line) {
         switch (parsedArray.get(1).toUpperCase()) {
             case ServerCommands.Notice:
                 MiscUtils.removeFirstElementFromList(parsedArray, 3);
-                sender.sendGenericServerEvent(parsedArray.get(0));
+                sender.sendGenericServerEvent(server, parsedArray.get(0));
                 break;
             case ServerCommands.Cap:
                 MiscUtils.removeFirstElementFromList(parsedArray, 3);
-                CapParser.parseCommand(parsedArray, configuration, writer, sender);
+                CapParser.parseCommand(parsedArray, configuration, server, sender);
                 break;
             default:
                 Log.v(LOG_TAG, line);

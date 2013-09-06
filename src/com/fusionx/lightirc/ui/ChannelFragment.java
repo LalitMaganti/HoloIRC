@@ -21,50 +21,68 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Html;
+import android.view.View;
 
-import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.ChannelEvent;
+import com.fusionx.lightirc.irc.event.PartEvent;
+import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
 public class ChannelFragment extends IRCFragment {
-    private final Handler channelFragmentHandler = new Handler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final ChannelEventTypeEnum type = (ChannelEventTypeEnum) bundle.getSerializable(EventBundleKeys
-                    .eventType);
-            final ChannelFragmentCallback callback = FragmentUtils.getParent(ChannelFragment.this,
-                    ChannelFragmentCallback.class);
-            switch (type) {
-                case UserListReceived:
-                    callback.updateUserList(title);
-                    break;
-                case UserListChanged:
-                    callback.updateUserList(title);
-                    if (!MiscUtils.isMessagesFromChannelShown(getActivity().getApplicationContext())) {
-                        break;
-                    }
-                case Generic:
-                    appendToTextView(bundle.getString(EventBundleKeys.message) + "\n");
-                    break;
-                case UserParted:
-                    callback.switchFragmentAndRemove(title);
-                    break;
-            }
+    private boolean mUserListMessagesShown;
+    private ChannelFragmentCallback callback;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(getActivity());
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if(getListAdapter() == null) {
+            final ChannelFragment.ChannelFragmentCallback callback = FragmentUtils.getParent(this,
+                    ChannelFragment.ChannelFragmentCallback.class);
+            final Server server = callback.getServer(true);
+            final Channel channel = server.getUserChannelInterface().getChannel(title);
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new IRCMessageAdapter
+                    (getActivity(), R.layout.irc_listview_textview, channel.getBuffer()));
+
+            adapter.setAbsListView(getListView());
+            setListAdapter(adapter);
         }
-    };
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
+                ChannelFragmentCallback.class);
+        final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
+        if(sender != null) {
+            sender.getBus().unregister(this);
+        }
+    }
 
     @Override
     public void onResume() {
@@ -72,13 +90,9 @@ public class ChannelFragment extends IRCFragment {
 
         final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
                 ChannelFragmentCallback.class);
-        final Server server = callback.getServer(true);
-        if (server != null) {
-            final Channel channel = server.getUserChannelInterface().getChannel(title);
-            if (channel != null) {
-                writeToTextView(channel.getBuffer());
-            }
-        }
+
+        getListAdapter().notifyDataSetChanged();
+        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
     }
 
     public void onUserMention(final ArrayList<ChannelUser> users) {
@@ -87,7 +101,6 @@ public class ChannelFragment extends IRCFragment {
         for (final ChannelUser userNick : users) {
             nicks += Html.fromHtml(userNick.getPrettyNick(title)) + ": ";
         }
-
         mEditText.clearComposingText();
         mEditText.setText(nicks + text);
     }
@@ -97,9 +110,34 @@ public class ChannelFragment extends IRCFragment {
         return FragmentTypeEnum.Channel;
     }
 
-    @Override
-    public Handler getHandler() {
-        return channelFragmentHandler;
+    @Subscribe
+    public void onChannelMessage(final ChannelEvent event) {
+        if(callback == null) {
+            callback = FragmentUtils.getParent(ChannelFragment.this,
+                    ChannelFragmentCallback.class);
+        }
+        if(title.equals(event.channelName)) {
+            if(event.userListChanged) {
+                callback.updateUserList(title);
+            }
+            if((!event.userListChanged || mUserListMessagesShown)) {
+                getListAdapter().notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Subscribe
+    public void onChannelPart(final PartEvent event) {
+        if(title.equals(event.channelName)) {
+            callback.switchFragmentAndRemove(title);
+        }
+    }
+
+    @Subscribe
+    public void onUserListReceived(final UserListReceivedEvent event) {
+        if(title.equals(event.channelName)) {
+            callback.updateUserList(title);
+        }
     }
 
     @Override
@@ -116,5 +154,7 @@ public class ChannelFragment extends IRCFragment {
         public Server getServer(final boolean nullAllowed);
 
         public void switchFragmentAndRemove(final String channelName);
+
+        public String getServerTitle();
     }
 }

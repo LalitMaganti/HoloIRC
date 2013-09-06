@@ -24,6 +24,7 @@ package com.fusionx.lightirc.ui;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
 import android.text.Html;
 import android.text.util.Linkify;
 import android.view.KeyEvent;
@@ -31,58 +32,39 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;
 
-public abstract class IRCFragment extends Fragment implements TextView.OnEditorActionListener {
+public abstract class IRCFragment extends ListFragment implements TextView
+        .OnEditorActionListener {
     @Getter
     protected String title = null;
-    protected TextView mTextView = null;
     protected EditText mEditText = null;
 
     @Override
-    public View onCreateView(final LayoutInflater inflate,
-                             final ViewGroup container, final Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
+                             final Bundle savedInstanceState) {
         final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
 
-        mTextView = (TextView) rootView.findViewById(R.id.textview);
         mEditText = (EditText) rootView.findViewById(R.id.editText1);
-
         mEditText.setOnEditorActionListener(this);
 
         title = getArguments().getString("title");
 
         return rootView;
-    }
-
-    public void appendToTextView(final String text) {
-        mTextView.append(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(mTextView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
-    }
-
-    void writeToTextView(final String text) {
-        mTextView.setText(Html.fromHtml(text.replace("\n", "<br/>")));
-        Linkify.addLinks(mTextView, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        final ScrollView scrollView = (ScrollView) getView().findViewById(R.id.scrollview);
-        scrollView.post(new Runnable() {
-            public void run() {
-                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
-            }
-        });
     }
 
     public void disableEditText() {
@@ -100,15 +82,18 @@ public abstract class IRCFragment extends Fragment implements TextView.OnEditorA
                 StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
             mEditText.setText("");
-
             sendMessage(message);
+            return true;
         }
         return false;
+    }
+
+    @Override
+    public AlphaInAnimationAdapter getListAdapter() {
+        return (AlphaInAnimationAdapter) super.getListAdapter();
     }
 
     public abstract void sendMessage(final String message);
 
     public abstract FragmentTypeEnum getType();
-
-    public abstract Handler getHandler();
 }

@@ -26,7 +26,6 @@ import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -42,20 +41,26 @@ import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.EventBundleKeys;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
-import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.irc.event.ConnectedEvent;
+import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
+import com.fusionx.lightirc.irc.event.JoinEvent;
+import com.fusionx.lightirc.irc.event.MentionEvent;
+import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
+import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
+import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DecorChildLayout;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,7 +72,7 @@ import java.util.Iterator;
  * @author Lalit Maganti
  */
 public class IRCActivity extends ActionBarActivity implements UserListFragment
-        .UserListCallback, IFragmentSideHandler, ServiceFragment.ServiceFragmentCallback,
+        .UserListCallback, ServiceFragment.ServiceFragmentCallback,
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
     private ServiceFragment mServiceFragment = null;
@@ -199,44 +204,43 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
         tabs.setIndicatorColorResource(android.R.color.white);
     }
 
-    private final Handler mServerChannelHandler = new Handler() {
-        @Override
-        public void handleMessage(final Message msg) {
-            final Bundle bundle = msg.getData();
-            final ServerChannelEventTypeEnum type = (ServerChannelEventTypeEnum)
-                    bundle.getSerializable(EventBundleKeys.eventType);
-            final String message = bundle.getString(EventBundleKeys.message);
-            switch (type) {
-                case Join:
-                    mIRCPagerFragment.createChannelFragment(message, true);
-                    return;
-                case NewPrivateMessage:
-                    createPMFragment(message);
-                    return;
-                case Connected:
-                    connectedToServer();
-                    break;
-                case RetryPendingDisconnected:
-                    onDisconnect(false, true);
-                    break;
-                case FinalDisconnected:
-                    onDisconnect(bundle.getBoolean(EventBundleKeys.disconnectSentByUser, true),
-                            false);
-                    break;
-                case SwitchToServerMessage:
-                    mIRCPagerFragment.selectServerFragment();
-                    break;
-            }
-            mIRCPagerFragment.writeMessageToServer(mServerTitle, message);
-        }
-    };
+    @Subscribe
+    public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
+        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
+        onDisconnect(false, true);
+    }
+
+    @Subscribe
+    public void onFinalDisconnect(final FinalDisconnectEvent event) {
+        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
+        onDisconnect(event.disconnectExpected, false);
+    }
+
+    @Subscribe
+    public void onChannelJoin(final JoinEvent event) {
+        mIRCPagerFragment.createChannelFragment(event.channelToJoin, true);
+    }
+
+    @Subscribe
+    public void onNewPrivateMessage(final PrivateMessageEvent event) {
+        createPMFragment(event.nick);
+    }
+
+    @Subscribe
+    public void onSwitchToServer(final SwitchToServerEvent event) {
+        mIRCPagerFragment.selectServerFragment();
+        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
+    }
 
     /**
      * Method called when the server reports that it has been connected to
      */
-    private void connectedToServer() {
+    @Subscribe
+    public void onServerConnected(final ConnectedEvent event) {
         mIRCPagerFragment.connectedToServer(mServerTitle);
-        mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
+        mActionsPagerFragment.updateConnectionStatus(true);
+
+        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
     }
 
     // Options Menu stuff
@@ -410,6 +414,11 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
         }
     }
 
+    @Override
+    public void serverIsAvailable() {
+        mIRCPagerFragment.serverisAvailable(mServerTitle, getServer(false).getBuffer());
+    }
+
     // UserListFragment Listener Callbacks
 
     /**
@@ -457,24 +466,15 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
     /**
      * Start of the ServerFragment callbacks
      */
-
-    @Override
-    public Handler getServerChannelHandler() {
-        return mServerChannelHandler;
-    }
-
-    @Override
-    public Handler getFragmentHandler(String destination, FragmentTypeEnum type) {
-        return mIRCPagerFragment.getFragmentHandler(destination, type, mServerTitle);
-    }
-
     /**
      * Method called when the user nick is mentioned by another user
      *
-     * @param destination - the place from which the mention originated
+     * @param event - the event which contains the destination
      */
-    public void onMention(final String destination) {
-        final String message = String.format(getString(R.string.activity_mentioned), destination);
+    @Subscribe
+    public void onMention(final MentionEvent event) {
+        final String message = String.format(getString(R.string.activity_mentioned),
+                event.destination);
 
         final TextView textView = (TextView) mMentionView.findViewById(R.id.toast_text);
         textView.setText(message);

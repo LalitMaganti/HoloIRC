@@ -51,8 +51,8 @@ public class ServerCommandSender {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendMessage(message);
 
-                MessageSender.getSender(server.getTitle()).sendMessageToChannel(channel,
-                        server.getUser(), message);
+                MessageSender.getSender(server.getTitle()).sendMessageToChannel(server.getUser()
+                        .getNick(), channel, server.getUser().getPrettyNick(channel), message);
                 return null;
             }
         };
@@ -67,8 +67,8 @@ public class ServerCommandSender {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendAction(action);
 
-                MessageSender.getSender(server.getTitle()).sendChannelAction(channelName,
-                        server.getUser(), action);
+                MessageSender.getSender(server.getTitle()).sendChannelAction(server.getUser()
+                        .getNick(), channel,  server.getUser(), action);
                 return null;
             }
         };
@@ -177,7 +177,7 @@ public class ServerCommandSender {
         final AsyncTask<Void, Void, Void> unknownEvent = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                MessageSender.getSender(server.getTitle()).switchToServerMessage(event);
+                MessageSender.getSender(server.getTitle()).switchToServerMessage(server, event);
                 return null;
             }
         };

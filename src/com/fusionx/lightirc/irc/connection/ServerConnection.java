@@ -97,14 +97,15 @@ class ServerConnection {
 
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         while (!disconnectSent && reconnectAttempts < timesToTry) {
-            sender.sendGenericServerEvent("Trying to " +
+            sender.sendGenericServerEvent(server, "Trying to " +
                     "reconnect to the server in 5 seconds.");
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 // This interrupt will *should* only ever occur if the user explicitly kills
                 // reconnection
-                sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
+                sender.sendFinalDisconnection(server, "Disconnected from the server",
+                        disconnectSent);
                 break;
             }
             connect();
@@ -158,7 +159,7 @@ class ServerConnection {
 
             // We are connected
             server.setStatus(mContext.getString(R.string.status_connected));
-            sender.setConnected(serverConfiguration.getUrl());
+            sender.sendConnected(server, serverConfiguration.getUrl());
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
@@ -189,19 +190,21 @@ class ServerConnection {
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
                 if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
-                    sender.sendFinalDisconnection("Disconnected from the server", disconnectSent);
+                    sender.sendFinalDisconnection(server, "Disconnected from the server",
+                            disconnectSent);
                 } else {
-                    sender.sendRetryPendingServerDisconnection("Disconnected from the server");
+                    sender.sendRetryPendingServerDisconnection(server,
+                            "Disconnected from the server");
                 }
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
             if (timesToTry == reconnectAttempts + 1 || disconnectSent) {
-                sender.sendFinalDisconnection(ex.getMessage() + "\n" + "Disconnected" +
+                sender.sendFinalDisconnection(server, ex.getMessage() + "<br/>" + "Disconnected" +
                         " from the server", disconnectSent);
             } else {
-                sender.sendRetryPendingServerDisconnection(ex.getMessage());
+                sender.sendRetryPendingServerDisconnection(server, ex.getMessage());
             }
         }
         // We are disconnected :( - close up shop

@@ -25,34 +25,41 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.ChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.EventBundleKeys;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.constants.ServerChannelEventTypeEnum;
-import com.fusionx.lightirc.constants.ServerEventTypeEnum;
-import com.fusionx.lightirc.constants.UserEventTypeEnum;
-import com.fusionx.lightirc.interfaces.IFragmentSideHandler;
-import com.fusionx.lightirc.interfaces.IIRCSideHandler;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.lightirc.irc.PrivateMessageUser;
+import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.User;
+import com.fusionx.lightirc.irc.event.ChannelEvent;
+import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
+import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
+import com.fusionx.lightirc.irc.event.UserEvent;
+import com.fusionx.lightirc.irc.event.PartEvent;
+import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
+import com.fusionx.lightirc.irc.event.ConnectedEvent;
+import com.fusionx.lightirc.irc.event.ServerEvent;
+import com.fusionx.lightirc.irc.event.JoinEvent;
+import com.fusionx.lightirc.irc.event.MentionEvent;
+import com.fusionx.lightirc.irc.event.NickInUseEvent;
+import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
+import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.ui.IRCActivity;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
-import java.util.LinkedHashMap;
-
-import lombok.NonNull;
+import java.util.HashMap;
 
 public class MessageSender {
-    private static LinkedHashMap<String, MessageSender> mHashMap = new LinkedHashMap<>();
+    private static final HashMap<String, MessageSender> mSenderMap = new HashMap<>();
+
     private Context mContext;
-    private boolean mToast;
+    private boolean mDisplayed;
+    private Bus mBus;
+    private String mServerName;
 
     private MessageSender() {
     }
@@ -61,111 +68,73 @@ public class MessageSender {
         mContext = context;
     }
 
-    public static MessageSender getSender(final String serverName) {
-        MessageSender handler = mHashMap.get(serverName);
-        if (handler == null) {
-            handler = new MessageSender();
-            mHashMap.put(serverName, handler);
+    public static MessageSender getSender(final String serverName, final boolean nullable) {
+        synchronized (mSenderMap) {
+            MessageSender sender = mSenderMap.get(serverName);
+            if (sender == null && !nullable) {
+                sender = new MessageSender();
+                sender.mServerName = serverName;
+                mSenderMap.put(serverName, sender);
+            }
+            return sender;
         }
-        return handler;
     }
 
-    private IIRCSideHandler ircSideHandlerInterface;
-    private IFragmentSideHandler fragmentSideHandlerInterface;
-
-    /*
-    Start of registers
-     */
-    public void registerIRCSideHandlerInterface(final IIRCSideHandler handlerInterface) {
-        ircSideHandlerInterface = handlerInterface;
+    public static MessageSender getSender(final String serverName) {
+        return getSender(serverName, false);
     }
 
-    public void registerServerChannelHandler(final IFragmentSideHandler handlerInterface) {
-        fragmentSideHandlerInterface = handlerInterface;
+    public static void clear() {
+        synchronized (mSenderMap) {
+            mSenderMap.clear();
+        }
     }
 
-    /*
-    Start of deregister
-     */
-    public void unregisterIRCSideHandlerInterface(final String serverName) {
-        ircSideHandlerInterface = null;
-        mHashMap.remove(serverName);
+    public static void removeSender(final String serverName) {
+        synchronized (mSenderMap) {
+            mSenderMap.remove(serverName);
+        }
     }
 
-    public void unregisterFragmentSideHandlerInterface() {
-        fragmentSideHandlerInterface = null;
+    public Bus getBus() {
+        if (mBus == null) {
+            mBus = new IRCBus(ThreadEnforcer.ANY);
+        }
+        return mBus;
     }
 
-    public void receiveMentionAsToast(final boolean toast) {
-        mToast = toast;
+    public void setDisplayed(final boolean toast) {
+        mDisplayed = toast;
     }
 
     /*
     Start of sending messages
      */
-    private void sendServerChannelMessage(final Bundle event) {
-        final Message message = Message.obtain();
-        message.setData(event);
-        ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
 
-        if (fragmentSideHandlerInterface != null) {
-            final Message fragmentMessage = Message.obtain();
-            fragmentMessage.setData(event);
-            fragmentSideHandlerInterface.getServerChannelHandler().sendMessage(fragmentMessage);
+    private void sendServerEvent(final Server server, final ServerEvent event) {
+        // Append to buffer in the channel
+        server.onServerEvent(event);
+        // Send message to the fragment if it exists
+        if(mDisplayed) {
+            mBus.post(event);
         }
     }
 
-    private void sendServerMessage(final Bundle event) {
-        final Message message = Message.obtain();
-        message.setData(event);
-        ircSideHandlerInterface.getServerHandler().dispatchMessage(message);
-
-        if (fragmentSideHandlerInterface != null) {
-            final Handler handler = fragmentSideHandlerInterface.getFragmentHandler(null,
-                    FragmentTypeEnum.Server);
-            if (handler != null) {
-                final Message fragmentMessage = Message.obtain();
-                fragmentMessage.setData(event);
-                handler.sendMessage(fragmentMessage);
-            }
+    private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
+        // Append to buffer in the channel
+        channel.onChannelEvent(event);
+        // Send message to the fragment if it exists
+        if(mDisplayed) {
+            mBus.post(event);
         }
     }
 
-    private void sendChannelMessage(final Bundle event) {
-        final String destination = event.getString(EventBundleKeys.destination);
-
-        final Message message = Message.obtain();
-        message.setData(event);
-        final Handler handler = ircSideHandlerInterface.getChannelHandler(destination);
-        handler.dispatchMessage(message);
-
-        if (fragmentSideHandlerInterface != null) {
-            final Handler fragmentHandler = fragmentSideHandlerInterface.getFragmentHandler
-                    (destination, FragmentTypeEnum.Channel);
-            if (fragmentHandler != null) {
-                final Message fragmentMessage = Message.obtain();
-                fragmentMessage.setData(event);
-                fragmentHandler.sendMessage(fragmentMessage);
-            }
-        }
-    }
-
-    private void sendUserMessage(final Bundle event) {
-        final String destination = event.getString(EventBundleKeys.destination);
-
-        final Message message = Message.obtain();
-        message.setData(event);
-        final Handler handler = ircSideHandlerInterface.getUserHandler(destination);
-        handler.dispatchMessage(message);
-
-        if (fragmentSideHandlerInterface != null) {
-            final Handler fragmentHandler = fragmentSideHandlerInterface.getFragmentHandler
-                    (destination, FragmentTypeEnum.User);
-            if (fragmentHandler != null) {
-                final Message fragmentMessage = Message.obtain();
-                fragmentMessage.setData(event);
-                fragmentHandler.sendMessage(fragmentMessage);
-            }
+    private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
+        // Append to buffer in the channel
+        user.onUserEvent(event);
+        // Send message to the fragment if it exists
+        if(mDisplayed) {
+            mBus.post(event);
         }
     }
 
@@ -174,81 +143,69 @@ public class MessageSender {
      */
 
     // Generic events start
-    public void sendGenericServerEvent(final String message) {
-        final Bundle joinEvent = parcelDataForBroadcast(null,
-                ServerEventTypeEnum.Generic, message);
-        sendServerMessage(joinEvent);
+    public void sendGenericServerEvent(final Server server, final String message) {
+        final ServerEvent event = new ServerEvent(message);
+        sendServerEvent(server, event);
     }
 
-    public void sendGenericChannelEvent(final String channelName, final String message) {
-        final Bundle privateMessageEvent = parcelDataForBroadcast(channelName,
-                ChannelEventTypeEnum.Generic, message);
-        sendChannelMessage(privateMessageEvent);
+    public void sendGenericChannelEvent(final Channel channel, final String message,
+                                        final boolean userListChanged) {
+        final ChannelEvent event = new ChannelEvent(channel.getName(), message,
+                userListChanged);
+        sendChannelEvent(channel, event);
     }
 
-    public void sendGenericUserListChangedEvent(final String channelName, final String message) {
-        final Bundle genericEvent = parcelDataForBroadcast(channelName,
-                ChannelEventTypeEnum.UserListChanged, message);
-        sendChannelMessage(genericEvent);
-    }
-
-    private void sendGenericUserEvent(final String nick, final String message) {
-        final Bundle privateMessageEvent = parcelDataForBroadcast(nick, UserEventTypeEnum.Generic,
-                message);
-        sendUserMessage(privateMessageEvent);
+    private void sendGenericUserEvent(final PrivateMessageUser user, final String message) {
+        final UserEvent privateMessageEvent = new UserEvent(user.getNick(), message);
+        sendUserEvent(user, privateMessageEvent);
     }
     // Generic events end
 
-    public void sendServerConnection(final String connectionLine) {
-        final Bundle connectEvent = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.Connected, connectionLine);
-        sendServerChannelMessage(connectEvent);
-    }
-
-    public void sendFinalDisconnection(final String disconnectLine,
+    public void sendFinalDisconnection(final Server server, final String disconnectLine,
                                        final boolean expectedDisconnect) {
-        final Bundle disconnectEvent = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.FinalDisconnected, disconnectLine);
-        disconnectEvent.putBoolean(EventBundleKeys.disconnectSentByUser, expectedDisconnect);
-        sendServerChannelMessage(disconnectEvent);
+        final FinalDisconnectEvent event = new FinalDisconnectEvent(expectedDisconnect,
+                disconnectLine);
+        sendServerEvent(server, event);
     }
 
-    public void sendRetryPendingServerDisconnection(final String disconnectLine) {
-        final Bundle disconnectEvent = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.RetryPendingDisconnected, disconnectLine);
-        sendServerChannelMessage(disconnectEvent);
+    public void sendRetryPendingServerDisconnection(final Server server,
+                                                    final String disconnectLine) {
+        final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
+        sendServerEvent(server, event);
     }
 
     public void sendChanelJoined(final String channelName) {
-        final Bundle joinEvent = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.Join, channelName);
-        sendServerChannelMessage(joinEvent);
+        if(mDisplayed) {
+            mBus.post(new JoinEvent(channelName));
+        }
     }
 
     public void sendChanelParted(final String channelName) {
-        final Bundle partEvent = parcelDataForBroadcast(channelName,
-                ChannelEventTypeEnum.UserParted, channelName);
-        sendChannelMessage(partEvent);
+        if(mDisplayed) {
+            mBus.post(new PartEvent(channelName));
+        }
     }
 
-    public void sendPrivateAction(final String actionDestination, final User sendingUser,
+    public void sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
                                   final String rawAction) {
         String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
         // TODO - change this to be specific for PMs
-        mention(actionDestination);
-        sendGenericUserEvent(actionDestination, message);
+        if(sendingUser.equals(user)) {
+            mention(user.getNick());
+        }
+        sendGenericUserEvent(user, message);
     }
 
-    public void sendChannelAction(final String actionDestination, final ChannelUser sendingUser,
-                                  final String rawAction) {
+    public void sendChannelAction(final String userNick, final Channel channel,
+                                  final ChannelUser sendingUser, final String rawAction) {
         String finalMessage = String.format(mContext.getString(R.string.parser_action),
-                sendingUser.getPrettyNick(actionDestination), rawAction);
-        if (rawAction.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
-            mention(actionDestination);
+                sendingUser.getPrettyNick(channel), rawAction);
+        if (rawAction.toLowerCase().contains(userNick.toLowerCase())) {
+            mention(channel.getName());
             finalMessage = "<b>" + finalMessage + "</b>";
         }
-        sendGenericChannelEvent(actionDestination, finalMessage);
+        sendGenericChannelEvent(channel, finalMessage, false);
     }
 
     /**
@@ -256,86 +213,60 @@ public class MessageSender {
      * <p/>
      * Method should not be used from anywhere but the Server class.
      *
-     * @param messageDestination - the nick name of the destination user
+     * @param user - the destination user object
      * @param sending            - the user who is sending the message - it may be us or it may
      *                           be the other user
      * @param rawMessage         - the message being sent
      */
-    public void sendPrivateMessage(final String messageDestination, final User sending,
+    public void sendPrivateMessage(final PrivateMessageUser user, final User sending,
                                    final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getColorfulNick(), rawMessage);
         // TODO - change this to be specific for PMs
-        mention(messageDestination);
-        sendGenericUserEvent(messageDestination, message);
+        mention(user.getNick());
+        sendGenericUserEvent(user, message);
     }
 
-    public void sendMessageToChannel(final Channel channel, final ChannelUser sending,
-                                     final String rawMessage) {
+    public void sendMessageToChannel(final String userNick, final Channel channel,
+                                     final String sendingNick, final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
-                sending.getPrettyNick(channel), rawMessage);
-        if (rawMessage.toLowerCase().contains(ircSideHandlerInterface.getNick().toLowerCase())) {
+                sendingNick, rawMessage);
+        if (rawMessage.toLowerCase().contains(userNick.toLowerCase())) {
             mention(channel.getName());
             preMessage = "<b>" + preMessage + "</b>";
         }
-        sendGenericChannelEvent(channel.getName(), preMessage);
+        sendGenericChannelEvent(channel, preMessage, false);
     }
 
-    public void sendNickInUseMessage() {
-        final Bundle event = parcelDataForBroadcast(null,
-                ServerEventTypeEnum.NickInUse, mContext.getString(R.string.parser_nick_in_use));
-        sendServerMessage(event);
+    public void sendNickInUseMessage(final Server server) {
+        final NickInUseEvent event = new NickInUseEvent(mContext);
+        sendServerEvent(server, event);
     }
 
-    public void switchToServerMessage(final String message) {
-        final Bundle event = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.SwitchToServerMessage, message);
-        sendServerChannelMessage(event);
+    public void switchToServerMessage(final Server server, final String message) {
+        final SwitchToServerEvent event = new SwitchToServerEvent(message);
+        sendServerEvent(server, event);
     }
 
-    public void userListReceived(final String channelName) {
-        final Bundle event = parcelDataForBroadcast(channelName,
-                ChannelEventTypeEnum.UserListReceived);
-        sendChannelMessage(event);
+    public void sendUserListReceived(final Channel channel) {
+        final UserListReceivedEvent event = new UserListReceivedEvent(channel.getName());
+        sendChannelEvent(channel, event);
     }
 
     public void sendNewPrivateMessage(final String nick) {
-        final Bundle event = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.NewPrivateMessage, nick);
-        sendServerChannelMessage(event);
+        if(mDisplayed) {
+            mBus.post(new PrivateMessageEvent(nick));
+        }
     }
 
-    public void setConnected(final String url) {
-        final Bundle event = parcelDataForBroadcast(null,
-                ServerChannelEventTypeEnum.Connected, String.format(mContext
-                .getString(R.string.parser_connected), url));
-        sendServerChannelMessage(event);
-    }
-
-    public Bundle parcelDataForBroadcast(final String destination,
-                                         @NonNull final Enum type,
-                                         @NonNull final String... message) {
-        final Bundle event = new Bundle();
-        if (destination != null) {
-            event.putString(EventBundleKeys.destination, destination);
-        }
-        event.putSerializable(EventBundleKeys.eventType, type);
-        if (message.length > 0) {
-            event.putString(EventBundleKeys.message, message[0]);
-        }
-
-        return event;
+    public void sendConnected(final Server server, final String url) {
+        final ConnectedEvent event = new ConnectedEvent(mContext, url);
+        sendServerEvent(server, event);
     }
 
     public void mention(final String messageDestination) {
-        if (mToast && fragmentSideHandlerInterface != null) {
-            final Handler mainHandler = new Handler(mContext.getMainLooper());
-            mainHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    fragmentSideHandlerInterface.onMention(messageDestination);
-                }
-            });
+        if (mDisplayed) {
+            mBus.post(new MentionEvent(messageDestination));
         } else {
             final NotificationManager mNotificationManager =
                     (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -348,7 +279,7 @@ public class MessageSender {
                     .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
                             messageDestination);
             final Intent mIntent = new Intent(mContext, IRCActivity.class);
-            mIntent.putExtra("serverTitle", ircSideHandlerInterface.getTitle());
+            mIntent.putExtra("serverTitle", mServerName);
             mIntent.putExtra("mention", messageDestination);
             final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
             taskStackBuilder.addParentStack(IRCActivity.class);

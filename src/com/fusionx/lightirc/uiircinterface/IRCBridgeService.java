@@ -35,6 +35,8 @@ import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.connection.ConnectionManager;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.ui.ServerListActivity;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -102,8 +104,7 @@ public class IRCBridgeService extends Service {
         }
 
         if (serverDisplayed != null) {
-            final Intent intent = new Intent(this,
-                    ServerListActivity.class);
+            final Intent intent = new Intent(this, ServerListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
             serverDisplayed = null;
@@ -115,6 +116,7 @@ public class IRCBridgeService extends Service {
     public void onDisconnect(final String serverName) {
         if (connectionManager.containsKey(serverName)) {
             connectionManager.remove(serverName);
+            MessageSender.removeSender(serverName);
             if (connectionManager.isEmpty()) {
                 stopForeground(true);
             } else {
