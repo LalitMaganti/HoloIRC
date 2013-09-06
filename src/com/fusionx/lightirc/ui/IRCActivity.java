@@ -72,9 +72,9 @@ import java.util.Iterator;
  *
  * @author Lalit Maganti
  */
-public class IRCActivity extends ActionBarActivity implements UserListFragment
-        .UserListCallback, ServiceFragment.ServiceFragmentCallback,
-        ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
+public class IRCActivity extends ActionBarActivity implements UserListFragment.UserListCallback,
+        ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
+                .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
     private ServiceFragment mServiceFragment = null;
     private UserListFragment mUserListFragment = null;
@@ -145,7 +145,8 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
             mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
             mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
             mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
-            mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+            mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+            mUserSlidingMenu.setTouchmodeMarginThreshold(10);
             mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
             mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
         }
@@ -158,6 +159,12 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
             ft.hide(mUserListFragment);
             ft.commit();
         } else {
+            mUserSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+                @Override
+                public void onOpen() {
+                    mUserListFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
+                }
+            });
             mUserSlidingMenu.setOnCloseListener(mUserListFragment);
         }
 
@@ -283,9 +290,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
                 mActionsSlidingMenu.toggle();
                 return true;
             case R.id.activity_server_channel_ab_users:
-                if (!mUserSlidingMenu.isMenuShowing()) {
-                    mUserListFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
-                }
                 mUserSlidingMenu.toggle();
                 return true;
             default:
@@ -525,6 +529,8 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
 
             mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
                     .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
+            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
+                    .TOUCHMODE_NONE : SlidingMenu.TOUCHMODE_MARGIN);
 
             mIRCPagerFragment.setCurrentItemIndex(position);
         }

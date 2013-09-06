@@ -22,8 +22,8 @@ public abstract class TwoWayHashSet<A extends Updateable, B extends Updateable> 
     }
 
     protected synchronized void addAToB(A objectA, B objectB) {
-        UpdateableTreeSet<A> listofA;
-        if ((listofA = bToAMap.get(objectB)) == null) {
+        UpdateableTreeSet<A> listofA = bToAMap.get(objectB);
+        if (listofA == null) {
             listofA = new UpdateableTreeSet<>();
             bToAMap.put(objectB, listofA);
         }
@@ -31,8 +31,8 @@ public abstract class TwoWayHashSet<A extends Updateable, B extends Updateable> 
     }
 
     protected synchronized void addBToA(A objectA, B objectB) {
-        UpdateableTreeSet<B> list;
-        if ((list = aToBMap.get(objectA)) == null) {
+        UpdateableTreeSet<B> list = aToBMap.get(objectA);
+        if (list == null) {
             list = new UpdateableTreeSet<>();
             aToBMap.put(objectA, list);
         }
@@ -40,17 +40,19 @@ public abstract class TwoWayHashSet<A extends Updateable, B extends Updateable> 
     }
 
     protected synchronized void decouple(final A objectA, final B objectB) {
-        // Needs an inexpensive way to check whether the objects are coupled
-        // or if the objects exist at all in the maps
         final Set<B> setOfB = aToBMap.get(objectA);
-        setOfB.remove(objectB);
-        if (setOfB.isEmpty()) {
-            aToBMap.remove(objectA);
+        if(setOfB != null) {
+            setOfB.remove(objectB);
+            if (setOfB.isEmpty()) {
+                aToBMap.remove(objectA);
+            }
         }
         final Set<A> setOfA = bToAMap.get(objectB);
-        setOfA.remove(objectA);
-        if (setOfA.isEmpty()) {
-            bToAMap.remove(objectB);
+        if(setOfA != null) {
+            setOfA.remove(objectA);
+            if (setOfA.isEmpty()) {
+                bToAMap.remove(objectB);
+            }
         }
     }
 
