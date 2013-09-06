@@ -26,10 +26,10 @@
         </activity>
         <activity
                 android:name=".ui.IRCActivity"
-                android:parentActivityName=".ui.IRCActivity">
+                android:parentActivityName=".ui.ServerListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.IRCActivity"/>
+                    android:value=".ui.ServerListActivity"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
