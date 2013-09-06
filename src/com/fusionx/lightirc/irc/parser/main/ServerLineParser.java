@@ -101,7 +101,7 @@ public class ServerLineParser {
                     codeParser.parseCode(parsedArray);
                     return false;
                 } else {
-                    return commandParser.parseCommand(parsedArray, line, disconnectSent);
+                    return commandParser.parseCommand(parsedArray, line);
                 }
         }
     }

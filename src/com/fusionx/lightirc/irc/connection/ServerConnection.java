@@ -209,6 +209,7 @@ class ServerConnection {
         }
         // We are disconnected :( - close up shop
         server.setStatus(mContext.getString(R.string.status_disconnected));
+        server.cleanup();
         closeSocket();
     }
 

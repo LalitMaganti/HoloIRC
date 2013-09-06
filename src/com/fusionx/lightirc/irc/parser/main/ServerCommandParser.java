@@ -62,8 +62,7 @@ public class ServerCommandParser {
     }
 
     // The server is sending a command to us - parse what it is
-    boolean parseCommand(final ArrayList<String> parsedArray, final String rawLine,
-                         final boolean disconnectSent) {
+    boolean parseCommand(final ArrayList<String> parsedArray, final String rawLine) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -91,7 +90,7 @@ public class ServerCommandParser {
                 }
                 return false;
             case ServerCommands.Part:
-                parseChannelPart(parsedArray, rawSource, disconnectSent);
+                parseChannelPart(parsedArray, rawSource);
                 return false;
             case ServerCommands.Mode:
                 parseModeChange(parsedArray, rawSource);
@@ -256,17 +255,15 @@ public class ServerCommandParser {
             mSender.sendGenericChannelEvent(channel,
                     String.format(mContext
                             .getString(R.string.parser_joined_channel), user.getPrettyNick(channel)), true);
-            //user.getWriter().sendWho();
         }
     }
 
-    private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource,
-                                  final boolean disconnectSent) {
+    private void parseChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
 
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        if (user.equals(mServer.getUser()) && !disconnectSent) {
+        if (user.equals(mServer.getUser())) {
             mSender.sendChanelParted(channel.getName());
             mUserChannelInterface.removeChannel(channel);
         } else {

@@ -165,25 +165,31 @@ public class MessageSender {
                                        final boolean expectedDisconnect) {
         final FinalDisconnectEvent event = new FinalDisconnectEvent(expectedDisconnect,
                 disconnectLine);
-        sendServerEvent(server, event);
+        // Append to buffer in the channel
+        server.onServerEvent(event);
+        // Send message to the fragment if it exists
+        mBus.post(event);
     }
 
     public void sendRetryPendingServerDisconnection(final Server server,
                                                     final String disconnectLine) {
         final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
-        sendServerEvent(server, event);
+        // Append to buffer in the channel
+        server.onServerEvent(event);
+        // Send message to the fragment if it exists
+        mBus.post(event);
+    }
+
+    public void sendNewPrivateMessage(final String nick) {
+        mBus.post(new PrivateMessageEvent(nick));
     }
 
     public void sendChanelJoined(final String channelName) {
-        if(mDisplayed) {
-            mBus.post(new JoinEvent(channelName));
-        }
+        mBus.post(new JoinEvent(channelName));
     }
 
     public void sendChanelParted(final String channelName) {
-        if(mDisplayed) {
-            mBus.post(new PartEvent(channelName));
-        }
+        mBus.post(new PartEvent(channelName));
     }
 
     public void sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
@@ -251,12 +257,6 @@ public class MessageSender {
     public void sendUserListReceived(final Channel channel) {
         final UserListReceivedEvent event = new UserListReceivedEvent(channel.getName());
         sendChannelEvent(channel, event);
-    }
-
-    public void sendNewPrivateMessage(final String nick) {
-        if(mDisplayed) {
-            mBus.post(new PrivateMessageEvent(nick));
-        }
     }
 
     public void sendConnected(final Server server, final String url) {

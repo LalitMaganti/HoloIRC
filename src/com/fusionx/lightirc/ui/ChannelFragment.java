@@ -127,13 +127,6 @@ public class ChannelFragment extends IRCFragment {
     }
 
     @Subscribe
-    public void onChannelPart(final PartEvent event) {
-        if(title.equals(event.channelName)) {
-            callback.switchFragmentAndRemove(title);
-        }
-    }
-
-    @Subscribe
     public void onUserListReceived(final UserListReceivedEvent event) {
         if(title.equals(event.channelName)) {
             callback.updateUserList(title);

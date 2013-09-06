@@ -52,6 +52,7 @@ import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.JoinEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
+import com.fusionx.lightirc.irc.event.PartEvent;
 import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
@@ -219,6 +220,11 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment
     @Subscribe
     public void onChannelJoin(final JoinEvent event) {
         mIRCPagerFragment.createChannelFragment(event.channelToJoin, true);
+    }
+
+    @Subscribe
+    public void onChannelPart(final PartEvent event) {
+        mIRCPagerFragment.switchFragmentAndRemove(event.channelName);
     }
 
     @Subscribe

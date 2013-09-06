@@ -44,16 +44,13 @@ import lombok.NonNull;
 public class Server {
     private ServerWriter writer;
     private UserChannelInterface userChannelInterface;
-
-    private final String title;
     private AppUser user;
 
-    @Getter
     protected ArrayList<String> buffer = new ArrayList<>();
 
     private String status = "Disconnected";
-    private String MOTD = "";
 
+    private final String title;
     private final ConnectionWrapper mWrapper;
     private final Context mContext;
 
@@ -130,5 +127,11 @@ public class Server {
     @Override
     public String toString() {
         return "HoloIRC " + MiscUtils.getAppVersion(mContext) + " Android IRC client";
+    }
+
+    public void cleanup() {
+        writer = null;
+        userChannelInterface = null;
+        user = null;
     }
 }

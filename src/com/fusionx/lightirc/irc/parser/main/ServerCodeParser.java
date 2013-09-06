@@ -51,7 +51,6 @@ import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
 import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
 public class ServerCodeParser {
-    private final StringBuilder mStringBuilder = new StringBuilder();
     private final WhoParser mWhoParser;
     private final UserChannelInterface mUserChannelInterface;
     private final Context mContext;
@@ -86,17 +85,16 @@ public class ServerCodeParser {
                 // TODO - maybe try to use this rather than WHO replies in the future?
                 return;
             case RPL_MOTDSTART:
-                mStringBuilder.setLength(0);
-                // Fall through here to RPL_MOTD case is intentional
             case RPL_MOTD:
                 final String motdline = message.substring(1).trim();
                 if (motdAllowed) {
                     mSender.sendGenericServerEvent(mServer, motdline);
                 }
-                mStringBuilder.append(motdline).append("<br/>");
                 return;
             case RPL_ENDOFMOTD:
-                parseMOTDFinished(message);
+                if (motdAllowed) {
+                    mSender.sendGenericServerEvent(mServer, message);
+                }
                 return;
             case RPL_TOPIC:
                 parseTopicReply(parsedArray);
@@ -152,22 +150,6 @@ public class ServerCodeParser {
         } else if(DEBUG) {
             // Not sure what to do here - TODO
             Log.v(LOG_TAG, message);
-        }
-    }
-
-    /**
-     * Packs up MOTD, adds it to the server details and sends a generic server event (if allowed)
-     *
-     * @param message - the final line of the MOTD command
-     */
-    private void parseMOTDFinished(String message) {
-        mStringBuilder.append(message);
-
-        final String MOTD = mStringBuilder.toString().trim();
-        mServer.setMOTD(MOTD);
-
-        if (motdAllowed) {
-            mSender.sendGenericServerEvent(mServer, message);
         }
     }
 }
