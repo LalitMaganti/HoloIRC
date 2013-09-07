@@ -22,18 +22,14 @@
 package com.fusionx.lightirc.ui;
 
 import android.app.Activity;
-import android.os.Bundle;
 import android.text.Html;
-import android.view.View;
 
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
-import com.fusionx.lightirc.irc.event.PartEvent;
 import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.uiircinterface.MessageParser;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
@@ -53,32 +49,17 @@ public class ChannelFragment extends IRCFragment {
         super.onAttach(activity);
 
         mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(getActivity());
-    }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if(getListAdapter() == null) {
-            final ChannelFragment.ChannelFragmentCallback callback = FragmentUtils.getParent(this,
-                    ChannelFragment.ChannelFragmentCallback.class);
-            final Server server = callback.getServer(true);
-            final Channel channel = server.getUserChannelInterface().getChannel(title);
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new IRCMessageAdapter
-                    (getActivity(), channel.getBuffer()));
-
-            adapter.setAbsListView(getListView());
-            setListAdapter(adapter);
+        if(callback == null) {
+            callback = FragmentUtils.getParent(ChannelFragment.this,
+                    ChannelFragmentCallback.class);
         }
-        getListAdapter().notifyDataSetChanged();
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
-                ChannelFragmentCallback.class);
         final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
         if(sender != null) {
             sender.getBus().unregister(this);
@@ -89,11 +70,19 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
-                ChannelFragmentCallback.class);
-        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
+        if(getListAdapter() == null) {
+            final Server server = callback.getServer(true);
+            final Channel channel = server.getUserChannelInterface().getChannel(title);
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
+                    IRCMessageAdapter(getActivity(), channel.getBuffer()));
 
-        getListAdapter().notifyDataSetChanged();
+            adapter.setAbsListView(getListView());
+            setListAdapter(adapter);
+        } else {
+            getListAdapter().notifyDataSetChanged();
+        }
+
+        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
     }
 
     public void onUserMention(final ArrayList<ChannelUser> users) {
@@ -103,7 +92,7 @@ public class ChannelFragment extends IRCFragment {
             nicks += Html.fromHtml(userNick.getPrettyNick(title)) + ": ";
         }
         mEditText.clearComposingText();
-        mEditText.setText(nicks + text);
+        mEditText.append(nicks + text);
     }
 
     @Override
@@ -113,10 +102,6 @@ public class ChannelFragment extends IRCFragment {
 
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if(callback == null) {
-            callback = FragmentUtils.getParent(ChannelFragment.this,
-                    ChannelFragmentCallback.class);
-        }
         if(title.equals(event.channelName)) {
             if(event.userListChanged) {
                 callback.updateUserList(title);
@@ -129,15 +114,13 @@ public class ChannelFragment extends IRCFragment {
 
     @Subscribe
     public void onUserListReceived(final UserListReceivedEvent event) {
-        if(title.equals(event.channelName)) {
+        if(event.channelName.equals(title)) {
             callback.updateUserList(title);
         }
     }
 
     @Override
     public void sendMessage(final String message) {
-        final ChannelFragmentCallback callback = FragmentUtils.getParent(this,
-                ChannelFragmentCallback.class);
         MessageParser.channelMessageToParse(getActivity(), callback.getServer(false), title,
                 message);
     }

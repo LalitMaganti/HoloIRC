@@ -22,9 +22,10 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Server;
@@ -37,22 +38,15 @@ import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationA
 import com.squareup.otto.Subscribe;
 
 public class ServerFragment extends IRCFragment {
+    private boolean mRegistered = false;
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final ServerFragmentCallback callback = FragmentUtils.getParent(this,
+        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
-        final Server server = callback.getServer(true);
-        if(server != null && getListAdapter() == null) {
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
-                    IRCMessageAdapter(getActivity(), server.getBuffer()));
-            adapter.setAbsListView(getListView());
-            setListAdapter(adapter);
-        }
-        if(getListAdapter() != null) {
-            getListAdapter().notifyDataSetChanged();
-        }
+        mEditText.setEnabled(callback.isConnectedToServer());
     }
 
     @Override
@@ -61,9 +55,8 @@ public class ServerFragment extends IRCFragment {
 
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
-        final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
-        if(sender != null) {
-            sender.getBus().unregister(this);
+        if(mRegistered) {
+            MessageSender.getSender(callback.getServerTitle()).getBus().unregister(this);
         }
     }
 
@@ -71,9 +64,18 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
+        final ServerFragmentCallback callback = FragmentUtils.getParent(this,
                 ServerFragmentCallback.class);
-        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
+        if(!mRegistered) {
+            MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
+        }
+        final Server server = callback.getServer(true);
+        if(server != null && getListAdapter() == null) {
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
+                    IRCMessageAdapter(getActivity(), server.getBuffer()));
+            adapter.setAbsListView(getListView());
+            setListAdapter(adapter);
+        }
         if(getListAdapter() != null) {
             getListAdapter().notifyDataSetChanged();
         }
@@ -97,6 +99,8 @@ public class ServerFragment extends IRCFragment {
         public void selectServerFragment();
 
         public String getServerTitle();
+
+        public boolean isConnectedToServer();
     }
 
     @Override

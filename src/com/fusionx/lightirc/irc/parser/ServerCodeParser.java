@@ -138,7 +138,7 @@ public class ServerCodeParser {
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         //channel.setTopicSetter(nick);
 
-        mSender.sendGenericChannelEvent(channel,
+        mSender.sendGenericChannelEvent(mServer, channel,
                 String.format(mContext.getString(R
                         .string.parser_new_topic), channel.getTopic(),
                         nick), false);

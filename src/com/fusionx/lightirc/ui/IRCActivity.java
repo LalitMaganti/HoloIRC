@@ -23,7 +23,6 @@ package com.fusionx.lightirc.ui;
 
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -265,7 +264,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     public void onServerConnected(final ConnectedEvent event) {
         mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
 
-        mIRCPagerFragment.connectedToServer(mServerTitle);
+        mIRCPagerFragment.connectedToServer();
         mActionsPagerFragment.updateConnectionStatus(true);
     }
 
@@ -393,15 +392,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     public void onDisconnect(final boolean expected, final boolean retryPending) {
         if (expected && !retryPending) {
             if (getServer(true) != null) {
-                final AsyncTask<Void, Void, Void> disconnect = new AsyncTask<Void,
-                        Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        mServiceFragment.removeServiceReference(mServerTitle);
-                        return null;
-                    }
-                };
-                disconnect.execute();
+                mServiceFragment.removeServiceReference(mServerTitle);
             }
             final Intent intent = new Intent(this, ServerListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -415,35 +406,15 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             mIRCPagerFragment.onUnexpectedDisconnect();
 
             if (getServer(true) != null) {
-                final AsyncTask<Void, Void, Void> unexpectedDisconnect = new AsyncTask<Void,
-                        Void, Void>() {
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        mServiceFragment.removeServiceReference(mServerTitle);
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
-                    }
-                };
-                unexpectedDisconnect.execute();
-            } else {
-                mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
+                mServiceFragment.removeServiceReference(mServerTitle);
             }
+            mActionsPagerFragment.updateConnectionStatus(false);
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    @Override
-    public void serverIsAvailable() {
-        mIRCPagerFragment.serverisAvailable(mServerTitle, getServer(false).getBuffer());
-    }
-
     // UserListFragment Listener Callbacks
-
     /**
      * Method which is called when the user requests a mention from
      * the UserListFragment

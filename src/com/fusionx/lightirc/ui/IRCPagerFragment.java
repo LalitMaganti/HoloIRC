@@ -142,6 +142,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return mCallback.getServerTitle();
     }
 
+    @Override
+    public boolean isConnectedToServer() {
+        return mCallback.isConnectedToServer();
+    }
+
     /**
      * Method called when a new ChannelFragment is to be created
      *
@@ -206,9 +211,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return mCallback.getServer(nullAllowed);
     }
 
-    public void connectedToServer(final String serverTitle) {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
-                FragmentTypeEnum.Server);
+    public void connectedToServer() {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getItem(0);
         fragment.onConnectedToServer();
     }
 
@@ -220,22 +224,13 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         }
     }
 
-    public void serverisAvailable(final String serverTitle, final ArrayList<Spanned> buffer) {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
-                FragmentTypeEnum.Server);
-        if (fragment != null && fragment.getListAdapter() == null) {
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
-                    IRCMessageAdapter(getActivity(), buffer));
-            adapter.setAbsListView(fragment.getListView());
-            fragment.setListAdapter(adapter);
-        }
-    }
-
     public interface IRCPagerInterface {
         public void onUserListChanged(String channelName);
 
         public Server getServer(boolean nullAllowed);
 
         public String getServerTitle();
+
+        public boolean isConnectedToServer();
     }
 }

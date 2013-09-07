@@ -111,33 +111,35 @@ public class MessageSender {
     Start of sending messages
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
-        if(mDisplayed) {
+        //if(mDisplayed) {
             // Send message to the fragment if it exists
             mBus.post(server, event);
-        } else {
+        //} else {
             // Append to buffer in the channel
-            server.onServerEvent(event);
-        }
+        //    server.onServerEvent(event);
+        //}
     }
 
-    private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
-        if(mDisplayed) {
+    private void sendChannelEvent(final Server server, final Channel channel,
+                                  final ChannelEvent event) {
+        //if(mDisplayed) {
             // Send message to the fragment if it exists
-            mBus.post(channel, event);
-        } else {
+            mBus.post(server, channel, event);
+        //} else {
             // Append to buffer in the channel
-            channel.onChannelEvent(event);
-        }
+        //    channel.onChannelEvent(event);
+        //}
     }
 
-    private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
-        if(mDisplayed) {
+    private void sendUserEvent(final Server server, final PrivateMessageUser user,
+                               final UserEvent event) {
+        //if(mDisplayed) {
             // Send message to the fragment if it exists
-            mBus.post(user, event);
-        } else {
+            mBus.post(server, user, event);
+        //} else {
             // Append to buffer in the channel
-            user.onUserEvent(event);
-        }
+        //    user.onUserEvent(event);
+        //}
     }
 
     /*
@@ -150,16 +152,17 @@ public class MessageSender {
         sendServerEvent(server, event);
     }
 
-    public void sendGenericChannelEvent(final Channel channel, final String message,
-                                        final boolean userListChanged) {
+    public void sendGenericChannelEvent(final Server server, final Channel channel,
+                                        final String message, final boolean userListChanged) {
         final ChannelEvent event = new ChannelEvent(channel.getName(), message,
                 userListChanged);
-        sendChannelEvent(channel, event);
+        sendChannelEvent(server, channel, event);
     }
 
-    private void sendGenericUserEvent(final PrivateMessageUser user, final String message) {
+    private void sendGenericUserEvent(final Server server, final PrivateMessageUser user,
+                                      final String message) {
         final UserEvent privateMessageEvent = new UserEvent(user.getNick(), message);
-        sendUserEvent(user, privateMessageEvent);
+        sendUserEvent(server, user, privateMessageEvent);
     }
     // Generic events end
 
@@ -190,7 +193,8 @@ public class MessageSender {
         mBus.post(new PartEvent(channelName));
     }
 
-    public void sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
+    public void sendPrivateAction(final Server server, final PrivateMessageUser user,
+                                  final User sendingUser,
                                   final String rawAction) {
         String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
@@ -198,10 +202,10 @@ public class MessageSender {
         if(sendingUser.equals(user)) {
             mention(user.getNick());
         }
-        sendGenericUserEvent(user, message);
+        sendGenericUserEvent(server, user, message);
     }
 
-    public void sendChannelAction(final String userNick, final Channel channel,
+    public void sendChannelAction(final Server server, final String userNick, final Channel channel,
                                   final ChannelUser sendingUser, final String rawAction) {
         String finalMessage = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getPrettyNick(channel), rawAction);
@@ -209,7 +213,7 @@ public class MessageSender {
             mention(channel.getName());
             finalMessage = "<b>" + finalMessage + "</b>";
         }
-        sendGenericChannelEvent(channel, finalMessage, false);
+        sendGenericChannelEvent(server, channel, finalMessage, false);
     }
 
     /**
@@ -222,24 +226,25 @@ public class MessageSender {
      *                           be the other user
      * @param rawMessage         - the message being sent
      */
-    public void sendPrivateMessage(final PrivateMessageUser user, final User sending,
-                                   final String rawMessage) {
+    public void sendPrivateMessage(final Server server, final PrivateMessageUser user,
+                                   final User sending, final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getColorfulNick(), rawMessage);
         // TODO - change this to be specific for PMs
         mention(user.getNick());
-        sendGenericUserEvent(user, message);
+        sendGenericUserEvent(server, user, message);
     }
 
-    public void sendMessageToChannel(final String userNick, final Channel channel,
-                                     final String sendingNick, final String rawMessage) {
+    public void sendMessageToChannel(final Server server, final String userNick,
+                                     final Channel channel, final String sendingNick,
+                                     final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
                 sendingNick, rawMessage);
         if (rawMessage.toLowerCase().contains(userNick.toLowerCase())) {
             mention(channel.getName());
             preMessage = "<b>" + preMessage + "</b>";
         }
-        sendGenericChannelEvent(channel, preMessage, false);
+        sendGenericChannelEvent(server, channel, preMessage, false);
     }
 
     public void sendNickInUseMessage(final Server server) {
@@ -253,9 +258,9 @@ public class MessageSender {
     }
 
     public void sendUserListReceived(final Channel channel) {
-        if (mDisplayed) {
+        //if (mDisplayed) {
             mBus.post(new UserListReceivedEvent(channel.getName()));
-        }
+        //}
     }
 
     public void sendConnected(final Server server, final String url) {

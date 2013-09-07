@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <ListView
+    <com.fusionx.lightirc.ui.widget.IRCListView
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -35,7 +35,9 @@
             android:dividerHeight="0dp"
             android:divider="@null"
             android:layout_marginTop="10dip"
-            android:lineSpacingExtra="3dip"/>
+            android:lineSpacingExtra="3dip">
+        <requestFocus/>
+            </com.fusionx.lightirc.ui.widget.IRCListView>
 
     <EditText
             android:id="@+id/editText1"

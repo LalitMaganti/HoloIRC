@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -122,18 +123,18 @@ public class ServiceFragment extends Fragment {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCBridgeService.IRCBinder) binder).getService();
-            mCallback.setUpViewPager();
 
             mService.setServerDisplayed(mCallback.getServerTitle());
 
             if (getServer(true, mCallback.getServerTitle()) != null) {
+                mCallback.setUpViewPager();
                 mCallback.repopulateFragmentsInPager();
             } else {
                 final ServerConfiguration.Builder builder =
                         getActivity().getIntent().getParcelableExtra("server");
                 mService.connectToServer(builder);
+                mCallback.setUpViewPager();
             }
-            mCallback.serverIsAvailable();
         }
 
         // Should never occur
@@ -158,9 +159,16 @@ public class ServiceFragment extends Fragment {
     }
 
     public void removeServiceReference(final String serverTitle) {
-        mService.setServerDisplayed(null);
-        mService.onDisconnect(serverTitle);
-        mService = null;
+        final AsyncTask<Void, Void, Void> disconnect = new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                mService.setServerDisplayed(null);
+                mService.removeServerFromManager(serverTitle);
+                mService = null;
+                return null;
+            }
+        };
+        disconnect.execute();
     }
 
     public MessageSender getSender() {
@@ -175,7 +183,5 @@ public class ServiceFragment extends Fragment {
         public void repopulateFragmentsInPager();
 
         public void onDisconnect(final boolean expected, final boolean retryPending);
-
-        public void serverIsAvailable();
     }
 }

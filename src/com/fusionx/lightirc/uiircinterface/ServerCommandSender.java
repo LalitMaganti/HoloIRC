@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.uiircinterface;
 
 import android.content.Context;
-import android.os.AsyncTask;
 
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
@@ -33,106 +32,94 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ServerCommandSender {
     public static void sendJoin(final Server server, final String channelName) {
-        final AsyncTask<Void, Void, Void> sendJoin = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 server.getWriter().joinChannel(channelName);
-                return null;
             }
-        };
-        sendJoin.execute();
+        });
     }
 
     public static void sendMessageToChannel(final Server server, final String channelName,
                                             final String message) {
-        final AsyncTask<Void, Void, Void> sendMessage = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendMessage(message);
 
-                MessageSender.getSender(server.getTitle()).sendMessageToChannel(server.getUser()
-                        .getNick(), channel, server.getUser().getPrettyNick(channel), message);
-                return null;
+                MessageSender.getSender(server.getTitle()).sendMessageToChannel(server,
+                        server.getUser().getNick(), channel, server.getUser().getPrettyNick
+                        (channel), message);
             }
-        };
-        sendMessage.execute();
+        });
     }
 
     public static void sendActionToChannel(final Server server, final String channelName,
                                            final String action) {
-        final AsyncTask<Void, Void, Void> sendAction = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 final Channel channel = server.getUserChannelInterface().getChannel(channelName);
                 channel.getWriter().sendAction(action);
 
-                MessageSender.getSender(server.getTitle()).sendChannelAction(server.getUser()
-                        .getNick(), channel,  server.getUser(), action);
-                return null;
+                MessageSender.getSender(server.getTitle()).sendChannelAction(server, server
+                        .getUser().getNick(), channel,  server.getUser(), action);
             }
-        };
-        sendAction.execute();
+        });
     }
 
     public static void sendMessageToUser(final Server server, final String userNick,
                                          final String message) {
         final PrivateMessageUser user = server.getPrivateMessageUser(userNick);
-        final AsyncTask<Void, Void, Void> sendMessage = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 if (StringUtils.isNotEmpty(message)) {
                     user.getWriter().sendMessage(message);
                 }
                 server.privateMessageSent(user, message, true);
-                return null;
             }
-        };
-        sendMessage.execute();
+        });
     }
 
     public static void sendActionToUser(final Server server, final String userNick,
                                         final String action) {
         final PrivateMessageUser user = server.getPrivateMessageUser(userNick);
-        final AsyncTask<Void, Void, Void> sendAction = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 if (StringUtils.isNotEmpty(action)) {
                     user.getWriter().sendAction(action);
                 }
                 server.privateActionSent(user, action, true);
-                return null;
             }
-        };
-        sendAction.execute();
+        });
     }
 
     public static void sendNickChange(final Server server, final String newNick) {
-        final AsyncTask<Void, Void, Void> changeNick = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 server.getWriter().changeNick(newNick);
-                return null;
             }
-        };
-        changeNick.execute();
+        });
     }
 
     public static void sendPart(final Server server, final String channelName,
                                 final Context applicationContext) {
         final Channel channel = server.getUserChannelInterface().getChannel(channelName);
-        sendPart(channel, applicationContext);
+        sendPart(server, channel, applicationContext);
     }
 
-    private static void sendPart(final Channel channel, final Context applicationContext) {
-        final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
+    private static void sendPart(final Server server, final Channel channel,
+                                 final Context applicationContext) {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 channel.getWriter().partChannel(MiscUtils.getPartReason(applicationContext));
-                return null;
             }
-        };
-        sendPart.execute();
+        });
     }
 
     public static void sendClosePrivateMessage(final Server server, final String nick) {
@@ -140,58 +127,48 @@ public class ServerCommandSender {
     }
 
     public static void sendClosePrivateMessage(final Server server, final PrivateMessageUser user) {
-        final AsyncTask<Void, Void, Void> sendPart = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 server.getUser().closePrivateMessage(user);
-                return null;
             }
-        };
-        sendPart.execute();
+        });
     }
 
     public static void sendMode(final Server server, final String channelName, final String
             destination, final String mode) {
-        final AsyncTask<Void, Void, Void> sendMode = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 server.getWriter().sendChannelMode(channelName, destination, mode);
-                return null;
             }
-        };
-        sendMode.execute();
+        });
     }
 
     public static void sendDisconnect(final Server server, final Context context) {
-        final AsyncTask<Void, Void, Void> disconnectEvent = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 server.disconnectFromServer(context);
-                return null;
             }
-        };
-        disconnectEvent.execute();
+        });
     }
 
     public static void sendUnknownEvent(final Server server, final String event) {
-        final AsyncTask<Void, Void, Void> unknownEvent = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 MessageSender.getSender(server.getTitle()).switchToServerMessage(server, event);
-                return null;
             }
-        };
-        unknownEvent.execute();
+        });
     }
 
     public static void sendUserWhois(final Server server, final String nick) {
-        final AsyncTask<Void, Void, Void> whois = new AsyncTask<Void, Void, Void>() {
+        server.getHandler().post(new Runnable() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public void run() {
                 server.getWriter().sendWhois(nick);
-                return null;
             }
-        };
-        whois.execute();
+        });
     }
 }

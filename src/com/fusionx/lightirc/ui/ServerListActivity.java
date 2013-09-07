@@ -219,7 +219,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
     private void disconnectFromServer(final ServerConfiguration.Builder builder) {
         ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
-        mService.onDisconnect(builder.getTitle());
+        mService.removeServerFromManager(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

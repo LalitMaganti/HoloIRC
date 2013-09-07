@@ -22,6 +22,8 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.text.Spanned;
 
@@ -58,6 +60,8 @@ public class Server {
     private final ConnectionWrapper mWrapper;
     private final Context mContext;
 
+    private Handler handler;
+
     public Server(final String serverTitle, final ConnectionWrapper wrapper,
                   final Context context) {
         title = serverTitle;
@@ -79,13 +83,13 @@ public class Server {
             user.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
+                sender.sendPrivateMessage(this, userWhoIsNotUs, sendingUser, message);
             }
 
             sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
+                sender.sendPrivateMessage(this, userWhoIsNotUs, sendingUser, message);
             }
         }
     }
@@ -98,13 +102,13 @@ public class Server {
             user.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
+                sender.sendPrivateAction(this, userWhoIsNotUs, sendingUser, action);
             }
 
             sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
+                sender.sendPrivateAction(this, userWhoIsNotUs, sendingUser, action);
             }
         }
     }

@@ -121,7 +121,7 @@ public class ServerCommandParser {
         final String formattedNotice = String.format(mContext.getString(R.string
                 .parser_message), sendingUser, notice);
         if (MiscUtils.isChannel(recipient.charAt(0))) {
-            mSender.sendGenericChannelEvent(mUserChannelInterface.getChannel(recipient),
+            mSender.sendGenericChannelEvent(mServer, mUserChannelInterface.getChannel(recipient),
                     formattedNotice, false);
         } else if (recipient.equals(mServer.getUser().getNick())) {
             final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
@@ -159,7 +159,7 @@ public class ServerCommandParser {
             if (MiscUtils.isChannel(recipient.charAt(0))) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
-                mSender.sendMessageToChannel(mServer.getUser().getNick(), channel,
+                mSender.sendMessageToChannel(mServer, mServer.getUser().getNick(), channel,
                         sendingUser.getPrettyNick(channel), message);
             } else {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
@@ -176,7 +176,7 @@ public class ServerCommandParser {
         if (!MiscUtils.getIgnoreList(mContext, mServer.getTitle().toLowerCase()).contains(nick)) {
             if (MiscUtils.isChannel(recipient.charAt(0))) {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
-                mSender.sendChannelAction(mServer.getUser().getNick(),
+                mSender.sendChannelAction(mServer, mServer.getUser().getNick(),
                         mUserChannelInterface.getChannel(recipient), sendingUser, action);
             } else {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
@@ -193,7 +193,7 @@ public class ServerCommandParser {
 
         final String message = String
                 .format(mContext.getString(R.string.parser_topic_changed, newTopic, setterNick));
-        mSender.sendGenericChannelEvent(channel, message, false);
+        mSender.sendGenericChannelEvent(mServer, channel, message, false);
     }
 
     private void parseNickChange(ArrayList<String> parsedArray, String rawSource) {
@@ -210,7 +210,7 @@ public class ServerCommandParser {
 
         if (channels != null) {
             for (final Channel channel : channels) {
-                mSender.sendGenericChannelEvent(channel, message, false);
+                mSender.sendGenericChannelEvent(mServer, channel, message, false);
                 channel.getUsers().update(user);
             }
         }
@@ -235,7 +235,7 @@ public class ServerCommandParser {
                 final String message = user.processModeChange(mContext, sendingUser, channel,
                         mode);
 
-                mSender.sendGenericChannelEvent(channel, message, true);
+                mSender.sendGenericChannelEvent(mServer, channel, message, true);
             }
         } else {
             // A user is changing a mode about themselves
@@ -252,7 +252,7 @@ public class ServerCommandParser {
             mSender.sendChanelJoined(channel.getName());
             channel.getWriter().sendWho();
         } else {
-            mSender.sendGenericChannelEvent(channel,
+            mSender.sendGenericChannelEvent(mServer, channel,
                     String.format(mContext
                             .getString(R.string.parser_joined_channel), user.getPrettyNick(channel)), true);
         }
@@ -279,7 +279,7 @@ public class ServerCommandParser {
                     String.format(mContext.getString(R.string.parser_reason),
                             parsedArray.get(3).replace("\"", "")) : "";
 
-            mSender.sendGenericChannelEvent(channel, message, true);
+            mSender.sendGenericChannelEvent(mServer, channel, message, true);
             mUserChannelInterface.decoupleUserAndChannel(user, channel);
         }
     }
@@ -301,7 +301,7 @@ public class ServerCommandParser {
                             ((parsedArray.size() == 3) ? " " +
                                     String.format(mContext.getString(R.string.parser_reason),
                                             StringUtils.remove(parsedArray.get(2), "\"")) : "");
-                    mSender.sendGenericChannelEvent(channel, message, true);
+                    mSender.sendGenericChannelEvent(mServer, channel, message, true);
                 }
             }
             return false;

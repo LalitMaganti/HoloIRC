@@ -21,15 +21,8 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.View;
-
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.event.UserEvent;
@@ -46,27 +39,21 @@ public class UserFragment extends IRCFragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onResume() {
+        super.onResume();
 
         if(getListAdapter() == null) {
             final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                     UserFragmentCallbacks.class);
             final Server server = callback.getServer(true);
             final PrivateMessageUser channel = server.getPrivateMessageUser(title);
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new IRCMessageAdapter
-                    (getActivity(), channel.getBuffer()));
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
+                    IRCMessageAdapter(getActivity(), channel.getBuffer()));
             adapter.setAbsListView(getListView());
             setListAdapter(adapter);
+        } else {
+            getListAdapter().notifyDataSetChanged();
         }
-        getListAdapter().notifyDataSetChanged();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getListAdapter().notifyDataSetChanged();
 
         final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                 UserFragmentCallbacks.class);

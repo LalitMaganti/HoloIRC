@@ -18,8 +18,11 @@ import com.fusionx.lightirc.util.UIUtils;
 import java.util.List;
 
 public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
+    public List<Spanned> mObjects;
+
     public IRCMessageAdapter(Context context, List<Spanned> objects) {
         super(context, R.layout.irc_listview_textview, objects);
+        mObjects = objects;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

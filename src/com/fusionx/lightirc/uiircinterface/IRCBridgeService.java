@@ -99,10 +99,11 @@ public class IRCBridgeService extends Service {
     }
 
     public void disconnectAll() {
-        if (connectionManager != null) {
-            connectionManager.disconnectAll();
+        synchronized (mBinder) {
+            if (connectionManager != null) {
+                connectionManager.disconnectAll();
+            }
         }
-
         if (serverDisplayed != null) {
             final Intent intent = new Intent(this, ServerListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -113,14 +114,16 @@ public class IRCBridgeService extends Service {
         stopForeground(true);
     }
 
-    public void onDisconnect(final String serverName) {
-        if (connectionManager.containsKey(serverName)) {
-            connectionManager.remove(serverName);
-            MessageSender.removeSender(serverName);
-            if (connectionManager.isEmpty()) {
-                stopForeground(true);
-            } else {
-                updateNotification();
+    public void removeServerFromManager(final String serverName) {
+        synchronized (mBinder) {
+            if (connectionManager.containsKey(serverName)) {
+                connectionManager.remove(serverName);
+                MessageSender.removeSender(serverName);
+                if (connectionManager.isEmpty()) {
+                    stopForeground(true);
+                } else {
+                    updateNotification();
+                }
             }
         }
     }

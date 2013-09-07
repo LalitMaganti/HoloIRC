@@ -20,7 +20,7 @@ public class IRCBus extends Bus {
     }
 
     public void post(final Server server, final ServerEvent event) {
-        mainThread.post(new Runnable() {
+        server.getHandler().post(new Runnable() {
             @Override
             public void run() {
                 server.onServerEvent(event);
@@ -29,8 +29,8 @@ public class IRCBus extends Bus {
         post(event);
     }
 
-    public void post(final Channel channel, final ChannelEvent event) {
-        mainThread.post(new Runnable() {
+    public void post(final Server server, final Channel channel, final ChannelEvent event) {
+        server.getHandler().post(new Runnable() {
             @Override
             public void run() {
                 channel.onChannelEvent(event);
@@ -39,8 +39,8 @@ public class IRCBus extends Bus {
         post(event);
     }
 
-    public void post(final PrivateMessageUser user, final UserEvent event) {
-        mainThread.post(new Runnable() {
+    public void post(final Server server, final PrivateMessageUser user, final UserEvent event) {
+        server.getHandler().post(new Runnable() {
             @Override
             public void run() {
                 user.onUserEvent(event);
