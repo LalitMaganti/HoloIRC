@@ -27,14 +27,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.base.TreeSetAdapter;
 import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.ArrayList;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class SelectionAdapter<T> extends TreeSetAdapter<T> {
+public class SelectionAdapter<T> extends CollectionAdapter<T> {
     /**
      * Lock for any operation invlolving the mSelectedItems
      */
@@ -46,7 +45,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
 
     public SelectionAdapter(final Context context, final SortedSet<T> objects) {
-        super(context, R.layout.default_listview_textview, (TreeSet<T>) objects);
+        super(context, R.layout.default_listview_textview, objects);
     }
 
     /**
@@ -124,7 +123,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     /**
      * Returns the list of selected items in the adapter
      *
-     * @return returns a Set of the currently selected items
+     * @return returns a ArrayList of the currently selected items
      */
     public ArrayList<T> getSelectedItems() {
         final ArrayList<T> list = new ArrayList<>();
@@ -137,7 +136,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
     }
 
     public ArrayList<Integer> getSelectedItemPositions() {
-        return mSelectedItems;
+        return new ArrayList<>(mSelectedItems);
     }
 
     public TreeSet<T> getCopyOfItems() {
@@ -165,7 +164,7 @@ public class SelectionAdapter<T> extends TreeSetAdapter<T> {
 
     public void setInternalSet(SortedSet<T> set) {
         synchronized (mLock) {
-            mObjects = (TreeSet<T>) set;
+            mObjects = set;
         }
         if (mNotifyOnChange) {
             notifyDataSetChanged();

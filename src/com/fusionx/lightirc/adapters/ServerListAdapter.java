@@ -35,11 +35,11 @@ import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.github.espiandev.showcaseview.ShowcaseView;
 
-public class BuilderAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
+public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
     private final Activity mActivity;
     private final BuilderAdapterCallback mCallback;
 
-    public BuilderAdapter(final Activity activity) {
+    public ServerListAdapter(final Activity activity) {
         super(activity, android.R.layout.simple_list_item_1);
         mActivity = activity;
 

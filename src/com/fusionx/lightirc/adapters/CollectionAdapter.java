@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fusionx.lightirc.adapters.base;
+package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -46,18 +46,16 @@ import java.util.TreeSet;
  * or to have some of data besides toString() results fill the views,
  * override {@link #getView(int, View, ViewGroup)} to return the type of view you want.
  */
-public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterable {
+public abstract class CollectionAdapter<T> extends BaseAdapter {
     /**
      * Contains the list of objects that represent the data of this ArrayAdapter.
      * The content of this list is referred to as "the array" in the documentation.
      */
-    protected TreeSet<T> mObjects;
+    protected Collection<T> mObjects;
 
     /**
      * Lock used to modify the content of {@link #mObjects}. Any write operation
-     * performed on the array should be synchronized on this lock. This lock is also
-     * used by the filter (see {@link #getFilter()} to make a synchronized copy of
-     * the original array of data.
+     * performed on the array should be synchronized on this lock.
      */
     protected final Object mLock = new Object();
 
@@ -88,11 +86,6 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
 
     private Context mContext;
 
-    // A copy of the original mObjects array, initialized from and then used instead as soon as
-    // the mFilter ArrayFilter is used. mObjects will then only contain the filtered values.
-    private TreeSet<T> mOriginalValues;
-    private ArrayFilter mFilter;
-
     private LayoutInflater mInflater;
 
     /**
@@ -102,7 +95,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      * @param textViewResourceId The resource ID for a layout file containing a TextView to use when
      *                           instantiating views.
      */
-    public TreeSetAdapter(Context context, int textViewResourceId) {
+    public CollectionAdapter(Context context, int textViewResourceId) {
         init(context, textViewResourceId, 0, new TreeSet<T>());
     }
 
@@ -114,7 +107,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      *                           instantiating views.
      * @param textViewResourceId The id of the TextView within the layout resource to be populated
      */
-    public TreeSetAdapter(Context context, int resource, int textViewResourceId) {
+    public CollectionAdapter(Context context, int resource, int textViewResourceId) {
         init(context, resource, textViewResourceId, new TreeSet<T>());
     }
 
@@ -126,7 +119,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      *                           instantiating views.
      * @param objects            The objects to represent in the ListView.
      */
-    public TreeSetAdapter(Context context, int textViewResourceId, TreeSet<T> objects) {
+    public CollectionAdapter(Context context, int textViewResourceId, Collection<T> objects) {
         init(context, textViewResourceId, 0, objects);
     }
 
@@ -139,7 +132,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      * @param textViewResourceId The id of the TextView within the layout resource to be populated
      * @param objects            The objects to represent in the ListView.
      */
-    public TreeSetAdapter(Context context, int resource, int textViewResourceId, TreeSet<T> objects) {
+    public CollectionAdapter(Context context, int resource, int textViewResourceId, Collection<T> objects) {
         init(context, resource, textViewResourceId, objects);
     }
 
@@ -150,11 +143,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      */
     public void add(T object) {
         synchronized (mLock) {
-            if (mOriginalValues != null) {
-                mOriginalValues.add(object);
-            } else {
-                mObjects.add(object);
-            }
+            mObjects.add(object);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }
@@ -166,11 +155,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      */
     public void addAll(Collection<? extends T> collection) {
         synchronized (mLock) {
-            if (mOriginalValues != null) {
-                mOriginalValues.addAll(collection);
-            } else {
-                mObjects.addAll(collection);
-            }
+            mObjects.addAll(collection);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }
@@ -182,11 +167,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      */
     public void addAll(T... items) {
         synchronized (mLock) {
-            if (mOriginalValues != null) {
-                Collections.addAll(mOriginalValues, items);
-            } else {
-                Collections.addAll(mObjects, items);
-            }
+            Collections.addAll(mObjects, items);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }
@@ -198,11 +179,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      */
     public void remove(T object) {
         synchronized (mLock) {
-            if (mOriginalValues != null) {
-                mOriginalValues.remove(object);
-            } else {
-                mObjects.remove(object);
-            }
+            mObjects.remove(object);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }
@@ -212,11 +189,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
      */
     public void clear() {
         synchronized (mLock) {
-            if (mOriginalValues != null) {
-                mOriginalValues.clear();
-            } else {
-                mObjects.clear();
-            }
+            mObjects.clear();
         }
         if (mNotifyOnChange) notifyDataSetChanged();
     }
@@ -248,7 +221,7 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
         mNotifyOnChange = notifyOnChange;
     }
 
-    private void init(Context context, int resource, int textViewResourceId, TreeSet<T> objects) {
+    private void init(Context context, int resource, int textViewResourceId, Collection<T> objects) {
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = mDropDownResource = resource;
@@ -355,90 +328,6 @@ public abstract class TreeSetAdapter<T> extends BaseAdapter implements Filterabl
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return createViewFromResource(position, convertView, parent, mDropDownResource);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Filter getFilter() {
-        if (mFilter == null) {
-            mFilter = new ArrayFilter();
-        }
-        return mFilter;
-    }
-
-    /**
-     * <p>An array filter constrains the content of the array adapter with
-     * a prefix. Each item that does not start with the supplied prefix
-     * is removed from the list.</p>
-     */
-    private class ArrayFilter extends Filter {
-        @Override
-        protected FilterResults performFiltering(CharSequence prefix) {
-            FilterResults results = new FilterResults();
-
-            if (mOriginalValues == null) {
-                synchronized (mLock) {
-                    mOriginalValues = new TreeSet<>(mObjects);
-                }
-            }
-
-            if (prefix == null || prefix.length() == 0) {
-                TreeSet<T> list;
-                synchronized (mLock) {
-                    list = new TreeSet<T>(mOriginalValues);
-                }
-                results.values = list;
-                results.count = list.size();
-            } else {
-                String prefixString = prefix.toString().toLowerCase();
-
-                ArrayList<T> values;
-                synchronized (mLock) {
-                    values = new ArrayList<T>(mOriginalValues);
-                }
-
-                final int count = values.size();
-                final ArrayList<T> newValues = new ArrayList<T>();
-
-                for (int i = 0; i < count; i++) {
-                    final T value = values.get(i);
-                    final String valueText = value.toString().toLowerCase();
-
-                    // First match against the whole, non-splitted value
-                    if (valueText.startsWith(prefixString)) {
-                        newValues.add(value);
-                    } else {
-                        final String[] words = valueText.split(" ");
-                        final int wordCount = words.length;
-
-                        // Start at index 0, in case valueText starts with space(s)
-                        for (int k = 0; k < wordCount; k++) {
-                            if (words[k].startsWith(prefixString)) {
-                                newValues.add(value);
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                results.values = newValues;
-                results.count = newValues.size();
-            }
-
-            return results;
-        }
-
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            //noinspection unchecked
-            mObjects = (TreeSet<T>) results.values;
-            if (results.count > 0) {
-                notifyDataSetChanged();
-            } else {
-                notifyDataSetInvalidated();
-            }
-        }
     }
 }
 

@@ -37,7 +37,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.BuilderAdapter;
+import com.fusionx.lightirc.adapters.ServerListAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -54,11 +54,11 @@ import java.util.ArrayList;
 
 public class ServerListActivity extends ActionBarActivity implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener,
-        BuilderAdapter.BuilderAdapterCallback, ShowcaseView.OnShowcaseEventListener {
+        ServerListAdapter.BuilderAdapterCallback, ShowcaseView.OnShowcaseEventListener {
     private IRCBridgeService mService = null;
     private BuilderList mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
-    private BuilderAdapter mServerCardsAdapter = null;
+    private ServerListAdapter mServerCardsAdapter = null;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -68,7 +68,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         setContentView(R.layout.activity_server_list);
 
-        mServerCardsAdapter = new BuilderAdapter(this);
+        mServerCardsAdapter = new ServerListAdapter(this);
         mBuilderList = new BuilderList();
     }
 
@@ -266,7 +266,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
                 .string.status_disconnected));
     }
 
-    // BuilderAdapter callbacks
+    // ServerListAdapter callbacks
     @Override
     public Server getServer(final String title) {
         return mService.getServer(title);
@@ -283,7 +283,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     }
 
     private class ServerCardsAdapter extends BaseAdapterDecorator {
-        public ServerCardsAdapter(final BuilderAdapter adapter) {
+        public ServerCardsAdapter(final ServerListAdapter adapter) {
             super(adapter);
         }
     }
