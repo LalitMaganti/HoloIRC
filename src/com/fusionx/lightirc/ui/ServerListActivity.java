@@ -42,6 +42,8 @@ import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
+import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
+import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
@@ -101,11 +103,26 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         for (ServerConfiguration.Builder builder : mBuilderList) {
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
             if (sender != null) {
-                //sender.getBus().unregister(this);
+                try {
+                    sender.getBus().unregister(this);
+                } catch (Exception ex) {
+                    // Do nothing - we aren't registered it seems
+                    // TODO - fix this properly
+                }
             }
         }
         unbindService(mConnection);
         mService = null;
+    }
+
+    @Subscribe
+    public void onDisconnect(final RetryPendingDisconnectEvent event) {
+        mServerCardsAdapter.notifyDataSetChanged();
+    }
+
+    @Subscribe
+    public void onDisconnect(final FinalDisconnectEvent event) {
+        mServerCardsAdapter.notifyDataSetChanged();
     }
 
     private final ServiceConnection mConnection = new ServiceConnection() {
@@ -174,6 +191,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
                 sender.getBus().register(this);
             }
         }
+        mServerCardsAdapter.notifyDataSetChanged();
     }
 
     @Subscribe

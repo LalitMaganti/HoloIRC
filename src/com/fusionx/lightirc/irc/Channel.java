@@ -61,7 +61,9 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         final String message = String.format(userChannelInterface.getContext().getString(R.string
                 .parser_joined_channel), userChannelInterface
                 .getServer().getUser().getColorfulNick());
-        buffer.add(Html.fromHtml(message));
+        synchronized (buffer.getLock()) {
+            buffer.add(Html.fromHtml(message));
+        }
 
         mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(mUserChannelInterface
                 .getContext());
