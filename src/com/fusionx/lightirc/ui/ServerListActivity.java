@@ -101,7 +101,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         for (ServerConfiguration.Builder builder : mBuilderList) {
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
             if(sender != null) {
-                sender.getBus().unregister(this);
+                //sender.getBus().unregister(this);
             }
         }
         unbindService(mConnection);

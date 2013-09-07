@@ -144,4 +144,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="nick_second_choice">Second choice nick name</string>
     <string name="nick_third_choice">Third choice nick name</string>
 
+    <string name="action_part_channel">Part channel</string>
+    <string name="action_close_pm">Close PM</string>
+
 </resources>

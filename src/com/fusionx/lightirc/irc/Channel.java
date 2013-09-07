@@ -22,16 +22,14 @@
 package com.fusionx.lightirc.irc;
 
 import android.text.Html;
-import android.text.Spanned;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.collections.BufferList;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
 
 import de.scrum_master.util.UpdateableTreeSet;
 import lombok.Getter;
@@ -42,7 +40,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     @Getter
     protected final String name;
     @Getter
-    protected final ArrayList<Spanned> buffer = new ArrayList<>();
+    protected final BufferList buffer = new BufferList();
 
     @Getter
     protected final ChannelWriter writer;
@@ -96,7 +94,9 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public void onChannelEvent(final ChannelEvent event) {
         if((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
                 .message)) {
-            buffer.add(Html.fromHtml(event.message));
+            synchronized (buffer.getLock()) {
+                buffer.add(Html.fromHtml(event.message));
+            }
         }
     }
 }

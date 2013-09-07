@@ -19,13 +19,13 @@
     <orderEntry type="module" module-name="SlidingMenu" />
     <orderEntry type="module" module-name="UpdateableTreeSet" />
     <orderEntry type="module" module-name="SlidingTabs" />
-    <orderEntry type="module" module-name="cwac-merge" />
     <orderEntry type="module" module-name="ShowcaseView" />
     <orderEntry type="library" name="android-support-v4" level="project" />
     <orderEntry type="module" module-name="appcompat" />
     <orderEntry type="module" module-name="numberpicker" />
     <orderEntry type="library" name="nineoldandroids-2.4.0" level="project" />
     <orderEntry type="library" name="otto-1.3.4" level="project" />
+    <orderEntry type="library" name="stickylistheaders_lib" level="project" />
   </component>
 </module>
 

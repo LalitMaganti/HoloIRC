@@ -23,11 +23,10 @@ package com.fusionx.lightirc.irc;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 import android.text.Html;
-import android.text.Spanned;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.collections.BufferList;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
@@ -37,14 +36,10 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
-import lombok.AccessLevel;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 
 @Data
 public class Server {
@@ -52,7 +47,7 @@ public class Server {
     private UserChannelInterface userChannelInterface;
     private AppUser user;
 
-    private final ArrayList<Spanned> buffer = new ArrayList<>();
+    private final BufferList buffer = new BufferList();
 
     private String status = "Disconnected";
 
@@ -71,7 +66,9 @@ public class Server {
 
     public void onServerEvent(final ServerEvent event) {
         if(StringUtils.isNotBlank(event.message)) {
-            buffer.add(Html.fromHtml(event.message));
+            synchronized (buffer.getLock()) {
+                buffer.add(Html.fromHtml(event.message));
+            }
         }
     }
 

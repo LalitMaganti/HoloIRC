@@ -3,7 +3,6 @@ package com.fusionx.lightirc.adapters;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.text.Html;
 import android.text.Spanned;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -13,14 +12,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.collections.BufferList;
 import com.fusionx.lightirc.util.UIUtils;
 
-import java.util.List;
-
 public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
-    public List<Spanned> mObjects;
+    private BufferList mObjects;
 
-    public IRCMessageAdapter(Context context, List<Spanned> objects) {
+    public IRCMessageAdapter(Context context, BufferList objects) {
         super(context, R.layout.irc_listview_textview, objects);
         mObjects = objects;
     }
@@ -42,5 +40,9 @@ public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
         view.setText(getItem(position));
         Linkify.addLinks(view, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
         return view;
+    }
+
+    public Object getListLock() {
+        return mObjects.getLock();
     }
 }
