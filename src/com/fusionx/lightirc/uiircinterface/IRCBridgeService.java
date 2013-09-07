@@ -35,8 +35,6 @@ import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.connection.ConnectionManager;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.ui.ServerListActivity;
-import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
 
 import lombok.AccessLevel;
 import lombok.Setter;

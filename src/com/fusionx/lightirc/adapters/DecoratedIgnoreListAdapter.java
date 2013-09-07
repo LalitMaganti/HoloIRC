@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
-import android.annotation.TargetApi;
+
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.util.SparseArray;
 import android.view.View;
@@ -21,16 +22,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A BaseAdapterDecorator class which applies multiple Animators at once to
+ * views when they are first shown. The Animators applied include the animations
+ * specified in getAnimators(ViewGroup, View), plus an alpha transition.
+ */
 public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
-    protected static final long DEFAULTANIMATIONDELAYMILLIS = 50;
-    protected static final long DEFAULTANIMATIONDURATIONMILLIS = 150;
-    private static final long INITIALDELAYMILLIS = 75;
+
+    protected static final long DEFAULTANIMATIONDELAYMILLIS = 100;
+    protected static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
+    private static final long INITIALDELAYMILLIS = 150;
+
     private SparseArray<AnimationInfo> mAnimators;
     private long mAnimationStartMillis;
     private int mLastAnimatedPosition;
+    private int mLastAnimatedHeaderPosition;
     private boolean mHasParentAnimationAdapter;
-
-    private OnDismissCallback mCallback;
+    private boolean mShouldAnimate = true;
 
     public DecoratedIgnoreListAdapter(BaseAdapter baseAdapter, OnDismissCallback callback) {
         super(baseAdapter);
@@ -38,6 +46,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
 
         mAnimationStartMillis = -1;
         mLastAnimatedPosition = -1;
+        mLastAnimatedHeaderPosition = -1;
 
         if (baseAdapter instanceof DecoratedIgnoreListAdapter) {
             ((DecoratedIgnoreListAdapter) baseAdapter).setHasParentAnimationAdapter(true);
@@ -48,38 +57,34 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     /**
      * Call this method to reset animation status on all views. The next time
      * notifyDataSetChanged() is called on the base adapter, all views will
-     * animate again.
+     * animate again. Will also call setShouldAnimate(true).
      */
     public void reset() {
         mAnimators.clear();
         mLastAnimatedPosition = -1;
+        mLastAnimatedHeaderPosition = -1;
         mAnimationStartMillis = -1;
+        mShouldAnimate = true;
 
         if (getDecoratedBaseAdapter() instanceof DecoratedIgnoreListAdapter) {
             ((DecoratedIgnoreListAdapter) getDecoratedBaseAdapter()).reset();
         }
     }
 
+    public void setShouldAnimate(boolean shouldAnimate) {
+        mShouldAnimate = shouldAnimate;
+    }
+
     @Override
     public final View getView(int position, View convertView, ViewGroup parent) {
         boolean alreadyStarted = false;
-
         if (!mHasParentAnimationAdapter) {
             if (getAbsListView() == null) {
                 throw new IllegalStateException("Call setListView() on this AnimationAdapter before setAdapter()!");
             }
 
             if (convertView != null) {
-                int hashCode = convertView.hashCode();
-                AnimationInfo animationInfo = mAnimators.get(hashCode);
-                if (animationInfo != null) {
-                    if (animationInfo.position != position) {
-                        animationInfo.animator.end();
-                        mAnimators.remove(hashCode);
-                    } else {
-                        alreadyStarted = true;
-                    }
-                }
+                alreadyStarted = cancelExistingAnimation(position, convertView);
             }
         }
 
@@ -91,14 +96,55 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         return itemView;
     }
 
+    @Override
+    public View getHeaderView(int position, View convertView, ViewGroup parent) {
+        boolean alreadyStarted = false;
+
+        if (!mHasParentAnimationAdapter && convertView != null) {
+            alreadyStarted = cancelExistingAnimation(position, convertView);
+        }
+
+        View itemView = super.getHeaderView(position, convertView, parent);
+
+        if (!mHasParentAnimationAdapter && !alreadyStarted) {
+            animateHeaderViewIfNecessary(position, itemView, parent);
+        }
+
+        return itemView;
+    }
+
+    private boolean cancelExistingAnimation(int position, View convertView) {
+        boolean alreadyStarted = false;
+
+        int hashCode = convertView.hashCode();
+        AnimationInfo animationInfo = mAnimators.get(hashCode);
+        if (animationInfo != null) {
+            if (animationInfo.position != position) {
+                animationInfo.animator.end();
+                mAnimators.remove(hashCode);
+            } else {
+                alreadyStarted = true;
+            }
+        }
+
+        return alreadyStarted;
+    }
+
     private void animateViewIfNecessary(int position, View view, ViewGroup parent) {
-        if (position > mLastAnimatedPosition && !mHasParentAnimationAdapter) {
-            animateView(position, parent, view);
+        if (position > mLastAnimatedPosition && mShouldAnimate) {
+            animateView(position, parent, view, false);
             mLastAnimatedPosition = position;
         }
     }
 
-    private void animateView(int position, ViewGroup parent, View view) {
+    private void animateHeaderViewIfNecessary(int position, View view, ViewGroup parent) {
+        if (position > mLastAnimatedHeaderPosition && mShouldAnimate) {
+            animateView(position, parent, view, true);
+            mLastAnimatedHeaderPosition = position;
+        }
+    }
+
+    private void animateView(int position, ViewGroup parent, View view, boolean isHeader) {
         if (mAnimationStartMillis == -1) {
             mAnimationStartMillis = System.currentTimeMillis();
         }
@@ -116,7 +162,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
 
         AnimatorSet set = new AnimatorSet();
         set.playTogether(concatAnimators(childAnimators, animators, alphaAnimator));
-        set.setStartDelay(calculateAnimationDelay());
+        set.setStartDelay(calculateAnimationDelay(isHeader));
         set.setDuration(getAnimationDurationMillis());
         set.start();
 
@@ -131,8 +177,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         set.start();
     }
 
-    private Animator[] concatAnimators(Animator[] childAnimators, Animator[] animators,
-                                       Animator alphaAnimator) {
+    private Animator[] concatAnimators(Animator[] childAnimators, Animator[] animators, Animator alphaAnimator) {
         Animator[] allAnimators = new Animator[childAnimators.length + animators.length + 1];
         int i;
 
@@ -149,11 +194,10 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         return allAnimators;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private long calculateAnimationDelay() {
+    @SuppressLint("NewApi")
+    private long calculateAnimationDelay(boolean isHeader) {
         long delay;
-        int numberOfItems = getAbsListView().getLastVisiblePosition()
-                - getAbsListView().getFirstVisiblePosition();
+        int numberOfItems = getAbsListView().getLastVisiblePosition() - getAbsListView().getFirstVisiblePosition();
         if (numberOfItems + 1 < mLastAnimatedPosition) {
             delay = getAnimationDelayMillis();
 
@@ -162,9 +206,11 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
             }
         } else {
             long delaySinceStart = (mLastAnimatedPosition + 1) * getAnimationDelayMillis();
-            delay = mAnimationStartMillis + INITIALDELAYMILLIS + delaySinceStart
-                    - System.currentTimeMillis();
+            delay = mAnimationStartMillis + getInitialDelayMillis() + delaySinceStart - System.currentTimeMillis();
+            delay -= isHeader && mLastAnimatedPosition > 0 ? getAnimationDelayMillis() : 0;
         }
+        // System.out.println(isHeader + ": " + delay);
+
         return Math.max(0, delay);
     }
 
@@ -179,26 +225,20 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     }
 
     /**
-     * Get the delay in milliseconds before an animation of a view should start.
+     * Get the delay in milliseconds before the first animation should start. Defaults to {@value #INITIALDELAYMILLIS}.
      */
+    protected long getInitialDelayMillis() {
+        return INITIALDELAYMILLIS;
+    }
+
     protected long getAnimationDelayMillis() {
         return DEFAULTANIMATIONDELAYMILLIS;
     }
 
-    /**
-     * Get the duration of the animation in milliseconds.
-     */
     protected long getAnimationDurationMillis() {
         return DEFAULTANIMATIONDURATIONMILLIS;
     }
 
-    /**
-     * Get the Animators to apply to the views. In addition to the returned
-     * Animators, an alpha transition will be applied to the view.
-     *
-     * @param parent The parent of the view
-     * @param view   The view that will be animated, as retrieved by getView()
-     */
     public Animator[] getAnimators(ViewGroup parent, View view) {
         return new Animator[0];
     }
@@ -213,14 +253,23 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         }
     }
 
-    public void animateDismiss(int index) {
-        animateDismiss(Arrays.asList(index));
+
+    private OnDismissCallback mCallback;
+
+    /**
+     * Animate dismissal of the item at given position.
+     */
+    public void animateDismiss(int position) {
+        animateDismiss(Arrays.asList(position));
     }
 
+    /**
+     * Animate dismissal of the items at given positions.
+     */
     public void animateDismiss(Collection<Integer> positions) {
         final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
         if (getAbsListView() == null) {
-            throw new IllegalStateException("Call setListView() on this AnimateDismissAdapter before calling setAdapter()!");
+            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter before calling setAdapter()!");
         }
 
         List<View> views = getVisibleViewsForPositions(positionsCopy);
@@ -242,20 +291,20 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
             animatorSet.addListener(new Animator.AnimatorListener() {
 
                 @Override
-                public void onAnimationStart(Animator arg0) {
+                public void onAnimationStart(Animator animator) {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animator arg0) {
+                public void onAnimationRepeat(Animator animator) {
                 }
 
                 @Override
-                public void onAnimationEnd(Animator arg0) {
+                public void onAnimationEnd(Animator animator) {
                     invokeCallback(positionsCopy);
                 }
 
                 @Override
-                public void onAnimationCancel(Animator arg0) {
+                public void onAnimationCancel(Animator animator) {
                 }
             });
             animatorSet.start();
@@ -293,21 +342,21 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         animator.addListener(new Animator.AnimatorListener() {
 
             @Override
-            public void onAnimationStart(Animator arg0) {
+            public void onAnimationStart(Animator animator) {
             }
 
             @Override
-            public void onAnimationRepeat(Animator arg0) {
+            public void onAnimationRepeat(Animator animator) {
             }
 
             @Override
-            public void onAnimationEnd(Animator arg0) {
+            public void onAnimationEnd(Animator animator) {
                 lp.height = 0;
                 view.setLayoutParams(lp);
             }
 
             @Override
-            public void onAnimationCancel(Animator arg0) {
+            public void onAnimationCancel(Animator animator) {
             }
         });
 
