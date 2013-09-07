@@ -34,6 +34,10 @@ public abstract class User {
     @Setter
     protected String nick;
 
+    @Getter
+    @Setter
+    protected String hostName;
+
     protected final String nickHTML;
     protected final UserChannelInterface userChannelInterface;
 

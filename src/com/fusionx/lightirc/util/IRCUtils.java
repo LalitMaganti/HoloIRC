@@ -12,8 +12,17 @@ public class IRCUtils {
     public static String getNickFromRaw(final String rawSource) {
         String nick;
         if (rawSource.contains("!") && rawSource.contains("@")) {
-            final int indexOfExclamation = rawSource.indexOf('!');
-            nick = StringUtils.left(rawSource, indexOfExclamation);
+            nick = StringUtils.substringBefore(rawSource, "!");
+        } else {
+            nick = rawSource;
+        }
+        return nick;
+    }
+
+    public static String getHostNameFromRaw(final String rawSource) {
+        String nick;
+        if (rawSource.contains("!") && rawSource.contains("@")) {
+            nick = StringUtils.substringAfter(rawSource, "@");
         } else {
             nick = rawSource;
         }

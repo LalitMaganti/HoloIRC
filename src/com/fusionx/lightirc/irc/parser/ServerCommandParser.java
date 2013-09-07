@@ -230,7 +230,7 @@ public class ServerCommandParser {
                 // User specified - therefore user mode in channel is being changed
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
                 final String userRecipient = parsedArray.get(4);
-                final ChannelUser user = mUserChannelInterface.getUser(userRecipient);
+                final ChannelUser user = mUserChannelInterface.getUserFromRaw(userRecipient);
 
                 final String message = user.processModeChange(mContext, sendingUser, channel,
                         mode);

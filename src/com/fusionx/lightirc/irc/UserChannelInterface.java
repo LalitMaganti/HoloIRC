@@ -100,12 +100,25 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized ChannelUser getUserFromRaw(@NonNull final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        return getUser(nick);
+        if (nick.equals("*")) {
+            return getUserFromHostName(IRCUtils.getHostNameFromRaw(rawSource));
+        } else {
+            return getUser(nick);
+        }
+    }
+
+    public synchronized ChannelUser getUserFromHostName(@NonNull final String hostname) {
+        for (final ChannelUser user : aToBMap.keySet()) {
+            if (hostname.equals(user.getHostName())) {
+                return user;
+            }
+        }
+        return null;
     }
 
     public synchronized ChannelUser getUserIfExists(@NonNull final String nick) {
         for (final ChannelUser user : aToBMap.keySet()) {
-            if (user.getNick().equals(nick)) {
+            if (nick.equals(user.getNick())) {
                 return user;
             }
         }
