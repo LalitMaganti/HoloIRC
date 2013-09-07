@@ -264,7 +264,7 @@ public class MessageSender {
     }
 
     public void sendConnected(final Server server, final String url) {
-        final ConnectedEvent event = new ConnectedEvent(mContext, url);
+        final ConnectedEvent event = new ConnectedEvent(mContext, url, server.getTitle());
         sendServerEvent(server, event);
     }
 

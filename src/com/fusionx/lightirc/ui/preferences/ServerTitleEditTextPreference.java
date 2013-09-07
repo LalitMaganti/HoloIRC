@@ -22,7 +22,7 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
         AlertDialog dialog = super.onEditTextChanged();
         if (dialog != null && listOfExistingServers != null) {
             for (String title : listOfExistingServers) {
-                if (title.toLowerCase().equals(getEditText().getText().toString().toLowerCase())) {
+                if (title.equalsIgnoreCase(getEditText().getText().toString())) {
                     getEditText().setError("Server with the same name already exists.");
                     dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
                     break;

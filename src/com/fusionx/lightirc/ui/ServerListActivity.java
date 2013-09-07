@@ -41,13 +41,16 @@ import com.fusionx.lightirc.adapters.ServerListAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
+import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.github.espiandev.showcaseview.ShowcaseView;
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.squareup.otto.Subscribe;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,20 +71,25 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         setContentView(R.layout.activity_server_list);
 
-        mServerCardsAdapter = new ServerListAdapter(this);
         mBuilderList = new BuilderList();
+        mServerCardsAdapter = new ServerListAdapter(this, mBuilderList);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        final Intent service = new Intent(this, IRCBridgeService.class);
+        service.putExtra("stop", false);
+        startService(service);
+        bindService(service, mConnection, 0);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (mService == null) {
-            final Intent service = new Intent(this, IRCBridgeService.class);
-            service.putExtra("stop", false);
-            startService(service);
-            bindService(service, mConnection, 0);
-        } else {
+        if (mService != null) {
             setUpServerList();
         }
     }
@@ -90,6 +98,12 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     protected void onStop() {
         super.onStop();
 
+        for (ServerConfiguration.Builder builder : mBuilderList) {
+            final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
+            if(sender != null) {
+                sender.getBus().unregister(this);
+            }
+        }
         unbindService(mConnection);
         mService = null;
     }
@@ -149,21 +163,22 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        setUpServers(SharedPreferencesUtils.getServersFromPreferences(this));
-    }
-
-    private void setUpServers(final ArrayList<String> serverFiles) {
         mBuilderList.clear();
+        ArrayList<String> serverFiles = SharedPreferencesUtils.getServersFromPreferences(this);
         for (final String file : serverFiles) {
-            mBuilderList.add(SharedPreferencesUtils.convertPrefsToBuilder(this, file));
-        }
-
-        mServerCardsAdapter.clear();
-        if (!mBuilderList.isEmpty()) {
-            for (final ServerConfiguration.Builder builder : mBuilderList) {
-                mServerCardsAdapter.add(builder);
+            ServerConfiguration.Builder builder = SharedPreferencesUtils.convertPrefsToBuilder
+                    (this, file);
+            mBuilderList.add(builder);
+            final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
+            if(sender != null) {
+                sender.getBus().register(this);
             }
         }
+    }
+
+    @Subscribe
+    public void onServerConnnected(final ConnectedEvent event) {
+        mServerCardsAdapter.notifyDataSetChanged();
     }
 
     // Connect to server
@@ -218,6 +233,11 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     }
 
     private void disconnectFromServer(final ServerConfiguration.Builder builder) {
+        final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
+        if(sender != null) {
+            sender.getBus().unregister(this);
+        }
+
         ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
         mService.removeServerFromManager(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
@@ -249,15 +269,12 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     }
 
     private void deleteServer(final String fileName) {
-        final ArrayList<String> servers = SharedPreferencesUtils
-                .getServersFromPreferences(getApplicationContext());
-        servers.remove(fileName);
-
         final File folder = new File(SharedPreferencesUtils
-                .getSharedPreferencesPath(getApplicationContext()) + fileName + ".xml");
+                .getSharedPreferencesPath(this) + fileName + ".xml");
         folder.delete();
 
-        setUpServers(servers);
+        mBuilderList.remove(fileName);
+        mServerCardsAdapter.notifyDataSetChanged();
     }
 
     private boolean serverIsAvailable(final String title) {

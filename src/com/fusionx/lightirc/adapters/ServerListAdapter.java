@@ -35,12 +35,14 @@ import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.github.espiandev.showcaseview.ShowcaseView;
 
+import java.util.ArrayList;
+
 public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
     private final Activity mActivity;
     private final BuilderAdapterCallback mCallback;
 
-    public ServerListAdapter(final Activity activity) {
-        super(activity, android.R.layout.simple_list_item_1);
+    public ServerListAdapter(final Activity activity, ArrayList<ServerConfiguration.Builder> list) {
+        super(activity, android.R.layout.simple_list_item_1, list);
         mActivity = activity;
 
         try {
@@ -53,11 +55,13 @@ public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder>
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        View view = convertView;
+        View view;
         final ServerConfiguration.Builder builder = getItem(position);
-        if (view == null) {
+        if (convertView == null) {
             final LayoutInflater vi = LayoutInflater.from(mActivity);
             view = vi.inflate(R.layout.item_server_card, parent, false);
+        } else {
+            view = convertView;
         }
 
         final TextView textView = (TextView) view.findViewById(R.id.title);
@@ -79,31 +83,6 @@ public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder>
 
         final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.overflow_menu);
         linearLayout.setTag(builder);
-
-        if (position == 0 && Constants.DEBUG) {
-            final ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
-            co.hideOnClickOutside = true;
-            co.insert = ShowcaseView.INSERT_TO_VIEW;
-            co.shotType = ShowcaseView.TYPE_ONE_SHOT;
-            final ShowcaseView sv = ShowcaseView.insertShowcaseView(contentLayout, mActivity,
-                    "Test12345", "Test1234", co);
-
-            sv.setOnShowcaseEventListener(new ShowcaseView.OnShowcaseEventListener() {
-                @Override
-                public void onShowcaseViewHide(ShowcaseView showcaseView) {
-                    final ShowcaseView.ConfigOptions options = new ShowcaseView.ConfigOptions();
-                    options.hideOnClickOutside = true;
-                    options.insert = ShowcaseView.INSERT_TO_VIEW;
-                    //options.shotType = ShowcaseView.TYPE_ONE_SHOT;
-                    final ShowcaseView showcase = ShowcaseView.insertShowcaseView(linearLayout,
-                            mActivity, "Test12345", "Test1234", options);
-                }
-
-                @Override
-                public void onShowcaseViewShow(ShowcaseView showcaseView) {
-                }
-            });
-        }
 
         return view;
     }
