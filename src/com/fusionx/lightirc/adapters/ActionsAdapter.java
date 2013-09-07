@@ -64,7 +64,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             row = (TextView) inflater.inflate(R.layout.default_listview_textview, parent, false);
         }
         UIUtils.setRobotoLight(getContext(), row);
-        if(position == 2) {
+        if (position == 2) {
             row.setText(connected ? "Disconnect" : "Close");
         } else {
             row.setText(getItem(position));
@@ -98,7 +98,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public String getItem(int position) {
-        if(position < mServerItemCount) {
+        if (position < mServerItemCount) {
             return super.getItem(position);
         } else if (mFragmentType == FragmentTypeEnum.Channel) {
             return channelArray[getCount() - position - 1];
@@ -111,7 +111,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public int getCount() {
-        if(mFragmentType == FragmentTypeEnum.Server) {
+        if (mFragmentType == FragmentTypeEnum.Server) {
             return mServerItemCount;
         } else if (mFragmentType == FragmentTypeEnum.Channel) {
             return mServerItemCount + channelArray.length;

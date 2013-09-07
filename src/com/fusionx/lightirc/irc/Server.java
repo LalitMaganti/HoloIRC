@@ -65,7 +65,7 @@ public class Server {
     }
 
     public void onServerEvent(final ServerEvent event) {
-        if(StringUtils.isNotBlank(event.message)) {
+        if (StringUtils.isNotBlank(event.message)) {
             synchronized (buffer.getLock()) {
                 buffer.add(Html.fromHtml(event.message));
             }

@@ -22,9 +22,7 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
@@ -55,7 +53,7 @@ public class ServerFragment extends IRCFragment {
 
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
-        if(mRegistered) {
+        if (mRegistered) {
             MessageSender.getSender(callback.getServerTitle()).getBus().unregister(this);
         }
     }
@@ -66,17 +64,17 @@ public class ServerFragment extends IRCFragment {
 
         final ServerFragmentCallback callback = FragmentUtils.getParent(this,
                 ServerFragmentCallback.class);
-        if(!mRegistered) {
+        if (!mRegistered) {
             MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
         }
         final Server server = callback.getServer(true);
-        if(server != null && getListAdapter() == null) {
+        if (server != null && getListAdapter() == null) {
             final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
                     IRCMessageAdapter(getActivity(), server.getBuffer()));
             adapter.setAbsListView(getListView());
             setListAdapter(adapter);
         }
-        if(getListAdapter() != null) {
+        if (getListAdapter() != null) {
             getListAdapter().notifyDataSetChanged();
         }
     }

@@ -35,18 +35,18 @@ import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.User;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
-import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
-import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
-import com.fusionx.lightirc.irc.event.UserEvent;
-import com.fusionx.lightirc.irc.event.PartEvent;
-import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
-import com.fusionx.lightirc.irc.event.ServerEvent;
+import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.JoinEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
 import com.fusionx.lightirc.irc.event.NickInUseEvent;
+import com.fusionx.lightirc.irc.event.PartEvent;
 import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
+import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
+import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
+import com.fusionx.lightirc.irc.event.UserEvent;
+import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.ui.IRCActivity;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
@@ -108,14 +108,14 @@ public class MessageSender {
     }
 
     /**
-    Start of sending messages
+     * Start of sending messages
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
         //if(mDisplayed) {
-            // Send message to the fragment if it exists
-            mBus.post(server, event);
+        // Send message to the fragment if it exists
+        mBus.post(server, event);
         //} else {
-            // Append to buffer in the channel
+        // Append to buffer in the channel
         //    server.onServerEvent(event);
         //}
     }
@@ -123,10 +123,10 @@ public class MessageSender {
     private void sendChannelEvent(final Server server, final Channel channel,
                                   final ChannelEvent event) {
         //if(mDisplayed) {
-            // Send message to the fragment if it exists
-            mBus.post(server, channel, event);
+        // Send message to the fragment if it exists
+        mBus.post(server, channel, event);
         //} else {
-            // Append to buffer in the channel
+        // Append to buffer in the channel
         //    channel.onChannelEvent(event);
         //}
     }
@@ -134,10 +134,10 @@ public class MessageSender {
     private void sendUserEvent(final Server server, final PrivateMessageUser user,
                                final UserEvent event) {
         //if(mDisplayed) {
-            // Send message to the fragment if it exists
-            mBus.post(server, user, event);
+        // Send message to the fragment if it exists
+        mBus.post(server, user, event);
         //} else {
-            // Append to buffer in the channel
+        // Append to buffer in the channel
         //    user.onUserEvent(event);
         //}
     }
@@ -199,7 +199,7 @@ public class MessageSender {
         String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
         // TODO - change this to be specific for PMs
-        if(sendingUser.equals(user)) {
+        if (sendingUser.equals(user)) {
             mention(user.getNick());
         }
         sendGenericUserEvent(server, user, message);
@@ -221,10 +221,10 @@ public class MessageSender {
      * <p/>
      * Method should not be used from anywhere but the Server class.
      *
-     * @param user - the destination user object
-     * @param sending            - the user who is sending the message - it may be us or it may
-     *                           be the other user
-     * @param rawMessage         - the message being sent
+     * @param user       - the destination user object
+     * @param sending    - the user who is sending the message - it may be us or it may
+     *                   be the other user
+     * @param rawMessage - the message being sent
      */
     public void sendPrivateMessage(final Server server, final PrivateMessageUser user,
                                    final User sending, final String rawMessage) {
@@ -259,7 +259,7 @@ public class MessageSender {
 
     public void sendUserListReceived(final Channel channel) {
         //if (mDisplayed) {
-            mBus.post(new UserListReceivedEvent(channel.getName()));
+        mBus.post(new UserListReceivedEvent(channel.getName()));
         //}
     }
 

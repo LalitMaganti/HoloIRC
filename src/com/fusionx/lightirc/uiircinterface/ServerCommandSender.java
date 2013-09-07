@@ -64,7 +64,7 @@ public class ServerCommandSender {
                 channel.getWriter().sendAction(action);
 
                 MessageSender.getSender(server.getTitle()).sendChannelAction(server, server
-                        .getUser().getNick(), channel,  server.getUser(), action);
+                        .getUser().getNick(), channel, server.getUser(), action);
             }
         });
     }

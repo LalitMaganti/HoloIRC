@@ -100,7 +100,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         for (ServerConfiguration.Builder builder : mBuilderList) {
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
-            if(sender != null) {
+            if (sender != null) {
                 //sender.getBus().unregister(this);
             }
         }
@@ -170,7 +170,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
                     (this, file);
             mBuilderList.add(builder);
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
-            if(sender != null) {
+            if (sender != null) {
                 sender.getBus().register(this);
             }
         }
@@ -234,7 +234,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
     private void disconnectFromServer(final ServerConfiguration.Builder builder) {
         final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
-        if(sender != null) {
+        if (sender != null) {
             sender.getBus().unregister(this);
         }
 

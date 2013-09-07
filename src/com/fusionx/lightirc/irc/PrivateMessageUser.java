@@ -25,7 +25,7 @@ public class PrivateMessageUser extends User {
     }
 
     public void onUserEvent(UserEvent event) {
-        if(nick.equals(event.userNick)) {
+        if (nick.equals(event.userNick)) {
             synchronized (buffer.getLock()) {
                 buffer.add(Html.fromHtml(event.message));
             }

@@ -40,7 +40,6 @@ import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -415,6 +414,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     }
 
     // UserListFragment Listener Callbacks
+
     /**
      * Method which is called when the user requests a mention from
      * the UserListFragment

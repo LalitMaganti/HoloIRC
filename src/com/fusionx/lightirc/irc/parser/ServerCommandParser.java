@@ -106,7 +106,7 @@ public class ServerCommandParser {
                 return false;
             default:
                 // Not sure what to do here - TODO
-                if(DEBUG) {
+                if (DEBUG) {
                     Log.v(LOG_TAG, rawLine);
                 }
                 return false;
@@ -267,7 +267,7 @@ public class ServerCommandParser {
         if (user.equals(mServer.getUser())) {
             // This is a caveat of ZNC where it decides weirdly to tell the client to part all
             // the channels before closing to socket - don't do that
-            if(!disconnectSent) {
+            if (!disconnectSent) {
                 mSender.sendChanelParted(channel.getName());
             }
             mUserChannelInterface.removeChannel(channel);

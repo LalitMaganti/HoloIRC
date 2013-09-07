@@ -42,7 +42,7 @@ public class UserFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        if(getListAdapter() == null) {
+        if (getListAdapter() == null) {
             final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                     UserFragmentCallbacks.class);
             final Server server = callback.getServer(true);
@@ -67,7 +67,7 @@ public class UserFragment extends IRCFragment {
         final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                 UserFragmentCallbacks.class);
         final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
-        if(sender != null) {
+        if (sender != null) {
             sender.getBus().unregister(this);
         }
     }

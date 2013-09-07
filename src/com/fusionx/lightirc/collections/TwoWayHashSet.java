@@ -41,14 +41,14 @@ public abstract class TwoWayHashSet<A extends Updateable, B extends Updateable> 
 
     protected synchronized void decouple(final A objectA, final B objectB) {
         final Set<B> setOfB = aToBMap.get(objectA);
-        if(setOfB != null) {
+        if (setOfB != null) {
             setOfB.remove(objectB);
             if (setOfB.isEmpty()) {
                 aToBMap.remove(objectA);
             }
         }
         final Set<A> setOfA = bToAMap.get(objectB);
-        if(setOfA != null) {
+        if (setOfA != null) {
             setOfA.remove(objectA);
             if (setOfA.isEmpty()) {
                 bToAMap.remove(objectB);

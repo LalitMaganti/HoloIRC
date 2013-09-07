@@ -17,7 +17,7 @@ public class BuilderList extends ArrayList<ServerConfiguration.Builder> {
 
     public boolean remove(String name) {
         for (ServerConfiguration.Builder builder : this) {
-            if(builder.getTitle().equalsIgnoreCase(name)) {
+            if (builder.getTitle().equalsIgnoreCase(name)) {
                 return super.remove(builder);
             }
         }

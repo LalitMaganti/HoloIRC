@@ -26,7 +26,6 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-import java.util.HashSet;
 import java.util.TreeSet;
 
 public class IgnoreListFragment extends ListFragment implements ActionMode.Callback,

@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.irc;
 
-import android.text.style.ForegroundColorSpan;
-
 import com.fusionx.lightirc.util.MiscUtils;
 
 import lombok.Getter;

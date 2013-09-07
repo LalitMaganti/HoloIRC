@@ -22,28 +22,19 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
-import android.text.Html;
-import android.text.util.Linkify;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Getter;

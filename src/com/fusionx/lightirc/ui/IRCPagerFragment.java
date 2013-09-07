@@ -3,22 +3,18 @@ package com.fusionx.lightirc.ui;
 import android.app.Activity;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import java.util.ArrayList;
 

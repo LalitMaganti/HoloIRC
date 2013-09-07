@@ -30,10 +30,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.github.espiandev.showcaseview.ShowcaseView;
 
 import java.util.ArrayList;
 

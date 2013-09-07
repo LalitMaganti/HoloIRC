@@ -50,7 +50,7 @@ public class ChannelFragment extends IRCFragment {
 
         mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(getActivity());
 
-        if(callback == null) {
+        if (callback == null) {
             callback = FragmentUtils.getParent(ChannelFragment.this,
                     ChannelFragmentCallback.class);
         }
@@ -61,7 +61,7 @@ public class ChannelFragment extends IRCFragment {
         super.onPause();
 
         final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
-        if(sender != null) {
+        if (sender != null) {
             sender.getBus().unregister(this);
         }
     }
@@ -70,7 +70,7 @@ public class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        if(getListAdapter() == null) {
+        if (getListAdapter() == null) {
             final Server server = callback.getServer(true);
             final Channel channel = server.getUserChannelInterface().getChannel(title);
             final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
@@ -102,11 +102,11 @@ public class ChannelFragment extends IRCFragment {
 
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if(title.equals(event.channelName)) {
-            if(event.userListChanged) {
+        if (title.equals(event.channelName)) {
+            if (event.userListChanged) {
                 callback.updateUserList(title);
             }
-            if((!event.userListChanged || mUserListMessagesShown)) {
+            if ((!event.userListChanged || mUserListMessagesShown)) {
                 getListAdapter().notifyDataSetChanged();
             }
         }
@@ -114,7 +114,7 @@ public class ChannelFragment extends IRCFragment {
 
     @Subscribe
     public void onUserListReceived(final UserListReceivedEvent event) {
-        if(event.channelName.equals(title)) {
+        if (event.channelName.equals(title)) {
             callback.updateUserList(title);
         }
     }

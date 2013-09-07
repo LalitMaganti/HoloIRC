@@ -27,11 +27,11 @@ public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView view;
-        if(convertView == null) {
+        if (convertView == null) {
             view = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
                     .irc_listview_textview, parent, false);
             view.setTypeface(UIUtils.getRobotoLight(getContext()));
-            if(UIUtils.hasHoneycomb()) {
+            if (UIUtils.hasHoneycomb()) {
                 view.setTextIsSelectable(true);
             }
         } else {

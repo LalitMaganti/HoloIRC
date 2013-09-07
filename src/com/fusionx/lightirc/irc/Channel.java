@@ -92,7 +92,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     }
 
     public void onChannelEvent(final ChannelEvent event) {
-        if((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
+        if ((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
                 .message)) {
             synchronized (buffer.getLock()) {
                 buffer.add(Html.fromHtml(event.message));

@@ -147,7 +147,7 @@ public class MiscUtils {
     }
 
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
-        if(ignoreList == null) {
+        if (ignoreList == null) {
             final SharedPreferences preferences = context.getSharedPreferences(fileName,
                     Context.MODE_PRIVATE);
             ignoreList = SharedPreferencesUtils.getStringSet(preferences,

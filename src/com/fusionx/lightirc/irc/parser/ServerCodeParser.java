@@ -147,7 +147,7 @@ public class ServerCodeParser {
     private void parseFallThroughCode(int code, String message) {
         if (genericCodes.contains(code)) {
             mSender.sendGenericServerEvent(mServer, message);
-        } else if(DEBUG) {
+        } else if (DEBUG) {
             // Not sure what to do here - TODO
             Log.v(LOG_TAG, message);
         }

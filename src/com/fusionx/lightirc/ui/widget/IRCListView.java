@@ -16,7 +16,7 @@ public class IRCListView extends ListView {
     protected void layoutChildren() {
         // Hacky way to get round exception
         // TODO - find a better way to do this
-        if(getCount() != getAdapter().getCount()) {
+        if (getCount() != getAdapter().getCount()) {
             getAdapter().notifyDataSetChanged();
         }
         synchronized (getAdapter().getListLock()) {
@@ -26,7 +26,7 @@ public class IRCListView extends ListView {
 
     @Override
     public IRCMessageAdapter getAdapter() {
-        if(super.getAdapter() == null) {
+        if (super.getAdapter() == null) {
             return null;
         } else {
             return (IRCMessageAdapter) ((AlphaInAnimationAdapter) super.getAdapter())
