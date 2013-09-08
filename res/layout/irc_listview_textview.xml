@@ -27,4 +27,5 @@
           android:paddingLeft="8dip"
           android:paddingRight="8dip"
           android:textSize="14sp"
+          android:text="?server_card_text"
           android:textIsSelectable="true"/>

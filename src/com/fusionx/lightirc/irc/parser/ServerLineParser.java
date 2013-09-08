@@ -21,11 +21,13 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import android.content.Context;
 import android.util.Log;
 
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.ErrorEvent;
+import com.fusionx.lightirc.irc.event.Event;
+import com.fusionx.lightirc.irc.event.QuitEvent;
 import com.fusionx.lightirc.irc.misc.CoreListener;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -52,10 +54,10 @@ public class ServerLineParser {
     private final ServerCodeParser codeParser;
     private final ServerCommandParser commandParser;
 
-    public ServerLineParser(final Context context, final Server server) {
+    public ServerLineParser(final Server server) {
         this.server = server;
-        commandParser = new ServerCommandParser(context, this);
-        codeParser = new ServerCodeParser(context, this);
+        commandParser = new ServerCommandParser(server.getContext(), this);
+        codeParser = new ServerCodeParser(server.getContext(), this);
     }
 
     /**
@@ -68,8 +70,8 @@ public class ServerLineParser {
         String line;
         try {
             while ((line = reader.readLine()) != null) {
-                final boolean quit = parseLine(line);
-                if (quit) {
+                final Event quit = parseLine(line);
+                if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
                     return;
                 }
             }
@@ -84,22 +86,21 @@ public class ServerLineParser {
      * @param line - the raw line from the server
      * @return - returns a boolean which indicates whether the server has disconnected
      */
-    boolean parseLine(final String line) {
+    Event parseLine(final String line) {
         final ArrayList<String> parsedArray = MiscUtils.splitRawLine(line, true);
         switch (parsedArray.get(0)) {
             case ServerCommands.Ping:
                 // Immediately return
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(server.getWriter(), source);
-                return false;
+                return new Event(line);
             case ServerCommands.Error:
                 // We are finished - the server has kicked us out for some reason
-                return true;
+                return new ErrorEvent(line);
             default:
                 // Check if the second thing is a code or a command
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
-                    codeParser.parseCode(parsedArray);
-                    return false;
+                    return codeParser.parseCode(parsedArray);
                 } else {
                     return commandParser.parseCommand(parsedArray, line, disconnectSent);
                 }

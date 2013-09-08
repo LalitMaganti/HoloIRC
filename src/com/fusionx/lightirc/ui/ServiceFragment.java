@@ -12,13 +12,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.communication.MessageSender;
 
 public class ServiceFragment extends Fragment {
-    private IRCBridgeService mService;
+    private IRCService mService;
     private ServiceFragmentCallback mCallback;
     private MessageSender mSender;
 
@@ -109,7 +109,7 @@ public class ServiceFragment extends Fragment {
     }
 
     public void setUpService() {
-        final Intent service = new Intent(getActivity(), IRCBridgeService.class);
+        final Intent service = new Intent(getActivity(), IRCService.class);
         service.putExtra("server", true);
         service.putExtra("serverName", mCallback.getServerTitle());
         service.putExtra("stop", false);
@@ -122,7 +122,7 @@ public class ServiceFragment extends Fragment {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCBridgeService.IRCBinder) binder).getService();
+            mService = ((IRCService.IRCBinder) binder).getService();
 
             mService.setServerDisplayed(mCallback.getServerTitle());
 

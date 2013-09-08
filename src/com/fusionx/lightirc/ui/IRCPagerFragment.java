@@ -212,14 +212,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         fragment.onConnectedToServer();
     }
 
-    public void notifyDataSetChanged(final String serverTitle) {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getFragment(serverTitle,
-                FragmentTypeEnum.Server);
-        if (fragment != null) {
-            fragment.getListAdapter().notifyDataSetChanged();
-        }
-    }
-
     public interface IRCPagerInterface {
         public void onUserListChanged(String channelName);
 

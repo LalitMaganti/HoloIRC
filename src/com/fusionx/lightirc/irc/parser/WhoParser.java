@@ -24,7 +24,9 @@ package com.fusionx.lightirc.irc.parser;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.irc.event.Event;
+import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
+import com.fusionx.lightirc.communication.MessageSender;
 
 import java.util.ArrayList;
 
@@ -38,7 +40,7 @@ public class WhoParser {
         mServerTitle = serverTitle;
     }
 
-    void parseWhoReply(final ArrayList<String> parsedArray) {
+    Event parseWhoReply(final ArrayList<String> parsedArray) {
         if (whoChannel == null) {
             whoChannel = mUserChannelInterface.getChannel(parsedArray.get(0));
         }
@@ -48,13 +50,19 @@ public class WhoParser {
 
         mUserChannelInterface.addChannelToUser(user, whoChannel);
         whoChannel.getUsers().markForAddition(user);
+
+        return new Event(user.getNick());
     }
 
-    void parseWhoFinished() {
+    Event parseWhoFinished() {
         if (whoChannel != null) {
             whoChannel.getUsers().addMarked();
-            MessageSender.getSender(mServerTitle).sendUserListReceived(whoChannel);
+            UserListReceivedEvent event = MessageSender.getSender(mServerTitle)
+                    .sendUserListReceived(whoChannel);
             whoChannel = null;
+            return event;
+        } else {
+            return new Event("null");
         }
     }
 }

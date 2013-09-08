@@ -22,18 +22,20 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
+import android.text.Spanned;
 import android.view.View;
 
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
+import com.fusionx.lightirc.communication.MessageParser;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.event.NickInUseEvent;
-import com.fusionx.lightirc.irc.event.ServerEvent;
-import com.fusionx.lightirc.uiircinterface.MessageParser;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.squareup.otto.Subscribe;
+
+import java.util.ArrayList;
 
 public class ServerFragment extends IRCFragment {
     private boolean mRegistered = false;
@@ -69,13 +71,13 @@ public class ServerFragment extends IRCFragment {
         }
         final Server server = callback.getServer(true);
         if (server != null && getListAdapter() == null) {
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
-                    IRCMessageAdapter(getActivity(), server.getBuffer()));
-            adapter.setAbsListView(getListView());
-            setListAdapter(adapter);
-        }
-        if (getListAdapter() != null) {
-            getListAdapter().notifyDataSetChanged();
+            final IRCMessageAdapter adapter = new IRCMessageAdapter(getActivity(),
+                    new ArrayList<Spanned>());
+            final AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter
+                    (adapter);
+            alphaInAnimationAdapter.setAbsListView(getListView());
+            setListAdapter(alphaInAnimationAdapter);
+            server.setBuffer(adapter);
         }
     }
 
@@ -111,11 +113,5 @@ public class ServerFragment extends IRCFragment {
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
         callback.selectServerFragment();
-        getListAdapter().notifyDataSetChanged();
-    }
-
-    @Subscribe
-    public void onServerEvent(ServerEvent event) {
-        getListAdapter().notifyDataSetChanged();
     }
 }

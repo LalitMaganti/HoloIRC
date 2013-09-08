@@ -12,15 +12,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.collections.BufferList;
 import com.fusionx.lightirc.util.UIUtils;
 
-public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
-    private BufferList mObjects;
+import java.util.ArrayList;
 
-    public IRCMessageAdapter(Context context, BufferList objects) {
+public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
+    public IRCMessageAdapter(Context context, ArrayList<Spanned> objects) {
         super(context, R.layout.irc_listview_textview, objects);
-        mObjects = objects;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -34,15 +32,12 @@ public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
             if (UIUtils.hasHoneycomb()) {
                 view.setTextIsSelectable(true);
             }
+            view.setTextColor(UIUtils.getThemedTextColor(getContext()));
         } else {
             view = (TextView) convertView;
         }
         view.setText(getItem(position));
         Linkify.addLinks(view, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
         return view;
-    }
-
-    public Object getListLock() {
-        return mObjects.getLock();
     }
 }

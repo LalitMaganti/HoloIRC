@@ -28,12 +28,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -80,8 +80,8 @@ public abstract class IRCFragment extends ListFragment implements TextView
     }
 
     @Override
-    public AlphaInAnimationAdapter getListAdapter() {
-        return (AlphaInAnimationAdapter) super.getListAdapter();
+    public BaseAdapter getListAdapter() {
+        return (BaseAdapter) super.getListAdapter();
     }
 
     public abstract void sendMessage(final String message);

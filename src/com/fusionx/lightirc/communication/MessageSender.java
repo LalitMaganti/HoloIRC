@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.uiircinterface;
+package com.fusionx.lightirc.communication;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -111,35 +111,18 @@ public class MessageSender {
      * Start of sending messages
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
-        //if(mDisplayed) {
-        // Send message to the fragment if it exists
-        mBus.post(server, event);
-        //} else {
-        // Append to buffer in the channel
-        //    server.onServerEvent(event);
-        //}
+        server.onServerEvent(event);
+        mBus.post(event);
     }
 
-    private void sendChannelEvent(final Server server, final Channel channel,
-                                  final ChannelEvent event) {
-        //if(mDisplayed) {
-        // Send message to the fragment if it exists
-        mBus.post(server, channel, event);
-        //} else {
-        // Append to buffer in the channel
-        //    channel.onChannelEvent(event);
-        //}
+    private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
+        channel.onChannelEvent(event);
+        //mBus.post(event);
     }
 
-    private void sendUserEvent(final Server server, final PrivateMessageUser user,
-                               final UserEvent event) {
-        //if(mDisplayed) {
-        // Send message to the fragment if it exists
-        mBus.post(server, user, event);
-        //} else {
-        // Append to buffer in the channel
-        //    user.onUserEvent(event);
-        //}
+    private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
+        user.onUserEvent(event);
+        //mBus.post(event);
     }
 
     /*
@@ -147,73 +130,82 @@ public class MessageSender {
      */
 
     // Generic events start
-    public void sendGenericServerEvent(final Server server, final String message) {
+    public ServerEvent sendGenericServerEvent(final Server server, final String message) {
         final ServerEvent event = new ServerEvent(message);
         sendServerEvent(server, event);
+        return event;
     }
 
-    public void sendGenericChannelEvent(final Server server, final Channel channel,
-                                        final String message, final boolean userListChanged) {
+    public ChannelEvent sendGenericChannelEvent(final Channel channel, final String message,
+                                                final boolean userListChanged) {
         final ChannelEvent event = new ChannelEvent(channel.getName(), message,
                 userListChanged);
-        sendChannelEvent(server, channel, event);
+        sendChannelEvent(channel, event);
+        return event;
     }
 
-    private void sendGenericUserEvent(final Server server, final PrivateMessageUser user,
-                                      final String message) {
+    private UserEvent sendGenericUserEvent(final PrivateMessageUser user, final String message) {
         final UserEvent privateMessageEvent = new UserEvent(user.getNick(), message);
-        sendUserEvent(server, user, privateMessageEvent);
+        sendUserEvent(user, privateMessageEvent);
+        return privateMessageEvent;
     }
     // Generic events end
 
-    public void sendFinalDisconnection(final Server server, final String disconnectLine,
-                                       final boolean expectedDisconnect) {
+    public FinalDisconnectEvent sendFinalDisconnection(final Server server,
+                                                       final String disconnectLine,
+                                                       final boolean expectedDisconnect) {
         final FinalDisconnectEvent event = new FinalDisconnectEvent(expectedDisconnect,
                 disconnectLine);
-        // Send message to the fragment if it exists
-        mBus.post(server, event);
+        sendServerEvent(server, event);
+        return event;
     }
 
-    public void sendRetryPendingServerDisconnection(final Server server,
+    public RetryPendingDisconnectEvent sendRetryPendingServerDisconnection(final Server server,
                                                     final String disconnectLine) {
         final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
-        // Send message to the fragment if it exists
-        mBus.post(server, event);
+        sendServerEvent(server, event);
+        return event;
     }
 
-    public void sendNewPrivateMessage(final String nick) {
-        mBus.post(new PrivateMessageEvent(nick));
+    public PrivateMessageEvent sendNewPrivateMessage(final String nick) {
+        final PrivateMessageEvent event = new PrivateMessageEvent(nick);
+        mBus.post(event);
+        return event;
     }
 
-    public void sendChanelJoined(final String channelName) {
-        mBus.post(new JoinEvent(channelName));
+    public JoinEvent sendChanelJoined(final String channelName) {
+        final JoinEvent event = new JoinEvent(channelName);
+        mBus.post(event);
+        return event;
     }
 
-    public void sendChanelParted(final String channelName) {
-        mBus.post(new PartEvent(channelName));
+    public PartEvent sendChanelParted(final String channelName) {
+        final PartEvent event = new PartEvent(channelName);
+        mBus.post(event);
+        return event;
     }
 
-    public void sendPrivateAction(final Server server, final PrivateMessageUser user,
-                                  final User sendingUser,
-                                  final String rawAction) {
+    public UserEvent sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
+                                       final String rawAction) {
         String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
         // TODO - change this to be specific for PMs
         if (sendingUser.equals(user)) {
             mention(user.getNick());
         }
-        sendGenericUserEvent(server, user, message);
+        return sendGenericUserEvent(user, message);
     }
 
-    public void sendChannelAction(final Server server, final String userNick, final Channel channel,
-                                  final ChannelUser sendingUser, final String rawAction) {
+    public ChannelEvent sendChannelAction(final String userNick,
+                                  final Channel channel, final ChannelUser sendingUser,
+                                  final String rawAction) {
         String finalMessage = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getPrettyNick(channel), rawAction);
         if (rawAction.toLowerCase().contains(userNick.toLowerCase())) {
             mention(channel.getName());
             finalMessage = "<b>" + finalMessage + "</b>";
         }
-        sendGenericChannelEvent(server, channel, finalMessage, false);
+        return sendGenericChannelEvent(channel, finalMessage, false);
     }
 
     /**
@@ -226,16 +218,16 @@ public class MessageSender {
      *                   be the other user
      * @param rawMessage - the message being sent
      */
-    public void sendPrivateMessage(final Server server, final PrivateMessageUser user,
-                                   final User sending, final String rawMessage) {
+    public UserEvent sendPrivateMessage(final PrivateMessageUser user, final User sending,
+                                        final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getColorfulNick(), rawMessage);
         // TODO - change this to be specific for PMs
         mention(user.getNick());
-        sendGenericUserEvent(server, user, message);
+        return sendGenericUserEvent(user, message);
     }
 
-    public void sendMessageToChannel(final Server server, final String userNick,
+    public ChannelEvent sendMessageToChannel(final String userNick,
                                      final Channel channel, final String sendingNick,
                                      final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
@@ -244,23 +236,25 @@ public class MessageSender {
             mention(channel.getName());
             preMessage = "<b>" + preMessage + "</b>";
         }
-        sendGenericChannelEvent(server, channel, preMessage, false);
+        return sendGenericChannelEvent(channel, preMessage, false);
     }
 
-    public void sendNickInUseMessage(final Server server) {
+    public NickInUseEvent sendNickInUseMessage(final Server server) {
         final NickInUseEvent event = new NickInUseEvent(mContext);
         sendServerEvent(server, event);
+        return event;
     }
 
-    public void switchToServerMessage(final Server server, final String message) {
+    public SwitchToServerEvent switchToServerMessage(final Server server, final String message) {
         final SwitchToServerEvent event = new SwitchToServerEvent(message);
         sendServerEvent(server, event);
+        return event;
     }
 
-    public void sendUserListReceived(final Channel channel) {
-        //if (mDisplayed) {
-        mBus.post(new UserListReceivedEvent(channel.getName()));
-        //}
+    public UserListReceivedEvent sendUserListReceived(final Channel channel) {
+        final UserListReceivedEvent event = new UserListReceivedEvent(channel.getName());
+        mBus.post(event);
+        return event;
     }
 
     public void sendConnected(final Server server, final String url) {

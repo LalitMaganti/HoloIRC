@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.irc.event;
 
-public class PartEvent {
+public class PartEvent extends Event {
     public final String channelName;
 
     public PartEvent(String channelName) {

@@ -56,7 +56,7 @@ import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DecorChildLayout;
-import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
+import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
@@ -224,13 +224,11 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
 
     @Subscribe
     public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
-        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
         onDisconnect(false, true);
     }
 
     @Subscribe
     public void onFinalDisconnect(final FinalDisconnectEvent event) {
-        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
         onDisconnect(event.disconnectExpected, false);
     }
 
@@ -251,8 +249,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
 
     @Subscribe
     public void onSwitchToServer(final SwitchToServerEvent event) {
-        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
-
         mIRCPagerFragment.selectServerFragment();
     }
 
@@ -261,8 +257,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
      */
     @Subscribe
     public void onServerConnected(final ConnectedEvent event) {
-        mIRCPagerFragment.notifyDataSetChanged(mServerTitle);
-
         mIRCPagerFragment.connectedToServer();
         mActionsPagerFragment.updateConnectionStatus(true);
     }

@@ -51,4 +51,9 @@ public abstract class User {
     public String getColorfulNick() {
         return String.format(nickHTML, nick);
     }
+
+    @Override
+    public String toString() {
+        return nick;
+    }
 }

@@ -16,9 +16,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ISettings;
-import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.michaelnovakjr.numberpicker.NumberPickerPreference;
@@ -116,7 +116,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     final Intent service = new Intent(mActivity,
-                                            IRCBridgeService.class);
+                                            IRCService.class);
                                     service.putExtra("stop", false);
                                     mActivity.bindService(service, mConnection, 0);
                                 }
@@ -128,7 +128,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
         private final ServiceConnection mConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
-                final IRCBridgeService service = ((IRCBridgeService.IRCBinder) binder).getService();
+                final IRCService service = ((IRCService.IRCBinder) binder).getService();
                 service.disconnectAll();
                 mActivity.unbindService(mConnection);
                 final Intent intent = mActivity.getBaseContext().getPackageManager()

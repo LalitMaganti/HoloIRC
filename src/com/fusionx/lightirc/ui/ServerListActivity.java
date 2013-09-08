@@ -39,14 +39,14 @@ import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
 import com.fusionx.lightirc.collections.BuilderList;
+import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
-import com.fusionx.lightirc.uiircinterface.IRCBridgeService;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
-import com.fusionx.lightirc.uiircinterface.ServerCommandSender;
+import com.fusionx.lightirc.communication.MessageSender;
+import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.github.espiandev.showcaseview.ShowcaseView;
@@ -60,7 +60,7 @@ import java.util.ArrayList;
 public class ServerListActivity extends ActionBarActivity implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener,
         ServerListAdapter.BuilderAdapterCallback, ShowcaseView.OnShowcaseEventListener {
-    private IRCBridgeService mService = null;
+    private IRCService mService = null;
     private BuilderList mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
     private ServerListAdapter mServerCardsAdapter = null;
@@ -81,7 +81,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     protected void onStart() {
         super.onStart();
 
-        final Intent service = new Intent(this, IRCBridgeService.class);
+        final Intent service = new Intent(this, IRCService.class);
         service.putExtra("stop", false);
         startService(service);
         bindService(service, mConnection, 0);
@@ -128,7 +128,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCBridgeService.IRCBinder) binder).getService();
+            mService = ((IRCService.IRCBinder) binder).getService();
             setUpServerList();
 
             final ListView listView = (ListView) findViewById(R.id.server_list);

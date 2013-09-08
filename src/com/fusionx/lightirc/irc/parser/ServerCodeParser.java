@@ -28,7 +28,9 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
+import com.fusionx.lightirc.irc.event.ChannelEvent;
+import com.fusionx.lightirc.irc.event.Event;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -72,7 +74,7 @@ public class ServerCodeParser {
      *
      * @param parsedArray - the array of the line (split by spaces)
      */
-    void parseCode(final ArrayList<String> parsedArray) {
+    Event parseCode(final ArrayList<String> parsedArray) {
         final int code = Integer.parseInt(parsedArray.get(1));
 
         // Pretty common across all the codes
@@ -83,73 +85,71 @@ public class ServerCodeParser {
             case RPL_NAMEREPLY:
             case RPL_ENDOFNAMES:
                 // TODO - maybe try to use this rather than WHO replies in the future?
-                return;
+                return new Event(message);
             case RPL_MOTDSTART:
             case RPL_MOTD:
                 final String motdline = message.substring(1).trim();
                 if (motdAllowed) {
-                    mSender.sendGenericServerEvent(mServer, motdline);
+                    return mSender.sendGenericServerEvent(mServer, motdline);
+                } else {
+                    return new Event(motdline);
                 }
-                return;
             case RPL_ENDOFMOTD:
                 if (motdAllowed) {
-                    mSender.sendGenericServerEvent(mServer, message);
+                    return mSender.sendGenericServerEvent(mServer, message);
+                } else {
+                    return new Event(message);
                 }
-                return;
             case RPL_TOPIC:
-                parseTopicReply(parsedArray);
-                return;
+                return parseTopicReply(parsedArray);
             case RPL_TOPICINFO:
-                parseTopicInfo(parsedArray);
-                return;
+                return parseTopicInfo(parsedArray);
             case RPL_WHOREPLY:
-                mWhoParser.parseWhoReply(parsedArray);
-                return;
+                return mWhoParser.parseWhoReply(parsedArray);
             case RPL_ENDOFWHO:
-                mWhoParser.parseWhoFinished();
-                return;
+                return mWhoParser.parseWhoFinished();
             case ERR_NICKNAMEINUSE:
                 final MessageSender sender = MessageSender.getSender(mServer.getTitle());
-                sender.sendNickInUseMessage(mServer);
-                return;
+                return sender.sendNickInUseMessage(mServer);
             default:
                 if (whoisCodes.contains(code)) {
-                    mSender.switchToServerMessage(mServer, MiscUtils.convertArrayListToString
+                    return mSender.switchToServerMessage(mServer, MiscUtils.convertArrayListToString
                             (parsedArray));
                 } else {
-                    parseFallThroughCode(code, message);
+                    return parseFallThroughCode(code, message);
                 }
         }
     }
 
-    private void parseTopicReply(ArrayList<String> parsedArray) {
+    private Event parseTopicReply(ArrayList<String> parsedArray) {
         final String channelName = parsedArray.get(0);
         final String topic = parsedArray.get(1);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         channel.setTopic(topic);
+        return new Event(topic);
     }
 
     // TODO - maybe using a colorful nick here if available?
     // TODO - possible optimization - make a new parser for topic stuff
     // Allows reduced overhead of retrieving channel from interface
-    private void parseTopicInfo(final ArrayList<String> parsedArray) {
+    private ChannelEvent parseTopicInfo(final ArrayList<String> parsedArray) {
         final String channelName = parsedArray.get(0);
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        //channel.setTopicSetter(nick);
 
-        mSender.sendGenericChannelEvent(mServer, channel,
+        return mSender.sendGenericChannelEvent(channel,
                 String.format(mContext.getString(R
                         .string.parser_new_topic), channel.getTopic(),
                         nick), false);
     }
 
-    private void parseFallThroughCode(int code, String message) {
+    private Event parseFallThroughCode(int code, String message) {
         if (genericCodes.contains(code)) {
-            mSender.sendGenericServerEvent(mServer, message);
+            return mSender.sendGenericServerEvent(mServer, message);
         } else if (DEBUG) {
             // Not sure what to do here - TODO
             Log.v(LOG_TAG, message);
         }
+        return new Event(message);
     }
 }

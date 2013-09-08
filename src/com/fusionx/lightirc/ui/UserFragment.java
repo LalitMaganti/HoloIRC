@@ -21,23 +21,14 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
+import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.event.UserEvent;
-import com.fusionx.lightirc.uiircinterface.MessageParser;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
-import com.squareup.otto.Subscribe;
 
 public class UserFragment extends IRCFragment {
-    @Subscribe
-    public void onUserEvent(final UserEvent event) {
-        getListAdapter().notifyDataSetChanged();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -47,28 +38,12 @@ public class UserFragment extends IRCFragment {
                     UserFragmentCallbacks.class);
             final Server server = callback.getServer(true);
             final PrivateMessageUser channel = server.getPrivateMessageUser(title);
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(new
-                    IRCMessageAdapter(getActivity(), channel.getBuffer()));
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(channel.getBuffer
+                    ());
             adapter.setAbsListView(getListView());
             setListAdapter(adapter);
         } else {
             getListAdapter().notifyDataSetChanged();
-        }
-
-        final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
-                UserFragmentCallbacks.class);
-        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
-                UserFragmentCallbacks.class);
-        final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
-        if (sender != null) {
-            sender.getBus().unregister(this);
         }
     }
 

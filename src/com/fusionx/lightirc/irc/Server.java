@@ -26,19 +26,23 @@ import android.os.Handler;
 import android.text.Html;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.collections.BufferList;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.lightirc.irc.event.Event;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.OutputStreamWriter;
 import java.util.Iterator;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
 
 @Data
@@ -46,66 +50,74 @@ public class Server {
     private ServerWriter writer;
     private UserChannelInterface userChannelInterface;
     private AppUser user;
-
-    private final BufferList buffer = new BufferList();
+    private final String title;
+    private IRCMessageAdapter buffer;
 
     private String status = "Disconnected";
 
-    private final String title;
+    @Getter(AccessLevel.NONE)
     private final ConnectionWrapper mWrapper;
+    @Getter(AccessLevel.NONE)
     private final Context mContext;
-
-    private Handler handler;
+    private final Handler mAdapterHandler;
 
     public Server(final String serverTitle, final ConnectionWrapper wrapper,
-                  final Context context) {
+                  final Context context, final Handler adapterHandler) {
         title = serverTitle;
         mWrapper = wrapper;
         mContext = context;
+        mAdapterHandler = adapterHandler;
     }
 
     public void onServerEvent(final ServerEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            synchronized (buffer.getLock()) {
-                buffer.add(Html.fromHtml(event.message));
+            mAdapterHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    buffer.add(Html.fromHtml(event.message));
+                }
+            });
+        }
+    }
+
+    public Event privateMessageSent(final PrivateMessageUser userWhoIsNotUs,
+                                    final String message, final boolean weAreSending) {
+        final MessageSender sender = MessageSender.getSender(title);
+        final User sendingUser = weAreSending ? user : userWhoIsNotUs;
+        if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
+            user.createPrivateMessage(userWhoIsNotUs);
+
+            if (StringUtils.isNotEmpty(message)) {
+                sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
+            }
+
+            return sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
+        } else {
+            if (StringUtils.isNotEmpty(message)) {
+                return sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
+            } else {
+                return new Event(userWhoIsNotUs.getNick());
             }
         }
     }
 
-    public void privateMessageSent(final PrivateMessageUser userWhoIsNotUs, final String message,
+    public Event privateActionSent(final PrivateMessageUser userWhoIsNotUs, final String action,
                                    final boolean weAreSending) {
         final MessageSender sender = MessageSender.getSender(title);
         final User sendingUser = weAreSending ? user : userWhoIsNotUs;
         if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
             user.createPrivateMessage(userWhoIsNotUs);
 
-            if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(this, userWhoIsNotUs, sendingUser, message);
-            }
-
-            sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
-        } else {
-            if (StringUtils.isNotEmpty(message)) {
-                sender.sendPrivateMessage(this, userWhoIsNotUs, sendingUser, message);
-            }
-        }
-    }
-
-    public void privateActionSent(final PrivateMessageUser userWhoIsNotUs, final String action,
-                                  final boolean weAreSending) {
-        final MessageSender sender = MessageSender.getSender(title);
-        final User sendingUser = weAreSending ? user : userWhoIsNotUs;
-        if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
-            user.createPrivateMessage(userWhoIsNotUs);
-
             if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(this, userWhoIsNotUs, sendingUser, action);
+                sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
             }
 
-            sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
+            return sender.sendNewPrivateMessage(userWhoIsNotUs.getNick());
         } else {
             if (StringUtils.isNotEmpty(action)) {
-                sender.sendPrivateAction(this, userWhoIsNotUs, sendingUser, action);
+                return sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
+            } else {
+                return new Event(userWhoIsNotUs.getNick());
             }
         }
     }
@@ -118,7 +130,7 @@ public class Server {
                 return privateMessageUser;
             }
         }
-        return new PrivateMessageUser(nick, userChannelInterface);
+        return new PrivateMessageUser(nick, userChannelInterface, mAdapterHandler);
     }
 
     public boolean isConnected(final Context context) {
@@ -134,9 +146,18 @@ public class Server {
         return "HoloIRC " + MiscUtils.getAppVersion(mContext) + " Android IRC client";
     }
 
+    public Context getContext() {
+        return mContext;
+    }
+
     public void cleanup() {
         writer = null;
         userChannelInterface = null;
         user = null;
+    }
+
+    public void setupUserChannelInterface(final OutputStreamWriter streamWriter) {
+        userChannelInterface = new UserChannelInterface(streamWriter, mContext, this,
+                mAdapterHandler);
     }
 }

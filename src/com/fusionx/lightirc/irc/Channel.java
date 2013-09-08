@@ -21,49 +21,59 @@
 
 package com.fusionx.lightirc.irc;
 
+import android.os.Handler;
 import android.text.Html;
+import android.text.Spanned;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.collections.BufferList;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+
 import de.scrum_master.util.UpdateableTreeSet;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
+@Getter
 public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
-    @Getter
     protected final String name;
-    @Getter
-    protected final BufferList buffer = new BufferList();
-
-    @Getter
     protected final ChannelWriter writer;
-    protected final UserChannelInterface mUserChannelInterface;
 
-    @Getter
+    @Setter(AccessLevel.NONE)
+    protected IRCMessageAdapter buffer;
     @Setter
     protected String topic;
 
+    @Getter(AccessLevel.NONE)
     private boolean mUserListMessagesShown;
+    @Getter(AccessLevel.NONE)
+    protected final UserChannelInterface mUserChannelInterface;
+    @Getter(AccessLevel.NONE)
+    private final Handler mAdapterHandler;
 
-    protected Channel(@NonNull final String channelName,
-                      @NonNull final UserChannelInterface userChannelInterface) {
+    protected Channel(final String channelName, final UserChannelInterface
+            userChannelInterface, final Handler adapterHandler) {
+        adapterHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                buffer = new IRCMessageAdapter(mUserChannelInterface.getContext(),
+                        new ArrayList<Spanned>());
+                final String message = String.format(userChannelInterface.getContext().getString
+                        (R.string.parser_joined_channel), userChannelInterface
+                        .getServer().getUser().getColorfulNick());
+                buffer.add(Html.fromHtml(message));
+            }
+        });
         name = channelName;
         writer = new ChannelWriter(userChannelInterface.getOutputStream(), this);
         mUserChannelInterface = userChannelInterface;
-
-        final String message = String.format(userChannelInterface.getContext().getString(R.string
-                .parser_joined_channel), userChannelInterface
-                .getServer().getUser().getColorfulNick());
-        synchronized (buffer.getLock()) {
-            buffer.add(Html.fromHtml(message));
-        }
+        mAdapterHandler = adapterHandler;
 
         mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(mUserChannelInterface
                 .getContext());
@@ -96,9 +106,12 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public void onChannelEvent(final ChannelEvent event) {
         if ((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
                 .message)) {
-            synchronized (buffer.getLock()) {
-                buffer.add(Html.fromHtml(event.message));
-            }
+            mAdapterHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    buffer.add(Html.fromHtml(event.message));
+                }
+            });
         }
     }
 }

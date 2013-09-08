@@ -19,14 +19,16 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.uiircinterface;
+package com.fusionx.lightirc.communication;
 
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 
 import com.fusionx.lightirc.R;
@@ -44,11 +46,11 @@ import lombok.Setter;
  *
  * @author Lalit Maganti
  */
-public class IRCBridgeService extends Service {
+public class IRCService extends Service {
     // Binder which returns this service
     public class IRCBinder extends Binder {
-        public IRCBridgeService getService() {
-            return IRCBridgeService.this;
+        public IRCService getService() {
+            return IRCService.this;
         }
     }
 
@@ -56,6 +58,7 @@ public class IRCBridgeService extends Service {
     private final IRCBinder mBinder = new IRCBinder();
     @Setter(AccessLevel.PUBLIC)
     private String serverDisplayed = null;
+    private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
     public void connectToServer(final ServerConfiguration.Builder server) {
         if (connectionManager == null) {
@@ -66,7 +69,8 @@ public class IRCBridgeService extends Service {
         final ServerConfiguration configuration = server.build();
 
         MessageSender.getSender(server.getTitle()).initialSetup(this);
-        final ConnectionWrapper thread = new ConnectionWrapper(configuration, this);
+        final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
+                mAdapterHandler);
         connectionManager.put(server.getTitle(), thread);
 
         updateNotification();
@@ -78,7 +82,7 @@ public class IRCBridgeService extends Service {
         final String text = String.format(getResources().getQuantityString(R.plurals
                 .server_connection, connectionManager.size()), connectionManager.size());
         final Intent intent = new Intent(this, ServerListActivity.class);
-        final Intent intent2 = new Intent(this, IRCBridgeService.class);
+        final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);

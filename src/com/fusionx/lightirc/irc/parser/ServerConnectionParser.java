@@ -21,15 +21,14 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import android.content.Context;
 import android.util.Log;
 
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.misc.CoreListener;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,8 +49,7 @@ public class ServerConnectionParser {
     private static int suffix = 0;
 
     public static String parseConnect(final Server server, final ServerConfiguration
-            configuration, final BufferedReader reader, final Context context) throws
-            IOException {
+            configuration, final BufferedReader reader) throws IOException {
 
         String line;
         suffix = 0;

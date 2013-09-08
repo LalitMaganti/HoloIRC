@@ -23,7 +23,6 @@ package com.fusionx.lightirc.irc.connection;
 
 import android.content.Context;
 import android.os.Handler;
-import android.os.Looper;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Server;
@@ -36,29 +35,20 @@ public class ConnectionWrapper extends Thread {
     private Server server;
     private final ServerConnection connection;
 
-    public ConnectionWrapper(final ServerConfiguration configuration, final Context context) {
-        connection = new ServerConnection(configuration, context, this);
-        server = connection.getServer();
+    public ConnectionWrapper(final ServerConfiguration configuration, final Context context,
+                             final Handler adapterHandler) {
+        server = new Server(configuration.getTitle(), this, context, adapterHandler);
+        connection = new ServerConnection(configuration, context, server);
     }
 
     @Override
     public void run() {
-        thread.start();
         try {
             connection.connectToServer();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    private final Thread thread = new Thread() {
-        @Override
-        public void run() {
-            Looper.prepare();
-            server.setHandler(new Handler());
-            Looper.loop();
-        }
-    };
 
     public void disconnectFromServer(final Context context) {
         final String status = server.getStatus();

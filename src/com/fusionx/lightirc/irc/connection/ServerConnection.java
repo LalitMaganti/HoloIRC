@@ -24,14 +24,13 @@ package com.fusionx.lightirc.irc.connection;
 import android.content.Context;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.parser.ServerConnectionParser;
 import com.fusionx.lightirc.irc.parser.ServerLineParser;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.uiircinterface.MessageSender;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,7 +44,6 @@ import java.net.Socket;
 import javax.net.ssl.SSLSocketFactory;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -55,8 +53,7 @@ import lombok.Setter;
  * @author Lalit Maganti
  */
 class ServerConnection {
-    @Getter(AccessLevel.PACKAGE)
-    private Server server;
+    private final Server server;
     private final Context mContext;
 
     private final ServerConfiguration serverConfiguration;
@@ -76,11 +73,10 @@ class ServerConnection {
      *
      * @param configuration - the ServerConfiguration which should be used to connect to the server
      * @param context       - context for retrieving strings from the res files
-     * @param wrapper       - the wrapper object which the Connection is contained by
      */
     ServerConnection(final ServerConfiguration configuration, final Context context,
-                     final ConnectionWrapper wrapper) {
-        server = new Server(configuration.getTitle(), wrapper, context);
+                     final Server serverObject) {
+        server = serverObject;
         serverConfiguration = configuration;
         mContext = context;
     }
@@ -131,10 +127,7 @@ class ServerConnection {
             server.setWriter(new ServerWriter(writer));
 
             server.setStatus(mContext.getString(R.string.status_connecting));
-
-            final UserChannelInterface userChannelInterface = new UserChannelInterface(writer,
-                    mContext, server);
-            server.setUserChannelInterface(userChannelInterface);
+            server.setupUserChannelInterface(writer);
 
             // By sending this line, the server *should* wait until we end the CAP stuff with CAP
             // END
@@ -155,7 +148,7 @@ class ServerConnection {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket
                     .getInputStream()));
             final String nick = ServerConnectionParser.parseConnect(server, serverConfiguration,
-                    reader, mContext);
+                    reader);
 
             // We are connected
             server.setStatus(mContext.getString(R.string.status_connected));
@@ -182,7 +175,7 @@ class ServerConnection {
                 }
 
                 // Initialise the parser used to parse any lines from the server
-                mParser = new ServerLineParser(mContext, server);
+                mParser = new ServerLineParser(server);
                 // Loops forever until broken
                 mParser.parseMain(reader);
 

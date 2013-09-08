@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.fusionx.lightirc.collections.TwoWayHashSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
@@ -41,28 +42,31 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
     private final OutputStreamWriter outputStream;
     private final Context context;
     private final Server server;
+    private final Handler mAdapterHandler;
 
-    public UserChannelInterface(@NonNull final OutputStreamWriter outputStream,
-                                Context context, final Server server) {
+    public UserChannelInterface(final OutputStreamWriter outputStream,
+                                final Context context, final Server server,
+                                final Handler adapterHandler) {
         this.outputStream = outputStream;
         this.context = context;
         this.server = server;
+        mAdapterHandler = adapterHandler;
     }
 
-    public synchronized void coupleUserAndChannel(@NonNull final ChannelUser user,
-                                                  @NonNull final Channel channel) {
+    public synchronized void coupleUserAndChannel(final ChannelUser user,
+                                                  final Channel channel) {
         user.getUserLevelMap().put(channel, UserLevelEnum.NONE);
         addChannelToUser(user, channel);
         addUserToChannel(user, channel);
     }
 
-    public synchronized void addChannelToUser(@NonNull final ChannelUser user,
-                                              @NonNull final Channel channel) {
+    public synchronized void addChannelToUser(final ChannelUser user,
+                                              final Channel channel) {
         super.addBToA(user, channel);
     }
 
-    private synchronized void addUserToChannel(@NonNull final ChannelUser user,
-                                               @NonNull final Channel channel) {
+    private synchronized void addUserToChannel(final ChannelUser user,
+                                               final Channel channel) {
         UpdateableTreeSet<ChannelUser> listofUsers = bToAMap.get(channel);
         if (listofUsers == null) {
             listofUsers = new UpdateableTreeSet<>(new IRCUserComparator(channel));
@@ -135,7 +139,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
                 return channel;
             }
         }
-        return new Channel(name, this);
+        return new Channel(name, this, mAdapterHandler);
     }
 
     synchronized void putAppUser(@NonNull final AppUser user) {
