@@ -25,19 +25,15 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.widget.TextView;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
@@ -59,8 +55,8 @@ import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
+import com.fusionx.lightirc.ui.helpers.MentionHelper;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
-import com.fusionx.lightirc.ui.widget.DecorChildLayout;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -78,7 +74,6 @@ import java.util.Iterator;
 public class IRCActivity extends ActionBarActivity implements UserListFragment.UserListCallback,
         ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
                 .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
-
     // The Fragments
     private ServiceFragment mServiceFragment = null;
     private UserListFragment mUserListFragment = null;
@@ -90,24 +85,22 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     private SlidingMenu mUserSlidingMenu = null;
     private ActionsSlidingMenu mActionsSlidingMenu = null;
 
-    // Mention things
-    private final Handler mMentionHandler = new Handler();
-    private View mMentionView;
-
     // Title
     private String mServerTitle = null;
+
+    // Mention helper
+    private MentionHelper mMentionHelper;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_server_channel);
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
                 ("serverTitle");
-
-        setContentView(R.layout.activity_server_channel);
 
         setUpSlidingMenu();
 
@@ -127,21 +120,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             actionBar.setTitle(mServerTitle);
         }
 
-        // Get Window Decor View
-        final ViewGroup decorView = (ViewGroup) getWindow().getDecorView();
-
-        // Create Header view and then add to Decor View
-        mMentionView = LayoutInflater.from(this.getSupportActionBar().getThemedContext()).inflate(R
-                .layout.toast_mention, decorView, false);
-        mMentionView.setVisibility(View.GONE);
-
-        // Create DecorChildLayout which will move all of the system's decor
-        // view's children + the  Header View to itself. See DecorChildLayout for more info.
-        final DecorChildLayout decorContents = new DecorChildLayout(this, decorView, mMentionView);
-
-        // Now add the DecorChildLayout to the decor view
-        decorView.addView(decorContents, ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
+        mMentionHelper = new MentionHelper(this);
     }
 
     private void setUpSlidingMenu() {
@@ -208,7 +187,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
                     .windowBackground});
             final int background = a.getResourceId(0, 0);
             a.recycle();
-
             // take the above view out of
             final ViewGroup contentParent = (ViewGroup) ((ViewGroup) findViewById(android.R.id
                     .content)).getChildAt(0);
@@ -453,11 +431,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     /*
      * Events start here
      */
-
-    /**
-     *
-     * @param event
-     */
     @Subscribe
     public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
         onDisconnect(false, true);
@@ -519,23 +492,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
      */
     @Subscribe
     public void onMention(final MentionEvent event) {
-        final String message = String.format(getString(R.string.activity_mentioned),
-                event.destination);
-
-        final TextView textView = (TextView) mMentionView.findViewById(R.id.toast_text);
-        textView.setText(message);
-
-        mMentionView.startAnimation(AnimationUtils.loadAnimation(this, R.anim.action_bar_in));
-        mMentionView.setVisibility(View.VISIBLE);
-
-        mMentionHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mMentionView.startAnimation(AnimationUtils.loadAnimation
-                        (IRCActivity.this, R.anim.action_bar_out));
-                mMentionView.setVisibility(View.INVISIBLE);
-            }
-        }, 2500);
+        mMentionHelper.onMention(event);
     }
     /*
      * Events end here

@@ -43,6 +43,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class ActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
     private IRCActionsCallback callback;
+    private FragmentTypeEnum type;
 
     @Override
     public void onAttach(Activity activity) {
@@ -55,21 +56,18 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setListAdapter(new ActionsAdapter(getActivity()));
         getListView().setOnItemClickListener(this);
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        setListAdapter(new ActionsAdapter(getActivity()));
+        if(type != null) {
+            getListAdapter().setFragmentType(type);
+            type = null;
+        }
         return inflater.inflate(R.layout.fragment_action_listview, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-
     }
 
     @Override
@@ -142,7 +140,11 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
     }
 
     public void onTabChanged(final FragmentTypeEnum selectedType) {
-        getListAdapter().setFragmentType(selectedType);
+        if(getListAdapter() == null) {
+            type = selectedType;
+        } else {
+            getListAdapter().setFragmentType(selectedType);
+        }
     }
 
     @Override
