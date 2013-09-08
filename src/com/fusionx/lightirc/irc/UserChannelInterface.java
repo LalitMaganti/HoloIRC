@@ -26,6 +26,7 @@ import android.os.Handler;
 
 import com.fusionx.lightirc.collections.TwoWayHashSet;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
+import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
 import com.fusionx.lightirc.util.IRCUtils;
@@ -67,18 +68,36 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     private synchronized void addUserToChannel(final ChannelUser user,
                                                final Channel channel) {
-        UpdateableTreeSet<ChannelUser> listofUsers = bToAMap.get(channel);
+        UserListTreeSet listofUsers = (UserListTreeSet) bToAMap.get(channel);
         if (listofUsers == null) {
-            listofUsers = new UpdateableTreeSet<>(new IRCUserComparator(channel));
+            listofUsers = new UserListTreeSet(new IRCUserComparator(channel));
             bToAMap.put(channel, listofUsers);
         }
-        listofUsers.add(user);
+        synchronized (listofUsers.getLock()) {
+            listofUsers.add(user);
+        }
     }
 
     public synchronized void decoupleUserAndChannel(@NonNull final ChannelUser user,
                                                     @NonNull final Channel channel) {
         user.getUserLevelMap().remove(channel);
-        super.decouple(user, channel);
+
+        final Set<Channel> setOfChannels = aToBMap.get(user);
+        if (setOfChannels != null) {
+            setOfChannels.remove(channel);
+            if (setOfChannels.isEmpty()) {
+                aToBMap.remove(user);
+            }
+        }
+        final UserListTreeSet setOfUsers = (UserListTreeSet) bToAMap.get(channel);
+        if (setOfUsers != null) {
+            synchronized (setOfUsers.getLock()) {
+                setOfUsers.remove(user);
+            }
+            if (setOfUsers.isEmpty()) {
+                bToAMap.remove(channel);
+            }
+        }
     }
 
     public synchronized Set<Channel> removeUser(@NonNull final ChannelUser user) {
@@ -88,13 +107,12 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
     public synchronized void removeChannel(@NonNull final Channel channel) {
         for (final ChannelUser user : bToAMap.remove(channel)) {
             aToBMap.get(user).remove(channel);
-
             user.getUserLevelMap().remove(channel);
         }
     }
 
-    synchronized UpdateableTreeSet<ChannelUser> getAllUsersInChannel(@NonNull final Channel channel) {
-        return super.getAllAInB(channel);
+    synchronized UserListTreeSet getAllUsersInChannel(@NonNull final Channel channel) {
+        return (UserListTreeSet) super.getAllAInB(channel);
     }
 
     synchronized UpdateableTreeSet<Channel> getAllChannelsInUser(@NonNull final ChannelUser user) {

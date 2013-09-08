@@ -27,10 +27,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.interfaces.SyncronizedCollection;
 import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.ArrayList;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 public class SelectionAdapter<T> extends CollectionAdapter<T> {
@@ -44,7 +44,7 @@ public class SelectionAdapter<T> extends CollectionAdapter<T> {
      */
     private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
 
-    public SelectionAdapter(final Context context, final SortedSet<T> objects) {
+    public SelectionAdapter(final Context context, final SyncronizedCollection<T> objects) {
         super(context, R.layout.default_listview_textview, objects);
     }
 
@@ -140,7 +140,7 @@ public class SelectionAdapter<T> extends CollectionAdapter<T> {
     }
 
     public TreeSet<T> getCopyOfItems() {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             return new TreeSet<>(mObjects);
         }
     }
@@ -162,8 +162,8 @@ public class SelectionAdapter<T> extends CollectionAdapter<T> {
         }
     }
 
-    public void setInternalSet(SortedSet<T> set) {
-        synchronized (mLock) {
+    public void setInternalSet(SyncronizedCollection<T> set) {
+        synchronized (mObjects.getLock()) {
             mObjects = set;
         }
         if (mNotifyOnChange) {

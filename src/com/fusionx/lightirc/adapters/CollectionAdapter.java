@@ -24,10 +24,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.fusionx.lightirc.interfaces.SyncronizedCollection;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.TreeSet;
 
 /**
  * A concrete BaseAdapter that is backed by an array of arbitrary
@@ -49,13 +50,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * Contains the list of objects that represent the data of this ArrayAdapter.
      * The content of this list is referred to as "the array" in the documentation.
      */
-    protected Collection<T> mObjects;
-
-    /**
-     * Lock used to modify the content of {@link #mObjects}. Any write operation
-     * performed on the array should be synchronized on this lock.
-     */
-    protected final Object mLock = new Object();
+    protected SyncronizedCollection<T> mObjects;
 
     /**
      * The resource indicating what views to inflate to display the content of this
@@ -92,32 +87,9 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param context            The current context.
      * @param textViewResourceId The resource ID for a layout file containing a TextView to use when
      *                           instantiating views.
-     */
-    public CollectionAdapter(Context context, int textViewResourceId) {
-        init(context, textViewResourceId, 0, new TreeSet<T>());
-    }
-
-    /**
-     * Constructor
-     *
-     * @param context            The current context.
-     * @param resource           The resource ID for a layout file containing a layout to use when
-     *                           instantiating views.
-     * @param textViewResourceId The id of the TextView within the layout resource to be populated
-     */
-    public CollectionAdapter(Context context, int resource, int textViewResourceId) {
-        init(context, resource, textViewResourceId, new TreeSet<T>());
-    }
-
-    /**
-     * Constructor
-     *
-     * @param context            The current context.
-     * @param textViewResourceId The resource ID for a layout file containing a TextView to use when
-     *                           instantiating views.
      * @param objects            The objects to represent in the ListView.
      */
-    public CollectionAdapter(Context context, int textViewResourceId, Collection<T> objects) {
+    public CollectionAdapter(Context context, int textViewResourceId, SyncronizedCollection<T> objects) {
         init(context, textViewResourceId, 0, objects);
     }
 
@@ -130,7 +102,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param textViewResourceId The id of the TextView within the layout resource to be populated
      * @param objects            The objects to represent in the ListView.
      */
-    public CollectionAdapter(Context context, int resource, int textViewResourceId, Collection<T> objects) {
+    public CollectionAdapter(Context context, int resource, int textViewResourceId, SyncronizedCollection<T> objects) {
         init(context, resource, textViewResourceId, objects);
     }
 
@@ -140,7 +112,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param object The object to add at the end of the array.
      */
     public void add(T object) {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             mObjects.add(object);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
@@ -152,7 +124,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param collection The Collection to add at the end of the array.
      */
     public void addAll(Collection<? extends T> collection) {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             mObjects.addAll(collection);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
@@ -164,7 +136,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param items The items to add at the end of the array.
      */
     public void addAll(T... items) {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             Collections.addAll(mObjects, items);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
@@ -176,7 +148,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param object The object to remove.
      */
     public void remove(T object) {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             mObjects.remove(object);
         }
         if (mNotifyOnChange) notifyDataSetChanged();
@@ -186,7 +158,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * Remove all elements from the list.
      */
     public void clear() {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             mObjects.clear();
         }
         if (mNotifyOnChange) notifyDataSetChanged();
@@ -219,7 +191,8 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
         mNotifyOnChange = notifyOnChange;
     }
 
-    private void init(Context context, int resource, int textViewResourceId, Collection<T> objects) {
+    private void init(Context context, int resource, int textViewResourceId,
+                      SyncronizedCollection<T> objects) {
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = mDropDownResource = resource;
@@ -241,7 +214,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * {@inheritDoc}
      */
     public int getCount() {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             return mObjects.size();
         }
     }
@@ -250,7 +223,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * {@inheritDoc}
      */
     public T getItem(int position) {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             return new ArrayList<>(mObjects).get(position);
         }
     }
@@ -262,7 +235,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @return The position of the specified item.
      */
     public int getPosition(T item) {
-        synchronized (mLock) {
+        synchronized (mObjects.getLock()) {
             return new ArrayList<>(mObjects).indexOf(item);
         }
     }

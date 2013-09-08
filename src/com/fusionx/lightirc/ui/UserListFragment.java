@@ -38,6 +38,7 @@ import android.widget.AdapterView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
@@ -82,7 +83,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
 
     public void onMenuOpened(final String channelName) {
         if (!channelName.equals(mChannelName)) {
-            final TreeSet<ChannelUser> userList = getUserList(channelName);
+            final UserListTreeSet userList = getUserList(channelName);
             if (userList != null) {
                 mChannelName = channelName;
                 getUserListAdapter().setInternalSet(userList);
@@ -195,7 +196,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         getListAdapter().notifyDataSetChanged();
     }
 
-    public TreeSet<ChannelUser> getUserList(final String channelName) {
+    public UserListTreeSet getUserList(final String channelName) {
         return mCallback.getServer(false).getUserChannelInterface().getChannel(channelName)
                 .getUsers();
     }

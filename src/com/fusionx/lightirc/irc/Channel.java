@@ -28,6 +28,7 @@ import android.text.Spanned;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
+import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -84,7 +85,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         return name.compareTo(channel.name);
     }
 
-    public UpdateableTreeSet<ChannelUser> getUsers() {
+    public UserListTreeSet getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
     }
 

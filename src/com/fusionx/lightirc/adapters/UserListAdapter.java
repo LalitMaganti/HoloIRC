@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import com.fusionx.lightirc.irc.ChannelUser;
 
-import java.util.SortedSet;
+import java.util.TreeSet;
 
 import lombok.Setter;
 
@@ -37,7 +37,7 @@ public class UserListAdapter extends SelectionAdapter<ChannelUser> {
     @Setter
     private String channelName;
 
-    public UserListAdapter(final Context context, final SortedSet<ChannelUser> array) {
+    public UserListAdapter(final Context context, final TreeSet<ChannelUser> array) {
         super(context, array);
     }
 
