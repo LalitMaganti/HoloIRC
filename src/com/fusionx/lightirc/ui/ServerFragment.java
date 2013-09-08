@@ -27,19 +27,14 @@ import android.view.View;
 
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.communication.MessageParser;
-import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.event.NickInUseEvent;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
 public class ServerFragment extends IRCFragment {
-    private boolean mRegistered = false;
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -50,29 +45,15 @@ public class ServerFragment extends IRCFragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                ServerFragmentCallback.class);
-        if (mRegistered) {
-            MessageSender.getSender(callback.getServerTitle()).getBus().unregister(this);
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
         final ServerFragmentCallback callback = FragmentUtils.getParent(this,
                 ServerFragmentCallback.class);
-        if (!mRegistered) {
-            MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
-        }
         final Server server = callback.getServer(true);
         if (server != null && getListAdapter() == null) {
-            final IRCMessageAdapter adapter = new IRCMessageAdapter(getActivity(),
-                    new ArrayList<Spanned>());
+            final IRCMessageAdapter adapter = server.getBuffer() == null ? new IRCMessageAdapter
+                    (getActivity(), new ArrayList<Spanned>()) : server.getBuffer();
             final AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter
                     (adapter);
             alphaInAnimationAdapter.setAbsListView(getListView());
@@ -96,22 +77,11 @@ public class ServerFragment extends IRCFragment {
     public interface ServerFragmentCallback {
         public Server getServer(boolean nullable);
 
-        public void selectServerFragment();
-
-        public String getServerTitle();
-
         public boolean isConnectedToServer();
     }
 
     @Override
     public FragmentTypeEnum getType() {
         return FragmentTypeEnum.Server;
-    }
-
-    @Subscribe
-    public void onNickInUse(NickInUseEvent event) {
-        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                ServerFragmentCallback.class);
-        callback.selectServerFragment();
     }
 }

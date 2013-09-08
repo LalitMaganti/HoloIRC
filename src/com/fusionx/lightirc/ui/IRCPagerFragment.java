@@ -134,11 +134,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     @Override
-    public String getServerTitle() {
-        return mCallback.getServerTitle();
-    }
-
-    @Override
     public boolean isConnectedToServer() {
         return mCallback.isConnectedToServer();
     }
@@ -198,11 +193,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     @Override
-    public void updateUserList(String channelName) {
-        mCallback.onUserListChanged(channelName);
-    }
-
-    @Override
     public Server getServer(boolean nullAllowed) {
         return mCallback.getServer(nullAllowed);
     }
@@ -213,11 +203,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public interface IRCPagerInterface {
-        public void onUserListChanged(String channelName);
-
         public Server getServer(boolean nullAllowed);
-
-        public String getServerTitle();
 
         public boolean isConnectedToServer();
     }

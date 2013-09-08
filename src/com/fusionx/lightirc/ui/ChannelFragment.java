@@ -25,16 +25,12 @@ import android.app.Activity;
 import android.text.Html;
 
 import com.fusionx.lightirc.communication.MessageParser;
-import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.event.ChannelEvent;
-import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
-import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
@@ -52,16 +48,6 @@ public class ChannelFragment extends IRCFragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        final MessageSender sender = MessageSender.getSender(callback.getServerTitle(), true);
-        if (sender != null) {
-            sender.getBus().unregister(this);
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -75,8 +61,6 @@ public class ChannelFragment extends IRCFragment {
         } else {
             getListAdapter().notifyDataSetChanged();
         }
-
-        MessageSender.getSender(callback.getServerTitle()).getBus().register(this);
     }
 
     public void onUserMention(final ArrayList<ChannelUser> users) {
@@ -94,22 +78,6 @@ public class ChannelFragment extends IRCFragment {
         return FragmentTypeEnum.Channel;
     }
 
-    @Subscribe
-    public void onChannelMessage(final ChannelEvent event) {
-        if (title.equals(event.channelName)) {
-            if (event.userListChanged) {
-                callback.updateUserList(title);
-            }
-        }
-    }
-
-    @Subscribe
-    public void onUserListReceived(final UserListReceivedEvent event) {
-        if (event.channelName.equals(title)) {
-            callback.updateUserList(title);
-        }
-    }
-
     @Override
     public void sendMessage(final String message) {
         MessageParser.channelMessageToParse(getActivity(), callback.getServer(false), title,
@@ -117,12 +85,6 @@ public class ChannelFragment extends IRCFragment {
     }
 
     public interface ChannelFragmentCallback {
-        public void updateUserList(final String channelName);
-
         public Server getServer(final boolean nullAllowed);
-
-        public void switchFragmentAndRemove(final String channelName);
-
-        public String getServerTitle();
     }
 }

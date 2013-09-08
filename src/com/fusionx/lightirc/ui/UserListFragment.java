@@ -38,9 +38,9 @@ import android.widget.AdapterView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -66,21 +66,18 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        final View rootView = super.onCreateView(inflater, container, savedInstanceState);
-
-        final UserListAdapter adapter = new UserListAdapter(inflater.getContext(),
-                new TreeSet<ChannelUser>());
-        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
-        setListAdapter(alphaInAnimationAdapter);
-
-        return rootView;
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getListAdapter().setAbsListView(getListView());
+        final UserListAdapter adapter = new UserListAdapter(view.getContext(),
+                new TreeSet<ChannelUser>());
+        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
+        setListAdapter(alphaInAnimationAdapter);
+        alphaInAnimationAdapter.setAbsListView(getListView());
     }
 
     public void onMenuOpened(final String channelName) {
@@ -104,6 +101,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
 
         getListView().setOnItemClickListener(this);
         getListView().setOnItemLongClickListener(this);
+        getListView().setFastScrollEnabled(true);
     }
 
     @Override

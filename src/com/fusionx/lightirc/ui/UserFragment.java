@@ -62,7 +62,5 @@ public class UserFragment extends IRCFragment {
 
     public interface UserFragmentCallbacks {
         public Server getServer(boolean nullable);
-
-        public String getServerTitle();
     }
 }

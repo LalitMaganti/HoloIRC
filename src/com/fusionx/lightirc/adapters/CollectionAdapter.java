@@ -241,14 +241,18 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * {@inheritDoc}
      */
     public int getCount() {
-        return mObjects.size();
+        synchronized (mLock) {
+            return mObjects.size();
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public T getItem(int position) {
-        return new ArrayList<>(mObjects).get(position);
+        synchronized (mLock) {
+            return new ArrayList<>(mObjects).get(position);
+        }
     }
 
     /**
@@ -258,7 +262,9 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @return The position of the specified item.
      */
     public int getPosition(T item) {
-        return new ArrayList<>(mObjects).indexOf(item);
+        synchronized (mLock) {
+            return new ArrayList<>(mObjects).indexOf(item);
+        }
     }
 
     /**
