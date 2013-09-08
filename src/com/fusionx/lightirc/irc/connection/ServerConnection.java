@@ -184,7 +184,7 @@ class ServerConnection {
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
                 if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
-                    sender.sendRetryPendingServerDisconnection(server,
+                    sender.sendRetryPendingDisconnection(server,
                             "Disconnected from the server");
                 }
             }
@@ -192,7 +192,7 @@ class ServerConnection {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
             if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
-                sender.sendRetryPendingServerDisconnection(server, ex.getMessage());
+                sender.sendRetryPendingDisconnection(server, ex.getMessage());
             }
         }
         // We are disconnected :( - close up shop

@@ -27,9 +27,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.ChannelUser;
-
-import java.util.TreeSet;
 
 import lombok.Setter;
 
@@ -37,8 +36,8 @@ public class UserListAdapter extends SelectionAdapter<ChannelUser> {
     @Setter
     private String channelName;
 
-    public UserListAdapter(final Context context, final TreeSet<ChannelUser> array) {
-        super(context, array);
+    public UserListAdapter(Context context, SynchronizedCollection<ChannelUser> objects) {
+        super(context, objects);
     }
 
     @Override

@@ -38,6 +38,7 @@ import android.widget.AdapterView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -46,7 +47,6 @@ import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationA
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
 
 public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
         ActionMode.Callback, AdapterView.OnItemLongClickListener, SlidingMenu.OnCloseListener {
@@ -75,7 +75,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         super.onViewCreated(view, savedInstanceState);
 
         final UserListAdapter adapter = new UserListAdapter(view.getContext(),
-                new TreeSet<ChannelUser>());
+                new SynchronizedTreeSet<ChannelUser>());
         AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
         setListAdapter(alphaInAnimationAdapter);
         alphaInAnimationAdapter.setAbsListView(getListView());

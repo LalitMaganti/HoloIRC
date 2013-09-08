@@ -43,7 +43,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
         return userChannelInterface.getAllChannelsInUser(this);
     }
 
-    public void processWhoMode(final String rawMode, final Channel channel) {
+    public UserLevelEnum processWhoMode(final String rawMode, final Channel channel) {
         UserLevelEnum mode = UserLevelEnum.NONE;
         if (rawMode.contains("~")) {
             mode = UserLevelEnum.OWNER;
@@ -57,6 +57,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
             mode = UserLevelEnum.VOICE;
         }
         userLevelMap.put(channel, mode);
+        return mode;
     }
 
     public String processModeChange(final Context context, final String sendingNick,

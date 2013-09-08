@@ -124,7 +124,9 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
         if (nick.equals("*")) {
             return getUserFromHostName(IRCUtils.getHostNameFromRaw(rawSource));
         } else {
-            return getUser(nick);
+            final ChannelUser user = getUser(nick);
+            user.setHostName(IRCUtils.getHostNameFromRaw(rawSource));
+            return user;
         }
     }
 

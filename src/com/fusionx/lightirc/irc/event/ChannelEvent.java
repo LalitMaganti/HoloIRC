@@ -8,6 +8,6 @@ public class ChannelEvent extends Event {
     public ChannelEvent(String channelName, String message, boolean userListChanged) {
         this.channelName = channelName;
         this.message = message;
-        this.userListChanged = false;
+        this.userListChanged = userListChanged;
     }
 }

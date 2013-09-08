@@ -257,9 +257,7 @@ public class ServerCommandParser {
         mUserChannelInterface.coupleUserAndChannel(user, channel);
 
         if (user.equals(mServer.getUser())) {
-            Event event = mSender.sendChanelJoined(channel.getName());
-            channel.getWriter().sendWho();
-            return event;
+            return mSender.sendChanelJoined(channel.getName());
         } else {
             return mSender.sendGenericChannelEvent(channel,
                     String.format(mContext.getString(R.string.parser_joined_channel),

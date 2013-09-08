@@ -27,7 +27,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.SyncronizedCollection;
+import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class SelectionAdapter<T> extends CollectionAdapter<T> {
      */
     private final ArrayList<Integer> mSelectedItems = new ArrayList<>();
 
-    public SelectionAdapter(final Context context, final SyncronizedCollection<T> objects) {
+    public SelectionAdapter(final Context context, final SynchronizedCollection<T> objects) {
         super(context, R.layout.default_listview_textview, objects);
     }
 
@@ -162,7 +162,7 @@ public class SelectionAdapter<T> extends CollectionAdapter<T> {
         }
     }
 
-    public void setInternalSet(SyncronizedCollection<T> set) {
+    public void setInternalSet(SynchronizedCollection<T> set) {
         synchronized (mObjects.getLock()) {
             mObjects = set;
         }

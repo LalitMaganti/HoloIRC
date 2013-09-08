@@ -21,12 +21,11 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import com.fusionx.lightirc.communication.MessageSender;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.event.Event;
-import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 
 import java.util.ArrayList;
 
@@ -34,6 +33,9 @@ public class WhoParser {
     private final UserChannelInterface mUserChannelInterface;
     private Channel whoChannel;
     private final String mServerTitle;
+
+    private int numberOfOps = 0;
+    private int numberOfNormals = 0;
 
     WhoParser(UserChannelInterface userChannelInterface, final String serverTitle) {
         mUserChannelInterface = userChannelInterface;
@@ -45,11 +47,18 @@ public class WhoParser {
             whoChannel = mUserChannelInterface.getChannel(parsedArray.get(0));
         }
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
-        user.processWhoMode(parsedArray.get(5), whoChannel);
+        UserLevelEnum levelEnum = user.processWhoMode(parsedArray.get(5), whoChannel);
         user.setHostName(parsedArray.get(2));
+        if(levelEnum == UserLevelEnum.OP) {
+            ++numberOfOps;
+        } else {
+            ++numberOfNormals;
+        }
 
         mUserChannelInterface.addChannelToUser(user, whoChannel);
-        whoChannel.getUsers().markForAddition(user);
+        if(whoChannel.getUsers() != null) {
+            whoChannel.getUsers().markForAddition(user);
+        }
 
         return new Event(user.getNick());
     }
@@ -57,10 +66,14 @@ public class WhoParser {
     Event parseWhoFinished() {
         if (whoChannel != null) {
             whoChannel.getUsers().addMarked();
-            UserListReceivedEvent event = MessageSender.getSender(mServerTitle)
-                    .sendUserListReceived(whoChannel);
+            //final MessageSender sender = MessageSender.getSender(mServerTitle);
+            //ChannelEvent event = sender.sendGenericChannelEvent(whoChannel,
+            // numberOfOps + " ops, " +
+            //        "" + numberOfNormals + " normal users", true);
+            numberOfNormals = 0;
+            numberOfOps = 0;
             whoChannel = null;
-            return event;
+            return new Event("event");
         } else {
             return new Event("null");
         }

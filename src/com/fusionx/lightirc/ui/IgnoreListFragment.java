@@ -18,6 +18,7 @@ import android.widget.ListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
+import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
@@ -39,8 +40,8 @@ public class IgnoreListFragment extends ListFragment implements ActionMode.Callb
         final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
 
-        final TreeSet<String> arrayList = new TreeSet<>(MiscUtils.getIgnoreList(getActivity(),
-                callback.getServerTitle().toLowerCase()));
+        final SynchronizedTreeSet<String> arrayList = new SynchronizedTreeSet<>(MiscUtils
+                .getIgnoreList(getActivity(), callback.getServerTitle().toLowerCase()));
 
         final SelectionAdapter<String> ignoreAdapter = new SelectionAdapter<>(getActivity(),
                 arrayList);

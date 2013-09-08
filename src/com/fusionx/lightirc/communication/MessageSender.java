@@ -46,7 +46,6 @@ import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.irc.event.UserEvent;
-import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.ui.IRCActivity;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
@@ -159,8 +158,8 @@ public class MessageSender {
         return event;
     }
 
-    public RetryPendingDisconnectEvent sendRetryPendingServerDisconnection(final Server server,
-                                                                           final String disconnectLine) {
+    public RetryPendingDisconnectEvent sendRetryPendingDisconnection(final Server server,
+                                                                     final String disconnectLine) {
         final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
         sendServerEvent(server, event);
         return event;
@@ -247,12 +246,6 @@ public class MessageSender {
     public SwitchToServerEvent switchToServerMessage(final Server server, final String message) {
         final SwitchToServerEvent event = new SwitchToServerEvent(message);
         sendServerEvent(server, event);
-        return event;
-    }
-
-    public UserListReceivedEvent sendUserListReceived(final Channel channel) {
-        final UserListReceivedEvent event = new UserListReceivedEvent(channel.getName());
-        mBus.post(event);
         return event;
     }
 

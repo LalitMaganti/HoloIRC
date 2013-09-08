@@ -22,6 +22,7 @@ import android.widget.ListView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.SelectionAdapter;
+import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.interfaces.IServerSettings;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
@@ -31,7 +32,6 @@ import com.fusionx.lightirc.util.UIUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static com.fusionx.lightirc.constants.PreferenceConstants.AutoJoin;
 
@@ -142,7 +142,7 @@ public class ChannelListFragment extends ListFragment implements AdapterView
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                              final Bundle savedInstanceState) {
         final View rootView = super.onCreateView(inflate, container, savedInstanceState);
-        adapter = new SelectionAdapter<>(getActivity(), new TreeSet<String>());
+        adapter = new SelectionAdapter<>(getActivity(), new SynchronizedTreeSet<String>());
 
         final SharedPreferences settings = getActivity()
                 .getSharedPreferences(mCallbacks.getFileName(), Context.MODE_PRIVATE);

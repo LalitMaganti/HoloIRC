@@ -54,7 +54,6 @@ import com.fusionx.lightirc.irc.event.PartEvent;
 import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
-import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.ui.helpers.MentionHelper;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
@@ -472,12 +471,9 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
 
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        onUserListChanged(event.channelName);
-    }
-
-    @Subscribe
-    public void onUserListReceived(final UserListReceivedEvent event) {
-        onUserListChanged(event.channelName);
+        if(event.userListChanged) {
+            onUserListChanged(event.channelName);
+        }
     }
 
     /**

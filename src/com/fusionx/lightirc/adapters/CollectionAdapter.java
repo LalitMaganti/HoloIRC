@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.interfaces.SyncronizedCollection;
+import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,7 +50,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * Contains the list of objects that represent the data of this ArrayAdapter.
      * The content of this list is referred to as "the array" in the documentation.
      */
-    protected SyncronizedCollection<T> mObjects;
+    protected SynchronizedCollection<T> mObjects;
 
     /**
      * The resource indicating what views to inflate to display the content of this
@@ -89,7 +89,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      *                           instantiating views.
      * @param objects            The objects to represent in the ListView.
      */
-    public CollectionAdapter(Context context, int textViewResourceId, SyncronizedCollection<T> objects) {
+    public CollectionAdapter(Context context, int textViewResourceId, SynchronizedCollection<T> objects) {
         init(context, textViewResourceId, 0, objects);
     }
 
@@ -102,7 +102,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param textViewResourceId The id of the TextView within the layout resource to be populated
      * @param objects            The objects to represent in the ListView.
      */
-    public CollectionAdapter(Context context, int resource, int textViewResourceId, SyncronizedCollection<T> objects) {
+    public CollectionAdapter(Context context, int resource, int textViewResourceId, SynchronizedCollection<T> objects) {
         init(context, resource, textViewResourceId, objects);
     }
 
@@ -192,7 +192,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
     }
 
     private void init(Context context, int resource, int textViewResourceId,
-                      SyncronizedCollection<T> objects) {
+                      SynchronizedCollection<T> objects) {
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = mDropDownResource = resource;
