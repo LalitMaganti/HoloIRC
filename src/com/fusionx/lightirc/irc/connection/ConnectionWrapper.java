@@ -34,19 +34,26 @@ public class ConnectionWrapper extends Thread {
     @Getter
     private Server server;
     private final ServerConnection connection;
+    private final Handler mAdapterHandler;
 
     public ConnectionWrapper(final ServerConfiguration configuration, final Context context,
                              final Handler adapterHandler) {
         server = new Server(configuration.getTitle(), this, context, adapterHandler);
         connection = new ServerConnection(configuration, context, server);
+        mAdapterHandler = adapterHandler;
     }
 
     @Override
     public void run() {
         try {
             connection.connectToServer();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (final Exception ex) {
+            mAdapterHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    throw new RuntimeException(ex);
+                }
+            });
         }
     }
 

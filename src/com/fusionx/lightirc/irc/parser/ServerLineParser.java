@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import android.util.Log;
-
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.event.ErrorEvent;
@@ -40,8 +38,6 @@ import java.util.ArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
-import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 
 public class ServerLineParser {
     @Getter(AccessLevel.PACKAGE)
@@ -66,17 +62,13 @@ public class ServerLineParser {
      *
      * @param reader - the reader associated with the server stream
      */
-    public void parseMain(final BufferedReader reader) {
+    public void parseMain(final BufferedReader reader) throws IOException {
         String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                final Event quit = parseLine(line);
-                if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
-                    return;
-                }
+        while ((line = reader.readLine()) != null) {
+            final Event quit = parseLine(line);
+            if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
+                return;
             }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, e.getMessage());
         }
     }
 

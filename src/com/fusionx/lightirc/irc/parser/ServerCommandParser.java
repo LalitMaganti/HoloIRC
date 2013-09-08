@@ -235,11 +235,13 @@ public class ServerCommandParser {
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
                 final String userRecipient = parsedArray.get(4);
                 final ChannelUser user = mUserChannelInterface.getUserFromRaw(userRecipient);
-
-                final String message = user.processModeChange(mContext, sendingUser, channel,
-                        mode);
-
-                return mSender.sendGenericChannelEvent(channel, message, true);
+                if(user != null) {
+                    final String message = user.processModeChange(mContext, sendingUser, channel,
+                            mode);
+                    return mSender.sendGenericChannelEvent(channel, message, true);
+                } else {
+                    throw new NullPointerException(rawSource);
+                }
             } else {
                 return new Event(mode);
             }
