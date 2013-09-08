@@ -29,20 +29,20 @@ import java.lang.reflect.Method;
  * This class provides a handy way to tie together the functionality of
  * {@link DrawerLayout} and the framework <code>ActionBar</code> to implement the recommended
  * design for navigation drawers.
- *
+ * <p/>
  * <p>To use <code>ActionBarDrawerToggle</code>, create one in your Activity and call through
  * to the following methods corresponding to your Activity callbacks:</p>
- *
+ * <p/>
  * <ul>
  * <li>{@link Activity#onConfigurationChanged(android.content.res.Configuration) onConfigurationChanged}</li>
  * <li>{@link Activity#onOptionsItemSelected(android.view.MenuItem) onOptionsItemSelected}</li>
  * </ul>
- *
+ * <p/>
  * <p>Call {@link #syncState()} from your <code>Activity</code>'s
  * {@link Activity#onPostCreate(android.os.Bundle) onPostCreate} to synchronize the indicator
  * with the state of the linked DrawerLayout after <code>onRestoreInstanceState</code>
  * has occurred.</p>
- *
+ * <p/>
  * <p><code>ActionBarDrawerToggle</code> can be used directly as a
  * {@link DrawerLayout.DrawerListener}, or if you are already providing your own listener,
  * call through to each of the listener methods from your own.</p>
@@ -57,7 +57,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
         /**
          * @return Delegate to use for ActionBarDrawableToggles, or null if the Activity
-         *         does not wish to override the default behavior.
+         * does not wish to override the default behavior.
          */
         Delegate getDrawerToggleDelegate();
     }
@@ -65,7 +65,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
     public interface Delegate {
         /**
          * @return Up indicator drawable as defined in the Activity's theme, or null if one is not
-         *         defined.
+         * defined.
          */
         Drawable getThemeUpIndicator();
 
@@ -86,7 +86,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
     }
 
     private static class ActionBarDrawerToggleImpl {
-        private static final int[] THEME_ATTRS = new int[] {
+        private static final int[] THEME_ATTRS = new int[]{
                 R.attr.homeAsUpIndicator
         };
         private static final String TAG = "ActionBarDrawerToggleHoneycomb";
@@ -185,7 +185,8 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     private static final ActionBarDrawerToggleImpl IMPL;
 
-    static {IMPL = new ActionBarDrawerToggleImpl();
+    static {
+        IMPL = new ActionBarDrawerToggleImpl();
     }
 
     // android.R.id.home as defined by public API in v11
@@ -207,20 +208,20 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     /**
      * Construct a new ActionBarDrawerToggle.
-     *
+     * <p/>
      * <p>The given {@link Activity} will be linked to the specified {@link DrawerLayout}.
      * The provided drawer indicator drawable will animate slightly off-screen as the drawer
      * is opened, indicating that in the open state the drawer will move off-screen when pressed
      * and in the closed state the drawer will move on-screen when pressed.</p>
-     *
+     * <p/>
      * <p>String resources must be provided to describe the open/close drawer actions for
      * accessibility services.</p>
      *
-     * @param activity The Activity hosting the drawer
-     * @param drawerLayout The DrawerLayout to link to the given Activity's ActionBar
-     * @param drawerImageRes A Drawable resource to use as the drawer indicator
-     * @param openDrawerContentDescRes A String resource to describe the "open drawer" action
-     *                                 for accessibility
+     * @param activity                  The Activity hosting the drawer
+     * @param drawerLayout              The DrawerLayout to link to the given Activity's ActionBar
+     * @param drawerImageRes            A Drawable resource to use as the drawer indicator
+     * @param openDrawerContentDescRes  A String resource to describe the "open drawer" action
+     *                                  for accessibility
      * @param closeDrawerContentDescRes A String resource to describe the "close drawer" action
      *                                  for accessibility
      */
@@ -248,7 +249,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     /**
      * Synchronize the state of the drawer indicator/affordance with the linked DrawerLayout.
-     *
+     * <p/>
      * <p>This should be called from your <code>Activity</code>'s
      * {@link Activity#onPostCreate(android.os.Bundle) onPostCreate} method to synchronize after
      * the DrawerLayout's instance state has been restored, and any other time when the state
@@ -270,7 +271,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     /**
      * Enable or disable the drawer indicator. The indicator defaults to enabled.
-     *
+     * <p/>
      * <p>When the indicator is disabled, the <code>ActionBar</code> will revert to displaying
      * the home-as-up indicator provided by the <code>Activity</code>'s theme in the
      * <code>android.R.attr.homeAsUpIndicator</code> attribute instead of the animated
@@ -338,7 +339,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
      * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
      * through to this method from your own listener object.
      *
-     * @param drawerView The child view that was moved
+     * @param drawerView  The child view that was moved
      * @param slideOffset The new offset of this drawer within its range, from 0-1
      */
     @Override

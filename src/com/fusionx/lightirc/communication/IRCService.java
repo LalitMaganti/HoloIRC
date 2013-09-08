@@ -66,7 +66,7 @@ public class IRCService extends Service {
             connectionManager = new ConnectionManager(this);
         }
 
-        if(server != null) {
+        if (server != null) {
             final ServerConfiguration configuration = server.build();
 
             MessageSender.getSender(server.getTitle()).initialSetup(this);

@@ -160,7 +160,7 @@ public class MessageSender {
     }
 
     public RetryPendingDisconnectEvent sendRetryPendingServerDisconnection(final Server server,
-                                                    final String disconnectLine) {
+                                                                           final String disconnectLine) {
         final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
         sendServerEvent(server, event);
         return event;
@@ -196,8 +196,8 @@ public class MessageSender {
     }
 
     public ChannelEvent sendChannelAction(final String userNick,
-                                  final Channel channel, final ChannelUser sendingUser,
-                                  final String rawAction) {
+                                          final Channel channel, final ChannelUser sendingUser,
+                                          final String rawAction) {
         String finalMessage = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getPrettyNick(channel), rawAction);
         if (rawAction.toLowerCase().contains(userNick.toLowerCase())) {
@@ -227,8 +227,8 @@ public class MessageSender {
     }
 
     public ChannelEvent sendMessageToChannel(final String userNick,
-                                     final Channel channel, final String sendingNick,
-                                     final String rawMessage) {
+                                             final Channel channel, final String sendingNick,
+                                             final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
                 sendingNick, rawMessage);
         if (rawMessage.toLowerCase().contains(userNick.toLowerCase())) {

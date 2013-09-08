@@ -25,12 +25,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.Event;
-import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 

@@ -65,7 +65,7 @@ public class ServerCommandParser {
 
     // The server is sending a command to us - parse what it is
     Event parseCommand(final ArrayList<String> parsedArray, final String rawLine,
-                         final boolean disconnectSent) {
+                       final boolean disconnectSent) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -131,7 +131,7 @@ public class ServerCommandParser {
     }
 
     private Event parseCTCPCommand(final ArrayList<String> parsedArray, final String message,
-                                  final String rawSource) {
+                                   final String rawSource) {
         if (message.startsWith("ACTION")) {
             return parseAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
@@ -186,7 +186,7 @@ public class ServerCommandParser {
     }
 
     private ChannelEvent parseTopicChange(final ArrayList<String> parsedArray,
-                                      final String rawSource) {
+                                          final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
         final String setterNick = user.getPrettyNick(channel);
@@ -234,7 +234,7 @@ public class ServerCommandParser {
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
                 final String userRecipient = parsedArray.get(4);
                 final ChannelUser user = mUserChannelInterface.getUserFromRaw(userRecipient);
-                if(user != null) {
+                if (user != null) {
                     final String message = user.processModeChange(mContext, sendingUser, channel,
                             mode);
                     return mSender.sendGenericChannelEvent(channel, message, true);
@@ -268,7 +268,7 @@ public class ServerCommandParser {
     }
 
     private Event parseChannelPart(final ArrayList<String> parsedArray, final String rawSource,
-                                  final boolean disconnectSent) {
+                                   final boolean disconnectSent) {
         final String channelName = parsedArray.get(2);
 
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);

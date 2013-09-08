@@ -13,9 +13,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.communication.MessageSender;
 
 public class ServiceFragment extends Fragment {
     private IRCService mService;

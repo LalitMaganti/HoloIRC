@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
     private Context activityContext;
+
     public IRCMessageAdapter(Context context, ArrayList<Spanned> objects) {
         super(context, R.layout.irc_listview_textview, objects);
         activityContext = context;

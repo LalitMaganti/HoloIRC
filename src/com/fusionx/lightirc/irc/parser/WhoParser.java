@@ -21,12 +21,12 @@
 
 package com.fusionx.lightirc.irc.parser;
 
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.event.Event;
 import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
-import com.fusionx.lightirc.communication.MessageSender;
 
 import java.util.ArrayList;
 

@@ -46,7 +46,7 @@ public class PrivateMessageUser extends User {
 
     @Override
     public boolean equals(final Object o) {
-        if(o instanceof String || o instanceof PrivateMessageUser) {
+        if (o instanceof String || o instanceof PrivateMessageUser) {
             String otherNick = o.toString();
             return IRCUtils.areNicksEqual(nick, otherNick);
         } else {

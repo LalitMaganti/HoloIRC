@@ -183,7 +183,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         } else {
             // get the window background
-            final TypedArray a = getTheme().obtainStyledAttributes(new int[] {android.R.attr
+            final TypedArray a = getTheme().obtainStyledAttributes(new int[]{android.R.attr
                     .windowBackground});
             final int background = a.getResourceId(0, 0);
             a.recycle();

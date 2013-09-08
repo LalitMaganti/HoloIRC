@@ -45,7 +45,7 @@ public class MentionHelper {
     }
 
     public void onMention(final MentionEvent event) {
-        if(!mDisplayed) {
+        if (!mDisplayed) {
             final String message = String.format(mActivity.getString(R.string.activity_mentioned),
                     event.destination);
 
@@ -78,13 +78,14 @@ public class MentionHelper {
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         mDisplayed = false;
-                        if(mentionEvents.contains(event)) {
+                        if (mentionEvents.contains(event)) {
                             mentionEvents.remove(event);
                         }
-                        if(!mentionEvents.isEmpty()) {
+                        if (!mentionEvents.isEmpty()) {
                             onMention(mentionEvents.get(0));
                         }
                     }
+
                     @Override
                     public void onAnimationRepeat(Animation animation) {
                     }

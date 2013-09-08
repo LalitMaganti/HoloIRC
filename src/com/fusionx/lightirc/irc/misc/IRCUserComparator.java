@@ -43,7 +43,7 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
         /**
          * Code for compatibility with objects being removed
          */
-        if(firstUserMode == null && secondUserMode == null) {
+        if (firstUserMode == null && secondUserMode == null) {
             return 0;
         } else if (firstUserMode == null) {
             return -1;

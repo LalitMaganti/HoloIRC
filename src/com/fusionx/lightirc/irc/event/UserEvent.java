@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.irc.event;
 
-public class UserEvent extends Event{
+public class UserEvent extends Event {
     public final String userNick;
     public final String message;
 

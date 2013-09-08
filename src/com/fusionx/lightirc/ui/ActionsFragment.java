@@ -32,11 +32,11 @@ import android.widget.AdapterView;
 import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
+import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
-import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -63,7 +63,7 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
         setListAdapter(new ActionsAdapter(getActivity()));
-        if(type != null) {
+        if (type != null) {
             getListAdapter().setFragmentType(type);
             type = null;
         }
@@ -140,7 +140,7 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
     }
 
     public void onTabChanged(final FragmentTypeEnum selectedType) {
-        if(getListAdapter() == null) {
+        if (getListAdapter() == null) {
             type = selectedType;
         } else {
             getListAdapter().setFragmentType(selectedType);
