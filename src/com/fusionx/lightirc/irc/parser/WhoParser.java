@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.irc.parser;
 
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -66,14 +67,14 @@ public class WhoParser {
     Event parseWhoFinished() {
         if (whoChannel != null) {
             whoChannel.getUsers().addMarked();
-            //final MessageSender sender = MessageSender.getSender(mServerTitle);
-            //ChannelEvent event = sender.sendGenericChannelEvent(whoChannel,
-            // numberOfOps + " ops, " +
-            //        "" + numberOfNormals + " normal users", true);
-            numberOfNormals = 0;
-            numberOfOps = 0;
-            whoChannel = null;
-            return new Event("event");
+            final MessageSender sender = MessageSender.getSender(mServerTitle);
+            try {
+                return sender.sendGenericChannelEvent(whoChannel, "", true);
+            } finally {
+                numberOfNormals = 0;
+                numberOfOps = 0;
+                whoChannel = null;
+            }
         } else {
             return new Event("null");
         }
