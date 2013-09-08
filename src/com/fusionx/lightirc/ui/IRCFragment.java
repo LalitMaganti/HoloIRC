@@ -49,13 +49,16 @@ public abstract class IRCFragment extends ListFragment implements TextView
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                              final Bundle savedInstanceState) {
         final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
-
         mEditText = (EditText) rootView.findViewById(R.id.editText1);
         mEditText.setOnEditorActionListener(this);
-
         title = getArguments().getString("title");
-
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getListView().setFastScrollEnabled(true);
     }
 
     public void disableEditText() {
@@ -65,7 +68,6 @@ public abstract class IRCFragment extends ListFragment implements TextView
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
         final CharSequence text = mEditText.getText();
-
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
                 || actionId == EditorInfo.IME_ACTION_DONE
                 || event.getAction() == KeyEvent.ACTION_DOWN

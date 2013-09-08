@@ -3,11 +3,8 @@ package com.fusionx.lightirc.collections;
 import java.util.HashMap;
 import java.util.Set;
 
-import de.scrum_master.util.UpdateableTreeSet;
-
-import static de.scrum_master.util.UpdateableTreeSet.Updateable;
-
-public abstract class TwoWayHashSet<A extends Updateable, B extends Updateable> {
+public abstract class TwoWayHashSet<A extends UpdateableTreeSet.Updateable,
+        B extends UpdateableTreeSet.Updateable> {
     protected final HashMap<A, UpdateableTreeSet<B>> aToBMap;
     protected final HashMap<B, UpdateableTreeSet<A>> bToAMap;
 

@@ -3,12 +3,12 @@ package com.fusionx.lightirc.irc;
 import android.content.Context;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 
-import de.scrum_master.util.UpdateableTreeSet;
 import lombok.Data;
 import lombok.NonNull;
 

@@ -25,6 +25,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.collections.UpdateableTreeSet;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Channel;
@@ -35,7 +37,6 @@ import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.Event;
 import com.fusionx.lightirc.irc.event.QuitEvent;
-import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -43,8 +44,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Set;
-
-import de.scrum_master.util.UpdateableTreeSet;
 
 import static com.fusionx.lightirc.constants.Constants.DEBUG;
 import static com.fusionx.lightirc.constants.Constants.LOG_TAG;

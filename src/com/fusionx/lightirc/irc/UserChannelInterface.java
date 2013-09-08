@@ -25,6 +25,7 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.fusionx.lightirc.collections.TwoWayHashSet;
+import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
 import com.fusionx.lightirc.util.IRCUtils;
@@ -32,7 +33,6 @@ import com.fusionx.lightirc.util.IRCUtils;
 import java.io.OutputStreamWriter;
 import java.util.Set;
 
-import de.scrum_master.util.UpdateableTreeSet;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
