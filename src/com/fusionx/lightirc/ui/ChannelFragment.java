@@ -57,6 +57,7 @@ public class ChannelFragment extends IRCFragment {
             final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(channel
                     .getBuffer());
             adapter.setAbsListView(getListView());
+            channel.getBuffer().setActivityContext(getActivity());
             setListAdapter(adapter);
         } else {
             getListAdapter().notifyDataSetChanged();

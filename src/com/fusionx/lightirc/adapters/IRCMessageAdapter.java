@@ -17,8 +17,10 @@ import com.fusionx.lightirc.util.UIUtils;
 import java.util.ArrayList;
 
 public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
+    private Context activityContext;
     public IRCMessageAdapter(Context context, ArrayList<Spanned> objects) {
         super(context, R.layout.irc_listview_textview, objects);
+        activityContext = context;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -26,18 +28,22 @@ public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView view;
         if (convertView == null) {
-            view = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
+            view = (TextView) LayoutInflater.from(activityContext).inflate(R.layout
                     .irc_listview_textview, parent, false);
-            view.setTypeface(UIUtils.getRobotoLight(getContext()));
+            view.setTypeface(UIUtils.getRobotoLight(activityContext));
             if (UIUtils.hasHoneycomb()) {
                 view.setTextIsSelectable(true);
             }
-            view.setTextColor(UIUtils.getThemedTextColor(getContext()));
+            view.setTextColor(UIUtils.getThemedTextColor(activityContext));
         } else {
             view = (TextView) convertView;
         }
         view.setText(getItem(position));
         Linkify.addLinks(view, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
         return view;
+    }
+
+    public void setActivityContext(final Context context) {
+        activityContext = context;
     }
 }

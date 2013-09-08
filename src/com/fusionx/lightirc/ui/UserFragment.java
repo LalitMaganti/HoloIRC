@@ -37,10 +37,11 @@ public class UserFragment extends IRCFragment {
             final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                     UserFragmentCallbacks.class);
             final Server server = callback.getServer(true);
-            final PrivateMessageUser channel = server.getPrivateMessageUser(title);
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(channel.getBuffer
+            final PrivateMessageUser user = server.getPrivateMessageUser(title);
+            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(user.getBuffer
                     ());
             adapter.setAbsListView(getListView());
+            user.getBuffer().setActivityContext(getActivity());
             setListAdapter(adapter);
         } else {
             getListAdapter().notifyDataSetChanged();
