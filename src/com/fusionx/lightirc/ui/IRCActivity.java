@@ -368,18 +368,13 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             final Intent intent = new Intent(this, ServerListActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-        } else if (!expected && retryPending) {
-            closeAllSlidingMenus();
-            mIRCPagerFragment.onUnexpectedDisconnect();
-            mActionsPagerFragment.updateConnectionStatus(isConnectedToServer());
         } else if (!expected) {
             closeAllSlidingMenus();
             mIRCPagerFragment.onUnexpectedDisconnect();
-
-            if (getServer(true) != null) {
+            mActionsPagerFragment.updateConnectionStatus(false);
+            if (getServer(true) != null && !retryPending) {
                 mServiceFragment.removeServiceReference(mServerTitle);
             }
-            mActionsPagerFragment.updateConnectionStatus(false);
         } else {
             throw new IllegalArgumentException();
         }
