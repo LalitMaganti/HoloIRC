@@ -68,13 +68,11 @@ public class WhoParser {
         if (whoChannel != null) {
             whoChannel.getUsers().addMarked();
             final MessageSender sender = MessageSender.getSender(mServerTitle);
-            try {
-                return sender.sendGenericChannelEvent(whoChannel, "", true);
-            } finally {
-                numberOfNormals = 0;
-                numberOfOps = 0;
-                whoChannel = null;
-            }
+            final Event event = sender.sendGenericChannelEvent(whoChannel, "",  true);
+            numberOfNormals = 0;
+            numberOfOps = 0;
+            whoChannel = null;
+            return event;
         } else {
             return new Event("null");
         }
