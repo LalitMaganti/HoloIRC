@@ -117,12 +117,11 @@ public class MessageSender {
 
     private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
         channel.onChannelEvent(event);
-        //mBus.post(event);
+        mBus.post(event);
     }
 
     private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
         user.onUserEvent(event);
-        //mBus.post(event);
     }
 
     /*
