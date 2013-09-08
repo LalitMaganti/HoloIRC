@@ -66,16 +66,18 @@ public class IRCService extends Service {
             connectionManager = new ConnectionManager(this);
         }
 
-        final ServerConfiguration configuration = server.build();
+        if(server != null) {
+            final ServerConfiguration configuration = server.build();
 
-        MessageSender.getSender(server.getTitle()).initialSetup(this);
-        final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
-                mAdapterHandler);
-        connectionManager.put(server.getTitle(), thread);
+            MessageSender.getSender(server.getTitle()).initialSetup(this);
+            final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
+                    mAdapterHandler);
+            connectionManager.put(server.getTitle(), thread);
 
-        updateNotification();
+            updateNotification();
 
-        thread.start();
+            thread.start();
+        }
     }
 
     private void updateNotification() {
@@ -93,7 +95,8 @@ public class IRCService extends Service {
                 .setContentIntent(pIntent);
 
         final Notification notification = builder.addAction(android.R.drawable
-                .ic_menu_close_clear_cancel, getString(R.string.service_disconnect_all), pIntent2).build();
+                .ic_menu_close_clear_cancel, getString(R.string.service_disconnect_all),
+                pIntent2).build();
 
         // Just a random number
         // TODO - maybe static int this?

@@ -40,6 +40,17 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
         final UserLevelEnum firstUserMode = user1.getUserLevelMap().get(channel);
         final UserLevelEnum secondUserMode = user2.getUserLevelMap().get(channel);
 
+        /**
+         * Code for compatibility with objects being removed
+         */
+        if(firstUserMode == null && secondUserMode == null) {
+            return 0;
+        } else if (firstUserMode == null) {
+            return -1;
+        } else if (secondUserMode == null) {
+            return 1;
+        }
+
         if (firstUserMode.equals(secondUserMode) &&
                 MiscUtils.isUserOwnerOrVoice(firstUserMode)) {
             final String firstRemoved = user1.getNick();

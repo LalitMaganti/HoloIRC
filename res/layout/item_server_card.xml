@@ -70,6 +70,7 @@
             android:layout_height="fill_parent"
             android:layout_weight="10"
             android:orientation="vertical"
+            android:background="@drawable/default_item_selector"
             android:onClick="showPopup"
             android:id="@+id/overflow_menu">
 

@@ -77,9 +77,8 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized void decoupleUserAndChannel(@NonNull final ChannelUser user,
                                                     @NonNull final Channel channel) {
-        super.decouple(user, channel);
-
         user.getUserLevelMap().remove(channel);
+        super.decouple(user, channel);
     }
 
     public synchronized Set<Channel> removeUser(@NonNull final ChannelUser user) {

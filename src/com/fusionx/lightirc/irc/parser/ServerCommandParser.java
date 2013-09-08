@@ -278,8 +278,8 @@ public class ServerCommandParser {
             // the channels before closing to socket - don't do that
             if (!disconnectSent) {
                 mSender.sendChanelParted(channel.getName());
+                mUserChannelInterface.removeChannel(channel);
             }
-            mUserChannelInterface.removeChannel(channel);
             return new Event(channelName);
         } else {
             String message = String.format(mContext.getString(R.string.parser_parted_channel),

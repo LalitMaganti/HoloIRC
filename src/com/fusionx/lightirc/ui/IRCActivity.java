@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.ui;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,6 +61,7 @@ import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.irc.event.UserListReceivedEvent;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DecorChildLayout;
+import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
@@ -82,6 +84,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     private UserListFragment mUserListFragment = null;
     private IRCPagerFragment mIRCPagerFragment = null;
     private ActionsPagerFragment mActionsPagerFragment = null;
+    private DrawerToggle mDrawerToggle;
 
     // Sliding menus
     private SlidingMenu mUserSlidingMenu = null;
@@ -148,7 +151,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
             mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
             mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
-            mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+            mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
             mUserSlidingMenu.setTouchmodeMarginThreshold(10);
             mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
             mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
@@ -172,19 +175,38 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         }
 
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
-
         mActionsPagerFragment = (ActionsPagerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.actions_fragment);
-
-        mActionsSlidingMenu.setOnOpenListener(mActionsPagerFragment.getActionFragmentListener());
+        mDrawerToggle = new DrawerToggle(this, mActionsSlidingMenu, R.drawable.ic_drawer_light,
+                R.string.about, R.string.add);
+        mActionsSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+            @Override
+            public void onOpen() {
+                mDrawerToggle.onDrawerOpened(null);
+                mActionsPagerFragment.getActionFragmentListener().onOpen();
+            }
+        });
+        mActionsSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
+            @Override
+            public void onClose() {
+                mDrawerToggle.onDrawerClosed(null);
+                mActionsPagerFragment.getIgnoreFragmentListener().onClose();
+            }
+        });
+        mActionsSlidingMenu.setOnScrolledListener(new SlidingMenu.OnScrolledListener() {
+            @Override
+            public void onScrolled(float offset) {
+                mDrawerToggle.onDrawerSlide(null, offset);
+            }
+        });
 
         if (UIUtils.hasHoneycomb()) {
             mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         } else {
             // get the window background
-            final TypedArray a = getTheme().obtainStyledAttributes(new int[]{android.R.attr
+            final TypedArray a = getTheme().obtainStyledAttributes(new int[] {android.R.attr
                     .windowBackground});
-            int background = a.getResourceId(0, 0);
+            final int background = a.getResourceId(0, 0);
             a.recycle();
 
             // take the above view out of
@@ -198,7 +220,19 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
                 content.setBackgroundResource(background);
             }
         }
-        mActionsSlidingMenu.setOnCloseListener(mActionsPagerFragment.getIgnoreFragmentListener());
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -229,10 +263,10 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
-            case android.R.id.home:
-                mActionsSlidingMenu.toggle();
-                return true;
             case R.id.activity_server_channel_ab_users:
                 mUserSlidingMenu.toggle();
                 return true;

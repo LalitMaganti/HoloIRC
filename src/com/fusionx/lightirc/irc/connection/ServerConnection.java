@@ -122,6 +122,7 @@ class ServerConnection {
                     sslSocketFactory.createSocket(serverConfiguration.getUrl(),
                             serverConfiguration.getPort()) :
                     new Socket(serverConfiguration.getUrl(), serverConfiguration.getPort());
+            mSocket.setKeepAlive(true);
 
             final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
             server.setWriter(new ServerWriter(writer));

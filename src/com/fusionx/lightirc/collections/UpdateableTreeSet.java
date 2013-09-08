@@ -86,9 +86,6 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
 
 	private static final long serialVersionUID = 1170156554123865966L;
 
-	// Use identity maps so as to avoid compareTo and possibly to have double candidates in the lists
-	// if 'put' is called multiple times for the same element in different states (thus with different
-	// keys at the time of insertion). BTW: Too bad there is no identity set for 'toBeRemoved'. :-(
     private HashSet<E> toBeAdded = new HashSet<>();
 
 	public UpdateableTreeSet() {
