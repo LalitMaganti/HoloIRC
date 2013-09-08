@@ -28,6 +28,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.ServerCommands;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -266,6 +267,7 @@ public class ServerCommandParser {
             channel.getWriter().sendWho();
             return mSender.sendChanelJoined(channel.getName());
         } else {
+            channel.incrementNormalUsers();
             return mSender.sendGenericChannelEvent(channel,
                     String.format(mContext.getString(R.string.parser_joined_channel),
                             user.getPrettyNick(channel)), true);
@@ -294,6 +296,12 @@ public class ServerCommandParser {
                     String.format(mContext.getString(R.string.parser_reason),
                             parsedArray.get(3).replace("\"", "")) : "";
 
+            if(user.getUserLevelMap().get(channel) == UserLevelEnum.OP) {
+                channel.decrementOps();
+            } else {
+                channel.decrementNormalUsers();
+            }
+
             final Event event = mSender.sendGenericChannelEvent(channel, message, true);
             mUserChannelInterface.decoupleUserAndChannel(user, channel);
             return event;
@@ -318,6 +326,11 @@ public class ServerCommandParser {
                                     String.format(mContext.getString(R.string.parser_reason),
                                             StringUtils.remove(parsedArray.get(2), "\"")) : "");
                     mSender.sendGenericChannelEvent(channel, message, true);
+                    if(user.getUserLevelMap().get(channel) == UserLevelEnum.OP) {
+                        channel.decrementOps();
+                    } else {
+                        channel.decrementNormalUsers();
+                    }
                 }
             }
             return new Event(rawSource);

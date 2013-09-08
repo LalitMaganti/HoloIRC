@@ -75,6 +75,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     if (addingMode) {
                         channel.getUsers().update(this, ImmutableList.of(channel,
                                 UserLevelEnum.OP));
+                        channel.incrementOps();
+                        channel.decrementNormalUsers();
                         break;
                     }
                 case 'v':
@@ -85,6 +87,10 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     }
                 default:
                     if (!addingMode && (character == 'v' || character == 'o')) {
+                        if(character == 'o') {
+                            channel.decrementOps();
+                            channel.incrementNormalUsers();
+                        }
                         channel.getUsers().update(this, ImmutableList.of(channel,
                                 UserLevelEnum.NONE));
                     }

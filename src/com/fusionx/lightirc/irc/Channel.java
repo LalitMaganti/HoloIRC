@@ -37,25 +37,26 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
 public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
+    @Getter
     protected final String name;
+    @Getter
     protected final ChannelWriter writer;
-
-    @Setter(AccessLevel.NONE)
+    @Getter
     protected IRCMessageAdapter buffer;
+    @Getter
     @Setter
     protected String topic;
+    @Getter
+    private int numberOfNormalUsers;
+    @Getter
+    private int numberOfOps;
 
-    @Getter(AccessLevel.NONE)
     private boolean mUserListMessagesShown;
-    @Getter(AccessLevel.NONE)
     protected final UserChannelInterface mUserChannelInterface;
-    @Getter(AccessLevel.NONE)
     private final Handler mAdapterHandler;
 
     protected Channel(final String channelName, final UserChannelInterface
@@ -114,5 +115,21 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
                 }
             });
         }
+    }
+
+    public void incrementOps() {
+        ++numberOfOps;
+    }
+
+    public void decrementOps() {
+        --numberOfOps;
+    }
+
+    public void incrementNormalUsers() {
+        ++numberOfNormalUsers;
+    }
+
+    public void decrementNormalUsers() {
+        --numberOfNormalUsers;
     }
 }

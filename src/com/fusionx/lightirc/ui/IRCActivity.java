@@ -107,14 +107,16 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         final FragmentManager fm = getSupportFragmentManager();
         mServiceFragment = (ServiceFragment) fm.findFragmentByTag("service");
 
+        final ActionBar actionBar = getSupportActionBar();
         if (mServiceFragment == null) {
             mServiceFragment = new ServiceFragment();
             fm.beginTransaction().add(mServiceFragment, "service").commit();
+            actionBar.setSubtitle(getString(R.string.status_connecting));
         } else {
+            actionBar.setSubtitle(getServer(false).getStatus());
             setUpViewPager();
         }
 
-        final ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle(mServerTitle);
@@ -148,9 +150,17 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
                 @Override
                 public void onOpen() {
                     mUserListFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
+
                 }
             });
-            mUserSlidingMenu.setOnCloseListener(mUserListFragment);
+            mUserSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
+                @Override
+                public void onClose() {
+                    getSupportActionBar().setTitle(mServerTitle);
+                    getSupportActionBar().setSubtitle(getServer(false).getStatus());
+                    mUserListFragment.onClose();
+                }
+            });
         }
 
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
@@ -198,6 +208,15 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
                 content.setBackgroundResource(background);
             }
         }
+    }
+
+    @Override
+    public void updateActionBar() {
+        final Channel channel = getServer(false).getUserChannelInterface()
+                .getChannel(mIRCPagerFragment.getCurrentTitle());
+        getSupportActionBar().setTitle(channel.getNumberOfNormalUsers() + " normal " +
+                "users");
+        getSupportActionBar().setSubtitle(channel.getNumberOfOps() + " OPs");
     }
 
     @Override
@@ -261,13 +280,15 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     private void onUserListChanged(final String channelName) {
         if (channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
             mUserListFragment.onUserListUpdated();
+            if(mUserSlidingMenu.isMenuShowing()) {
+                updateActionBar();
+            }
         }
     }
 
     /*
      * CALLBACKS START HERE
      */
-
     @Override
     public void repopulateFragmentsInPager() {
         if (isConnectedToServer()) {
@@ -361,6 +382,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
      */
     @Override
     public void onDisconnect(final boolean expected, final boolean retryPending) {
+        getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
         if (expected && !retryPending) {
             if (getServer(true) != null) {
                 mServiceFragment.removeServiceReference(mServerTitle);
@@ -463,6 +485,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     public void onServerConnected(final ConnectedEvent event) {
         mIRCPagerFragment.connectedToServer();
         mActionsPagerFragment.updateConnectionStatus(true);
+        getSupportActionBar().setSubtitle(getServer(false).getStatus());
     }
 
     @Subscribe

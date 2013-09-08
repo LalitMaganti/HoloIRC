@@ -86,6 +86,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
             final UserListTreeSet userList = getUserList(channelName);
             if (userList != null) {
                 mChannelName = channelName;
+                mCallback.updateActionBar();
                 getUserListAdapter().setInternalSet(userList);
                 getUserListAdapter().setChannelName(channelName);
                 getListAdapter().notifyDataSetChanged();
@@ -241,5 +242,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         public Server getServer(boolean nullable);
 
         public void closeAllSlidingMenus();
+
+        public void updateActionBar();
     }
 }

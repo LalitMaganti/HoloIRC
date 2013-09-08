@@ -35,9 +35,6 @@ public class WhoParser {
     private Channel whoChannel;
     private final String mServerTitle;
 
-    private int numberOfOps = 0;
-    private int numberOfNormals = 0;
-
     WhoParser(UserChannelInterface userChannelInterface, final String serverTitle) {
         mUserChannelInterface = userChannelInterface;
         mServerTitle = serverTitle;
@@ -51,9 +48,9 @@ public class WhoParser {
         UserLevelEnum levelEnum = user.processWhoMode(parsedArray.get(5), whoChannel);
         user.setHostName(parsedArray.get(2));
         if(levelEnum == UserLevelEnum.OP) {
-            ++numberOfOps;
+            whoChannel.incrementOps();
         } else {
-            ++numberOfNormals;
+            whoChannel.incrementNormalUsers();
         }
 
         mUserChannelInterface.addChannelToUser(user, whoChannel);
@@ -69,8 +66,6 @@ public class WhoParser {
             whoChannel.getUsers().addMarked();
             final MessageSender sender = MessageSender.getSender(mServerTitle);
             final Event event = sender.sendGenericChannelEvent(whoChannel, "",  true);
-            numberOfNormals = 0;
-            numberOfOps = 0;
             whoChannel = null;
             return event;
         } else {
