@@ -62,7 +62,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         adapterHandler.post(new Runnable() {
             @Override
             public void run() {
-                buffer = new IRCMessageAdapter(mUserChannelInterface.getContext(),
+                buffer = new IRCMessageAdapter(userChannelInterface.getContext(),
                         new ArrayList<Spanned>());
                 final String message = String.format(userChannelInterface.getContext().getString
                         (R.string.parser_joined_channel), userChannelInterface
