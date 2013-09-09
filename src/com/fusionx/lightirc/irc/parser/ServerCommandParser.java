@@ -125,8 +125,10 @@ public class ServerCommandParser {
             } else {
                 return mSender.sendGenericServerEvent(mServer, formattedNotice);
             }
-        } else {
+        } else if (DEBUG) {
             throw new IllegalArgumentException();
+        } else {
+            return new Event("unknown");
         }
     }
 
@@ -139,9 +141,11 @@ public class ServerCommandParser {
             mServer.getWriter().sendVersion(nick, mServer.toString());
             return new Event(rawSource);
             // TODO - figure out what should be done here
-        } else {
+        } else if (DEBUG) {
             // TODO - add more things here
             throw new IllegalStateException();
+        } else {
+            return new Event("Non-DEBUG");
         }
     }
 
@@ -238,8 +242,10 @@ public class ServerCommandParser {
                     final String message = user.processModeChange(mContext, sendingUser, channel,
                             mode);
                     return mSender.sendGenericChannelEvent(channel, message, true);
-                } else {
+                } else if (DEBUG) {
                     throw new NullPointerException(rawSource);
+                } else {
+                    return new Event("NON-DEBUG");
                 }
             } else {
                 return new Event(mode);

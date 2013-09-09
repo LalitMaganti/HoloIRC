@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.ServerCommandSender;
+import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -374,7 +375,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             if (getServer(true) != null && !retryPending) {
                 mServiceFragment.removeServiceReference(mServerTitle);
             }
-        } else {
+        } else if (Constants.DEBUG) {
             throw new IllegalArgumentException();
         }
     }
