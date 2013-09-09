@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.irc.parser;
 
 import com.fusionx.lightirc.communication.MessageSender;
-import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
@@ -45,13 +44,8 @@ public class WhoParser {
             whoChannel = mUserChannelInterface.getChannel(parsedArray.get(0));
         }
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
-        UserLevelEnum levelEnum = user.processWhoMode(parsedArray.get(5), whoChannel);
+        user.processWhoMode(parsedArray.get(5), whoChannel);
         user.setHostName(parsedArray.get(2));
-        if(levelEnum == UserLevelEnum.OP) {
-            whoChannel.incrementOps();
-        } else {
-            whoChannel.incrementNormalUsers();
-        }
 
         mUserChannelInterface.addChannelToUser(user, whoChannel);
         if(whoChannel.getUsers() != null) {

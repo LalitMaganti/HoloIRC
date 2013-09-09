@@ -23,18 +23,23 @@ package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
 import android.text.Html;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
+import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 
 import lombok.Setter;
 
-public class UserListAdapter extends SelectionAdapter<ChannelUser> {
+public class UserListAdapter extends SelectionAdapter<ChannelUser> implements
+        StickyListHeadersAdapter {
     @Setter
-    private String channelName;
+    private Channel channel;
 
     public UserListAdapter(Context context, SynchronizedCollection<ChannelUser> objects) {
         super(context, objects);
@@ -43,7 +48,32 @@ public class UserListAdapter extends SelectionAdapter<ChannelUser> {
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
-        view.setText(Html.fromHtml(getItem(position).getPrettyNick(channelName)));
+        view.setText(Html.fromHtml(getItem(position).getPrettyNick(channel)));
         return view;
+    }
+
+    @Override
+    public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
+        final TextView view = (TextView) ((convertView != null) ? convertView : LayoutInflater.from
+                (getContext()).inflate(R.layout.sliding_menu_header, viewGroup, false));
+        final char firstChar = getFirstCharacter(i);
+        if (firstChar == '@') {
+            view.setText(channel.getNumberOfOwners() + " owners");
+        } else if (firstChar == '+') {
+            view.setText(channel.getNumberOfVoices() + " voices");
+        } else {
+            view.setText(channel.getNumberOfNormalUsers() + " users");
+        }
+        return view;
+    }
+
+    @Override
+    public long getHeaderId(int i) {
+        return getFirstCharacter(i);
+    }
+
+    public char getFirstCharacter(final int position) {
+        final ChannelUser user = getItem(position);
+        return user.getUserPrefix(channel);
     }
 }

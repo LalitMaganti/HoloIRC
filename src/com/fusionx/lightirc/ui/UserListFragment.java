@@ -41,6 +41,7 @@ import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.communication.ServerCommandSender;
+import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
@@ -48,11 +49,13 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import java.util.ArrayList;
 
+import lombok.NonNull;
+
 public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
         ActionMode.Callback, AdapterView.OnItemLongClickListener, SlidingMenu.OnCloseListener {
-    private ActionMode mode;
+    private ActionMode mMode;
     private UserListCallback mCallback;
-    private String mChannelName;
+    private Channel mChannel;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -67,7 +70,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+        return inflater.inflate(R.layout.fragment_userlist_listview, container, false);
     }
 
     @Override
@@ -81,14 +84,13 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         alphaInAnimationAdapter.setAbsListView(getListView());
     }
 
-    public void onMenuOpened(final String channelName) {
-        if (!channelName.equals(mChannelName)) {
-            final UserListTreeSet userList = getUserList(channelName);
+    public void onMenuOpened(@NonNull final Channel channel) {
+        if (!channel.equals(mChannel)) {
+            final UserListTreeSet userList = channel.getUsers();
             if (userList != null) {
-                mChannelName = channelName;
-                mCallback.updateActionBar();
+                mChannel = channel;
                 getUserListAdapter().setInternalSet(userList);
-                getUserListAdapter().setChannelName(channelName);
+                getUserListAdapter().setChannel(channel);
                 getListAdapter().notifyDataSetChanged();
             } else {
                 getUserListAdapter().clear();
@@ -150,7 +152,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         final MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.fragment_userlist_cab, menu);
 
-        this.mode = mode;
+        this.mMode = mode;
 
         return true;
     }
@@ -159,7 +161,7 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     public void onDestroyActionMode(final ActionMode mode) {
         getUserListAdapter().clearSelection();
 
-        this.mode = null;
+        this.mMode = null;
     }
 
     @Override
@@ -191,15 +193,10 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     }
 
     public void onUserListUpdated() {
-        if (mode != null) {
-            mode.finish();
+        if (mMode != null) {
+            mMode.finish();
         }
         getListAdapter().notifyDataSetChanged();
-    }
-
-    public UserListTreeSet getUserList(final String channelName) {
-        return mCallback.getServer(false).getUserChannelInterface().getChannel(channelName)
-                .getUsers();
     }
 
     public boolean isNickOtherUsers(final String nick) {
@@ -209,11 +206,11 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
                             final long l) {
-        if (mode == null) {
+        if (mMode == null) {
             ((ActionBarActivity) getActivity()).startSupportActionMode(this);
         }
         getUserListAdapter().toggleSelection(i);
-        mode.invalidate();
+        mMode.invalidate();
     }
 
     @Override
@@ -224,13 +221,13 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
 
     @Override
     public void onClose() {
-        if (mode != null) {
-            mode.finish();
+        if (mMode != null) {
+            mMode.finish();
         }
     }
 
     public void part() {
-        mChannelName = "null";
+        mChannel = null;
         getUserListAdapter().clear();
     }
 
@@ -242,7 +239,5 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
         public Server getServer(boolean nullable);
 
         public void closeAllSlidingMenus();
-
-        public void updateActionBar();
     }
 }

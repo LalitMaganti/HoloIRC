@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
+import android.widget.Checkable;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
@@ -13,8 +14,9 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
+public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
     protected final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<>();
+    private boolean mChecked = false;
 
     public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
@@ -28,14 +30,14 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
         return String.format(nickHTML, getUserPrefix(channel) + nick);
     }
 
-    protected String getUserPrefix(final Channel channel) {
+    public char getUserPrefix(final Channel channel) {
         final UserLevelEnum level = userLevelMap.get(channel);
         if (UserLevelEnum.OP.equals(level)) {
-            return "@";
+            return '@';
         } else if (UserLevelEnum.VOICE.equals(level)) {
-            return "+";
+            return '+';
         } else {
-            return "";
+            return '\0';
         }
     }
 
@@ -45,16 +47,25 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
 
     public UserLevelEnum processWhoMode(final String rawMode, final Channel channel) {
         UserLevelEnum mode = UserLevelEnum.NONE;
+        // TODO - fix this up
         if (rawMode.contains("~")) {
-            mode = UserLevelEnum.OWNER;
+            //mode = UserLevelEnum.OWNER;
+            mode = UserLevelEnum.OP;
+            channel.incrementOps();
         } else if (rawMode.contains("&")) {
-            mode = UserLevelEnum.SUPEROP;
+            //mode = UserLevelEnum.SUPEROP;
+            mode = UserLevelEnum.OP;
+            channel.incrementOps();
         } else if (rawMode.contains("@")) {
             mode = UserLevelEnum.OP;
+            channel.incrementOps();
         } else if (rawMode.contains("%")) {
-            mode = UserLevelEnum.HALFOP;
+            //mode = UserLevelEnum.HALFOP;
+            mode = UserLevelEnum.VOICE;
+            channel.incrementVoices();
         } else if (rawMode.contains("+")) {
             mode = UserLevelEnum.VOICE;
+            channel.incrementVoices();
         }
         userLevelMap.put(channel, mode);
         return mode;
@@ -73,14 +84,16 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     break;
                 case 'o':
                     if (addingMode) {
+                        if(userLevelMap.get(channel) == UserLevelEnum.VOICE) {
+                            channel.decrementVoices();
+                        }
                         channel.getUsers().update(this, ImmutableList.of(channel,
                                 UserLevelEnum.OP));
-                        channel.incrementOps();
-                        channel.decrementNormalUsers();
                         break;
                     }
                 case 'v':
                     if (addingMode && !userLevelMap.get(channel).equals(UserLevelEnum.OP)) {
+                        channel.incrementVoices();
                         channel.getUsers().update(this,
                                 ImmutableList.of(channel, UserLevelEnum.VOICE));
                         break;
@@ -89,7 +102,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
                     if (!addingMode && (character == 'v' || character == 'o')) {
                         if(character == 'o') {
                             channel.decrementOps();
-                            channel.incrementNormalUsers();
+                        } else {
+                            channel.decrementVoices();
                         }
                         channel.getUsers().update(this, ImmutableList.of(channel,
                                 UserLevelEnum.NONE));
@@ -129,5 +143,20 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable {
     @Override
     public boolean equals(final Object o) {
         return o instanceof ChannelUser && ((ChannelUser) o).getNick().equals(nick);
+    }
+
+    @Override
+    public void setChecked(boolean b) {
+        mChecked = b;
+    }
+
+    @Override
+    public boolean isChecked() {
+        return mChecked;
+    }
+
+    @Override
+    public void toggle() {
+        mChecked = !mChecked;
     }
 }

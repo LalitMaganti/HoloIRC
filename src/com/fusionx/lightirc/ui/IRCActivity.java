@@ -116,11 +116,8 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             actionBar.setSubtitle(getServer(false).getStatus());
             setUpViewPager();
         }
-
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(mServerTitle);
-        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(mServerTitle);
 
         mMentionHelper = new MentionHelper(this);
     }
@@ -149,14 +146,15 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
             mUserSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
                 @Override
                 public void onOpen() {
-                    mUserListFragment.onMenuOpened(mIRCPagerFragment.getCurrentTitle());
+                    mUserListFragment.onMenuOpened(getServer(false).getUserChannelInterface()
+                            .getChannel(mIRCPagerFragment.getCurrentTitle()));
+                    onUserListDisplayed();
 
                 }
             });
             mUserSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
                 @Override
                 public void onClose() {
-                    getSupportActionBar().setTitle(mServerTitle);
                     getSupportActionBar().setSubtitle(getServer(false).getStatus());
                     mUserListFragment.onClose();
                 }
@@ -171,21 +169,21 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         mActionsSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
             @Override
             public void onOpen() {
-                mDrawerToggle.onDrawerOpened(null);
+                mDrawerToggle.onDrawerOpened(mActionsSlidingMenu);
                 mActionsPagerFragment.getActionFragmentListener().onOpen();
             }
         });
         mActionsSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
             @Override
             public void onClose() {
-                mDrawerToggle.onDrawerClosed(null);
+                mDrawerToggle.onDrawerClosed(mActionsSlidingMenu);
                 mActionsPagerFragment.getIgnoreFragmentListener().onClose();
             }
         });
         mActionsSlidingMenu.setOnScrolledListener(new SlidingMenu.OnScrolledListener() {
             @Override
             public void onScrolled(float offset) {
-                mDrawerToggle.onDrawerSlide(null, offset);
+                mDrawerToggle.onDrawerSlide(mActionsSlidingMenu, offset);
             }
         });
 
@@ -210,13 +208,10 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         }
     }
 
-    @Override
-    public void updateActionBar() {
+    private void onUserListDisplayed() {
         final Channel channel = getServer(false).getUserChannelInterface()
                 .getChannel(mIRCPagerFragment.getCurrentTitle());
-        getSupportActionBar().setTitle(channel.getNumberOfNormalUsers() + " normal " +
-                "users");
-        getSupportActionBar().setSubtitle(channel.getNumberOfOps() + " OPs");
+        getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " number of users");
     }
 
     @Override
@@ -281,7 +276,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         if (channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
             mUserListFragment.onUserListUpdated();
             if(mUserSlidingMenu.isMenuShowing()) {
-                updateActionBar();
+                onUserListDisplayed();
             }
         }
     }

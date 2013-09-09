@@ -230,13 +230,13 @@ public class ServerCommandParser {
         if (MiscUtils.isChannel(recipient.charAt(0))) {
             // The recipient is a channel (i.e. the mode of a user in the channel is being changed
             // or possibly the mode of the channel itself)
+            final Channel channel = mUserChannelInterface.getChannel(recipient);
             if (parsedArray.size() == 4) {
                 // User not specified - therefore channel mode is being changed
                 // TODO - implement this?
                 return new Event(mode);
             } else if (parsedArray.size() == 5) {
                 // User specified - therefore user mode in channel is being changed
-                final Channel channel = mUserChannelInterface.getChannel(recipient);
                 final String userRecipient = parsedArray.get(4);
                 final ChannelUser user = mUserChannelInterface.getUserFromRaw(userRecipient);
                 if (user != null) {
@@ -249,7 +249,13 @@ public class ServerCommandParser {
                     return new Event("NON-DEBUG");
                 }
             } else {
-                return new Event(mode);
+                MiscUtils.removeFirstElementFromList(parsedArray, 4);
+                final ChannelUser user = mUserChannelInterface.getUserIfExists(sendingUser);
+                final String nick = (user == null) ? sendingUser : user.getPrettyNick(channel);
+                final String message = String.format(mContext.getString(R.string
+                        .parser_mode_changed), mode,
+                        MiscUtils.convertArrayListToString(parsedArray), nick);
+                return mSender.sendGenericChannelEvent(channel, message, true);
             }
         } else {
             // A user is changing a mode about themselves
@@ -267,7 +273,6 @@ public class ServerCommandParser {
             channel.getWriter().sendWho();
             return mSender.sendChanelJoined(channel.getName());
         } else {
-            channel.incrementNormalUsers();
             return mSender.sendGenericChannelEvent(channel,
                     String.format(mContext.getString(R.string.parser_joined_channel),
                             user.getPrettyNick(channel)), true);
@@ -298,8 +303,8 @@ public class ServerCommandParser {
 
             if(user.getUserLevelMap().get(channel) == UserLevelEnum.OP) {
                 channel.decrementOps();
-            } else {
-                channel.decrementNormalUsers();
+            } else if (user.getUserLevelMap().get(channel) == UserLevelEnum.VOICE) {
+                channel.decrementVoices();
             }
 
             final Event event = mSender.sendGenericChannelEvent(channel, message, true);
@@ -328,8 +333,8 @@ public class ServerCommandParser {
                     mSender.sendGenericChannelEvent(channel, message, true);
                     if(user.getUserLevelMap().get(channel) == UserLevelEnum.OP) {
                         channel.decrementOps();
-                    } else {
-                        channel.decrementNormalUsers();
+                    } else if (user.getUserLevelMap().get(channel) == UserLevelEnum.VOICE) {
+                        channel.decrementVoices();
                     }
                 }
             }

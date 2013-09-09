@@ -42,16 +42,12 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        final View otherHeader = convertView == null ? inflater.inflate(R.layout
-                .sliding_menu_header, null, false) : convertView;
+        final TextView otherHeader = (TextView) (convertView == null ? inflater.inflate(R.layout
+                .sliding_menu_header, null, false) : convertView);
         if (i == 0 && convertView == null) {
-            final TextView otherTextView = (TextView) otherHeader.findViewById(R.id
-                    .sliding_menu_heading_textview);
-            otherTextView.setText(getContext().getString(R.string.server));
+            otherHeader.setText(getContext().getString(R.string.server));
         } else if (i == mServerItemCount) {
-            final TextView otherTextView = (TextView) otherHeader.findViewById(R.id
-                    .sliding_menu_heading_textview);
-            otherTextView.setText(mFragmentType == FragmentTypeEnum.Channel ? getContext()
+            otherHeader.setText(mFragmentType == FragmentTypeEnum.Channel ? getContext()
                     .getString(R.string.channel) : getContext().getString(R.string.user));
         }
         return otherHeader;

@@ -4,12 +4,12 @@ package com.fusionx.lightirc.irc.event;
  * A common class for all events to subclass
  */
 public class Event {
-    public String message = "";
+    public String baseMessage = "";
 
     Event() {
     }
 
-    public Event(String message) {
-        this.message = message;
+    public Event(String baseMessage) {
+        this.baseMessage = baseMessage;
     }
 }

@@ -29,6 +29,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -36,6 +37,7 @@ import com.fusionx.lightirc.util.MiscUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -50,10 +52,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     @Getter
     @Setter
     protected String topic;
-    @Getter
-    private int numberOfNormalUsers;
-    @Getter
-    private int numberOfOps;
+    private final HashMap<UserLevelEnum, Integer> numberOfUsers = new HashMap<>();
 
     private boolean mUserListMessagesShown;
     protected final UserChannelInterface mUserChannelInterface;
@@ -76,6 +75,10 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         writer = new ChannelWriter(userChannelInterface.getOutputStream(), this);
         mUserChannelInterface = userChannelInterface;
         mAdapterHandler = adapterHandler;
+
+        // Number of users
+        numberOfUsers.put(UserLevelEnum.OP, 0);
+        numberOfUsers.put(UserLevelEnum.VOICE, 0);
 
         mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(mUserChannelInterface
                 .getContext());
@@ -117,19 +120,67 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         }
     }
 
+    public int getNumberOfUsers() {
+        return getUsers().size();
+    }
+
     public void incrementOps() {
-        ++numberOfOps;
+        synchronized (numberOfUsers) {
+            Integer numberOfOps = numberOfUsers.get(UserLevelEnum.OP);
+            if(numberOfOps == null) {
+                numberOfOps = 1;
+            } else {
+                ++numberOfOps;
+            }
+            numberOfUsers.put(UserLevelEnum.OP, numberOfOps);
+        }
     }
 
     public void decrementOps() {
-        --numberOfOps;
+        synchronized (numberOfUsers) {
+            Integer numberOfOps = numberOfUsers.get(UserLevelEnum.OP);
+            --numberOfOps;
+            numberOfUsers.put(UserLevelEnum.OP, numberOfOps);
+        }
     }
 
-    public void incrementNormalUsers() {
-        ++numberOfNormalUsers;
+    public void incrementVoices() {
+        synchronized (numberOfUsers) {
+            Integer numberOfVoices = numberOfUsers.get(UserLevelEnum.VOICE);
+            if(numberOfVoices == null) {
+                numberOfVoices = 1;
+            } else {
+                ++numberOfVoices;
+            }
+            numberOfUsers.put(UserLevelEnum.VOICE, numberOfVoices);
+        }
     }
 
-    public void decrementNormalUsers() {
-        --numberOfNormalUsers;
+    public void decrementVoices() {
+        synchronized (numberOfUsers) {
+            Integer numberOfVoices = numberOfUsers.get(UserLevelEnum.VOICE);
+            --numberOfVoices;
+            numberOfUsers.put(UserLevelEnum.VOICE, numberOfVoices);
+        }
+    }
+
+    public int getNumberOfOwners() {
+        synchronized (numberOfUsers) {
+            return numberOfUsers.get(UserLevelEnum.OP);
+        }
+    }
+
+    public int getNumberOfVoices() {
+        synchronized (numberOfUsers) {
+            return numberOfUsers.get(UserLevelEnum.VOICE);
+        }
+    }
+
+    public int getNumberOfNormalUsers() {
+        int normalUsers;
+        synchronized (numberOfUsers) {
+            normalUsers = getNumberOfUsers() - (getNumberOfOwners() + getNumberOfVoices());
+        }
+        return normalUsers;
     }
 }
