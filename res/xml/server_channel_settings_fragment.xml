@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:holo="http://schemas.android.com/apk/res-auto"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
 
     <PreferenceCategory android:title="Server Settings">
-        <com.fusionx.lightirc.ui.preferences.NumberPickerPreference
+        <NumberPickerPreference
                 android:key="pref_reconnect_tries"
                 android:dialogMessage="The number of times the app should try to reconnect to the server"
-                android:title="Reconnect attempts"/>
+                android:title="Reconnect attempts"
+                holo:max="20"
+                holo:min="0"/>
         <CheckBoxPreference
                 android:key="pref_motd"
                 android:defaultValue="true"

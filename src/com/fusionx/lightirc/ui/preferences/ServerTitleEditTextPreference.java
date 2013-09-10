@@ -1,9 +1,10 @@
 package com.fusionx.lightirc.ui.preferences;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.util.AttributeSet;
+
+import org.holoeverywhere.app.AlertDialog;
 
 import java.util.ArrayList;
 

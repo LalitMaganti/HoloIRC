@@ -11,13 +11,13 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ISettings;
-import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 
 import org.holoeverywhere.app.Activity;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.preference.ListPreference;
+import org.holoeverywhere.preference.NumberPickerPreference;
 import org.holoeverywhere.preference.Preference;
 import org.holoeverywhere.preference.PreferenceActivity;
 import org.holoeverywhere.preference.PreferenceScreen;
@@ -52,7 +52,8 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
     public void setupNumberPicker(final PreferenceScreen screen) {
         final NumberPickerPreference numberPickerDialogPreference = (NumberPickerPreference)
                 screen.findPreference(PreferenceConstants.ReconnectTries);
-        numberPickerDialogPreference.setSummary(String.valueOf(0));
+        numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
+                .getValue()));
     }
 
     @Override
