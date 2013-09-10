@@ -21,12 +21,12 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 public class UserFragment extends IRCFragment {
     @Override
@@ -38,7 +38,7 @@ public class UserFragment extends IRCFragment {
                     UserFragmentCallbacks.class);
             final Server server = callback.getServer(true);
             final PrivateMessageUser user = server.getPrivateMessageUser(title);
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(user.getBuffer
+            final IRCAnimationAdapter adapter = new IRCAnimationAdapter(user.getBuffer
                     ());
             adapter.setAbsListView(getListView());
             user.getBuffer().setActivityContext(getActivity());

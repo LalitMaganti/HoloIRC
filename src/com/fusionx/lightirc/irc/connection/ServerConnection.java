@@ -39,6 +39,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -118,11 +119,12 @@ class ServerConnection {
             final SSLSocketFactory sslSocketFactory = (SSLSocketFactory)
                     SSLSocketFactory.getDefault();
 
-            mSocket = serverConfiguration.isSsl() ?
-                    sslSocketFactory.createSocket(serverConfiguration.getUrl(),
-                            serverConfiguration.getPort()) :
-                    new Socket(serverConfiguration.getUrl(), serverConfiguration.getPort());
+            InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
+                    serverConfiguration.getPort());
+
+            mSocket = serverConfiguration.isSsl() ? sslSocketFactory.createSocket() : new Socket();
             mSocket.setKeepAlive(true);
+            mSocket.connect(address, 5000);
 
             final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
             server.setWriter(new ServerWriter(writer));

@@ -39,8 +39,10 @@ import java.util.HashSet;
  */
 public class MultiSelectionUtils {
     public static Controller attachMultiSelectionController(final ListView listView,
-                                                            final ActionBarActivity activity, final MultiChoiceModeListener listener) {
-        return Controller.attach(listView, activity, listener);
+                                                            final ActionBarActivity activity,
+                                                            final MultiChoiceModeListener listener,
+                                                            boolean startModeOnClick) {
+        return Controller.attach(listView, activity, listener, startModeOnClick);
     }
 
     public static class Controller implements
@@ -60,12 +62,16 @@ public class MultiSelectionUtils {
         }
 
         public static Controller attach(ListView listView, ActionBarActivity activity,
-                                        MultiChoiceModeListener listener) {
+                                        MultiChoiceModeListener listener,
+                                        boolean startModeOnClick) {
             Controller controller = new Controller();
             controller.mListView = listView;
             controller.mActivity = activity;
             controller.mListener = listener;
             listView.setOnItemLongClickListener(controller);
+            if(startModeOnClick) {
+                listView.setOnItemClickListener(controller);
+            }
             return controller;
         }
 
@@ -192,19 +198,25 @@ public class MultiSelectionUtils {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-            boolean checked = mListView.isItemChecked(position);
-            mListener.onItemCheckedStateChanged(mActionMode, position, id, checked);
+            if(mActionMode == null) {
+                mItemsToCheck = new HashSet<Pair<Integer, Long>>();
+                mItemsToCheck.add(new Pair<Integer, Long>(position, id));
+                mActionMode = mActivity.startSupportActionMode(Controller.this);
+            } else {
+                boolean checked = mListView.isItemChecked(position);
+                mListener.onItemCheckedStateChanged(mActionMode, position, id, checked);
 
-            int numChecked = 0;
-            SparseBooleanArray checkedItemPositions = mListView.getCheckedItemPositions();
-            if (checkedItemPositions != null) {
-                for (int i = 0; i < checkedItemPositions.size(); i++) {
-                    numChecked += checkedItemPositions.valueAt(i) ? 1 : 0;
+                int numChecked = 0;
+                SparseBooleanArray checkedItemPositions = mListView.getCheckedItemPositions();
+                if (checkedItemPositions != null) {
+                    for (int i = 0; i < checkedItemPositions.size(); i++) {
+                        numChecked += checkedItemPositions.valueAt(i) ? 1 : 0;
+                    }
                 }
-            }
 
-            if (numChecked <= 0) {
-                mActionMode.finish();
+                if (numChecked <= 0) {
+                    mActionMode.finish();
+                }
             }
         }
 

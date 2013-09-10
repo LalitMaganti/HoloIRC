@@ -5,17 +5,16 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <TextView
+    <org.holoeverywhere.widget.TextView
             android:textIsSelectable="true"
             android:id="@+id/text_dialog_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dip"
             android:paddingLeft="12dip"
-            android:paddingRight="12dip">
-    </TextView>
+            android:paddingRight="12dip"/>
 
-    <com.michaelnovakjr.numberpicker.NumberPicker
+    <org.holoeverywhere.widget.NumberPicker
             android:id="@+id/number_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

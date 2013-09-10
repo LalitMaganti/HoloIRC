@@ -56,7 +56,7 @@ public class WhoParser {
     }
 
     Event parseWhoFinished() {
-        if (whoChannel != null) {
+        if (whoChannel != null && whoChannel.getUsers() != null) {
             whoChannel.getUsers().addMarked();
             final MessageSender sender = MessageSender.getSender(mServerTitle);
             final Event event = sender.sendGenericChannelEvent(whoChannel, "",  true);

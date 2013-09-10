@@ -19,20 +19,20 @@
     You should have received a copy of the GNU General Public License
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
-
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:id="@+id/server_list"
-              android:clipToPadding="false"
-              android:divider="@null"
-              android:fadingEdge="none"
-              android:dividerHeight="16dp"
-              android:padding="16dp"
-              android:scrollbarStyle="outsideOverlay"/>
-
-</LinearLayout>
+<org.holoeverywhere.widget.GridView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/server_list"
+        android:clipToPadding="false"
+        android:divider="@null"
+        android:fadingEdge="none"
+        android:dividerHeight="16dp"
+        android:padding="16dp"
+        android:columnWidth="300dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
+        android:horizontalSpacing="10dp"
+        android:stretchMode="columnWidth"
+        android:gravity="center"
+        android:scrollbarStyle="outsideOverlay"/>

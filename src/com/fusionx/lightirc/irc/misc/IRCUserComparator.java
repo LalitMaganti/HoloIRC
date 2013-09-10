@@ -37,8 +37,8 @@ public class IRCUserComparator implements Comparator<ChannelUser> {
 
     @Override
     public int compare(final ChannelUser user1, final ChannelUser user2) {
-        final UserLevelEnum firstUserMode = user1.getUserLevelMap().get(channel);
-        final UserLevelEnum secondUserMode = user2.getUserLevelMap().get(channel);
+        final UserLevelEnum firstUserMode = user1.getChannelPrivileges(channel);
+        final UserLevelEnum secondUserMode = user2.getChannelPrivileges(channel);
 
         /**
          * Code for compatibility with objects being removed

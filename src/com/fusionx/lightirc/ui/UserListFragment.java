@@ -21,20 +21,16 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
@@ -44,16 +40,18 @@ import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-import java.util.ArrayList;
+import org.holoeverywhere.LayoutInflater;
+import org.holoeverywhere.app.Activity;
+
+import java.util.List;
 
 import lombok.NonNull;
 
-public class UserListFragment extends ListFragment implements AdapterView.OnItemClickListener,
-        ActionMode.Callback, AdapterView.OnItemLongClickListener, SlidingMenu.OnCloseListener {
-    private ActionMode mMode;
+public class UserListFragment extends MultiChoiceListFragment<ChannelUser> implements
+        SlidingMenu.OnCloseListener {
     private UserListCallback mCallback;
     private Channel mChannel;
 
@@ -70,7 +68,8 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_userlist_listview, container, false);
+        return inflater.inflate(R.layout.fragment_userlist_listview, container,
+                false);
     }
 
     @Override
@@ -79,9 +78,15 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
 
         final UserListAdapter adapter = new UserListAdapter(view.getContext(),
                 new SynchronizedTreeSet<ChannelUser>());
-        AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(adapter);
-        setListAdapter(alphaInAnimationAdapter);
-        alphaInAnimationAdapter.setAbsListView(getListView());
+        setListAdapter(adapter);
+
+        getListView().setFastScrollEnabled(true);
+    }
+
+    @Override
+    protected void attachSelectionController() {
+        mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
+                getListView(), (ActionBarActivity) getActivity(), this, true);
     }
 
     public void onMenuOpened(@NonNull final Channel channel) {
@@ -89,28 +94,19 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
             final UserListTreeSet userList = channel.getUsers();
             if (userList != null) {
                 mChannel = channel;
-                getUserListAdapter().setInternalSet(userList);
-                getUserListAdapter().setChannel(channel);
-                getListAdapter().notifyDataSetChanged();
+                getRealAdapter().setInternalSet(userList);
+                getRealAdapter().setChannel(channel);
+                getRealAdapter().notifyDataSetChanged();
             } else {
-                getUserListAdapter().clear();
+                getRealAdapter().clear();
             }
         }
         getListView().smoothScrollToPosition(0);
     }
 
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        getListView().setOnItemClickListener(this);
-        getListView().setOnItemLongClickListener(this);
-        getListView().setFastScrollEnabled(true);
-    }
-
-    @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final ArrayList<ChannelUser> selectedItems = getUserListAdapter().getSelectedItems();
+        final List<ChannelUser> selectedItems = getCheckedItems();
         final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
@@ -151,52 +147,14 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
         final MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.fragment_userlist_cab, menu);
-
-        this.mMode = mode;
-
         return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(final ActionMode mode) {
-        getUserListAdapter().clearSelection();
-
-        this.mMode = null;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        int selectedItemCount = getUserListAdapter().getSelectedItemCount();
-
-        if (selectedItemCount == 0) {
-            mode.finish();
-        } else {
-            final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
-                    selectedItemCount, selectedItemCount);
-
-            mode.setTitle(quantityString);
-
-            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
-        }
-
-        return true;
-    }
-
-    public UserListAdapter getUserListAdapter() {
-        return (UserListAdapter) getListAdapter().getDecoratedBaseAdapter();
-    }
-
-    @Override
-    public AlphaInAnimationAdapter getListAdapter() {
-        return (AlphaInAnimationAdapter) super.getListAdapter();
     }
 
     public void onUserListUpdated() {
-        if (mMode != null) {
-            mMode.finish();
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.finish();
         }
-        getListAdapter().notifyDataSetChanged();
+        getRealAdapter().notifyDataSetChanged();
     }
 
     public boolean isNickOtherUsers(final String nick) {
@@ -204,35 +162,38 @@ public class UserListFragment extends ListFragment implements AdapterView.OnItem
     }
 
     @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
-                            final long l) {
-        if (mMode == null) {
-            ((ActionBarActivity) getActivity()).startSupportActionMode(this);
-        }
-        getUserListAdapter().toggleSelection(i);
-        mMode.invalidate();
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-        onItemClick(adapterView, view, i, l);
-        return true;
-    }
-
-    @Override
     public void onClose() {
-        if (mMode != null) {
-            mMode.finish();
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.finish();
         }
     }
 
     public void part() {
         mChannel = null;
-        getUserListAdapter().clear();
+        getRealAdapter().clear();
+    }
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        int selectedItemCount = getCheckedItems().size();
+
+        if (selectedItemCount != 0) {
+            final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
+                    selectedItemCount, selectedItemCount);
+            mode.setTitle(quantityString);
+
+            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
+            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
+        }
+    }
+
+    @Override
+    protected UserListAdapter getRealAdapter() {
+        return (UserListAdapter) super.getListAdapter();
     }
 
     public interface UserListCallback {
-        public void onUserMention(final ArrayList<ChannelUser> users);
+        public void onUserMention(final List<ChannelUser> users);
 
         public void createPMFragment(final String userNick);
 

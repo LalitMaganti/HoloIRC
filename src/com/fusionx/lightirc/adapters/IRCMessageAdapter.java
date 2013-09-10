@@ -35,7 +35,6 @@ public class IRCMessageAdapter extends ArrayAdapter<Spanned> {
             if (UIUtils.hasHoneycomb()) {
                 view.setTextIsSelectable(true);
             }
-            view.setTextColor(UIUtils.getThemedTextColor(activityContext));
         } else {
             view = (TextView) convertView;
         }

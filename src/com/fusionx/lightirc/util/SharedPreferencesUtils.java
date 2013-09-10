@@ -21,16 +21,14 @@
 
 package com.fusionx.lightirc.util;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.os.Build;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 
 import org.apache.commons.lang3.StringUtils;
+import org.holoeverywhere.preference.SharedPreferences;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -96,8 +94,8 @@ public class SharedPreferencesUtils {
 
     public static String migrateFileToNewSystem(final Context context, final String fileName) {
         final File file = new File(getSharedPreferencesPath(context), fileName);
-        final SharedPreferences sharedPreferences = context.getSharedPreferences(StringUtils
-                .remove(fileName, ".xml"), Context.MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = (SharedPreferences) context
+                .getSharedPreferences(StringUtils.remove(fileName, ".xml"), Context.MODE_PRIVATE);
         final String newName = sharedPreferences.getString(Title, "").toLowerCase();
         file.renameTo(new File(getSharedPreferencesPath(context),
                 newName + ".xml"));
@@ -106,8 +104,8 @@ public class SharedPreferencesUtils {
 
     public static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
                                                                     final String filename) {
-        final SharedPreferences serverSettings = context.getSharedPreferences(filename,
-                Context.MODE_PRIVATE);
+        final SharedPreferences serverSettings = (SharedPreferences) context.getSharedPreferences
+                (filename, Context.MODE_PRIVATE);
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
 
         // Server connection
@@ -149,49 +147,15 @@ public class SharedPreferencesUtils {
         return builder;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static void putStringSet(SharedPreferences preferences, final String key,
-                                    final Set<String> set) {
+    public static void putStringSet(org.holoeverywhere.preference.SharedPreferences preferences,
+                                    final String key, final Set<String> set) {
         final SharedPreferences.Editor editor = preferences.edit();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-            editor.putStringSet(key, set);
-        } else {
-            // removes old occurrences of key
-            for (String k : preferences.getAll().keySet()) {
-                if (k.startsWith(key)) {
-                    editor.remove(k);
-                }
-            }
-
-            int i = 0;
-            for (String value : set) {
-                editor.putString(key + i++, value);
-            }
-        }
+        editor.putStringSet(key, set);
         editor.commit();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static Set<String> getStringSet(final SharedPreferences pref, final String key,
                                            final Set<String> defaultValue) {
-        if (UIUtils.hasHoneycomb()) {
-            return pref.getStringSet(key, defaultValue);
-        } else {
-            final Set<String> set = new HashSet<>();
-
-            int i = 0;
-
-            Set<String> keySet = pref.getAll().keySet();
-            while (keySet.contains(key + i)) {
-                set.add(pref.getString(key + i, ""));
-                i++;
-            }
-
-            if (set.isEmpty()) {
-                return defaultValue;
-            } else {
-                return set;
-            }
-        }
+        return pref.getStringSet(key, defaultValue);
     }
 }

@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.ui.widget;
 
 import android.content.Context;
-import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +9,8 @@ import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
+
+import org.holoeverywhere.preference.Preference;
 
 /**
  * Hacky way to add a view to a settings fragment

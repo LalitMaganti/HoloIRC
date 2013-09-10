@@ -25,23 +25,22 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 
 import java.util.ArrayList;
 
-public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder> {
-    private final Activity mActivity;
+public class ServerListAdapter extends BaseCollectionAdapter<ServerConfiguration.Builder> {
     private final BuilderAdapterCallback mCallback;
 
-    public ServerListAdapter(final Activity activity, ArrayList<ServerConfiguration.Builder> list) {
-        super(activity, android.R.layout.simple_list_item_1, list);
-        mActivity = activity;
+    public ServerListAdapter(final Activity activity, SynchronizedCollection<ServerConfiguration
+            .Builder> list) {
+        super(activity, R.layout.item_server_card, list);
 
         try {
             mCallback = (BuilderAdapterCallback) activity;
@@ -56,7 +55,7 @@ public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder>
         View view;
         final ServerConfiguration.Builder builder = getItem(position);
         if (convertView == null) {
-            final LayoutInflater vi = LayoutInflater.from(mActivity);
+            final LayoutInflater vi = LayoutInflater.from(getContext());
             view = vi.inflate(R.layout.item_server_card, parent, false);
         } else {
             view = convertView;
@@ -72,7 +71,7 @@ public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder>
             if (server != null) {
                 description.setText(server.getStatus());
             } else {
-                description.setText(mActivity.getString(R.string.status_disconnected));
+                description.setText(getContext().getString(R.string.status_disconnected));
             }
         }
 
@@ -83,6 +82,16 @@ public class ServerListAdapter extends ArrayAdapter<ServerConfiguration.Builder>
         linearLayout.setTag(builder);
 
         return view;
+    }
+
+    public ArrayList<String> getListOfTitles(final ServerConfiguration.Builder exclusion) {
+        final ArrayList<String> listOfTitles = new ArrayList<>();
+        for (ServerConfiguration.Builder builder : mObjects) {
+            if (!builder.equals(exclusion)) {
+                listOfTitles.add(builder.getTitle());
+            }
+        }
+        return listOfTitles;
     }
 
     public interface BuilderAdapterCallback {

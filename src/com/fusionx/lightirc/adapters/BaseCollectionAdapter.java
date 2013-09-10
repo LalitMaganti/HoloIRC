@@ -29,6 +29,9 @@ import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A concrete BaseAdapter that is backed by an array of arbitrary
@@ -45,7 +48,7 @@ import java.util.Collections;
  * or to have some of data besides toString() results fill the views,
  * override {@link #getView(int, View, ViewGroup)} to return the type of view you want.
  */
-public abstract class CollectionAdapter<T> extends BaseAdapter {
+public class BaseCollectionAdapter<T> extends BaseAdapter {
     /**
      * Contains the list of objects that represent the data of this ArrayAdapter.
      * The content of this list is referred to as "the array" in the documentation.
@@ -89,7 +92,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      *                           instantiating views.
      * @param objects            The objects to represent in the ListView.
      */
-    public CollectionAdapter(Context context, int textViewResourceId, SynchronizedCollection<T> objects) {
+    public BaseCollectionAdapter(Context context, int textViewResourceId, SynchronizedCollection<T> objects) {
         init(context, textViewResourceId, 0, objects);
     }
 
@@ -102,7 +105,7 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
      * @param textViewResourceId The id of the TextView within the layout resource to be populated
      * @param objects            The objects to represent in the ListView.
      */
-    public CollectionAdapter(Context context, int resource, int textViewResourceId, SynchronizedCollection<T> objects) {
+    public BaseCollectionAdapter(Context context, int resource, int textViewResourceId, SynchronizedCollection<T> objects) {
         init(context, resource, textViewResourceId, objects);
     }
 
@@ -305,6 +308,18 @@ public abstract class CollectionAdapter<T> extends BaseAdapter {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         return createViewFromResource(position, convertView, parent, mDropDownResource);
+    }
+
+    public List<T> getListOfItems() {
+        synchronized (mObjects.getLock()) {
+            return new ArrayList<>(mObjects);
+        }
+    }
+
+    public Set<T> getSetOfItems() {
+        synchronized (mObjects.getLock()) {
+            return new HashSet<>(mObjects);
+        }
     }
 }
 

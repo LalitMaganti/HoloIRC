@@ -1,17 +1,9 @@
 package com.fusionx.lightirc.ui;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
@@ -21,11 +13,16 @@ import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.widget.MustBeCompleteView;
 
 import org.apache.commons.lang3.StringUtils;
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.preference.CheckBoxPreference;
+import org.holoeverywhere.preference.EditTextPreference;
+import org.holoeverywhere.preference.Preference;
+import org.holoeverywhere.preference.PreferenceFragment;
+import org.holoeverywhere.preference.PreferenceManager;
 
 import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
 import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class ServerPreferenceFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {
     private MustBeCompleteView mCompleteView = null;

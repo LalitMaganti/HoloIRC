@@ -24,13 +24,14 @@ package com.fusionx.lightirc.ui;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.view.View;
+import android.view.WindowManager;
 
+import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import java.util.ArrayList;
 
@@ -38,6 +39,9 @@ public class ServerFragment extends IRCFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
+                .SOFT_INPUT_STATE_HIDDEN);
 
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
@@ -54,7 +58,7 @@ public class ServerFragment extends IRCFragment {
         if (server != null && getListAdapter() == null) {
             final IRCMessageAdapter adapter = server.getBuffer() == null ? new IRCMessageAdapter
                     (getActivity(), new ArrayList<Spanned>()) : server.getBuffer();
-            final AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter
+            final IRCAnimationAdapter alphaInAnimationAdapter = new IRCAnimationAdapter
                     (adapter);
             alphaInAnimationAdapter.setAbsListView(getListView());
             setListAdapter(alphaInAnimationAdapter);

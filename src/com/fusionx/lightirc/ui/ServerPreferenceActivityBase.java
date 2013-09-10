@@ -1,13 +1,14 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.IServerSettings;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
+
+import org.holoeverywhere.preference.PreferenceActivity;
 
 import java.io.File;
 

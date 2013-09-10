@@ -28,14 +28,14 @@
         android:weightSum="100"
         android:padding="16dp"
         android:baselineAligned="false"
-        android:background="?attr/server_card_background"
+        android:background="?server_card_background"
         android:cacheColorHint="?server_card_background">
 
     <LinearLayout
             android:id="@+id/contentLayout"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:background="@drawable/default_item_selector"
+            android:background="?selectableItemBackground"
             android:layout_marginLeft="8dip"
             android:layout_weight="90"
             android:onClick="onCardClick"
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dip"
                 android:text="@string/title"
-                android:textColor="?attr/server_card_text"
+                android:textColor="?server_card_text"
                 android:textSize="24sp"/>
 
         <com.fusionx.lightirc.ui.widget.RobotoLightTextView
@@ -61,7 +61,7 @@
                 android:ellipsize="end"
                 android:maxLines="3"
                 android:text="@string/description"
-                android:textColor="?attr/server_card_text"
+                android:textColor="?server_card_text"
                 android:textSize="16sp"/>
     </LinearLayout>
 
@@ -70,7 +70,6 @@
             android:layout_height="fill_parent"
             android:layout_weight="10"
             android:orientation="vertical"
-            android:background="@drawable/default_item_selector"
             android:onClick="showPopup"
             android:id="@+id/overflow_menu">
 
@@ -78,9 +77,9 @@
                 android:id="@+id/overflow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/default_item_selector"
+                android:background="?selectableItemBackground"
                 android:contentDescription="@string/overflow"
                 android:padding="2dip"
-                android:src="?attr/overflow_menu_drawable"/>
+                android:src="?overflow_menu_drawable"/>
     </LinearLayout>
 </LinearLayout>

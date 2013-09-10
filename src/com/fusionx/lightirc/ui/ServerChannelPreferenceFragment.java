@@ -21,16 +21,14 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ISettings;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+import org.holoeverywhere.app.Activity;
+import org.holoeverywhere.preference.PreferenceFragment;
+
 public class ServerChannelPreferenceFragment extends PreferenceFragment {
     private ISettings mCallback;
 

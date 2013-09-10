@@ -1,11 +1,12 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 
 import com.fusionx.lightirc.interfaces.IServerSettings;
 
-public class ChannelListActivity extends ActionBarActivity implements IServerSettings {
+import org.holoeverywhere.app.Activity;
+
+public class ChannelListActivity extends Activity implements IServerSettings {
     private String mFileName;
 
     @Override

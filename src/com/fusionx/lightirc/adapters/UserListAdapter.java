@@ -22,7 +22,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 package com.fusionx.lightirc.adapters;
 
 import android.content.Context;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,22 +32,24 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.lightirc.util.UIUtils;
 
 import lombok.Setter;
 
-public class UserListAdapter extends SelectionAdapter<ChannelUser> implements
+public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
         StickyListHeadersAdapter {
     @Setter
     private Channel channel;
 
     public UserListAdapter(Context context, SynchronizedCollection<ChannelUser> objects) {
-        super(context, objects);
+        super(context, R.layout.default_listview_textview, objects);
     }
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
-        view.setText(Html.fromHtml(getItem(position).getPrettyNick(channel)));
+        view.setTypeface(UIUtils.getRobotoLight(getContext()));
+        view.setText(getItem(position).getSpannableNick(channel));
         return view;
     }
 
@@ -75,5 +76,14 @@ public class UserListAdapter extends SelectionAdapter<ChannelUser> implements
     public char getFirstCharacter(final int position) {
         final ChannelUser user = getItem(position);
         return user.getUserPrefix(channel);
+    }
+
+    public void setInternalSet(SynchronizedCollection<ChannelUser> set) {
+        synchronized (mObjects.getLock()) {
+            mObjects = set;
+        }
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 }

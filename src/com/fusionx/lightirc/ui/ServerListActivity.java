@@ -25,20 +25,20 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
+import android.widget.AbsListView;
+import android.widget.GridView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
-import com.fusionx.lightirc.collections.BuilderList;
+import com.fusionx.lightirc.collections.SynchronizedArrayList;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.communication.ServerCommandSender;
@@ -49,21 +49,21 @@ import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import com.github.espiandev.showcaseview.ShowcaseView;
-import com.haarman.listviewanimations.BaseAdapterDecorator;
-import com.haarman.listviewanimations.swinginadapters.prepared.SwingBottomInAnimationAdapter;
+import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.squareup.otto.Subscribe;
+
+import org.holoeverywhere.app.Activity;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class ServerListActivity extends ActionBarActivity implements PopupMenu
+public class ServerListActivity extends Activity implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener,
-        ServerListAdapter.BuilderAdapterCallback, ShowcaseView.OnShowcaseEventListener {
+        ServerListAdapter.BuilderAdapterCallback, OnDismissCallback {
     private IRCService mService = null;
-    private BuilderList mBuilderList = null;
     private ServerConfiguration.Builder mBuilder = null;
     private ServerListAdapter mServerCardsAdapter = null;
+    private AnimatedServerListAdapter mAnimationAdapter = null;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -73,8 +73,8 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         setContentView(R.layout.activity_server_list);
 
-        mBuilderList = new BuilderList();
-        mServerCardsAdapter = new ServerListAdapter(this, mBuilderList);
+        mServerCardsAdapter = new ServerListAdapter(this,
+                new SynchronizedArrayList<ServerConfiguration.Builder>());
     }
 
     @Override
@@ -100,7 +100,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     protected void onStop() {
         super.onStop();
 
-        for (ServerConfiguration.Builder builder : mBuilderList) {
+        for (ServerConfiguration.Builder builder : mServerCardsAdapter.getListOfItems()) {
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
             if (sender != null) {
                 try {
@@ -131,13 +131,12 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
             mService = ((IRCService.IRCBinder) binder).getService();
             setUpServerList();
 
-            final ListView listView = (ListView) findViewById(R.id.server_list);
-            final SwingBottomInAnimationAdapter adapter = new SwingBottomInAnimationAdapter
-                    (new ServerCardsAdapter(mServerCardsAdapter));
-            adapter.setAbsListView(listView);
-            listView.setAdapter(adapter);
+            final GridView listView = (GridView) findViewById(R.id.server_list);
+            mAnimationAdapter = new AnimatedServerListAdapter
+                    (mServerCardsAdapter, ServerListActivity.this);
+            mAnimationAdapter.setAbsListView(listView);
+            listView.setAdapter(mAnimationAdapter);
         }
-
         @Override
         public void onServiceDisconnected(final ComponentName name) {
         }
@@ -180,22 +179,21 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
             globalSettings.edit().putBoolean("firstrun", false).commit();
         }
 
-        mBuilderList.clear();
+        mServerCardsAdapter.clear();
         ArrayList<String> serverFiles = SharedPreferencesUtils.getServersFromPreferences(this);
         for (final String file : serverFiles) {
             ServerConfiguration.Builder builder = SharedPreferencesUtils.convertPrefsToBuilder
                     (this, file);
-            mBuilderList.add(builder);
+            mServerCardsAdapter.add(builder);
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
             if (sender != null) {
                 sender.getBus().register(this);
             }
         }
-        mServerCardsAdapter.notifyDataSetChanged();
     }
 
     @Subscribe
-    public void onServerConnnected(final ConnectedEvent event) {
+    public void onServerConnected(final ConnectedEvent event) {
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
@@ -241,7 +239,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
                 disconnectFromServer(mBuilder);
                 break;
             case R.id.activity_server_list_popup_delete:
-                deleteServer(mBuilder.getFile());
+                deleteServer(mBuilder);
                 break;
             default:
                 return false;
@@ -262,37 +260,28 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     }
 
     private void addNewServer() {
-        final Intent intent = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new Intent
-                (ServerListActivity.this, ServerPreferenceActivityCompat.class) : new Intent
-                (ServerListActivity.this, ServerPreferenceActivityHC.class);
+        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivityHC.class);
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
         intent.putExtra("main", true);
-        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles(null));
+        intent.putStringArrayListExtra("list", mServerCardsAdapter.getListOfTitles(null));
         startActivity(intent);
     }
 
     private void editServer(final ServerConfiguration.Builder builder) {
-        final Intent intent = Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB ? new Intent
-                (ServerListActivity.this, ServerPreferenceActivityCompat.class) : new Intent
-                (ServerListActivity.this, ServerPreferenceActivityHC.class);
+        final Intent intent =new Intent(ServerListActivity.this, ServerPreferenceActivityHC.class);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("file", builder.getFile());
-        intent.putStringArrayListExtra("list", mBuilderList.getListOfTitles(builder));
+        intent.putStringArrayListExtra("list", mServerCardsAdapter.getListOfTitles(builder));
         intent.putExtra("server", builder);
         intent.putExtra("main", true);
         startActivity(intent);
     }
 
-    private void deleteServer(final String fileName) {
-        final File folder = new File(SharedPreferencesUtils
-                .getSharedPreferencesPath(this) + fileName + ".xml");
-        folder.delete();
-
-        mBuilderList.remove(fileName);
-        mServerCardsAdapter.notifyDataSetChanged();
+    private void deleteServer(final ServerConfiguration.Builder builder) {
+        mAnimationAdapter.animateDismiss(mServerCardsAdapter.getPosition(builder));
     }
 
     private boolean serverIsAvailable(final String title) {
@@ -308,18 +297,15 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     }
 
     @Override
-    public void onShowcaseViewHide(ShowcaseView showcaseView) {
+    public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+        for(int position : reverseSortedPositions) {
+            final ServerConfiguration.Builder builder = mServerCardsAdapter.getItem(position);
+            final File folder = new File(SharedPreferencesUtils
+                    .getSharedPreferencesPath(this) + mServerCardsAdapter.getItem(position)
+                    .getFile() + ".xml");
+            folder.delete();
 
-    }
-
-    @Override
-    public void onShowcaseViewShow(ShowcaseView showcaseView) {
-
-    }
-
-    private class ServerCardsAdapter extends BaseAdapterDecorator {
-        public ServerCardsAdapter(final ServerListAdapter adapter) {
-            super(adapter);
+            mServerCardsAdapter.remove(builder);
         }
     }
 }

@@ -19,13 +19,14 @@
     You should have received a copy of the GNU General Public License
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          android:id="@+id/text1"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:gravity="center_vertical"
-          android:paddingLeft="8dip"
-          android:paddingRight="8dip"
-          android:textSize="14sp"
-          android:text="?server_card_text"
-          android:textIsSelectable="true"/>
+<org.holoeverywhere.widget.TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/text1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dip"
+        android:paddingRight="8dip"
+        android:textSize="14sp"
+        android:textColor="?server_card_text"
+        android:textIsSelectable="true"/>

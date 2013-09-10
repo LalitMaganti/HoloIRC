@@ -2,7 +2,7 @@ package com.fusionx.lightirc.collections;
 
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 
-import java.util.Set;
+import java.util.Collection;
 import java.util.TreeSet;
 
 public class SynchronizedTreeSet<T> extends TreeSet<T> implements SynchronizedCollection<T> {
@@ -16,7 +16,7 @@ public class SynchronizedTreeSet<T> extends TreeSet<T> implements SynchronizedCo
         super();
     }
 
-    public SynchronizedTreeSet(Set<T> set) {
+    public SynchronizedTreeSet(Collection<T> set) {
         super(set);
     }
 }

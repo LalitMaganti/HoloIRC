@@ -60,7 +60,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public void switchToIgnoreFragment() {
-        ((ActionBarActivity) getActivity()).startSupportActionMode(getIgnoreFragment());
+        ((ActionBarActivity) getActivity()).startSupportActionMode(getIgnoreFragment()
+                .mMultiSelectionController);
         mActionViewPager.setCurrentItem(1, true);
     }
 

@@ -301,9 +301,9 @@ public class ServerCommandParser {
                     String.format(mContext.getString(R.string.parser_reason),
                             parsedArray.get(3).replace("\"", "")) : "";
 
-            if(user.getUserLevelMap().get(channel) == UserLevelEnum.OP) {
+            if(user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
                 channel.decrementOps();
-            } else if (user.getUserLevelMap().get(channel) == UserLevelEnum.VOICE) {
+            } else if (user.getChannelPrivileges(channel) == UserLevelEnum.VOICE) {
                 channel.decrementVoices();
             }
 
@@ -331,9 +331,9 @@ public class ServerCommandParser {
                                     String.format(mContext.getString(R.string.parser_reason),
                                             StringUtils.remove(parsedArray.get(2), "\"")) : "");
                     mSender.sendGenericChannelEvent(channel, message, true);
-                    if(user.getUserLevelMap().get(channel) == UserLevelEnum.OP) {
+                    if(user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
                         channel.decrementOps();
-                    } else if (user.getUserLevelMap().get(channel) == UserLevelEnum.VOICE) {
+                    } else if (user.getChannelPrivileges(channel) == UserLevelEnum.VOICE) {
                         channel.decrementVoices();
                     }
                 }

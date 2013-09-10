@@ -1,6 +1,8 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
+import android.text.Html;
+import android.text.Spanned;
 import android.widget.Checkable;
 
 import com.fusionx.lightirc.R;
@@ -10,12 +12,11 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
 
-import lombok.Data;
 import lombok.NonNull;
 
-@Data
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
-    protected final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<>();
+    private final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<>();
+    private final HashMap<Channel, Spanned> channelSpannableHashMap = new HashMap<>();
     private boolean mChecked = false;
 
     public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
@@ -28,6 +29,33 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public String getPrettyNick(final Channel channel) {
         return String.format(nickHTML, getUserPrefix(channel) + nick);
+    }
+
+    public Spanned getSpannableNick(final Channel channel) {
+        Spanned spannable = channelSpannableHashMap.get(channel);
+        if(spannable == null) {
+            updateSpannableNick(channel);
+        }
+        return spannable;
+    }
+
+    public void onJoin(final Channel channel) {
+        userLevelMap.put(channel, UserLevelEnum.NONE);
+        updateSpannableNick(channel);
+    }
+
+    public void onRemove(final Channel channel) {
+        userLevelMap.remove(channel);
+        channelSpannableHashMap.remove(channel);
+    }
+
+    public UserLevelEnum getChannelPrivileges(final Channel channel) {
+        return userLevelMap.get(channel);
+    }
+
+    private void updateSpannableNick(final Channel channel) {
+        Spanned spannable = Html.fromHtml(getPrettyNick(channel));
+        channelSpannableHashMap.put(channel, spannable);
     }
 
     public char getUserPrefix(final Channel channel) {
@@ -68,6 +96,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             channel.incrementVoices();
         }
         userLevelMap.put(channel, mode);
+        updateSpannableNick(channel);
         return mode;
     }
 
@@ -111,6 +140,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                     break;
             }
         }
+
+        updateSpannableNick(channel);
 
         final String formattedSenderNick;
         final ChannelUser sendingUser = userChannelInterface.getUserIfExists(sendingNick);

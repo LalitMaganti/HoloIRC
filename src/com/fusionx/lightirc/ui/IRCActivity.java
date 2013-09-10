@@ -29,7 +29,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,8 +61,10 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
+import org.holoeverywhere.app.Activity;
+
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Activity which contains all the communication code between the fragments
@@ -71,7 +72,7 @@ import java.util.Iterator;
  *
  * @author Lalit Maganti
  */
-public class IRCActivity extends ActionBarActivity implements UserListFragment.UserListCallback,
+public class IRCActivity extends Activity implements UserListFragment.UserListCallback,
         ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
                 .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
     // The Fragments
@@ -164,7 +165,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         mActionsSlidingMenu = new ActionsSlidingMenu(this);
         mActionsPagerFragment = (ActionsPagerFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.actions_fragment);
-        mDrawerToggle = new DrawerToggle(this, mActionsSlidingMenu, R.drawable.ic_drawer_light,
+        mDrawerToggle = new DrawerToggle(this, mActionsSlidingMenu, R.drawable.ic_drawer,
                 R.string.about, R.string.add);
         mActionsSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
             @Override
@@ -406,7 +407,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
      * @param users - the list of users which the app user wants to mentuin
      */
     @Override
-    public void onUserMention(final ArrayList<ChannelUser> users) {
+    public void onUserMention(final List<ChannelUser> users) {
         mIRCPagerFragment.onMentionRequested(users);
         closeAllSlidingMenus();
     }

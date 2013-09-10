@@ -16,7 +16,7 @@ import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
         ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallbacks {
@@ -161,7 +161,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         }
     }
 
-    public void onMentionRequested(final ArrayList<ChannelUser> users) {
+    public void onMentionRequested(final List<ChannelUser> users) {
         if (getCurrentType().equals(FragmentTypeEnum.Channel)) {
             final ChannelFragment channel = (ChannelFragment) getCurrentItem();
             channel.onUserMention(users);

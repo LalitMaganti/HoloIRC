@@ -21,18 +21,19 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
 import android.text.Html;
 
+import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
-import java.util.ArrayList;
+import org.holoeverywhere.app.Activity;
+
+import java.util.List;
 
 public class ChannelFragment extends IRCFragment {
     private ChannelFragmentCallback callback;
@@ -54,7 +55,7 @@ public class ChannelFragment extends IRCFragment {
         if (getListAdapter() == null) {
             final Server server = callback.getServer(true);
             final Channel channel = server.getUserChannelInterface().getChannel(title);
-            final AlphaInAnimationAdapter adapter = new AlphaInAnimationAdapter(channel
+            final IRCAnimationAdapter adapter = new IRCAnimationAdapter(channel
                     .getBuffer());
             adapter.setAbsListView(getListView());
             channel.getBuffer().setActivityContext(getActivity());
@@ -64,7 +65,7 @@ public class ChannelFragment extends IRCFragment {
         }
     }
 
-    public void onUserMention(final ArrayList<ChannelUser> users) {
+    public void onUserMention(final List<ChannelUser> users) {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
         for (final ChannelUser userNick : users) {

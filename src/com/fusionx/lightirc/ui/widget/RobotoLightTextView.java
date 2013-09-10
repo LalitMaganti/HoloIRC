@@ -2,9 +2,10 @@ package com.fusionx.lightirc.ui.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
 import com.fusionx.lightirc.util.UIUtils;
+
+import org.holoeverywhere.widget.TextView;
 
 public class RobotoLightTextView extends TextView {
     public RobotoLightTextView(Context context) {
