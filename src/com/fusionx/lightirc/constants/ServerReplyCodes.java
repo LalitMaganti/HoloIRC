@@ -25,8 +25,8 @@ import com.google.common.collect.ImmutableList;
 
 public final class ServerReplyCodes {
     public static final int RPL_WELCOME = 1;
-    public static final int RPL_YOURHOST = 2;
-    public static final int RPL_CREATED = 3;
+    private static final int RPL_YOURHOST = 2;
+    private static final int RPL_CREATED = 3;
 
     // Error Replies.
     public static final int ERR_NOSUCHNICK = 401;
@@ -95,11 +95,11 @@ public final class ServerReplyCodes {
     public static final int RPL_STATSUPTIME = 242;
     public static final int RPL_STATSOLINE = 243;
     public static final int RPL_STATSHLINE = 244;
-    public static final int RPL_LUSERCLIENT = 251;
-    public static final int RPL_LUSEROP = 252;
-    public static final int RPL_LUSERUNKNOWN = 253;
-    public static final int RPL_LUSERCHANNELS = 254;
-    public static final int RPL_LUSERME = 255;
+    private static final int RPL_LUSERCLIENT = 251;
+    private static final int RPL_LUSEROP = 252;
+    private static final int RPL_LUSERUNKNOWN = 253;
+    private static final int RPL_LUSERCHANNELS = 254;
+    private static final int RPL_LUSERME = 255;
     public static final int RPL_ADMINME = 256;
     public static final int RPL_ADMINLOC1 = 257;
     public static final int RPL_ADMINLOC2 = 258;
@@ -111,14 +111,14 @@ public final class ServerReplyCodes {
     public static final int RPL_ISON = 303;
     public static final int RPL_UNAWAY = 305;
     public static final int RPL_NOWAWAY = 306;
-    public static final int RPL_WHOISUSER = 311;
-    public static final int RPL_WHOISSERVER = 312;
-    public static final int RPL_WHOISOPERATOR = 313;
+    private static final int RPL_WHOISUSER = 311;
+    private static final int RPL_WHOISSERVER = 312;
+    private static final int RPL_WHOISOPERATOR = 313;
     public static final int RPL_WHOWASUSER = 314;
     public static final int RPL_ENDOFWHO = 315;
-    public static final int RPL_WHOISIDLE = 317;
-    public static final int RPL_ENDOFWHOIS = 318;
-    public static final int RPL_WHOISCHANNELS = 319;
+    private static final int RPL_WHOISIDLE = 317;
+    private static final int RPL_ENDOFWHOIS = 318;
+    private static final int RPL_WHOISCHANNELS = 319;
     public static final int RPL_LISTSTART = 321;
     public static final int RPL_LIST = 322;
     public static final int RPL_LISTEND = 323;
@@ -157,7 +157,7 @@ public final class ServerReplyCodes {
     public static final int RPL_SERVICE = 233;
     public static final int RPL_SERVLIST = 234;
     public static final int RPL_SERVLISTEND = 235;
-    public static final int RPL_WHOISCHANOP = 316;
+    private static final int RPL_WHOISCHANOP = 316;
     public static final int RPL_KILLDONE = 361;
     public static final int RPL_CLOSING = 362;
     public static final int RPL_CLOSEEND = 363;

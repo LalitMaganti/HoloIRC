@@ -9,7 +9,7 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
 
-public class CapParser {
+class CapParser {
     static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
             configuration, final Server server, final MessageSender sender) {
         final ServerWriter writer = server.getWriter();
@@ -33,28 +33,28 @@ public class CapParser {
         }
     }
 
-    static boolean parseCode(final int code, final ArrayList<String> parsedArray,
-                             final MessageSender sender, final Server server) {
+    static void parseCode(final int code, final ArrayList<String> parsedArray,
+                          final MessageSender sender, final Server server) {
         final ServerWriter writer = server.getWriter();
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:
                 final String successful = parsedArray.get(3);
                 sender.sendGenericServerEvent(server, successful);
                 writer.sendEndCap();
-                return true;
+                return;
             case ServerReplyCodes.RPL_SASL_LOGGED_IN:
                 final String loginMessage = parsedArray.get(5);
                 sender.sendGenericServerEvent(server, loginMessage);
                 writer.sendEndCap();
-                return true;
+                return;
             case ServerReplyCodes.ERR_SASL_FAILED:
             case ServerReplyCodes.ERR_SASL_FAILED_2:
                 final String error = parsedArray.get(3);
                 sender.sendGenericServerEvent(server, error);
                 writer.sendEndCap();
-                return false;
+                return;
             default:
-                return false;
+                return;
         }
     }
 }

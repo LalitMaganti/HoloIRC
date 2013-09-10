@@ -138,7 +138,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
         }
     }
 
-    public synchronized ChannelUser getUserFromHostName(@NonNull final String hostname) {
+    synchronized ChannelUser getUserFromHostName(@NonNull final String hostname) {
         for (final ChannelUser user : aToBMap.keySet()) {
             if (hostname.equals(user.getHostName())) {
                 return user;

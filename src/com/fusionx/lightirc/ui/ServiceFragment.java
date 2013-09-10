@@ -17,7 +17,7 @@ import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 
-public class ServiceFragment extends Fragment {
+class ServiceFragment extends Fragment {
     private IRCService mService;
     private ServiceFragmentCallback mCallback;
     private MessageSender mSender;
@@ -108,7 +108,7 @@ public class ServiceFragment extends Fragment {
         return null;
     }
 
-    public void setUpService() {
+    void setUpService() {
         final Intent service = new Intent(getActivity(), IRCService.class);
         service.putExtra("server", true);
         service.putExtra("serverName", mCallback.getServerTitle());

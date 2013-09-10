@@ -254,7 +254,7 @@ public class MessageSender {
         sendServerEvent(server, event);
     }
 
-    public void mention(final String messageDestination) {
+    void mention(final String messageDestination) {
         if (mDisplayed) {
             mBus.post(new MentionEvent(messageDestination));
         } else {

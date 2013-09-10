@@ -15,9 +15,9 @@ import org.holoeverywhere.app.ListFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MultiChoiceListFragment<T> extends ListFragment implements
+abstract class MultiChoiceListFragment<T> extends ListFragment implements
         MultiSelectionUtils.MultiChoiceModeListener {
-    protected MultiSelectionUtils.Controller mMultiSelectionController;
+    MultiSelectionUtils.Controller mMultiSelectionController;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public abstract class MultiChoiceListFragment<T> extends ListFragment implements
 
     protected abstract void attachSelectionController();
 
-    protected List<Integer> getCheckedPositions() {
+    List<Integer> getCheckedPositions() {
         List<Integer> checkedSessionPositions = new ArrayList<>();
         ListView listView = getListView();
         if (listView == null) {
@@ -51,7 +51,7 @@ public abstract class MultiChoiceListFragment<T> extends ListFragment implements
         return checkedSessionPositions;
     }
 
-    protected List<T> getCheckedItems() {
+    List<T> getCheckedItems() {
         List<T> checkedSessionPositions = new ArrayList<>();
         ListView listView = getListView();
         if (listView == null) {

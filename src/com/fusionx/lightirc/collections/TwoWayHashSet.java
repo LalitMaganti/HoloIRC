@@ -8,7 +8,7 @@ public abstract class TwoWayHashSet<A extends UpdateableTreeSet.Updateable,
     protected final HashMap<A, UpdateableTreeSet<B>> aToBMap;
     protected final HashMap<B, UpdateableTreeSet<A>> bToAMap;
 
-    public TwoWayHashSet() {
+    protected TwoWayHashSet() {
         aToBMap = new HashMap<>();
         bToAMap = new HashMap<>();
     }
@@ -18,7 +18,7 @@ public abstract class TwoWayHashSet<A extends UpdateableTreeSet.Updateable,
         addBToA(objectA, objectB);
     }
 
-    protected synchronized void addAToB(A objectA, B objectB) {
+    synchronized void addAToB(A objectA, B objectB) {
         UpdateableTreeSet<A> listofA = bToAMap.get(objectB);
         if (listofA == null) {
             listofA = new UpdateableTreeSet<>();

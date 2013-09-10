@@ -23,7 +23,7 @@ import org.holoeverywhere.preference.PreferenceManager;
 import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
 import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
 
-public class ServerPreferenceFragment extends PreferenceFragment implements Preference
+class ServerPreferenceFragment extends PreferenceFragment implements Preference
         .OnPreferenceChangeListener {
     private MustBeCompleteView mCompleteView = null;
     private ServerTitleEditTextPreference mTitle = null;

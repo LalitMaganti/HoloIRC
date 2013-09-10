@@ -43,7 +43,7 @@ public abstract class IRCFragment extends ListFragment implements TextView
         .OnEditorActionListener {
     @Getter
     protected String title = null;
-    protected EditText mEditText = null;
+    EditText mEditText = null;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
@@ -80,7 +80,7 @@ public abstract class IRCFragment extends ListFragment implements TextView
         return (BaseAdapter) super.getListAdapter();
     }
 
-    public abstract void sendMessage(final String message);
+    protected abstract void sendMessage(final String message);
 
     public abstract FragmentTypeEnum getType();
 }

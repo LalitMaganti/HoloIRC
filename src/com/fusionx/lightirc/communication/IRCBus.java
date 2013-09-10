@@ -6,7 +6,7 @@ import android.os.Looper;
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
-public class IRCBus extends Bus {
+class IRCBus extends Bus {
     private final Handler mainThread = new Handler(Looper.getMainLooper());
 
     public IRCBus(final ThreadEnforcer enforcer) {

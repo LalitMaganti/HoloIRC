@@ -52,7 +52,7 @@ import static com.fusionx.lightirc.constants.ServerReplyCodes.genericCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
 import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
-public class ServerCodeParser {
+class ServerCodeParser {
     private final WhoParser mWhoParser;
     private final UserChannelInterface mUserChannelInterface;
     private final Context mContext;

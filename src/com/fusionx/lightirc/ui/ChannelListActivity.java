@@ -3,6 +3,7 @@ package com.fusionx.lightirc.ui;
 import android.os.Bundle;
 
 import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.util.UIUtils;
 
 import org.holoeverywhere.app.Activity;
 
@@ -11,6 +12,8 @@ public class ChannelListActivity extends Activity implements IServerSettings {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt(this));
+
         super.onCreate(savedInstanceState);
 
         mFileName = getIntent().getStringExtra("filename");

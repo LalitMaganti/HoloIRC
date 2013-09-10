@@ -55,10 +55,10 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     private final HashMap<UserLevelEnum, Integer> numberOfUsers = new HashMap<>();
 
     private boolean mUserListMessagesShown;
-    protected final UserChannelInterface mUserChannelInterface;
+    private final UserChannelInterface mUserChannelInterface;
     private final Handler mAdapterHandler;
 
-    protected Channel(final String channelName, final UserChannelInterface
+    Channel(final String channelName, final UserChannelInterface
             userChannelInterface, final Handler adapterHandler) {
         adapterHandler.post(new Runnable() {
             @Override

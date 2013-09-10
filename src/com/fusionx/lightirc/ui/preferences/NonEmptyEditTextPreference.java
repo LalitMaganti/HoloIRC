@@ -56,7 +56,7 @@ public class NonEmptyEditTextPreference extends SummaryEditTextPreference implem
         onEditTextChanged();
     }
 
-    protected AlertDialog onEditTextChanged() {
+    AlertDialog onEditTextChanged() {
         final boolean enable = !getEditText().getText().toString().isEmpty();
         final Dialog dlg = getDialog();
         final AlertDialog alertDlg = (AlertDialog) dlg;

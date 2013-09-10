@@ -20,7 +20,7 @@ import lombok.Getter;
 
 public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
     private final LayoutInflater inflater;
-    protected Context mContext;
+    private Context mContext;
     private final int mServerItemCount;
 
     @Getter

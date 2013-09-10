@@ -29,7 +29,7 @@ import com.fusionx.lightirc.irc.event.Event;
 
 import java.util.ArrayList;
 
-public class WhoParser {
+class WhoParser {
     private final UserChannelInterface mUserChannelInterface;
     private Channel whoChannel;
     private final String mServerTitle;

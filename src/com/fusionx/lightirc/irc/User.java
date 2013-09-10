@@ -36,11 +36,11 @@ public abstract class User {
     @Setter
     protected String hostName;
 
-    protected final String nickHTML;
-    protected final UserChannelInterface userChannelInterface;
+    final String nickHTML;
+    final UserChannelInterface userChannelInterface;
 
-    public User(@NonNull final String nick,
-                @NonNull final UserChannelInterface userChannelInterface) {
+    User(@NonNull final String nick,
+         @NonNull final UserChannelInterface userChannelInterface) {
         this.nick = nick;
         this.userChannelInterface = userChannelInterface;
 

@@ -96,7 +96,7 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
         super(c);
     }
 
-    public UpdateableTreeSet(Comparator<? super E> comparator) {
+    UpdateableTreeSet(Comparator<? super E> comparator) {
         super(comparator);
     }
 

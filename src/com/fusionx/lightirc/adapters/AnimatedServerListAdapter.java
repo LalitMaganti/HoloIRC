@@ -29,8 +29,8 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
         this(baseAdapter, animationDelayMillis, DEFAULTANIMATIONDURATIONMILLIS, callback);
     }
 
-    public AnimatedServerListAdapter(BaseAdapter baseAdapter, long animationDelayMillis,
-                                     long animationDurationMillis, OnDismissCallback callback) {
+    private AnimatedServerListAdapter(BaseAdapter baseAdapter, long animationDelayMillis,
+                                      long animationDurationMillis, OnDismissCallback callback) {
         super(baseAdapter);
         mAnimationDelayMillis = animationDelayMillis;
         mAnimationDurationMillis = animationDurationMillis;
@@ -64,8 +64,8 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
     /**
      * Animate dismissal of the items at given positions.
      */
-    public void animateDismiss(Collection<Integer> positions) {
-        final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
+    void animateDismiss(Collection<Integer> positions) {
+        final List<Integer> positionsCopy = new ArrayList<>(positions);
         if (getAbsListView() == null) {
             throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter before calling setAdapter()!");
         }
@@ -108,7 +108,7 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
     }
 
     private void invokeCallback(Collection<Integer> positions) {
-        ArrayList<Integer> positionsList = new ArrayList<Integer>(positions);
+        ArrayList<Integer> positionsList = new ArrayList<>(positions);
         Collections.sort(positionsList);
         int[] dismissPositions = new int[positionsList.size()];
         for (int i = 0; i < positionsList.size(); i++) {
@@ -118,7 +118,7 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
     }
 
     private List<View> getVisibleViewsForPositions(Collection<Integer> positions) {
-        List<View> views = new ArrayList<View>();
+        List<View> views = new ArrayList<>();
         for (int i = 0; i < getAbsListView().getChildCount(); i++) {
             View child = getAbsListView().getChildAt(i);
             if (positions.contains(getAbsListView().getPositionForView(child))) {

@@ -35,8 +35,8 @@ import com.nineoldandroids.animation.ObjectAnimator;
  * specified in getAnimators(ViewGroup, View), plus an alpha transition.
  */
 public class IRCAnimationAdapter extends BaseAdapterDecorator {
-    protected static final long DEFAULTANIMATIONDELAYMILLIS = 100;
-    protected static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
+    private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
+    private static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
     private static final long INITIALDELAYMILLIS = 150;
 
     private SparseArray<AnimationInfo> mAnimators;
@@ -47,7 +47,7 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
 
     public IRCAnimationAdapter(BaseAdapter baseAdapter) {
         super(baseAdapter);
-        mAnimators = new SparseArray<AnimationInfo>();
+        mAnimators = new SparseArray<>();
 
         mAnimationStartMillis = -1;
         mLastAnimatedPosition = baseAdapter.getCount();
@@ -58,7 +58,7 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
      * notifyDataSetChanged() is called on the base adapter, all views will
      * animate again. Will also call setShouldAnimate(true).
      */
-    public void reset() {
+    void reset() {
         mAnimators.clear();
         mLastAnimatedPosition = getDecoratedBaseAdapter().getCount();
         mAnimationStartMillis = -1;
@@ -160,8 +160,8 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
             allAnimators[i] = animators[i];
         }
 
-        for (int j = 0; j < childAnimators.length; ++j) {
-            allAnimators[i] = childAnimators[j];
+        for (Animator childAnimator : childAnimators) {
+            allAnimators[i] = childAnimator;
             ++i;
         }
 
@@ -202,19 +202,19 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
     /**
      * Get the delay in milliseconds before the first animation should start. Defaults to {@value #INITIALDELAYMILLIS}.
      */
-    protected long getInitialDelayMillis() {
+    long getInitialDelayMillis() {
         return INITIALDELAYMILLIS;
     }
 
-    protected long getAnimationDelayMillis() {
+    long getAnimationDelayMillis() {
         return DEFAULTANIMATIONDELAYMILLIS;
     }
 
-    protected long getAnimationDurationMillis() {
+    long getAnimationDurationMillis() {
         return DEFAULTANIMATIONDURATIONMILLIS;
     }
 
-    public Animator[] getAnimators(ViewGroup parent, View view) {
+    Animator[] getAnimators(ViewGroup parent, View view) {
         return new Animator[0];
     }
 

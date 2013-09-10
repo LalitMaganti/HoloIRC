@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.irc.writers;
 
-public final class WriterCommands {
+final class WriterCommands {
     public final static String PRIVMSG = "PRIVMSG %1$s :%2$s";
     public final static String Part = "PART %1$s";
     public final static String PartWithReason = "PART %1$s :%2$s";

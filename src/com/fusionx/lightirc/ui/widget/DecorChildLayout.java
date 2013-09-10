@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import lombok.NonNull;
+
 /**
  * This class allows us to insert a layer in between the system decor view
  * and the actual decor. (e.g. Action Bar views). This is needed so we can
@@ -41,7 +43,7 @@ public final class DecorChildLayout extends FrameLayout {
     }
 
     @Override
-    protected boolean fitSystemWindows(Rect insets) {
+    protected boolean fitSystemWindows(@NonNull Rect insets) {
         // Adjust the Header View's padding to take the insets into account
         mHeaderViewWrapper.setPadding(insets.left, insets.top,
                 insets.right, insets.bottom);

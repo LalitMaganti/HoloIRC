@@ -15,12 +15,12 @@ import com.fusionx.lightirc.R;
 import org.holoeverywhere.app.AlertDialog;
 import org.holoeverywhere.preference.DialogPreference;
 
-public abstract class AbstractNickPreference extends DialogPreference implements TextWatcher {
-    protected EditText mFirstChoice;
-    protected EditText mSecondChoice;
-    protected EditText mThirdChoice;
+abstract class AbstractNickPreference extends DialogPreference implements TextWatcher {
+    EditText mFirstChoice;
+    EditText mSecondChoice;
+    EditText mThirdChoice;
 
-    public AbstractNickPreference(final Context context, final AttributeSet attrs) {
+    AbstractNickPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
 
         setPersistent(false);

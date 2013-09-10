@@ -13,10 +13,10 @@ import org.holoeverywhere.preference.PreferenceActivity;
 import java.io.File;
 
 class ServerPreferenceActivityBase extends PreferenceActivity implements IServerSettings {
-    protected boolean mCanSaveChanges = true;
-    protected boolean mNewServer = false;
-    protected String mFileName = null;
-    protected boolean backPressed = false;
+    private boolean mCanSaveChanges = true;
+    private boolean mNewServer = false;
+    private String mFileName = null;
+    private boolean backPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

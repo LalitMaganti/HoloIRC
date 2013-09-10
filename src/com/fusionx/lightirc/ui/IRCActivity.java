@@ -512,7 +512,7 @@ public class IRCActivity extends Activity implements UserListFragment.UserListCa
     /**
      * Listener used when the view pages changes pages
      */
-    final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
+    private final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
             .SimpleOnPageChangeListener() {
         @Override
         public void onPageSelected(final int position) {

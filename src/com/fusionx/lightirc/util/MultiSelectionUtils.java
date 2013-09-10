@@ -80,7 +80,7 @@ public class MultiSelectionUtils {
             if (savedInstanceState != null) {
                 long[] checkedIds = savedInstanceState.getLongArray(getStateKey());
                 if (checkedIds != null && checkedIds.length > 0) {
-                    mTempIdsToCheckOnRestore = new HashSet<Long>();
+                    mTempIdsToCheckOnRestore = new HashSet<>();
                     for (long id : checkedIds) {
                         mTempIdsToCheckOnRestore.add(id);
                     }
@@ -110,10 +110,10 @@ public class MultiSelectionUtils {
                 if (mTempIdsToCheckOnRestore.contains(adapter.getItemId(pos))) {
                     idsFound = true;
                     if (mItemsToCheck == null) {
-                        mItemsToCheck = new HashSet<Pair<Integer, Long>>();
+                        mItemsToCheck = new HashSet<>();
                     }
                     mItemsToCheck.add(
-                            new Pair<Integer, Long>(pos, adapter.getItemId(pos)));
+                            new Pair<>(pos, adapter.getItemId(pos)));
                 }
             }
 
@@ -199,8 +199,8 @@ public class MultiSelectionUtils {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             if(mActionMode == null) {
-                mItemsToCheck = new HashSet<Pair<Integer, Long>>();
-                mItemsToCheck.add(new Pair<Integer, Long>(position, id));
+                mItemsToCheck = new HashSet<>();
+                mItemsToCheck.add(new Pair<>(position, id));
                 mActionMode = mActivity.startSupportActionMode(Controller.this);
             } else {
                 boolean checked = mListView.isItemChecked(position);
@@ -227,8 +227,8 @@ public class MultiSelectionUtils {
                 return false;
             }
 
-            mItemsToCheck = new HashSet<Pair<Integer, Long>>();
-            mItemsToCheck.add(new Pair<Integer, Long>(position, id));
+            mItemsToCheck = new HashSet<>();
+            mItemsToCheck.add(new Pair<>(position, id));
             mActionMode = mActivity.startSupportActionMode(Controller.this);
             return true;
         }

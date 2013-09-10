@@ -53,7 +53,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      * Contains the list of objects that represent the data of this ArrayAdapter.
      * The content of this list is referred to as "the array" in the documentation.
      */
-    protected SynchronizedCollection<T> mObjects;
+    SynchronizedCollection<T> mObjects;
 
     /**
      * The resource indicating what views to inflate to display the content of this
@@ -68,7 +68,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     private int mDropDownResource;
 
     /**
-     * If the inflated resource is not a TextView, {@link #mFieldId} is used to find
+     * If the inflated resource is not a TextView, mFieldId is used to find
      * a TextView inside the inflated views hierarchy. This field must contain the
      * identifier that matches the one defined in the resource file.
      */
@@ -78,7 +78,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      * Indicates whether or not {@link #notifyDataSetChanged()} must be called whenever
      * {@link #mObjects} is modified.
      */
-    protected boolean mNotifyOnChange = true;
+    boolean mNotifyOnChange = true;
 
     private Context mContext;
 
@@ -209,7 +209,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      *
      * @return The Context associated with this adapter.
      */
-    public Context getContext() {
+    Context getContext() {
         return mContext;
     }
 

@@ -157,7 +157,7 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
         getRealAdapter().notifyDataSetChanged();
     }
 
-    public boolean isNickOtherUsers(final String nick) {
+    boolean isNickOtherUsers(final String nick) {
         return !mCallback.getServer(false).getUser().getNick().equals(nick);
     }
 

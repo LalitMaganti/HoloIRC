@@ -29,8 +29,8 @@ import java.util.List;
  */
 public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
 
-    protected static final long DEFAULTANIMATIONDELAYMILLIS = 100;
-    protected static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
+    private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
+    private static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
     private static final long INITIALDELAYMILLIS = 150;
 
     private SparseArray<AnimationInfo> mAnimators;
@@ -42,7 +42,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
 
     public DecoratedIgnoreListAdapter(BaseAdapter baseAdapter, OnDismissCallback callback) {
         super(baseAdapter);
-        mAnimators = new SparseArray<AnimationInfo>();
+        mAnimators = new SparseArray<>();
 
         mAnimationStartMillis = -1;
         mLastAnimatedPosition = -1;
@@ -59,7 +59,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
      * notifyDataSetChanged() is called on the base adapter, all views will
      * animate again. Will also call setShouldAnimate(true).
      */
-    public void reset() {
+    void reset() {
         mAnimators.clear();
         mLastAnimatedPosition = -1;
         mLastAnimatedHeaderPosition = -1;
@@ -185,8 +185,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
             allAnimators[i] = animators[i];
         }
 
-        for (int j = 0; j < childAnimators.length; ++j) {
-            allAnimators[i] = childAnimators[j];
+        for (Animator childAnimator : childAnimators) {
+            allAnimators[i] = childAnimator;
             ++i;
         }
 
@@ -220,26 +220,26 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
      * not apply any animations to the views. Should not be set explicitly, the
      * AnimationAdapter class manages this by itself.
      */
-    public void setHasParentAnimationAdapter(boolean hasParentAnimationAdapter) {
+    void setHasParentAnimationAdapter(boolean hasParentAnimationAdapter) {
         mHasParentAnimationAdapter = hasParentAnimationAdapter;
     }
 
     /**
      * Get the delay in milliseconds before the first animation should start. Defaults to {@value #INITIALDELAYMILLIS}.
      */
-    protected long getInitialDelayMillis() {
+    long getInitialDelayMillis() {
         return INITIALDELAYMILLIS;
     }
 
-    protected long getAnimationDelayMillis() {
+    long getAnimationDelayMillis() {
         return DEFAULTANIMATIONDELAYMILLIS;
     }
 
-    protected long getAnimationDurationMillis() {
+    long getAnimationDurationMillis() {
         return DEFAULTANIMATIONDURATIONMILLIS;
     }
 
-    public Animator[] getAnimators(ViewGroup parent, View view) {
+    Animator[] getAnimators(ViewGroup parent, View view) {
         return new Animator[0];
     }
 
@@ -267,7 +267,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
      * Animate dismissal of the items at given positions.
      */
     public void animateDismiss(Collection<Integer> positions) {
-        final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
+        final List<Integer> positionsCopy = new ArrayList<>(positions);
         if (getAbsListView() == null) {
             throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter before calling setAdapter()!");
         }
@@ -275,7 +275,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         List<View> views = getVisibleViewsForPositions(positionsCopy);
 
         if (!views.isEmpty()) {
-            List<Animator> animators = new ArrayList<Animator>();
+            List<Animator> animators = new ArrayList<>();
             for (final View view : views) {
                 animators.add(createAnimatorForView(view));
             }
@@ -314,7 +314,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     }
 
     private void invokeCallback(Collection<Integer> positions) {
-        ArrayList<Integer> positionsList = new ArrayList<Integer>(positions);
+        ArrayList<Integer> positionsList = new ArrayList<>(positions);
         Collections.sort(positionsList);
         int[] dismissPositions = new int[positionsList.size()];
         for (int i = 0; i < positionsList.size(); i++) {
@@ -324,7 +324,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     }
 
     private List<View> getVisibleViewsForPositions(Collection<Integer> positions) {
-        List<View> views = new ArrayList<View>();
+        List<View> views = new ArrayList<>();
         for (int i = 0; i < getAbsListView().getChildCount(); i++) {
             View child = getAbsListView().getChildAt(i);
             if (positions.contains(getAbsListView().getPositionForView(child))) {

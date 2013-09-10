@@ -73,7 +73,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
         return getFirstCharacter(i);
     }
 
-    public char getFirstCharacter(final int position) {
+    char getFirstCharacter(final int position) {
         final ChannelUser user = getItem(position);
         return user.getUserPrefix(channel);
     }

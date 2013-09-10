@@ -49,7 +49,7 @@ import java.util.Set;
 import static com.fusionx.lightirc.constants.Constants.DEBUG;
 import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 
-public class ServerCommandParser {
+class ServerCommandParser {
     private final Context mContext;
     private final UserChannelInterface mUserChannelInterface;
     private final Server mServer;

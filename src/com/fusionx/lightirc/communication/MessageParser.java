@@ -159,7 +159,7 @@ public class MessageParser {
         }
     }
 
-    public static void sendUnknownEvent(final Server server, final String rawLine) {
+    private static void sendUnknownEvent(final Server server, final String rawLine) {
         ServerCommandSender.sendUnknownEvent(server, rawLine + " is not a valid command");
     }
 }

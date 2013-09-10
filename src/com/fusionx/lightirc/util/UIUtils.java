@@ -31,7 +31,7 @@ public class UIUtils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
     }
 
-    public static boolean isTablet(Context context) {
+    private static boolean isTablet(Context context) {
         return (context.getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK)
                 >= Configuration.SCREENLAYOUT_SIZE_LARGE;
@@ -53,7 +53,7 @@ public class UIUtils {
         textView.setTypeface(font);
     }
 
-    public static Typeface getRobotoThin(final Context context) {
+    private static Typeface getRobotoThin(final Context context) {
         if (mRobotoLightTypeface == null) {
             mRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
                     "Roboto-Thin.ttf");
