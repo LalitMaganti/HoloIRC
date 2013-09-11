@@ -29,4 +29,5 @@
         android:paddingLeft="8dip"
         android:paddingRight="8dip"
         android:textAppearance="@android:style/TextAppearance.Medium"
+        android:background="?activatableItemBackground"
         android:textIsSelectable="false"/>

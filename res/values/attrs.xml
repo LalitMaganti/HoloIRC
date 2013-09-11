@@ -29,4 +29,11 @@
         <attr name="max" format="integer"/>
         <attr name="defaultValue" format="integer"/>
     </declare-styleable>
+
+    <declare-styleable name="BaseTheme">
+        <attr name="textHeaderMaxLines" format="integer" />
+        <attr name="trackAbstractMaxLines" format="integer" />
+        <attr name="activatableItemBackground" format="reference" />
+        <attr name="emptyText" format="reference" />
+    </declare-styleable>
 </resources>
