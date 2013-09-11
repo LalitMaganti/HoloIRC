@@ -1,13 +1,13 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
-import android.text.Html;
 import android.text.Spanned;
 import android.widget.Checkable;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
+import com.fusionx.lightirc.util.HtmlUtils;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public String getBracketedNick(final Channel channel) {
-        return "<" + getUserPrefix(channel) + ">";
+        return String.format(nickHTML, "<" + getUserPrefix(channel) + nick + ">");
     }
 
     public void onJoin(final Channel channel) {
@@ -60,7 +60,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     private void updateSpannableNick(final Channel channel) {
-        Spanned spannable = Html.fromHtml(getPrettyNick(channel));
+        Spanned spannable = HtmlUtils.parseHtml(getPrettyNick(channel));
         channelSpannableHashMap.put(channel, spannable);
     }
 

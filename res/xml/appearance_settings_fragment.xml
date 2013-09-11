@@ -27,5 +27,10 @@
                 android:title="@string/theme"
                 android:key="fragment_settings_theme"
                 android:entries="@array/themes"/>
+        <CheckBoxPreference
+                android:key="pref_highlight_whole_line"
+                android:title="@string/pref_highlight_whole_line_title"
+                android:summary="@string/pref_highlight_whole_line_summary"
+                android:defaultValue="true"/>
     </PreferenceCategory>
 </PreferenceScreen>

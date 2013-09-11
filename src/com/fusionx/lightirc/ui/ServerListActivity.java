@@ -70,6 +70,8 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         super.onCreate(savedInstanceState);
 
+        SharedPreferencesUtils.setUpPreferences(this);
+
         setContentView(R.layout.activity_server_list);
 
         mServerCardsAdapter = new ServerListAdapter(this,

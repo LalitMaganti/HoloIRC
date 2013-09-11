@@ -22,9 +22,6 @@
 package com.fusionx.lightirc.irc;
 
 import android.os.Handler;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.Spanned;
 
 import com.fusionx.lightirc.R;
@@ -34,6 +31,7 @@ import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
+import com.fusionx.lightirc.util.HtmlUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,10 +68,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
                 final String message = String.format(userChannelInterface.getContext().getString
                         (R.string.parser_joined_channel), userChannelInterface
                         .getServer().getUser().getColorfulNick());
-                SpannableString string = new SpannableString(message);
-                string.setSpan(message, 0, message.indexOf(" "),
-                        Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-                buffer.add(Html.fromHtml(message));
+                buffer.add(HtmlUtils.parseHtml(message));
 
             }
         });
@@ -120,7 +115,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(Html.fromHtml(event.message));
+                    buffer.add(HtmlUtils.parseHtml(event.message));
                 }
             });
         }

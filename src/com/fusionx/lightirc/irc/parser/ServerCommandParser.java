@@ -165,7 +165,7 @@ class ServerCommandParser {
             if (mServer.getUser().isPrivateMessageOpen(user)) {
                 return mServer.privateMessageSent(user, notice, false);
             } else {
-                return mSender.sendGenericServerEvent(mServer, formattedNotice);
+                return mSender.sendSwitchToServerEvent(mServer, formattedNotice);
             }
         } else if (DEBUG) {
             throw new IllegalArgumentException();
@@ -202,7 +202,7 @@ class ServerCommandParser {
                 final ChannelUser sendingUser = mUserChannelInterface.getUser(nick);
                 final Channel channel = mUserChannelInterface.getChannel(recipient);
                 return mSender.sendMessageToChannel(mServer.getUser().getNick(), channel,
-                        sendingUser.getPrettyNick(channel), message);
+                        sendingUser.getBracketedNick(channel), message);
             } else {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
                 return mServer.privateMessageSent(sendingUser, message, false);

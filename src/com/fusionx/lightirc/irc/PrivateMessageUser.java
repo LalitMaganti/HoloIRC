@@ -1,12 +1,12 @@
 package com.fusionx.lightirc.irc;
 
 import android.os.Handler;
-import android.text.Html;
 import android.text.Spanned;
 
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.irc.writers.UserWriter;
+import com.fusionx.lightirc.util.HtmlUtils;
 import com.fusionx.lightirc.util.IRCUtils;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class PrivateMessageUser extends User {
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(Html.fromHtml(event.message));
+                    buffer.add(HtmlUtils.parseHtml(event.message));
                 }
             });
         }

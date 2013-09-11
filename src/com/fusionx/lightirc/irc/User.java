@@ -40,8 +40,8 @@ public abstract class User {
         this.nick = nick;
         this.userChannelInterface = userChannelInterface;
 
-        nickHTML = "<font color=\"" + MiscUtils.generateRandomColor(MiscUtils
-                .getUserColorOffset(userChannelInterface.getContext())) + "\">%1$s</font>";
+        nickHTML = "<color=" + MiscUtils.generateRandomColor(MiscUtils
+                .getUserColorOffset(userChannelInterface.getContext())) + ">%1$s</color>";
     }
 
     public String getColorfulNick() {

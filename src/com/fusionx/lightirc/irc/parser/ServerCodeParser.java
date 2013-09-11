@@ -115,7 +115,7 @@ class ServerCodeParser {
                 return sender.sendNickInUseMessage(mServer);
             default:
                 if (whoisCodes.contains(code)) {
-                    return mSender.switchToServerMessage(mServer, MiscUtils.convertArrayListToString
+                    return mSender.sendSwitchToServerEvent(mServer, MiscUtils.convertArrayListToString
                             (parsedArray));
                 } else {
                     return parseFallThroughCode(code, message);

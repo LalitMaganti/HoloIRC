@@ -54,6 +54,7 @@ public class PreferenceConstants {
 
     // Appearance Settings
     public final static String Theme = "fragment_settings_theme";
+    public final static String LineColourful = "pref_highlight_whole_line";
 
     // Server channel settings
     public final static String ReconnectTries = "pref_reconnect_tries";

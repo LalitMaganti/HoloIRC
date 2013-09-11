@@ -168,7 +168,7 @@ public class ServerCommandSender {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                MessageSender.getSender(server.getTitle()).switchToServerMessage(server, event);
+                MessageSender.getSender(server.getTitle()).sendSwitchToServerEvent(server, event);
                 return null;
             }
         }.execute();

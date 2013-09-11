@@ -250,7 +250,7 @@ public class MessageSender {
         return event;
     }
 
-    public SwitchToServerEvent switchToServerMessage(final Server server, final String message) {
+    public SwitchToServerEvent sendSwitchToServerEvent(final Server server, final String message) {
         final SwitchToServerEvent event = new SwitchToServerEvent(message);
         sendServerEvent(server, event);
         return event;

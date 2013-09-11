@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.ui;
 
 import android.app.Activity;
-import android.text.Html;
 
 import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.communication.MessageParser;
@@ -31,6 +30,7 @@ import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.HtmlUtils;
 
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class ChannelFragment extends IRCFragment {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
         for (final ChannelUser userNick : users) {
-            nicks += Html.fromHtml(userNick.getPrettyNick(title)) + ": ";
+            nicks += HtmlUtils.parseHtml(userNick.getPrettyNick(title)) + ": ";
         }
         mEditText.clearComposingText();
         mEditText.append(nicks + text);

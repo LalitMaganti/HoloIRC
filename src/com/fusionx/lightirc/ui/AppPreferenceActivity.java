@@ -21,6 +21,7 @@ import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ISettings;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.List;
@@ -47,6 +48,13 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
             setupAppVersionPreference(getPreferenceScreen());
             showAlertDialog();
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        SharedPreferencesUtils.setUpPreferences(this);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

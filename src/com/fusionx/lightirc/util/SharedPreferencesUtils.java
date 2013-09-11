@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -194,5 +195,10 @@ public class SharedPreferencesUtils {
                 return set;
             }
         }
+    }
+
+    public static void setUpPreferences(final Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        UIUtils.updateLineColourfulness(preferences);
     }
 }
