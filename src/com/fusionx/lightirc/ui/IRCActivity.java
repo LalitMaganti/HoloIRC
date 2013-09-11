@@ -21,9 +21,11 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -34,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
@@ -49,6 +52,7 @@ import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.JoinEvent;
+import com.fusionx.lightirc.irc.event.KickEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
 import com.fusionx.lightirc.irc.event.NickInUseEvent;
 import com.fusionx.lightirc.irc.event.PartEvent;
@@ -91,12 +95,20 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     // Mention helper
     private MentionHelper mMentionHelper;
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_channel);
+
+        final RelativeLayout layout = (RelativeLayout) findViewById(R.id.relative_layout);
+        if(UIUtils.hasJellyBeanMR1()) {
+            layout.setBackground(null);
+        } else {
+            layout.setBackgroundDrawable(null);
+        }
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
@@ -464,13 +476,18 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     }
 
     @Subscribe
+    public void onKicked(final KickEvent event) {
+        mIRCPagerFragment.switchToServerAndRemove(event.channelName);
+    }
+
+    @Subscribe
     public void onNewPrivateMessage(final PrivateMessageEvent event) {
         createPMFragment(event.nick);
     }
 
     @Subscribe
     public void onSwitchToServer(final SwitchToServerEvent event) {
-        mIRCPagerFragment.selectServerFragment();
+        mIRCPagerFragment.switchToServerFragment();
     }
 
     /**
@@ -485,7 +502,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
 
     @Subscribe
     public void onNickInUse(final NickInUseEvent event) {
-        mIRCPagerFragment.selectServerFragment();
+        mIRCPagerFragment.switchToServerFragment();
     }
 
     @Subscribe

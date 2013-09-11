@@ -74,11 +74,13 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->
+    <string name="parser_notice"><b>%1$s: %2$s</b></string>
     <string name="parser_message">%1$s: %2$s</string>
     <string name="parser_connected">Connected to %1$s</string>
     <string name="parser_joined_channel">%1$s joined the channel</string>
     <string name="parser_quit_server">%1$s quit the server</string>
     <string name="parser_parted_channel">%1$s parted from the channel</string>
+    <string name="parser_kicked_channel">%1$s was kicked from the channel by %2$s</string>
     <string name="parser_reason">(Reason: %1$s)</string>
     <string name="parser_mode_changed">Mode %1$s on %2$s by %3$s</string>
     <string name="parser_new_topic">The topic is %1$s as set forth by %2$s</string>
@@ -88,7 +90,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_nick_in_use">Nickname is already in use.</string>
     <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
     <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
-    <string name="parser_action" translatable="false">* %1$s %2$s</string>
+    <string name="parser_action" translatable="false"><b>* %1$s %2$s</b></string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>

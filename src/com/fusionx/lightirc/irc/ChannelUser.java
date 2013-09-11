@@ -39,6 +39,10 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         return spannable;
     }
 
+    public String getBracketedNick(final Channel channel) {
+        return "<" + getUserPrefix(channel) + ">";
+    }
+
     public void onJoin(final Channel channel) {
         userLevelMap.put(channel, UserLevelEnum.NONE);
         updateSpannableNick(channel);

@@ -38,6 +38,7 @@ import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.JoinEvent;
+import com.fusionx.lightirc.irc.event.KickEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
 import com.fusionx.lightirc.irc.event.NickInUseEvent;
 import com.fusionx.lightirc.irc.event.PartEvent;
@@ -179,6 +180,12 @@ public class MessageSender {
 
     public PartEvent sendChanelParted(final String channelName) {
         final PartEvent event = new PartEvent(channelName);
+        mBus.post(event);
+        return event;
+    }
+
+    public KickEvent sendKicked(final String channelName) {
+        final KickEvent event = new KickEvent(channelName);
         mBus.post(event);
         return event;
     }

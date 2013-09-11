@@ -100,6 +100,8 @@ class ServerCommandParser {
                 return parseNickChange(parsedArray, rawSource);
             case ServerCommands.Topic:
                 return parseTopicChange(parsedArray, rawSource);
+            case ServerCommands.Kick:
+                return parseKick(parsedArray, rawSource);
             default:
                 // Not sure what to do here - TODO
                 if (DEBUG) {
@@ -109,13 +111,44 @@ class ServerCommandParser {
         }
     }
 
+    private Event parseKick(ArrayList<String> parsedArray, String rawSource) {
+        final String channelName = parsedArray.get(2);
+        final String kickedNick = parsedArray.get(3);
+
+        final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
+        final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
+        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        if (kickedNick.equals(mServer.getUser())) {
+            mSender.sendKicked(channel.getName());
+            mUserChannelInterface.removeChannel(channel);
+            return new Event(channelName);
+        } else {
+            String message = String.format(mContext.getString(R.string.parser_kicked_channel),
+                    kickedUser.getPrettyNick(channel), user.getPrettyNick(channel));
+            // If you have 4 strings in the array, the last must be the reason for parting
+            message += (parsedArray.size() == 5) ? " " + String.format(mContext.getString(R
+                    .string.parser_reason),
+                    parsedArray.get(4).replace("\"", "")) : "";
+
+            if (user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
+                channel.decrementOps();
+            } else if (user.getChannelPrivileges(channel) == UserLevelEnum.VOICE) {
+                channel.decrementVoices();
+            }
+
+            final Event event = mSender.sendGenericChannelEvent(channel, message, true);
+            mUserChannelInterface.decoupleUserAndChannel(user, channel);
+            return event;
+        }
+    }
+
     private Event parseNotice(final ArrayList<String> parsedArray, final String rawSource) {
         final String sendingUser = IRCUtils.getNickFromRaw(rawSource);
         final String recipient = parsedArray.get(2);
         final String notice = parsedArray.get(3);
 
         final String formattedNotice = String.format(mContext.getString(R.string
-                .parser_message), sendingUser, notice);
+                .parser_notice), sendingUser, notice);
         if (MiscUtils.isChannel(recipient.charAt(0))) {
             return mSender.sendGenericChannelEvent(mUserChannelInterface.getChannel(recipient),
                     formattedNotice, false);

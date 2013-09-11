@@ -115,8 +115,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     /**
      * Selects the ServerFragment regardless of what is currently selected in the ViewPager
      */
-    public void selectServerFragment() {
-        mViewPager.setCurrentItem(0, true);
+    public void switchToServerFragment() {
+        if(mViewPager.getCurrentItem() != 0) {
+            mViewPager.setCurrentItem(0, true);
+        }
     }
 
     /**
@@ -131,6 +133,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
             mViewPager.setCurrentItem(index - 1, true);
         }
         mAdapter.removeFragment(index);
+    }
+
+    public void switchToServerAndRemove(final String fragmentTitle) {
+        switchToServerFragment();
+        mAdapter.removeFragment(mAdapter.getIndexFromTitle(fragmentTitle));
     }
 
     @Override
