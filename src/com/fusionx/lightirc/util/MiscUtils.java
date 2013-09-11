@@ -22,17 +22,16 @@
 package com.fusionx.lightirc.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.google.common.base.CharMatcher;
-
-import org.holoeverywhere.preference.PreferenceManager;
-import org.holoeverywhere.preference.SharedPreferences;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -149,8 +148,8 @@ public class MiscUtils {
 
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
         if (ignoreList == null) {
-            final SharedPreferences preferences = (SharedPreferences) context.getSharedPreferences
-                    (fileName,  Context.MODE_PRIVATE);
+            final SharedPreferences preferences = context.getSharedPreferences(fileName,
+                    Context.MODE_PRIVATE);
             ignoreList = SharedPreferencesUtils.getStringSet(preferences,
                     PreferenceConstants.IgnoreList, new HashSet<String>());
         }

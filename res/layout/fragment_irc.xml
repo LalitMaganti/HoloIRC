@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <org.holoeverywhere.widget.ListView
+    <ListView
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -37,7 +37,7 @@
             android:layout_marginTop="10dip"
             android:lineSpacingExtra="3dip"/>
 
-    <org.holoeverywhere.widget.EditText
+    <EditText
             android:id="@+id/editText1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

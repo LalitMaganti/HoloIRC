@@ -54,6 +54,9 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     protected String topic;
     private final HashMap<UserLevelEnum, Integer> numberOfUsers = new HashMap<>();
 
+    @Setter
+    private boolean mInitialWho;
+
     private boolean mUserListMessagesShown;
     private final UserChannelInterface mUserChannelInterface;
     private final Handler mAdapterHandler;
@@ -127,7 +130,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public void incrementOps() {
         synchronized (numberOfUsers) {
             Integer numberOfOps = numberOfUsers.get(UserLevelEnum.OP);
-            if(numberOfOps == null) {
+            if (numberOfOps == null) {
                 numberOfOps = 1;
             } else {
                 ++numberOfOps;
@@ -147,7 +150,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public void incrementVoices() {
         synchronized (numberOfUsers) {
             Integer numberOfVoices = numberOfUsers.get(UserLevelEnum.VOICE);
-            if(numberOfVoices == null) {
+            if (numberOfVoices == null) {
                 numberOfVoices = 1;
             } else {
                 ++numberOfVoices;

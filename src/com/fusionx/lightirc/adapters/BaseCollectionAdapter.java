@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -227,7 +228,11 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      */
     public T getItem(int position) {
         synchronized (mObjects.getLock()) {
-            return new ArrayList<>(mObjects).get(position);
+            Iterator<T> iterator = mObjects.iterator();
+            for(int i = 0; i < position; i++) {
+                iterator.next();
+            }
+            return iterator.next();
         }
     }
 
@@ -239,7 +244,14 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      */
     public int getPosition(T item) {
         synchronized (mObjects.getLock()) {
-            return new ArrayList<>(mObjects).indexOf(item);
+            final int size = mObjects.size();
+            final Iterator<T> iterator = mObjects.iterator();
+            for(int i = 0; i < size; i++) {
+                if(iterator.next() == item) {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 

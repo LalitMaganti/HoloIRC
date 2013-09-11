@@ -45,21 +45,14 @@ class WhoParser {
         }
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
         user.processWhoMode(parsedArray.get(5), whoChannel);
-        user.setHostName(parsedArray.get(2));
-
-        mUserChannelInterface.addChannelToUser(user, whoChannel);
-        if(whoChannel.getUsers() != null) {
-            whoChannel.getUsers().markForAddition(user);
-        }
-
+        //user.setHostName(parsedArray.get(2));
         return new Event(user.getNick());
     }
 
     Event parseWhoFinished() {
         if (whoChannel != null && whoChannel.getUsers() != null) {
-            whoChannel.getUsers().addMarked();
             final MessageSender sender = MessageSender.getSender(mServerTitle);
-            final Event event = sender.sendGenericChannelEvent(whoChannel, "",  true);
+            final Event event = sender.sendGenericChannelEvent(whoChannel, "", true);
             whoChannel = null;
             return event;
         } else {

@@ -129,23 +129,22 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized ChannelUser getUserFromRaw(@NonNull final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        if (nick.equals("*")) {
-            return getUserFromHostName(IRCUtils.getHostNameFromRaw(rawSource));
-        } else {
-            final ChannelUser user = getUser(nick);
-            user.setHostName(IRCUtils.getHostNameFromRaw(rawSource));
-            return user;
-        }
+        //if (nick.equals("*")) {
+        //    return getUserFromHostName(IRCUtils.getHostNameFromRaw(rawSource));
+        //} else {
+            //user.setHostName(IRCUtils.getHostNameFromRaw(rawSource));
+            return getUser(nick);
+        //}
     }
 
-    synchronized ChannelUser getUserFromHostName(@NonNull final String hostname) {
+    /*synchronized ChannelUser getUserFromHostName(@NonNull final String hostname) {
         for (final ChannelUser user : aToBMap.keySet()) {
             if (hostname.equals(user.getHostName())) {
                 return user;
             }
         }
         return null;
-    }
+    }*/
 
     public synchronized ChannelUser getUserIfExists(@NonNull final String nick) {
         for (final ChannelUser user : aToBMap.keySet()) {
@@ -161,12 +160,17 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
     }
 
     public synchronized Channel getChannel(@NonNull final String name) {
+        return getChannelIfExists(name) != null ? getChannelIfExists(name) : new Channel(name,
+                this, mAdapterHandler);
+    }
+
+    public synchronized Channel getChannelIfExists(@NonNull final String name) {
         for (final Channel channel : bToAMap.keySet()) {
             if (channel.getName().equals(name)) {
                 return channel;
             }
         }
-        return new Channel(name, this, mAdapterHandler);
+        return null;
     }
 
     synchronized void putAppUser(@NonNull final AppUser user) {

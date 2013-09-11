@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
@@ -9,8 +10,6 @@ import android.widget.ListView;
 
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
-
-import org.holoeverywhere.app.ListFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ abstract class MultiChoiceListFragment<T> extends ListFragment implements
 
         attachSelectionController();
 
-        if(mMultiSelectionController != null) {
+        if (mMultiSelectionController != null) {
             mMultiSelectionController.tryRestoreInstanceState(savedInstanceState);
         } else {
             throw new IllegalArgumentException();

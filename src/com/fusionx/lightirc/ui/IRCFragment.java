@@ -22,7 +22,9 @@
 package com.fusionx.lightirc.ui;
 
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -34,8 +36,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 
 import org.apache.commons.lang3.StringUtils;
-import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.ListFragment;
 
 import lombok.Getter;
 

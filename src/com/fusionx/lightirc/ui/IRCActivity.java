@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -61,8 +62,6 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
-import org.holoeverywhere.app.Activity;
-
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,7 +71,7 @@ import java.util.List;
  *
  * @author Lalit Maganti
  */
-public class IRCActivity extends Activity implements UserListFragment.UserListCallback,
+public class IRCActivity extends ActionBarActivity implements UserListFragment.UserListCallback,
         ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
                 .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
     // The Fragments
@@ -212,7 +211,7 @@ public class IRCActivity extends Activity implements UserListFragment.UserListCa
     private void onUserListDisplayed() {
         final Channel channel = getServer(false).getUserChannelInterface()
                 .getChannel(mIRCPagerFragment.getCurrentTitle());
-        getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " number of users");
+        getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " users");
     }
 
     @Override
@@ -276,7 +275,7 @@ public class IRCActivity extends Activity implements UserListFragment.UserListCa
     private void onUserListChanged(final String channelName) {
         if (channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
             mUserListFragment.onUserListUpdated();
-            if(mUserSlidingMenu.isMenuShowing()) {
+            if (mUserSlidingMenu.isMenuShowing()) {
                 onUserListDisplayed();
             }
         }
@@ -491,7 +490,7 @@ public class IRCActivity extends Activity implements UserListFragment.UserListCa
 
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if(event.userListChanged) {
+        if (event.userListChanged) {
             onUserListChanged(event.channelName);
         }
     }

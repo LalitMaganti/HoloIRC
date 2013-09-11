@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.text.Html;
 
 import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
@@ -30,8 +31,6 @@ import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.FragmentUtils;
-
-import org.holoeverywhere.app.Activity;
 
 import java.util.List;
 

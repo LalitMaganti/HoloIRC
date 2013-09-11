@@ -1,12 +1,12 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import android.content.Context;
+import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
 import com.fusionx.lightirc.R;
 
 import org.apache.commons.lang3.StringUtils;
-import org.holoeverywhere.preference.EditTextPreference;
 
 public class PasswordSummaryEditTextPreference extends EditTextPreference {
     public PasswordSummaryEditTextPreference(Context context, AttributeSet attrs) {

@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.ui.preferences;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -28,8 +29,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.widget.Button;
-
-import org.holoeverywhere.app.AlertDialog;
 
 /**
  * A EditTextPreference sub class which disables the positive button when the EditText is empty

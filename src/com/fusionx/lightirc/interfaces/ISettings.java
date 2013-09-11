@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.interfaces;
 
-import org.holoeverywhere.preference.PreferenceScreen;
+import android.preference.PreferenceScreen;
 
 public interface ISettings {
     void setupNumberPicker(final PreferenceScreen screen);

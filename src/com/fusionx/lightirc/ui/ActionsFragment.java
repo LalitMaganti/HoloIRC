@@ -21,7 +21,10 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -36,10 +39,6 @@ import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
-import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.ListFragment;
 
 public class ActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {

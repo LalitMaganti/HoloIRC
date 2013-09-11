@@ -33,7 +33,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public Spanned getSpannableNick(final Channel channel) {
         Spanned spannable = channelSpannableHashMap.get(channel);
-        if(spannable == null) {
+        if (spannable == null) {
             updateSpannableNick(channel);
         }
         return spannable;
@@ -71,6 +71,33 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public UpdateableTreeSet<Channel> getChannels() {
         return userChannelInterface.getAllChannelsInUser(this);
+    }
+
+    public void processNameMode(final String nick, final Channel channel) {
+        UserLevelEnum mode = UserLevelEnum.NONE;
+        final char firstChar = nick.charAt(0);
+        // TODO - fix this up
+        if (firstChar == '~') {
+            //mode = UserLevelEnum.OWNER;
+            mode = UserLevelEnum.OP;
+            channel.incrementOps();
+        } else if (firstChar == '&') {
+            //mode = UserLevelEnum.SUPEROP;
+            mode = UserLevelEnum.OP;
+            channel.incrementOps();
+        } else if (firstChar == '@') {
+            mode = UserLevelEnum.OP;
+            channel.incrementOps();
+        } else if (firstChar == '%') {
+            //mode = UserLevelEnum.HALFOP;
+            mode = UserLevelEnum.VOICE;
+            channel.incrementVoices();
+        } else if (firstChar == '+') {
+            mode = UserLevelEnum.VOICE;
+            channel.incrementVoices();
+        }
+        userLevelMap.put(channel, mode);
+        updateSpannableNick(channel);
     }
 
     public void processWhoMode(final String rawMode, final Channel channel) {
@@ -112,7 +139,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                     break;
                 case 'o':
                     if (addingMode) {
-                        if(userLevelMap.get(channel) == UserLevelEnum.VOICE) {
+                        if (userLevelMap.get(channel) == UserLevelEnum.VOICE) {
                             channel.decrementVoices();
                         }
                         channel.getUsers().update(this, ImmutableList.of(channel,
@@ -128,7 +155,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                     }
                 default:
                     if (!addingMode && (character == 'v' || character == 'o')) {
-                        if(character == 'o') {
+                        if (character == 'o') {
                             channel.decrementOps();
                         } else {
                             channel.decrementVoices();

@@ -21,11 +21,13 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -42,9 +44,6 @@ import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
-import org.holoeverywhere.LayoutInflater;
-import org.holoeverywhere.app.Activity;
 
 import java.util.List;
 

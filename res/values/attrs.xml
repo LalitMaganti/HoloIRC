@@ -23,4 +23,10 @@
     <attr name="server_card_background" format="reference|color"/>
     <attr name="server_card_text" format="reference|color"/>
     <attr name="overflow_menu_drawable" format="reference"/>
+
+    <declare-styleable name="NumberPickerPreference">
+        <attr name="min" format="integer"/>
+        <attr name="max" format="integer"/>
+        <attr name="defaultValue" format="integer"/>
+    </declare-styleable>
 </resources>

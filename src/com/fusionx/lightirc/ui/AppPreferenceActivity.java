@@ -1,26 +1,27 @@
 package com.fusionx.lightirc.ui;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceScreen;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ISettings;
+import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
-
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.preference.ListPreference;
-import org.holoeverywhere.preference.NumberPickerPreference;
-import org.holoeverywhere.preference.Preference;
-import org.holoeverywhere.preference.PreferenceActivity;
-import org.holoeverywhere.preference.PreferenceScreen;
 
 import java.util.List;
 
@@ -30,8 +31,25 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
+
+        if (!UIUtils.hasHoneycomb()) {
+            // Appearance settings
+            addPreferencesFromResource(R.xml.appearance_settings_fragment);
+            setupThemePreference(getPreferenceScreen());
+            // Server Channel Settings
+            addPreferencesFromResource(R.xml.server_channel_settings_fragment);
+            setupNumberPicker(getPreferenceScreen());
+
+            // Default User Settings
+            addPreferencesFromResource(R.xml.default_user_fragment);
+            // About settings
+            addPreferencesFromResource(R.xml.about_settings_fragment);
+            setupAppVersionPreference(getPreferenceScreen());
+            showAlertDialog();
+        }
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBuildHeaders(final List<Header> target) {
         loadHeadersFromResource(R.xml.main_settings_headers, target);
@@ -54,6 +72,15 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
                 screen.findPreference(PreferenceConstants.ReconnectTries);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
                 .getValue()));
+        numberPickerDialogPreference.setOnPreferenceChangeListener(new  Preference
+                .OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
+                        .getValue()));
+                return false;
+            }
+        });
     }
 
     @Override

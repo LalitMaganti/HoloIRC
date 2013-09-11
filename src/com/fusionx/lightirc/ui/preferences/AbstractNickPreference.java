@@ -1,8 +1,10 @@
 package com.fusionx.lightirc.ui.preferences;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.preference.DialogPreference;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -11,9 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.fusionx.lightirc.R;
-
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.preference.DialogPreference;
 
 abstract class AbstractNickPreference extends DialogPreference implements TextWatcher {
     EditText mFirstChoice;

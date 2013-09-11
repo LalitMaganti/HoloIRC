@@ -69,7 +69,7 @@ public class MultiSelectionUtils {
             controller.mActivity = activity;
             controller.mListener = listener;
             listView.setOnItemLongClickListener(controller);
-            if(startModeOnClick) {
+            if (startModeOnClick) {
                 listView.setOnItemClickListener(controller);
             }
             return controller;
@@ -198,7 +198,7 @@ public class MultiSelectionUtils {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-            if(mActionMode == null) {
+            if (mActionMode == null) {
                 mItemsToCheck = new HashSet<>();
                 mItemsToCheck.add(new Pair<>(position, id));
                 mActionMode = mActivity.startSupportActionMode(Controller.this);

@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 public class SynchronizedTreeSet<T> extends TreeSet<T> implements SynchronizedCollection<T> {
     private final Object object = new Object();
+
     @Override
     public Object getLock() {
         return object;

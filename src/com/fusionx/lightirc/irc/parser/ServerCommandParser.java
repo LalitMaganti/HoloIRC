@@ -270,7 +270,6 @@ class ServerCommandParser {
         mUserChannelInterface.coupleUserAndChannel(user, channel);
 
         if (user.equals(mServer.getUser())) {
-            channel.getWriter().sendWho();
             return mSender.sendChanelJoined(channel.getName());
         } else {
             return mSender.sendGenericChannelEvent(channel,
@@ -297,11 +296,10 @@ class ServerCommandParser {
             String message = String.format(mContext.getString(R.string.parser_parted_channel),
                     user.getPrettyNick(channel));
             // If you have 4 strings in the array, the last must be the reason for parting
-            message += (parsedArray.size() == 4) ? " " +
-                    String.format(mContext.getString(R.string.parser_reason),
-                            parsedArray.get(3).replace("\"", "")) : "";
+            message += (parsedArray.size() == 4) ? " " + String.format(mContext.getString(R.string.parser_reason),
+                    parsedArray.get(3).replace("\"", "")) : "";
 
-            if(user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
+            if (user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
                 channel.decrementOps();
             } else if (user.getChannelPrivileges(channel) == UserLevelEnum.VOICE) {
                 channel.decrementVoices();
@@ -331,7 +329,7 @@ class ServerCommandParser {
                                     String.format(mContext.getString(R.string.parser_reason),
                                             StringUtils.remove(parsedArray.get(2), "\"")) : "");
                     mSender.sendGenericChannelEvent(channel, message, true);
-                    if(user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
+                    if (user.getChannelPrivileges(channel) == UserLevelEnum.OP) {
                         channel.decrementOps();
                     } else if (user.getChannelPrivileges(channel) == UserLevelEnum.VOICE) {
                         channel.decrementVoices();

@@ -28,4 +28,17 @@ public class IRCUtils {
         }
         return nick;
     }
+
+    public static String getNickFromNameReply(final String rawNameNick) {
+        String nickToReturn;
+        final char firstChar = rawNameNick.charAt(0);
+        // TODO - fix this up
+        if (firstChar == '~' || firstChar == '&' || firstChar == '@' || firstChar == '%' ||
+                firstChar == '+') {
+            nickToReturn = rawNameNick.substring(1);
+        } else {
+            nickToReturn = rawNameNick;
+        }
+        return nickToReturn;
+    }
 }

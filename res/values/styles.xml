@@ -20,15 +20,17 @@ You should have received a copy of the GNU General Public License
 along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-    <style name="Light" parent="@style/Holo.Theme.Light.DarkActionBar">
+    <style name="Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="server_card_background">@color/server_card_background_light</item>
         <item name="server_card_text">@android:color/black</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
+        <item name="numberPickerStyle">@style/NPWidget.Holo.NumberPicker</item>
     </style>
 
-    <style name="Dark" parent="@style/Holo.Theme">
+    <style name="Dark" parent="@style/Theme.AppCompat">
         <item name="server_card_background">@color/server_card_background_dark</item>
         <item name="server_card_text">@android:color/white</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
+        <item name="numberPickerStyle">@style/NPWidget.Holo.Light.NumberPicker</item>
     </style>
 </resources>

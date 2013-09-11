@@ -54,6 +54,7 @@ import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
 class ServerCodeParser {
     private final WhoParser mWhoParser;
+    private final NameParser mNameParser;
     private final UserChannelInterface mUserChannelInterface;
     private final Context mContext;
     private final Server mServer;
@@ -64,6 +65,7 @@ class ServerCodeParser {
         mServer = parser.getServer();
         mUserChannelInterface = mServer.getUserChannelInterface();
         mWhoParser = new WhoParser(mUserChannelInterface, mServer.getTitle());
+        mNameParser = new NameParser(mUserChannelInterface, mServer.getTitle());
         mContext = context;
         mSender = MessageSender.getSender(mServer.getTitle());
         motdAllowed = isMotdAllowed(mContext);
@@ -83,9 +85,9 @@ class ServerCodeParser {
 
         switch (code) {
             case RPL_NAMEREPLY:
+                return mNameParser.parseNameReply(parsedArray);
             case RPL_ENDOFNAMES:
-                // TODO - maybe try to use this rather than WHO replies in the future?
-                return new Event(message);
+                return mNameParser.parseNameFinished();
             case RPL_MOTDSTART:
             case RPL_MOTD:
                 final String motdline = message.substring(1).trim();

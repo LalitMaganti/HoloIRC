@@ -1,6 +1,8 @@
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -12,14 +14,13 @@ import android.view.View;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.IServerSettings;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 
-import org.holoeverywhere.app.Activity;
-import org.holoeverywhere.preference.SharedPreferences;
-
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,11 +43,10 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        final SharedPreferences settings = (SharedPreferences) getActivity()
-                .getSharedPreferences(mCallbacks.getFileName(), Context.MODE_PRIVATE);
-        final Set<String> set = SharedPreferencesUtils.getStringSet(settings, AutoJoin,
-                new SynchronizedTreeSet<String>());
+        SharedPreferences settings = getActivity().getSharedPreferences(mCallbacks.getFileName(),
+                Context.MODE_PRIVATE);
+        final Set<String> set = settings.getStringSet(PreferenceConstants.AutoJoin,
+                new HashSet<String>());
         mAdapter = new BaseCollectionAdapter<>(getActivity(),
                 R.layout.default_listview_textview, new SynchronizedTreeSet<>(set));
 
@@ -135,9 +135,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
     @Override
     public void onPause() {
-        SharedPreferencesUtils.putStringSet((SharedPreferences) getActivity()
-                .getSharedPreferences(mCallbacks.getFileName(), Context.MODE_PRIVATE), AutoJoin,
-                mAdapter.getSetOfItems());
+       SharedPreferencesUtils.getStringSet(getActivity().getSharedPreferences(mCallbacks
+               .getFileName(), Context.MODE_PRIVATE), AutoJoin, mAdapter.getSetOfItems());
         super.onPause();
     }
 

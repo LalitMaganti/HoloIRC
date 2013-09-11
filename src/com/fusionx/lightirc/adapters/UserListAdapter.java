@@ -59,7 +59,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
                 (getContext()).inflate(R.layout.sliding_menu_header, viewGroup, false));
         final char firstChar = getFirstCharacter(i);
         if (firstChar == '@') {
-            view.setText(channel.getNumberOfOwners() + " owners");
+            view.setText(channel.getNumberOfOwners() + " operators");
         } else if (firstChar == '+') {
             view.setText(channel.getNumberOfVoices() + " voices");
         } else {

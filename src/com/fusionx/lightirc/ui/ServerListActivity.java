@@ -27,6 +27,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,12 +53,10 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.squareup.otto.Subscribe;
 
-import org.holoeverywhere.app.Activity;
-
 import java.io.File;
 import java.util.ArrayList;
 
-public class ServerListActivity extends Activity implements PopupMenu
+public class ServerListActivity extends ActionBarActivity implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener,
         ServerListAdapter.BuilderAdapterCallback, OnDismissCallback {
     private IRCService mService = null;
@@ -137,6 +136,7 @@ public class ServerListActivity extends Activity implements PopupMenu
             mAnimationAdapter.setAbsListView(listView);
             listView.setAdapter(mAnimationAdapter);
         }
+
         @Override
         public void onServiceDisconnected(final ComponentName name) {
         }
@@ -260,7 +260,8 @@ public class ServerListActivity extends Activity implements PopupMenu
     }
 
     private void addNewServer() {
-        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivityHC.class);
+        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivity
+                .class);
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
@@ -270,7 +271,7 @@ public class ServerListActivity extends Activity implements PopupMenu
     }
 
     private void editServer(final ServerConfiguration.Builder builder) {
-        final Intent intent =new Intent(ServerListActivity.this, ServerPreferenceActivityHC.class);
+        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivity.class);
 
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("file", builder.getFile());
@@ -298,7 +299,7 @@ public class ServerListActivity extends Activity implements PopupMenu
 
     @Override
     public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
-        for(int position : reverseSortedPositions) {
+        for (int position : reverseSortedPositions) {
             final ServerConfiguration.Builder builder = mServerCardsAdapter.getItem(position);
             final File folder = new File(SharedPreferencesUtils
                     .getSharedPreferencesPath(this) + mServerCardsAdapter.getItem(position)

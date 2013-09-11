@@ -4,7 +4,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <org.holoeverywhere.widget.TextView
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
@@ -16,7 +16,7 @@
             android:id="@+id/textView"
             android:layout_gravity="start"/>
 
-    <org.holoeverywhere.widget.EditText
+    <EditText
             android:id="@+id/edit_text_nick_first_choice"
             android:inputType="text"
             android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:singleLine="true"
             android:lines="1"/>
 
-    <org.holoeverywhere.widget.TextView
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
@@ -36,7 +36,7 @@
             android:id="@+id/textView2"
             android:layout_gravity="start"/>
 
-    <org.holoeverywhere.widget.EditText
+    <EditText
             android:id="@+id/edit_text_nick_second_choice"
             android:inputType="text"
             android:hint="@string/optional"
@@ -45,7 +45,7 @@
             android:singleLine="true"
             android:lines="1"/>
 
-    <org.holoeverywhere.widget.TextView
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dip"
@@ -57,7 +57,7 @@
             android:id="@+id/textView3"
             android:layout_gravity="start"/>
 
-    <org.holoeverywhere.widget.EditText
+    <EditText
             android:id="@+id/edit_text_nick_third_choice"
             android:inputType="text"
             android:hint="@string/optional"

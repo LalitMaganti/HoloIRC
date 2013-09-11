@@ -21,18 +21,17 @@
 
 package com.fusionx.lightirc.ui.dialogbuilder;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
-
-import org.holoeverywhere.app.AlertDialog;
-import org.holoeverywhere.widget.Button;
-import org.holoeverywhere.widget.EditText;
 
 public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {

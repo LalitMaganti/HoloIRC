@@ -1,13 +1,15 @@
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceScreen;
+import android.support.v7.app.ActionBarActivity;
 
 import com.fusionx.lightirc.interfaces.IServerSettings;
 import com.fusionx.lightirc.util.UIUtils;
 
-import org.holoeverywhere.app.Activity;
-
-public class ChannelListActivity extends Activity implements IServerSettings {
+public class ChannelListActivity extends ActionBarActivity implements IServerSettings {
     private String mFileName;
 
     @Override
@@ -28,12 +30,12 @@ public class ChannelListActivity extends Activity implements IServerSettings {
     }
 
     @Override
-    public boolean canSaveChanges() {
+    public void setupPreferences(PreferenceScreen screen, Activity activity) {
         throw new IllegalArgumentException();
     }
 
     @Override
-    public void setCanSaveChanges(boolean canSave) {
+    public boolean onPreferenceChange(Preference preference, Object o) {
         throw new IllegalArgumentException();
     }
 }

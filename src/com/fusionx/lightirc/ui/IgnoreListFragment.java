@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -22,8 +23,6 @@ import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
-import org.holoeverywhere.preference.SharedPreferences;
 
 import java.util.Set;
 
@@ -113,11 +112,10 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
         callback.switchToIRCActionFragment();
-        final SharedPreferences preferences = (SharedPreferences) getActivity().getSharedPreferences
-                (callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
+        final SharedPreferences preferences = getActivity().getSharedPreferences(
+                callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
         final Set<String> set = getIgnoreAdapter().getSetOfItems();
-        SharedPreferencesUtils.putStringSet(preferences, PreferenceConstants.IgnoreList,
-                set);
+        SharedPreferencesUtils.putStringSet(preferences, PreferenceConstants.IgnoreList, set);
         MiscUtils.forceUpdateIgnoreList(set);
     }
 
