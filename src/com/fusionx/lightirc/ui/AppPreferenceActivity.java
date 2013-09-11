@@ -72,7 +72,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
                 screen.findPreference(PreferenceConstants.ReconnectTries);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
                 .getValue()));
-        numberPickerDialogPreference.setOnPreferenceChangeListener(new  Preference
+        numberPickerDialogPreference.setOnPreferenceChangeListener(new Preference
                 .OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

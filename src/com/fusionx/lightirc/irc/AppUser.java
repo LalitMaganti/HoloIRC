@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.irc;
 
+import com.fusionx.lightirc.collections.UpdateableTreeSet;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -50,7 +52,17 @@ public class AppUser extends ChannelUser {
     }
 
     @Override
+    public UpdateableTreeSet<Channel> getChannels() {
+        return userChannelInterface.getAllChannelsInUser(this);
+    }
+
+    @Override
     public boolean equals(final Object o) {
-        return o instanceof AppUser && ((AppUser) o).getNick().equals(nick);
+        if(o instanceof AppUser) {
+            AppUser us = ((AppUser) o);
+            return us.getNick().equals(nick) && us.mServer.equals(mServer);
+        } else {
+            return false;
+        }
     }
 }

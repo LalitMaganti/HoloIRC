@@ -104,7 +104,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         setContentView(R.layout.activity_server_channel);
 
         final RelativeLayout layout = (RelativeLayout) findViewById(R.id.relative_layout);
-        if(UIUtils.hasJellyBeanMR1()) {
+        if (UIUtils.hasJellyBeanMR1()) {
             layout.setBackground(null);
         } else {
             layout.setBackgroundDrawable(null);
@@ -285,7 +285,7 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
      * @param channelName - name of channel which was updated
      */
     private void onUserListChanged(final String channelName) {
-        if (channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
+        if (channelName != null && channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
             mUserListFragment.onUserListUpdated();
             if (mUserSlidingMenu.isMenuShowing()) {
                 onUserListDisplayed();
@@ -473,11 +473,13 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     @Subscribe
     public void onChannelPart(final PartEvent event) {
         mIRCPagerFragment.switchFragmentAndRemove(event.channelName);
+        mUserListFragment.onChannelClosed();
     }
 
     @Subscribe
     public void onKicked(final KickEvent event) {
         mIRCPagerFragment.switchToServerAndRemove(event.channelName);
+        mUserListFragment.onChannelClosed();
     }
 
     @Subscribe

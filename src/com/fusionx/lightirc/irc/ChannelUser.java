@@ -18,9 +18,11 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     private final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<>();
     private final HashMap<Channel, Spanned> channelSpannableHashMap = new HashMap<>();
     private boolean mChecked = false;
+    protected final Server mServer;
 
     public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
+        mServer = userChannelInterface.getServer();
     }
 
     public String getPrettyNick(final String channel) {
@@ -146,6 +148,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                         if (userLevelMap.get(channel) == UserLevelEnum.VOICE) {
                             channel.decrementVoices();
                         }
+                        channel.incrementOps();
                         channel.getUsers().update(this, ImmutableList.of(channel,
                                 UserLevelEnum.OP));
                         break;
@@ -203,7 +206,12 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     @Override
     public boolean equals(final Object o) {
-        return o instanceof ChannelUser && ((ChannelUser) o).getNick().equals(nick);
+        if(o instanceof ChannelUser) {
+            ChannelUser us = ((ChannelUser) o);
+            return us.getNick().equals(nick) && us.mServer.equals(mServer);
+        } else {
+            return false;
+        }
     }
 
     @Override

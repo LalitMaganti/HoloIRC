@@ -53,7 +53,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
         mNewServer = getIntent().getBooleanExtra("new", false);
         mCanSaveChanges = !mNewServer;
 
-        if(UIUtils.hasHoneycomb()) {
+        if (UIUtils.hasHoneycomb()) {
             final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
             getFragmentManager().beginTransaction().replace(android.R.id.content,
                     fragment).commit();

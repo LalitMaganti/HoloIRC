@@ -156,6 +156,11 @@ public class Server {
         user = null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return (o instanceof Server) && ((Server) o).getTitle().equals(title);
+    }
+
     public void setupUserChannelInterface(final OutputStreamWriter streamWriter) {
         userChannelInterface = new UserChannelInterface(streamWriter, mContext, this,
                 mAdapterHandler);

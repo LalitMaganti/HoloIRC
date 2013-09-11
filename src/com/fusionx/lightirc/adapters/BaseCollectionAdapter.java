@@ -229,7 +229,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     public T getItem(int position) {
         synchronized (mObjects.getLock()) {
             Iterator<T> iterator = mObjects.iterator();
-            for(int i = 0; i < position; i++) {
+            for (int i = 0; i < position; i++) {
                 iterator.next();
             }
             return iterator.next();
@@ -246,8 +246,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mObjects.getLock()) {
             final int size = mObjects.size();
             final Iterator<T> iterator = mObjects.iterator();
-            for(int i = 0; i < size; i++) {
-                if(iterator.next() == item) {
+            for (int i = 0; i < size; i++) {
+                if (iterator.next() == item) {
                     return i;
                 }
             }

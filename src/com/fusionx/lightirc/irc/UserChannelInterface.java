@@ -116,6 +116,9 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
         for (final ChannelUser user : bToAMap.remove(channel)) {
             aToBMap.get(user).remove(channel);
             user.onRemove(channel);
+            if(aToBMap.get(user).isEmpty()) {
+                aToBMap.remove(user);
+            }
         }
     }
 
@@ -129,22 +132,8 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized ChannelUser getUserFromRaw(@NonNull final String rawSource) {
         final String nick = IRCUtils.getNickFromRaw(rawSource);
-        //if (nick.equals("*")) {
-        //    return getUserFromHostName(IRCUtils.getHostNameFromRaw(rawSource));
-        //} else {
-            //user.setHostName(IRCUtils.getHostNameFromRaw(rawSource));
-            return getUser(nick);
-        //}
+        return getUser(nick);
     }
-
-    /*synchronized ChannelUser getUserFromHostName(@NonNull final String hostname) {
-        for (final ChannelUser user : aToBMap.keySet()) {
-            if (hostname.equals(user.getHostName())) {
-                return user;
-            }
-        }
-        return null;
-    }*/
 
     public synchronized ChannelUser getUserIfExists(@NonNull final String nick) {
         for (final ChannelUser user : aToBMap.keySet()) {

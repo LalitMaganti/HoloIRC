@@ -46,7 +46,7 @@ class NameParser {
             mChannel = mUserChannelInterface.getChannel(parsedArray.get(1));
         }
         final ArrayList<String> listOfUsers = MiscUtils.splitRawLine(parsedArray.get(2), false);
-        for(final String rawNick : listOfUsers) {
+        for (final String rawNick : listOfUsers) {
             final String nick = IRCUtils.getNickFromNameReply(rawNick);
             final ChannelUser user = mUserChannelInterface.getUser(nick);
             user.processNameMode(rawNick, mChannel);

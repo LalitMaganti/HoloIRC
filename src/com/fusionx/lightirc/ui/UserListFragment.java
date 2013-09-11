@@ -167,7 +167,7 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
         }
     }
 
-    public void part() {
+    public void onChannelClosed() {
         mChannel = null;
         getRealAdapter().clear();
     }

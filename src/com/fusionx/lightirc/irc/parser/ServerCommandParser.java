@@ -118,10 +118,18 @@ class ServerCommandParser {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
-        if (kickedNick.equals(mServer.getUser())) {
+        if (kickedUser.equals(mServer.getUser())) {
+            String message = String.format(mContext.getString(R.string.parser_user_kicked_channel,
+                    channel.getName(), user.getPrettyNick(channel)));
+            // If you have 4 strings in the array, the last must be the reason for parting
+            message += (parsedArray.size() == 5) ? " " + String.format(mContext.getString(R
+                    .string.parser_reason),
+                    parsedArray.get(4).replace("\"", "")) : "";
+            final Event event = mSender.sendGenericServerEvent(mServer, message);
+
             mSender.sendKicked(channel.getName());
             mUserChannelInterface.removeChannel(channel);
-            return new Event(channelName);
+            return event;
         } else {
             String message = String.format(mContext.getString(R.string.parser_kicked_channel),
                     kickedUser.getPrettyNick(channel), user.getPrettyNick(channel));
@@ -137,7 +145,7 @@ class ServerCommandParser {
             }
 
             final Event event = mSender.sendGenericChannelEvent(channel, message, true);
-            mUserChannelInterface.decoupleUserAndChannel(user, channel);
+            mUserChannelInterface.decoupleUserAndChannel(kickedUser, channel);
             return event;
         }
     }

@@ -135,8 +135,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
     @Override
     public void onPause() {
-       SharedPreferencesUtils.getStringSet(getActivity().getSharedPreferences(mCallbacks
-               .getFileName(), Context.MODE_PRIVATE), AutoJoin, mAdapter.getSetOfItems());
+        SharedPreferencesUtils.getStringSet(getActivity().getSharedPreferences(mCallbacks
+                .getFileName(), Context.MODE_PRIVATE), AutoJoin, mAdapter.getSetOfItems());
         super.onPause();
     }
 

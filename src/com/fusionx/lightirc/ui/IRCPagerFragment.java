@@ -116,7 +116,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * Selects the ServerFragment regardless of what is currently selected in the ViewPager
      */
     public void switchToServerFragment() {
-        if(mViewPager.getCurrentItem() != 0) {
+        if (mViewPager.getCurrentItem() != 0) {
             mViewPager.setCurrentItem(0, true);
         }
     }
