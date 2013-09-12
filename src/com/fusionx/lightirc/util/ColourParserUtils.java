@@ -6,9 +6,7 @@ import android.text.Spanned;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 
-import com.fusionx.lightirc.constants.Constants;
 import com.google.common.base.CharMatcher;
 
 public class ColourParserUtils {
@@ -35,16 +33,15 @@ public class ColourParserUtils {
                 characterStyle = new StyleSpan(Typeface.BOLD);
                 closingTag = "</b>";
             } else {
-                if(Constants.DEBUG) {
-                    throw new UnsupportedOperationException();
-                } else {
-                    return builder;
-                }
+                processed = indexOfOpenClosing + 1;
+                builder.append(trimmedText.substring(bracketIndex, processed));
+                continue;
             }
             processed = indexOfOpenClosing + 1;
             final int indexOfClosingOpen = trimmedText.indexOf(closingTag, processed);
             final String textToStyle = trimmedText.substring(processed, indexOfClosingOpen);
             int length;
+            int len = builder.length();
             if (containsValidTag(textToStyle)) {
                 final Spanned spanned = parseHtml(textToStyle);
                 length = spanned.length();
@@ -54,19 +51,11 @@ public class ColourParserUtils {
                 builder.append(textToStyle);
             }
             if (highlightLine) {
-                try {
-                builder.setSpan(characterStyle, 0, length + bracketIndex,
+                builder.setSpan(characterStyle, 0, length + len,
                         Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                } catch (IndexOutOfBoundsException ex) {
-                    Log.e("HoloIRC", input);
-                }
             } else {
-                try {
-                    builder.setSpan(characterStyle, bracketIndex, length + bracketIndex,
-                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                } catch (IndexOutOfBoundsException ex) {
-                    Log.e("HoloIRC", input);
-                }
+                builder.setSpan(characterStyle, len, length + len,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             processed = indexOfClosingOpen + closingTag.length();
         }
