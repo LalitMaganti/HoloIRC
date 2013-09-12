@@ -82,6 +82,6 @@ public class UIUtils {
     }
 
     public static void updateLineColourfulness(final SharedPreferences preferences) {
-        HtmlUtils.highlightLine =  preferences.getBoolean(PreferenceConstants.LineColourful, true);
+        HtmlUtils.highlightLine = preferences.getBoolean(PreferenceConstants.LineColourful, true);
     }
 }

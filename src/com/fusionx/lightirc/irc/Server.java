@@ -23,7 +23,6 @@ package com.fusionx.lightirc.irc;
 
 import android.content.Context;
 import android.os.Handler;
-import android.text.Html;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;

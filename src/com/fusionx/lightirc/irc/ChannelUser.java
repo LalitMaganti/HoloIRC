@@ -206,7 +206,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     @Override
     public boolean equals(final Object o) {
-        if(o instanceof ChannelUser) {
+        if (o instanceof ChannelUser) {
             ChannelUser us = ((ChannelUser) o);
             return us.getNick().equals(nick) && us.mServer.equals(mServer);
         } else {

@@ -58,7 +58,7 @@ public class AppUser extends ChannelUser {
 
     @Override
     public boolean equals(final Object o) {
-        if(o instanceof AppUser) {
+        if (o instanceof AppUser) {
             AppUser us = ((AppUser) o);
             return us.getNick().equals(nick) && us.mServer.equals(mServer);
         } else {

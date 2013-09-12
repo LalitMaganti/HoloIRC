@@ -38,7 +38,7 @@ public class HtmlUtils {
             final String text = textAfterTag.substring(0, indexOfLastOpen);
             final int len = builder.length();
             int length;
-            if(!containsValidTag(text)) {
+            if (!containsValidTag(text)) {
                 length = text.length();
                 builder.append(text);
             } else {
@@ -46,7 +46,7 @@ public class HtmlUtils {
                 length = spanned.length();
                 builder.append(spanned);
             }
-            if(highlightLine) {
+            if (highlightLine) {
                 builder.setSpan(characterStyle, 0, length + len, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             } else {
                 builder.setSpan(characterStyle, len, length + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
