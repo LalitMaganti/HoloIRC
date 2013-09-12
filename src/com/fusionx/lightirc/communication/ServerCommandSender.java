@@ -51,7 +51,7 @@ public class ServerCommandSender {
                 channel.getWriter().sendMessage(message);
 
                 MessageSender.getSender(server.getTitle()).sendMessageToChannel(server.getUser()
-                        .getNick(), channel, server.getUser().getPrettyNick(channel), message);
+                        .getNick(), channel, server.getUser().getBracketedNick(channel), message);
                 return null;
             }
         }.execute();
