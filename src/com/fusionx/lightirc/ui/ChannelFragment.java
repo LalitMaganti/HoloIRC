@@ -29,8 +29,8 @@ import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.util.ColourParserUtils;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.HtmlUtils;
 
 import java.util.List;
 
@@ -68,7 +68,7 @@ public class ChannelFragment extends IRCFragment {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
         for (final ChannelUser userNick : users) {
-            nicks += HtmlUtils.parseHtml(userNick.getPrettyNick(title)) + ": ";
+            nicks += ColourParserUtils.parseHtml(userNick.getPrettyNick(title)) + ": ";
         }
         mEditText.clearComposingText();
         mEditText.append(nicks + text);

@@ -31,7 +31,7 @@ import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.irc.event.Event;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.util.HtmlUtils;
+import com.fusionx.lightirc.util.ColourParserUtils;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -74,7 +74,7 @@ public class Server {
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(HtmlUtils.parseHtml(event.message));
+                    buffer.add(ColourParserUtils.parseHtml(event.message));
                 }
             });
         }

@@ -7,7 +7,7 @@ import android.widget.Checkable;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
-import com.fusionx.lightirc.util.HtmlUtils;
+import com.fusionx.lightirc.util.ColourParserUtils;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashMap;
@@ -60,7 +60,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     private void updateSpannableNick(final Channel channel) {
-        Spanned spannable = HtmlUtils.parseHtml(getPrettyNick(channel));
+        Spanned spannable = ColourParserUtils.parseHtml(getPrettyNick(channel));
         channelSpannableHashMap.put(channel, spannable);
     }
 
@@ -79,29 +79,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         return userChannelInterface.getAllChannelsInUser(this);
     }
 
-    public void processNameMode(final String nick, final Channel channel) {
-        UserLevelEnum mode = UserLevelEnum.NONE;
-        final char firstChar = nick.charAt(0);
-        // TODO - fix this up
-        if (firstChar == '~') {
-            //mode = UserLevelEnum.OWNER;
-            mode = UserLevelEnum.OP;
-            channel.incrementOps();
-        } else if (firstChar == '&') {
-            //mode = UserLevelEnum.SUPEROP;
-            mode = UserLevelEnum.OP;
-            channel.incrementOps();
-        } else if (firstChar == '@') {
-            mode = UserLevelEnum.OP;
-            channel.incrementOps();
-        } else if (firstChar == '%') {
-            //mode = UserLevelEnum.HALFOP;
-            mode = UserLevelEnum.VOICE;
-            channel.incrementVoices();
-        } else if (firstChar == '+') {
-            mode = UserLevelEnum.VOICE;
-            channel.incrementVoices();
-        }
+    public void putMode(final UserLevelEnum mode, final Channel channel) {
         userLevelMap.put(channel, mode);
         updateSpannableNick(channel);
     }

@@ -6,7 +6,7 @@ import android.text.Spanned;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.irc.writers.UserWriter;
-import com.fusionx.lightirc.util.HtmlUtils;
+import com.fusionx.lightirc.util.ColourParserUtils;
 import com.fusionx.lightirc.util.IRCUtils;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class PrivateMessageUser extends User {
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(HtmlUtils.parseHtml(event.message));
+                    buffer.add(ColourParserUtils.parseHtml(event.message));
                 }
             });
         }
@@ -46,8 +46,8 @@ public class PrivateMessageUser extends User {
 
     @Override
     public boolean equals(final Object o) {
-        if (o instanceof String || o instanceof PrivateMessageUser) {
-            String otherNick = o.toString();
+        if (o instanceof PrivateMessageUser) {
+            String otherNick = ((PrivateMessageUser) o).getNick();
             return IRCUtils.areNicksEqual(nick, otherNick);
         } else {
             return false;

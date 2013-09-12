@@ -74,7 +74,7 @@ public class MiscUtils {
      */
     public static ArrayList<String> splitRawLine(final String input,
                                                  final boolean careAboutColon) {
-        ArrayList<String> stringParts = new ArrayList<>();
+        final ArrayList<String> stringParts = new ArrayList<>();
         if (input == null || input.length() == 0)
             return stringParts;
 
@@ -90,7 +90,7 @@ public class MiscUtils {
             if (trimmedInput.charAt(pos) == ':' && careAboutColon) {
                 stringParts.add(trimmedInput.substring(pos + 1));
                 return stringParts;
-            }
+            } 
         }
         //No more spaces, add last part of line
         stringParts.add(trimmedInput.substring(pos));

@@ -22,11 +22,11 @@
 package com.fusionx.lightirc.irc.parser;
 
 import com.fusionx.lightirc.communication.MessageSender;
+import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.event.Event;
-import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import java.util.ArrayList;
@@ -47,10 +47,7 @@ class NameParser {
         }
         final ArrayList<String> listOfUsers = MiscUtils.splitRawLine(parsedArray.get(2), false);
         for (final String rawNick : listOfUsers) {
-            final String nick = IRCUtils.getNickFromNameReply(rawNick);
-            final ChannelUser user = mUserChannelInterface.getUser(nick);
-            user.processNameMode(rawNick, mChannel);
-
+            final ChannelUser user = getNickFromNameReply(rawNick);
             mUserChannelInterface.addChannelToUser(user, mChannel);
             mChannel.getUsers().markForAddition(user);
         }
@@ -63,5 +60,31 @@ class NameParser {
         final Event event = sender.sendGenericChannelEvent(mChannel, "", true);
         mChannel = null;
         return event;
+    }
+
+    public ChannelUser getNickFromNameReply(final String rawNameNick) {
+        UserLevelEnum mode;
+        final char firstChar = rawNameNick.charAt(0);
+        // THIS IS WRONG - TODO - fix this properly
+        switch (firstChar) {
+            case '~':
+            case '&':
+            case '@':
+                mode = UserLevelEnum.OP;
+                mChannel.incrementOps();
+                break;
+            case '%':
+            case '+':
+                mode = UserLevelEnum.VOICE;
+                mChannel.incrementVoices();
+                break;
+            default:
+                mode = UserLevelEnum.NONE;
+                break;
+        }
+        final ChannelUser user = mUserChannelInterface.getUser(mode == UserLevelEnum.NONE ?
+                rawNameNick : rawNameNick.substring(1));
+        user.putMode(mode, mChannel);
+        return user;
     }
 }

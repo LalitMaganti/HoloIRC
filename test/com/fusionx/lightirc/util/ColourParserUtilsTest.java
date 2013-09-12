@@ -12,12 +12,12 @@ import org.robolectric.RobolectricTestRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
-public class HtmlUtilsTest {
+public class ColourParserUtilsTest {
     @Test
     public void parseTest() {
         final int color = MiscUtils.generateRandomColor(0);
-        HtmlUtils.highlightLine = true;
-        final Spanned test = HtmlUtils.parseHtml("<color=" + color +
+        ColourParserUtils.highlightLine = true;
+        final Spanned test = ColourParserUtils.parseHtml("<color=" + color +
                 "><222222></color>: gsjiknsknfkdjngjdkngdfkknjfkdnf");
         final SpannableStringBuilder expected = new SpannableStringBuilder();
         expected.append("<222222>: gsjiknsknfkdjngjdkngdfkknjfkdnf");
@@ -27,20 +27,20 @@ public class HtmlUtilsTest {
 
         final long time = System.nanoTime();
         for(int i = 0; i < 10000; i++) {
-            Html.fromHtml("<color=" + color +
-                    "><222222></color>: gsjiknsknfkdjngjdkngdfkknjfkdnf");
+            Html.fromHtml("<font color=\"" + color +
+                    "\">222222</font>: gsjiknsknfkdjngjdkngdfkknjfkdnf");
         }
         final long totla = System.nanoTime() - time;
 
         System.out.println(totla);
 
-        final long time2 = System.nanoTime();
+        final long time3 = System.nanoTime();
         for(int i = 0; i < 10000; i++) {
-            HtmlUtils.parseHtml("<color=" + color +
+            ColourParserUtils.parseHtml("<color=" + color +
                     ">222222</color>: gsjiknsknfkdjngjdkngdfkknjfkdnf");
         }
-        final long totla2 = System.nanoTime() - time2;
+        final long totla3 = System.nanoTime() - time3;
 
-        System.out.println(totla2);
+        System.out.println(totla3);
     }
 }

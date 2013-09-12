@@ -31,7 +31,7 @@ import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
-import com.fusionx.lightirc.util.HtmlUtils;
+import com.fusionx.lightirc.util.ColourParserUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +68,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
                 final String message = String.format(userChannelInterface.getContext().getString
                         (R.string.parser_joined_channel), userChannelInterface
                         .getServer().getUser().getColorfulNick());
-                buffer.add(HtmlUtils.parseHtml(message));
+                buffer.add(ColourParserUtils.parseHtml(message));
 
             }
         });
@@ -115,7 +115,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(HtmlUtils.parseHtml(event.message));
+                    buffer.add(ColourParserUtils.parseHtml(event.message));
                 }
             });
         }
