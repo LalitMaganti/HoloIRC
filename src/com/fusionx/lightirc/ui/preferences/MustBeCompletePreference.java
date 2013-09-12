@@ -16,11 +16,11 @@ import com.fusionx.lightirc.util.UIUtils;
  *
  * @author Lalit Maganti
  */
-public class MustBeCompleteView extends Preference {
+public class MustBeCompletePreference extends Preference {
     private TextView mTextView;
     private String mText;
 
-    public MustBeCompleteView(final Context context, final AttributeSet attrs) {
+    public MustBeCompletePreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -36,7 +36,7 @@ public class MustBeCompleteView extends Preference {
         return convertView;
     }
 
-    public void setInitialText(String text) {
+    public void setInitialText(CharSequence text) {
         mText = String.format(getContext().getString(R.string.server_settings_non_empty), text);
         if (mTextView != null) {
             mTextView.setText(mText);

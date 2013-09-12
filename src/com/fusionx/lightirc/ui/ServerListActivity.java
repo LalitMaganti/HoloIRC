@@ -50,7 +50,6 @@ import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.squareup.otto.Subscribe;
 
 import java.io.File;
@@ -58,7 +57,7 @@ import java.util.ArrayList;
 
 public class ServerListActivity extends ActionBarActivity implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener,
-        ServerListAdapter.BuilderAdapterCallback, OnDismissCallback {
+        ServerListAdapter.BuilderAdapterCallback, AnimatedServerListAdapter.SingleDismissCallback {
     private IRCService mService = null;
     private ServerConfiguration.Builder mBuilder = null;
     private ServerListAdapter mServerCardsAdapter = null;
@@ -69,11 +68,9 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
-
-        SharedPreferencesUtils.setUpPreferences(this);
-
         setContentView(R.layout.activity_server_list);
 
+        SharedPreferencesUtils.setUpPreferences(this);
         mServerCardsAdapter = new ServerListAdapter(this,
                 new SynchronizedArrayList<ServerConfiguration.Builder>());
     }
@@ -267,7 +264,6 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
-        intent.putExtra("main", true);
         intent.putStringArrayListExtra("list", mServerCardsAdapter.getListOfTitles(null));
         startActivity(intent);
     }
@@ -275,11 +271,9 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     private void editServer(final ServerConfiguration.Builder builder) {
         final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivity.class);
 
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("file", builder.getFile());
-        intent.putStringArrayListExtra("list", mServerCardsAdapter.getListOfTitles(builder));
         intent.putExtra("server", builder);
-        intent.putExtra("main", true);
+        intent.putStringArrayListExtra("list", mServerCardsAdapter.getListOfTitles(builder));
         startActivity(intent);
     }
 
@@ -299,16 +293,16 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         return mService.getServer(title);
     }
 
+    @SuppressWarnings("RedundantCast")
     @Override
-    public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
-        for (int position : reverseSortedPositions) {
-            final ServerConfiguration.Builder builder = mServerCardsAdapter.getItem(position);
-            final File folder = new File(SharedPreferencesUtils
-                    .getSharedPreferencesPath(this) + mServerCardsAdapter.getItem(position)
-                    .getFile() + ".xml");
-            folder.delete();
-
-            mServerCardsAdapter.remove(builder);
-        }
+    public void onDismiss(AbsListView listView, int position) {
+        final ServerConfiguration.Builder builder = mServerCardsAdapter.getItem(position);
+        final File folder = new File(SharedPreferencesUtils
+                .getSharedPreferencesPath(this) + builder.getFile() + ".xml");
+        folder.delete();
+        ((GridView) listView).setAdapter(null);
+        mServerCardsAdapter.remove(builder);
+        mAnimationAdapter.notifyDataSetChanged();
+        ((GridView) listView).setAdapter(mAnimationAdapter);
     }
 }

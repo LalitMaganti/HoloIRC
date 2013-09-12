@@ -18,7 +18,7 @@ import android.widget.Toast;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.ui.preferences.MustBeCompleteView;
+import com.fusionx.lightirc.ui.preferences.MustBeCompletePreference;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
@@ -38,9 +38,10 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
     private String mFileName = null;
     private boolean backPressed = false;
 
-    private MustBeCompleteView mCompleteView = null;
+    private MustBeCompletePreference mCompletePreference = null;
     private ServerTitleEditTextPreference mTitle = null;
     private EditTextPreference mUrl = null;
+    private PreferenceScreen mScreen;
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -122,12 +123,14 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
 
     @Override
     public void setupPreferences(final PreferenceScreen screen, final Activity activity) {
+        mScreen = screen;
+
         mTitle = (ServerTitleEditTextPreference) screen.findPreference(Title);
         mTitle.setOnPreferenceChangeListener(this);
         mTitle.setListOfExistingServers(activity.getIntent().getStringArrayListExtra("list"));
 
         // URL of server
-        mCompleteView = (MustBeCompleteView) screen.findPreference("must_be_complete");
+        mCompletePreference = (MustBeCompletePreference) screen.findPreference("must_be_complete");
 
         // URL of server
         mUrl = (EditTextPreference) screen.findPreference(URL);
@@ -148,9 +151,9 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
 
         if (!mCanSaveChanges) {
             setupNewServer(screen, activity);
-            mCompleteView.setInitialText(mTitle.getTitle().toString());
+            mCompletePreference.setInitialText(mTitle.getTitle().toString());
         } else {
-            screen.removePreference(mCompleteView);
+            screen.removePreference(mCompletePreference);
         }
     }
 
@@ -184,14 +187,14 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
     @Override
     public boolean onPreferenceChange(final Preference preference, final Object newValue) {
         if (!mCanSaveChanges) {
-            if (StringUtils.isEmpty(mTitle.getText())) {
-                mCompleteView.setInitialText(mTitle.getTitle().toString());
+            if (preference == mTitle && StringUtils.isEmpty(mUrl.getText())) {
+                mCompletePreference.setInitialText(mUrl.getTitle());
                 mCanSaveChanges = false;
-            } else if (StringUtils.isEmpty(mTitle.getText())) {
-                mCompleteView.setInitialText(mUrl.getTitle().toString());
+            } else if (preference == mUrl && StringUtils.isEmpty(mTitle.getText())) {
+                mCompletePreference.setInitialText(mTitle.getTitle());
                 mCanSaveChanges = false;
             } else {
-                getPreferenceScreen().removePreference(mCompleteView);
+                mScreen.removePreference(mCompletePreference);
                 mCanSaveChanges = true;
             }
         }
