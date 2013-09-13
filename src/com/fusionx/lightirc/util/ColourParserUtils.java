@@ -13,55 +13,47 @@ public class ColourParserUtils {
     public static boolean highlightLine = true;
 
     public static Spanned parseHtml(final String input) {
-        final SpannableStringBuilder builder = new SpannableStringBuilder();
-        String trimmedText = CharMatcher.JAVA_ISO_CONTROL.removeFrom(input);
-
-        int processed = 0, bracketIndex;
-        while ((bracketIndex = trimmedText.indexOf('<', processed)) >= 0) {
-            builder.append(trimmedText.substring(processed, bracketIndex));
-            processed = bracketIndex + 1;
-
-            final String tag = trimmedText.substring(processed);
-            String closingTag;
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        String remainingText = CharMatcher.JAVA_ISO_CONTROL.removeFrom(input);
+        while (containsValidTag(remainingText)) {
+            final int indexOfFirstOpen = remainingText.indexOf("<");
+            final String start = remainingText.substring(0, indexOfFirstOpen);
+            builder.append(start);
+            final int indexOfFirstClose = remainingText.indexOf(">");
+            String tag = remainingText.substring(indexOfFirstOpen + 1, indexOfFirstClose);
+            final String textAfterTag = remainingText.substring(indexOfFirstClose + 1);
             CharacterStyle characterStyle;
-            final int indexOfOpenClosing = trimmedText.indexOf(">", processed);
-            if (tag.startsWith("color=")) {
-                characterStyle = new ForegroundColorSpan(Integer.parseInt(trimmedText.substring
-                        (processed + 6, indexOfOpenClosing)));
-                closingTag = "</color>";
-            } else if (tag.startsWith("b>")) {
+            if (tag.startsWith("color")) {
+                characterStyle = new ForegroundColorSpan(Integer.parseInt(tag.substring(6)));
+                tag = "color";
+            } else if (tag.equals("b")) {
                 characterStyle = new StyleSpan(Typeface.BOLD);
-                closingTag = "</b>";
             } else {
-                processed = indexOfOpenClosing + 1;
-                builder.append(trimmedText.substring(bracketIndex, processed));
+                final int indexOfLastOpen = textAfterTag.indexOf("</" + tag + ">");
+                builder.append(tag);
+                remainingText = textAfterTag.substring(indexOfLastOpen + 3 + tag.length());
                 continue;
             }
-            processed = indexOfOpenClosing + 1;
-            final int indexOfClosingOpen = trimmedText.indexOf(closingTag, processed);
-            final String textToStyle = trimmedText.substring(processed, indexOfClosingOpen);
+            final int indexOfLastOpen = textAfterTag.indexOf("</" + tag + ">");
+            final String text = textAfterTag.substring(0, indexOfLastOpen);
+            final int len = builder.length();
             int length;
-            int len = builder.length();
-            if (containsValidTag(textToStyle)) {
-                final Spanned spanned = parseHtml(textToStyle);
+            if (!containsValidTag(text)) {
+                length = text.length();
+                builder.append(text);
+            } else {
+                final Spanned spanned = parseHtml(text);
                 length = spanned.length();
                 builder.append(spanned);
-            } else {
-                length = textToStyle.length();
-                builder.append(textToStyle);
             }
             if (highlightLine) {
-                builder.setSpan(characterStyle, 0, length + len,
-                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                builder.setSpan(characterStyle, 0, length + len, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             } else {
-                builder.setSpan(characterStyle, len, length + len,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.setSpan(characterStyle, len, length + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
-            processed = indexOfClosingOpen + closingTag.length();
+            remainingText = textAfterTag.substring(indexOfLastOpen + 3 + tag.length());
         }
-        builder.append(trimmedText.substring(processed));
-
-        return builder;
+        return builder.append(remainingText);
     }
 
     public static boolean containsValidTag(final String text) {
