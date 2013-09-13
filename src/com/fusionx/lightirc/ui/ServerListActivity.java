@@ -49,6 +49,7 @@ import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.squareup.otto.Subscribe;
@@ -199,7 +200,8 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
     // Connect to server
     public void onCardClick(final View view) {
-        final Intent intent = new Intent(ServerListActivity.this, IRCActivity.class);
+        // TODO - fix this - choose tablet activity for tablets
+        final Intent intent = new Intent(ServerListActivity.this, IRCPhoneActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("server", (ServerConfiguration.Builder) view.getTag());
         startActivity(intent);

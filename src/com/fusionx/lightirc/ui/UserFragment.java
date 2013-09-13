@@ -43,6 +43,7 @@ public class UserFragment extends IRCFragment {
             adapter.setAbsListView(getListView());
             user.getBuffer().setActivityContext(getActivity());
             setListAdapter(adapter);
+            getListView().setSelection(getListView().getCount());
         } else {
             getListAdapter().notifyDataSetChanged();
         }

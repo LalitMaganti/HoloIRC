@@ -4,14 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
 
 class IRCBus extends Bus {
     private final Handler mainThread = new Handler(Looper.getMainLooper());
-
-    public IRCBus(final ThreadEnforcer enforcer) {
-        super(enforcer);
-    }
 
     @Override
     public void post(final Object event) {

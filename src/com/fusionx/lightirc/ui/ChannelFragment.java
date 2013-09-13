@@ -59,6 +59,7 @@ public class ChannelFragment extends IRCFragment {
             adapter.setAbsListView(getListView());
             channel.getBuffer().setActivityContext(getActivity());
             setListAdapter(adapter);
+            getListView().setSelection(getListView().getCount());
         } else {
             getListAdapter().notifyDataSetChanged();
         }

@@ -63,6 +63,7 @@ public class ServerFragment extends IRCFragment {
             alphaInAnimationAdapter.setAbsListView(getListView());
             setListAdapter(alphaInAnimationAdapter);
             server.setBuffer(adapter);
+            getListView().setSelection(getListView().getCount());
         }
     }
 

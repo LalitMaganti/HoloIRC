@@ -42,8 +42,11 @@ import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.KickEvent;
+import com.fusionx.lightirc.irc.event.PartEvent;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -194,10 +197,21 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
     public interface UserListCallback {
         public void onUserMention(final List<ChannelUser> users);
 
-        public void createPMFragment(final String userNick);
-
         public Server getServer(boolean nullable);
 
         public void closeAllSlidingMenus();
+    }
+
+    /*
+     * Subscribed events
+     */
+    @Subscribe
+    public void onChannelPart(final PartEvent event) {
+        onChannelClosed();
+    }
+
+    @Subscribe
+    public void onKicked(final KickEvent event) {
+        onChannelClosed();
     }
 }

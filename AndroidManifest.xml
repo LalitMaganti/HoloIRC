@@ -25,6 +25,16 @@
             </intent-filter>
         </activity>
         <activity
+                android:name=".ui.phone.IRCPhoneActivity"
+                android:parentActivityName=".ui.ServerListActivity">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value=".ui.ServerListActivity"/>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+            </intent-filter>
+        </activity>
+        <activity
                 android:name=".ui.IRCActivity"
                 android:parentActivityName=".ui.ServerListActivity">
             <meta-data

@@ -15,6 +15,14 @@ import com.fusionx.lightirc.adapters.IRCPagerAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.ConnectedEvent;
+import com.fusionx.lightirc.irc.event.JoinEvent;
+import com.fusionx.lightirc.irc.event.KickEvent;
+import com.fusionx.lightirc.irc.event.NickInUseEvent;
+import com.fusionx.lightirc.irc.event.PartEvent;
+import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
+import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -213,5 +221,43 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         public Server getServer(boolean nullAllowed);
 
         public boolean isConnectedToServer();
+    }
+
+    /*
+     * Events start here
+     */
+    @Subscribe
+    public void onChannelPart(final PartEvent event) {
+        switchFragmentAndRemove(event.channelName);
+    }
+
+    @Subscribe
+    public void onChannelJoin(final JoinEvent event) {
+        createChannelFragment(event.channelToJoin, true);
+    }
+
+    @Subscribe
+    public void onKicked(final KickEvent event) {
+        switchToServerAndRemove(event.channelName);
+    }
+
+    @Subscribe
+    public void onNewPrivateMessage(final PrivateMessageEvent event) {
+        createPMFragment(event.nick);
+    }
+
+    @Subscribe
+    public void onSwitchToServer(final SwitchToServerEvent event) {
+        switchToServerFragment();
+    }
+
+    @Subscribe
+    public void onServerConnected(final ConnectedEvent event) {
+        connectedToServer();
+    }
+
+    @Subscribe
+    public void onNickInUse(final NickInUseEvent event) {
+        switchToServerFragment();
     }
 }

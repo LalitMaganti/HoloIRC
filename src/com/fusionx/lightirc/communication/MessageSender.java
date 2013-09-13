@@ -47,9 +47,8 @@ import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.irc.event.UserEvent;
-import com.fusionx.lightirc.ui.IRCActivity;
+import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
 import com.squareup.otto.Bus;
-import com.squareup.otto.ThreadEnforcer;
 
 import java.util.HashMap;
 
@@ -98,7 +97,7 @@ public class MessageSender {
 
     public Bus getBus() {
         if (mBus == null) {
-            mBus = new IRCBus(ThreadEnforcer.ANY);
+            mBus = new IRCBus();
         }
         return mBus;
     }
@@ -274,11 +273,11 @@ public class MessageSender {
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setAutoCancel(true)
                     .setTicker(mContext.getString(R.string.service_you_mentioned) + " " + messageDestination);
-            final Intent mIntent = new Intent(mContext, IRCActivity.class);
+            final Intent mIntent = new Intent(mContext, IRCPhoneActivity.class);
             mIntent.putExtra("serverTitle", mServerName);
             mIntent.putExtra("mention", messageDestination);
             final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
-            taskStackBuilder.addParentStack(IRCActivity.class);
+            taskStackBuilder.addParentStack(IRCPhoneActivity.class);
             taskStackBuilder.addNextIntent(mIntent);
             final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
                     PendingIntent.FLAG_UPDATE_CURRENT);

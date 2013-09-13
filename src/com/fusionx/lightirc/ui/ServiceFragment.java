@@ -16,10 +16,11 @@ import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.squareup.otto.Bus;
 
 class ServiceFragment extends Fragment {
     private IRCService mService;
-    private ServiceFragmentCallback mCallback;
+    private ServiceFragmentCallback mCallbacks;
     private MessageSender mSender;
 
     /**
@@ -32,7 +33,7 @@ class ServiceFragment extends Fragment {
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
-        mSender = MessageSender.getSender(mCallback.getServerTitle());
+        mSender = MessageSender.getSender(mCallbacks.getServerTitle());
 
         if (mService == null) {
             setUpService();
@@ -50,15 +51,17 @@ class ServiceFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            mCallback = (ServiceFragmentCallback) activity;
+            mCallbacks = (ServiceFragmentCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
                     "ServiceFragmentCallback");
         }
         if (mSender == null) {
-            mSender = MessageSender.getSender(mCallback.getServerTitle());
+            mSender = MessageSender.getSender(mCallbacks.getServerTitle());
         }
-        mSender.getBus().register(getActivity());
+        if(mService != null) {
+            mCallbacks.registerForBus(mSender.getBus());
+        }
     }
 
     @Override
@@ -66,7 +69,7 @@ class ServiceFragment extends Fragment {
         super.onResume();
 
         if (mService != null) {
-            mService.setServerDisplayed(mCallback.getServerTitle());
+            mService.setServerDisplayed(mCallbacks.getServerTitle());
         }
     }
 
@@ -87,8 +90,8 @@ class ServiceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        mSender.getBus().unregister(getActivity());
-        mCallback = null;
+        mCallbacks.unregisterFromBus(mSender.getBus());
+        mCallbacks = null;
     }
 
     @Override
@@ -111,9 +114,9 @@ class ServiceFragment extends Fragment {
     void setUpService() {
         final Intent service = new Intent(getActivity(), IRCService.class);
         service.putExtra("server", true);
-        service.putExtra("serverName", mCallback.getServerTitle());
+        service.putExtra("serverName", mCallbacks.getServerTitle());
         service.putExtra("stop", false);
-        service.putExtra("setBound", mCallback.getServerTitle());
+        service.putExtra("setBound", mCallbacks.getServerTitle());
 
         getActivity().getApplicationContext().startService(service);
         getActivity().getApplicationContext().bindService(service, mConnection, 0);
@@ -124,23 +127,25 @@ class ServiceFragment extends Fragment {
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
 
-            mService.setServerDisplayed(mCallback.getServerTitle());
+            mService.setServerDisplayed(mCallbacks.getServerTitle());
 
-            if (getServer(true, mCallback.getServerTitle()) != null) {
-                mCallback.setUpViewPager();
-                mCallback.repopulateFragmentsInPager();
+            if (getServer(true, mCallbacks.getServerTitle()) != null) {
+                mCallbacks.setUpViewPager();
+                mCallbacks.registerForBus(mSender.getBus());
+                mCallbacks.repopulateFragmentsInPager();
             } else {
                 final ServerConfiguration.Builder builder =
                         getActivity().getIntent().getParcelableExtra("server");
                 mService.connectToServer(builder);
-                mCallback.setUpViewPager();
+                mCallbacks.setUpViewPager();
+                mCallbacks.registerForBus(mSender.getBus());
             }
         }
 
         // Should never occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            mCallback.onDisconnect(false, false);
+            mCallbacks.onDisconnect(false, false);
             throw new IllegalArgumentException();
         }
     };
@@ -183,5 +188,9 @@ class ServiceFragment extends Fragment {
         public void repopulateFragmentsInPager();
 
         public void onDisconnect(final boolean expected, final boolean retryPending);
+
+        public void registerForBus(final Bus bus);
+
+        public void unregisterFromBus(final Bus bus);
     }
 }

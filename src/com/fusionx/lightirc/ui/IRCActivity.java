@@ -24,18 +24,14 @@ package com.fusionx.lightirc.ui;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
@@ -51,23 +47,20 @@ import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
-import com.fusionx.lightirc.irc.event.JoinEvent;
-import com.fusionx.lightirc.irc.event.KickEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
-import com.fusionx.lightirc.irc.event.NickInUseEvent;
-import com.fusionx.lightirc.irc.event.PartEvent;
-import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
-import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
-import com.fusionx.lightirc.ui.helpers.MentionHelper;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.Iterator;
 import java.util.List;
+
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * Activity which contains all the communication code between the fragments
@@ -75,25 +68,23 @@ import java.util.List;
  *
  * @author Lalit Maganti
  */
-public class IRCActivity extends ActionBarActivity implements UserListFragment.UserListCallback,
-        ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
-                .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
+public abstract class IRCActivity extends ActionBarActivity implements UserListFragment
+        .UserListCallback, ServiceFragment.ServiceFragmentCallback,
+        ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
+
     // The Fragments
-    private ServiceFragment mServiceFragment = null;
-    private UserListFragment mUserListFragment = null;
-    private IRCPagerFragment mIRCPagerFragment = null;
-    private ActionsPagerFragment mActionsPagerFragment = null;
-    private DrawerToggle mDrawerToggle;
+    protected ServiceFragment mServiceFragment = null;
+    protected UserListFragment mUserListFragment = null;
+    protected IRCPagerFragment mIRCPagerFragment = null;
+    protected ActionsPagerFragment mActionsPagerFragment = null;
+    protected DrawerToggle mDrawerToggle;
 
     // Sliding menus
-    private SlidingMenu mUserSlidingMenu = null;
-    private ActionsSlidingMenu mActionsSlidingMenu = null;
+    protected SlidingMenu mUserSlidingMenu = null;
+    protected ActionsSlidingMenu mActionsSlidingMenu = null;
 
     // Title
-    private String mServerTitle = null;
-
-    // Mention helper
-    private MentionHelper mMentionHelper;
+    protected String mServerTitle = null;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -130,97 +121,18 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mServerTitle);
-
-        mMentionHelper = new MentionHelper(this);
     }
 
-    private void setUpSlidingMenu() {
-        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
-        if (!tabletSize) {
-            mUserSlidingMenu = (SlidingMenu) findViewById(R.id.slidingmenulayout);
-            mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
-            mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
-            mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
-            mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
-            mUserSlidingMenu.setTouchmodeMarginThreshold(10);
-            mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
-            mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
-        }
+    @Override
+    protected void onDestroy() {
+        Crouton.clearCroutonsForActivity(this);
 
-        mUserListFragment = (UserListFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.userlist_fragment);
-
-        if (tabletSize) {
-            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.hide(mUserListFragment);
-            ft.commit();
-        } else {
-            mUserSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
-                @Override
-                public void onOpen() {
-                    mUserListFragment.onMenuOpened(getServer(false).getUserChannelInterface()
-                            .getChannel(mIRCPagerFragment.getCurrentTitle()));
-                    onUserListDisplayed();
-
-                }
-            });
-            mUserSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
-                @Override
-                public void onClose() {
-                    getSupportActionBar().setSubtitle(getServer(false).getStatus());
-                    mUserListFragment.onClose();
-                }
-            });
-        }
-
-        mActionsSlidingMenu = new ActionsSlidingMenu(this);
-        mActionsPagerFragment = (ActionsPagerFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.actions_fragment);
-        mDrawerToggle = new DrawerToggle(this, mActionsSlidingMenu, R.drawable.ic_drawer,
-                R.string.about, R.string.add);
-        mActionsSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
-            @Override
-            public void onOpen() {
-                mDrawerToggle.onDrawerOpened(mActionsSlidingMenu);
-                mActionsPagerFragment.getActionFragmentListener().onOpen();
-            }
-        });
-        mActionsSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
-            @Override
-            public void onClose() {
-                mDrawerToggle.onDrawerClosed(mActionsSlidingMenu);
-                mActionsPagerFragment.getIgnoreFragmentListener().onClose();
-            }
-        });
-        mActionsSlidingMenu.setOnScrolledListener(new SlidingMenu.OnScrolledListener() {
-            @Override
-            public void onScrolled(float offset) {
-                mDrawerToggle.onDrawerSlide(mActionsSlidingMenu, offset);
-            }
-        });
-
-        if (UIUtils.hasHoneycomb()) {
-            mActionsSlidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        } else {
-            // get the window background
-            final TypedArray a = getTheme().obtainStyledAttributes(new int[]{android.R.attr
-                    .windowBackground});
-            final int background = a.getResourceId(0, 0);
-            a.recycle();
-            // take the above view out of
-            final ViewGroup contentParent = (ViewGroup) ((ViewGroup) findViewById(android.R.id
-                    .content)).getChildAt(0);
-            View content = contentParent.getChildAt(1);
-            contentParent.removeView(content);
-            contentParent.addView(mActionsSlidingMenu);
-            mActionsSlidingMenu.setContent(content);
-            if (content.getBackground() == null) {
-                content.setBackgroundResource(background);
-            }
-        }
+        super.onDestroy();
     }
 
-    private void onUserListDisplayed() {
+    protected abstract void setUpSlidingMenu();
+
+    protected void onUserListDisplayed() {
         final Channel channel = getServer(false).getUserChannelInterface()
                 .getChannel(mIRCPagerFragment.getCurrentTitle());
         getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " users");
@@ -260,8 +172,8 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.getItem(0).setVisible(FragmentTypeEnum.Channel.equals(mIRCPagerFragment
-                .getCurrentType()) && mUserSlidingMenu != null);
+        menu.findItem(R.id.activity_server_channel_ab_users).setVisible(FragmentTypeEnum.Channel
+                .equals(mIRCPagerFragment.getCurrentType()) && mUserSlidingMenu != null);
         return true;
     }
 
@@ -300,12 +212,12 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     public void repopulateFragmentsInPager() {
         if (isConnectedToServer()) {
             for (final Channel channel : getServer(false).getUser().getChannels()) {
-                createChannelFragment(channel.getName());
+                mIRCPagerFragment.createChannelFragment(channel.getName(), false);
             }
             final Iterator<PrivateMessageUser> iterator = getServer(false).getUser()
                     .getPrivateMessageIterator();
             while (iterator.hasNext()) {
-                createPMFragment(iterator.next().getNick());
+                mIRCPagerFragment.createPMFragment(iterator.next().getNick());
             }
         }
     }
@@ -341,16 +253,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     }
 
     /**
-     * Method called when a new UserFragment is to be created
-     *
-     * @param userNick - the nick of the user the PM is to
-     */
-    @Override
-    public void createPMFragment(final String userNick) {
-        mIRCPagerFragment.createPMFragment(userNick);
-    }
-
-    /**
      * Close all SlidingMenus (if open)
      */
     @Override
@@ -370,15 +272,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
     public boolean isConnectedToServer() {
         final Server server = getServer(true);
         return server != null && server.isConnected(this);
-    }
-
-    /**
-     * Create a ChannelFragment with the specified name
-     *
-     * @param channelName - name of the channel to create
-     */
-    private void createChannelFragment(final String channelName) {
-        mIRCPagerFragment.createChannelFragment(channelName, false);
     }
 
     /**
@@ -452,81 +345,6 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
         }
     }
 
-    /*
-     * Events start here
-     */
-    @Subscribe
-    public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
-        onDisconnect(false, true);
-    }
-
-    @Subscribe
-    public void onFinalDisconnect(final FinalDisconnectEvent event) {
-        onDisconnect(event.disconnectExpected, false);
-    }
-
-    @Subscribe
-    public void onChannelJoin(final JoinEvent event) {
-        mIRCPagerFragment.createChannelFragment(event.channelToJoin, true);
-    }
-
-    @Subscribe
-    public void onChannelPart(final PartEvent event) {
-        mIRCPagerFragment.switchFragmentAndRemove(event.channelName);
-        mUserListFragment.onChannelClosed();
-    }
-
-    @Subscribe
-    public void onKicked(final KickEvent event) {
-        mIRCPagerFragment.switchToServerAndRemove(event.channelName);
-        mUserListFragment.onChannelClosed();
-    }
-
-    @Subscribe
-    public void onNewPrivateMessage(final PrivateMessageEvent event) {
-        createPMFragment(event.nick);
-    }
-
-    @Subscribe
-    public void onSwitchToServer(final SwitchToServerEvent event) {
-        mIRCPagerFragment.switchToServerFragment();
-    }
-
-    /**
-     * Method called when the server reports that it has been connected to
-     */
-    @Subscribe
-    public void onServerConnected(final ConnectedEvent event) {
-        mIRCPagerFragment.connectedToServer();
-        mActionsPagerFragment.updateConnectionStatus(true);
-        getSupportActionBar().setSubtitle(getServer(false).getStatus());
-    }
-
-    @Subscribe
-    public void onNickInUse(final NickInUseEvent event) {
-        mIRCPagerFragment.switchToServerFragment();
-    }
-
-    @Subscribe
-    public void onChannelMessage(final ChannelEvent event) {
-        if (event.userListChanged) {
-            onUserListChanged(event.channelName);
-        }
-    }
-
-    /**
-     * Method called when the user nick is mentioned by another user
-     *
-     * @param event - the event which contains the destination
-     */
-    @Subscribe
-    public void onMention(final MentionEvent event) {
-        mMentionHelper.onMention(event);
-    }
-    /*
-     * Events end here
-     */
-
     /**
      * Listener used when the view pages changes pages
      */
@@ -545,6 +363,57 @@ public class IRCActivity extends ActionBarActivity implements UserListFragment.U
                     .TOUCHMODE_NONE : SlidingMenu.TOUCHMODE_MARGIN);
 
             mIRCPagerFragment.setCurrentItemIndex(position);
+        }
+    };
+
+    @Override
+    public void registerForBus(Bus bus) {
+        bus.register(mIRCPagerFragment);
+        bus.register(mUserListFragment);
+        bus.register(mEventReceiver);
+    }
+
+    @Override
+    public void unregisterFromBus(Bus bus) {
+        bus.unregister(mIRCPagerFragment);
+        bus.unregister(mUserListFragment);
+        bus.unregister(mEventReceiver);
+    }
+
+    protected final Object mEventReceiver = new Object() {
+        @Subscribe
+        public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
+            onDisconnect(false, true);
+        }
+
+        @Subscribe
+        public void onFinalDisconnect(final FinalDisconnectEvent event) {
+            onDisconnect(event.disconnectExpected, false);
+        }
+
+        @Subscribe
+        public void onServerConnected(final ConnectedEvent event) {
+            mActionsPagerFragment.updateConnectionStatus(true);
+            getSupportActionBar().setSubtitle(getServer(false).getStatus());
+        }
+
+        @Subscribe
+        public void onChannelMessage(final ChannelEvent event) {
+            if (event.userListChanged) {
+                onUserListChanged(event.channelName);
+            }
+        }
+
+        @Subscribe
+        public void onMention(final MentionEvent event) {
+            final String message = String.format(getString(R.string.activity_mentioned),
+                    event.destination);
+            de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new de
+                    .keyboardsurfer.android.widget.crouton.Configuration.Builder();
+            builder.setDuration(2000);
+            Crouton crouton = Crouton.makeText(IRCActivity.this, message,
+                    Style.INFO).setConfiguration(builder.build());
+            crouton.show();
         }
     };
 }

@@ -28,6 +28,7 @@
     <orderEntry type="module" module-name="appcompat" />
     <orderEntry type="library" name="android-support-v7-appcompat" level="project" />
     <orderEntry type="module" module-name="numberpicker" />
+    <orderEntry type="module" module-name="Crouton" />
   </component>
 </module>
 
