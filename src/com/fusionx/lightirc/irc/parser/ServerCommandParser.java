@@ -337,7 +337,8 @@ class ServerCommandParser {
             String message = String.format(mContext.getString(R.string.parser_parted_channel),
                     user.getPrettyNick(channel));
             // If you have 4 strings in the array, the last must be the reason for parting
-            message += (parsedArray.size() == 4) ? " " + String.format(mContext.getString(R.string.parser_reason),
+            message += (parsedArray.size() == 4) ? " " + String.format(mContext.getString(R
+                    .string.parser_reason),
                     parsedArray.get(3).replace("\"", "")) : "";
 
             if (user.getChannelPrivileges(channel) == UserLevelEnum.OP) {

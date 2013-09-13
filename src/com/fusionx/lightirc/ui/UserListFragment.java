@@ -130,7 +130,8 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
                             .setPositiveButton(getActivity().getString(R.string.ok),
                                     new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                        public void onClick(DialogInterface dialogInterface,
+                                                            int i) {
                                             dialogInterface.dismiss();
                                         }
                                     });

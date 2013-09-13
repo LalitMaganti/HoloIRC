@@ -272,7 +272,8 @@ public class MessageSender {
                             messageDestination)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setAutoCancel(true)
-                    .setTicker(mContext.getString(R.string.service_you_mentioned) + " " + messageDestination);
+                    .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
+                            messageDestination);
             final Intent mIntent = new Intent(mContext, IRCPhoneActivity.class);
             mIntent.putExtra("serverTitle", mServerName);
             mIntent.putExtra("mention", messageDestination);

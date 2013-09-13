@@ -93,7 +93,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      *                           instantiating views.
      * @param objects            The objects to represent in the ListView.
      */
-    public BaseCollectionAdapter(Context context, int textViewResourceId, SynchronizedCollection<T> objects) {
+    public BaseCollectionAdapter(Context context, int textViewResourceId,
+                                 SynchronizedCollection<T> objects) {
         init(context, textViewResourceId, 0, objects);
     }
 
@@ -106,7 +107,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      * @param textViewResourceId The id of the TextView within the layout resource to be populated
      * @param objects            The objects to represent in the ListView.
      */
-    public BaseCollectionAdapter(Context context, int resource, int textViewResourceId, SynchronizedCollection<T> objects) {
+    public BaseCollectionAdapter(Context context, int resource, int textViewResourceId,
+                                 SynchronizedCollection<T> objects) {
         init(context, resource, textViewResourceId, objects);
     }
 

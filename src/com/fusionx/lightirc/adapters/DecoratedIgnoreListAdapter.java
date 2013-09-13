@@ -80,7 +80,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         boolean alreadyStarted = false;
         if (!mHasParentAnimationAdapter) {
             if (getAbsListView() == null) {
-                throw new IllegalStateException("Call setListView() on this AnimationAdapter before setAdapter()!");
+                throw new IllegalStateException("Call setListView() on this AnimationAdapter " +
+                        "before setAdapter()!");
             }
 
             if (convertView != null) {
@@ -153,7 +154,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
 
         Animator[] childAnimators;
         if (mDecoratedBaseAdapter instanceof DecoratedIgnoreListAdapter) {
-            childAnimators = ((DecoratedIgnoreListAdapter) mDecoratedBaseAdapter).getAnimators(parent, view);
+            childAnimators = ((DecoratedIgnoreListAdapter) mDecoratedBaseAdapter).getAnimators
+                    (parent, view);
         } else {
             childAnimators = new Animator[0];
         }
@@ -177,7 +179,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
         set.start();
     }
 
-    private Animator[] concatAnimators(Animator[] childAnimators, Animator[] animators, Animator alphaAnimator) {
+    private Animator[] concatAnimators(Animator[] childAnimators, Animator[] animators,
+                                       Animator alphaAnimator) {
         Animator[] allAnimators = new Animator[childAnimators.length + animators.length + 1];
         int i;
 
@@ -197,16 +200,19 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     @SuppressLint("NewApi")
     private long calculateAnimationDelay(boolean isHeader) {
         long delay;
-        int numberOfItems = getAbsListView().getLastVisiblePosition() - getAbsListView().getFirstVisiblePosition();
+        int numberOfItems = getAbsListView().getLastVisiblePosition() - getAbsListView()
+                .getFirstVisiblePosition();
         if (numberOfItems + 1 < mLastAnimatedPosition) {
             delay = getAnimationDelayMillis();
 
             if (getAbsListView() instanceof GridView && Build.VERSION.SDK_INT >= 11) {
-                delay += getAnimationDelayMillis() * ((mLastAnimatedPosition + 1) % ((GridView) getAbsListView()).getNumColumns());
+                delay += getAnimationDelayMillis() * ((mLastAnimatedPosition + 1) % ((GridView)
+                        getAbsListView()).getNumColumns());
             }
         } else {
             long delaySinceStart = (mLastAnimatedPosition + 1) * getAnimationDelayMillis();
-            delay = mAnimationStartMillis + getInitialDelayMillis() + delaySinceStart - System.currentTimeMillis();
+            delay = mAnimationStartMillis + getInitialDelayMillis() + delaySinceStart - System
+                    .currentTimeMillis();
             delay -= isHeader && mLastAnimatedPosition > 0 ? getAnimationDelayMillis() : 0;
         }
         // System.out.println(isHeader + ": " + delay);
@@ -225,7 +231,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     }
 
     /**
-     * Get the delay in milliseconds before the first animation should start. Defaults to {@value #INITIALDELAYMILLIS}.
+     * Get the delay in milliseconds before the first animation should start. Defaults to {@value
+     * #INITIALDELAYMILLIS}.
      */
     long getInitialDelayMillis() {
         return INITIALDELAYMILLIS;
@@ -269,7 +276,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
     public void animateDismiss(Collection<Integer> positions) {
         final List<Integer> positionsCopy = new ArrayList<>(positions);
         if (getAbsListView() == null) {
-            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter before calling setAdapter()!");
+            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter " +
+                    "before calling setAdapter()!");
         }
 
         List<View> views = getVisibleViewsForPositions(positionsCopy);

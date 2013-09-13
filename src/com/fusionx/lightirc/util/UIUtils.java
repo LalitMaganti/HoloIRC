@@ -31,19 +31,19 @@ public class UIUtils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1;
     }
 
-    private static boolean isTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    private static boolean isTablet(final Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration
+                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
-    public static boolean isHoneycombTablet(Context context) {
+    public static boolean isHoneycombTablet(final Context context) {
         return hasHoneycomb() && isTablet(context);
     }
 
     public static Typeface getRobotoLight(final Context context) {
         if (mRobotoLightTypeface == null) {
-            mRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(), "Roboto-Light.ttf");
+            mRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(),
+                    "Roboto-Light.ttf");
         }
         return mRobotoLightTypeface;
     }
@@ -67,7 +67,8 @@ public class UIUtils {
     }
 
     public static int getThemeInt(final Context context) {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (context);
         final int theme = Integer.parseInt(preferences.getString(PreferenceConstants.Theme, "1"));
         return theme != 0 ? R.style.Light : R.style.Dark;
     }

@@ -24,7 +24,8 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
     }
 
     private AnimatedServerListAdapter(BaseAdapter baseAdapter, long animationDelayMillis,
-                                      long animationDurationMillis, SingleDismissCallback callback) {
+                                      long animationDurationMillis,
+                                      SingleDismissCallback callback) {
         super(baseAdapter);
         mAnimationDelayMillis = animationDelayMillis;
         mAnimationDurationMillis = animationDurationMillis;
@@ -53,7 +54,8 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
      */
     public void animateDismiss(final int position) {
         if (getAbsListView() == null) {
-            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter before calling setAdapter()!");
+            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter " +
+                    "before calling setAdapter()!");
         }
 
         View view = getAbsListView().getChildAt(position);

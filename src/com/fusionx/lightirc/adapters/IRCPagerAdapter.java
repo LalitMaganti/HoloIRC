@@ -243,7 +243,8 @@ public class IRCPagerAdapter extends PagerAdapter {
     @Override
     public CharSequence getPageTitle(@NonNull final int position) {
         final IRCFragment fragment = views.get(position);
-        return fragment.isAdded() ? fragment.getTitle() : fragment.getArguments().getString("title");
+        return fragment.isAdded() ? fragment.getTitle() : fragment.getArguments().getString
+                ("title");
     }
 
     public void removeFragment(final int index) {

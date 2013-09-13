@@ -90,7 +90,7 @@ public class MiscUtils {
             if (trimmedInput.charAt(pos) == ':' && careAboutColon) {
                 stringParts.add(trimmedInput.substring(pos + 1));
                 return stringParts;
-            } 
+            }
         }
         //No more spaces, add last part of line
         stringParts.add(trimmedInput.substring(pos));

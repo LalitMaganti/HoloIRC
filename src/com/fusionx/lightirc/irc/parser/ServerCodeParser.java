@@ -144,7 +144,7 @@ class ServerCodeParser {
         } else if (whoisCodes.contains(code)) {
             return mSender.sendSwitchToServerEvent(mServer, MiscUtils.convertArrayListToString
                     (parsedArray));
-        } else if(doNothingCodes.contains(code)) {
+        } else if (doNothingCodes.contains(code)) {
             return new Event(message);
         } else if (DEBUG) {
             // Not sure what to do here - TODO

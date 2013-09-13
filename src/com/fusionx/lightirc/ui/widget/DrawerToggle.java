@@ -1,4 +1,3 @@
-
 package com.fusionx.lightirc.ui.widget;
 
 import android.app.Activity;
@@ -34,7 +33,8 @@ import java.lang.reflect.Method;
  * to the following methods corresponding to your Activity callbacks:</p>
  * <p/>
  * <ul>
- * <li>{@link Activity#onConfigurationChanged(android.content.res.Configuration) onConfigurationChanged}</li>
+ * <li>{@link Activity#onConfigurationChanged(android.content.res.Configuration)
+ * onConfigurationChanged}</li>
  * <li>{@link Activity#onOptionsItemSelected(android.view.MenuItem) onOptionsItemSelected}</li>
  * </ul>
  * <p/>
@@ -301,7 +301,8 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     /**
      * This method should always be called by your <code>Activity</code>'s
-     * {@link Activity#onConfigurationChanged(android.content.res.Configuration) onConfigurationChanged}
+     * {@link Activity#onConfigurationChanged(android.content.res.Configuration)
+     * onConfigurationChanged}
      * method.
      *
      * @param newConfig The new configuration

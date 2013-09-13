@@ -15,7 +15,8 @@ public class NickPreference extends AbstractNickPreference {
     @Override
     protected void retrieveNick() {
         final SharedPreferences sharedPreferences = getSharedPreferences();
-        mFirstChoice.setText(sharedPreferences.getString(PreferenceConstants.FirstNick, "HoloIRCUser"));
+        mFirstChoice.setText(sharedPreferences.getString(PreferenceConstants.FirstNick,
+                "HoloIRCUser"));
         mSecondChoice.setText(sharedPreferences.getString(PreferenceConstants.SecondNick, ""));
         mThirdChoice.setText(sharedPreferences.getString(PreferenceConstants.ThirdNick, ""));
     }

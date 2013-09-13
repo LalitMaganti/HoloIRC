@@ -7,11 +7,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * This class is just a thin layer around its parent class, adding an element updating and re-sorting
+ * This class is just a thin layer around its parent class, adding an element updating and
+ * re-sorting
  * feature which works as follows:
  * <p/>
  * As you might know you should never add or remove elements of Java collections while
- * iterating over them in a loop. There is one exception: If you use an {@link java.util.Iterator Iterator}
+ * iterating over them in a loop. There is one exception: If you use an {@link java.util.Iterator
+ * Iterator}
  * you may safely use its {@link java.util.Iterator#remove() remove} method. Many people
  * do not know that or are even unaware of that method's existence because they iterate
  * using {@code for} loops.
@@ -52,9 +54,12 @@ import java.util.TreeSet;
  *
  * mySortedSet.updateMarked();
  * </pre>
- * Special thanks go to user <a href="http://stackoverflow.com/users/15472/tucuxi">tucuxi at stackoverflow.com</a>
- * because his <a href="http://stackoverflow.com/a/2581450/1082681">answer</a> in one of the discussion threads
- * inspired me to implement this class based on his idea. My version is just a bit more sophisticated because
+ * Special thanks go to user <a href="http://stackoverflow.com/users/15472/tucuxi">tucuxi at
+ * stackoverflow.com</a>
+ * because his <a href="http://stackoverflow.com/a/2581450/1082681">answer</a> in one of the
+ * discussion threads
+ * inspired me to implement this class based on his idea. My version is just a bit more
+ * sophisticated because
  * it supports deferred updates and is thus useful within {@code for} loops.
  * <p/>
  *
@@ -78,7 +83,8 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
 
         /**
          * Update method for elements which need one or more new values. If more than one value is
-         * necessary, {@code newValue} could e.g. be a Map or a List. If you do not need this method,
+         * necessary, {@code newValue} could e.g. be a Map or a List. If you do not need this
+         * method,
          * just specify a version dropping the value and calling {@link #update()} instead.
          */
         void update(Object newValue);

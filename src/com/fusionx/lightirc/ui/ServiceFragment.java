@@ -59,7 +59,7 @@ class ServiceFragment extends Fragment {
         if (mSender == null) {
             mSender = MessageSender.getSender(mCallbacks.getServerTitle());
         }
-        if(mService != null) {
+        if (mService != null) {
             mCallbacks.registerForBus(mSender.getBus());
         }
     }

@@ -49,7 +49,8 @@ public class ColourParserUtils {
             if (highlightLine) {
                 builder.setSpan(characterStyle, 0, length + len, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             } else {
-                builder.setSpan(characterStyle, len, length + len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.setSpan(characterStyle, len, length + len,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             remainingText = textAfterTag.substring(indexOfLastOpen + 3 + tag.length());
         }

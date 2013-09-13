@@ -127,7 +127,7 @@ public class ServerConnectionParser {
             default:
                 if (saslCodes.contains(code)) {
                     CapParser.parseCode(code, parsedArray, sender, server);
-                } else if(DEBUG) {
+                } else if (DEBUG) {
                     Log.v(LOG_TAG, rawLine);
                 }
                 break;
@@ -149,7 +149,7 @@ public class ServerConnectionParser {
                 CapParser.parseCommand(parsedArray, configuration, server, sender);
                 break;
             default:
-                if(DEBUG) {
+                if (DEBUG) {
                     Log.v(LOG_TAG, rawLine);
                 }
                 break;

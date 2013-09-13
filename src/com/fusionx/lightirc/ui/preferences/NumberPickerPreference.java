@@ -15,7 +15,8 @@ import com.fusionx.lightirc.R;
 import net.simonvt.numberpicker.NumberPicker;
 
 /**
- * A {@link DialogPreference} that provides a user with the means to select an integer from a {@link NumberPicker}, and persist it.
+ * A {@link DialogPreference} that provides a user with the means to select an integer from a
+ * {@link NumberPicker}, and persist it.
  *
  * @author lukehorvat
  */
