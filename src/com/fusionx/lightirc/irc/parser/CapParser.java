@@ -21,10 +21,13 @@ class CapParser {
             final ArrayList<String> capabilities = MiscUtils.splitRawLine(parsedArray.get(1),
                     true);
             if (capabilities.contains("sasl")) {
-                if (command.equals("LS")) {
-                    writer.requestSasl();
-                } else if (command.equals("ACK")) {
-                    writer.sendPlainSaslAuthentication();
+                switch (command) {
+                    case "LS":
+                        writer.requestSasl();
+                        break;
+                    case "ACK":
+                        writer.sendPlainSaslAuthentication();
+                        break;
                 }
             } else {
                 sender.sendGenericServerEvent(server, "SASL not supported by server");
@@ -52,9 +55,6 @@ class CapParser {
                 final String error = parsedArray.get(3);
                 sender.sendGenericServerEvent(server, error);
                 writer.sendEndCap();
-                return;
-            default:
-                return;
         }
     }
 }

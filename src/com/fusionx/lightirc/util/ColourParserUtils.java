@@ -9,9 +9,9 @@ import android.text.style.StyleSpan;
 
 import com.google.common.base.CharMatcher;
 
-public class ColourParserUtils {
-    public static boolean highlightLine = true;
+import static com.fusionx.lightirc.misc.AppPreferences.highlightLine;
 
+public class ColourParserUtils {
     public static Spanned parseHtml(final String input) {
         SpannableStringBuilder builder = new SpannableStringBuilder();
         String remainingText = CharMatcher.JAVA_ISO_CONTROL.removeFrom(input);

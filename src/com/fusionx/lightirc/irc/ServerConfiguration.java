@@ -33,7 +33,9 @@ public class ServerConfiguration {
     private final String title;
     private final String url;
     private final int port;
+
     private final boolean ssl;
+    private final boolean sslAcceptAllCertificates;
 
     private final NickStorage nickStorage;
     private final String realName;
@@ -53,7 +55,9 @@ public class ServerConfiguration {
         title = builder.getTitle();
         url = builder.getUrl();
         port = builder.getPort();
+
         ssl = builder.isSsl();
+        sslAcceptAllCertificates = builder.isSslAcceptAllCertificates();
 
         nickStorage = builder.getNickStorage();
         realName = builder.getRealName();
@@ -72,12 +76,15 @@ public class ServerConfiguration {
 
     @Data
     public static class Builder implements Parcelable {
+        // For app use only
         private String file;
 
         private String title;
         private String url;
         private int port;
+
         private boolean ssl;
+        private boolean sslAcceptAllCertificates;
 
         private NickStorage nickStorage;
         private String realName;
@@ -103,7 +110,9 @@ public class ServerConfiguration {
             out.writeString(title);
             out.writeString(url);
             out.writeInt(port);
+
             out.writeInt(ssl ? 1 : 0);
+            out.writeInt(sslAcceptAllCertificates ? 1 : 0);
 
             out.writeParcelable(nickStorage, 0);
             out.writeString(realName);
@@ -140,7 +149,9 @@ public class ServerConfiguration {
             title = in.readString();
             url = in.readString();
             port = in.readInt();
+
             ssl = in.readInt() == 1;
+            sslAcceptAllCertificates = in.readInt() == 1;
 
             nickStorage = in.readParcelable(NickStorage.class.getClassLoader());
             realName = in.readString();

@@ -32,6 +32,7 @@ import com.fusionx.lightirc.irc.parser.ServerConnectionParser;
 import com.fusionx.lightirc.irc.parser.ServerLineParser;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.SSLUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -116,8 +117,8 @@ class ServerConnection {
     private void connect() {
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         try {
-            final SSLSocketFactory sslSocketFactory = (SSLSocketFactory)
-                    SSLSocketFactory.getDefault();
+            final SSLSocketFactory sslSocketFactory = SSLUtils.getCorrectSSLSocketFactory
+                    (serverConfiguration.isSslAcceptAllCertificates());
 
             InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
                     serverConfiguration.getPort());
@@ -143,7 +144,8 @@ class ServerConnection {
                 server.getWriter().sendServerPassword(serverConfiguration.getServerPassword());
             }
 
-            server.getWriter().changeNick(serverConfiguration.getNickStorage().getFirstChoiceNick());
+            server.getWriter().changeNick(serverConfiguration.getNickStorage().getFirstChoiceNick
+                    ());
             server.getWriter().sendUser(serverConfiguration.getServerUserName(), "8", "*",
                     StringUtils.isNotEmpty(serverConfiguration.getRealName()) ?
                             serverConfiguration.getRealName() : "HoloIRC");

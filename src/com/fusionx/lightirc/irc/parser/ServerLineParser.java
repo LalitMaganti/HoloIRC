@@ -75,26 +75,26 @@ public class ServerLineParser {
     /**
      * Parses a line from the server
      *
-     * @param line - the raw line from the server
+     * @param rawLine - the raw line from the server
      * @return - returns a boolean which indicates whether the server has disconnected
      */
-    Event parseLine(final String line) {
-        final ArrayList<String> parsedArray = MiscUtils.splitRawLine(line, true);
+    Event parseLine(final String rawLine) {
+        final ArrayList<String> parsedArray = MiscUtils.splitRawLine(rawLine, true);
         switch (parsedArray.get(0)) {
             case ServerCommands.Ping:
                 // Immediately return
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(server.getWriter(), source);
-                return new Event(line);
+                return new Event(rawLine);
             case ServerCommands.Error:
                 // We are finished - the server has kicked us out for some reason
-                return new ErrorEvent(line);
+                return new ErrorEvent(rawLine);
             default:
                 // Check if the second thing is a code or a command
                 if (StringUtils.isNumeric(parsedArray.get(1))) {
-                    return codeParser.parseCode(parsedArray);
+                    return codeParser.parseCode(parsedArray, rawLine);
                 } else {
-                    return commandParser.parseCommand(parsedArray, line, disconnectSent);
+                    return commandParser.parseCommand(parsedArray, rawLine, disconnectSent);
                 }
         }
     }

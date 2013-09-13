@@ -45,11 +45,21 @@
                 android:defaultValue="6667"
                 android:singleLine="true"
                 android:lines="1"/>
+    </PreferenceCategory>
+
+
+    <PreferenceCategory android:title="SSL">
         <CheckBoxPreference
-                android:key="pref_ssl"
+            android:key="pref_ssl"
+            android:defaultValue="false"
+            android:title="@string/server_settings_ssl_title"
+            android:summary="@string/server_settings_ssl_summary"/>
+        <CheckBoxPreference
+                android:key="pref_ssl_accept_all_connections"
                 android:defaultValue="false"
-                android:title="@string/server_settings_ssl_title"
-                android:summary="@string/server_settings_ssl_summary"/>
+                android:dependency="pref_ssl"
+                android:title="Accept all SSL certificates"
+                android:summary="Warning - this could be quite dangerous if used incorrectly"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="User">

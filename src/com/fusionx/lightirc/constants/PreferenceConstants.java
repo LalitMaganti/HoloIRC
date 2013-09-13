@@ -34,7 +34,9 @@ public class PreferenceConstants {
     public final static String Title = "pref_title";
     public final static String URL = "pref_url";
     public final static String Port = "pref_port";
+
     public final static String SSL = "pref_ssl";
+    public final static String SSLAcceptAll = "pref_ssl_accept_all_connections";
 
     public final static String FirstNick = "pref_nick";
     public final static String SecondNick = "pref_second_nick";

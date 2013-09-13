@@ -19,9 +19,9 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ISettings;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 
 import java.util.List;
@@ -40,7 +40,6 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
             // Server Channel Settings
             addPreferencesFromResource(R.xml.server_channel_settings_fragment);
             setupNumberPicker(getPreferenceScreen());
-
             // Default User Settings
             addPreferencesFromResource(R.xml.default_user_fragment);
             // About settings
@@ -54,7 +53,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
     protected void onStop() {
         super.onStop();
 
-        SharedPreferencesUtils.setUpPreferences(this);
+        AppPreferences.setUpPreferences(this);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

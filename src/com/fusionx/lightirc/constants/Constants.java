@@ -27,8 +27,7 @@ import com.google.common.collect.ImmutableList;
  * Class containing generic constants
  */
 public class Constants {
-    // Non final to prevent warnings
-    public static boolean DEBUG = false;
+    public final static boolean DEBUG = true;
 
     public final static String LOG_TAG = "HoloIRC";
 

@@ -44,10 +44,11 @@ import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFNAMES;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_ENDOFWHO;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_MOTD;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_MOTDSTART;
-import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_NAMEREPLY;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_NAMREPLY;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPIC;
-import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPICINFO;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_TOPICWHOTIME;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_WHOREPLY;
+import static com.fusionx.lightirc.constants.ServerReplyCodes.doNothingCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.genericCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
 import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
@@ -76,7 +77,7 @@ class ServerCodeParser {
      *
      * @param parsedArray - the array of the line (split by spaces)
      */
-    Event parseCode(final ArrayList<String> parsedArray) {
+    Event parseCode(final ArrayList<String> parsedArray, final String rawLine) {
         final int code = Integer.parseInt(parsedArray.get(1));
 
         // Pretty common across all the codes
@@ -84,7 +85,7 @@ class ServerCodeParser {
         final String message = parsedArray.get(0);
 
         switch (code) {
-            case RPL_NAMEREPLY:
+            case RPL_NAMREPLY:
                 return mNameParser.parseNameReply(parsedArray);
             case RPL_ENDOFNAMES:
                 return mNameParser.parseNameFinished();
@@ -104,29 +105,22 @@ class ServerCodeParser {
                 }
             case RPL_TOPIC:
                 return parseTopicReply(parsedArray);
-            case RPL_TOPICINFO:
+            case RPL_TOPICWHOTIME:
                 return parseTopicInfo(parsedArray);
             case RPL_WHOREPLY:
                 return mWhoParser.parseWhoReply(parsedArray);
             case RPL_ENDOFWHO:
                 return mWhoParser.parseWhoFinished();
             case ERR_NICKNAMEINUSE:
-                final MessageSender sender = MessageSender.getSender(mServer.getTitle());
-                return sender.sendNickInUseMessage(mServer);
+                return mSender.sendNickInUseMessage(mServer);
             default:
-                if (whoisCodes.contains(code)) {
-                    return mSender.sendSwitchToServerEvent(mServer, MiscUtils.convertArrayListToString
-                            (parsedArray));
-                } else {
-                    return parseFallThroughCode(code, message);
-                }
+                return parseFallThroughCode(code, message, rawLine, parsedArray);
         }
     }
 
     private Event parseTopicReply(ArrayList<String> parsedArray) {
-        final String channelName = parsedArray.get(0);
         final String topic = parsedArray.get(1);
-        final Channel channel = mUserChannelInterface.getChannel(channelName);
+        final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(0));
         channel.setTopic(topic);
         return new Event(topic);
     }
@@ -139,18 +133,22 @@ class ServerCodeParser {
         final String nick = IRCUtils.getNickFromRaw(parsedArray.get(1));
         final Channel channel = mUserChannelInterface.getChannel(channelName);
 
-        return mSender.sendGenericChannelEvent(channel,
-                String.format(mContext.getString(R
-                        .string.parser_new_topic), channel.getTopic(),
-                        nick), false);
+        return mSender.sendGenericChannelEvent(channel, String.format(mContext.getString(R.string
+                .parser_new_topic), channel.getTopic(), nick), false);
     }
 
-    private Event parseFallThroughCode(int code, String message) {
+    private Event parseFallThroughCode(final int code, final String message, final String rawLine,
+                                       final ArrayList<String> parsedArray) {
         if (genericCodes.contains(code)) {
             return mSender.sendGenericServerEvent(mServer, message);
+        } else if (whoisCodes.contains(code)) {
+            return mSender.sendSwitchToServerEvent(mServer, MiscUtils.convertArrayListToString
+                    (parsedArray));
+        } else if(doNothingCodes.contains(code)) {
+            return new Event(message);
         } else if (DEBUG) {
             // Not sure what to do here - TODO
-            Log.v(LOG_TAG, message);
+            Log.v(LOG_TAG, rawLine);
         }
         return new Event(message);
     }

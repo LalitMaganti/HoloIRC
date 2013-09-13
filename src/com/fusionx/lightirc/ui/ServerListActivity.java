@@ -48,6 +48,7 @@ import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.squareup.otto.Subscribe;
@@ -70,7 +71,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_list);
 
-        SharedPreferencesUtils.setUpPreferences(this);
+        AppPreferences.setUpPreferences(this);
         mServerCardsAdapter = new ServerListAdapter(this,
                 new SynchronizedArrayList<ServerConfiguration.Builder>());
     }

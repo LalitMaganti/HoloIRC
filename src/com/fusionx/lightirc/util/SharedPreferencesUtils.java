@@ -26,7 +26,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Build;
-import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -114,8 +113,13 @@ public class SharedPreferencesUtils {
         // Server connection
         builder.setTitle(serverSettings.getString(PreferenceConstants.Title, ""));
         builder.setUrl(serverSettings.getString(PreferenceConstants.URL, "").trim());
-        builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceConstants.Port, "6667")));
+        builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceConstants.Port,
+                "6667")));
+
+        // SSL
         builder.setSsl(serverSettings.getBoolean(PreferenceConstants.SSL, false));
+        builder.setSslAcceptAllCertificates(serverSettings.getBoolean(PreferenceConstants
+                .SSLAcceptAll, false));
 
         // User settings
         final String firstChoice = serverSettings.getString(PreferenceConstants.FirstNick,
@@ -126,7 +130,8 @@ public class SharedPreferencesUtils {
                 (firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
         builder.setRealName(serverSettings.getString(PreferenceConstants.RealName, "HoloIRC"));
-        builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.AutoNickChange, true));
+        builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.AutoNickChange,
+                true));
 
         // Autojoin channels
         final ArrayList<String> auto = new ArrayList<>(getStringSet(serverSettings,
@@ -136,15 +141,18 @@ public class SharedPreferencesUtils {
         }
 
         // Server authorisation
-        builder.setServerUserName(serverSettings.getString(PreferenceConstants.ServerUserName, "holoirc"));
-        builder.setServerPassword(serverSettings.getString(PreferenceConstants.ServerPassword, ""));
+        builder.setServerUserName(serverSettings.getString(PreferenceConstants.ServerUserName,
+                "holoirc"));
+        builder.setServerPassword(serverSettings.getString(PreferenceConstants.ServerPassword,
+                ""));
 
         // SASL authorisation
         builder.setSaslUsername(serverSettings.getString(PreferenceConstants.SaslUsername, ""));
         builder.setSaslPassword(serverSettings.getString(PreferenceConstants.SaslPassword, ""));
 
         // NickServ authorisation
-        builder.setNickservPassword(serverSettings.getString(PreferenceConstants.NickServPassword, ""));
+        builder.setNickservPassword(serverSettings.getString(PreferenceConstants
+                .NickServPassword, ""));
 
         builder.setFile(filename);
         return builder;
@@ -195,10 +203,5 @@ public class SharedPreferencesUtils {
                 return set;
             }
         }
-    }
-
-    public static void setUpPreferences(final Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        UIUtils.updateLineColourfulness(preferences);
     }
 }

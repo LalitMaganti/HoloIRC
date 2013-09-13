@@ -45,7 +45,6 @@ class WhoParser {
         }
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
         user.processWhoMode(parsedArray.get(5), whoChannel);
-        //user.setHostName(parsedArray.get(2));
         return new Event(user.getNick());
     }
 

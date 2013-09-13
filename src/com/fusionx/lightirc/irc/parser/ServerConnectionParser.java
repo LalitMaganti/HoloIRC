@@ -37,6 +37,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.fusionx.lightirc.constants.Constants.DEBUG;
 import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NICKNAMEINUSE;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.ERR_NONICKNAMEGIVEN;
@@ -94,7 +95,7 @@ public class ServerConnectionParser {
                                               final MessageSender sender,
                                               final Server server,
                                               final ServerConfiguration.NickStorage nickStorage,
-                                              final String line) {
+                                              final String rawLine) {
         final int code = Integer.parseInt(parsedArray.get(1));
         final ServerWriter writer = server.getWriter();
         switch (code) {
@@ -126,8 +127,8 @@ public class ServerConnectionParser {
             default:
                 if (saslCodes.contains(code)) {
                     CapParser.parseCode(code, parsedArray, sender, server);
-                } else {
-                    Log.v(LOG_TAG, line);
+                } else if(DEBUG) {
+                    Log.v(LOG_TAG, rawLine);
                 }
                 break;
         }
@@ -137,7 +138,7 @@ public class ServerConnectionParser {
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
                                                final ServerConfiguration configuration,
                                                final MessageSender sender, final Server server,
-                                               final String line) {
+                                               final String rawLine) {
         switch (parsedArray.get(1).toUpperCase()) {
             case ServerCommands.Notice:
                 MiscUtils.removeFirstElementFromList(parsedArray, 3);
@@ -148,7 +149,9 @@ public class ServerConnectionParser {
                 CapParser.parseCommand(parsedArray, configuration, server, sender);
                 break;
             default:
-                Log.v(LOG_TAG, line);
+                if(DEBUG) {
+                    Log.v(LOG_TAG, rawLine);
+                }
                 break;
         }
     }

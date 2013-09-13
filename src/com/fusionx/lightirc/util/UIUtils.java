@@ -80,8 +80,4 @@ public class UIUtils {
     public static boolean isThemeLight(final Context context) {
         return getThemeInt(context) == R.style.Light;
     }
-
-    public static void updateLineColourfulness(final SharedPreferences preferences) {
-        ColourParserUtils.highlightLine = preferences.getBoolean(PreferenceConstants.LineColourful, true);
-    }
 }
