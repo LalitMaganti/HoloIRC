@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.IRCActivity"
+                android:name=".ui.tablet.IRCTabletActivity"
                 android:parentActivityName=".ui.ServerListActivity">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"

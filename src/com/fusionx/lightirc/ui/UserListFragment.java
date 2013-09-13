@@ -96,14 +96,15 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
             final UserListTreeSet userList = channel.getUsers();
             if (userList != null) {
                 mChannel = channel;
-                getRealAdapter().setInternalSet(userList);
-                getRealAdapter().setChannel(channel);
-                getRealAdapter().notifyDataSetChanged();
+                final UserListAdapter adapter = getRealAdapter();
+                setListAdapter(null);
+                adapter.setInternalSet(userList);
+                adapter.setChannel(channel);
+                setListAdapter(adapter);
             } else {
                 getRealAdapter().clear();
             }
         }
-        getListView().smoothScrollToPosition(0);
     }
 
     @Override
