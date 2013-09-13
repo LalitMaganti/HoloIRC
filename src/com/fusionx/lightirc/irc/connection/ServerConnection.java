@@ -117,28 +117,9 @@ class ServerConnection {
     private void connect() {
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         try {
-            final SSLSocketFactory sslSocketFactory = SSLUtils.getCorrectSSLSocketFactory
-                    (serverConfiguration.isSslAcceptAllCertificates());
-
-            InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
-                    serverConfiguration.getPort());
-
-            mSocket = serverConfiguration.isSsl() ? sslSocketFactory.createSocket() : new Socket();
-            mSocket.setKeepAlive(true);
-            mSocket.connect(address, 5000);
-
-            final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
-            server.setWriter(new ServerWriter(writer));
-
-            server.setStatus(mContext.getString(R.string.status_connecting));
-            server.setupUserChannelInterface(writer);
-
-            // By sending this line, the server *should* wait until we end the CAP stuff with CAP
-            // END
-            if (StringUtils.isNotEmpty(serverConfiguration.getSaslPassword()) && StringUtils
-                    .isNotEmpty(serverConfiguration.getSaslUsername())) {
-                server.getWriter().getSupportedCapabilities();
-            }
+            setupSocket();
+            setupServer();
+            useSaslIfAvailable();
 
             if (StringUtils.isNotEmpty(serverConfiguration.getServerPassword())) {
                 server.getWriter().sendServerPassword(serverConfiguration.getServerPassword());
@@ -155,9 +136,7 @@ class ServerConnection {
             final String nick = ServerConnectionParser.parseConnect(server, serverConfiguration,
                     reader);
 
-            // We are connected
-            server.setStatus(mContext.getString(R.string.status_connected));
-            sender.sendConnected(server, serverConfiguration.getUrl());
+            onConnected(sender);
 
             // This nick may well be different from any of the nicks in storage - get the
             // *official* nick from the server itself and use it
@@ -188,8 +167,7 @@ class ServerConnection {
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
                 if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
-                    sender.sendRetryPendingDisconnection(server,
-                            "Disconnected from the server");
+                    sender.sendRetryPendingDisconnection(server, "Disconnected from the server");
                 }
             }
         } catch (final IOException ex) {
@@ -199,10 +177,68 @@ class ServerConnection {
                 sender.sendRetryPendingDisconnection(server, ex.getMessage());
             }
         }
+        onDisconnected();
+    }
+
+    /**
+     * If the SASL is given by the user then try and authenticate with it
+     */
+    private void useSaslIfAvailable() {
+        // By sending this line, the server *should* wait until we end the CAP stuff with CAP
+        // END
+        if (StringUtils.isNotEmpty(serverConfiguration.getSaslPassword()) && StringUtils
+                .isNotEmpty(serverConfiguration.getSaslUsername())) {
+            server.getWriter().getSupportedCapabilities();
+        }
+    }
+
+    /**
+     * Called to setup the socket
+     *
+     * @throws IOException
+     */
+    private void setupSocket() throws IOException {
+        final SSLSocketFactory sslSocketFactory = SSLUtils.getCorrectSSLSocketFactory
+                (serverConfiguration.isSslAcceptAllCertificates());
+
+        final InetSocketAddress address = new InetSocketAddress(serverConfiguration.getUrl(),
+                serverConfiguration.getPort());
+
+        mSocket = serverConfiguration.isSsl() ? sslSocketFactory.createSocket() : new Socket();
+        mSocket.setKeepAlive(true);
+        mSocket.connect(address, 5000);
+    }
+
+    /**
+     * Called to setup the server
+     *
+     * @throws IOException
+     */
+    private void setupServer() throws IOException {
+        final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());
+        server.setWriter(new ServerWriter(writer));
+
+        server.setStatus(mContext.getString(R.string.status_connecting));
+        server.setupUserChannelInterface(writer);
+    }
+
+    /**
+     * Called when we are disconnected
+     */
+    private void onDisconnected() {
         // We are disconnected :( - close up shop
         server.setStatus(mContext.getString(R.string.status_disconnected));
         server.cleanup();
         closeSocket();
+    }
+
+    /**
+     * Called when we are connected to the server
+     */
+    private void onConnected(final MessageSender sender) {
+        // We are connected
+        server.setStatus(mContext.getString(R.string.status_connected));
+        sender.sendConnected(server, serverConfiguration.getUrl());
     }
 
     /**
