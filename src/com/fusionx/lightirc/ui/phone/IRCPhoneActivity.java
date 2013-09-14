@@ -15,8 +15,13 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class IRCPhoneActivity extends IRCActivity {
     @Override
+    protected void setUpContent() {
+        setContentView(R.layout.activity_irc);
+    }
+
+    @Override
     protected void setUpSlidingMenu() {
-        mUserSlidingMenu = (SlidingMenu) findViewById(R.id.slidingmenulayout);
+        mUserSlidingMenu = (SlidingMenu) findViewById(R.id.user_sliding_menu);
         mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
         mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
         mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);

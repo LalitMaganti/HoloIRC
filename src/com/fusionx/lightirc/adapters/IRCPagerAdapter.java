@@ -57,9 +57,6 @@ public class IRCPagerAdapter extends PagerAdapter {
     @Setter
     private PagerSlidingTabStrip tabStrip;
 
-    @Setter
-    private int currentItemIndex;
-
     public IRCPagerAdapter(final FragmentManager fm) {
         mFragmentManager = fm;
     }

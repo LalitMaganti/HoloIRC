@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.irc.Server;
@@ -68,6 +69,15 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
+
+        MessageSender.getSender(mCallback.getServerTitle()).getBus().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        MessageSender.getSender(mCallback.getServerTitle()).getBus().unregister(this);
     }
 
     /**
@@ -79,20 +89,29 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return inflater.inflate(R.layout.view_pager, container);
     }
 
-    /**
-     * Creates the ServerFragment object
-     */
-    public void createServerFragment(final String serverTitle) {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         if (mAdapter == null) {
             mAdapter = new IRCPagerAdapter(getChildFragmentManager());
-            mAdapter.addServerFragment(serverTitle);
         }
+
         final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
                 {android.R.attr.windowBackground});
         final int background = a.getResourceId(0, 0);
         mViewPager = (ViewPager) getView().findViewById(R.id.pager);
         mViewPager.setBackgroundResource(background);
         mViewPager.setAdapter(mAdapter);
+    }
+
+    /**
+     * Creates the ServerFragment object
+     */
+    public void createServerFragment(final String serverTitle) {
+        if(mAdapter.getCount() == 0) {
+            mAdapter.addServerFragment(serverTitle);
+        }
     }
 
     /**
@@ -198,10 +217,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return getCurrentItem().getType();
     }
 
-    public void setCurrentItemIndex(final int position) {
-        mAdapter.setCurrentItemIndex(position);
-    }
-
     public void setTabStrip(PagerSlidingTabStrip tabs) {
         tabs.setViewPager(mViewPager);
         mAdapter.setTabStrip(tabs);
@@ -221,6 +236,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         public Server getServer(boolean nullAllowed);
 
         public boolean isConnectedToServer();
+
+        public String getServerTitle();
     }
 
     /*

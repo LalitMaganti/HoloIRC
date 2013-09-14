@@ -89,15 +89,15 @@ public class MessageSender {
         }
     }
 
-    public static void removeSender(final String serverName) {
+    void removeSender() {
         synchronized (mSenderMap) {
-            mSenderMap.remove(serverName);
+            mSenderMap.remove(mServerName);
         }
     }
 
     public Bus getBus() {
         if (mBus == null) {
-            mBus = new IRCBus();
+            mBus = new IRCBus(this);
         }
         return mBus;
     }

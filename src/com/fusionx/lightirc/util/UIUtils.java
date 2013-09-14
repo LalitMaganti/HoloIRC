@@ -40,6 +40,11 @@ public class UIUtils {
         return hasHoneycomb() && isTablet(context);
     }
 
+    public static boolean isLandscape(final Context context) {
+        return context.getResources().getConfiguration().orientation == Configuration
+                .ORIENTATION_LANDSCAPE;
+    }
+
     public static Typeface getRobotoLight(final Context context) {
         if (mRobotoLightTypeface == null) {
             mRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(),

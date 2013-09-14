@@ -42,7 +42,8 @@ import lombok.AccessLevel;
 import lombok.Setter;
 
 /**
- * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend code
+ * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend
+ * code
  *
  * @author Lalit Maganti
  */
@@ -69,7 +70,9 @@ public class IRCService extends Service {
         if (server != null) {
             final ServerConfiguration configuration = server.build();
 
-            MessageSender.getSender(server.getTitle()).initialSetup(this);
+            MessageSender sender = MessageSender.getSender(server.getTitle());
+            sender.initialSetup(this);
+            sender.getBus().register(this);
             final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
                     mAdapterHandler);
             connectionManager.put(server.getTitle(), thread);
@@ -89,7 +92,8 @@ public class IRCService extends Service {
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.app_name)).setContentText(text).setTicker(text)
+                .setContentTitle(getString(R.string.app_name)).setContentText(text).setTicker
+                        (text)
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
@@ -123,7 +127,7 @@ public class IRCService extends Service {
         synchronized (mBinder) {
             if (connectionManager.containsKey(serverName)) {
                 connectionManager.remove(serverName);
-                MessageSender.removeSender(serverName);
+                MessageSender.getSender(serverName).getBus().unregister(this);
                 if (connectionManager.isEmpty()) {
                     stopForeground(true);
                 } else {

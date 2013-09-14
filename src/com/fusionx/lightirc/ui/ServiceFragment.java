@@ -2,6 +2,7 @@ package com.fusionx.lightirc.ui;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
@@ -16,7 +17,6 @@ import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.squareup.otto.Bus;
 
 class ServiceFragment extends Fragment {
     private IRCService mService;
@@ -34,9 +34,18 @@ class ServiceFragment extends Fragment {
         setRetainInstance(true);
 
         mSender = MessageSender.getSender(mCallbacks.getServerTitle());
+    }
 
+    public void connectToServer(Context context, final String serverTitle) {
         if (mService == null) {
-            setUpService();
+            final Intent service = new Intent(context, IRCService.class);
+            service.putExtra("server", true);
+            service.putExtra("serverName", serverTitle);
+            service.putExtra("stop", false);
+            service.putExtra("setBound", serverTitle);
+
+            context.getApplicationContext().startService(service);
+            context.getApplicationContext().bindService(service, mConnection, 0);
         }
     }
 
@@ -58,9 +67,6 @@ class ServiceFragment extends Fragment {
         }
         if (mSender == null) {
             mSender = MessageSender.getSender(mCallbacks.getServerTitle());
-        }
-        if (mService != null) {
-            mCallbacks.registerForBus(mSender.getBus());
         }
     }
 
@@ -90,7 +96,6 @@ class ServiceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        mCallbacks.unregisterFromBus(mSender.getBus());
         mCallbacks = null;
     }
 
@@ -99,7 +104,6 @@ class ServiceFragment extends Fragment {
         super.onDestroy();
 
         getActivity().getApplicationContext().unbindService(mConnection);
-        mService = null;
     }
 
     /**
@@ -111,17 +115,6 @@ class ServiceFragment extends Fragment {
         return null;
     }
 
-    void setUpService() {
-        final Intent service = new Intent(getActivity(), IRCService.class);
-        service.putExtra("server", true);
-        service.putExtra("serverName", mCallbacks.getServerTitle());
-        service.putExtra("stop", false);
-        service.putExtra("setBound", mCallbacks.getServerTitle());
-
-        getActivity().getApplicationContext().startService(service);
-        getActivity().getApplicationContext().bindService(service, mConnection, 0);
-    }
-
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
@@ -131,22 +124,20 @@ class ServiceFragment extends Fragment {
 
             if (getServer(true, mCallbacks.getServerTitle()) != null) {
                 mCallbacks.setUpViewPager();
-                mCallbacks.registerForBus(mSender.getBus());
                 mCallbacks.repopulateFragmentsInPager();
             } else {
                 final ServerConfiguration.Builder builder =
                         getActivity().getIntent().getParcelableExtra("server");
                 mService.connectToServer(builder);
                 mCallbacks.setUpViewPager();
-                mCallbacks.registerForBus(mSender.getBus());
             }
         }
 
         // Should never occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            mCallbacks.onDisconnect(false, false);
             throw new IllegalArgumentException();
+            //mCallbacks.onDisconnect(false, false);
         }
     };
 
@@ -188,9 +179,5 @@ class ServiceFragment extends Fragment {
         public void repopulateFragmentsInPager();
 
         public void onDisconnect(final boolean expected, final boolean retryPending);
-
-        public void registerForBus(final Bus bus);
-
-        public void unregisterFromBus(final Bus bus);
     }
 }

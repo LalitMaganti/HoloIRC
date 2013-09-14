@@ -32,10 +32,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.RelativeLayout;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
@@ -53,7 +53,6 @@ import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.util.Iterator;
@@ -83,8 +82,9 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected SlidingMenu mUserSlidingMenu = null;
     protected ActionsSlidingMenu mActionsSlidingMenu = null;
 
-    // Title
+    // Other objects
     protected String mServerTitle = null;
+    protected EventReceiver mEventReceiver = new EventReceiver();
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -92,14 +92,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_server_channel);
 
-        final RelativeLayout layout = (RelativeLayout) findViewById(R.id.relative_layout);
-        if (UIUtils.hasJellyBeanMR1()) {
-            layout.setBackground(null);
-        } else {
-            layout.setBackgroundDrawable(null);
-        }
+        setUpContent();
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
@@ -109,6 +103,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         final FragmentManager fm = getSupportFragmentManager();
         mServiceFragment = (ServiceFragment) fm.findFragmentByTag("service");
+        mIRCPagerFragment = (IRCPagerFragment) fm.findFragmentById(R.id.pager_fragment);
 
         final ActionBar actionBar = getSupportActionBar();
         if (mServiceFragment == null) {
@@ -121,7 +116,18 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mServerTitle);
+
+        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id
+                .pager_tabs);
+        mIRCPagerFragment.setTabStrip(tabs);
+        tabs.setOnPageChangeListener(mListener);
+        tabs.setTextColorResource(android.R.color.white);
+
+        mServiceFragment.connectToServer(this, mServerTitle);
+        MessageSender.getSender(mServerTitle).getBus().register(mEventReceiver);
     }
+
+    protected abstract void setUpContent();
 
     @Override
     protected void onDestroy() {
@@ -141,14 +147,18 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+        if(mDrawerToggle != null) {
+            // Sync the toggle state after onRestoreInstanceState has occurred.
+            mDrawerToggle.syncState();
+        }
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        if(mDrawerToggle != null) {
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        }
     }
 
     @Override
@@ -179,7 +189,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
         switch (item.getItemId()) {
@@ -205,9 +215,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
     }
 
-    /*
-     * CALLBACKS START HERE
-     */
     @Override
     public void repopulateFragmentsInPager() {
         if (isConnectedToServer()) {
@@ -224,19 +231,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public void setUpViewPager() {
-        mIRCPagerFragment = (IRCPagerFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.pager_fragment);
         mIRCPagerFragment.createServerFragment(mServerTitle);
-
-        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        mIRCPagerFragment.setTabStrip(tabs);
-        tabs.setOnPageChangeListener(mListener);
-        tabs.setBackgroundResource(R.color.sliding_menu_background);
-        tabs.setTextColorResource(android.R.color.white);
-        tabs.setIndicatorColorResource(android.R.color.white);
+        getSupportActionBar().setSubtitle(getServer(false).getStatus());
     }
 
-    // CommonIRCListener Callbacks
     @Override
     public Server getServer(final boolean nullAllowed) {
         return mServiceFragment.getServer(nullAllowed, mServerTitle);
@@ -257,10 +255,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
      */
     @Override
     public void closeAllSlidingMenus() {
-        mActionsSlidingMenu.showContent();
-        if (mUserSlidingMenu != null) {
-            mUserSlidingMenu.showContent();
+        if(mActionsSlidingMenu != null) {
+            mActionsSlidingMenu.showContent();
         }
+        mUserSlidingMenu.showContent();
     }
 
     /**
@@ -302,8 +300,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
     }
 
-    // UserListFragment Listener Callbacks
-
     /**
      * Method which is called when the user requests a mention from
      * the UserListFragment
@@ -315,8 +311,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         mIRCPagerFragment.onMentionRequested(users);
         closeAllSlidingMenus();
     }
-
-    // ActionsFragment Listener Callbacks
 
     /**
      * Method which returns the nick of the user
@@ -357,30 +351,16 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
             mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
 
-            mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
-                    .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
+            if(mActionsSlidingMenu != null) {
+                mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
+                        .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
+            }
             mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
                     .TOUCHMODE_NONE : SlidingMenu.TOUCHMODE_MARGIN);
-
-            mIRCPagerFragment.setCurrentItemIndex(position);
         }
     };
 
-    @Override
-    public void registerForBus(Bus bus) {
-        bus.register(mIRCPagerFragment);
-        bus.register(mUserListFragment);
-        bus.register(mEventReceiver);
-    }
-
-    @Override
-    public void unregisterFromBus(Bus bus) {
-        bus.unregister(mIRCPagerFragment);
-        bus.unregister(mUserListFragment);
-        bus.unregister(mEventReceiver);
-    }
-
-    protected final Object mEventReceiver = new Object() {
+    private final class EventReceiver {
         @Subscribe
         public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
             onDisconnect(false, true);
@@ -415,5 +395,5 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                     Style.INFO).setConfiguration(builder.build());
             crouton.show();
         }
-    };
+    }
 }

@@ -38,6 +38,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -65,6 +66,20 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement UserListCallback");
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        MessageSender.getSender(mCallback.getServerTitle()).getBus().unregister(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        MessageSender.getSender(mCallback.getServerTitle()).getBus().register(this);
     }
 
     @Override
@@ -202,6 +217,8 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
         public Server getServer(boolean nullable);
 
         public void closeAllSlidingMenus();
+
+        public String getServerTitle();
     }
 
     /*

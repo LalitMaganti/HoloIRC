@@ -23,17 +23,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/relative_layout">
+                android:id="@+id/relative_layout"
+                android:clickable="false">
 
-    <com.astuetz.viewpager.extensions.PagerSlidingTabStrip
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="48dip"/>
+    <include layout="@layout/pager_tab_strip"
+             android:id="@+id/pager_tabs"/>
 
     <com.jeremyfeinstein.slidingmenu.lib.SlidingMenu
-            android:id="@+id/slidingmenulayout"
+            android:id="@+id/user_sliding_menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/tabs"
+            android:layout_below="@id/pager_tabs"
             android:background="@null"/>
 </RelativeLayout>
