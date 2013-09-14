@@ -50,10 +50,10 @@
 
     <PreferenceCategory android:title="SSL">
         <CheckBoxPreference
-            android:key="pref_ssl"
-            android:defaultValue="false"
-            android:title="@string/server_settings_ssl_title"
-            android:summary="@string/server_settings_ssl_summary"/>
+                android:key="pref_ssl"
+                android:defaultValue="false"
+                android:title="@string/server_settings_ssl_title"
+                android:summary="@string/server_settings_ssl_summary"/>
         <CheckBoxPreference
                 android:key="pref_ssl_accept_all_connections"
                 android:defaultValue="false"
