@@ -22,6 +22,7 @@ class ServiceFragment extends Fragment {
     private IRCService mService;
     private ServiceFragmentCallback mCallbacks;
     private MessageSender mSender;
+    private Server mServer;
 
     /**
      * This method will only be called once when the retained Fragment is first created.
@@ -137,20 +138,18 @@ class ServiceFragment extends Fragment {
         @Override
         public void onServiceDisconnected(final ComponentName name) {
             throw new IllegalArgumentException();
-            //mCallbacks.onDisconnect(false, false);
         }
     };
 
     public Server getServer(final boolean nullAllowed, final String serverTitle) {
-        Server server;
-        if (mService == null || (server = mService.getServer(serverTitle)) == null) {
+        if (mService == null || (mServer = mService.getServer(serverTitle)) == null) {
             if (nullAllowed) {
                 return null;
             } else {
                 throw new UnsupportedOperationException();
             }
         } else {
-            return server;
+            return mServer;
         }
     }
 
@@ -158,9 +157,10 @@ class ServiceFragment extends Fragment {
         final AsyncTask<Void, Void, Void> disconnect = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                mService.setServerDisplayed(null);
-                mService.removeServerFromManager(serverTitle);
-                mService = null;
+                if(mService != null) {
+                    mService.setServerDisplayed(null);
+                    mService.removeServerFromManager(serverTitle);
+                }
                 return null;
             }
         };
