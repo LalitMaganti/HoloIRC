@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.communication;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -47,7 +48,7 @@ import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.irc.event.UserEvent;
-import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
+import com.fusionx.lightirc.util.UIUtils;
 import com.squareup.otto.Bus;
 
 import java.util.HashMap;
@@ -266,23 +267,24 @@ public class MessageSender {
         } else {
             final NotificationManager mNotificationManager =
                     (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            final NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext)
+            final Intent intent = new Intent(mContext, UIUtils.getIRCActivity(mContext));
+            intent.putExtra("serverTitle", mServerName);
+            intent.putExtra("mention", messageDestination);
+            final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
+            taskStackBuilder.addParentStack(UIUtils.getIRCActivity(mContext));
+            taskStackBuilder.addNextIntent(intent);
+            final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            final Notification notification = new NotificationCompat.Builder(mContext)
                     .setContentTitle(mContext.getString(R.string.app_name))
                     .setContentText(mContext.getString(R.string.service_you_mentioned) + " " +
                             messageDestination)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setAutoCancel(true)
                     .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
-                            messageDestination);
-            final Intent mIntent = new Intent(mContext, IRCPhoneActivity.class);
-            mIntent.putExtra("serverTitle", mServerName);
-            mIntent.putExtra("mention", messageDestination);
-            final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
-            taskStackBuilder.addParentStack(IRCPhoneActivity.class);
-            taskStackBuilder.addNextIntent(mIntent);
-            final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
-                    PendingIntent.FLAG_UPDATE_CURRENT);
-            mNotificationManager.notify(345, builder.setContentIntent(pIntent).build());
+                            messageDestination)
+                    .setContentIntent(pIntent).build();
+            mNotificationManager.notify(345, notification);
         }
     }
 }

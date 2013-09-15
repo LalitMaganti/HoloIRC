@@ -384,14 +384,16 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onMention(final MentionEvent event) {
-            final String message = String.format(getString(R.string.activity_mentioned),
-                    event.destination);
-            de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new de
-                    .keyboardsurfer.android.widget.crouton.Configuration.Builder();
-            builder.setDuration(2000);
-            Crouton crouton = Crouton.makeText(IRCActivity.this, message,
-                    Style.INFO).setConfiguration(builder.build());
-            crouton.show();
+            if(!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
+                final String message = String.format(getString(R.string.activity_mentioned),
+                        event.destination);
+                de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new de
+                        .keyboardsurfer.android.widget.crouton.Configuration.Builder();
+                builder.setDuration(2000);
+                Crouton crouton = Crouton.makeText(IRCActivity.this, message,
+                        Style.INFO).setConfiguration(builder.build());
+                crouton.show();
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ public class IRCPhoneActivity extends IRCActivity {
         mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         mUserSlidingMenu.setTouchmodeMarginThreshold(10);
         mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
-        mUserSlidingMenu.setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
+        mUserSlidingMenu.setBehindWidthRes(R.dimen.user_menu_sliding_width);
 
         mUserListFragment = (UserListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.userlist_fragment);

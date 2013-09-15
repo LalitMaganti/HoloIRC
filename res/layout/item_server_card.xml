@@ -25,9 +25,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:weightSum="100"
         android:padding="16dp"
-        android:baselineAligned="false"
         android:background="?server_card_background"
         android:cacheColorHint="?server_card_background">
 
@@ -35,11 +33,11 @@
             android:id="@+id/contentLayout"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:background="?selectableItemBackground"
             android:layout_marginLeft="8dip"
             android:layout_weight="90"
             android:onClick="onCardClick"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="?selectableItemBackground">
 
         <com.fusionx.lightirc.ui.widget.RobotoThinTextView
                 android:id="@+id/title"
@@ -65,21 +63,13 @@
                 android:textSize="16sp"/>
     </LinearLayout>
 
-    <LinearLayout
-            android:layout_width="0dip"
-            android:layout_height="fill_parent"
-            android:layout_weight="10"
-            android:orientation="vertical"
+    <ImageView
+            android:id="@+id/overflow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/overflow"
+            android:src="?overflow_menu_drawable"
+            android:background="?selectableItemBackground"
             android:onClick="showPopup"
-            android:id="@+id/overflow_menu">
-
-        <ImageView
-                android:id="@+id/overflow"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?selectableItemBackground"
-                android:contentDescription="@string/overflow"
-                android:padding="2dip"
-                android:src="?overflow_menu_drawable"/>
-    </LinearLayout>
+            android:layout_gravity="top"/>
 </LinearLayout>

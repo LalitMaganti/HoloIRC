@@ -25,7 +25,6 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
@@ -75,11 +74,11 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerConfiguration
             }
         }
 
-        final LinearLayout contentLayout = (LinearLayout) view.findViewById(R.id.contentLayout);
+        final View contentLayout = view.findViewById(R.id.contentLayout);
         contentLayout.setTag(builder);
 
-        final LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.overflow_menu);
-        linearLayout.setTag(builder);
+        final View overflowMenu = view.findViewById(R.id.overflow);
+        overflowMenu.setTag(builder);
 
         return view;
     }

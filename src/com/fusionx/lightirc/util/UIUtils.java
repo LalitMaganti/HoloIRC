@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.ui.IRCActivity;
+import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
+import com.fusionx.lightirc.ui.tablet.IRCTabletActivity;
 
 public class UIUtils {
     private static Typeface mRobotoLightTypeface = null;
@@ -51,6 +54,11 @@ public class UIUtils {
                     "Roboto-Light.ttf");
         }
         return mRobotoLightTypeface;
+    }
+
+    public static Class<? extends IRCActivity> getIRCActivity(final Context context) {
+        return UIUtils.isHoneycombTablet(context) ? IRCTabletActivity.class : IRCPhoneActivity
+                .class;
     }
 
     public static void setRobotoLight(final Context context, final TextView textView) {

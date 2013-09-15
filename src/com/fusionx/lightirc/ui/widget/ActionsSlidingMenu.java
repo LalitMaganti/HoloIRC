@@ -13,6 +13,6 @@ public class ActionsSlidingMenu extends SlidingMenu {
         setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
         setTouchmodeMarginThreshold(10);
         setMenu(R.layout.sliding_menu_fragment_actions);
-        setBehindWidthRes(R.dimen.server_channel_sliding_actions_menu_width);
+        setBehindWidthRes(R.dimen.user_menu_sliding_width);
     }
 }

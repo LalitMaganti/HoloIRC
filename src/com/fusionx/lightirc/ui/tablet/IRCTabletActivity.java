@@ -25,7 +25,7 @@ public class IRCTabletActivity extends IRCActivity {
         mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
         mUserSlidingMenu.setTouchmodeMarginThreshold(10);
         mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
-        mUserSlidingMenu.setBehindWidth(400);
+        mUserSlidingMenu.setBehindWidth(R.dimen.user_menu_sliding_width);
 
         mUserListFragment = (UserListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.userlist_fragment);

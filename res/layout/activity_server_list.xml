@@ -29,7 +29,7 @@
         android:fadingEdge="none"
         android:dividerHeight="16dp"
         android:padding="16dp"
-        android:columnWidth="300dp"
+        android:columnWidth="400dp"
         android:numColumns="auto_fit"
         android:verticalSpacing="10dp"
         android:horizontalSpacing="10dp"

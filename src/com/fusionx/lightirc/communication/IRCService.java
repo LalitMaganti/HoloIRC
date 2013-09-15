@@ -22,8 +22,10 @@
 package com.fusionx.lightirc.communication;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -121,6 +123,10 @@ public class IRCService extends Service {
         }
 
         stopForeground(true);
+
+        final NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.cancelAll();
     }
 
     public void removeServerFromManager(final String serverName) {
@@ -132,6 +138,9 @@ public class IRCService extends Service {
                     stopForeground(true);
                 } else {
                     updateNotification();
+                    final NotificationManager mNotificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.cancel(345);
                 }
             }
         }
