@@ -37,7 +37,6 @@ import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.communication.ServerCommandSender;
-import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -132,6 +131,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
+        MessageSender.getSender(mServerTitle).getBus().unregister(mEventReceiver);
 
         super.onDestroy();
     }
@@ -295,8 +295,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             if (getServer(true) != null && !retryPending) {
                 mServiceFragment.removeServiceReference(mServerTitle);
             }
-        } else if (Constants.DEBUG) {
-            throw new IllegalArgumentException();
         }
     }
 
@@ -368,7 +366,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onFinalDisconnect(final FinalDisconnectEvent event) {
-            onDisconnect(event.disconnectExpected, event.disconnectExpected);
+            onDisconnect(event.disconnectExpected, false);
         }
 
         @Subscribe

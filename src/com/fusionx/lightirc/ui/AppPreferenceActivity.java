@@ -27,25 +27,49 @@ import com.fusionx.lightirc.util.UIUtils;
 import java.util.List;
 
 public class AppPreferenceActivity extends PreferenceActivity implements ISettings {
+    private final static String PREF_ACTION_APPEARANCE = "com.fusionx.lightirc.ui" +
+            ".AppPreferenceActivity.Appearance";
+    private final static String PREF_ACTION_SERVER_CHANNEL = "com.fusionx.lightirc.ui" +
+            ".AppPreferenceActivity.ServerChannel";
+    private final static String PREF_ACTION_DEFAULT_USER = "com.fusionx.lightirc.ui" +
+            ".AppPreferenceActivity.DefaultUser";
+    private final static String PREF_ACTION_ABOUT = "com.fusionx.lightirc.ui" +
+            ".AppPreferenceActivity.About";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
+        String action = getIntent().getAction();
         if (!UIUtils.hasHoneycomb()) {
-            // Appearance settings
-            addPreferencesFromResource(R.xml.appearance_settings_fragment);
-            setupThemePreference(getPreferenceScreen());
-            // Server Channel Settings
-            addPreferencesFromResource(R.xml.server_channel_settings_fragment);
-            setupNumberPicker(getPreferenceScreen());
-            // Default User Settings
-            addPreferencesFromResource(R.xml.default_user_fragment);
-            // About settings
-            addPreferencesFromResource(R.xml.about_settings_fragment);
-            setupAppVersionPreference(getPreferenceScreen());
-            showAlertDialog();
+            if (action != null) {
+                switch (action) {
+                    case PREF_ACTION_APPEARANCE:
+                        // Appearance settings
+                        addPreferencesFromResource(R.xml.appearance_settings_fragment);
+                        setupThemePreference(getPreferenceScreen());
+                        break;
+                    case PREF_ACTION_SERVER_CHANNEL:
+                        // Server Channel Settings
+                        addPreferencesFromResource(R.xml.server_channel_settings_fragment);
+                        setupNumberPicker(getPreferenceScreen());
+                        break;
+                    case PREF_ACTION_DEFAULT_USER:
+                        // Default User Settings
+                        addPreferencesFromResource(R.xml.default_user_fragment);
+                        break;
+                    case PREF_ACTION_ABOUT:
+                        // About settings
+                        addPreferencesFromResource(R.xml.about_settings_fragment);
+                        setupAppVersionPreference(getPreferenceScreen());
+                        break;
+                }
+            } else {
+                addPreferencesFromResource(R.xml.app_settings_headers_legacy);
+                showAlertDialog();
+            }
         }
     }
 
@@ -59,7 +83,7 @@ public class AppPreferenceActivity extends PreferenceActivity implements ISettin
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBuildHeaders(final List<Header> target) {
-        loadHeadersFromResource(R.xml.main_settings_headers, target);
+        loadHeadersFromResource(R.xml.app_settings_headers, target);
         showAlertDialog();
     }
 

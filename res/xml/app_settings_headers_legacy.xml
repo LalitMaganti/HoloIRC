@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+            android:title="@string/appearance"
+            android:summary="@string/settings_appearance_summary">
+        <intent
+                android:targetPackage="com.fusionx.lightirc"
+                android:targetClass="com.fusionx.lightirc.ui.AppPreferenceActivity"
+                android:action="com.fusionx.lightirc.ui.AppPreferenceActivity.Appearance"/>
+    </Preference>
+    <Preference
+            android:title="@string/server_channel_settings_title"
+            android:summary="@string/server_channel_settings_summary">
+        <intent
+                android:targetPackage="com.fusionx.lightirc"
+                android:targetClass="com.fusionx.lightirc.ui.AppPreferenceActivity"
+                android:action="com.fusionx.lightirc.ui.AppPreferenceActivity.ServerChannel"/>
+    </Preference>
+    <Preference
+            android:title="@string/default_user_settings_header"
+            android:summary="@string/default_user_settings_summary">
+        <intent
+                android:targetPackage="com.fusionx.lightirc"
+                android:targetClass="com.fusionx.lightirc.ui.AppPreferenceActivity"
+                android:action="com.fusionx.lightirc.ui.AppPreferenceActivity.DefaultUser"/>
+    </Preference>
+    <Preference
+            android:title="@string/about"
+            android:summary="@string/settings_about_fragment_summary">
+        <intent
+                android:targetPackage="com.fusionx.lightirc"
+                android:targetClass="com.fusionx.lightirc.ui.AppPreferenceActivity"
+                android:action="com.fusionx.lightirc.ui.AppPreferenceActivity.About"/>
+    </Preference>
+</PreferenceScreen>

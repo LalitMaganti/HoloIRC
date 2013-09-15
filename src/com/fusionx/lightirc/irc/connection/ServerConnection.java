@@ -108,7 +108,7 @@ class ServerConnection {
             ++reconnectAttempts;
         }
 
-        sender.sendFinalDisconnection(server, "Disconnected from the server", true);
+        sender.sendFinalDisconnection(server, "Disconnected from the server", disconnectSent);
     }
 
     /**
