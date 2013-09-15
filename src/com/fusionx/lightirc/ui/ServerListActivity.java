@@ -294,7 +294,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     // ServerListAdapter callbacks
     @Override
     public Server getServer(final String title) {
-        return mService.getServer(title);
+        return mService != null ? mService.getServer(title) : null;
     }
 
     @SuppressWarnings("RedundantCast")

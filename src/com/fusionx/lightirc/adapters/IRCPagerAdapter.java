@@ -266,14 +266,16 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void removeAllButServer() {
-        final Iterator<IRCFragment> iterator = views.iterator();
-        iterator.next();
-        while (iterator.hasNext()) {
+        if(views.size() > 1) {
+            final Iterator<IRCFragment> iterator = views.iterator();
             iterator.next();
-            iterator.remove();
-        }
+            while (iterator.hasNext()) {
+                iterator.next();
+                iterator.remove();
+            }
 
-        tabStrip.notifyDataSetChanged();
-        notifyDataSetChanged();
+            tabStrip.notifyDataSetChanged();
+            notifyDataSetChanged();
+        }
     }
 }

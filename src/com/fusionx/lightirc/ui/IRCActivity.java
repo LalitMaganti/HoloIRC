@@ -368,7 +368,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onFinalDisconnect(final FinalDisconnectEvent event) {
-            onDisconnect(event.disconnectExpected, false);
+            onDisconnect(event.disconnectExpected, event.disconnectExpected);
         }
 
         @Subscribe
