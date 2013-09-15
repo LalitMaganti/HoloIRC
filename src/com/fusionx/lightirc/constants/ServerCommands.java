@@ -35,6 +35,7 @@ public class ServerCommands {
     public final static String Cap = "CAP";
     public final static String Authenticate = "AUTHENTICATE";
     public final static String Kick = "KICK";
+    public final static String Invite = "INVITE";
 
     private ServerCommands() {
 

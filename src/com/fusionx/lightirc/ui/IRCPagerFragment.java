@@ -109,7 +109,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * Creates the ServerFragment object
      */
     public void createServerFragment(final String serverTitle) {
-        if(mAdapter.getCount() == 0) {
+        if (mAdapter.getCount() == 0) {
             mAdapter.addServerFragment(serverTitle);
         }
     }

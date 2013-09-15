@@ -9,21 +9,21 @@ import com.fusionx.lightirc.util.UIUtils;
 public class RobotoLightTextView extends TextView {
     public RobotoLightTextView(Context context) {
         super(context);
-        if(!isInEditMode()) {
+        if (!isInEditMode()) {
             UIUtils.setRobotoLight(getContext(), this);
         }
     }
 
     public RobotoLightTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        if(!isInEditMode()) {
+        if (!isInEditMode()) {
             UIUtils.setRobotoLight(getContext(), this);
         }
     }
 
     public RobotoLightTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        if(!isInEditMode()) {
+        if (!isInEditMode()) {
             UIUtils.setRobotoLight(getContext(), this);
         }
     }

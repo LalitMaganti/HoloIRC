@@ -42,7 +42,7 @@ class IRCBus extends Bus {
         super.unregister(object);
 
         --registeredCount;
-        if(registeredCount == 0) {
+        if (registeredCount == 0) {
             mSender.removeSender();
         }
     }

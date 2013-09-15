@@ -102,6 +102,8 @@ class ServerCommandParser {
                 return parseTopicChange(parsedArray, rawSource);
             case ServerCommands.Kick:
                 return parseKick(parsedArray, rawSource);
+            case ServerCommands.Invite:
+                return parseInvite(parsedArray, rawSource);
             default:
                 // Not sure what to do here - TODO
                 if (DEBUG) {
@@ -109,6 +111,17 @@ class ServerCommandParser {
                 }
                 return new Event(rawLine);
         }
+    }
+
+    private Event parseInvite(ArrayList<String> parsedArray, String rawSource) {
+        final String invitingNick = IRCUtils.getNickFromRaw(rawSource);
+        if (parsedArray.get(2).equals(mServer.getUser().getNick())) {
+            final String channelName = parsedArray.get(3);
+            mSender.sendInviteEvent(mServer, channelName);
+        } else {
+            // TODO - fix up what should happen here
+        }
+        return null;
     }
 
     private Event parseKick(ArrayList<String> parsedArray, String rawSource) {

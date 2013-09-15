@@ -266,7 +266,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public void removeAllButServer() {
-        if(views.size() > 1) {
+        if (views.size() > 1) {
             final Iterator<IRCFragment> iterator = views.iterator();
             iterator.next();
             while (iterator.hasNext()) {

@@ -55,17 +55,12 @@ import java.util.HashMap;
 
 public class MessageSender {
     private static final HashMap<String, MessageSender> mSenderMap = new HashMap<>();
-
     private Context mContext;
     private boolean mDisplayed;
     private IRCBus mBus;
     private String mServerName;
 
     private MessageSender() {
-    }
-
-    public void initialSetup(Context context) {
-        mContext = context;
     }
 
     public static MessageSender getSender(final String serverName, final boolean nullable) {
@@ -88,6 +83,10 @@ public class MessageSender {
         synchronized (mSenderMap) {
             mSenderMap.clear();
         }
+    }
+
+    public void initialSetup(Context context) {
+        mContext = context;
     }
 
     void removeSender() {
@@ -286,5 +285,9 @@ public class MessageSender {
                     .setContentIntent(pIntent).build();
             mNotificationManager.notify(345, notification);
         }
+    }
+
+    public void sendInviteEvent(Server server, String channelName) {
+        // TODO figure out what to do here
     }
 }

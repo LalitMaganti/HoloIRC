@@ -147,7 +147,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if(mDrawerToggle != null) {
+        if (mDrawerToggle != null) {
             // Sync the toggle state after onRestoreInstanceState has occurred.
             mDrawerToggle.syncState();
         }
@@ -156,7 +156,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(mDrawerToggle != null) {
+        if (mDrawerToggle != null) {
             mDrawerToggle.onConfigurationChanged(newConfig);
         }
     }
@@ -255,7 +255,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
      */
     @Override
     public void closeAllSlidingMenus() {
-        if(mActionsSlidingMenu != null) {
+        if (mActionsSlidingMenu != null) {
             mActionsSlidingMenu.showContent();
         }
         mUserSlidingMenu.showContent();
@@ -349,7 +349,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
             mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
 
-            if(mActionsSlidingMenu != null) {
+            if (mActionsSlidingMenu != null) {
                 mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
                         .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
             }
@@ -384,7 +384,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onMention(final MentionEvent event) {
-            if(!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
+            if (!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
                 final String message = String.format(getString(R.string.activity_mentioned),
                         event.destination);
                 de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new de

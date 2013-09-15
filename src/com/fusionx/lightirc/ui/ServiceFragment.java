@@ -157,7 +157,7 @@ class ServiceFragment extends Fragment {
         final AsyncTask<Void, Void, Void> disconnect = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                if(mService != null) {
+                if (mService != null) {
                     mService.setServerDisplayed(null);
                     mService.removeServerFromManager(serverTitle);
                 }
