@@ -14,7 +14,7 @@ public class Message {
         if(AppPreferences.timestamp) {
             final Time now = new Time();
             now.setToNow();
-            this.timestamp = now.format("%H:%M: ");
+            this.timestamp = now.format("%H:%M");
         } else {
             this.timestamp = "";
         }

@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:paddingRight="2dip"
+            android:paddingRight="6dip"
             android:textColor="?server_card_text"
             android:text="Testing"
             android:textIsSelectable="true"/>
