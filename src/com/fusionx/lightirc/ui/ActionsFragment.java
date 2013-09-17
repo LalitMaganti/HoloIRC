@@ -23,7 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +40,12 @@ import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-public class ActionsFragment extends ListFragment implements AdapterView.OnItemClickListener,
+public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
     private IRCActionsCallback callback;
     private FragmentTypeEnum type;
+    private StickyListHeadersListView mListView;
+    private ActionsAdapter mAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -56,18 +58,26 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        getListView().setOnItemClickListener(this);
+        mListView.setOnItemClickListener(this);
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        setListAdapter(new ActionsAdapter(getActivity()));
+        return inflater.inflate(R.layout.fragment_action_listview, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mAdapter = new ActionsAdapter(getActivity());
+        mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
+        mListView.setAdapter(mAdapter);
         if (type != null) {
-            getListAdapter().setFragmentType(type);
+            mAdapter.setFragmentType(type);
             type = null;
         }
-        return inflater.inflate(R.layout.fragment_action_listview, container, false);
     }
 
     @Override
@@ -123,33 +133,23 @@ public class ActionsFragment extends ListFragment implements AdapterView.OnItemC
 
     @Override
     public void onOpen() {
-        if (callback.isConnectedToServer() != getListAdapter().isConnected()) {
-            getListAdapter().setConnected(callback.isConnectedToServer());
-            getListAdapter().notifyDataSetChanged();
+        if (callback.isConnectedToServer() != mAdapter.isConnected()) {
+            mAdapter.setConnected(callback.isConnectedToServer());
+            mAdapter.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public ActionsAdapter getListAdapter() {
-        return (ActionsAdapter) super.getListAdapter();
     }
 
     public void updateConnectionStatus(final boolean isConnected) {
-        getListAdapter().setConnected(isConnected);
-        getListAdapter().notifyDataSetChanged();
+        mAdapter.setConnected(isConnected);
+        mAdapter.notifyDataSetChanged();
     }
 
     public void onTabChanged(final FragmentTypeEnum selectedType) {
-        if (getListAdapter() == null) {
+        if (mAdapter == null) {
             type = selectedType;
         } else {
-            getListAdapter().setFragmentType(selectedType);
+            mAdapter.setFragmentType(selectedType);
         }
-    }
-
-    @Override
-    public StickyListHeadersListView getListView() {
-        return (StickyListHeadersListView) super.getListView();
     }
 
     public interface IRCActionsCallback {

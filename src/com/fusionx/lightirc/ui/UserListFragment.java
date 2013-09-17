@@ -53,10 +53,11 @@ import java.util.List;
 
 import lombok.NonNull;
 
-public class UserListFragment extends MultiChoiceListFragment<ChannelUser> implements
+public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser> implements
         SlidingMenu.OnCloseListener {
     private UserListCallback mCallback;
     private Channel mChannel;
+    private UserListAdapter mAdapter;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -93,9 +94,9 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final UserListAdapter adapter = new UserListAdapter(view.getContext(),
+        mAdapter = new UserListAdapter(view.getContext(),
                 new SynchronizedTreeSet<ChannelUser>());
-        setListAdapter(adapter);
+        getListView().setAdapter(mAdapter);
 
         getListView().setFastScrollEnabled(true);
     }
@@ -103,7 +104,7 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
     @Override
     protected void attachSelectionController() {
         mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                getListView(), (ActionBarActivity) getActivity(), this, true);
+                getListView().getWrappedList(), (ActionBarActivity) getActivity(), this, true);
     }
 
     public void onMenuOpened(@NonNull final Channel channel) {
@@ -111,11 +112,10 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
             final UserListTreeSet userList = channel.getUsers();
             if (userList != null) {
                 mChannel = channel;
-                final UserListAdapter adapter = getRealAdapter();
-                setListAdapter(null);
-                adapter.setInternalSet(userList);
-                adapter.setChannel(channel);
-                setListAdapter(adapter);
+                getListView().setAdapter(null);
+                mAdapter.setInternalSet(userList);
+                mAdapter.setChannel(channel);
+                getListView().setAdapter(mAdapter);
             } else {
                 getRealAdapter().clear();
             }
@@ -208,7 +208,7 @@ public class UserListFragment extends MultiChoiceListFragment<ChannelUser> imple
 
     @Override
     protected UserListAdapter getRealAdapter() {
-        return (UserListAdapter) super.getListAdapter();
+        return mAdapter;
     }
 
     public interface UserListCallback {

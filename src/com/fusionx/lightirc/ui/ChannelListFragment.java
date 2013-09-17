@@ -45,8 +45,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         super.onViewCreated(view, savedInstanceState);
         SharedPreferences settings = getActivity().getSharedPreferences(mCallbacks.getFileName(),
                 Context.MODE_PRIVATE);
-        final Set<String> set = settings.getStringSet(PreferenceConstants.AutoJoin,
-                new HashSet<String>());
+        final Set<String> set = SharedPreferencesUtils.getStringSet(settings,
+                PreferenceConstants.AutoJoin, new HashSet<String>());
         mAdapter = new BaseCollectionAdapter<>(getActivity(),
                 R.layout.default_listview_textview, new SynchronizedTreeSet<>(set));
 
