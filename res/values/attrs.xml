@@ -38,7 +38,7 @@
     </declare-styleable>
 
     <declare-styleable name="MultiSelectListPreference">
-        <attr name="entries" format="reference" />
-        <attr name="entryValues" format="reference" />
+        <attr name="entries" format="reference"/>
+        <attr name="entryValues" format="reference"/>
     </declare-styleable>
 </resources>

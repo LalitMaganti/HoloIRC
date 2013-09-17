@@ -17,7 +17,8 @@ public class ColourParserUtilsTest {
     public void parseTest() {
         AppPreferences.highlightLine = true;
         final SpannableStringBuilder expected = new SpannableStringBuilder();
-        expected.append("Welcome to Arch Linux World Domination, Inc. <+> Remember: Arch Linux does not like to " +
+        expected.append("Welcome to Arch Linux World Domination, Inc. <+> Remember: Arch Linux " +
+                "does not like to " +
                 "be neglected. <+> Latest news:  https://www.archlinux.org/news/ <+> Adopt AUR " +
                 "orphans https://bbs.archlinux.org/viewtopic.php?id=50869");
         final Spanned test = ColourParserUtils.parseMarkup(expected.toString());

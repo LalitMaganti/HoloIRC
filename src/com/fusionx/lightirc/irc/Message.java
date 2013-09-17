@@ -11,7 +11,7 @@ public class Message {
     public final Spanned message;
 
     public Message(String message) {
-        if(AppPreferences.timestamp) {
+        if (AppPreferences.timestamp) {
             final Time now = new Time();
             now.setToNow();
             this.timestamp = now.format("%H:%M");

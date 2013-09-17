@@ -35,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_toRightOf="@id/actions_menu">
+
         <include
                 layout="@layout/pager_tab_strip"
                 android:id="@+id/pager_tabs"/>

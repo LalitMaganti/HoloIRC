@@ -26,8 +26,9 @@
                 android:id="@+id/relative_layout"
                 android:clickable="false">
 
-    <include layout="@layout/pager_tab_strip"
-             android:id="@+id/pager_tabs"/>
+    <include
+            layout="@layout/pager_tab_strip"
+            android:id="@+id/pager_tabs"/>
 
     <com.jeremyfeinstein.slidingmenu.lib.SlidingMenu
             android:id="@+id/user_sliding_menu"
