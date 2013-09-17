@@ -157,5 +157,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
         with a nick
     </string>
+    <string name="notification_settings_summary">Control when you are notified by the app</string>
+    <string name="notification_settings_title">Notification Settings</string>
 
 </resources>

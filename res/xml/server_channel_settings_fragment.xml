@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:custom="http://schemas.android.com/apk/res-auto"
+                  xmlns:holoirc="http://schemas.android.com/apk/res-auto"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
 
@@ -10,14 +10,19 @@
                 android:key="pref_reconnect_tries"
                 android:dialogMessage="The number of times the app should try to reconnect to the server"
                 android:title="Reconnect attempts"
-                custom:defaultValue="3"
-                custom:min="0"
-                custom:max="20"/>
+                holoirc:defaultValue="3"
+                holoirc:min="0"
+                holoirc:max="20"/>
         <CheckBoxPreference
                 android:key="pref_motd"
                 android:defaultValue="true"
                 android:title="@string/server_channel_settings_motd_title"
                 android:summary="@string/server_channel_settings_motd_description"/>
+        <CheckBoxPreference
+                android:key="pref_timestamps"
+                android:defaultValue="false"
+                android:title="Show timestamps"
+                android:summary="Show when a message when was received"/>
         <com.fusionx.lightirc.ui.preferences.SummaryEditTextPreference
                 android:key="pref_quit_reason"
                 android:defaultValue=""

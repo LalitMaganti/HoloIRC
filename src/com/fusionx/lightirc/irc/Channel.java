@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.irc;
 
 import android.os.Handler;
-import android.text.Spanned;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
@@ -31,7 +30,6 @@ import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
-import com.fusionx.lightirc.util.ColourParserUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,15 +45,14 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     protected final String name;
     @Getter
     protected final ChannelWriter writer;
+    private final UserChannelInterface mUserChannelInterface;
+    private final Handler mAdapterHandler;
+    private final HashMap<UserLevelEnum, Integer> mNumberOfUsers = new HashMap<>();
     @Getter
     protected IRCMessageAdapter buffer;
     @Getter
     @Setter
     protected String topic;
-
-    private final UserChannelInterface mUserChannelInterface;
-    private final Handler mAdapterHandler;
-    private final HashMap<UserLevelEnum, Integer> mNumberOfUsers = new HashMap<>();
     private boolean mUserListMessagesShown;
 
     Channel(final String channelName, final UserChannelInterface
@@ -64,11 +61,11 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
             @Override
             public void run() {
                 buffer = new IRCMessageAdapter(userChannelInterface.getContext(),
-                        new ArrayList<Spanned>());
-                final String message = String.format(userChannelInterface.getContext().getString
-                        (R.string.parser_joined_channel), userChannelInterface
-                        .getServer().getUser().getColorfulNick());
-                buffer.add(ColourParserUtils.parseHtml(message));
+                        new ArrayList<Message>());
+                final String message = String.format(userChannelInterface.getContext()
+                        .getString(R.string.parser_joined_channel),
+                        userChannelInterface.getServer().getUser().getColorfulNick());
+                buffer.add(new Message(message));
 
             }
         });
@@ -115,7 +112,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(ColourParserUtils.parseHtml(event.message));
+                    buffer.add(new Message(event.message));
                 }
             });
         }

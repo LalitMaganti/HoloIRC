@@ -61,6 +61,7 @@ public class PreferenceConstants {
     // Server channel settings
     public final static String ReconnectTries = "pref_reconnect_tries";
     public final static String Motd = "pref_motd";
+    public final static String Timestamp = "pref_timestamps";
     public final static String QuitReason = "pref_quit_reason";
 
     public final static String HideMessages = "pref_hide_messages";

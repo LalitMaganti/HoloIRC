@@ -8,13 +8,11 @@ import com.fusionx.lightirc.constants.PreferenceConstants;
 
 public class AppPreferences {
     public static boolean highlightLine = true;
+    public static boolean timestamp = false;
 
     public static void setUpPreferences(final Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        updateLineColourfulness(preferences);
-    }
-
-    public static void updateLineColourfulness(final SharedPreferences preferences) {
         highlightLine = preferences.getBoolean(PreferenceConstants.LineColourful, true);
+        timestamp = preferences.getBoolean(PreferenceConstants.Timestamp, false);
     }
 }

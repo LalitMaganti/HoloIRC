@@ -69,7 +69,7 @@ public class ChannelFragment extends IRCFragment {
         final String text = String.valueOf(mEditText.getText());
         String nicks = "";
         for (final ChannelUser userNick : users) {
-            nicks += ColourParserUtils.parseHtml(userNick.getPrettyNick(title)) + ": ";
+            nicks += ColourParserUtils.parseMarkup(userNick.getPrettyNick(title)) + ": ";
         }
         mEditText.clearComposingText();
         mEditText.append(nicks + text);

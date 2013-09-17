@@ -12,7 +12,7 @@ import com.google.common.base.CharMatcher;
 import static com.fusionx.lightirc.misc.AppPreferences.highlightLine;
 
 public class ColourParserUtils {
-    public static Spanned parseHtml(final String input) {
+    public static Spanned parseMarkup(final String input) {
         SpannableStringBuilder builder = new SpannableStringBuilder();
         String remainingText = CharMatcher.JAVA_ISO_CONTROL.removeFrom(input);
         while (containsValidTag(remainingText)) {
@@ -42,7 +42,7 @@ public class ColourParserUtils {
                 length = text.length();
                 builder.append(text);
             } else {
-                final Spanned spanned = parseHtml(text);
+                final Spanned spanned = parseMarkup(text);
                 length = spanned.length();
                 builder.append(spanned);
             }

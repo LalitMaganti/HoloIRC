@@ -1,13 +1,13 @@
 package com.fusionx.lightirc.irc;
 
 import android.os.Handler;
-import android.text.Spanned;
 
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.irc.writers.UserWriter;
-import com.fusionx.lightirc.util.ColourParserUtils;
 import com.fusionx.lightirc.util.IRCUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -28,17 +28,17 @@ public class PrivateMessageUser extends User {
             @Override
             public void run() {
                 buffer = new IRCMessageAdapter(userChannelInterface.getContext(),
-                        new ArrayList<Spanned>());
+                        new ArrayList<Message>());
             }
         });
     }
 
     public void onUserEvent(final UserEvent event) {
-        if (nick.equals(event.userNick)) {
+        if (StringUtils.isNotBlank(event.message)) {
             mAdapterHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    buffer.add(ColourParserUtils.parseHtml(event.message));
+                    buffer.add(new Message(event.message));
                 }
             });
         }

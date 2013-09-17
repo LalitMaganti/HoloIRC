@@ -26,6 +26,14 @@
                 android:action="com.fusionx.lightirc.ui.AppPreferenceActivity.DefaultUser"/>
     </Preference>
     <Preference
+            android:title="@string/notification_settings_title"
+            android:summary="@string/notification_settings_summary">
+        <intent
+                android:targetPackage="com.fusionx.lightirc"
+                android:targetClass="com.fusionx.lightirc.ui.AppPreferenceActivity"
+                android:action="com.fusionx.lightirc.ui.AppPreferenceActivity.Notification"/>
+    </Preference>
+    <Preference
             android:title="@string/about"
             android:summary="@string/settings_about_fragment_summary">
         <intent
