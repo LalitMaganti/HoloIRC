@@ -114,10 +114,13 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized void removeChannel(@NonNull final Channel channel) {
         for (final ChannelUser user : bToAMap.remove(channel)) {
-            aToBMap.get(user).remove(channel);
-            user.onRemove(channel);
-            if (aToBMap.get(user).isEmpty()) {
-                aToBMap.remove(user);
+            final UpdateableTreeSet<Channel> channelMap = aToBMap.get(user);
+            if(channelMap != null) {
+                channelMap.remove(channel);
+                user.onRemove(channel);
+                if (channelMap.isEmpty()) {
+                    aToBMap.remove(user);
+                }
             }
         }
     }
