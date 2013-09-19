@@ -12,12 +12,15 @@ lint.xml
 .classpath
 .settings/
 .loadpath
+.gradle
 
 # Locally stored "Eclipse launch configurations"
 *.launch
 
 # Idea files
 .idea
+build
+*.iml
 out
 
 # built application files
