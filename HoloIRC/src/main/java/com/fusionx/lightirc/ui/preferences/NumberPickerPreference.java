@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.ui.preferences;
 
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
@@ -43,6 +42,8 @@ public class NumberPickerPreference extends DialogPreference {
             setMinValue(a.getInteger(R.styleable.NumberPickerPreference_min, DEFAULT_MIN_VALUE));
             setMaxValue(a.getInteger(R.styleable.NumberPickerPreference_max,
                     DEFAULT_MAX_VALUE));
+            setDefaultValue(a.getInteger(R.styleable.NumberPickerPreference_defaultValue,
+                    DEFAULT_VALUE));
         } finally {
             a.recycle();
         }

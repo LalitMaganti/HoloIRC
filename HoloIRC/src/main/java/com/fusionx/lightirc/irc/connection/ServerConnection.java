@@ -166,14 +166,14 @@ class ServerConnection {
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
-                if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
+                if (timesToTry != reconnectAttempts && !disconnectSent) {
                     sender.sendRetryPendingDisconnection(server, "Disconnected from the server");
                 }
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
-            if (timesToTry != reconnectAttempts + 1 && !disconnectSent) {
+            if (timesToTry != reconnectAttempts && !disconnectSent) {
                 sender.sendRetryPendingDisconnection(server, ex.getMessage());
             }
         }

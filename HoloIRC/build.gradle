@@ -29,4 +29,25 @@ android {
         minSdkVersion 9
         targetSdkVersion 18
     }
+
+    signingConfigs {
+        release
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+// specify signing properties on the command line
+if (hasProperty('storeFile')) {
+    println 'Generating a signed package.'
+    android.signingConfigs.release.storeFile = file(storeFile)
+    android.signingConfigs.release.storePassword = storePassword
+    android.signingConfigs.release.keyAlias = keyAlias
+    android.signingConfigs.release.keyPassword = keyPassword
+} else {
+    android.buildTypes.release.signingConfig = null
 }

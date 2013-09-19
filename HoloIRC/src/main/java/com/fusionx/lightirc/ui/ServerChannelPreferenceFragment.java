@@ -51,9 +51,8 @@ public class ServerChannelPreferenceFragment extends PreferenceFragment {
                 .OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
-                numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
-                        .getValue()));
-                return false;
+                preference.setSummary(String.valueOf(newValue));
+                return true;
             }
         });
     }
