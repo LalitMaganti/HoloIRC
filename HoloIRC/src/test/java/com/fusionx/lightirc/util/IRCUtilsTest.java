@@ -1,11 +1,13 @@
 package com.fusionx.lightirc.util;
 
+import com.fusionx.lightirc.RobolectricGradleTestRunner;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 public class IRCUtilsTest {
     @Test
     public void checkNicks() throws Exception {

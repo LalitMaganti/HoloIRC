@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.RobolectricGradleTestRunner;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Server;
@@ -16,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 public class ServerCommandParserTest {
     private ServerCommandParser parser;
     private Context context;

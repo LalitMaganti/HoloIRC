@@ -11,9 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class PrivateMessageUser extends User {
     protected final UserWriter writer;
     private final Handler mAdapterHandler;
