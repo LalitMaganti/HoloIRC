@@ -11,13 +11,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class PrivateMessageUser extends User {
+@Getter
+public final class PrivateMessageUser extends User {
     protected final UserWriter writer;
     private final Handler mAdapterHandler;
-    protected IRCMessageAdapter buffer;
+    private IRCMessageAdapter buffer;
 
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface,
                               final Handler adapterHandler) {

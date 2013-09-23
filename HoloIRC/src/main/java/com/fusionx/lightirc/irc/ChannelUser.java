@@ -179,6 +179,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             if (list.get(0) instanceof Channel && list.get(1) instanceof UserLevelEnum) {
                 userLevelMap.put((Channel) list.get(0), (UserLevelEnum) list.get(1));
             }
+        } else if (newValue instanceof Channel) {
+            updateSpannableNick((Channel) newValue);
         }
     }
 
