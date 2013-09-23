@@ -267,8 +267,8 @@ class ServerCommandParser {
 
         if (channels != null) {
             for (final Channel channel : channels) {
-                mSender.sendGenericChannelEvent(channel, message, false);
-                channel.getUsers().update(user);
+                mSender.sendGenericChannelEvent(channel, message, true);
+                channel.getUsers().update(user, channel);
             }
         }
         return new Event(user.getNick());
