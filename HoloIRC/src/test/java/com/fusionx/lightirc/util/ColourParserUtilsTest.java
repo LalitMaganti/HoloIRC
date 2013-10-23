@@ -3,6 +3,7 @@ package com.fusionx.lightirc.util;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 
+import com.fusionx.lightirc.RobolectricGradleTestRunner;
 import com.fusionx.lightirc.misc.AppPreferences;
 
 import org.junit.Test;
@@ -11,7 +12,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 public class ColourParserUtilsTest {
     @Test
     public void parseTest() {

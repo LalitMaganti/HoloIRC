@@ -2,6 +2,7 @@ package com.fusionx.lightirc.irc.parser;
 
 import android.os.Handler;
 
+import com.fusionx.lightirc.RobolectricGradleTestRunner;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
@@ -12,7 +13,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
 public class ServerLineParserTest {
     private ServerLineParser parser;
 

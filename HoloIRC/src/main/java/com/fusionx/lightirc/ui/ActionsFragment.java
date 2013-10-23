@@ -78,6 +78,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
             mAdapter.setFragmentType(type);
             type = null;
         }
+        onOpen();
     }
 
     @Override
@@ -91,12 +92,8 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 nickChangeDialog();
                 break;
             case 2:
-                final Server server = callback.getServer(true);
-                if (server == null) {
-                    callback.onDisconnect(true, false);
-                } else {
-                    ServerCommandSender.sendDisconnect(server, getActivity());
-                }
+                ServerCommandSender.sendDisconnect(callback.getServer(), getActivity());
+                callback.onDisconnect(true, false);
                 return;
             case 3:
                 ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
@@ -114,7 +111,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 callback.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendNickChange(callback.getServer(false), input);
+                ServerCommandSender.sendNickChange(callback.getServer(), input);
             }
         };
         nickDialog.show();
@@ -125,7 +122,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 (getActivity()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendJoin(callback.getServer(false), input);
+                ServerCommandSender.sendJoin(callback.getServer(), input);
             }
         };
         builder.show();
@@ -159,7 +156,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         public boolean isConnectedToServer();
 
-        public Server getServer(boolean nullable);
+        public Server getServer();
 
         public void closeAllSlidingMenus();
 

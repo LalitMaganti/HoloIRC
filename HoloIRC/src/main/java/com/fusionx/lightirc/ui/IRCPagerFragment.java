@@ -223,8 +223,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     @Override
-    public Server getServer(boolean nullAllowed) {
-        return mCallback.getServer(nullAllowed);
+    public Server getServer() {
+        return mCallback.getServer();
     }
 
     public void connectedToServer() {
@@ -233,7 +233,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public interface IRCPagerInterface {
-        public Server getServer(boolean nullAllowed);
+        public Server getServer();
 
         public boolean isConnectedToServer();
 

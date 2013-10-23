@@ -18,7 +18,7 @@ import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 
-class ServiceFragment extends Fragment {
+public class ServiceFragment extends Fragment {
     private IRCService mService;
     private ServiceFragmentCallback mCallbacks;
     private MessageSender mSender;
@@ -123,7 +123,7 @@ class ServiceFragment extends Fragment {
 
             mService.setServerDisplayed(mCallbacks.getServerTitle());
 
-            if (getServer(true, mCallbacks.getServerTitle()) != null) {
+            if (getServer(mCallbacks.getServerTitle()) != null) {
                 mCallbacks.setUpViewPager();
                 mCallbacks.repopulateFragmentsInPager();
             } else {
@@ -141,16 +141,11 @@ class ServiceFragment extends Fragment {
         }
     };
 
-    public Server getServer(final boolean nullAllowed, final String serverTitle) {
-        if (mService == null || (mServer = mService.getServer(serverTitle)) == null) {
-            if (nullAllowed) {
-                return null;
-            } else {
-                throw new UnsupportedOperationException();
-            }
-        } else {
-            return mServer;
+    public Server getServer(final String serverTitle) {
+        if (mServer == null && mService != null) {
+            mServer = mService.getServer(serverTitle);
         }
+        return mServer;
     }
 
     public void removeServiceReference(final String serverTitle) {

@@ -36,7 +36,7 @@ public class UserFragment extends IRCFragment {
         if (getListAdapter() == null) {
             final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                     UserFragmentCallbacks.class);
-            final Server server = callback.getServer(true);
+            final Server server = callback.getServer();
             final PrivateMessageUser user = server.getPrivateMessageUser(title);
             final IRCAnimationAdapter adapter = new IRCAnimationAdapter(user.getBuffer
                     ());
@@ -58,11 +58,11 @@ public class UserFragment extends IRCFragment {
     public void sendMessage(final String message) {
         UserFragmentCallbacks callback = FragmentUtils.getParent(this,
                 UserFragmentCallbacks.class);
-        MessageParser.userMessageToParse(getActivity(), callback.getServer(false), title,
+        MessageParser.userMessageToParse(getActivity(), callback.getServer(), title,
                 message);
     }
 
     public interface UserFragmentCallbacks {
-        public Server getServer(boolean nullable);
+        public Server getServer();
     }
 }

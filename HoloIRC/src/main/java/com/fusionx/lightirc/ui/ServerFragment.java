@@ -54,8 +54,8 @@ public class ServerFragment extends IRCFragment {
 
         final ServerFragmentCallback callback = FragmentUtils.getParent(this,
                 ServerFragmentCallback.class);
-        final Server server = callback.getServer(true);
-        if (server != null && getListAdapter() == null) {
+        final Server server = callback.getServer();
+        if (getListAdapter() == null) {
             final IRCMessageAdapter adapter = server.getBuffer() == null ? new IRCMessageAdapter
                     (getActivity(), new ArrayList<Message>()) : server.getBuffer();
             final IRCAnimationAdapter alphaInAnimationAdapter = new IRCAnimationAdapter
@@ -71,7 +71,7 @@ public class ServerFragment extends IRCFragment {
     public void sendMessage(String message) {
         final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
                 ServerFragmentCallback.class);
-        final Server server = callback.getServer(true);
+        final Server server = callback.getServer();
         MessageParser.serverMessageToParse(getActivity(), server, message);
     }
 
@@ -80,7 +80,7 @@ public class ServerFragment extends IRCFragment {
     }
 
     public interface ServerFragmentCallback {
-        public Server getServer(boolean nullable);
+        public Server getServer();
 
         public boolean isConnectedToServer();
     }

@@ -35,12 +35,12 @@ public class AppPreferenceActivity extends PreferenceActivity {
             if (action != null) {
                 if (action.equals(PREF_ACTION_APPEARANCE)) {// Appearance settings
                     addPreferencesFromResource(R.xml.appearance_settings_fragment);
-                    AppearancePreferenceFragment.setupThemePreference(getPreferenceScreen(),
+                    PreferenceHelpers.setupThemePreference(getPreferenceScreen(),
                             this);
 
                 } else if (action.equals(PREF_ACTION_SERVER_CHANNEL)) {// Server Channel Settings
                     addPreferencesFromResource(R.xml.server_channel_settings_fragment);
-                    ServerChannelPreferenceFragment.setupNumberPicker(getPreferenceScreen());
+                    PreferenceHelpers.setupNumberPicker(getPreferenceScreen());
 
                 } else if (action.equals(PREF_ACTION_DEFAULT_USER)) {// Default User Settings
                     addPreferencesFromResource(R.xml.default_user_fragment);
@@ -50,7 +50,7 @@ public class AppPreferenceActivity extends PreferenceActivity {
 
                 } else if (action.equals(PREF_ACTION_ABOUT)) {// About settings
                     addPreferencesFromResource(R.xml.about_settings_fragment);
-                    AboutPreferenceFragment.setupAppVersionPreference(getPreferenceScreen(),
+                    PreferenceHelpers.setupAppVersionPreference(getPreferenceScreen(),
                             this);
 
                 }

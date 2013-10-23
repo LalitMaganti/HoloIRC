@@ -22,16 +22,11 @@
 package com.fusionx.lightirc.ui;
 
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.util.MiscUtils;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class AboutPreferenceFragment extends PreferenceFragment {
@@ -40,15 +35,6 @@ public class AboutPreferenceFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.about_settings_fragment);
 
-        setupAppVersionPreference(getPreferenceScreen(), getActivity());
-    }
-
-    public static void setupAppVersionPreference(final PreferenceScreen screen,
-                                                 final Context context) {
-        final Preference appVersionPreference = screen.findPreference(PreferenceConstants
-                .AppVersion);
-        if (appVersionPreference != null) {
-            appVersionPreference.setSummary(MiscUtils.getAppVersion(context));
-        }
+        PreferenceHelpers.setupAppVersionPreference(getPreferenceScreen(), getActivity());
     }
 }

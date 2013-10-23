@@ -52,7 +52,7 @@ public class ChannelFragment extends IRCFragment {
         super.onResume();
 
         if (getListAdapter() == null) {
-            final Server server = callback.getServer(true);
+            final Server server = callback.getServer();
             final Channel channel = server.getUserChannelInterface().getChannel(title);
             final IRCAnimationAdapter adapter = new IRCAnimationAdapter(channel
                     .getBuffer());
@@ -82,11 +82,11 @@ public class ChannelFragment extends IRCFragment {
 
     @Override
     public void sendMessage(final String message) {
-        MessageParser.channelMessageToParse(getActivity(), callback.getServer(false), title,
+        MessageParser.channelMessageToParse(getActivity(), callback.getServer(), title,
                 message);
     }
 
     public interface ChannelFragmentCallback {
-        public Server getServer(final boolean nullAllowed);
+        public Server getServer();
     }
 }
