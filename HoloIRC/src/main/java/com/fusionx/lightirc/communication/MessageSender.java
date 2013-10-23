@@ -64,12 +64,17 @@ public class MessageSender {
     private MessageSender() {
     }
 
+    public Bus getBus() {
+        return mBus;
+    }
+
     public static MessageSender getSender(final String serverName, final boolean nullable) {
         synchronized (mSenderMap) {
             MessageSender sender = mSenderMap.get(serverName);
             if (sender == null && !nullable) {
                 sender = new MessageSender();
                 sender.mServerName = serverName;
+                sender.mBus = new IRCBus(sender);
                 mSenderMap.put(serverName, sender);
             }
             return sender;
@@ -94,13 +99,6 @@ public class MessageSender {
         synchronized (mSenderMap) {
             mSenderMap.remove(mServerName);
         }
-    }
-
-    public Bus getBus() {
-        if (mBus == null) {
-            mBus = new IRCBus(this);
-        }
-        return mBus;
     }
 
     public void setDisplayed(final boolean toast) {

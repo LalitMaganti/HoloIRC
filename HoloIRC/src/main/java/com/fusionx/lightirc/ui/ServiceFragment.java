@@ -142,12 +142,10 @@ public class ServiceFragment extends Fragment {
     };
 
     public Server getServer(final String serverTitle) {
-        if (mServer != null || (mService != null && (mServer = mService.getServer(serverTitle)) !=
-                null)) {
-            return mServer;
-        } else {
-            throw new IllegalArgumentException();
+        if (mServer == null && mService != null) {
+            mServer = mService.getServer(serverTitle);
         }
+        return mServer;
     }
 
     public void removeServiceReference(final String serverTitle) {
