@@ -134,7 +134,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 return true;
             case R.id.fragment_userlist_cab_pm: {
                 if (isNickOtherUsers(nick)) {
-                    ServerCommandSender.sendMessageToUser(mCallback.getServer(false), nick, "");
+                    ServerCommandSender.sendMessageToUser(mCallback.getServer(), nick, "");
                     mCallback.closeAllSlidingMenus();
                     mode.finish();
                 } else {
@@ -155,7 +155,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 return true;
             }
             case R.id.fragment_userlist_cab_whois:
-                ServerCommandSender.sendUserWhois(mCallback.getServer(false), nick);
+                ServerCommandSender.sendUserWhois(mCallback.getServer(), nick);
                 return true;
             default:
                 return false;
@@ -177,7 +177,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     }
 
     boolean isNickOtherUsers(final String nick) {
-        return !mCallback.getServer(false).getUser().getNick().equals(nick);
+        return !mCallback.getServer().getUser().getNick().equals(nick);
     }
 
     @Override
@@ -214,7 +214,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public interface UserListCallback {
         public void onUserMention(final List<ChannelUser> users);
 
-        public Server getServer(boolean nullable);
+        public Server getServer();
 
         public void closeAllSlidingMenus();
 

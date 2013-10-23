@@ -107,8 +107,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public Server getServer(boolean nullable) {
-        return mCallback.getServer(nullable);
+    public Server getServer() {
+        return mCallback.getServer();
     }
 
     @Override
@@ -130,7 +130,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
         public boolean isConnectedToServer();
 
-        public Server getServer(boolean nullable);
+        public Server getServer();
 
         public void closeAllSlidingMenus();
 

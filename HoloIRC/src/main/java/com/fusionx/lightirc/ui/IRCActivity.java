@@ -91,17 +91,17 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
-
-        setUpContent();
+        setContentView(R.layout.activity_irc);
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
                 ("serverTitle");
 
-        setUpSlidingMenu();
-
         final FragmentManager fm = getSupportFragmentManager();
         mServiceFragment = (ServiceFragment) fm.findFragmentByTag("service");
+
+        setUpSlidingMenu(fm);
+
         mIRCPagerFragment = (IRCPagerFragment) fm.findFragmentById(R.id.pager_fragment);
 
         final ActionBar actionBar = getSupportActionBar();
@@ -110,7 +110,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             fm.beginTransaction().add(mServiceFragment, "service").commit();
             actionBar.setSubtitle(getString(R.string.status_connecting));
         } else {
-            actionBar.setSubtitle(getServer(false).getStatus());
+            actionBar.setSubtitle(getServer().getStatus());
             setUpViewPager();
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -126,8 +126,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         MessageSender.getSender(mServerTitle).getBus().register(mEventReceiver);
     }
 
-    protected abstract void setUpContent();
-
     @Override
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
@@ -136,10 +134,41 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         super.onDestroy();
     }
 
-    protected abstract void setUpSlidingMenu();
+    private void setUpSlidingMenu(final FragmentManager manager) {
+        mUserSlidingMenu = (SlidingMenu) findViewById(R.id.user_sliding_menu);
+        mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
+        mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
+        mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
+        mUserSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+        mUserSlidingMenu.setTouchmodeMarginThreshold(10);
+        mUserSlidingMenu.setMode(SlidingMenu.RIGHT);
+        mUserSlidingMenu.setBehindWidthRes(R.dimen.user_menu_sliding_width);
+
+        mUserListFragment = (UserListFragment) manager.findFragmentById(R.id.userlist_fragment);
+
+        mUserSlidingMenu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+            @Override
+            public void onOpen() {
+                mUserListFragment.onMenuOpened(getServer().getUserChannelInterface()
+                        .getChannel(mIRCPagerFragment.getCurrentTitle()));
+                onUserListDisplayed();
+            }
+        });
+        mUserSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
+            @Override
+            public void onClose() {
+                getSupportActionBar().setSubtitle(getServer().getStatus());
+                mUserListFragment.onClose();
+            }
+        });
+
+        setUpActionsFragment();
+    }
+
+    protected abstract void setUpActionsFragment();
 
     protected void onUserListDisplayed() {
-        final Channel channel = getServer(false).getUserChannelInterface()
+        final Channel channel = getServer().getUserChannelInterface()
                 .getChannel(mIRCPagerFragment.getCurrentTitle());
         getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " users");
     }
@@ -218,10 +247,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void repopulateFragmentsInPager() {
         if (isConnectedToServer()) {
-            for (final Channel channel : getServer(false).getUser().getChannels()) {
+            for (final Channel channel : getServer().getUser().getChannels()) {
                 mIRCPagerFragment.createChannelFragment(channel.getName(), false);
             }
-            final Iterator<PrivateMessageUser> iterator = getServer(false).getUser()
+            final Iterator<PrivateMessageUser> iterator = getServer().getUser()
                     .getPrivateMessageIterator();
             while (iterator.hasNext()) {
                 mIRCPagerFragment.createPMFragment(iterator.next().getNick());
@@ -232,12 +261,12 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void setUpViewPager() {
         mIRCPagerFragment.createServerFragment(mServerTitle);
-        getSupportActionBar().setSubtitle(getServer(false).getStatus());
+        getSupportActionBar().setSubtitle(getServer().getStatus());
     }
 
     @Override
-    public Server getServer(final boolean nullAllowed) {
-        return mServiceFragment.getServer(nullAllowed, mServerTitle);
+    public Server getServer() {
+        return mServiceFragment.getServer(mServerTitle);
     }
 
     /**
@@ -268,7 +297,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
      */
     @Override
     public boolean isConnectedToServer() {
-        final Server server = getServer(true);
+        final Server server = getServer();
         return server != null && server.isConnected(this);
     }
 
@@ -282,7 +311,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     public void onDisconnect(final boolean expected, final boolean retryPending) {
         getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
         if (expected && !retryPending) {
-            if (getServer(true) != null) {
+            if (getServer() != null) {
                 mServiceFragment.removeServiceReference(mServerTitle);
             }
             final Intent intent = new Intent(this, ServerListActivity.class);
@@ -292,7 +321,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             closeAllSlidingMenus();
             mIRCPagerFragment.onUnexpectedDisconnect();
             mActionsPagerFragment.updateConnectionStatus(false);
-            if (getServer(true) != null && !retryPending) {
+            if (!retryPending && getServer() != null) {
                 mServiceFragment.removeServiceReference(mServerTitle);
             }
         }
@@ -317,7 +346,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
      */
     @Override
     public String getNick() {
-        return getServer(false).getUser().getNick();
+        return getServer().getUser().getNick();
     }
 
     /**
@@ -325,7 +354,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
      */
     @Override
     public void closeOrPartCurrentTab() {
-        final Server server = getServer(false);
+        final Server server = getServer();
         if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
             ServerCommandSender.sendClosePrivateMessage(server,
                     mIRCPagerFragment.getCurrentTitle());
@@ -372,7 +401,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         @Subscribe
         public void onServerConnected(final ConnectedEvent event) {
             mActionsPagerFragment.updateConnectionStatus(true);
-            getSupportActionBar().setSubtitle(getServer(false).getStatus());
+            getSupportActionBar().setSubtitle(getServer().getStatus());
         }
 
         @Subscribe
