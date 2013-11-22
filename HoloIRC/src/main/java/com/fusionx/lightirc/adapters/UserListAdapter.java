@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.Channel;
@@ -35,6 +34,7 @@ import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.util.UIUtils;
 
 import lombok.Setter;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
         StickyListHeadersAdapter {

@@ -28,11 +28,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.AbsListView;
 import android.widget.GridView;
 
@@ -49,19 +47,18 @@ import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
 import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.ui.widget.ServerCard;
+import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.squareup.otto.Subscribe;
 
-import java.io.File;
 import java.util.ArrayList;
 
-public class ServerListActivity extends ActionBarActivity implements PopupMenu
-        .OnMenuItemClickListener, PopupMenu.OnDismissListener,
-        ServerListAdapter.BuilderAdapterCallback, AnimatedServerListAdapter
-                .SingleDismissCallback {
+public class ServerListActivity extends ActionBarActivity implements ServerListAdapter
+        .BuilderAdapterCallback, AnimatedServerListAdapter.SingleDismissCallback,
+        ServerCard.ServerCardCallback {
     private IRCService mService = null;
-    private ServerConfiguration.Builder mBuilder = null;
     private ServerListAdapter mServerCardsAdapter = null;
     private AnimatedServerListAdapter mAnimationAdapter = null;
 
@@ -74,7 +71,7 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
 
         AppPreferences.setUpPreferences(this);
         mServerCardsAdapter = new ServerListAdapter(this,
-                new SynchronizedArrayList<ServerConfiguration.Builder>());
+                new SynchronizedArrayList<ServerCardInterface>());
     }
 
     @Override
@@ -100,14 +97,16 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     protected void onStop() {
         super.onStop();
 
-        for (ServerConfiguration.Builder builder : mServerCardsAdapter.getListOfItems()) {
-            final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
-            if (sender != null) {
-                try {
-                    sender.getBus().unregister(this);
-                } catch (Exception ex) {
-                    // Do nothing - we aren't registered it seems
-                    // TODO - fix this properly
+        for (ServerCardInterface builder : mServerCardsAdapter.getListOfItems()) {
+            if(builder.getTitle() != null) {
+                final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
+                if (sender != null) {
+                    try {
+                        sender.getBus().unregister(this);
+                    } catch (Exception ex) {
+                        // Do nothing - we aren't registered it seems
+                        // TODO - fix this properly
+                    }
                 }
             }
         }
@@ -185,7 +184,8 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         for (final String file : serverFiles) {
             ServerConfiguration.Builder builder = SharedPreferencesUtils.convertPrefsToBuilder
                     (this, file);
-            mServerCardsAdapter.add(builder);
+            final ServerCard card = new ServerCard(this, builder, this);
+            mServerCardsAdapter.add(card);
             final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
             if (sender != null) {
                 sender.getBus().register(this);
@@ -198,58 +198,8 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
-    // Connect to server
-    public void onCardClick(final View view) {
-        Intent intent = new Intent(ServerListActivity.this, UIUtils.getIRCActivity(this));
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("server", (ServerConfiguration.Builder) view.getTag());
-        startActivity(intent);
-    }
-
-    // Popup menu
-    public void showPopup(final View view) {
-        final PopupMenu popup = new PopupMenu(this, view);
-        mBuilder = (ServerConfiguration.Builder) view.getTag();
-        popup.inflate(R.menu.activity_server_list_popup);
-
-        if (serverIsAvailable(mBuilder.getTitle())) {
-            popup.getMenu().getItem(1).setEnabled(false);
-            popup.getMenu().getItem(2).setEnabled(false);
-        } else {
-            popup.getMenu().getItem(0).setEnabled(false);
-        }
-
-        popup.setOnMenuItemClickListener(this);
-        popup.setOnDismissListener(this);
-        popup.show();
-    }
-
-
     @Override
-    public void onDismiss(final PopupMenu popupMenu) {
-        mBuilder = null;
-    }
-
-    @Override
-    public boolean onMenuItemClick(final MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.activity_server_list_popup_edit:
-                editServer(mBuilder);
-                break;
-            case R.id.activity_server_list_popup_disconnect:
-                disconnectFromServer(mBuilder);
-                break;
-            case R.id.activity_server_list_popup_delete:
-                deleteServer(mBuilder);
-                break;
-            default:
-                return false;
-        }
-        mBuilder = null;
-        return true;
-    }
-
-    private void disconnectFromServer(final ServerConfiguration.Builder builder) {
+    public void disconnectFromServer(final ServerCard builder) {
         final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
         if (sender != null) {
             sender.getBus().unregister(this);
@@ -260,9 +210,13 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         mServerCardsAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public ArrayList<String> getServerTitles(ServerCard card) {
+        return mServerCardsAdapter.getListOfTitles(card);
+    }
+
     private void addNewServer() {
-        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivity
-                .class);
+        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivity.class);
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
@@ -270,20 +224,13 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
         startActivity(intent);
     }
 
-    private void editServer(final ServerConfiguration.Builder builder) {
-        final Intent intent = new Intent(ServerListActivity.this, ServerPreferenceActivity.class);
-
-        intent.putExtra("file", builder.getFile());
-        intent.putExtra("server", builder);
-        intent.putStringArrayListExtra("list", mServerCardsAdapter.getListOfTitles(builder));
-        startActivity(intent);
-    }
-
-    private void deleteServer(final ServerConfiguration.Builder builder) {
+    @Override
+    public void deleteServer(final ServerCard builder) {
         mAnimationAdapter.animateDismiss(mServerCardsAdapter.getPosition(builder));
     }
 
-    private boolean serverIsAvailable(final String title) {
+    @Override
+    public boolean isServerAvailable(final String title) {
         final Server server = getServer(title);
         return mService != null && server != null && !server.getStatus().equals(getString(R
                 .string.status_disconnected));
@@ -298,10 +245,9 @@ public class ServerListActivity extends ActionBarActivity implements PopupMenu
     @SuppressWarnings("RedundantCast")
     @Override
     public void onDismiss(AbsListView listView, int position) {
-        final ServerConfiguration.Builder builder = mServerCardsAdapter.getItem(position);
-        final File folder = new File(SharedPreferencesUtils
-                .getSharedPreferencesPath(this) + builder.getFile() + ".xml");
-        folder.delete();
+        final ServerCardInterface builder = mServerCardsAdapter.getItem(position);
+        builder.onCardDismiss();
+
         ((GridView) listView).setAdapter(null);
         mServerCardsAdapter.remove(builder);
         mAnimationAdapter.notifyDataSetChanged();

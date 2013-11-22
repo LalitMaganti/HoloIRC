@@ -18,7 +18,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         .IgnoreListCallback, ActionsFragment.IRCActionsCallback {
     private ViewPager mActionViewPager;
-    private ActionPagerAdapter mActionsPagerAdapter = null;
+    private ActionPagerAdapter mActionsPagerAdapter;
     private ActionsPagerFragmentCallback mCallback;
 
     @Override

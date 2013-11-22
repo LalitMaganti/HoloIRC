@@ -31,6 +31,7 @@ import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.UserChannelInterface;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.Event;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -51,7 +52,6 @@ import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_WHOREPLY;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.doNothingCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.genericCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
-import static com.fusionx.lightirc.util.MiscUtils.isMotdAllowed;
 
 class ServerCodeParser {
     private final WhoParser mWhoParser;
@@ -60,7 +60,7 @@ class ServerCodeParser {
     private final Context mContext;
     private final Server mServer;
     private final MessageSender mSender;
-    private boolean motdAllowed;
+    //private boolean motdAllowed;
 
     ServerCodeParser(final Context context, final ServerLineParser parser) {
         mServer = parser.getServer();
@@ -69,7 +69,7 @@ class ServerCodeParser {
         mNameParser = new NameParser(mUserChannelInterface, mServer.getTitle());
         mContext = context;
         mSender = MessageSender.getSender(mServer.getTitle());
-        motdAllowed = isMotdAllowed(mContext);
+        //motdAllowed = isMotdAllowed(mContext);
     }
 
     /**
@@ -92,13 +92,13 @@ class ServerCodeParser {
             case RPL_MOTDSTART:
             case RPL_MOTD:
                 final String motdline = message.substring(1).trim();
-                if (motdAllowed) {
+                if (AppPreferences.motdAllowed) {
                     return mSender.sendGenericServerEvent(mServer, motdline);
                 } else {
                     return new Event(motdline);
                 }
             case RPL_ENDOFMOTD:
-                if (motdAllowed) {
+                if (AppPreferences.motdAllowed) {
                     return mSender.sendGenericServerEvent(mServer, message);
                 } else {
                     return new Event(message);

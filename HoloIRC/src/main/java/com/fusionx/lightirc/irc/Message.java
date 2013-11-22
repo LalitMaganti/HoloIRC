@@ -10,7 +10,7 @@ public class Message {
     public final String timestamp;
     public final Spanned message;
 
-    public Message(String message) {
+    public Message(final String message) {
         if (AppPreferences.timestamp) {
             final Time now = new Time();
             now.setToNow();

@@ -20,7 +20,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-    <attr name="server_card_background" format="reference|color"/>
+    <attr name="card_server_background" format="reference|color"/>
     <attr name="server_card_text" format="reference|color"/>
     <attr name="overflow_menu_drawable" format="reference"/>
 

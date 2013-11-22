@@ -21,32 +21,62 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
+import android.app.Activity;
+
 import com.fusionx.lightirc.communication.MessageParser;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.irc.Message;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.squareup.otto.Subscribe;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 public class UserFragment extends IRCFragment {
+    private UserFragmentCallback mCallback;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if (mCallback == null) {
+            mCallback = FragmentUtils.getParent(this, UserFragmentCallback.class);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
 
-        if (getListAdapter() == null) {
-            final UserFragmentCallbacks callback = FragmentUtils.getParent(this,
-                    UserFragmentCallbacks.class);
-            final Server server = callback.getServer();
-            final PrivateMessageUser user = server.getPrivateMessageUser(title);
-            final IRCAnimationAdapter adapter = new IRCAnimationAdapter(user.getBuffer
-                    ());
-            adapter.setAbsListView(getListView());
-            user.getBuffer().setActivityContext(getActivity());
-            setListAdapter(adapter);
-            getListView().setSelection(getListView().getCount());
-        } else {
-            getListAdapter().notifyDataSetChanged();
-        }
+        MessageSender.getSender(mCallback.getServer().getTitle())
+                .getBus().register(this);
+        mCallback.getServer().getPrivateMessageUser(mTitle).setCached(true);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        MessageSender.getSender(mCallback.getServer().getTitle())
+                .getBus().unregister(this);
+        mCallback.getServer().getPrivateMessageUser(mTitle).setCached(false);
+    }
+
+    @Override
+    protected List<Message> onRetrieveMessages() {
+        final PrivateMessageUser uci = mCallback.getServer().getPrivateMessageUser(mTitle);
+        return uci.getBuffer();
+    }
+
+    @Override
+    protected void onPersistMessages(List<Message> list) {
+        final PrivateMessageUser user = mCallback.getServer().getPrivateMessageUser(mTitle);
+        user.setBuffer(list);
     }
 
     @Override
@@ -55,14 +85,19 @@ public class UserFragment extends IRCFragment {
     }
 
     @Override
-    public void sendMessage(final String message) {
-        UserFragmentCallbacks callback = FragmentUtils.getParent(this,
-                UserFragmentCallbacks.class);
-        MessageParser.userMessageToParse(getActivity(), callback.getServer(), title,
+    public void onSendMessage(final String message) {
+        MessageParser.userMessageToParse(getActivity(), mCallback.getServer(), mTitle,
                 message);
     }
 
-    public interface UserFragmentCallbacks {
+    @Subscribe
+    public void onUserEvent(final UserEvent event) {
+        if (StringUtils.isNotBlank(event.message)) {
+            mMessageAdapter.add(new Message(event.message));
+        }
+    }
+
+    public interface UserFragmentCallback {
         public Server getServer();
     }
 }

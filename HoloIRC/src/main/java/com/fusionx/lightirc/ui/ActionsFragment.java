@@ -29,7 +29,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
 import com.fusionx.lightirc.communication.ServerCommandSender;
@@ -39,6 +38,8 @@ import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {

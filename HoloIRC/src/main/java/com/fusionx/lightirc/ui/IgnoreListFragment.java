@@ -50,6 +50,13 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        MiscUtils.forceUpdateIgnoreList(null);
+    }
+
+    @Override
     protected void attachSelectionController() {
         mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
                 getListView(), (ActionBarActivity) getActivity(), this, true);

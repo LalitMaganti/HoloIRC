@@ -27,6 +27,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -72,7 +73,7 @@ public class IRCService extends Service {
         if (server != null) {
             final ServerConfiguration configuration = server.build();
 
-            MessageSender sender = MessageSender.getSender(server.getTitle());
+            final MessageSender sender = MessageSender.getSender(server.getTitle());
             sender.initialSetup(this);
             sender.getBus().register(this);
             final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
@@ -112,7 +113,15 @@ public class IRCService extends Service {
     public void disconnectAll() {
         synchronized (mBinder) {
             if (connectionManager != null) {
-                connectionManager.disconnectAll();
+                final AsyncTask<Void, Void, Void> disconnectAll = new AsyncTask<Void, Void,
+                        Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        connectionManager.disconnectAll();
+                        return null;
+                    }
+                };
+                disconnectAll.execute();
             }
         }
         if (serverDisplayed != null) {
@@ -138,8 +147,8 @@ public class IRCService extends Service {
                     stopForeground(true);
                 } else {
                     updateNotification();
-                    final NotificationManager mNotificationManager =
-                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    final NotificationManager mNotificationManager = (NotificationManager)
+                            getSystemService(Context.NOTIFICATION_SERVICE);
                     mNotificationManager.cancel(345);
                 }
             }

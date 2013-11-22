@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class AppUser extends ChannelUser {
-    private ArrayList<PrivateMessageUser> privateMessages = new ArrayList<PrivateMessageUser>();
+    private ArrayList<PrivateMessageUser> mPrivateMessages = new ArrayList<PrivateMessageUser>();
 
     public AppUser(final String nick,
                    final UserChannelInterface userChannelInterface) {
@@ -36,19 +36,19 @@ public class AppUser extends ChannelUser {
     }
 
     public void createPrivateMessage(final PrivateMessageUser user) {
-        privateMessages.add(user);
+        mPrivateMessages.add(user);
     }
 
     public void closePrivateMessage(final PrivateMessageUser user) {
-        privateMessages.remove(user);
+        mPrivateMessages.remove(user);
     }
 
     public boolean isPrivateMessageOpen(final PrivateMessageUser user) {
-        return privateMessages.contains(user);
+        return mPrivateMessages.contains(user);
     }
 
     public Iterator<PrivateMessageUser> getPrivateMessageIterator() {
-        return privateMessages.iterator();
+        return mPrivateMessages.iterator();
     }
 
     @Override

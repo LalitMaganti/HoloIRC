@@ -26,7 +26,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.preference.PreferenceManager;
 
 import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.PreferenceConstants;
@@ -47,22 +46,10 @@ import java.util.Set;
 public class MiscUtils {
     private static Set<String> ignoreList = null;
 
-    public static boolean isMotdAllowed(final Context context) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        return preferences.getBoolean(PreferenceConstants.Motd, true);
-    }
-
-    public static boolean isMessagesFromChannelShown(final Context context) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        return !preferences.getBoolean(PreferenceConstants.HideMessages, false);
-    }
-
-    public static String getPartReason(final Context context) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        return preferences.getString(PreferenceConstants.PartReason, "");
+    /**
+     * Static utility methods only - can't instantiate this class
+     */
+    private MiscUtils() {
     }
 
     /**
@@ -96,7 +83,6 @@ public class MiscUtils {
         stringParts.add(trimmedInput.substring(pos));
         return stringParts;
     }
-
 
     public static String convertArrayListToString(final ArrayList<String> list) {
         final StringBuilder builder = new StringBuilder();
@@ -134,18 +120,6 @@ public class MiscUtils {
         return Constants.channelPrefixes.contains(firstCharacter);
     }
 
-    public static String getQuitReason(final Context context) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        return preferences.getString(PreferenceConstants.QuitReason, "");
-    }
-
-    public static int getNumberOfReconnectEvents(final Context context) {
-        final SharedPreferences preferences = PreferenceManager
-                .getDefaultSharedPreferences(context);
-        return preferences.getInt(PreferenceConstants.ReconnectTries, 3);
-    }
-
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
         if (ignoreList == null) {
             final SharedPreferences preferences = context.getSharedPreferences(fileName,
@@ -173,11 +147,5 @@ public class MiscUtils {
 
     public static boolean isUserOwnerOrVoice(final UserLevelEnum level) {
         return level.equals(UserLevelEnum.OP) || level.equals(UserLevelEnum.VOICE);
-    }
-
-    /**
-     * Static utility methods only - can't instantiate this class
-     */
-    private MiscUtils() {
     }
 }

@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
-import android.os.Handler;
 
 import com.fusionx.lightirc.collections.TwoWayHashSet;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
@@ -33,24 +32,18 @@ import com.fusionx.lightirc.util.IRCUtils;
 import java.io.OutputStreamWriter;
 import java.util.Set;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
 
-@Getter(AccessLevel.PACKAGE)
 public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Channel> {
-    private final OutputStreamWriter outputStream;
-    private final Context context;
-    private final Server server;
-    private final Handler mAdapterHandler;
+    private final OutputStreamWriter mOutputStream;
+    private final Context mContext;
+    private final Server mServer;
 
     public UserChannelInterface(final OutputStreamWriter outputStream,
-                                final Context context, final Server server,
-                                final Handler adapterHandler) {
-        this.outputStream = outputStream;
-        this.context = context;
-        this.server = server;
-        mAdapterHandler = adapterHandler;
+                                final Context context, final Server server) {
+        mOutputStream = outputStream;
+        mContext = context;
+        mServer = server;
     }
 
     public synchronized void coupleUserAndChannel(final ChannelUser user,
@@ -153,7 +146,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     public synchronized Channel getChannel(@NonNull final String name) {
         return getChannelIfExists(name) != null ? getChannelIfExists(name) : new Channel(name,
-                this, mAdapterHandler);
+                this);
     }
 
     public synchronized Channel getChannelIfExists(@NonNull final String name) {
@@ -167,5 +160,18 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
 
     synchronized void putAppUser(@NonNull final AppUser user) {
         aToBMap.put(user, new UpdateableTreeSet<Channel>());
+    }
+
+    // Getters and setters
+    OutputStreamWriter getOutputStream() {
+        return mOutputStream;
+    }
+
+    Context getContext() {
+        return mContext;
+    }
+
+    Server getServer() {
+        return mServer;
     }
 }

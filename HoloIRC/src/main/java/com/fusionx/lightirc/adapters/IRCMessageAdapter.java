@@ -16,14 +16,16 @@ import com.fusionx.lightirc.util.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class IRCMessageAdapter extends ArrayAdapter<Message> {
-    private Context activityContext;
+    private Context mContext;
+    private List<Message> mObjects;
 
-    public IRCMessageAdapter(Context context, ArrayList<Message> objects) {
+    public IRCMessageAdapter(Context context, final List<Message> objects) {
         super(context, R.layout.irc_listview_textview, objects);
-        activityContext = context;
+        mContext = context;
+        mObjects = objects;
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -32,12 +34,14 @@ public class IRCMessageAdapter extends ArrayAdapter<Message> {
         View view;
         ViewHolder holder;
         if (convertView == null) {
-            view = LayoutInflater.from(activityContext).inflate(R.layout
+            view = LayoutInflater.from(mContext).inflate(R.layout
                     .irc_listview_textview, parent, false);
             final TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
-            timestamp.setTypeface(UIUtils.getRobotoLight(activityContext));
+            timestamp.setTypeface(UIUtils.getRobotoLight(mContext));
+
             final TextView message = (TextView) view.findViewById(R.id.message);
-            message.setTypeface(UIUtils.getRobotoLight(activityContext));
+            message.setTypeface(UIUtils.getRobotoLight(mContext));
+
             holder = new ViewHolder(timestamp, message);
             view.setTag(holder);
         } else {
@@ -56,17 +60,17 @@ public class IRCMessageAdapter extends ArrayAdapter<Message> {
         return view;
     }
 
-    public void setActivityContext(final Context context) {
-        activityContext = context;
-    }
-
     private static class ViewHolder {
         public final TextView timestamp;
         public final TextView message;
 
-        private ViewHolder(TextView timestamp, TextView message) {
+        private ViewHolder(final TextView timestamp, final TextView message) {
             this.timestamp = timestamp;
             this.message = message;
         }
+    }
+
+    public List<Message> getMessages() {
+        return mObjects;
     }
 }

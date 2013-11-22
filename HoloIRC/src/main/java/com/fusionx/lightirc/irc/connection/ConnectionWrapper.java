@@ -34,13 +34,13 @@ public class ConnectionWrapper extends Thread {
     @Getter
     private Server server;
     private final ServerConnection connection;
-    private final Handler mAdapterHandler;
+    private final Handler mHandler;
 
     public ConnectionWrapper(final ServerConfiguration configuration, final Context context,
-                             final Handler adapterHandler) {
-        server = new Server(configuration.getTitle(), this, context, adapterHandler);
+                             final Handler handler) {
+        server = new Server(configuration.getTitle(), this, context);
         connection = new ServerConnection(configuration, context, server);
-        mAdapterHandler = adapterHandler;
+        mHandler = handler;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ConnectionWrapper extends Thread {
         try {
             connection.connectToServer();
         } catch (final Exception ex) {
-            mAdapterHandler.post(new Runnable() {
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     throw new RuntimeException(ex);
@@ -61,7 +61,7 @@ public class ConnectionWrapper extends Thread {
         final String status = server.getStatus();
 
         if (status.equals(context.getString(R.string.status_connected))) {
-            connection.disconnectFromServer();
+            connection.onDisconnect();
         } else if (isAlive()) {
             connection.setDisconnectSent(true);
             interrupt();

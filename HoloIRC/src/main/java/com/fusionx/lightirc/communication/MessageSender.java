@@ -109,17 +109,27 @@ public class MessageSender {
      * Start of sending messages
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
-        server.onServerEvent(event);
-        mBus.post(event);
+        if(server.isCached()) {
+            mBus.post(event);
+        } else {
+            server.onServerEvent(event);
+        }
     }
 
     private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
-        channel.onChannelEvent(event);
-        mBus.post(event);
+        if(channel.isCached()) {
+            mBus.post(event);
+        } else {
+            channel.onChannelEvent(event);
+        }
     }
 
     private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
-        user.onUserEvent(event);
+        if(user.isCached()) {
+            mBus.post(event);
+        } else {
+            user.onUserEvent(event);
+        }
     }
 
     /*
@@ -231,7 +241,8 @@ public class MessageSender {
     }
 
     public ChannelEvent sendMessageToChannel(final String userNick,
-                                             final Channel channel, final String sendingNick,
+                                             final Channel channel,
+                                             final String sendingNick,
                                              final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
                 sendingNick, rawMessage);

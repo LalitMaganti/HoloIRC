@@ -15,8 +15,8 @@ import java.util.HashMap;
 import lombok.NonNull;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
-    private final HashMap<Channel, UserLevelEnum> userLevelMap = new HashMap<Channel, UserLevelEnum>();
-    private final HashMap<Channel, Spanned> channelSpannableHashMap = new HashMap<Channel, Spanned>();
+    private final HashMap<Channel, UserLevelEnum> mUserLevelMap = new HashMap<Channel, UserLevelEnum>();
+    private final HashMap<Channel, Spanned> mChannelSpannedMap = new HashMap<Channel, Spanned>();
     private boolean mChecked = false;
     protected final Server mServer;
 
@@ -34,7 +34,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public Spanned getSpannableNick(final Channel channel) {
-        Spanned spannable = channelSpannableHashMap.get(channel);
+        final Spanned spannable = mChannelSpannedMap.get(channel);
         if (spannable == null) {
             updateSpannableNick(channel);
         }
@@ -46,26 +46,26 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public void onJoin(final Channel channel) {
-        userLevelMap.put(channel, UserLevelEnum.NONE);
+        mUserLevelMap.put(channel, UserLevelEnum.NONE);
         updateSpannableNick(channel);
     }
 
     public void onRemove(final Channel channel) {
-        userLevelMap.remove(channel);
-        channelSpannableHashMap.remove(channel);
+        mUserLevelMap.remove(channel);
+        mChannelSpannedMap.remove(channel);
     }
 
     public UserLevelEnum getChannelPrivileges(final Channel channel) {
-        return userLevelMap.get(channel);
+        return mUserLevelMap.get(channel);
     }
 
     private void updateSpannableNick(final Channel channel) {
         Spanned spannable = ColourParserUtils.parseMarkup(getPrettyNick(channel));
-        channelSpannableHashMap.put(channel, spannable);
+        mChannelSpannedMap.put(channel, spannable);
     }
 
     public char getUserPrefix(final Channel channel) {
-        final UserLevelEnum level = userLevelMap.get(channel);
+        final UserLevelEnum level = mUserLevelMap.get(channel);
         if (UserLevelEnum.OP.equals(level)) {
             return '@';
         } else if (UserLevelEnum.VOICE.equals(level)) {
@@ -80,7 +80,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public void putMode(final UserLevelEnum mode, final Channel channel) {
-        userLevelMap.put(channel, mode);
+        mUserLevelMap.put(channel, mode);
         updateSpannableNick(channel);
     }
 
@@ -106,7 +106,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             mode = UserLevelEnum.VOICE;
             channel.incrementVoices();
         }
-        userLevelMap.put(channel, mode);
+        mUserLevelMap.put(channel, mode);
         updateSpannableNick(channel);
     }
 
@@ -123,7 +123,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                     break;
                 case 'o':
                     if (addingMode) {
-                        if (userLevelMap.get(channel) == UserLevelEnum.VOICE) {
+                        if (mUserLevelMap.get(channel) == UserLevelEnum.VOICE) {
                             channel.decrementVoices();
                         }
                         channel.incrementOps();
@@ -132,7 +132,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                         break;
                     }
                 case 'v':
-                    if (addingMode && !userLevelMap.get(channel).equals(UserLevelEnum.OP)) {
+                    if (addingMode && !mUserLevelMap.get(channel).equals(UserLevelEnum.OP)) {
                         channel.incrementVoices();
                         channel.getUsers().update(this,
                                 ImmutableList.of(channel, UserLevelEnum.VOICE));
@@ -177,7 +177,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             // ArrayList = mode change
             ImmutableList list = (ImmutableList) newValue;
             if (list.get(0) instanceof Channel && list.get(1) instanceof UserLevelEnum) {
-                userLevelMap.put((Channel) list.get(0), (UserLevelEnum) list.get(1));
+                mUserLevelMap.put((Channel) list.get(0), (UserLevelEnum) list.get(1));
             }
         } else if (newValue instanceof Channel) {
             updateSpannableNick((Channel) newValue);

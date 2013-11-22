@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import lombok.NonNull;
-import lombok.Setter;
 
 public class IRCPagerAdapter extends PagerAdapter {
     private static final boolean DEBUG = false;
@@ -50,13 +49,10 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     private final FragmentManager mFragmentManager;
     private final ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
-    private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>
-            ();
+    private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
 
-    private final ArrayList<IRCFragment> views = new ArrayList<IRCFragment>();
-
-    @Setter
-    private PagerSlidingTabStrip tabStrip;
+    private final ArrayList<IRCFragment> mViews = new ArrayList<IRCFragment>();
+    private PagerSlidingTabStrip mTabStrip;
 
     public IRCPagerAdapter(final FragmentManager fm) {
         mFragmentManager = fm;
@@ -93,7 +89,7 @@ public class IRCPagerAdapter extends PagerAdapter {
      * Return the Fragment associated with a specified position.
      */
     public IRCFragment getItem(final int position) {
-        return views.get(position);
+        return mViews.get(position);
     }
 
     @Override
@@ -216,22 +212,22 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     public int addFragment(final IRCFragment s) {
-        views.add(s);
+        mViews.add(s);
         notifyDataSetChanged();
-        if (tabStrip != null) {
-            tabStrip.notifyDataSetChanged();
+        if (mTabStrip != null) {
+            mTabStrip.notifyDataSetChanged();
         }
-        return views.indexOf(s);
+        return mViews.indexOf(s);
     }
 
     @Override
     public int getCount() {
-        return views.size();
+        return mViews.size();
     }
 
     @Override
     public int getItemPosition(final Object object) {
-        if (views.contains(object)) {
+        if (mViews.contains(object)) {
             return POSITION_UNCHANGED;
         } else {
             return POSITION_NONE;
@@ -240,43 +236,48 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     @Override
     public CharSequence getPageTitle(@NonNull final int position) {
-        final IRCFragment fragment = views.get(position);
+        final IRCFragment fragment = mViews.get(position);
         return fragment.isAdded() ? fragment.getTitle() : fragment.getArguments().getString
                 ("title");
     }
 
     public void removeFragment(final int index) {
-        views.remove(index);
-        tabStrip.notifyDataSetChanged();
+        mViews.remove(index);
+        mTabStrip.notifyDataSetChanged();
         notifyDataSetChanged();
     }
 
     public int getIndexFromTitle(@NonNull final String title) {
-        for (final IRCFragment i : views) {
+        for (final IRCFragment i : mViews) {
             if (title.equals(i.getTitle())) {
-                return views.indexOf(i);
+                return mViews.indexOf(i);
             }
         }
         return -1;
     }
 
     public void disableAllEditTexts() {
-        for (final IRCFragment fragment : views) {
+        for (final IRCFragment fragment : mViews) {
             fragment.disableEditText();
         }
     }
 
     public void removeAllButServer() {
-        if (views.size() > 1) {
-            final Iterator<IRCFragment> iterator = views.iterator();
+        if (mViews.size() > 1) {
+            final Iterator<IRCFragment> iterator = mViews.iterator();
             iterator.next();
             while (iterator.hasNext()) {
                 iterator.next();
                 iterator.remove();
             }
 
-            tabStrip.notifyDataSetChanged();
+            mTabStrip.notifyDataSetChanged();
             notifyDataSetChanged();
         }
+    }
+
+    // Getters and setters
+    public void setmTabStrip(PagerSlidingTabStrip mTabStrip) {
+        this.mTabStrip = mTabStrip;
     }
 }

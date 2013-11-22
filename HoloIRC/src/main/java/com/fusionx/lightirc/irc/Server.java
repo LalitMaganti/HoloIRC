@@ -22,10 +22,8 @@
 package com.fusionx.lightirc.irc;
 
 import android.content.Context;
-import android.os.Handler;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
 import com.fusionx.lightirc.irc.event.Event;
@@ -38,53 +36,41 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
+import java.util.List;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
 import lombok.NonNull;
 
-@Data
 public class Server {
-    private ServerWriter writer;
-    private UserChannelInterface userChannelInterface;
-    private AppUser user;
-    private final String title;
-    private IRCMessageAdapter buffer;
-
-    private String status = "Disconnected";
-
-    @Getter(AccessLevel.NONE)
+    private final String mTitle;
     private final ConnectionWrapper mWrapper;
-    @Getter(AccessLevel.NONE)
     private final Context mContext;
-    private final Handler mAdapterHandler;
+    private ServerWriter mWriter;
+    private UserChannelInterface mUserChannelInterface;
+    private AppUser mUser;
+
+    private List<Message> mBuffer;
+    private String mStatus = "Disconnected";
+    private boolean mCached;
 
     public Server(final String serverTitle, final ConnectionWrapper wrapper,
-                  final Context context, final Handler adapterHandler) {
-        title = serverTitle;
+                  final Context context) {
+        mTitle = serverTitle;
         mWrapper = wrapper;
         mContext = context;
-        mAdapterHandler = adapterHandler;
     }
 
     public void onServerEvent(final ServerEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            mAdapterHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    buffer.add(new Message(event.message));
-                }
-            });
+            mBuffer.add(new Message(event.message));
         }
     }
 
     public Event privateMessageSent(final PrivateMessageUser userWhoIsNotUs,
                                     final String message, final boolean weAreSending) {
-        final MessageSender sender = MessageSender.getSender(title);
-        final User sendingUser = weAreSending ? user : userWhoIsNotUs;
-        if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
-            user.createPrivateMessage(userWhoIsNotUs);
+        final MessageSender sender = MessageSender.getSender(mTitle);
+        final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
+        if (!mUser.isPrivateMessageOpen(userWhoIsNotUs)) {
+            mUser.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(message)) {
                 sender.sendPrivateMessage(userWhoIsNotUs, sendingUser, message);
@@ -102,10 +88,10 @@ public class Server {
 
     public Event privateActionSent(final PrivateMessageUser userWhoIsNotUs, final String action,
                                    final boolean weAreSending) {
-        final MessageSender sender = MessageSender.getSender(title);
-        final User sendingUser = weAreSending ? user : userWhoIsNotUs;
-        if (!user.isPrivateMessageOpen(userWhoIsNotUs)) {
-            user.createPrivateMessage(userWhoIsNotUs);
+        final MessageSender sender = MessageSender.getSender(mTitle);
+        final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
+        if (!mUser.isPrivateMessageOpen(userWhoIsNotUs)) {
+            mUser.createPrivateMessage(userWhoIsNotUs);
 
             if (StringUtils.isNotEmpty(action)) {
                 sender.sendPrivateAction(userWhoIsNotUs, sendingUser, action);
@@ -122,18 +108,18 @@ public class Server {
     }
 
     public synchronized PrivateMessageUser getPrivateMessageUser(@NonNull final String nick) {
-        final Iterator<PrivateMessageUser> iterator = user.getPrivateMessageIterator();
+        final Iterator<PrivateMessageUser> iterator = mUser.getPrivateMessageIterator();
         while (iterator.hasNext()) {
             final PrivateMessageUser privateMessageUser = iterator.next();
             if (IRCUtils.areNicksEqual(privateMessageUser.getNick(), nick)) {
                 return privateMessageUser;
             }
         }
-        return new PrivateMessageUser(nick, userChannelInterface, mAdapterHandler);
+        return new PrivateMessageUser(nick, mUserChannelInterface);
     }
 
     public boolean isConnected(final Context context) {
-        return status.equals(context.getString(R.string.status_connected));
+        return mStatus.equals(context.getString(R.string.status_connected));
     }
 
     public void disconnectFromServer(final Context context) {
@@ -145,23 +131,66 @@ public class Server {
         return "HoloIRC " + MiscUtils.getAppVersion(mContext) + " Android IRC client";
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
     public void cleanup() {
-        writer = null;
-        userChannelInterface = null;
-        user = null;
+        mWriter = null;
+        mUserChannelInterface = null;
+        mUser = null;
     }
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Server) && ((Server) o).getTitle().equals(title);
+        return (o instanceof Server) && ((Server) o).getTitle().equals(mTitle);
     }
 
     public void setupUserChannelInterface(final OutputStreamWriter streamWriter) {
-        userChannelInterface = new UserChannelInterface(streamWriter, mContext, this,
-                mAdapterHandler);
+        mUserChannelInterface = new UserChannelInterface(streamWriter, mContext, this);
+    }
+
+    // Getters and Setters
+    public Context getContext() {
+        return mContext;
+    }
+
+    public List<Message> getBuffer() {
+        return mBuffer;
+    }
+    public void setBuffer(List<Message> buffer) {
+        mBuffer = buffer;
+    }
+
+    public ServerWriter getWriter() {
+        return mWriter;
+    }
+    public void setWriter(ServerWriter writer) {
+       mWriter = writer;
+    }
+
+    public UserChannelInterface getUserChannelInterface() {
+        return mUserChannelInterface;
+    }
+
+    public AppUser getUser() {
+        return mUser;
+    }
+    public void setUser(AppUser user) {
+        mUser = user;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public String getStatus() {
+        return mStatus;
+    }
+    public void setStatus(String status) {
+        mStatus = status;
+    }
+
+    public boolean isCached() {
+        return mCached;
+    }
+    public void setCached(boolean cached) {
+        mCached = cached;
     }
 }

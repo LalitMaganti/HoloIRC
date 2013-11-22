@@ -18,11 +18,6 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
         this(baseAdapter, DEFAULTANIMATIONDELAYMILLIS, DEFAULTANIMATIONDURATIONMILLIS, callback);
     }
 
-    public AnimatedServerListAdapter(BaseAdapter baseAdapter, long animationDelayMillis,
-                                     SingleDismissCallback callback) {
-        this(baseAdapter, animationDelayMillis, DEFAULTANIMATIONDURATIONMILLIS, callback);
-    }
-
     private AnimatedServerListAdapter(BaseAdapter baseAdapter, long animationDelayMillis,
                                       long animationDurationMillis,
                                       SingleDismissCallback callback) {
