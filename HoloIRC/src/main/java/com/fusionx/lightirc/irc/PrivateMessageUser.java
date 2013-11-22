@@ -42,6 +42,7 @@ public final class PrivateMessageUser extends User {
     public List<Message> getBuffer() {
         return mBuffer;
     }
+
     public void setBuffer(final List<Message> buffer) {
         mBuffer = buffer;
     }
@@ -49,6 +50,7 @@ public final class PrivateMessageUser extends User {
     public boolean isCached() {
         return mCached;
     }
+
     public void setCached(boolean cached) {
         mCached = cached;
     }

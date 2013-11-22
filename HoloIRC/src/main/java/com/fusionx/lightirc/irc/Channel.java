@@ -87,7 +87,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     }
 
     public int getNumberOfUsers() {
-        if(getUsers() != null) {
+        if (getUsers() != null) {
             return getUsers().size();
         } else {
             return 0;
@@ -166,6 +166,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public List<Message> getBuffer() {
         return mBuffer;
     }
+
     public void setBuffer(List<Message> buffer) {
         mBuffer = buffer;
     }
@@ -173,6 +174,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public String getTopic() {
         return mTopic;
     }
+
     public void setTopic(String mTopic) {
         this.mTopic = mTopic;
     }
@@ -180,6 +182,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     public boolean isCached() {
         return mCached;
     }
+
     public void setCached(boolean cached) {
         mCached = cached;
     }

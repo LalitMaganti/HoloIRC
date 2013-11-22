@@ -18,8 +18,6 @@ import org.robolectric.Robolectric;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 
-import static org.junit.Assert.assertEquals;
-
 @RunWith(RobolectricGradleTestRunner.class)
 public class ServerCommandParserTest {
     private ServerCommandParser parser;

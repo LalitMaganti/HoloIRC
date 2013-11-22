@@ -22,8 +22,8 @@
 <menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-            android:id="@+id/activity_server_channel_ab_users"
-            holoirc:showAsAction="withText|ifRoom"
-            android:icon="@drawable/ic_menu_cc"
-            android:title="@string/users"/>
+        android:id="@+id/activity_server_channel_ab_users"
+        holoirc:showAsAction="withText|ifRoom"
+        android:icon="@drawable/ic_menu_cc"
+        android:title="@string/users"/>
 </menu>

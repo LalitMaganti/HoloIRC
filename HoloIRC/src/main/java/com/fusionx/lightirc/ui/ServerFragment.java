@@ -78,7 +78,8 @@ public class ServerFragment extends IRCFragment {
     }
 
     @Override
-    protected List<Message> onRetrieveMessages() {;
+    protected List<Message> onRetrieveMessages() {
+        ;
         return mCallback.getServer().getBuffer();
     }
 

@@ -154,6 +154,7 @@ public class Server {
     public List<Message> getBuffer() {
         return mBuffer;
     }
+
     public void setBuffer(List<Message> buffer) {
         mBuffer = buffer;
     }
@@ -161,8 +162,9 @@ public class Server {
     public ServerWriter getWriter() {
         return mWriter;
     }
+
     public void setWriter(ServerWriter writer) {
-       mWriter = writer;
+        mWriter = writer;
     }
 
     public UserChannelInterface getUserChannelInterface() {
@@ -172,6 +174,7 @@ public class Server {
     public AppUser getUser() {
         return mUser;
     }
+
     public void setUser(AppUser user) {
         mUser = user;
     }
@@ -183,6 +186,7 @@ public class Server {
     public String getStatus() {
         return mStatus;
     }
+
     public void setStatus(String status) {
         mStatus = status;
     }
@@ -190,6 +194,7 @@ public class Server {
     public boolean isCached() {
         return mCached;
     }
+
     public void setCached(boolean cached) {
         mCached = cached;
     }

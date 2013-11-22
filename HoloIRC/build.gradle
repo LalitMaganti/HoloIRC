@@ -20,7 +20,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.0'
     compile 'com.squareup:otto:1.3.2'
     compile 'com.nineoldandroids:library:2.4.0'
-    compile ('de.keyboardsurfer.android.widget:crouton:1.8.1') {
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.1') {
         exclude group: 'com.google.android'
     }
     compile project(':libraries:PagerSlidingTabStrip:library')

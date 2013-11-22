@@ -98,7 +98,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         super.onStop();
 
         for (ServerCardInterface builder : mServerCardsAdapter.getListOfItems()) {
-            if(builder.getTitle() != null) {
+            if (builder.getTitle() != null) {
                 final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
                 if (sender != null) {
                     try {

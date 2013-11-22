@@ -65,7 +65,7 @@ public class ServerConnectionParser {
                 final String source = parsedArray.get(1);
                 CoreListener.respondToPing(server.getWriter(), source);
             } else if (s.equals(ServerCommands.Error)) {// We are finished - the server has
-            // kicked us out for some reason
+                // kicked us out for some reason
                 return null;
             } else if (s.equals(ServerCommands.Authenticate)) {
                 CapParser.parseCommand(parsedArray, configuration, server, sender);

@@ -58,7 +58,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         super.onResume();
 
         final List<Message> list = onRetrieveMessages();
-        mMessageAdapter = new IRCMessageAdapter(getActivity(),  list != null ? list : new
+        mMessageAdapter = new IRCMessageAdapter(getActivity(), list != null ? list : new
                 ArrayList<Message>());
         final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
         adapter.setAbsListView(getListView());
@@ -84,7 +84,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
         final CharSequence text = mMessageBox.getText();
         if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo
-                .IME_ACTION_DONE || event.getAction() == KeyEvent .ACTION_DOWN && event
+                .IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event
                 .getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
             mMessageBox.setText("");
@@ -107,6 +107,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
     protected abstract void onSendMessage(final String message);
 
     protected abstract List<Message> onRetrieveMessages();
+
     protected abstract void onPersistMessages(List<Message> list);
 
     public abstract FragmentTypeEnum getType();

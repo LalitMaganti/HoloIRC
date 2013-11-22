@@ -86,8 +86,8 @@ public class ServerLineParser {
             CoreListener.respondToPing(server.getWriter(), source);
             return new Event(rawLine);
         } else if (s.equals(ServerCommands.Error)) {
-        // We are finished - the server has kicked us
-        // out for some reason
+            // We are finished - the server has kicked us
+            // out for some reason
             return new ErrorEvent(rawLine);
         } else {// Check if the second thing is a code or a command
             if (StringUtils.isNumeric(parsedArray.get(1))) {
