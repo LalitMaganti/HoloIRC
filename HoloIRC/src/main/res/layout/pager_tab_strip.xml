@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.astuetz.viewpager.extensions.PagerSlidingTabStrip
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:pager="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/activity_irc_tabs"
-        android:layout_width="match_parent"
-        android:background="@color/sliding_menu_background"
-        android:layout_height="48dip"
-        pager:textAllCapsTabs="false"
-        pager:indicatorColor="@android:color/white"/>
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:pager="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_irc_tabs"
+    android:layout_width="match_parent"
+    android:background="@color/sliding_menu_background"
+    android:layout_height="48dip"
+    pager:textAllCapsTabs="false"
+    pager:indicatorColor="@android:color/white"/>

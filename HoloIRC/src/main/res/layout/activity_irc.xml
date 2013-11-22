@@ -27,13 +27,13 @@
                 android:clickable="false">
 
     <include
-            layout="@layout/pager_tab_strip"
-            android:id="@+id/pager_tabs"/>
+        layout="@layout/pager_tab_strip"
+        android:id="@+id/pager_tabs"/>
 
     <com.jeremyfeinstein.slidingmenu.lib.SlidingMenu
-            android:id="@+id/user_sliding_menu"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/pager_tabs"
-            android:background="@null"/>
+        android:id="@+id/user_sliding_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/pager_tabs"
+        android:background="@null"/>
 </RelativeLayout>

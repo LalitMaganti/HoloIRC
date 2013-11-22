@@ -109,7 +109,7 @@ public class MessageSender {
      * Start of sending messages
      */
     private void sendServerEvent(final Server server, final ServerEvent event) {
-        if(server.isCached()) {
+        if (server.isCached()) {
             mBus.post(event);
         } else {
             server.onServerEvent(event);
@@ -117,7 +117,7 @@ public class MessageSender {
     }
 
     private void sendChannelEvent(final Channel channel, final ChannelEvent event) {
-        if(channel.isCached()) {
+        if (channel.isCached()) {
             mBus.post(event);
         } else {
             channel.onChannelEvent(event);
@@ -125,7 +125,7 @@ public class MessageSender {
     }
 
     private void sendUserEvent(final PrivateMessageUser user, final UserEvent event) {
-        if(user.isCached()) {
+        if (user.isCached()) {
             mBus.post(event);
         } else {
             user.onUserEvent(event);

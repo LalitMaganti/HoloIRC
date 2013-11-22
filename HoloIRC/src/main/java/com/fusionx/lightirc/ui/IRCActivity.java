@@ -407,7 +407,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onChannelMessage(final ChannelEvent event) {
-            if(event.userListChanged) {
+            if (event.userListChanged) {
                 onUserListChanged(event.channelName);
             }
         }

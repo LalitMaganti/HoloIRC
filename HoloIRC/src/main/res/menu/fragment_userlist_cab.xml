@@ -21,12 +21,12 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-            android:id="@+id/fragment_userlist_cab_mention"
-            android:title="@string/mention"/>
+        android:id="@+id/fragment_userlist_cab_mention"
+        android:title="@string/mention"/>
     <item
-            android:id="@+id/fragment_userlist_cab_pm"
-            android:title="@string/private_message_short_form"/>
+        android:id="@+id/fragment_userlist_cab_pm"
+        android:title="@string/private_message_short_form"/>
     <item
-            android:id="@+id/fragment_userlist_cab_whois"
-            android:title="@string/whois"/>
+        android:id="@+id/fragment_userlist_cab_whois"
+        android:title="@string/whois"/>
 </menu>

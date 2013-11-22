@@ -20,27 +20,27 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/timestamp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:paddingRight="6dip"
+        android:textColor="?server_card_text"
+        android:text="Testing"
+        android:textIsSelectable="true"/>
 
     <TextView
-            android:id="@+id/timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:paddingRight="6dip"
-            android:textColor="?server_card_text"
-            android:text="Testing"
-            android:textIsSelectable="true"/>
-
-    <TextView
-            android:id="@+id/message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="?server_card_text"
-            android:text="Testing"
-            android:textIsSelectable="true"
-            android:layout_toRightOf="@+id/timestamp"/>
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="?server_card_text"
+        android:text="Testing"
+        android:textIsSelectable="true"
+        android:layout_toRightOf="@+id/timestamp"/>
 </RelativeLayout>
