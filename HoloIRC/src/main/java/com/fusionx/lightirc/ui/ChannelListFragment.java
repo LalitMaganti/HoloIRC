@@ -1,5 +1,14 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
+import com.fusionx.lightirc.collections.SynchronizedTreeSet;
+import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,15 +20,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +27,9 @@ import java.util.Set;
 import static com.fusionx.lightirc.constants.PreferenceConstants.AutoJoin;
 
 public class ChannelListFragment extends MultiChoiceListFragment<String> {
+
     private BaseCollectionAdapter<String> mAdapter;
+
     private IServerSettings mCallbacks;
 
     @Override
@@ -99,7 +101,7 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position,
-                                          long id, boolean checked) {
+            long id, boolean checked) {
         int selectedItemCount = getCheckedItems().size();
         if (selectedItemCount != 0) {
             final String quantityString = getResources().getQuantityString(R.plurals

@@ -21,9 +21,6 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.communication.MessageSender;
@@ -43,6 +40,9 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.content.Context;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -50,9 +50,13 @@ import static com.fusionx.lightirc.constants.Constants.DEBUG;
 import static com.fusionx.lightirc.constants.Constants.LOG_TAG;
 
 class ServerCommandParser {
+
     private final Context mContext;
+
     private final UserChannelInterface mUserChannelInterface;
+
     private final Server mServer;
+
     private final MessageSender mSender;
 
     ServerCommandParser(final Context context, ServerLineParser parser) {
@@ -66,7 +70,7 @@ class ServerCommandParser {
 
     // The server is sending a command to us - parse what it is
     Event parseCommand(final ArrayList<String> parsedArray, final String rawLine,
-                       final boolean disconnectSent) {
+            final boolean disconnectSent) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -185,7 +189,7 @@ class ServerCommandParser {
     }
 
     private Event parseCTCPCommand(final ArrayList<String> parsedArray, final String message,
-                                   final String rawSource) {
+            final String rawSource) {
         if (message.startsWith("ACTION")) {
             return parseAction(parsedArray, rawSource);
         } else if (message.startsWith("VERSION")) {
@@ -242,7 +246,7 @@ class ServerCommandParser {
     }
 
     private ChannelEvent parseTopicChange(final ArrayList<String> parsedArray,
-                                          final String rawSource) {
+            final String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(parsedArray.get(2));
         final String setterNick = user.getPrettyNick(channel);
@@ -330,7 +334,7 @@ class ServerCommandParser {
     }
 
     private Event parseChannelPart(final ArrayList<String> parsedArray, final String rawSource,
-                                   final boolean disconnectSent) {
+            final boolean disconnectSent) {
         final String channelName = parsedArray.get(2);
 
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);

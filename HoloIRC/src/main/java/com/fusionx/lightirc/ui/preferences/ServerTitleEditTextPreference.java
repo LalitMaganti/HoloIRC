@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import lombok.Setter;
 
 public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
+
     @Setter
     public ArrayList<String> listOfExistingServers;
 

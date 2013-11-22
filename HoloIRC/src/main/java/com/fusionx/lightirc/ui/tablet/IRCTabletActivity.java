@@ -10,6 +10,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import static com.fusionx.lightirc.util.UIUtils.isLandscape;
 
 public class IRCTabletActivity extends IRCActivity {
+
     @Override
     protected void setUpActionsFragment() {
         if (!isLandscape(this)) {

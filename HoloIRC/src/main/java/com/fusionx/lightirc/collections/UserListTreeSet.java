@@ -7,6 +7,7 @@ import java.util.Comparator;
 
 public class UserListTreeSet extends UpdateableTreeSet<ChannelUser> implements
         SynchronizedCollection<ChannelUser> {
+
     public UserListTreeSet(Comparator<ChannelUser> comparator) {
         super(comparator);
     }

@@ -30,8 +30,11 @@ import com.fusionx.lightirc.irc.event.Event;
 import java.util.ArrayList;
 
 class WhoParser {
+
     private final UserChannelInterface mUserChannelInterface;
+
     private Channel whoChannel;
+
     private final String mServerTitle;
 
     WhoParser(UserChannelInterface userChannelInterface, final String serverTitle) {

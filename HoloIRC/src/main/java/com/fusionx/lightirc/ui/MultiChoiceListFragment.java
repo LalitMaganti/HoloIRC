@@ -1,5 +1,8 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
+
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.view.ActionMode;
@@ -8,14 +11,12 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.ListView;
 
-import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
 abstract class MultiChoiceListFragment<T> extends ListFragment implements
         MultiSelectionUtils.MultiChoiceModeListener {
+
     MultiSelectionUtils.Controller mMultiSelectionController;
 
     @Override

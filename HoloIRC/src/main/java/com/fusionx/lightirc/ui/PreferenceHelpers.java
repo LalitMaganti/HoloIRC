@@ -1,5 +1,11 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
+import com.fusionx.lightirc.util.MiscUtils;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -12,13 +18,8 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
-import com.fusionx.lightirc.util.MiscUtils;
-
 public class PreferenceHelpers {
+
     public static void setupNumberPicker(final PreferenceScreen screen) {
         final NumberPickerPreference numberPickerDialogPreference = (NumberPickerPreference)
                 screen.findPreference(PreferenceConstants.ReconnectTries);
@@ -35,7 +36,7 @@ public class PreferenceHelpers {
     }
 
     public static void setupThemePreference(final PreferenceScreen screen,
-                                            final Activity activity) {
+            final Activity activity) {
         final ListPreference themePreference = (ListPreference) screen.findPreference
                 (PreferenceConstants.Theme);
         if (themePreference.getEntry() == null) {
@@ -46,7 +47,9 @@ public class PreferenceHelpers {
     }
 
     static class ThemeChangeListener implements Preference.OnPreferenceChangeListener {
+
         private final Activity mActivity;
+
         private final ServiceConnection mConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
@@ -88,7 +91,7 @@ public class PreferenceHelpers {
     }
 
     public static void setupAppVersionPreference(final PreferenceScreen screen,
-                                                 final Context context) {
+            final Context context) {
         final Preference appVersionPreference = screen.findPreference(PreferenceConstants
                 .AppVersion);
         if (appVersionPreference != null) {

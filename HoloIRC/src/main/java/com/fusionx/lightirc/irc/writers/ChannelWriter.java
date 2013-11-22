@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.OutputStreamWriter;
 
 public class ChannelWriter extends RawWriter {
+
     private Channel mChannel;
 
     public ChannelWriter(OutputStreamWriter out, Channel channel) {

@@ -10,6 +10,7 @@ import com.fusionx.lightirc.util.MiscUtils;
 import java.util.ArrayList;
 
 class CapParser {
+
     static void parseCommand(final ArrayList<String> parsedArray, final ServerConfiguration
             configuration, final Server server, final MessageSender sender) {
         final ServerWriter writer = server.getWriter();
@@ -34,7 +35,7 @@ class CapParser {
     }
 
     static void parseCode(final int code, final ArrayList<String> parsedArray,
-                          final MessageSender sender, final Server server) {
+            final MessageSender sender, final Server server) {
         final ServerWriter writer = server.getWriter();
         switch (code) {
             case ServerReplyCodes.RPL_SASL_SUCCESSFUL:

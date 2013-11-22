@@ -16,6 +16,11 @@
 
 package com.fusionx.lightirc.adapters;
 
+import com.haarman.listviewanimations.BaseAdapterDecorator;
+import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.animation.AnimatorSet;
+import com.nineoldandroids.animation.ObjectAnimator;
+
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.util.SparseArray;
@@ -24,25 +29,27 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
-import com.haarman.listviewanimations.BaseAdapterDecorator;
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.AnimatorSet;
-import com.nineoldandroids.animation.ObjectAnimator;
-
 /**
- * A BaseAdapterDecorator class which applies multiple Animators at once to
- * views when they are first shown. The Animators applied include the animations
- * specified in getAnimators(ViewGroup, View), plus an alpha transition.
+ * A BaseAdapterDecorator class which applies multiple Animators at once to views when they are
+ * first shown. The Animators applied include the animations specified in getAnimators(ViewGroup,
+ * View), plus an alpha transition.
  */
 public class IRCAnimationAdapter extends BaseAdapterDecorator {
+
     private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
+
     private static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
+
     private static final long INITIALDELAYMILLIS = 150;
 
     private SparseArray<AnimationInfo> mAnimators;
+
     private long mAnimationStartMillis;
+
     private int mLastAnimatedPosition;
+
     private boolean mHasParentAnimationAdapter;
+
     private boolean mShouldAnimate = true;
 
     public IRCAnimationAdapter(BaseAdapter baseAdapter) {
@@ -54,9 +61,9 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
     }
 
     /**
-     * Call this method to reset animation status on all views. The next time
-     * notifyDataSetChanged() is called on the base adapter, all views will
-     * animate again. Will also call setShouldAnimate(true).
+     * Call this method to reset animation status on all views. The next time notifyDataSetChanged()
+     * is called on the base adapter, all views will animate again. Will also call
+     * setShouldAnimate(true).
      */
     void reset() {
         mAnimators.clear();
@@ -155,7 +162,7 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
     }
 
     private Animator[] concatAnimators(Animator[] childAnimators, Animator[] animators,
-                                       Animator alphaAnimator) {
+            Animator alphaAnimator) {
         Animator[] allAnimators = new Animator[childAnimators.length + animators.length + 1];
         int i;
 
@@ -196,10 +203,9 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
     }
 
     /**
-     * Set whether this AnimationAdapter is encapsulated by another
-     * AnimationAdapter. When this is set to true, this AnimationAdapter does
-     * not apply any animations to the views. Should not be set explicitly, the
-     * AnimationAdapter class manages this by itself.
+     * Set whether this AnimationAdapter is encapsulated by another AnimationAdapter. When this is
+     * set to true, this AnimationAdapter does not apply any animations to the views. Should not be
+     * set explicitly, the AnimationAdapter class manages this by itself.
      */
     public void setHasParentAnimationAdapter(boolean hasParentAnimationAdapter) {
         mHasParentAnimationAdapter = hasParentAnimationAdapter;
@@ -226,7 +232,9 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
     }
 
     private class AnimationInfo {
+
         public int position;
+
         public Animator animator;
 
         public AnimationInfo(int position, Animator animator) {

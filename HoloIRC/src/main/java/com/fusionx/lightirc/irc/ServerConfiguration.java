@@ -30,21 +30,29 @@ import lombok.Data;
 
 @Data
 public class ServerConfiguration {
+
     private final String title;
+
     private final String url;
+
     private final int port;
 
     private final boolean ssl;
+
     private final boolean sslAcceptAllCertificates;
 
     private final NickStorage nickStorage;
+
     private final String realName;
+
     private final boolean nickChangable;
 
     private final String serverUserName;
+
     private final String serverPassword;
 
     private final String saslUsername;
+
     private final String saslPassword;
 
     private final String nickservPassword;
@@ -76,24 +84,32 @@ public class ServerConfiguration {
 
     @Data
     public static class Builder implements Parcelable {
+
         // For app use only
         private String file;
 
         private String title;
+
         private String url;
+
         private int port;
 
         private boolean ssl;
+
         private boolean sslAcceptAllCertificates;
 
         private NickStorage nickStorage;
+
         private String realName;
+
         private boolean nickChangeable;
 
         private String serverUserName;
+
         private String serverPassword;
 
         private String saslUsername;
+
         private String saslPassword;
 
         private String nickservPassword;
@@ -175,12 +191,15 @@ public class ServerConfiguration {
 
     @Data
     public static class NickStorage implements Parcelable {
+
         private String firstChoiceNick = "HoloIRCUser";
+
         private String secondChoiceNick = "";
+
         private String thirdChoiceNick = "";
 
         public NickStorage(final String firstChoice, final String secondChoice,
-                           final String thirdChoice) {
+                final String thirdChoice) {
             firstChoiceNick = firstChoice;
             secondChoiceNick = secondChoice;
             thirdChoiceNick = thirdChoice;

@@ -21,14 +21,6 @@
 
 package com.fusionx.lightirc.communication;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
@@ -51,14 +43,27 @@ import com.fusionx.lightirc.irc.event.UserEvent;
 import com.fusionx.lightirc.util.UIUtils;
 import com.squareup.otto.Bus;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
+
 import java.util.HashMap;
 
 public class MessageSender {
+
     private static final HashMap<String, MessageSender> mSenderMap = new HashMap<String,
             MessageSender>();
+
     private Context mContext;
+
     private boolean mDisplayed;
+
     private IRCBus mBus;
+
     private String mServerName;
 
     private MessageSender() {
@@ -144,7 +149,7 @@ public class MessageSender {
     }
 
     public ChannelEvent sendGenericChannelEvent(final Channel channel, final String message,
-                                                final boolean userListChanged) {
+            final boolean userListChanged) {
         final ChannelEvent event = new ChannelEvent(channel.getName(), message,
                 userListChanged);
         sendChannelEvent(channel, event);
@@ -159,8 +164,8 @@ public class MessageSender {
     // Generic events end
 
     public FinalDisconnectEvent sendFinalDisconnection(final Server server,
-                                                       final String disconnectLine,
-                                                       final boolean expectedDisconnect) {
+            final String disconnectLine,
+            final boolean expectedDisconnect) {
         final FinalDisconnectEvent event = new FinalDisconnectEvent(expectedDisconnect,
                 disconnectLine);
         sendServerEvent(server, event);
@@ -168,7 +173,7 @@ public class MessageSender {
     }
 
     public RetryPendingDisconnectEvent sendRetryPendingDisconnection(final Server server,
-                                                                     final String disconnectLine) {
+            final String disconnectLine) {
         final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
         sendServerEvent(server, event);
         return event;
@@ -199,7 +204,7 @@ public class MessageSender {
     }
 
     public UserEvent sendPrivateAction(final PrivateMessageUser user, final User sendingUser,
-                                       final String rawAction) {
+            final String rawAction) {
         String message = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getColorfulNick(), rawAction);
         // TODO - change this to be specific for PMs
@@ -210,8 +215,8 @@ public class MessageSender {
     }
 
     public ChannelEvent sendChannelAction(final String userNick,
-                                          final Channel channel, final ChannelUser sendingUser,
-                                          final String rawAction) {
+            final Channel channel, final ChannelUser sendingUser,
+            final String rawAction) {
         String finalMessage = String.format(mContext.getString(R.string.parser_action),
                 sendingUser.getPrettyNick(channel), rawAction);
         if (rawAction.toLowerCase().contains(userNick.toLowerCase())) {
@@ -222,17 +227,16 @@ public class MessageSender {
     }
 
     /**
-     * Method used to send a private message.
-     * <p/>
-     * Method should not be used from anywhere but the Server class.
+     * Method used to send a private message. <p/> Method should not be used from anywhere but the
+     * Server class.
      *
      * @param user       - the destination user object
-     * @param sending    - the user who is sending the message - it may be us or it may
-     *                   be the other user
+     * @param sending    - the user who is sending the message - it may be us or it may be the other
+     *                   user
      * @param rawMessage - the message being sent
      */
     public UserEvent sendPrivateMessage(final PrivateMessageUser user, final User sending,
-                                        final String rawMessage) {
+            final String rawMessage) {
         final String message = String.format(mContext.getString(R.string.parser_message),
                 sending.getColorfulNick(), rawMessage);
         // TODO - change this to be specific for PMs
@@ -241,9 +245,9 @@ public class MessageSender {
     }
 
     public ChannelEvent sendMessageToChannel(final String userNick,
-                                             final Channel channel,
-                                             final String sendingNick,
-                                             final String rawMessage) {
+            final Channel channel,
+            final String sendingNick,
+            final String rawMessage) {
         String preMessage = String.format(mContext.getString(R.string.parser_message),
                 sendingNick, rawMessage);
         if (rawMessage.toLowerCase().contains(userNick.toLowerCase())) {

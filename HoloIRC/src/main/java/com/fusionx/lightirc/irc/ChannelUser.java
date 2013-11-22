@@ -1,23 +1,29 @@
 package com.fusionx.lightirc.irc;
 
-import android.content.Context;
-import android.text.Spanned;
-import android.widget.Checkable;
+import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.util.ColourParserUtils;
-import com.google.common.collect.ImmutableList;
+
+import android.content.Context;
+import android.text.Spanned;
+import android.widget.Checkable;
 
 import java.util.HashMap;
 
 import lombok.NonNull;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
-    private final HashMap<Channel, UserLevelEnum> mUserLevelMap = new HashMap<Channel, UserLevelEnum>();
+
+    private final HashMap<Channel, UserLevelEnum> mUserLevelMap
+            = new HashMap<Channel, UserLevelEnum>();
+
     private final HashMap<Channel, Spanned> mChannelSpannedMap = new HashMap<Channel, Spanned>();
+
     private boolean mChecked = false;
+
     protected final Server mServer;
 
     public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
@@ -111,7 +117,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public String processModeChange(final Context context, final String sendingNick,
-                                    final Channel channel, final String mode) {
+            final Channel channel, final String mode) {
         boolean addingMode = false;
         for (char character : mode.toCharArray()) {
             switch (character) {

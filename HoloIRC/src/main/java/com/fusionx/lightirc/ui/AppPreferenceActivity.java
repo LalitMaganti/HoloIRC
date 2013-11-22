@@ -1,26 +1,31 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.util.UIUtils;
+
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.util.UIUtils;
-
 import java.util.List;
 
 public class AppPreferenceActivity extends PreferenceActivity {
+
     private final static String PREF_ACTION_APPEARANCE = "com.fusionx.lightirc.ui" +
             ".AppPreferenceActivity.Appearance";
+
     private final static String PREF_ACTION_SERVER_CHANNEL = "com.fusionx.lightirc.ui" +
             ".AppPreferenceActivity.ServerChannel";
+
     private final static String PREF_ACTION_DEFAULT_USER = "com.fusionx.lightirc.ui" +
             ".AppPreferenceActivity.DefaultUser";
+
     private final static String PREF_ACTION_NOTIFICATION = "com.fusionx.lightirc.ui" +
             ".AppPreferenceActivity.Notification";
+
     private final static String PREF_ACTION_ABOUT = "com.fusionx.lightirc.ui" +
             ".AppPreferenceActivity.About";
 

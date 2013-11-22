@@ -1,5 +1,9 @@
 package com.fusionx.lightirc.adapters;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.util.UIUtils;
+
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -8,10 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.util.UIUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -19,14 +19,18 @@ import lombok.Getter;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
+
     private final LayoutInflater inflater;
+
     private final int mServerItemCount;
 
     @Getter
     private boolean connected = false;
+
     private FragmentTypeEnum mFragmentType = FragmentTypeEnum.Server;
 
     private final String[] channelArray;
+
     private final String[] userArray;
 
     public ActionsAdapter(final Context context) {

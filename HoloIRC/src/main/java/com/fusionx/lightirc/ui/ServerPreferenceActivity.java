@@ -1,5 +1,16 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.ui.preferences.MustBeCompletePreference;
+import com.fusionx.lightirc.ui.preferences.NickPreference;
+import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.UIUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -15,17 +26,6 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.ui.preferences.MustBeCompletePreference;
-import com.fusionx.lightirc.ui.preferences.NickPreference;
-import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.fusionx.lightirc.util.UIUtils;
-
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.File;
 
 import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
@@ -33,14 +33,21 @@ import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
 
 public class ServerPreferenceActivity extends PreferenceActivity implements IServerSettings,
         Preference.OnPreferenceChangeListener {
+
     private boolean mCanSaveChanges = true;
+
     private boolean mNewServer = false;
+
     private String mFileName = null;
+
     private boolean backPressed = false;
 
     private MustBeCompletePreference mCompletePreference = null;
+
     private ServerTitleEditTextPreference mTitle = null;
+
     private EditTextPreference mUrl = null;
+
     private PreferenceScreen mScreen;
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

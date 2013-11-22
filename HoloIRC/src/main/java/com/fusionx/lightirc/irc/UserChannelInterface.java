@@ -21,13 +21,13 @@
 
 package com.fusionx.lightirc.irc;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.collections.TwoWayHashSet;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
 import com.fusionx.lightirc.util.IRCUtils;
+
+import android.content.Context;
 
 import java.io.OutputStreamWriter;
 import java.util.Set;
@@ -35,31 +35,34 @@ import java.util.Set;
 import lombok.NonNull;
 
 public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Channel> {
+
     private final OutputStreamWriter mOutputStream;
+
     private final Context mContext;
+
     private final Server mServer;
 
     public UserChannelInterface(final OutputStreamWriter outputStream,
-                                final Context context, final Server server) {
+            final Context context, final Server server) {
         mOutputStream = outputStream;
         mContext = context;
         mServer = server;
     }
 
     public synchronized void coupleUserAndChannel(final ChannelUser user,
-                                                  final Channel channel) {
+            final Channel channel) {
         user.onJoin(channel);
         addChannelToUser(user, channel);
         addUserToChannel(user, channel);
     }
 
     public synchronized void addChannelToUser(final ChannelUser user,
-                                              final Channel channel) {
+            final Channel channel) {
         super.addBToA(user, channel);
     }
 
     private synchronized void addUserToChannel(final ChannelUser user,
-                                               final Channel channel) {
+            final Channel channel) {
         UserListTreeSet setOfUsers = (UserListTreeSet) bToAMap.get(channel);
         if (setOfUsers == null) {
             setOfUsers = new UserListTreeSet(new IRCUserComparator(channel));
@@ -71,7 +74,7 @@ public final class UserChannelInterface extends TwoWayHashSet<ChannelUser, Chann
     }
 
     public synchronized void decoupleUserAndChannel(@NonNull final ChannelUser user,
-                                                    @NonNull final Channel channel) {
+            @NonNull final Channel channel) {
         user.onRemove(channel);
 
         final Set<Channel> setOfChannels = aToBMap.get(user);

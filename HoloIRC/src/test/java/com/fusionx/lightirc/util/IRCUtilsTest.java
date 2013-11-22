@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(RobolectricGradleTestRunner.class)
 public class IRCUtilsTest {
+
     @Test
     public void checkNicks() throws Exception {
         final String nick = IRCUtils.getNickFromRaw("ikonia!~irc@unaffiliated/ikonia");

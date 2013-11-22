@@ -1,17 +1,19 @@
 package com.fusionx.lightirc.adapters;
 
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.BaseAdapter;
-
 import com.haarman.listviewanimations.swinginadapters.SingleAnimationAdapter;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
 
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.BaseAdapter;
+
 public class AnimatedServerListAdapter extends SingleAnimationAdapter {
+
     private final long mAnimationDelayMillis;
+
     private final long mAnimationDurationMillis;
 
     public AnimatedServerListAdapter(BaseAdapter baseAdapter, SingleDismissCallback callback) {
@@ -19,8 +21,8 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
     }
 
     private AnimatedServerListAdapter(BaseAdapter baseAdapter, long animationDelayMillis,
-                                      long animationDurationMillis,
-                                      SingleDismissCallback callback) {
+            long animationDurationMillis,
+            SingleDismissCallback callback) {
         super(baseAdapter);
         mAnimationDelayMillis = animationDelayMillis;
         mAnimationDurationMillis = animationDurationMillis;
@@ -91,6 +93,7 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
     }
 
     public interface SingleDismissCallback {
+
         public void onDismiss(AbsListView listView, int position);
     }
 }

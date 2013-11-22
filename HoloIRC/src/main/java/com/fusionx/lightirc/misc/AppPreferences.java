@@ -1,18 +1,25 @@
 package com.fusionx.lightirc.misc;
 
+import com.fusionx.lightirc.constants.PreferenceConstants;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
-
 public class AppPreferences {
+
     public static boolean highlightLine = true;
+
     public static boolean timestamp = false;
+
     public static boolean motdAllowed = true;
+
     public static boolean hideUserMessages = false;
+
     public static String partReason = "";
+
     public static String quitReason = "";
+
     public static int numberOfReconnectEvents = 3;
 
     public static void setUpPreferences(final Context context) {

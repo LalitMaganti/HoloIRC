@@ -21,6 +21,9 @@
 
 package com.fusionx.lightirc.ui.dialogbuilder;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.UIUtils;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,16 +33,15 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.UIUtils;
-
 public abstract class PromptDialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {
+
     private final EditText input;
+
     private AlertDialog dialog = null;
 
     PromptDialogBuilder(final Context context, final String title, final String hint,
-                        final String defaultText) {
+            final String defaultText) {
         super(context);
 
         setTitle(title);

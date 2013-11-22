@@ -16,6 +16,8 @@
 
 package com.fusionx.lightirc.adapters;
 
+import com.fusionx.lightirc.interfaces.SynchronizedCollection;
+
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,8 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,49 +35,45 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A concrete BaseAdapter that is backed by an array of arbitrary
- * objects.  By default this class expects that the provided resource id references
- * a single TextView.  If you want to use a more complex layout, use the constructors that
- * also takes a field id.  That field id should reference a TextView in the larger layout
- * resource.
- * <p/>
- * <p>However the TextView is referenced, it will be filled with the toString() of each object in
- * the array. You can add lists or arrays of custom objects. Override the toString() method
- * of your objects to determine what text will be displayed for the item in the list.
- * <p/>
- * <p>To use something other than TextViews for the array display, for instance, ImageViews,
- * or to have some of data besides toString() results fill the views,
+ * A concrete BaseAdapter that is backed by an array of arbitrary objects.  By default this class
+ * expects that the provided resource id references a single TextView.  If you want to use a more
+ * complex layout, use the constructors that also takes a field id.  That field id should reference
+ * a TextView in the larger layout resource. <p/> <p>However the TextView is referenced, it will be
+ * filled with the toString() of each object in the array. You can add lists or arrays of custom
+ * objects. Override the toString() method of your objects to determine what text will be displayed
+ * for the item in the list. <p/> <p>To use something other than TextViews for the array display,
+ * for instance, ImageViews, or to have some of data besides toString() results fill the views,
  * override {@link #getView(int, View, ViewGroup)} to return the type of view you want.
  */
 public class BaseCollectionAdapter<T> extends BaseAdapter {
+
     /**
-     * Contains the list of objects that represent the data of this ArrayAdapter.
-     * The content of this list is referred to as "the array" in the documentation.
+     * Contains the list of objects that represent the data of this ArrayAdapter. The content of
+     * this list is referred to as "the array" in the documentation.
      */
     SynchronizedCollection<T> mObjects;
 
     /**
-     * The resource indicating what views to inflate to display the content of this
-     * array adapter.
+     * The resource indicating what views to inflate to display the content of this array adapter.
      */
     private int mResource;
 
     /**
-     * The resource indicating what views to inflate to display the content of this
-     * array adapter in a drop down widget.
+     * The resource indicating what views to inflate to display the content of this array adapter in
+     * a drop down widget.
      */
     private int mDropDownResource;
 
     /**
-     * If the inflated resource is not a TextView, mFieldId is used to find
-     * a TextView inside the inflated views hierarchy. This field must contain the
-     * identifier that matches the one defined in the resource file.
+     * If the inflated resource is not a TextView, mFieldId is used to find a TextView inside the
+     * inflated views hierarchy. This field must contain the identifier that matches the one defined
+     * in the resource file.
      */
     private int mFieldId = 0;
 
     /**
-     * Indicates whether or not {@link #notifyDataSetChanged()} must be called whenever
-     * {@link #mObjects} is modified.
+     * Indicates whether or not {@link #notifyDataSetChanged()} must be called whenever {@link
+     * #mObjects} is modified.
      */
     boolean mNotifyOnChange = true;
 
@@ -94,7 +90,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      * @param objects            The objects to represent in the ListView.
      */
     public BaseCollectionAdapter(Context context, int textViewResourceId,
-                                 SynchronizedCollection<T> objects) {
+            SynchronizedCollection<T> objects) {
         init(context, textViewResourceId, 0, objects);
     }
 
@@ -108,7 +104,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      * @param objects            The objects to represent in the ListView.
      */
     public BaseCollectionAdapter(Context context, int resource, int textViewResourceId,
-                                 SynchronizedCollection<T> objects) {
+            SynchronizedCollection<T> objects) {
         init(context, resource, textViewResourceId, objects);
     }
 
@@ -121,7 +117,9 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mObjects.getLock()) {
             mObjects.add(object);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -133,7 +131,9 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mObjects.getLock()) {
             mObjects.addAll(collection);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -145,7 +145,9 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mObjects.getLock()) {
             Collections.addAll(mObjects, items);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -157,7 +159,9 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mObjects.getLock()) {
             mObjects.remove(object);
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -167,7 +171,9 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mObjects.getLock()) {
             mObjects.clear();
         }
-        if (mNotifyOnChange) notifyDataSetChanged();
+        if (mNotifyOnChange) {
+            notifyDataSetChanged();
+        }
     }
 
     /**
@@ -180,17 +186,12 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     }
 
     /**
-     * Control whether methods that change the list ({@link #add},
-     * {@link #remove}, {@link #clear}) automatically call
-     * {@link #notifyDataSetChanged}.  If set to false, caller must
-     * manually call notifyDataSetChanged() to have the changes
-     * reflected in the attached view.
-     * <p/>
-     * The default is true, and calling notifyDataSetChanged()
-     * resets the flag to true.
+     * Control whether methods that change the list ({@link #add}, {@link #remove}, {@link #clear})
+     * automatically call {@link #notifyDataSetChanged}.  If set to false, caller must manually call
+     * notifyDataSetChanged() to have the changes reflected in the attached view. <p/> The default
+     * is true, and calling notifyDataSetChanged() resets the flag to true.
      *
-     * @param notifyOnChange if true, modifications to the list will
-     *                       automatically call {@link
+     * @param notifyOnChange if true, modifications to the list will automatically call {@link
      *                       #notifyDataSetChanged}
      */
     public void setNotifyOnChange(boolean notifyOnChange) {
@@ -198,7 +199,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     }
 
     private void init(Context context, int resource, int textViewResourceId,
-                      SynchronizedCollection<T> objects) {
+            SynchronizedCollection<T> objects) {
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mResource = mDropDownResource = resource;
@@ -207,8 +208,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     }
 
     /**
-     * Returns the context associated with this array adapter. The context is used
-     * to create views from the resource passed to the constructor.
+     * Returns the context associated with this array adapter. The context is used to create views
+     * from the resource passed to the constructor.
      *
      * @return The Context associated with this adapter.
      */
@@ -272,7 +273,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     }
 
     private View createViewFromResource(int position, View convertView, ViewGroup parent,
-                                        int resource) {
+            int resource) {
         View view;
         TextView text;
 

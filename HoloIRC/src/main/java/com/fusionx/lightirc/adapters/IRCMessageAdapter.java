@@ -1,5 +1,11 @@
 package com.fusionx.lightirc.adapters;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.Message;
+import com.fusionx.lightirc.util.UIUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
@@ -10,16 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.Message;
-import com.fusionx.lightirc.util.UIUtils;
-
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.List;
 
 public class IRCMessageAdapter extends ArrayAdapter<Message> {
+
     private Context mContext;
+
     private List<Message> mObjects;
 
     public IRCMessageAdapter(Context context, final List<Message> objects) {
@@ -61,7 +63,9 @@ public class IRCMessageAdapter extends ArrayAdapter<Message> {
     }
 
     private static class ViewHolder {
+
         public final TextView timestamp;
+
         public final TextView message;
 
         private ViewHolder(final TextView timestamp, final TextView message) {

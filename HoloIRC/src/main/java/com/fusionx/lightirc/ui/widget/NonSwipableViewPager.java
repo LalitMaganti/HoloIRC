@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 public class NonSwipableViewPager extends ViewPager {
+
     public NonSwipableViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

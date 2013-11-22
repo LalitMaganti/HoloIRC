@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 public class SynchronizedTreeSet<T> extends TreeSet<T> implements SynchronizedCollection<T> {
+
     private final Object object = new Object();
 
     @Override

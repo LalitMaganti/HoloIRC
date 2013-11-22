@@ -1,14 +1,15 @@
 package com.fusionx.lightirc.ui.preferences;
 
-import android.content.Context;
-import android.preference.EditTextPreference;
-import android.util.AttributeSet;
-
 import com.fusionx.lightirc.R;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.content.Context;
+import android.preference.EditTextPreference;
+import android.util.AttributeSet;
+
 public class PasswordSummaryEditTextPreference extends EditTextPreference {
+
     public PasswordSummaryEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

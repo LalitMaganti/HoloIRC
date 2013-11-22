@@ -21,23 +21,26 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
 package com.fusionx.lightirc.irc.connection;
 
-import android.content.Context;
-import android.os.Handler;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 
+import android.content.Context;
+import android.os.Handler;
+
 import lombok.Getter;
 
 public class ConnectionWrapper extends Thread {
+
     @Getter
     private Server server;
+
     private final ServerConnection connection;
+
     private final Handler mHandler;
 
     public ConnectionWrapper(final ServerConfiguration configuration, final Context context,
-                             final Handler handler) {
+            final Handler handler) {
         server = new Server(configuration.getTitle(), this, context);
         connection = new ServerConnection(configuration, context, server);
         mHandler = handler;

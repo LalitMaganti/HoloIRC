@@ -32,8 +32,11 @@ import com.fusionx.lightirc.util.MiscUtils;
 import java.util.ArrayList;
 
 class NameParser {
+
     private final UserChannelInterface mUserChannelInterface;
+
     private Channel mChannel;
+
     private final String mServerTitle;
 
     NameParser(UserChannelInterface userChannelInterface, final String serverTitle) {

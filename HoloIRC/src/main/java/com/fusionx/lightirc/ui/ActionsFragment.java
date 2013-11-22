@@ -21,14 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
 import com.fusionx.lightirc.communication.ServerCommandSender;
@@ -39,13 +31,25 @@ import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
+
     private IRCActionsCallback callback;
+
     private FragmentTypeEnum type;
+
     private StickyListHeadersListView mListView;
+
     private ActionsAdapter mAdapter;
 
     @Override
@@ -64,7 +68,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
+            final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_action_listview, container, false);
     }
 
@@ -84,7 +88,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
-                            final long l) {
+            final long l) {
         switch (i) {
             case 0:
                 channelNameDialog();
@@ -151,6 +155,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     public interface IRCActionsCallback {
+
         public String getNick();
 
         public void closeOrPartCurrentTab();

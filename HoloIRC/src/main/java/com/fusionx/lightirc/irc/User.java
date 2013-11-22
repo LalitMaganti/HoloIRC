@@ -28,15 +28,17 @@ import lombok.NonNull;
 import lombok.Setter;
 
 public abstract class User {
+
     @Getter
     @Setter
     protected String nick;
 
     final String nickHTML;
+
     final UserChannelInterface userChannelInterface;
 
     User(@NonNull final String nick,
-         @NonNull final UserChannelInterface userChannelInterface) {
+            @NonNull final UserChannelInterface userChannelInterface) {
         this.nick = nick;
         this.userChannelInterface = userChannelInterface;
 

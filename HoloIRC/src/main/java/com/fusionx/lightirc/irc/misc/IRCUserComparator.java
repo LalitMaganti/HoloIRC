@@ -29,6 +29,7 @@ import com.fusionx.lightirc.util.MiscUtils;
 import java.util.Comparator;
 
 public class IRCUserComparator implements Comparator<ChannelUser> {
+
     private final Channel channel;
 
     public IRCUserComparator(final Channel channel) {

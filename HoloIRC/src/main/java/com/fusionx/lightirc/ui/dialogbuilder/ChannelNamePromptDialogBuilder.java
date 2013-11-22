@@ -21,16 +21,19 @@
 
 package com.fusionx.lightirc.ui.dialogbuilder;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.R;
 
+import android.content.Context;
+
 public abstract class ChannelNamePromptDialogBuilder extends PromptDialogBuilder {
+
     public ChannelNamePromptDialogBuilder(final Context context) {
-        super(context, context.getString(R.string.prompt_dialog_channel_name), context.getString(R.string.prompt_dialog_including_starting), "");
+        super(context, context.getString(R.string.prompt_dialog_channel_name),
+                context.getString(R.string.prompt_dialog_including_starting), "");
     }
 
     public ChannelNamePromptDialogBuilder(final Context context, final String channelName) {
-        super(context, context.getString(R.string.prompt_dialog_channel_name), context.getString(R.string.prompt_dialog_including_starting), channelName);
+        super(context, context.getString(R.string.prompt_dialog_channel_name),
+                context.getString(R.string.prompt_dialog_including_starting), channelName);
     }
 }

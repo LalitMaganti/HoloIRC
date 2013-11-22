@@ -21,11 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.view.WindowManager;
-
 import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
@@ -37,9 +32,15 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
+
 import java.util.List;
 
 public class ServerFragment extends IRCFragment {
+
     private ServerFragmentCallback mCallback;
 
     @Override
@@ -112,6 +113,7 @@ public class ServerFragment extends IRCFragment {
     }
 
     public interface ServerFragmentCallback {
+
         public Server getServer();
 
         public boolean isConnectedToServer();

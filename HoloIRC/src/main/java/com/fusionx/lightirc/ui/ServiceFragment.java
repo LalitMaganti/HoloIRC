@@ -1,5 +1,10 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.communication.MessageSender;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,15 +18,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.communication.MessageSender;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-
 public class ServiceFragment extends Fragment {
+
     private IRCService mService;
+
     private ServiceFragmentCallback mCallbacks;
+
     private MessageSender mSender;
+
     private Server mServer;
 
     /**
@@ -51,9 +55,8 @@ public class ServiceFragment extends Fragment {
     }
 
     /**
-     * Hold a reference to the parent Activity so we can report the
-     * task's current progress and results. The Android framework
-     * will pass us a reference to the newly created Activity after
+     * Hold a reference to the parent Activity so we can report the task's current progress and
+     * results. The Android framework will pass us a reference to the newly created Activity after
      * each configuration change.
      */
     @Override
@@ -90,8 +93,7 @@ public class ServiceFragment extends Fragment {
     }
 
     /**
-     * Set the callback to null so we don't accidentally leak the
-     * Activity instance.
+     * Set the callback to null so we don't accidentally leak the Activity instance.
      */
     @Override
     public void onDetach() {
@@ -112,7 +114,7 @@ public class ServiceFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         return null;
     }
 
@@ -167,6 +169,7 @@ public class ServiceFragment extends Fragment {
     }
 
     public interface ServiceFragmentCallback {
+
         public void setUpViewPager();
 
         public String getServerTitle();

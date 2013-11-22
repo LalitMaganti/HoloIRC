@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 abstract class RawWriter {
+
     private final OutputStreamWriter streamWriter;
 
     RawWriter(final OutputStreamWriter writer) {

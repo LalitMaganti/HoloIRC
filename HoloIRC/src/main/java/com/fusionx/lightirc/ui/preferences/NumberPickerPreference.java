@@ -1,5 +1,9 @@
 package com.fusionx.lightirc.ui.preferences;
 
+import com.fusionx.lightirc.R;
+
+import net.simonvt.numberpicker.NumberPicker;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
@@ -9,24 +13,26 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-
-import net.simonvt.numberpicker.NumberPicker;
-
 /**
- * A {@link DialogPreference} that provides a user with the means to select an integer from a
- * {@link NumberPicker}, and persist it.
+ * A {@link DialogPreference} that provides a user with the means to select an integer from a {@link
+ * NumberPicker}, and persist it.
  *
  * @author lukehorvat
  */
 public class NumberPickerPreference extends DialogPreference {
+
     private static final int DEFAULT_MIN_VALUE = 0;
+
     private static final int DEFAULT_MAX_VALUE = 100;
+
     private static final int DEFAULT_VALUE = 0;
 
     private int mMinValue;
+
     private int mMaxValue;
+
     private int mValue;
+
     private NumberPicker mNumberPicker;
 
     public NumberPickerPreference(Context context) {
@@ -149,8 +155,11 @@ public class NumberPickerPreference extends DialogPreference {
     }
 
     private static class SavedState extends BaseSavedState {
+
         int minValue;
+
         int maxValue;
+
         int value;
 
         public SavedState(Parcelable superState) {

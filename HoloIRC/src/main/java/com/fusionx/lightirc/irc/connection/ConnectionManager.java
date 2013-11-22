@@ -21,15 +21,17 @@
 
 package com.fusionx.lightirc.irc.connection;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.R;
+
+import android.content.Context;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
 public class ConnectionManager extends HashMap<String, ConnectionWrapper> {
+
     private static final long serialVersionUID = 2426166268063489300L;
+
     private final Context context;
 
     public ConnectionManager(final Context context) {

@@ -21,9 +21,6 @@
 
 package com.fusionx.lightirc.communication;
 
-import android.content.Context;
-import android.os.AsyncTask;
-
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
@@ -31,7 +28,11 @@ import com.fusionx.lightirc.misc.AppPreferences;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.content.Context;
+import android.os.AsyncTask;
+
 public class ServerCommandSender {
+
     public static void sendJoin(final Server server, final String channelName) {
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -43,7 +44,7 @@ public class ServerCommandSender {
     }
 
     public static void sendMessageToChannel(final Server server, final String channelName,
-                                            final String message) {
+            final String message) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -58,7 +59,7 @@ public class ServerCommandSender {
     }
 
     public static void sendActionToChannel(final Server server, final String channelName,
-                                           final String action) {
+            final String action) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -73,7 +74,7 @@ public class ServerCommandSender {
     }
 
     public static void sendMessageToUser(final Server server, final String userNick,
-                                         final String message) {
+            final String message) {
         final PrivateMessageUser user = server.getPrivateMessageUser(userNick);
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -88,7 +89,7 @@ public class ServerCommandSender {
     }
 
     public static void sendActionToUser(final Server server, final String userNick,
-                                        final String action) {
+            final String action) {
         final PrivateMessageUser user = server.getPrivateMessageUser(userNick);
         new AsyncTask<Void, Void, Void>() {
             @Override
@@ -113,7 +114,7 @@ public class ServerCommandSender {
     }
 
     public static void sendPart(final Server server, final String channelName,
-                                final Context applicationContext) {
+            final Context applicationContext) {
         final Channel channel = server.getUserChannelInterface().getChannel(channelName);
         sendPart(channel);
     }

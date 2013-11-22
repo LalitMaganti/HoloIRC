@@ -34,13 +34,19 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
+
     protected final String mName;
+
     protected String mTopic;
+
     private final UserChannelInterface mUserChannelInterface;
+
     private List<Message> mBuffer;
+
     private boolean mCached;
 
     protected final ChannelWriter mWriter;
+
     private final HashMap<UserLevelEnum, Integer> mNumberOfUsers = new HashMap<UserLevelEnum,
             Integer>();
 

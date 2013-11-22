@@ -12,6 +12,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public class SSLUtils {
+
     public static SSLSocketFactory getCorrectSSLSocketFactory(final Boolean acceptAll) {
         if (acceptAll) {
             try {

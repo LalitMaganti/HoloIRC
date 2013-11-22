@@ -24,29 +24,29 @@
                 android:layout_height="match_parent">
 
     <ListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/fragment_irc_message_box"
-        android:layout_marginBottom="10dip"
-        android:layout_marginLeft="15dip"
-        android:layout_marginRight="15dip"
-        android:transcriptMode="normal"
-        android:dividerHeight="0dp"
-        android:divider="@null"
-        android:layout_marginTop="10dip"
-        android:lineSpacingExtra="3dip"/>
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/fragment_irc_message_box"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="15dip"
+            android:layout_marginRight="15dip"
+            android:transcriptMode="normal"
+            android:dividerHeight="0dp"
+            android:divider="@null"
+            android:layout_marginTop="10dip"
+            android:lineSpacingExtra="3dip"/>
 
     <EditText
-        android:id="@+id/fragment_irc_message_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:inputType="textCapSentences|textAutoCorrect"
-        android:ems="10"
-        android:hint="@string/message"
-        android:imeOptions="actionSend"/>
+            android:id="@+id/fragment_irc_message_box"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:inputType="textCapSentences|textAutoCorrect"
+            android:ems="10"
+            android:hint="@string/message"
+            android:imeOptions="actionSend"/>
 
 </RelativeLayout>

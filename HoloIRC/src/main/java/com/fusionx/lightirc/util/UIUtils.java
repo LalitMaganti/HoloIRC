@@ -1,5 +1,11 @@
 package com.fusionx.lightirc.util;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.ui.IRCActivity;
+import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
+import com.fusionx.lightirc.ui.tablet.IRCTabletActivity;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -8,14 +14,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.ui.IRCActivity;
-import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
-import com.fusionx.lightirc.ui.tablet.IRCTabletActivity;
-
 public class UIUtils {
+
     private static Typeface mRobotoLightTypeface = null;
+
     private static Typeface mRobotoThinTypeface = null;
 
     public static boolean hasHoneycomb() {

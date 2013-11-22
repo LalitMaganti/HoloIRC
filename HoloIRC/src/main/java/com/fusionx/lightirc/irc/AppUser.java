@@ -27,10 +27,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class AppUser extends ChannelUser {
+
     private ArrayList<PrivateMessageUser> mPrivateMessages = new ArrayList<PrivateMessageUser>();
 
     public AppUser(final String nick,
-                   final UserChannelInterface userChannelInterface) {
+            final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
     }

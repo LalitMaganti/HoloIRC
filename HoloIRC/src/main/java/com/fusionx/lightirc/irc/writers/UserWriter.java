@@ -26,6 +26,7 @@ import com.fusionx.lightirc.irc.PrivateMessageUser;
 import java.io.OutputStreamWriter;
 
 public class UserWriter extends RawWriter {
+
     private final PrivateMessageUser mUser;
 
     public UserWriter(OutputStreamWriter writer, final PrivateMessageUser user) {
