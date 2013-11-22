@@ -31,9 +31,9 @@ dependencies {
     compile 'org.projectlombok:lombok:0.10.6'
 
     // TEST
-    //testCompile 'junit:junit:4.10'
-    //testCompile 'org.robolectric:robolectric:2.1.+'
-    //testCompile 'com.squareup:fest-android:1.0.+'
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.robolectric:robolectric:2.1.+'
+    testCompile 'com.squareup:fest-android:1.0.+'
 }
 
 android {

@@ -28,7 +28,7 @@ import com.squareup.otto.Subscribe;
 import java.util.List;
 
 public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
-        ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallbacks {
+        ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallback {
     private ViewPager mViewPager = null;
     private IRCPagerInterface mCallback = null;
     private IRCPagerAdapter mAdapter = null;
@@ -185,7 +185,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", channelName);
-
         channel.setArguments(bundle);
 
         final int position = mAdapter.addFragment(channel);
@@ -219,7 +218,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     public void setTabStrip(PagerSlidingTabStrip tabs) {
         tabs.setViewPager(mViewPager);
-        mAdapter.setTabStrip(tabs);
+        mAdapter.setmTabStrip(tabs);
     }
 
     @Override

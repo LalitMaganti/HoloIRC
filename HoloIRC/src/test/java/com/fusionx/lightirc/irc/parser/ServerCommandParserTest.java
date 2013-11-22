@@ -3,15 +3,12 @@ package com.fusionx.lightirc.irc.parser;
 import android.content.Context;
 import android.os.Handler;
 
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.AppUser;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
-import com.fusionx.lightirc.irc.event.ChannelEvent;
-import com.fusionx.lightirc.util.MiscUtils;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +17,6 @@ import org.robolectric.Robolectric;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 

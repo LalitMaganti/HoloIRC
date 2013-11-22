@@ -22,23 +22,21 @@
 package com.fusionx.lightirc.adapters;
 
 import android.app.Activity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 
 import java.util.ArrayList;
 
-public class ServerListAdapter extends BaseCollectionAdapter<ServerConfiguration.Builder> {
+public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface> {
     private final BuilderAdapterCallback mCallback;
 
-    public ServerListAdapter(final Activity activity, SynchronizedCollection<ServerConfiguration
-            .Builder> list) {
+    public ServerListAdapter(final Activity activity,
+                             SynchronizedCollection<ServerCardInterface> list) {
         super(activity, R.layout.item_server_card, list);
 
         try {
@@ -51,42 +49,16 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerConfiguration
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        View view;
-        final ServerConfiguration.Builder builder = getItem(position);
-        if (convertView == null) {
-            final LayoutInflater vi = LayoutInflater.from(getContext());
-            view = vi.inflate(R.layout.item_server_card, parent, false);
-        } else {
-            view = convertView;
-        }
-
-        final TextView textView = (TextView) view.findViewById(R.id.title);
-        final TextView description = (TextView) view.findViewById(R.id.description);
-        if (textView != null) {
-            textView.setText(builder.getTitle());
-        }
-        if (description != null) {
-            final Server server = mCallback.getServer(builder.getTitle());
-            if (server != null) {
-                description.setText(server.getStatus());
-            } else {
-                description.setText(getContext().getString(R.string.status_disconnected));
-            }
-        }
-
-        final View contentLayout = view.findViewById(R.id.contentLayout);
-        contentLayout.setTag(builder);
-
-        final View overflowMenu = view.findViewById(R.id.overflow);
-        overflowMenu.setTag(builder);
-
-        return view;
+        final ServerCardInterface card = getItem(position);
+        final Server server = card.getTitle() == null ? null :
+                mCallback.getServer(card.getTitle());
+        return getItem(position).getView(convertView, parent, server);
     }
 
-    public ArrayList<String> getListOfTitles(final ServerConfiguration.Builder exclusion) {
+    public ArrayList<String> getListOfTitles(final ServerCardInterface exclusion) {
         final ArrayList<String> listOfTitles = new ArrayList<String>();
-        for (ServerConfiguration.Builder builder : mObjects) {
-            if (!builder.equals(exclusion)) {
+        for (ServerCardInterface builder : mObjects) {
+            if (!builder.equals(exclusion) && builder.getTitle() != null) {
                 listOfTitles.add(builder.getTitle());
             }
         }

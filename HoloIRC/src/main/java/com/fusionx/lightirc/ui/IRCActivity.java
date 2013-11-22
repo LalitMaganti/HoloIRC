@@ -165,6 +165,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         setUpActionsFragment();
     }
 
+    // This is different for tablets and phones so get subclasses to do the work
     protected abstract void setUpActionsFragment();
 
     protected void onUserListDisplayed() {
@@ -406,7 +407,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onChannelMessage(final ChannelEvent event) {
-            if (event.userListChanged) {
+            if(event.userListChanged) {
                 onUserListChanged(event.channelName);
             }
         }

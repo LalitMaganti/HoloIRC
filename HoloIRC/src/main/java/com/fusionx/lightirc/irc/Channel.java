@@ -21,71 +21,43 @@
 
 package com.fusionx.lightirc.irc;
 
-import android.os.Handler;
-
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.writers.ChannelWriter;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.misc.AppPreferences;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import lombok.Getter;
-import lombok.Setter;
+import java.util.List;
 
 public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
-    @Getter
-    protected final String name;
-    @Getter
-    protected final ChannelWriter writer;
+    protected final String mName;
+    protected String mTopic;
     private final UserChannelInterface mUserChannelInterface;
-    private final Handler mAdapterHandler;
+    private List<Message> mBuffer;
+    private boolean mCached;
+
+    protected final ChannelWriter mWriter;
     private final HashMap<UserLevelEnum, Integer> mNumberOfUsers = new HashMap<UserLevelEnum,
             Integer>();
-    @Getter
-    protected IRCMessageAdapter buffer;
-    @Getter
-    @Setter
-    protected String topic;
-    private boolean mUserListMessagesShown;
 
     Channel(final String channelName, final UserChannelInterface
-            userChannelInterface, final Handler adapterHandler) {
-        adapterHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                buffer = new IRCMessageAdapter(userChannelInterface.getContext(),
-                        new ArrayList<Message>());
-                final String message = String.format(userChannelInterface.getContext()
-                        .getString(R.string.parser_joined_channel),
-                        userChannelInterface.getServer().getUser().getColorfulNick());
-                buffer.add(new Message(message));
-
-            }
-        });
-        name = channelName;
-        writer = new ChannelWriter(userChannelInterface.getOutputStream(), this);
+            userChannelInterface) {
+        mName = channelName;
+        mWriter = new ChannelWriter(userChannelInterface.getOutputStream(), this);
         mUserChannelInterface = userChannelInterface;
-        mAdapterHandler = adapterHandler;
 
         // Number of users
         mNumberOfUsers.put(UserLevelEnum.OP, 0);
         mNumberOfUsers.put(UserLevelEnum.VOICE, 0);
-
-        mUserListMessagesShown = MiscUtils.isMessagesFromChannelShown(mUserChannelInterface
-                .getContext());
     }
 
     @Override
     public int compareTo(final Channel channel) {
-        return name.compareTo(channel.name);
+        return mName.compareTo(channel.mName);
     }
 
     public UserListTreeSet getUsers() {
@@ -94,7 +66,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
 
     @Override
     public boolean equals(final Object o) {
-        return o instanceof Channel && ((Channel) o).name.equals(name);
+        return o instanceof Channel && ((Channel) o).mName.equals(mName);
     }
 
     @Override
@@ -108,19 +80,18 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     }
 
     public void onChannelEvent(final ChannelEvent event) {
-        if ((!event.userListChanged || mUserListMessagesShown) && StringUtils.isNotEmpty(event
-                .message)) {
-            mAdapterHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    buffer.add(new Message(event.message));
-                }
-            });
+        if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
+                .isNotEmpty(event.message) && mBuffer != null) {
+            mBuffer.add(new Message(event.message));
         }
     }
 
     public int getNumberOfUsers() {
-        return getUsers().size();
+        if(getUsers() != null) {
+            return getUsers().size();
+        } else {
+            return 0;
+        }
     }
 
     public void incrementOps() {
@@ -181,5 +152,35 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
             normalUsers = getNumberOfUsers() - (getNumberOfOwners() + getNumberOfVoices());
         }
         return normalUsers;
+    }
+
+    // Getters and setters
+    public String getName() {
+        return mName;
+    }
+
+    public ChannelWriter getWriter() {
+        return mWriter;
+    }
+
+    public List<Message> getBuffer() {
+        return mBuffer;
+    }
+    public void setBuffer(List<Message> buffer) {
+        mBuffer = buffer;
+    }
+
+    public String getTopic() {
+        return mTopic;
+    }
+    public void setTopic(String mTopic) {
+        this.mTopic = mTopic;
+    }
+
+    public boolean isCached() {
+        return mCached;
+    }
+    public void setCached(boolean cached) {
+        mCached = cached;
     }
 }

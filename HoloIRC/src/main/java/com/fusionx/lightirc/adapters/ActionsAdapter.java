@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.UIUtils;
@@ -17,10 +16,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import lombok.Getter;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
     private final LayoutInflater inflater;
-    private Context mContext;
     private final int mServerItemCount;
 
     @Getter
@@ -33,8 +32,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     public ActionsAdapter(final Context context) {
         super(context, R.layout.default_listview_textview, new ArrayList<String>(Arrays.asList
                 (context.getResources().getStringArray(R.array.server_actions))));
-        mContext = context;
-        inflater = LayoutInflater.from(mContext);
+        inflater = LayoutInflater.from(context);
         mServerItemCount = super.getCount();
         channelArray = context.getResources().getStringArray(R.array.channel_actions);
         userArray = context.getResources().getStringArray(R.array.user_actions);

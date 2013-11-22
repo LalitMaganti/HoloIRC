@@ -26,21 +26,20 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="?server_card_background"
-        android:cacheColorHint="?server_card_background">
+        android:background="?attr/card_server_background"
+        android:cacheColorHint="?attr/card_server_background">
 
     <LinearLayout
-            android:id="@+id/contentLayout"
+            android:id="@+id/card_server_content"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dip"
             android:layout_weight="90"
-            android:onClick="onCardClick"
             android:orientation="vertical"
             android:background="?selectableItemBackground">
 
         <com.fusionx.lightirc.ui.widget.RobotoThinTextView
-                android:id="@+id/title"
+                android:id="@+id/card_server_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dip"
@@ -49,7 +48,7 @@
                 android:textSize="24sp"/>
 
         <com.fusionx.lightirc.ui.widget.RobotoLightTextView
-                android:id="@+id/description"
+                android:id="@+id/card_server_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -64,12 +63,11 @@
     </LinearLayout>
 
     <ImageView
-            android:id="@+id/overflow"
+            android:id="@+id/card_server_overflow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/overflow"
             android:src="?overflow_menu_drawable"
             android:background="?selectableItemBackground"
-            android:onClick="showPopup"
             android:layout_gravity="top"/>
 </LinearLayout>

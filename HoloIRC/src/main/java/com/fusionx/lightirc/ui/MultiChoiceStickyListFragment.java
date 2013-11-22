@@ -7,12 +7,13 @@ import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.View;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersListView;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 abstract class MultiChoiceStickyListFragment<T> extends Fragment implements
         MultiSelectionUtils.MultiChoiceModeListener {

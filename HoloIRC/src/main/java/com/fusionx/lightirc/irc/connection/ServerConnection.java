@@ -31,7 +31,7 @@ import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.parser.ServerConnectionParser;
 import com.fusionx.lightirc.irc.parser.ServerLineParser;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.SSLUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -66,7 +66,6 @@ class ServerConnection {
     @Setter(AccessLevel.PACKAGE)
     private boolean disconnectSent = false;
 
-    private int timesToTry;
     private int reconnectAttempts = 0;
 
     /**
@@ -88,13 +87,12 @@ class ServerConnection {
      * the user has not explicitly tried to disconnect
      */
     void connectToServer() {
-        timesToTry = MiscUtils.getNumberOfReconnectEvents(mContext);
         reconnectAttempts = 0;
 
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         connect();
 
-        while (!disconnectSent && reconnectAttempts < timesToTry) {
+        while (!disconnectSent && reconnectAttempts < AppPreferences.numberOfReconnectEvents) {
             sender.sendGenericServerEvent(server, "Trying to reconnect to the server in 5 " +
                     "seconds.");
             try {
@@ -166,14 +164,14 @@ class ServerConnection {
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
-                if (timesToTry != reconnectAttempts && !disconnectSent) {
+                if (AppPreferences.numberOfReconnectEvents != reconnectAttempts && !disconnectSent) {
                     sender.sendRetryPendingDisconnection(server, "Disconnected from the server");
                 }
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
-            if (timesToTry != reconnectAttempts && !disconnectSent) {
+            if (AppPreferences.numberOfReconnectEvents != reconnectAttempts && !disconnectSent) {
                 sender.sendRetryPendingDisconnection(server, ex.getMessage());
             }
         }
@@ -244,11 +242,11 @@ class ServerConnection {
     /**
      * Called when the user explicitly requests a disconnect
      */
-    public void disconnectFromServer() {
+    public void onDisconnect() {
         disconnectSent = true;
         server.setStatus(mContext.getString(R.string.status_disconnected));
         mParser.setDisconnectSent(true);
-        server.getWriter().quitServer(MiscUtils.getQuitReason(mContext));
+        server.getWriter().quitServer(AppPreferences.quitReason);
     }
 
     /**

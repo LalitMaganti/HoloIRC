@@ -27,7 +27,7 @@
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/editText1"
+            android:layout_above="@+id/fragment_irc_message_box"
             android:layout_marginBottom="10dip"
             android:layout_marginLeft="15dip"
             android:layout_marginRight="15dip"
@@ -38,7 +38,7 @@
             android:lineSpacingExtra="3dip"/>
 
     <EditText
-            android:id="@+id/editText1"
+            android:id="@+id/fragment_irc_message_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

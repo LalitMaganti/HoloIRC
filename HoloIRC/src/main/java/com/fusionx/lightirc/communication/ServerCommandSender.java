@@ -27,7 +27,7 @@ import android.os.AsyncTask;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.PrivateMessageUser;
 import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.misc.AppPreferences;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -115,15 +115,14 @@ public class ServerCommandSender {
     public static void sendPart(final Server server, final String channelName,
                                 final Context applicationContext) {
         final Channel channel = server.getUserChannelInterface().getChannel(channelName);
-        sendPart(server, channel, applicationContext);
+        sendPart(channel);
     }
 
-    private static void sendPart(final Server server, final Channel channel,
-                                 final Context applicationContext) {
+    private static void sendPart(final Channel channel) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                channel.getWriter().partChannel(MiscUtils.getPartReason(applicationContext));
+                channel.getWriter().partChannel(AppPreferences.partReason);
                 return null;
             }
         }.execute();

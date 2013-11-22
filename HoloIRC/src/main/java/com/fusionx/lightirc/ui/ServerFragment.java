@@ -21,21 +21,36 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.communication.MessageParser;
+import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.irc.Message;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 public class ServerFragment extends IRCFragment {
+    private ServerFragmentCallback mCallback;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        if (mCallback == null) {
+            mCallback = FragmentUtils.getParent(this, ServerFragmentCallback.class);
+        }
+    }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -43,50 +58,61 @@ public class ServerFragment extends IRCFragment {
         getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
                 .SOFT_INPUT_STATE_HIDDEN);
 
-        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                ServerFragmentCallback.class);
-        mEditText.setEnabled(callback.isConnectedToServer());
+        mMessageBox.setEnabled(mCallback.isConnectedToServer());
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        final ServerFragmentCallback callback = FragmentUtils.getParent(this,
-                ServerFragmentCallback.class);
-        final Server server = callback.getServer();
-        if (getListAdapter() == null) {
-            final IRCMessageAdapter adapter = server.getBuffer() == null ? new IRCMessageAdapter
-                    (getActivity(), new ArrayList<Message>()) : server.getBuffer();
-            final IRCAnimationAdapter alphaInAnimationAdapter = new IRCAnimationAdapter
-                    (adapter);
-            alphaInAnimationAdapter.setAbsListView(getListView());
-            setListAdapter(alphaInAnimationAdapter);
-            server.setBuffer(adapter);
-            getListView().setSelection(getListView().getCount());
-        }
+        MessageSender.getSender(mTitle).getBus().register(this);
+        mCallback.getServer().setCached(true);
     }
 
     @Override
-    public void sendMessage(String message) {
-        final ServerFragmentCallback callback = FragmentUtils.getParent(ServerFragment.this,
-                ServerFragmentCallback.class);
-        final Server server = callback.getServer();
+    public void onPause() {
+        super.onPause();
+
+        MessageSender.getSender(mTitle).getBus().unregister(this);
+        mCallback.getServer().setCached(false);
+    }
+
+    @Override
+    protected List<Message> onRetrieveMessages() {;
+        return mCallback.getServer().getBuffer();
+    }
+
+    @Override
+    protected void onPersistMessages(final List<Message> list) {
+        mCallback.getServer().setBuffer(list);
+    }
+
+    @Override
+    public void onSendMessage(final String message) {
+        final Server server = mCallback.getServer();
         MessageParser.serverMessageToParse(getActivity(), server, message);
     }
 
     public void onConnectedToServer() {
-        mEditText.setEnabled(true);
+        mMessageBox.setEnabled(true);
+    }
+
+    // Subscription event
+    @Subscribe
+    public void onServerEvent(final ServerEvent event) {
+        if (StringUtils.isNotBlank(event.message)) {
+            mMessageAdapter.add(new Message(event.message));
+        }
+    }
+
+    @Override
+    public FragmentTypeEnum getType() {
+        return FragmentTypeEnum.Server;
     }
 
     public interface ServerFragmentCallback {
         public Server getServer();
 
         public boolean isConnectedToServer();
-    }
-
-    @Override
-    public FragmentTypeEnum getType() {
-        return FragmentTypeEnum.Server;
     }
 }

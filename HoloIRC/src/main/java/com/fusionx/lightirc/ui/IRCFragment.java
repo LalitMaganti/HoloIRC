@@ -28,59 +28,91 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.irc.Message;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class IRCFragment extends ListFragment implements TextView
-        .OnEditorActionListener {
-    @Getter
-    protected String title = null;
-    EditText mEditText = null;
+public abstract class IRCFragment extends ListFragment implements TextView.OnEditorActionListener {
+    protected String mTitle = null;
+    protected EditText mMessageBox = null;
+    protected IRCMessageAdapter mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        final View rootView = inflate.inflate(R.layout.fragment_irc, container, false);
-        mEditText = (EditText) rootView.findViewById(R.id.editText1);
-        mEditText.setOnEditorActionListener(this);
-        title = getArguments().getString("title");
-        return rootView;
+        return inflate.inflate(R.layout.fragment_irc, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        final List<Message> list = onRetrieveMessages();
+        mMessageAdapter = new IRCMessageAdapter(getActivity(),  list != null ? list : new
+                ArrayList<Message>());
+        final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
+        adapter.setAbsListView(getListView());
+        setListAdapter(adapter);
+
+        getListView().setSelection(getListView().getCount());
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mMessageBox = (EditText) getView().findViewById(R.id.fragment_irc_message_box);
+        mMessageBox.setOnEditorActionListener(this);
+        mTitle = getArguments().getString("title");
     }
 
     public void disableEditText() {
-        mEditText.setEnabled(false);
+        mMessageBox.setEnabled(false);
     }
 
     @Override
     public boolean onEditorAction(final TextView v, final int actionId, final KeyEvent event) {
-        final CharSequence text = mEditText.getText();
-        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH
-                || actionId == EditorInfo.IME_ACTION_DONE
-                || event.getAction() == KeyEvent.ACTION_DOWN
-                && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) &&
-                StringUtils.isNotEmpty(text)) {
+        final CharSequence text = mMessageBox.getText();
+        if ((event == null || actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo
+                .IME_ACTION_DONE || event.getAction() == KeyEvent .ACTION_DOWN && event
+                .getKeyCode() == KeyEvent.KEYCODE_ENTER) && StringUtils.isNotEmpty(text)) {
             final String message = text.toString();
-            mEditText.setText("");
-            sendMessage(message);
+            mMessageBox.setText("");
+            onSendMessage(message);
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     @Override
-    public BaseAdapter getListAdapter() {
-        return (BaseAdapter) super.getListAdapter();
+    public void onPause() {
+        super.onPause();
+
+        setListAdapter(null);
+        onPersistMessages(mMessageAdapter.getMessages());
     }
 
-    protected abstract void sendMessage(final String message);
+    // Abstract methods
+    protected abstract void onSendMessage(final String message);
+
+    protected abstract List<Message> onRetrieveMessages();
+    protected abstract void onPersistMessages(List<Message> list);
 
     public abstract FragmentTypeEnum getType();
+
+    // Getters and setters
+    public String getTitle() {
+        return mTitle;
+    }
 }

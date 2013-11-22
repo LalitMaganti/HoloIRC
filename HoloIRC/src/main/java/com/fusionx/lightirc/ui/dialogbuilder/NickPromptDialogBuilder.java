@@ -27,7 +27,6 @@ import com.fusionx.lightirc.R;
 
 public abstract class NickPromptDialogBuilder extends PromptDialogBuilder {
     public NickPromptDialogBuilder(final Context context, final String nick) {
-        super(context, context.getString(R.string.nickname), context.getString(R.string.new_nick)
-                , nick);
+        super(context, context.getString(R.string.nickname), context.getString(R.string.new_nick), nick);
     }
 }
