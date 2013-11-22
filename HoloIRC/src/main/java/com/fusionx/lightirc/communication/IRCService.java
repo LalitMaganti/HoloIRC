@@ -21,6 +21,13 @@
 
 package com.fusionx.lightirc.communication;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.irc.connection.ConnectionManager;
+import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.lightirc.ui.ServerListActivity;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -34,34 +41,31 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.connection.ConnectionManager;
-import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
-import com.fusionx.lightirc.ui.ServerListActivity;
-
 import lombok.AccessLevel;
 import lombok.Setter;
 
 /**
- * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend
- * code
+ * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend code
  *
  * @author Lalit Maganti
  */
 public class IRCService extends Service {
+
     // Binder which returns this service
     public class IRCBinder extends Binder {
+
         public IRCService getService() {
             return IRCService.this;
         }
     }
 
     private ConnectionManager connectionManager = null;
+
     private final IRCBinder mBinder = new IRCBinder();
+
     @Setter(AccessLevel.PUBLIC)
     private String serverDisplayed = null;
+
     private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
     public void connectToServer(final ServerConfiguration.Builder server) {

@@ -36,18 +36,19 @@ import android.widget.Button;
  * @author Lalit Maganti
  */
 public class NonEmptyEditTextPreference extends SummaryEditTextPreference implements TextWatcher {
+
     public NonEmptyEditTextPreference(final Context context, final AttributeSet attributes) {
         super(context, attributes);
     }
 
     @Override
     public void onTextChanged(final CharSequence s, final int start, final int before,
-                              final int count) {
+            final int count) {
     }
 
     @Override
     public void beforeTextChanged(final CharSequence s, final int start, final int before,
-                                  final int count) {
+            final int count) {
     }
 
     @Override

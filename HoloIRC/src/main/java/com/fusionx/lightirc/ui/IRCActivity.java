@@ -21,18 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.annotation.TargetApi;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageSender;
@@ -54,6 +42,18 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -61,8 +61,8 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
- * Activity which contains all the communication code between the fragments
- * It also implements a lot of callbacks to stop exposing objects to the fragments
+ * Activity which contains all the communication code between the fragments It also implements a lot
+ * of callbacks to stop exposing objects to the fragments
  *
  * @author Lalit Maganti
  */
@@ -72,17 +72,23 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     // The Fragments
     protected ServiceFragment mServiceFragment = null;
+
     protected UserListFragment mUserListFragment = null;
+
     protected IRCPagerFragment mIRCPagerFragment = null;
+
     protected ActionsPagerFragment mActionsPagerFragment = null;
+
     protected DrawerToggle mDrawerToggle;
 
     // Sliding menus
     protected SlidingMenu mUserSlidingMenu = null;
+
     protected ActionsSlidingMenu mActionsSlidingMenu = null;
 
     // Other objects
     protected String mServerTitle = null;
+
     protected EventReceiver mEventReceiver = new EventReceiver();
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -329,8 +335,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     /**
-     * Method which is called when the user requests a mention from
-     * the UserListFragment
+     * Method which is called when the user requests a mention from the UserListFragment
      *
      * @param users - the list of users which the app user wants to mentuin
      */
@@ -389,6 +394,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     };
 
     private final class EventReceiver {
+
         @Subscribe
         public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
             onDisconnect(false, true);

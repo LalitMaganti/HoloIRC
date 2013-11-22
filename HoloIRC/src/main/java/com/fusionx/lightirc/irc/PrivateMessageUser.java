@@ -9,8 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 public final class PrivateMessageUser extends User {
+
     protected final UserWriter mWriter;
+
     private List<Message> mBuffer;
+
     private boolean mCached;
 
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface) {

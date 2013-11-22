@@ -5,6 +5,7 @@ import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
 public class SummaryEditTextPreference extends EditTextPreference {
+
     public SummaryEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

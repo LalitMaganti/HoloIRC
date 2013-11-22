@@ -21,10 +21,10 @@
 
 package com.fusionx.lightirc.communication;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.util.MiscUtils;
+
+import android.content.Context;
 
 import java.util.ArrayList;
 
@@ -32,8 +32,9 @@ import java.util.ArrayList;
  * This entire class needs full parsing
  */
 public class MessageParser {
+
     public static void channelMessageToParse(final Context context, final Server server,
-                                             final String channelName, final String message) {
+            final String channelName, final String message) {
         final ArrayList<String> parsedArray = MiscUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
 
@@ -64,7 +65,7 @@ public class MessageParser {
     }
 
     public static void userMessageToParse(final Context context, final Server server,
-                                          final String userNick, final String message) {
+            final String userNick, final String message) {
         final ArrayList<String> parsedArray = MiscUtils.splitRawLine(message, false);
         final String command = parsedArray.remove(0);
 
@@ -90,7 +91,7 @@ public class MessageParser {
     }
 
     public static void serverMessageToParse(final Context context, final Server server,
-                                            final String message) {
+            final String message) {
         if (message.startsWith("/")) {
             serverCommandToParse(context, server, message);
         } else {
@@ -99,7 +100,7 @@ public class MessageParser {
     }
 
     private static void serverCommandToParse(final Context context, final Server server,
-                                             final String rawLine) {
+            final String rawLine) {
         final ArrayList<String> parsedArray = MiscUtils.splitRawLine(rawLine, false);
         final String command = parsedArray.remove(0);
 

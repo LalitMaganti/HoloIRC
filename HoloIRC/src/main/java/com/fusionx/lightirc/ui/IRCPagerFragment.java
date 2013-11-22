@@ -1,14 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
-import android.content.res.TypedArray;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCPagerAdapter;
@@ -25,18 +16,29 @@ import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.squareup.otto.Subscribe;
 
+import android.app.Activity;
+import android.content.res.TypedArray;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import java.util.List;
 
 public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
         ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallback {
+
     private ViewPager mViewPager = null;
+
     private IRCPagerInterface mCallback = null;
+
     private IRCPagerAdapter mAdapter = null;
 
     /**
-     * Hold a reference to the parent Activity so we can report the
-     * task's current progress and results. The Android framework
-     * will pass us a reference to the newly created Activity after
+     * Hold a reference to the parent Activity so we can report the task's current progress and
+     * results. The Android framework will pass us a reference to the newly created Activity after
      * each configuration change.
      */
     @Override
@@ -51,8 +53,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     /**
-     * Since the fragment is retained, when the activity detaches, a new activity is created so
-     * null the callback when the old activity detaches
+     * Since the fragment is retained, when the activity detaches, a new activity is created so null
+     * the callback when the old activity detaches
      */
     @Override
     public void onDetach() {
@@ -85,7 +87,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         return inflater.inflate(R.layout.view_pager, container);
     }
 
@@ -149,8 +151,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     /**
-     * If the currently displayed fragment is the one being removed then switch
-     * to one tab back. Then remove the fragment regardless.
+     * If the currently displayed fragment is the one being removed then switch to one tab back.
+     * Then remove the fragment regardless.
      *
      * @param fragmentTitle - name of the fragment to be removed
      */
@@ -232,6 +234,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public interface IRCPagerInterface {
+
         public Server getServer();
 
         public boolean isConnectedToServer();

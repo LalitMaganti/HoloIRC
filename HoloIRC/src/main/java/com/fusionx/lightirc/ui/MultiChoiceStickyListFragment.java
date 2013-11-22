@@ -1,14 +1,14 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.View;
-
-import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,9 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 abstract class MultiChoiceStickyListFragment<T> extends Fragment implements
         MultiSelectionUtils.MultiChoiceModeListener {
+
     MultiSelectionUtils.Controller mMultiSelectionController;
+
     private StickyListHeadersListView mListView;
 
     @Override

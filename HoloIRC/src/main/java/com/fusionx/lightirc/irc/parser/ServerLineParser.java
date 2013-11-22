@@ -40,6 +40,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class ServerLineParser {
+
     @Getter(AccessLevel.PACKAGE)
     private final Server server;
 
@@ -48,6 +49,7 @@ public class ServerLineParser {
     private boolean disconnectSent;
 
     private final ServerCodeParser codeParser;
+
     private final ServerCommandParser commandParser;
 
     public ServerLineParser(final Server server) {
@@ -57,8 +59,7 @@ public class ServerLineParser {
     }
 
     /**
-     * A loop which reads each line from the server as it is received and passes it on
-     * to parse
+     * A loop which reads each line from the server as it is received and passes it on to parse
      *
      * @param reader - the reader associated with the server stream
      */

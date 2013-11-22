@@ -1,5 +1,8 @@
 package com.fusionx.lightirc.ui.preferences;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.UIUtils;
+
 import android.content.Context;
 import android.preference.Preference;
 import android.util.AttributeSet;
@@ -8,16 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.UIUtils;
-
 /**
  * Hacky way to add a view to a settings fragment
  *
  * @author Lalit Maganti
  */
 public class MustBeCompletePreference extends Preference {
+
     private TextView mTextView;
+
     private String mText;
 
     public MustBeCompletePreference(final Context context, final AttributeSet attrs) {

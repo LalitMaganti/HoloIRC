@@ -7,6 +7,7 @@ import org.robolectric.annotation.Config;
 import org.robolectric.res.Fs;
 
 public class RobolectricGradleTestRunner extends RobolectricTestRunner {
+
     public RobolectricGradleTestRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
     }
@@ -17,7 +18,8 @@ public class RobolectricGradleTestRunner extends RobolectricTestRunner {
         if (config.manifest().equals(Config.DEFAULT) && manifestProperty != null) {
             String resProperty = System.getProperty("android.resources");
             String assetsProperty = System.getProperty("android.assets");
-            return new AndroidManifest(Fs.fileFromPath(manifestProperty), Fs.fileFromPath(resProperty),
+            return new AndroidManifest(Fs.fileFromPath(manifestProperty),
+                    Fs.fileFromPath(resProperty),
                     Fs.fileFromPath(assetsProperty));
         }
         return super.getAppManifest(config);

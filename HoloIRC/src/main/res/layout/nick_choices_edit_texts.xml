@@ -1,69 +1,69 @@
 <LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/nick_first_choice"
-        android:id="@+id/textView"
-        android:layout_gravity="start"/>
-
-    <EditText
-        android:id="@+id/edit_text_nick_first_choice"
-        android:inputType="text"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:lines="1"/>
+        android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/nick_second_choice"
-        android:id="@+id/textView2"
-        android:layout_gravity="start"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/nick_first_choice"
+            android:id="@+id/textView"
+            android:layout_gravity="start"/>
 
     <EditText
-        android:id="@+id/edit_text_nick_second_choice"
-        android:inputType="text"
-        android:hint="@string/optional"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:lines="1"/>
+            android:id="@+id/edit_text_nick_first_choice"
+            android:inputType="text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:lines="1"/>
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dip"
-        android:layout_marginLeft="10dip"
-        android:layout_marginRight="10dip"
-        android:layout_marginTop="10dip"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/nick_third_choice"
-        android:id="@+id/textView3"
-        android:layout_gravity="start"/>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/nick_second_choice"
+            android:id="@+id/textView2"
+            android:layout_gravity="start"/>
 
     <EditText
-        android:id="@+id/edit_text_nick_third_choice"
-        android:inputType="text"
-        android:hint="@string/optional"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:singleLine="true"
-        android:lines="1"/>
+            android:id="@+id/edit_text_nick_second_choice"
+            android:inputType="text"
+            android:hint="@string/optional"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:lines="1"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"
+            android:layout_marginTop="10dip"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/nick_third_choice"
+            android:id="@+id/textView3"
+            android:layout_gravity="start"/>
+
+    <EditText
+            android:id="@+id/edit_text_nick_third_choice"
+            android:inputType="text"
+            android:hint="@string/optional"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:lines="1"/>
 
 </LinearLayout>

@@ -1,13 +1,14 @@
 package com.fusionx.lightirc.ui.widget;
 
+import com.fusionx.lightirc.irc.Server;
+
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.fusionx.lightirc.irc.Server;
 
 import java.util.ArrayList;
 
 public interface ServerCardInterface {
+
     public String getTitle();
 
     public View getView(final View convertView, final ViewGroup parent, final Server server);

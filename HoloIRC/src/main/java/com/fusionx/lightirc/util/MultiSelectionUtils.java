@@ -33,15 +33,16 @@ import android.widget.ListView;
 import java.util.HashSet;
 
 /**
- * Utilities for handling multiple selection in list views. Contains functionality similar to
- * {@link AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link ActionBarActivity} and
+ * Utilities for handling multiple selection in list views. Contains functionality similar to {@link
+ * AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link ActionBarActivity} and
  * backward-compatible action bars.
  */
 public class MultiSelectionUtils {
+
     public static Controller attachMultiSelectionController(final ListView listView,
-                                                            final ActionBarActivity activity,
-                                                            final MultiChoiceModeListener listener,
-                                                            boolean startModeOnClick) {
+            final ActionBarActivity activity,
+            final MultiChoiceModeListener listener,
+            boolean startModeOnClick) {
         return Controller.attach(listView, activity, listener, startModeOnClick);
     }
 
@@ -49,21 +50,29 @@ public class MultiSelectionUtils {
             ActionMode.Callback,
             AdapterView.OnItemClickListener,
             AdapterView.OnItemLongClickListener {
+
         private Handler mHandler = new Handler();
+
         private ActionMode mActionMode;
+
         private ListView mListView = null;
+
         private ActionBarActivity mActivity = null;
+
         private MultiChoiceModeListener mListener = null;
+
         private HashSet<Long> mTempIdsToCheckOnRestore;
+
         private HashSet<Pair<Integer, Long>> mItemsToCheck;
+
         private AdapterView.OnItemClickListener mOldItemClickListener;
 
         private Controller() {
         }
 
         public static Controller attach(ListView listView, ActionBarActivity activity,
-                                        MultiChoiceModeListener listener,
-                                        boolean startModeOnClick) {
+                MultiChoiceModeListener listener,
+                boolean startModeOnClick) {
             Controller controller = new Controller();
             controller.mListView = listView;
             controller.mActivity = activity;
@@ -222,7 +231,7 @@ public class MultiSelectionUtils {
 
         @Override
         public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position,
-                                       long id) {
+                long id) {
             if (mActionMode != null) {
                 return false;
             }
@@ -238,12 +247,13 @@ public class MultiSelectionUtils {
      * @see android.widget.AbsListView.MultiChoiceModeListener
      */
     public static interface MultiChoiceModeListener extends ActionMode.Callback {
+
         /**
          * @see android.widget.AbsListView.MultiChoiceModeListener#onItemCheckedStateChanged(
          *android.view.ActionMode, int, long, boolean)
          */
         public void onItemCheckedStateChanged(ActionMode mode,
-                                              int position, long id, boolean checked);
+                int position, long id, boolean checked);
     }
 }
 

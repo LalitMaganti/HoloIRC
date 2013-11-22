@@ -21,6 +21,10 @@
 
 package com.fusionx.lightirc.adapters;
 
+import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.fusionx.lightirc.ui.IRCFragment;
+import com.fusionx.lightirc.ui.ServerFragment;
+
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
@@ -31,27 +35,29 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.ui.IRCFragment;
-import com.fusionx.lightirc.ui.ServerFragment;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import lombok.NonNull;
 
 public class IRCPagerAdapter extends PagerAdapter {
+
     private static final boolean DEBUG = false;
+
     private static final String TAG = "FragmentStatePagerAdapter";
 
     private Fragment mCurrentPrimaryItem = null;
+
     private FragmentTransaction mCurTransaction = null;
 
     private final FragmentManager mFragmentManager;
+
     private final ArrayList<Fragment> mFragments = new ArrayList<Fragment>();
+
     private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
 
     private final ArrayList<IRCFragment> mViews = new ArrayList<IRCFragment>();
+
     private PagerSlidingTabStrip mTabStrip;
 
     public IRCPagerAdapter(final FragmentManager fm) {
@@ -65,8 +71,10 @@ public class IRCPagerAdapter extends PagerAdapter {
         if (mCurTransaction == null) {
             mCurTransaction = mFragmentManager.beginTransaction();
         }
-        if (DEBUG) Log.v(TAG, "Removing item #" + position + ": f=" + object
-                + " v=" + ((Fragment) object).getView());
+        if (DEBUG) {
+            Log.v(TAG, "Removing item #" + position + ": f=" + object
+                    + " v=" + ((Fragment) object).getView());
+        }
         while (mSavedState.size() <= position) {
             mSavedState.add(null);
         }
@@ -110,8 +118,9 @@ public class IRCPagerAdapter extends PagerAdapter {
         }
 
         final Fragment fragment = getItem(position);
-        if (DEBUG)
+        if (DEBUG) {
             Log.v(TAG, "Adding item #" + position + ": f=" + fragment);
+        }
         if (mSavedState.size() > position) {
             Fragment.SavedState fss = mSavedState.get(position);
             if (fss != null) {

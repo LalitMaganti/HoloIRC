@@ -1,9 +1,5 @@
 package com.fusionx.lightirc.ui.phone;
 
-import android.content.res.TypedArray;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.ui.ActionsPagerFragment;
 import com.fusionx.lightirc.ui.IRCActivity;
@@ -12,7 +8,12 @@ import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import android.content.res.TypedArray;
+import android.view.View;
+import android.view.ViewGroup;
+
 public class IRCPhoneActivity extends IRCActivity {
+
     @Override
     protected void setUpActionsFragment() {
         mActionsSlidingMenu = new ActionsSlidingMenu(this);

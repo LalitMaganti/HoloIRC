@@ -1,11 +1,12 @@
 package com.fusionx.lightirc.ui.widget;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.R;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import android.content.Context;
+
 public class ActionsSlidingMenu extends SlidingMenu {
+
     public ActionsSlidingMenu(Context context) {
         super(context);
         setShadowDrawable(R.drawable.shadow);

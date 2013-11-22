@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import android.util.Log;
-
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
@@ -32,6 +30,8 @@ import com.fusionx.lightirc.irc.writers.ServerWriter;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
+
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,8 +45,11 @@ import static com.fusionx.lightirc.constants.ServerReplyCodes.RPL_WELCOME;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.saslCodes;
 
 public class ServerConnectionParser {
+
     private static boolean triedSecondNick = false;
+
     private static boolean triedThirdNick = false;
+
     private static int suffix = 0;
 
     public static String parseConnect(final Server server, final ServerConfiguration
@@ -87,11 +90,11 @@ public class ServerConnectionParser {
     }
 
     private static String parseConnectionCode(final boolean canChangeNick,
-                                              final ArrayList<String> parsedArray,
-                                              final MessageSender sender,
-                                              final Server server,
-                                              final ServerConfiguration.NickStorage nickStorage,
-                                              final String rawLine) {
+            final ArrayList<String> parsedArray,
+            final MessageSender sender,
+            final Server server,
+            final ServerConfiguration.NickStorage nickStorage,
+            final String rawLine) {
         final int code = Integer.parseInt(parsedArray.get(1));
         final ServerWriter writer = server.getWriter();
         switch (code) {
@@ -132,9 +135,9 @@ public class ServerConnectionParser {
     }
 
     private static void parseConnectionCommand(final ArrayList<String> parsedArray,
-                                               final ServerConfiguration configuration,
-                                               final MessageSender sender, final Server server,
-                                               final String rawLine) {
+            final ServerConfiguration configuration,
+            final MessageSender sender, final Server server,
+            final String rawLine) {
         String s = parsedArray.get(1).toUpperCase();
         if (s.equals(ServerCommands.Notice)) {
             MiscUtils.removeFirstElementFromList(parsedArray, 3);

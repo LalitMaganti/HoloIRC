@@ -21,23 +21,24 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
 package com.fusionx.lightirc.adapters;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.Channel;
 import com.fusionx.lightirc.irc.ChannelUser;
 import com.fusionx.lightirc.util.UIUtils;
 
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
 import lombok.Setter;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
         StickyListHeadersAdapter {
+
     @Setter
     private Channel channel;
 

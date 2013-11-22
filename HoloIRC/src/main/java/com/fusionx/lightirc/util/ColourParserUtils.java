@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.util;
 
+import com.google.common.base.CharMatcher;
+
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -7,11 +9,10 @@ import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
-import com.google.common.base.CharMatcher;
-
 import static com.fusionx.lightirc.misc.AppPreferences.highlightLine;
 
 public class ColourParserUtils {
+
     public static Spanned parseMarkup(final String input) {
         try {
             final SpannableStringBuilder builder = new SpannableStringBuilder();

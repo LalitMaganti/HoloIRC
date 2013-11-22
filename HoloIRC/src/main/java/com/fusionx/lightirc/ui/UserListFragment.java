@@ -21,19 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;
@@ -49,14 +36,30 @@ import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+
 import java.util.List;
 
 import lombok.NonNull;
 
 public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser> implements
         SlidingMenu.OnCloseListener {
+
     private UserListCallback mCallback;
+
     private Channel mChannel;
+
     private UserListAdapter mAdapter;
 
     @Override
@@ -85,7 +88,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
+            final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_userlist_listview, container,
                 false);
     }
@@ -146,7 +149,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                                     new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialogInterface,
-                                                            int i) {
+                                                int i) {
                                             dialogInterface.dismiss();
                                         }
                                     });
@@ -212,6 +215,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     }
 
     public interface UserListCallback {
+
         public void onUserMention(final List<ChannelUser> users);
 
         public Server getServer();

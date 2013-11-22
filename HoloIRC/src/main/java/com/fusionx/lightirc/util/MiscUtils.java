@@ -21,16 +21,17 @@
 
 package com.fusionx.lightirc.util;
 
+import com.google.common.base.CharMatcher;
+
+import com.fusionx.lightirc.constants.Constants;
+import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.constants.UserLevelEnum;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-
-import com.fusionx.lightirc.constants.Constants;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.constants.UserLevelEnum;
-import com.google.common.base.CharMatcher;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import java.util.Set;
  * @author Lalit Maganti
  */
 public class MiscUtils {
+
     private static Set<String> ignoreList = null;
 
     /**
@@ -60,10 +62,11 @@ public class MiscUtils {
      * @return the parsed list
      */
     public static ArrayList<String> splitRawLine(final String input,
-                                                 final boolean careAboutColon) {
+            final boolean careAboutColon) {
         final ArrayList<String> stringParts = new ArrayList<String>();
-        if (input == null || input.length() == 0)
+        if (input == null || input.length() == 0) {
             return stringParts;
+        }
 
         final String colonLessLine = input.charAt(0) == ':' ? input.substring(1) : input;
         //Heavily optimized version string split by space with all characters after :

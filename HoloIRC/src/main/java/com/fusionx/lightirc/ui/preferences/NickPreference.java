@@ -1,12 +1,13 @@
 package com.fusionx.lightirc.ui.preferences;
 
+import com.fusionx.lightirc.constants.PreferenceConstants;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.AttributeSet;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
-
 public class NickPreference extends AbstractNickPreference {
+
     public NickPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

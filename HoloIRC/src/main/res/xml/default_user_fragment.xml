@@ -5,19 +5,19 @@
 
     <PreferenceCategory android:title="@string/default_user_settings_header">
         <com.fusionx.lightirc.ui.preferences.DefaultNickPreference
-            android:key="pref_default_nick_storage"
-            android:title="@string/server_settings_nick_storage_title"
-            android:summary="@string/server_settings_nick_storage_summary"/>
+                android:key="pref_default_nick_storage"
+                android:title="@string/server_settings_nick_storage_title"
+                android:summary="@string/server_settings_nick_storage_summary"/>
         <com.fusionx.lightirc.ui.preferences.SummaryEditTextPreference
-            android:defaultValue="HoloIRCUser"
-            android:key="pref_default_realname"
-            android:title="Real Name"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue="HoloIRCUser"
+                android:key="pref_default_realname"
+                android:title="Real Name"
+                android:singleLine="true"
+                android:lines="1"/>
         <CheckBoxPreference
-            android:key="pref_default_auto_nick"
-            android:defaultValue="true"
-            android:title="@string/server_settings_auto_nick_title"
-            android:summary="@string/server_settings_auto_nick_summary"/>
+                android:key="pref_default_auto_nick"
+                android:defaultValue="true"
+                android:title="@string/server_settings_auto_nick_title"
+                android:summary="@string/server_settings_auto_nick_summary"/>
     </PreferenceCategory>
 </PreferenceScreen>

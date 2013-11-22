@@ -21,16 +21,16 @@
 
 package com.fusionx.lightirc.util;
 
+import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.irc.ServerConfiguration;
+
+import org.apache.commons.lang3.StringUtils;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Build;
-
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,6 +44,7 @@ import java.util.Set;
 import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
 
 public class SharedPreferencesUtils {
+
     public static String getSharedPreferencesPath(final Context context) {
         return context.getFilesDir().getAbsolutePath().replace("files", "shared_prefs/");
     }
@@ -105,7 +106,7 @@ public class SharedPreferencesUtils {
     }
 
     public static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
-                                                                    final String filename) {
+            final String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 Context.MODE_PRIVATE);
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
@@ -161,7 +162,7 @@ public class SharedPreferencesUtils {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void putStringSet(SharedPreferences preferences, final String key,
-                                    final Set<String> set) {
+            final Set<String> set) {
         final SharedPreferences.Editor editor = preferences.edit();
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
             editor.putStringSet(key, set);
@@ -183,7 +184,7 @@ public class SharedPreferencesUtils {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static Set<String> getStringSet(final SharedPreferences pref, final String key,
-                                           final Set<String> defaultValue) {
+            final Set<String> defaultValue) {
         if (UIUtils.hasHoneycomb()) {
             return pref.getStringSet(key, defaultValue);
         } else {

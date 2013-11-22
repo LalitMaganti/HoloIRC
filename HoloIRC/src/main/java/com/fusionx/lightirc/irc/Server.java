@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.irc;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
@@ -34,6 +32,8 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.content.Context;
+
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
@@ -41,19 +41,27 @@ import java.util.List;
 import lombok.NonNull;
 
 public class Server {
+
     private final String mTitle;
+
     private final ConnectionWrapper mWrapper;
+
     private final Context mContext;
+
     private ServerWriter mWriter;
+
     private UserChannelInterface mUserChannelInterface;
+
     private AppUser mUser;
 
     private List<Message> mBuffer;
+
     private String mStatus = "Disconnected";
+
     private boolean mCached;
 
     public Server(final String serverTitle, final ConnectionWrapper wrapper,
-                  final Context context) {
+            final Context context) {
         mTitle = serverTitle;
         mWrapper = wrapper;
         mContext = context;
@@ -66,7 +74,7 @@ public class Server {
     }
 
     public Event privateMessageSent(final PrivateMessageUser userWhoIsNotUs,
-                                    final String message, final boolean weAreSending) {
+            final String message, final boolean weAreSending) {
         final MessageSender sender = MessageSender.getSender(mTitle);
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
         if (!mUser.isPrivateMessageOpen(userWhoIsNotUs)) {
@@ -87,7 +95,7 @@ public class Server {
     }
 
     public Event privateActionSent(final PrivateMessageUser userWhoIsNotUs, final String action,
-                                   final boolean weAreSending) {
+            final boolean weAreSending) {
         final MessageSender sender = MessageSender.getSender(mTitle);
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
         if (!mUser.isPrivateMessageOpen(userWhoIsNotUs)) {

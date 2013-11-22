@@ -1,12 +1,13 @@
 package com.fusionx.lightirc.ui.preferences;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.content.Context;
 import android.preference.EditTextPreference;
 import android.util.AttributeSet;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class SaslUsernameEditTextPreference extends EditTextPreference {
+
     public SaslUsernameEditTextPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }

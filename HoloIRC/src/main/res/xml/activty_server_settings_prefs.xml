@@ -23,108 +23,108 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
     <com.fusionx.lightirc.ui.preferences.MustBeCompletePreference
-        android:key="must_be_complete"/>
+            android:key="must_be_complete"/>
 
     <PreferenceCategory android:title="Connection">
         <com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference
-            android:key="pref_title"
-            android:defaultValue=""
-            android:singleLine="true"
-            android:lines="1"
-            android:title="@string/server_settings_server_title"/>
+                android:key="pref_title"
+                android:defaultValue=""
+                android:singleLine="true"
+                android:lines="1"
+                android:title="@string/server_settings_server_title"/>
         <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
-            android:key="pref_url"
-            android:defaultValue=""
-            android:singleLine="true"
-            android:lines="1"
-            android:title="@string/server_settings_url_title"/>
+                android:key="pref_url"
+                android:defaultValue=""
+                android:singleLine="true"
+                android:lines="1"
+                android:title="@string/server_settings_url_title"/>
         <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
-            android:key="pref_port"
-            android:title="@string/server_settings_port_title"
-            android:inputType="number"
-            android:defaultValue="6667"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:key="pref_port"
+                android:title="@string/server_settings_port_title"
+                android:inputType="number"
+                android:defaultValue="6667"
+                android:singleLine="true"
+                android:lines="1"/>
     </PreferenceCategory>
 
 
     <PreferenceCategory android:title="SSL">
         <CheckBoxPreference
-            android:key="pref_ssl"
-            android:defaultValue="false"
-            android:title="@string/server_settings_ssl_title"
-            android:summary="@string/server_settings_ssl_summary"/>
+                android:key="pref_ssl"
+                android:defaultValue="false"
+                android:title="@string/server_settings_ssl_title"
+                android:summary="@string/server_settings_ssl_summary"/>
         <CheckBoxPreference
-            android:key="pref_ssl_accept_all_connections"
-            android:defaultValue="false"
-            android:dependency="pref_ssl"
-            android:title="Accept all SSL certificates"
-            android:summary="Warning - this could be quite dangerous if used incorrectly"/>
+                android:key="pref_ssl_accept_all_connections"
+                android:defaultValue="false"
+                android:dependency="pref_ssl"
+                android:title="Accept all SSL certificates"
+                android:summary="Warning - this could be quite dangerous if used incorrectly"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="User">
         <com.fusionx.lightirc.ui.preferences.NickPreference
-            android:key="pref_nick_storage"
-            android:title="@string/server_settings_nick_storage_title"
-            android:summary="@string/server_settings_nick_storage_summary"/>
+                android:key="pref_nick_storage"
+                android:title="@string/server_settings_nick_storage_title"
+                android:summary="@string/server_settings_nick_storage_summary"/>
         <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
-            android:defaultValue="HoloIRCUser"
-            android:key="pref_realname"
-            android:title="Real Name"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue="HoloIRCUser"
+                android:key="pref_realname"
+                android:title="Real Name"
+                android:singleLine="true"
+                android:lines="1"/>
         <CheckBoxPreference
-            android:key="pref_auto_nick"
-            android:defaultValue="true"
-            android:title="@string/server_settings_auto_nick_title"
-            android:summary="@string/server_settings_auto_nick_summary"/>
+                android:key="pref_auto_nick"
+                android:defaultValue="true"
+                android:title="@string/server_settings_auto_nick_title"
+                android:summary="@string/server_settings_auto_nick_summary"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Channels">
         <Preference
-            android:key="pref_autojoin_intent"
-            android:title="@string/server_settings_auto_join_title"/>
+                android:key="pref_autojoin_intent"
+                android:title="@string/server_settings_auto_join_title"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Credentials">
         <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
-            android:defaultValue="holoirc"
-            android:key="pref_login_username"
-            android:title="@string/username"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue="holoirc"
+                android:key="pref_login_username"
+                android:title="@string/username"
+                android:singleLine="true"
+                android:lines="1"/>
         <com.fusionx.lightirc.ui.preferences.PasswordSummaryEditTextPreference
-            android:defaultValue=""
-            android:inputType="textPassword"
-            android:key="pref_login_password"
-            android:title="@string/password"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue=""
+                android:inputType="textPassword"
+                android:key="pref_login_password"
+                android:title="@string/password"
+                android:singleLine="true"
+                android:lines="1"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="SASL Credentials - if supported">
         <com.fusionx.lightirc.ui.preferences.SaslUsernameEditTextPreference
-            android:defaultValue=""
-            android:key="pref_sasl_username"
-            android:title="SASL Username"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue=""
+                android:key="pref_sasl_username"
+                android:title="SASL Username"
+                android:singleLine="true"
+                android:lines="1"/>
         <com.fusionx.lightirc.ui.preferences.PasswordSummaryEditTextPreference
-            android:defaultValue=""
-            android:inputType="textPassword"
-            android:key="pref_sasl_password"
-            android:title="SASL Password"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue=""
+                android:inputType="textPassword"
+                android:key="pref_sasl_password"
+                android:title="SASL Password"
+                android:singleLine="true"
+                android:lines="1"/>
     </PreferenceCategory>
 
     <PreferenceCategory android:title="NickServ Credentials - if supported">
         <com.fusionx.lightirc.ui.preferences.PasswordSummaryEditTextPreference
-            android:defaultValue=""
-            android:key="pref_nickserv_password"
-            android:title="@string/server_settings_server_password_title"
-            android:inputType="textPassword"
-            android:singleLine="true"
-            android:lines="1"/>
+                android:defaultValue=""
+                android:key="pref_nickserv_password"
+                android:title="@string/server_settings_server_password_title"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:lines="1"/>
     </PreferenceCategory>
 </PreferenceScreen>

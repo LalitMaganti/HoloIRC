@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.communication.MessageSender;
@@ -39,10 +37,13 @@ import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.app.Activity;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public final class ChannelFragment extends IRCFragment {
+
     private ChannelFragmentCallback mCallback;
 
     @Override
@@ -126,6 +127,7 @@ public final class ChannelFragment extends IRCFragment {
 
     // Callback interface
     public interface ChannelFragmentCallback {
+
         public Server getServer();
     }
 }

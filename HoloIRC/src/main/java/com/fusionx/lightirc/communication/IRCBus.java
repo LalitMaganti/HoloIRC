@@ -1,14 +1,17 @@
 package com.fusionx.lightirc.communication;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import com.squareup.otto.Bus;
 import com.squareup.otto.ThreadEnforcer;
 
+import android.os.Handler;
+import android.os.Looper;
+
 class IRCBus extends Bus {
+
     private final Handler mainThread = new Handler(Looper.getMainLooper());
+
     private final MessageSender mSender;
+
     private int registeredCount;
 
     public IRCBus(final MessageSender sender) {

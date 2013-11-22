@@ -24,6 +24,7 @@ package com.fusionx.lightirc.irc.misc;
 import com.fusionx.lightirc.irc.writers.ServerWriter;
 
 public class CoreListener {
+
     public static void respondToPing(final ServerWriter serverWriter, final String serverName) {
         serverWriter.pongServer(serverName);
     }

@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.irc.connection;
 
-import android.content.Context;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.AppUser;
@@ -35,6 +33,8 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.SSLUtils;
 
 import org.apache.commons.lang3.StringUtils;
+
+import android.content.Context;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,10 +55,13 @@ import lombok.Setter;
  * @author Lalit Maganti
  */
 class ServerConnection {
+
     private final Server server;
+
     private final Context mContext;
 
     private final ServerConfiguration serverConfiguration;
+
     private Socket mSocket;
 
     private ServerLineParser mParser;
@@ -69,22 +72,22 @@ class ServerConnection {
     private int reconnectAttempts = 0;
 
     /**
-     * Constructor for the object - package local since this object should always be contained
-     * only within a {@link ConnectionWrapper} object
+     * Constructor for the object - package local since this object should always be contained only
+     * within a {@link ConnectionWrapper} object
      *
      * @param configuration - the ServerConfiguration which should be used to connect to the server
      * @param context       - context for retrieving strings from the res files
      */
     ServerConnection(final ServerConfiguration configuration, final Context context,
-                     final Server serverObject) {
+            final Server serverObject) {
         server = serverObject;
         serverConfiguration = configuration;
         mContext = context;
     }
 
     /**
-     * Method which keeps trying to reconnect to the server the number of times specified and if
-     * the user has not explicitly tried to disconnect
+     * Method which keeps trying to reconnect to the server the number of times specified and if the
+     * user has not explicitly tried to disconnect
      */
     void connectToServer() {
         reconnectAttempts = 0;
@@ -164,7 +167,8 @@ class ServerConnection {
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
-                if (AppPreferences.numberOfReconnectEvents != reconnectAttempts && !disconnectSent) {
+                if (AppPreferences.numberOfReconnectEvents != reconnectAttempts
+                        && !disconnectSent) {
                     sender.sendRetryPendingDisconnection(server, "Disconnected from the server");
                 }
             }
@@ -192,8 +196,6 @@ class ServerConnection {
 
     /**
      * Called to setup the socket
-     *
-     * @throws IOException
      */
     private void setupSocket() throws IOException {
         final SSLSocketFactory sslSocketFactory = SSLUtils.getCorrectSSLSocketFactory
@@ -209,8 +211,6 @@ class ServerConnection {
 
     /**
      * Called to setup the server
-     *
-     * @throws IOException
      */
     private void setupServer() throws IOException {
         final OutputStreamWriter writer = new OutputStreamWriter(mSocket.getOutputStream());

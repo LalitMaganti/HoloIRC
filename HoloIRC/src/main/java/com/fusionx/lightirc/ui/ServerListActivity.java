@@ -21,19 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.AbsListView;
-import android.widget.GridView;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
@@ -53,13 +40,29 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.squareup.otto.Subscribe;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.AbsListView;
+import android.widget.GridView;
+
 import java.util.ArrayList;
 
 public class ServerListActivity extends ActionBarActivity implements ServerListAdapter
         .BuilderAdapterCallback, AnimatedServerListAdapter.SingleDismissCallback,
         ServerCard.ServerCardCallback {
+
     private IRCService mService = null;
+
     private ServerListAdapter mServerCardsAdapter = null;
+
     private AnimatedServerListAdapter mAnimationAdapter = null;
 
     @Override

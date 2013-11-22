@@ -3,11 +3,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/about">
         <Preference
-            android:key="pref_app_version"
-            android:title="@string/about_settings_app_version"/>
+                android:key="pref_app_version"
+                android:title="@string/about_settings_app_version"/>
         <Preference
-            android:key="pref_author"
-            android:title="Author"
-            android:summary="Lalit Maganti (tilal6991)"/>
+                android:key="pref_author"
+                android:title="Author"
+                android:summary="Lalit Maganti (tilal6991)"/>
     </PreferenceCategory>
 </PreferenceScreen>

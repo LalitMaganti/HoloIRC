@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.ui.preferences;
 
+import com.fusionx.lightirc.R;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -12,11 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.fusionx.lightirc.R;
-
 abstract class AbstractNickPreference extends DialogPreference implements TextWatcher {
+
     EditText mFirstChoice;
+
     EditText mSecondChoice;
+
     EditText mThirdChoice;
 
     AbstractNickPreference(final Context context, final AttributeSet attrs) {

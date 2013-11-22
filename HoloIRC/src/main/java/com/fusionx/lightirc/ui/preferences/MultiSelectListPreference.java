@@ -16,6 +16,9 @@
 
 package com.fusionx.lightirc.ui.preferences;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
+
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,28 +28,27 @@ import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A {@link android.preference.Preference} that displays a list of entries as
- * a dialog.
- * <p/>
- * This preference will store a set of strings into the SharedPreferences.
- * This set will contain one or more values from the
- * {@link #setEntryValues(CharSequence[])} array.
+ * A {@link android.preference.Preference} that displays a list of entries as a dialog. <p/> This
+ * preference will store a set of strings into the SharedPreferences. This set will contain one or
+ * more values from the {@link #setEntryValues(CharSequence[])} array.
  *
  * @attr ref R.styleable#MultiSelectListPreference_entries
  * @attr ref R.styleable#MultiSelectListPreference_entryValues
  */
 public class MultiSelectListPreference extends DialogPreference {
+
     private CharSequence[] mEntries;
+
     private CharSequence[] mEntryValues;
+
     private Set<String> mValues = new HashSet<String>();
+
     private Set<String> mNewValues = new HashSet<String>();
+
     private boolean mPreferenceChanged;
 
     public MultiSelectListPreference(Context context, AttributeSet attrs) {
@@ -66,11 +68,9 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     /**
-     * Sets the human-readable entries to be shown in the list. This will be
-     * shown in subsequent dialogs.
-     * <p/>
-     * Each entry must have a corresponding index in
-     * {@link #setEntryValues(CharSequence[])}.
+     * Sets the human-readable entries to be shown in the list. This will be shown in subsequent
+     * dialogs. <p/> Each entry must have a corresponding index in {@link
+     * #setEntryValues(CharSequence[])}.
      *
      * @param entries The entries.
      * @see #setEntryValues(CharSequence[])
@@ -97,9 +97,9 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     /**
-     * The array to find the value to save for a preference when an entry from
-     * entries is selected. If a user clicks on the second item in entries, the
-     * second item in this array will be saved to the preference.
+     * The array to find the value to save for a preference when an entry from entries is selected.
+     * If a user clicks on the second item in entries, the second item in this array will be saved
+     * to the preference.
      *
      * @param entryValues The array to be used as values to save for the preference.
      */
@@ -132,8 +132,7 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     /**
-     * Sets the value of the key. This should contain entries in
-     * {@link #getEntryValues()}.
+     * Sets the value of the key. This should contain entries in {@link #getEntryValues()}.
      *
      * @param values The values to set for the key.
      */
@@ -267,6 +266,7 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     private static class SavedState extends BaseSavedState {
+
         public static final Parcelable.Creator<SavedState> CREATOR =
                 new Parcelable.Creator<SavedState>() {
                     public SavedState createFromParcel(Parcel in) {
@@ -277,6 +277,7 @@ public class MultiSelectListPreference extends DialogPreference {
                         return new SavedState[size];
                     }
                 };
+
         Set<String> values;
 
         public SavedState(Parcel source) {

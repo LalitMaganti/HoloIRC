@@ -5,7 +5,9 @@ import java.util.Set;
 
 public abstract class TwoWayHashSet<A extends UpdateableTreeSet.Updateable,
         B extends UpdateableTreeSet.Updateable> {
+
     protected final HashMap<A, UpdateableTreeSet<B>> aToBMap;
+
     protected final HashMap<B, UpdateableTreeSet<A>> bToAMap;
 
     protected TwoWayHashSet() {

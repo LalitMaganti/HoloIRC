@@ -21,13 +21,14 @@
 
 package com.fusionx.lightirc.irc.writers;
 
-import android.util.Base64;
-
 import org.apache.commons.lang3.StringUtils;
+
+import android.util.Base64;
 
 import java.io.OutputStreamWriter;
 
 public class ServerWriter extends RawWriter {
+
     public ServerWriter(final OutputStreamWriter out) {
         super(out);
     }

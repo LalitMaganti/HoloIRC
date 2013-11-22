@@ -1,5 +1,11 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.ActionPagerAdapter;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.irc.Server;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,16 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.ActionPagerAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.irc.Server;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         .IgnoreListCallback, ActionsFragment.IRCActionsCallback {
+
     private ViewPager mActionViewPager;
+
     private ActionPagerAdapter mActionsPagerAdapter;
+
     private ActionsPagerFragmentCallback mCallback;
 
     @Override
@@ -42,7 +45,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             final Bundle savedInstanceState) {
+            final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.non_scrollable_view_pager, container);
 
         mActionViewPager = (ViewPager) view;
@@ -122,6 +125,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public interface ActionsPagerFragmentCallback {
+
         public String getServerTitle();
 
         public String getNick();

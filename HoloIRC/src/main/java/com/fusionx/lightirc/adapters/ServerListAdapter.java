@@ -21,22 +21,23 @@
 
 package com.fusionx.lightirc.adapters;
 
-import android.app.Activity;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.SynchronizedCollection;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 
+import android.app.Activity;
+import android.view.View;
+import android.view.ViewGroup;
+
 import java.util.ArrayList;
 
 public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface> {
+
     private final BuilderAdapterCallback mCallback;
 
     public ServerListAdapter(final Activity activity,
-                             SynchronizedCollection<ServerCardInterface> list) {
+            SynchronizedCollection<ServerCardInterface> list) {
         super(activity, R.layout.item_server_card, list);
 
         try {
@@ -66,6 +67,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
     }
 
     public interface BuilderAdapterCallback {
+
         public Server getServer(final String title);
     }
 }

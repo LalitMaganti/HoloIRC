@@ -4,8 +4,8 @@
                   xmlns:holoirc="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="In-app Notification">
         <com.fusionx.lightirc.ui.preferences.MultiSelectListPreference
-            android:title="When nickname is mentioned"
-            holoirc:entries="@array/themes"
-            holoirc:entryValues="@array/themes_values"/>
+                android:title="When nickname is mentioned"
+                holoirc:entries="@array/themes"
+                holoirc:entryValues="@array/themes_values"/>
     </PreferenceCategory>
 </PreferenceScreen>

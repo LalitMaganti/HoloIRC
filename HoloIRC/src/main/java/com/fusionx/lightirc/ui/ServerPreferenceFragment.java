@@ -1,5 +1,8 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.interfaces.IServerSettings;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -7,11 +10,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.IServerSettings;
-
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class ServerPreferenceFragment extends PreferenceFragment {
+
     private IServerSettings mCallback = null;
 
     @Override

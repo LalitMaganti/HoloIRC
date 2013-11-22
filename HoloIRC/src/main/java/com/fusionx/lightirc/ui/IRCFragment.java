@@ -21,6 +21,14 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
+import com.fusionx.lightirc.adapters.IRCMessageAdapter;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.irc.Message;
+
+import org.apache.commons.lang3.StringUtils;
+
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
@@ -31,25 +39,20 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
-import com.fusionx.lightirc.adapters.IRCMessageAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.irc.Message;
-
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class IRCFragment extends ListFragment implements TextView.OnEditorActionListener {
+
     protected String mTitle = null;
+
     protected EditText mMessageBox = null;
+
     protected IRCMessageAdapter mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
-                             final Bundle savedInstanceState) {
+            final Bundle savedInstanceState) {
         return inflate.inflate(R.layout.fragment_irc, container, false);
     }
 

@@ -1,7 +1,5 @@
 package com.fusionx.lightirc.irc.parser;
 
-import android.os.Handler;
-
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
@@ -12,8 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 
+import android.os.Handler;
+
 @RunWith(RobolectricGradleTestRunner.class)
 public class ServerLineParserTest {
+
     private ServerLineParser parser;
 
     @Before

@@ -21,9 +21,6 @@
 
 package com.fusionx.lightirc.irc.parser;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.irc.Channel;
@@ -34,6 +31,9 @@ import com.fusionx.lightirc.irc.event.Event;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.IRCUtils;
 import com.fusionx.lightirc.util.MiscUtils;
+
+import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -54,11 +54,17 @@ import static com.fusionx.lightirc.constants.ServerReplyCodes.genericCodes;
 import static com.fusionx.lightirc.constants.ServerReplyCodes.whoisCodes;
 
 class ServerCodeParser {
+
     private final WhoParser mWhoParser;
+
     private final NameParser mNameParser;
+
     private final UserChannelInterface mUserChannelInterface;
+
     private final Context mContext;
+
     private final Server mServer;
+
     private final MessageSender mSender;
     //private boolean motdAllowed;
 
@@ -138,7 +144,7 @@ class ServerCodeParser {
     }
 
     private Event parseFallThroughCode(final int code, final String message, final String rawLine,
-                                       final ArrayList<String> parsedArray) {
+            final ArrayList<String> parsedArray) {
         if (genericCodes.contains(code)) {
             return mSender.sendGenericServerEvent(mServer, message);
         } else if (whoisCodes.contains(code)) {

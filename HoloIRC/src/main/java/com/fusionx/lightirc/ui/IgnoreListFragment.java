@@ -1,16 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AbsListView;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
@@ -24,10 +13,22 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AbsListView;
+
 import java.util.Set;
 
 public class IgnoreListFragment extends MultiChoiceListFragment<String> implements SlidingMenu
         .OnCloseListener, OnDismissCallback {
+
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -152,6 +153,7 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
     }
 
     public interface IgnoreListCallback {
+
         public void switchToIRCActionFragment();
 
         public String getServerTitle();

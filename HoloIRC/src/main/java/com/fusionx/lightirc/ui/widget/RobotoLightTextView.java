@@ -1,12 +1,13 @@
 package com.fusionx.lightirc.ui.widget;
 
+import com.fusionx.lightirc.util.UIUtils;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.util.UIUtils;
-
 public class RobotoLightTextView extends TextView {
+
     public RobotoLightTextView(Context context) {
         super(context);
         if (!isInEditMode()) {

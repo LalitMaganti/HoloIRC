@@ -1,5 +1,12 @@
 package com.fusionx.lightirc.ui.widget;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.lightirc.ui.ServerPreferenceActivity;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.UIUtils;
+
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.PopupMenu;
@@ -9,25 +16,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.ui.ServerPreferenceActivity;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.fusionx.lightirc.util.UIUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 
 public class ServerCard implements ServerCardInterface, View.OnClickListener,
         PopupMenu.OnMenuItemClickListener {
+
     private final Context mContext;
+
     private final ServerConfiguration.Builder mServer;
+
     private final ServerCardCallback mCallback;
 
     public ServerCard(final Context context,
-                      final ServerConfiguration.Builder server,
-                      final ServerCardCallback callback) {
+            final ServerConfiguration.Builder server,
+            final ServerCardCallback callback) {
         mContext = context;
         mServer = server;
         mCallback = callback;
@@ -124,6 +127,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
     };
 
     public interface ServerCardCallback {
+
         public boolean isServerAvailable(final String title);
 
         public void deleteServer(final ServerCard card);

@@ -4,11 +4,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 public class FragmentUtils {
+
     /**
      * @param frag              The Fragment whose parent is to be found
      * @param callbackInterface The interface class that the parent should implement
-     * @return The parent of frag that implements the callbackInterface or null
-     * if no such parent can be found
+     * @return The parent of frag that implements the callbackInterface or null if no such parent
+     * can be found
      */
     @SuppressWarnings("unchecked") // Casts are checked using runtime methods
     public static <T> T getParent(Fragment frag, Class<T> callbackInterface) {
