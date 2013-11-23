@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.irc;
 
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
@@ -30,25 +31,32 @@ import com.fusionx.lightirc.misc.AppPreferences;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
 
+    /**
+     * Name of the channel
+     */
     protected final String mName;
-
-    protected String mTopic;
-
-    private final UserChannelInterface mUserChannelInterface;
-
-    private List<Message> mBuffer;
-
-    private boolean mCached;
 
     protected final ChannelWriter mWriter;
 
+    private final UserChannelInterface mUserChannelInterface;
+
+    private final List<Message> mBuffer = new ArrayList<Message>();
+
     private final HashMap<UserLevelEnum, Integer> mNumberOfUsers = new HashMap<UserLevelEnum,
             Integer>();
+
+    /**
+     * Topic of the channel
+     */
+    protected String mTopic;
+
+    private boolean mCached;
 
     Channel(final String channelName, final UserChannelInterface
             userChannelInterface) {
@@ -59,6 +67,11 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         // Number of users
         mNumberOfUsers.put(UserLevelEnum.OP, 0);
         mNumberOfUsers.put(UserLevelEnum.VOICE, 0);
+
+        final String message = String.format(mUserChannelInterface.getContext().getString(R.string
+                .parser_joined_channel),
+                mUserChannelInterface.getServer().getUser().getColorfulNick());
+        mBuffer.add(new Message(message));
     }
 
     @Override
@@ -87,7 +100,7 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
 
     public void onChannelEvent(final ChannelEvent event) {
         if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
-                .isNotEmpty(event.message) && mBuffer != null) {
+                .isNotEmpty(event.message)) {
             mBuffer.add(new Message(event.message));
         }
     }
@@ -171,10 +184,6 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
 
     public List<Message> getBuffer() {
         return mBuffer;
-    }
-
-    public void setBuffer(List<Message> buffer) {
-        mBuffer = buffer;
     }
 
     public String getTopic() {

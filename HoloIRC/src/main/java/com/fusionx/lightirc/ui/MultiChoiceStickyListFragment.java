@@ -117,7 +117,7 @@ abstract class MultiChoiceStickyListFragment<T> extends Fragment implements
 
     protected abstract BaseCollectionAdapter<T> getRealAdapter();
 
-    public StickyListHeadersListView getListView() {
+    protected StickyListHeadersListView getListView() {
         return mListView;
     }
 }

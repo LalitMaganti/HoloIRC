@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
@@ -39,13 +38,18 @@ import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class ChannelFragment extends IRCFragment {
 
+    /**
+     * Callback interface for the activity or parent fragment
+     */
     private ChannelFragmentCallback mCallback;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -54,7 +58,9 @@ public final class ChannelFragment extends IRCFragment {
             mCallback = FragmentUtils.getParent(this, ChannelFragmentCallback.class);
         }
     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -64,6 +70,9 @@ public final class ChannelFragment extends IRCFragment {
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPause() {
         super.onPause();
@@ -73,26 +82,13 @@ public final class ChannelFragment extends IRCFragment {
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(false);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected List<Message> onRetrieveMessages() {
         final UserChannelInterface uci = mCallback.getServer().getUserChannelInterface();
-        final List<Message> buffer = uci.getChannel(mTitle).getBuffer();
-        if (buffer == null) {
-            final String message = String.format(getActivity().getString(R.string
-                    .parser_joined_channel), mCallback.getServer()
-                    .getUser().getColorfulNick());
-            final ArrayList<Message> newBuffer = new ArrayList<Message>();
-            newBuffer.add(new Message(message));
-            return newBuffer;
-        } else {
-            return buffer;
-        }
-    }
-
-    @Override
-    protected void onPersistMessages(List<Message> list) {
-        final UserChannelInterface uci = mCallback.getServer().getUserChannelInterface();
-        uci.getChannel(mTitle).setBuffer(list);
+        return uci.getChannel(mTitle).getBuffer();
     }
 
     public void onUserMention(final List<ChannelUser> users) {
@@ -105,11 +101,17 @@ public final class ChannelFragment extends IRCFragment {
         mMessageBox.append(nicks + text);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FragmentTypeEnum getType() {
         return FragmentTypeEnum.Channel;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onSendMessage(final String message) {
         MessageParser.channelMessageToParse(getActivity(), mCallback.getServer(), mTitle,
@@ -121,7 +123,9 @@ public final class ChannelFragment extends IRCFragment {
     public void onChannelMessage(final ChannelEvent event) {
         if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
                 .isNotEmpty(event.message) && mTitle.equals(event.channelName)) {
-            mMessageAdapter.add(new Message(event.message));
+            synchronized (mMessageAdapter.getMessages()) {
+                mMessageAdapter.add(new Message(event.message));
+            }
         }
     }
 

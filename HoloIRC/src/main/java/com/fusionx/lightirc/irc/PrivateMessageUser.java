@@ -6,16 +6,32 @@ import com.fusionx.lightirc.util.IRCUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class PrivateMessageUser extends User {
-
+    /**
+     * This is the object that allows sending of messages directly to the server
+     */
     protected final UserWriter mWriter;
 
-    private List<Message> mBuffer;
+    /**
+     * Contains a copy of the messages when the conversation is not displayed to the user
+     */
+    private final List<Message> mBuffer = new ArrayList<Message>();
 
+    /**
+     * Stores whether the fragment corresponding to this conversation is cached by the
+     * FragmentManager
+     */
     private boolean mCached;
 
+    /**
+     * Constructor
+     *
+     * @param nick - the nickname of the user we're having the conversation with
+     * @param userChannelInterface - a copy of the user channel interface
+     */
     public PrivateMessageUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         mWriter = new UserWriter(userChannelInterface.getOutputStream(), this);
@@ -32,8 +48,10 @@ public final class PrivateMessageUser extends User {
     }
 
     public void onUserEvent(final UserEvent event) {
-        if (StringUtils.isNotBlank(event.message) && mBuffer != null) {
-            mBuffer.add(new Message(event.message));
+        if (StringUtils.isNotBlank(event.message)) {
+            synchronized (mBuffer) {
+                mBuffer.add(new Message(event.message));
+            }
         }
     }
 
@@ -44,10 +62,6 @@ public final class PrivateMessageUser extends User {
 
     public List<Message> getBuffer() {
         return mBuffer;
-    }
-
-    public void setBuffer(final List<Message> buffer) {
-        mBuffer = buffer;
     }
 
     public boolean isCached() {

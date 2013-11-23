@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import android.content.Context;
 
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class Server {
 
     private AppUser mUser;
 
-    private List<Message> mBuffer;
+    private final List<Message> mBuffer = new ArrayList<Message>();
 
     private String mStatus = "Disconnected";
 
@@ -69,7 +70,9 @@ public class Server {
 
     public void onServerEvent(final ServerEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            mBuffer.add(new Message(event.message));
+            synchronized (mBuffer) {
+                mBuffer.add(new Message(event.message));
+            }
         }
     }
 
@@ -161,10 +164,6 @@ public class Server {
 
     public List<Message> getBuffer() {
         return mBuffer;
-    }
-
-    public void setBuffer(List<Message> buffer) {
-        mBuffer = buffer;
     }
 
     public ServerWriter getWriter() {

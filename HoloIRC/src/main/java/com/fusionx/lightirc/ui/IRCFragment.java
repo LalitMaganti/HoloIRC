@@ -39,7 +39,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class IRCFragment extends ListFragment implements TextView.OnEditorActionListener {
@@ -60,9 +59,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
     public void onResume() {
         super.onResume();
 
-        final List<Message> list = onRetrieveMessages();
-        mMessageAdapter = new IRCMessageAdapter(getActivity(), list != null ? list : new
-                ArrayList<Message>());
+        mMessageAdapter = new IRCMessageAdapter(getActivity(), onRetrieveMessages());
         final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
         adapter.setAbsListView(getListView());
         setListAdapter(adapter);
@@ -98,20 +95,10 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        setListAdapter(null);
-        onPersistMessages(mMessageAdapter.getMessages());
-    }
-
     // Abstract methods
     protected abstract void onSendMessage(final String message);
 
     protected abstract List<Message> onRetrieveMessages();
-
-    protected abstract void onPersistMessages(List<Message> list);
 
     public abstract FragmentTypeEnum getType();
 
