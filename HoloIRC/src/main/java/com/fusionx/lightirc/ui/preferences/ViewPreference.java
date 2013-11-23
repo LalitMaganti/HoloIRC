@@ -16,13 +16,13 @@ import android.widget.TextView;
  *
  * @author Lalit Maganti
  */
-public class MustBeCompletePreference extends Preference {
+public class ViewPreference extends Preference {
 
     private TextView mTextView;
 
     private String mText;
 
-    public MustBeCompletePreference(final Context context, final AttributeSet attrs) {
+    public ViewPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
     }
 

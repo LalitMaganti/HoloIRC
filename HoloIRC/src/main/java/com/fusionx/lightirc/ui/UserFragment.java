@@ -75,12 +75,6 @@ public class UserFragment extends IRCFragment {
     }
 
     @Override
-    protected void onPersistMessages(List<Message> list) {
-        final PrivateMessageUser user = mCallback.getServer().getPrivateMessageUser(mTitle);
-        user.setBuffer(list);
-    }
-
-    @Override
     public FragmentTypeEnum getType() {
         return FragmentTypeEnum.User;
     }
@@ -94,7 +88,9 @@ public class UserFragment extends IRCFragment {
     @Subscribe
     public void onUserEvent(final UserEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            mMessageAdapter.add(new Message(event.message));
+            synchronized (mMessageAdapter.getMessages()) {
+                mMessageAdapter.add(new Message(event.message));
+            }
         }
     }
 

@@ -80,13 +80,7 @@ public class ServerFragment extends IRCFragment {
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        ;
         return mCallback.getServer().getBuffer();
-    }
-
-    @Override
-    protected void onPersistMessages(final List<Message> list) {
-        mCallback.getServer().setBuffer(list);
     }
 
     @Override
@@ -103,7 +97,9 @@ public class ServerFragment extends IRCFragment {
     @Subscribe
     public void onServerEvent(final ServerEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            mMessageAdapter.add(new Message(event.message));
+            synchronized (mMessageAdapter.getMessages()) {
+                mMessageAdapter.add(new Message(event.message));
+            }
         }
     }
 

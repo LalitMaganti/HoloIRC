@@ -3,7 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.IServerSettings;
-import com.fusionx.lightirc.ui.preferences.MustBeCompletePreference;
+import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
@@ -42,7 +42,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
 
     private boolean backPressed = false;
 
-    private MustBeCompletePreference mCompletePreference = null;
+    private ViewPreference mCompletePreference = null;
 
     private ServerTitleEditTextPreference mTitle = null;
 
@@ -137,7 +137,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
         mTitle.setListOfExistingServers(activity.getIntent().getStringArrayListExtra("list"));
 
         // URL of server
-        mCompletePreference = (MustBeCompletePreference) screen.findPreference("must_be_complete");
+        mCompletePreference = (ViewPreference) screen.findPreference("must_be_complete");
 
         // URL of server
         mUrl = (EditTextPreference) screen.findPreference(URL);
