@@ -31,8 +31,7 @@ import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
-import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
-import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
+import com.fusionx.lightirc.irc.event.DisconnectEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.widget.ServerCard;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
@@ -118,12 +117,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     }
 
     @Subscribe
-    public void onDisconnect(final RetryPendingDisconnectEvent event) {
-        mServerCardsAdapter.notifyDataSetChanged();
-    }
-
-    @Subscribe
-    public void onDisconnect(final FinalDisconnectEvent event) {
+    public void onDisconnect(final DisconnectEvent event) {
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

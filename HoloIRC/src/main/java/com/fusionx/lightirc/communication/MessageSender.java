@@ -29,14 +29,13 @@ import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.User;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
-import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
+import com.fusionx.lightirc.irc.event.DisconnectEvent;
 import com.fusionx.lightirc.irc.event.JoinEvent;
 import com.fusionx.lightirc.irc.event.KickEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
 import com.fusionx.lightirc.irc.event.NickInUseEvent;
 import com.fusionx.lightirc.irc.event.PartEvent;
 import com.fusionx.lightirc.irc.event.PrivateMessageEvent;
-import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.irc.event.ServerEvent;
 import com.fusionx.lightirc.irc.event.SwitchToServerEvent;
 import com.fusionx.lightirc.irc.event.UserEvent;
@@ -162,19 +161,9 @@ public class MessageSender {
         return privateMessageEvent;
     }
     // Generic events end
-
-    public FinalDisconnectEvent sendFinalDisconnection(final Server server,
-            final String disconnectLine,
-            final boolean expectedDisconnect) {
-        final FinalDisconnectEvent event = new FinalDisconnectEvent(expectedDisconnect,
-                disconnectLine);
-        sendServerEvent(server, event);
-        return event;
-    }
-
-    public RetryPendingDisconnectEvent sendRetryPendingDisconnection(final Server server,
-            final String disconnectLine) {
-        final RetryPendingDisconnectEvent event = new RetryPendingDisconnectEvent(disconnectLine);
+    public DisconnectEvent sendDisconnect(final Server server,
+            final String disconnectLine, final boolean retryPending) {
+        final DisconnectEvent event = new DisconnectEvent(disconnectLine, retryPending);
         sendServerEvent(server, event);
         return event;
     }

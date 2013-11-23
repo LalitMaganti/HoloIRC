@@ -45,16 +45,13 @@ import java.net.Socket;
 
 import javax.net.ssl.SSLSocketFactory;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 /**
  * Class which carries out all the interesting connection stuff including the inital setting up
  * logic
  *
  * @author Lalit Maganti
  */
-class ServerConnection {
+public class ServerConnection {
 
     private final Server server;
 
@@ -64,10 +61,7 @@ class ServerConnection {
 
     private Socket mSocket;
 
-    private ServerLineParser mParser;
-
-    @Setter(AccessLevel.PACKAGE)
-    private boolean disconnectSent = false;
+    private boolean mUserDisconnected;
 
     private int reconnectAttempts = 0;
 
@@ -95,7 +89,7 @@ class ServerConnection {
         final MessageSender sender = MessageSender.getSender(server.getTitle());
         connect();
 
-        while (!disconnectSent && reconnectAttempts < AppPreferences.numberOfReconnectEvents) {
+        while (reconnectAttempts < AppPreferences.numberOfReconnectEvents && !mUserDisconnected) {
             sender.sendGenericServerEvent(server, "Trying to reconnect to the server in 5 " +
                     "seconds.");
             try {
@@ -109,7 +103,7 @@ class ServerConnection {
             ++reconnectAttempts;
         }
 
-        sender.sendFinalDisconnection(server, "Disconnected from the server", disconnectSent);
+        sender.sendDisconnect(server, "Disconnected from the server", false);
     }
 
     /**
@@ -160,26 +154,30 @@ class ServerConnection {
                 }
 
                 // Initialise the parser used to parse any lines from the server
-                mParser = new ServerLineParser(server);
+                final ServerLineParser parser = new ServerLineParser(server, this);
                 // Loops forever until broken
-                mParser.parseMain(reader);
+                parser.parseMain(reader);
 
                 // If we have reached this point the connection has been broken - try to
                 // reconnect unless the disconnection was requested by the user or we have used
                 // all out lives
-                if (AppPreferences.numberOfReconnectEvents != reconnectAttempts
-                        && !disconnectSent) {
-                    sender.sendRetryPendingDisconnection(server, "Disconnected from the server");
+                if (AppPreferences.numberOfReconnectEvents != reconnectAttempts && !mUserDisconnected) {
+                    sender.sendDisconnect(server, "Disconnected from the server", true);
                 }
             }
         } catch (final IOException ex) {
             // Usually occurs when WiFi/3G is turned off on the device - usually fruitless to try
             // to reconnect but hey ho
-            if (AppPreferences.numberOfReconnectEvents != reconnectAttempts && !disconnectSent) {
-                sender.sendRetryPendingDisconnection(server, ex.getMessage());
+            if (AppPreferences.numberOfReconnectEvents != reconnectAttempts && !mUserDisconnected) {
+                sender.sendDisconnect(server, ex.getMessage(), true);
             }
         }
-        onDisconnected();
+        if(!mUserDisconnected) {
+            // We are disconnected :( - close up shop
+            server.setStatus(mContext.getString(R.string.status_disconnected));
+            server.cleanup();
+            closeSocket();
+        }
     }
 
     /**
@@ -221,16 +219,6 @@ class ServerConnection {
     }
 
     /**
-     * Called when we are disconnected
-     */
-    private void onDisconnected() {
-        // We are disconnected :( - close up shop
-        server.setStatus(mContext.getString(R.string.status_disconnected));
-        server.cleanup();
-        closeSocket();
-    }
-
-    /**
      * Called when we are connected to the server
      */
     private void onConnected(final MessageSender sender) {
@@ -243,9 +231,8 @@ class ServerConnection {
      * Called when the user explicitly requests a disconnect
      */
     public void onDisconnect() {
-        disconnectSent = true;
+        mUserDisconnected = true;
         server.setStatus(mContext.getString(R.string.status_disconnected));
-        mParser.setDisconnectSent(true);
         server.getWriter().quitServer(AppPreferences.quitReason);
     }
 
@@ -261,5 +248,9 @@ class ServerConnection {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isUserDisconnected() {
+        return mUserDisconnected;
     }
 }

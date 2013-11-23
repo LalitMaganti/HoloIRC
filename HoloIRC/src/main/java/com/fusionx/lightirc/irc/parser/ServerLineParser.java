@@ -23,6 +23,7 @@ package com.fusionx.lightirc.irc.parser;
 
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.irc.Server;
+import com.fusionx.lightirc.irc.connection.ServerConnection;
 import com.fusionx.lightirc.irc.event.ErrorEvent;
 import com.fusionx.lightirc.irc.event.Event;
 import com.fusionx.lightirc.irc.event.QuitEvent;
@@ -35,27 +36,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-
 public class ServerLineParser {
 
-    @Getter(AccessLevel.PACKAGE)
-    private final Server server;
+    private final Server mServer;
 
-    @Getter(AccessLevel.PACKAGE)
-    @Setter
-    private boolean disconnectSent;
+    private final ServerConnection mServerConnection;
 
-    private final ServerCodeParser codeParser;
+    private final ServerCodeParser mCodeParser;
 
-    private final ServerCommandParser commandParser;
+    private final ServerCommandParser mCommandParser;
 
-    public ServerLineParser(final Server server) {
-        this.server = server;
-        commandParser = new ServerCommandParser(server.getContext(), this);
-        codeParser = new ServerCodeParser(server.getContext(), this);
+    public ServerLineParser(final Server server, final ServerConnection connection) {
+        mServer = server;
+        mServerConnection = connection;
+        mCommandParser = new ServerCommandParser(server.getContext(), this);
+        mCodeParser = new ServerCodeParser(server.getContext(), this);
     }
 
     /**
@@ -65,7 +60,7 @@ public class ServerLineParser {
      */
     public void parseMain(final BufferedReader reader) throws IOException {
         String line;
-        while ((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null && !mServerConnection.isUserDisconnected()) {
             final Event quit = parseLine(line);
             if (quit instanceof QuitEvent || quit instanceof ErrorEvent) {
                 return;
@@ -84,7 +79,7 @@ public class ServerLineParser {
         String s = parsedArray.get(0);
         if (s.equals(ServerCommands.Ping)) {// Immediately return
             final String source = parsedArray.get(1);
-            CoreListener.respondToPing(server.getWriter(), source);
+            CoreListener.respondToPing(mServer.getWriter(), source);
             return new Event(rawLine);
         } else if (s.equals(ServerCommands.Error)) {
             // We are finished - the server has kicked us
@@ -92,10 +87,14 @@ public class ServerLineParser {
             return new ErrorEvent(rawLine);
         } else {// Check if the second thing is a code or a command
             if (StringUtils.isNumeric(parsedArray.get(1))) {
-                return codeParser.parseCode(parsedArray, rawLine);
+                return mCodeParser.parseCode(parsedArray, rawLine);
             } else {
-                return commandParser.parseCommand(parsedArray, rawLine, disconnectSent);
+                return mCommandParser.parseCommand(parsedArray, rawLine);
             }
         }
+    }
+
+    Server getServer() {
+        return mServer;
     }
 }

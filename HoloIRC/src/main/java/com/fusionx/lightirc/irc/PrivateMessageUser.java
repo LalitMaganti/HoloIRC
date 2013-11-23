@@ -41,7 +41,7 @@ public final class PrivateMessageUser extends User {
     public boolean equals(final Object o) {
         if (o instanceof PrivateMessageUser) {
             String otherNick = ((PrivateMessageUser) o).getNick();
-            return IRCUtils.areNicksEqual(nick, otherNick);
+            return IRCUtils.areNicksEqual(mNick, otherNick);
         } else {
             return false;
         }

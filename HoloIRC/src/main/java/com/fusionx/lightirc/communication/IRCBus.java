@@ -8,11 +8,11 @@ import android.os.Looper;
 
 class IRCBus extends Bus {
 
-    private final Handler mainThread = new Handler(Looper.getMainLooper());
+    private final Handler mMainThread = new Handler(Looper.getMainLooper());
 
     private final MessageSender mSender;
 
-    private int registeredCount;
+    private int mRegisteredCount;
 
     public IRCBus(final MessageSender sender) {
         super(ThreadEnforcer.ANY);
@@ -24,7 +24,7 @@ class IRCBus extends Bus {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             super.post(event);
         } else {
-            mainThread.post(new Runnable() {
+            mMainThread.post(new Runnable() {
                 @Override
                 public void run() {
                     IRCBus.super.post(event);
@@ -37,15 +37,15 @@ class IRCBus extends Bus {
     public void register(Object object) {
         super.register(object);
 
-        ++registeredCount;
+        ++mRegisteredCount;
     }
 
     @Override
     public void unregister(Object object) {
         super.unregister(object);
 
-        --registeredCount;
-        if (registeredCount == 0) {
+        --mRegisteredCount;
+        if (mRegisteredCount == 0) {
             mSender.removeSender();
         }
     }

@@ -28,28 +28,24 @@ import com.fusionx.lightirc.irc.ServerConfiguration;
 import android.content.Context;
 import android.os.Handler;
 
-import lombok.Getter;
-
 public class ConnectionWrapper extends Thread {
+    private Server mServer;
 
-    @Getter
-    private Server server;
-
-    private final ServerConnection connection;
+    private final ServerConnection mConnection;
 
     private final Handler mHandler;
 
     public ConnectionWrapper(final ServerConfiguration configuration, final Context context,
             final Handler handler) {
-        server = new Server(configuration.getTitle(), this, context);
-        connection = new ServerConnection(configuration, context, server);
+        mServer = new Server(configuration.getTitle(), this, context);
+        mConnection = new ServerConnection(configuration, context, mServer);
         mHandler = handler;
     }
 
     @Override
     public void run() {
         try {
-            connection.connectToServer();
+            mConnection.connectToServer();
         } catch (final Exception ex) {
             mHandler.post(new Runnable() {
                 @Override
@@ -61,13 +57,17 @@ public class ConnectionWrapper extends Thread {
     }
 
     public void disconnectFromServer(final Context context) {
-        final String status = server.getStatus();
+        final String status = mServer.getStatus();
 
         if (status.equals(context.getString(R.string.status_connected))) {
-            connection.onDisconnect();
+            mConnection.onDisconnect();
         } else if (isAlive()) {
-            connection.setDisconnectSent(true);
             interrupt();
+            mConnection.closeSocket();
         }
+    }
+
+    public Server getServer() {
+        return mServer;
     }
 }

@@ -66,7 +66,6 @@ class ServerCodeParser {
     private final Server mServer;
 
     private final MessageSender mSender;
-    //private boolean motdAllowed;
 
     ServerCodeParser(final Context context, final ServerLineParser parser) {
         mServer = parser.getServer();
@@ -75,7 +74,6 @@ class ServerCodeParser {
         mNameParser = new NameParser(mUserChannelInterface, mServer.getTitle());
         mContext = context;
         mSender = MessageSender.getSender(mServer.getTitle());
-        //motdAllowed = isMotdAllowed(mContext);
     }
 
     /**

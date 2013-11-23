@@ -23,35 +23,37 @@ package com.fusionx.lightirc.irc;
 
 import com.fusionx.lightirc.util.MiscUtils;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
 public abstract class User {
 
-    @Getter
-    @Setter
-    protected String nick;
+    protected String mNick;
 
-    final String nickHTML;
+    final String mColourCode;
 
-    final UserChannelInterface userChannelInterface;
+    final UserChannelInterface mUserChannelInterface;
 
-    User(@NonNull final String nick,
-            @NonNull final UserChannelInterface userChannelInterface) {
-        this.nick = nick;
-        this.userChannelInterface = userChannelInterface;
+    User(final String nick, final UserChannelInterface userChannelInterface) {
+        mNick = nick;
+        mUserChannelInterface = userChannelInterface;
 
-        nickHTML = "<color=" + MiscUtils.generateRandomColor(MiscUtils
+        mColourCode = "<color=" + MiscUtils.generateRandomColor(MiscUtils
                 .getUserColorOffset(userChannelInterface.getContext())) + ">%1$s</color>";
     }
 
     public String getColorfulNick() {
-        return String.format(nickHTML, nick);
+        return String.format(mColourCode, mNick);
     }
 
     @Override
     public String toString() {
-        return nick;
+        return mNick;
+    }
+
+    // Getters and setters
+    public String getNick() {
+        return mNick;
+    }
+
+    public void setNick(String nick) {
+        mNick = nick;
     }
 }

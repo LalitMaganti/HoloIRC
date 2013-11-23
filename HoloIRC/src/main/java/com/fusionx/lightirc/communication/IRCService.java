@@ -41,9 +41,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 
-import lombok.AccessLevel;
-import lombok.Setter;
-
 /**
  * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend code
  *
@@ -59,19 +56,16 @@ public class IRCService extends Service {
         }
     }
 
-    private ConnectionManager connectionManager = null;
+    private ConnectionManager mConnectionManager = null;
 
     private final IRCBinder mBinder = new IRCBinder();
-
-    @Setter(AccessLevel.PUBLIC)
-    private String serverDisplayed = null;
 
     private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
     public void connectToServer(final ServerConfiguration.Builder server) {
-        if (connectionManager == null) {
+        if (mConnectionManager == null) {
             // Means that this that a server is being connected to for the first time
-            connectionManager = new ConnectionManager(this);
+            mConnectionManager = new ConnectionManager(this);
         }
 
         if (server != null) {
@@ -82,7 +76,7 @@ public class IRCService extends Service {
             sender.getBus().register(this);
             final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
                     mAdapterHandler);
-            connectionManager.put(server.getTitle(), thread);
+            mConnectionManager.put(server.getTitle(), thread);
 
             updateNotification();
 
@@ -92,7 +86,7 @@ public class IRCService extends Service {
 
     private void updateNotification() {
         final String text = String.format(getResources().getQuantityString(R.plurals
-                .server_connection, connectionManager.size()), connectionManager.size());
+                .server_connection, mConnectionManager.size()), mConnectionManager.size());
         final Intent intent = new Intent(this, ServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
@@ -116,38 +110,33 @@ public class IRCService extends Service {
 
     public void disconnectAll() {
         synchronized (mBinder) {
-            if (connectionManager != null) {
+            if (mConnectionManager != null) {
                 final AsyncTask<Void, Void, Void> disconnectAll = new AsyncTask<Void, Void,
                         Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        connectionManager.disconnectAll();
+                        mConnectionManager.disconnectAll();
                         return null;
                     }
                 };
                 disconnectAll.execute();
             }
         }
-        if (serverDisplayed != null) {
-            final Intent intent = new Intent(this, ServerListActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            serverDisplayed = null;
-        }
-
         stopForeground(true);
 
         final NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
+
+        stopSelf();
     }
 
     public void removeServerFromManager(final String serverName) {
         synchronized (mBinder) {
-            if (connectionManager.containsKey(serverName)) {
-                connectionManager.remove(serverName);
+            if (mConnectionManager.containsKey(serverName)) {
+                mConnectionManager.remove(serverName);
                 MessageSender.getSender(serverName).getBus().unregister(this);
-                if (connectionManager.isEmpty()) {
+                if (mConnectionManager.isEmpty()) {
                     stopForeground(true);
                 } else {
                     updateNotification();
@@ -160,8 +149,8 @@ public class IRCService extends Service {
     }
 
     public Server getServer(final String serverName) {
-        if (connectionManager != null && connectionManager.get(serverName) != null) {
-            return connectionManager.get(serverName).getServer();
+        if (mConnectionManager != null && mConnectionManager.get(serverName) != null) {
+            return mConnectionManager.get(serverName).getServer();
         } else {
             return null;
         }
@@ -175,7 +164,6 @@ public class IRCService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (intent != null) {
-            serverDisplayed = intent.getStringExtra("setBound");
             if (intent.getBooleanExtra("stop", false)) {
                 disconnectAll();
                 return 0;
@@ -186,7 +174,6 @@ public class IRCService extends Service {
 
     @Override
     public boolean onUnbind(final Intent intent) {
-        serverDisplayed = null;
         return true;
     }
 }
