@@ -54,14 +54,14 @@ public class AppUser extends ChannelUser {
 
     @Override
     public UpdateableTreeSet<Channel> getChannels() {
-        return userChannelInterface.getAllChannelsInUser(this);
+        return mUserChannelInterface.getAllChannelsInUser(this);
     }
 
     @Override
     public boolean equals(final Object o) {
         if (o instanceof AppUser) {
             AppUser us = ((AppUser) o);
-            return us.getNick().equals(nick) && us.mServer.equals(mServer);
+            return us.getNick().equals(mNick) && us.mServer.equals(mServer);
         } else {
             return false;
         }

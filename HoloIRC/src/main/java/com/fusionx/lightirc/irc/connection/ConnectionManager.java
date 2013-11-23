@@ -21,33 +21,22 @@
 
 package com.fusionx.lightirc.irc.connection;
 
-import com.fusionx.lightirc.R;
-
 import android.content.Context;
 
 import java.util.HashMap;
 import java.util.Iterator;
 
 public class ConnectionManager extends HashMap<String, ConnectionWrapper> {
-
-    private static final long serialVersionUID = 2426166268063489300L;
-
-    private final Context context;
+    private final Context mContext;
 
     public ConnectionManager(final Context context) {
-        this.context = context;
+        mContext = context;
     }
 
     public void disconnectAll() {
         final Iterator<ConnectionWrapper> iterator = values().iterator();
         while (iterator.hasNext()) {
-            final ConnectionWrapper wrapper = iterator.next();
-            if (wrapper.getServer().getStatus().equals(context
-                    .getString(R.string.status_connected))) {
-                wrapper.disconnectFromServer(context);
-            } else if (wrapper.isAlive()) {
-                wrapper.interrupt();
-            }
+            iterator.next().disconnectFromServer(mContext);
             iterator.remove();
         }
     }

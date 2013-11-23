@@ -32,11 +32,11 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public String getPrettyNick(final String channel) {
-        return getPrettyNick(userChannelInterface.getChannel(channel));
+        return getPrettyNick(mUserChannelInterface.getChannel(channel));
     }
 
     public String getPrettyNick(final Channel channel) {
-        return String.format(nickHTML, getUserPrefix(channel) + nick);
+        return String.format(mColourCode, getUserPrefix(channel) + mNick);
     }
 
     public Spanned getSpannableNick(final Channel channel) {
@@ -48,7 +48,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public String getBracketedNick(final Channel channel) {
-        return String.format(nickHTML, "<" + getUserPrefix(channel) + nick + ">");
+        return String.format(mColourCode, "<" + getUserPrefix(channel) + mNick + ">");
     }
 
     public void onJoin(final Channel channel) {
@@ -82,7 +82,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     public UpdateableTreeSet<Channel> getChannels() {
-        return userChannelInterface.getAllChannelsInUser(this);
+        return mUserChannelInterface.getAllChannelsInUser(this);
     }
 
     public void putMode(final UserLevelEnum mode, final Channel channel) {
@@ -161,7 +161,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         updateSpannableNick(channel);
 
         final String formattedSenderNick;
-        final ChannelUser sendingUser = userChannelInterface.getUserIfExists(sendingNick);
+        final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
         if (sendingUser == null) {
             formattedSenderNick = sendingNick;
         } else {
@@ -194,12 +194,13 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     public boolean equals(final Object o) {
         if (o instanceof ChannelUser) {
             ChannelUser us = ((ChannelUser) o);
-            return us.getNick().equals(nick) && us.mServer.equals(mServer);
+            return us.mNick.equals(mNick) && us.mServer.equals(mServer);
         } else {
             return false;
         }
     }
 
+    // Checkable interface implementation
     @Override
     public void setChecked(boolean b) {
         mChecked = b;

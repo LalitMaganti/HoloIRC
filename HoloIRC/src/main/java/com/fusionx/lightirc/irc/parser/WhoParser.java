@@ -33,7 +33,7 @@ class WhoParser {
 
     private final UserChannelInterface mUserChannelInterface;
 
-    private Channel whoChannel;
+    private Channel mWhoChannel;
 
     private final String mServerTitle;
 
@@ -43,19 +43,19 @@ class WhoParser {
     }
 
     Event parseWhoReply(final ArrayList<String> parsedArray) {
-        if (whoChannel == null) {
-            whoChannel = mUserChannelInterface.getChannel(parsedArray.get(0));
+        if (mWhoChannel == null) {
+            mWhoChannel = mUserChannelInterface.getChannel(parsedArray.get(0));
         }
         final ChannelUser user = mUserChannelInterface.getUser(parsedArray.get(4));
-        user.processWhoMode(parsedArray.get(5), whoChannel);
+        user.processWhoMode(parsedArray.get(5), mWhoChannel);
         return new Event(user.getNick());
     }
 
     Event parseWhoFinished() {
-        if (whoChannel != null && whoChannel.getUsers() != null) {
+        if (mWhoChannel != null && mWhoChannel.getUsers() != null) {
             final MessageSender sender = MessageSender.getSender(mServerTitle);
-            final Event event = sender.sendGenericChannelEvent(whoChannel, "", true);
-            whoChannel = null;
+            final Event event = sender.sendGenericChannelEvent(mWhoChannel, "", true);
+            mWhoChannel = null;
             return event;
         } else {
             return new Event("null");

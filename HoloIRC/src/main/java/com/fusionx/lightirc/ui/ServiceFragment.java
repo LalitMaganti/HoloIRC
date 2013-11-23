@@ -22,7 +22,7 @@ public class ServiceFragment extends Fragment {
 
     private IRCService mService;
 
-    private ServiceFragmentCallback mCallbacks;
+    private ServiceFragmentCallback mCallback;
 
     private MessageSender mSender;
 
@@ -38,7 +38,7 @@ public class ServiceFragment extends Fragment {
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
 
-        mSender = MessageSender.getSender(mCallbacks.getServerTitle());
+        mSender = MessageSender.getSender(mCallback.getServerTitle());
     }
 
     public void connectToServer(Context context, final String serverTitle) {
@@ -64,31 +64,13 @@ public class ServiceFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            mCallbacks = (ServiceFragmentCallback) activity;
+            mCallback = (ServiceFragmentCallback) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
                     "ServiceFragmentCallback");
         }
         if (mSender == null) {
-            mSender = MessageSender.getSender(mCallbacks.getServerTitle());
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (mService != null) {
-            mService.setServerDisplayed(mCallbacks.getServerTitle());
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        if (mService != null) {
-            mService.setServerDisplayed(null);
+            mSender = MessageSender.getSender(mCallback.getServerTitle());
         }
     }
 
@@ -99,7 +81,7 @@ public class ServiceFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
 
-        mCallbacks = null;
+        mCallback = null;
     }
 
     @Override
@@ -123,23 +105,23 @@ public class ServiceFragment extends Fragment {
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
 
-            mService.setServerDisplayed(mCallbacks.getServerTitle());
-
-            if (getServer(mCallbacks.getServerTitle()) != null) {
-                mCallbacks.setUpViewPager();
-                mCallbacks.repopulateFragmentsInPager();
+            if (getServer(mCallback.getServerTitle()) != null) {
+                mCallback.setUpViewPager();
+                mCallback.repopulateFragmentsInPager();
             } else {
                 final ServerConfiguration.Builder builder =
                         getActivity().getIntent().getParcelableExtra("server");
                 mService.connectToServer(builder);
-                mCallbacks.setUpViewPager();
+                mCallback.setUpViewPager();
             }
         }
 
         // Should never occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            throw new IllegalArgumentException();
+            final Intent intent = new Intent(getActivity(), ServerListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
         }
     };
 
@@ -155,7 +137,6 @@ public class ServiceFragment extends Fragment {
             @Override
             protected Void doInBackground(Void... voids) {
                 if (mService != null) {
-                    mService.setServerDisplayed(null);
                     mService.removeServerFromManager(serverTitle);
                 }
                 return null;
@@ -175,7 +156,5 @@ public class ServiceFragment extends Fragment {
         public String getServerTitle();
 
         public void repopulateFragmentsInPager();
-
-        public void onDisconnect(final boolean expected, final boolean retryPending);
     }
 }

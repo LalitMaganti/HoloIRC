@@ -120,8 +120,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public void onDisconnect(boolean expected, boolean retryPending) {
-        mCallback.onDisconnect(expected, retryPending);
+    public void onDisconnect() {
+        mCallback.onDisconnect();
     }
 
     public interface ActionsPagerFragmentCallback {
@@ -138,6 +138,6 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
         public void closeAllSlidingMenus();
 
-        public void onDisconnect(final boolean expected, final boolean retryPending);
+        public void onDisconnect();
     }
 }

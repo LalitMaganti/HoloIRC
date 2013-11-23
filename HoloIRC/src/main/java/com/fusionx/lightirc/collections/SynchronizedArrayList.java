@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 public class SynchronizedArrayList<T> extends ArrayList<T> implements SynchronizedCollection<T> {
 
-    private final Object object = new Object();
+    private final Object mLock = new Object();
 
     @Override
     public Object getLock() {
-        return object;
+        return mLock;
     }
 
     public SynchronizedArrayList() {

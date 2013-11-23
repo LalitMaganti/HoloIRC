@@ -69,8 +69,7 @@ class ServerCommandParser {
     }
 
     // The server is sending a command to us - parse what it is
-    Event parseCommand(final ArrayList<String> parsedArray, final String rawLine,
-            final boolean disconnectSent) {
+    Event parseCommand(final ArrayList<String> parsedArray, final String rawLine) {
         final String rawSource = parsedArray.get(0);
         final String command = parsedArray.get(1).toUpperCase();
 
@@ -93,7 +92,7 @@ class ServerCommandParser {
                 return parseNotice(parsedArray, rawSource);
             }
         } else if (command.equals(ServerCommands.Part)) {
-            return parseChannelPart(parsedArray, rawSource, disconnectSent);
+            return parseChannelPart(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Mode)) {
             return parseModeChange(parsedArray, rawSource);
         } else if (command.equals(ServerCommands.Quit)) {
@@ -333,19 +332,14 @@ class ServerCommandParser {
         }
     }
 
-    private Event parseChannelPart(final ArrayList<String> parsedArray, final String rawSource,
-            final boolean disconnectSent) {
+    private Event parseChannelPart(final ArrayList<String> parsedArray, final String rawSource) {
         final String channelName = parsedArray.get(2);
 
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         if (user.equals(mServer.getUser())) {
-            // This is a caveat of ZNC where it decides weirdly to tell the client to part all
-            // the channels before closing to socket - don't do that
-            if (!disconnectSent) {
-                mSender.sendChanelParted(channel.getName());
-                mUserChannelInterface.removeChannel(channel);
-            }
+            mSender.sendChanelParted(channel.getName());
+            mUserChannelInterface.removeChannel(channel);
             return new Event(channelName);
         } else {
             String message = String.format(mContext.getString(R.string.parser_parted_channel),

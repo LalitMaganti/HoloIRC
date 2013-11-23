@@ -33,19 +33,16 @@ import com.fusionx.lightirc.irc.Server;
 import com.fusionx.lightirc.irc.ServerConfiguration;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
-import com.fusionx.lightirc.irc.event.FinalDisconnectEvent;
+import com.fusionx.lightirc.irc.event.DisconnectEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
-import com.fusionx.lightirc.irc.event.RetryPendingDisconnectEvent;
 import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -70,6 +67,27 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         .UserListCallback, ServiceFragment.ServiceFragmentCallback,
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
+    /**
+     * Listener used when the view pages changes pages
+     */
+    private final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
+            .SimpleOnPageChangeListener() {
+        @Override
+        public void onPageSelected(final int position) {
+            supportInvalidateOptionsMenu();
+            closeAllSlidingMenus();
+
+            mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
+
+            if (mActionsSlidingMenu != null) {
+                mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
+                        .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
+            }
+            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
+                    .TOUCHMODE_NONE : SlidingMenu.TOUCHMODE_MARGIN);
+        }
+    };
+
     // The Fragments
     protected ServiceFragment mServiceFragment = null;
 
@@ -78,8 +96,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected IRCPagerFragment mIRCPagerFragment = null;
 
     protected ActionsPagerFragment mActionsPagerFragment = null;
-
-    protected DrawerToggle mDrawerToggle;
 
     // Sliding menus
     protected SlidingMenu mUserSlidingMenu = null;
@@ -91,7 +107,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     protected EventReceiver mEventReceiver = new EventReceiver();
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    protected DrawerToggle mDrawerToggle;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt(this));
@@ -309,29 +326,15 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     /**
-     * Method called when the server disconnects
-     *
-     * @param expected     - whether the disconnect was triggered by the user
-     * @param retryPending - whether there is a reconnection attempt pending
+     * Method called when the user disconnects
      */
-    @Override
-    public void onDisconnect(final boolean expected, final boolean retryPending) {
-        getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
-        if (expected && !retryPending) {
-            if (getServer() != null) {
-                mServiceFragment.removeServiceReference(mServerTitle);
-            }
-            final Intent intent = new Intent(this, ServerListActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        } else if (!expected) {
-            closeAllSlidingMenus();
-            mIRCPagerFragment.onUnexpectedDisconnect();
-            mActionsPagerFragment.updateConnectionStatus(false);
-            if (!retryPending && getServer() != null) {
-                mServiceFragment.removeServiceReference(mServerTitle);
-            }
-        }
+    public void onDisconnect() {
+        ServerCommandSender.sendDisconnect(getServer(), this);
+        mServiceFragment.removeServiceReference(mServerTitle);
+
+        final Intent intent = new Intent(this, ServerListActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     /**
@@ -356,7 +359,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     /**
-     * Close the currently displayed PM or part the currently displayed channel
+     * Close the currently displayed PM or parts from the currently displayed channel
      */
     @Override
     public void closeOrPartCurrentTab() {
@@ -372,37 +375,17 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
     }
 
-    /**
-     * Listener used when the view pages changes pages
-     */
-    private final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
-            .SimpleOnPageChangeListener() {
-        @Override
-        public void onPageSelected(final int position) {
-            supportInvalidateOptionsMenu();
-            closeAllSlidingMenus();
-
-            mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
-
-            if (mActionsSlidingMenu != null) {
-                mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
-                        .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
-            }
-            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
-                    .TOUCHMODE_NONE : SlidingMenu.TOUCHMODE_MARGIN);
-        }
-    };
-
     private final class EventReceiver {
 
         @Subscribe
-        public void onRetryPendingDisconnect(final RetryPendingDisconnectEvent event) {
-            onDisconnect(false, true);
-        }
-
-        @Subscribe
-        public void onFinalDisconnect(final FinalDisconnectEvent event) {
-            onDisconnect(event.disconnectExpected, false);
+        public void onDisconnected(final DisconnectEvent event) {
+            getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
+            closeAllSlidingMenus();
+            mIRCPagerFragment.onUnexpectedDisconnect();
+            mActionsPagerFragment.updateConnectionStatus(false);
+            if (!event.retryPending && getServer() != null) {
+                mServiceFragment.removeServiceReference(mServerTitle);
+            }
         }
 
         @Subscribe
