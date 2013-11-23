@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import lombok.NonNull;
-
 public class Server {
 
     private final String mTitle;
@@ -118,7 +116,7 @@ public class Server {
         }
     }
 
-    public synchronized PrivateMessageUser getPrivateMessageUser(@NonNull final String nick) {
+    public synchronized PrivateMessageUser getPrivateMessageUser(final String nick) {
         final Iterator<PrivateMessageUser> iterator = mUser.getPrivateMessageIterator();
         while (iterator.hasNext()) {
             final PrivateMessageUser privateMessageUser = iterator.next();

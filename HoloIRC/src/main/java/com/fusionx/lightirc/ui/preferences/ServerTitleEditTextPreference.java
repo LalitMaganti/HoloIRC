@@ -7,12 +7,9 @@ import android.util.AttributeSet;
 
 import java.util.ArrayList;
 
-import lombok.Setter;
-
 public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
 
-    @Setter
-    public ArrayList<String> listOfExistingServers;
+    public ArrayList<String> mListOfExistingServers;
 
     public ServerTitleEditTextPreference(Context context, AttributeSet attributes) {
         super(context, attributes);
@@ -21,14 +18,14 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
     @Override
     protected AlertDialog onEditTextChanged() {
         AlertDialog dialog = super.onEditTextChanged();
-        if (dialog != null && listOfExistingServers != null) {
+        if (dialog != null && mListOfExistingServers != null) {
             final String currentText = getEditText().getText().toString();
             if (currentText.contains("/")) {
                 getEditText().setError("The character / is not allowed in the title");
                 dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
                 return dialog;
             }
-            for (String title : listOfExistingServers) {
+            for (String title : mListOfExistingServers) {
                 if (title.equalsIgnoreCase(currentText)) {
                     getEditText().setError("Server with the same name already exists.");
                     dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
@@ -37,5 +34,10 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
             }
         }
         return dialog;
+    }
+
+    // Getters and setters
+    public void setListOfExistingServers(ArrayList<String> listOfExistingServers) {
+        this.mListOfExistingServers = listOfExistingServers;
     }
 }

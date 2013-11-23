@@ -32,8 +32,6 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Set;
 
-import lombok.NonNull;
-
 public final class UserChannelInterface {
 
     protected final HashMap<ChannelUser, UpdateableTreeSet<Channel>> mUserToChannelMap;
@@ -172,7 +170,7 @@ public final class UserChannelInterface {
         return null;
     }
 
-    synchronized void putAppUser(@NonNull final AppUser user) {
+    synchronized void putAppUser(final AppUser user) {
         mUserToChannelMap.put(user, new UpdateableTreeSet<Channel>());
     }
 

@@ -26,123 +26,119 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 
-import lombok.Data;
-
-@Data
 public class ServerConfiguration {
 
-    private final String title;
+    private final String mTitle;
 
-    private final String url;
+    private final String mUrl;
 
-    private final int port;
+    private final int mPort;
 
-    private final boolean ssl;
+    private final boolean mSsl;
 
-    private final boolean sslAcceptAllCertificates;
+    private final boolean mSslAcceptAllCertificates;
 
-    private final NickStorage nickStorage;
+    private final NickStorage mNickStorage;
 
-    private final String realName;
+    private final String mRealName;
 
-    private final boolean nickChangable;
+    private final boolean mNickChangable;
 
-    private final String serverUserName;
+    private final String mServerUserName;
 
-    private final String serverPassword;
+    private final String mServerPassword;
 
-    private final String saslUsername;
+    private final String mSaslUsername;
 
-    private final String saslPassword;
+    private final String mSaslPassword;
 
-    private final String nickservPassword;
+    private final String mNickservPassword;
 
-    private final ArrayList<String> autoJoinChannels;
+    private final ArrayList<String> mAutoJoinChannels;
 
     private ServerConfiguration(final Builder builder) {
-        title = builder.getTitle();
-        url = builder.getUrl();
-        port = builder.getPort();
+        mTitle = builder.getTitle();
+        mUrl = builder.getUrl();
+        mPort = builder.getPort();
 
-        ssl = builder.isSsl();
-        sslAcceptAllCertificates = builder.isSslAcceptAllCertificates();
+        mSsl = builder.isSsl();
+        mSslAcceptAllCertificates = builder.isSslAcceptAllCertificates();
 
-        nickStorage = builder.getNickStorage();
-        realName = builder.getRealName();
-        nickChangable = builder.isNickChangeable();
+        mNickStorage = builder.getNickStorage();
+        mRealName = builder.getRealName();
+        mNickChangable = builder.isNickChangeable();
 
-        serverUserName = builder.getServerUserName();
-        serverPassword = builder.getServerPassword();
+        mServerUserName = builder.getServerUserName();
+        mServerPassword = builder.getServerPassword();
 
-        saslUsername = builder.getSaslUsername();
-        saslPassword = builder.getSaslPassword();
+        mSaslUsername = builder.getSaslUsername();
+        mSaslPassword = builder.getSaslPassword();
 
-        nickservPassword = builder.getNickservPassword();
+        mNickservPassword = builder.getNickservPassword();
 
-        autoJoinChannels = builder.getAutoJoinChannels();
+        mAutoJoinChannels = builder.getAutoJoinChannels();
     }
 
-    @Data
     public static class Builder implements Parcelable {
 
         // For app use only
-        private String file;
+        private String mFile;
 
-        private String title;
+        private String mTitle;
 
-        private String url;
+        private String mUrl;
 
-        private int port;
+        private int mPort;
 
-        private boolean ssl;
+        private boolean mSsl;
 
-        private boolean sslAcceptAllCertificates;
+        private boolean mSslAcceptAllCertificates;
 
-        private NickStorage nickStorage;
+        private NickStorage mNickStorage;
 
-        private String realName;
+        private String mRealName;
 
-        private boolean nickChangeable;
+        private boolean mNickChangeable;
 
-        private String serverUserName;
+        private String mServerUserName;
 
-        private String serverPassword;
+        private String mServerPassword;
 
-        private String saslUsername;
+        private String mSaslUsername;
 
-        private String saslPassword;
+        private String mSaslPassword;
 
-        private String nickservPassword;
+        private String mNickservPassword;
 
-        private ArrayList<String> autoJoinChannels = new ArrayList<String>();
+        private ArrayList<String> mAutoJoinChannels = new ArrayList<String>();
 
         public int describeContents() {
             return 0;
         }
 
         public void writeToParcel(Parcel out, int flags) {
-            out.writeString(file);
+            out.writeString(mFile);
 
-            out.writeString(title);
-            out.writeString(url);
-            out.writeInt(port);
+            out.writeString(mTitle);
+            out.writeString(mUrl);
+            out.writeInt(mPort);
 
-            out.writeInt(ssl ? 1 : 0);
-            out.writeInt(sslAcceptAllCertificates ? 1 : 0);
+            out.writeInt(mSsl ? 1 : 0);
+            out.writeInt(mSslAcceptAllCertificates ? 1 : 0);
 
-            out.writeParcelable(nickStorage, 0);
-            out.writeString(realName);
-            out.writeInt(nickChangeable ? 1 : 0);
+            out.writeParcelable(mNickStorage, 0);
+            out.writeString(mRealName);
+            out.writeInt(mNickChangeable ? 1 : 0);
 
-            out.writeString(serverUserName);
-            out.writeString(serverPassword);
+            out.writeString(mServerUserName);
+            out.writeString(mServerPassword);
 
-            out.writeString(saslUsername);
-            out.writeString(saslPassword);
+            out.writeString(mSaslUsername);
+            out.writeString(mSaslPassword);
 
-            out.writeString(nickservPassword);
+            out.writeString(mNickservPassword);
 
-            out.writeStringList(autoJoinChannels);
+            out.writeStringList(mAutoJoinChannels);
         }
 
         public static final Parcelable.Creator<Builder> CREATOR =
@@ -160,49 +156,165 @@ public class ServerConfiguration {
         }
 
         private Builder(final Parcel in) {
-            file = in.readString();
+            mFile = in.readString();
 
-            title = in.readString();
-            url = in.readString();
-            port = in.readInt();
+            mTitle = in.readString();
+            mUrl = in.readString();
+            mPort = in.readInt();
 
-            ssl = in.readInt() == 1;
-            sslAcceptAllCertificates = in.readInt() == 1;
+            mSsl = in.readInt() == 1;
+            mSslAcceptAllCertificates = in.readInt() == 1;
 
-            nickStorage = in.readParcelable(NickStorage.class.getClassLoader());
-            realName = in.readString();
-            nickChangeable = in.readInt() == 1;
+            mNickStorage = in.readParcelable(NickStorage.class.getClassLoader());
+            mRealName = in.readString();
+            mNickChangeable = in.readInt() == 1;
 
-            serverUserName = in.readString();
-            serverPassword = in.readString();
+            mServerUserName = in.readString();
+            mServerPassword = in.readString();
 
-            saslUsername = in.readString();
-            saslPassword = in.readString();
+            mSaslUsername = in.readString();
+            mSaslPassword = in.readString();
 
-            nickservPassword = in.readString();
+            mNickservPassword = in.readString();
 
-            in.readStringList(autoJoinChannels);
+            in.readStringList(mAutoJoinChannels);
         }
 
         public ServerConfiguration build() {
             return new ServerConfiguration(this);
         }
+
+        // Getters and setters
+        public String getFile() {
+            return mFile;
+        }
+
+        public void setFile(String file) {
+            this.mFile = file;
+        }
+
+        public String getTitle() {
+            return mTitle;
+        }
+
+        public void setTitle(String title) {
+            this.mTitle = title;
+        }
+
+        public String getUrl() {
+            return mUrl;
+        }
+
+        public void setUrl(String url) {
+            this.mUrl = url;
+        }
+
+        public int getPort() {
+            return mPort;
+        }
+
+        public void setPort(int port) {
+            this.mPort = port;
+        }
+
+        public boolean isSsl() {
+            return mSsl;
+        }
+
+        public void setSsl(boolean ssl) {
+            this.mSsl = ssl;
+        }
+
+        public boolean isSslAcceptAllCertificates() {
+            return mSslAcceptAllCertificates;
+        }
+
+        public void setSslAcceptAllCertificates(boolean sslAcceptAllCertificates) {
+            this.mSslAcceptAllCertificates = sslAcceptAllCertificates;
+        }
+
+        public NickStorage getNickStorage() {
+            return mNickStorage;
+        }
+
+        public void setNickStorage(NickStorage nickStorage) {
+            this.mNickStorage = nickStorage;
+        }
+
+        public String getRealName() {
+            return mRealName;
+        }
+
+        public void setRealName(String realName) {
+            this.mRealName = realName;
+        }
+
+        public boolean isNickChangeable() {
+            return mNickChangeable;
+        }
+
+        public void setNickChangeable(boolean nickChangeable) {
+            this.mNickChangeable = nickChangeable;
+        }
+
+        public String getServerUserName() {
+            return mServerUserName;
+        }
+
+        public void setServerUserName(String serverUserName) {
+            this.mServerUserName = serverUserName;
+        }
+
+        public String getServerPassword() {
+            return mServerPassword;
+        }
+
+        public void setServerPassword(String serverPassword) {
+            this.mServerPassword = serverPassword;
+        }
+
+        public String getSaslUsername() {
+            return mSaslUsername;
+        }
+
+        public void setSaslUsername(String saslUsername) {
+            this.mSaslUsername = saslUsername;
+        }
+
+        public String getSaslPassword() {
+            return mSaslPassword;
+        }
+
+        public void setSaslPassword(String saslPassword) {
+            this.mSaslPassword = saslPassword;
+        }
+
+        public String getNickservPassword() {
+            return mNickservPassword;
+        }
+
+        public void setNickservPassword(String nickservPassword) {
+            this.mNickservPassword = nickservPassword;
+        }
+
+        public ArrayList<String> getAutoJoinChannels() {
+            return mAutoJoinChannels;
+        }
     }
 
-    @Data
     public static class NickStorage implements Parcelable {
 
-        private String firstChoiceNick = "HoloIRCUser";
+        private String mFirstChoiceNick = "HoloIRCUser";
 
-        private String secondChoiceNick = "";
+        private String mSecondChoiceNick = "";
 
-        private String thirdChoiceNick = "";
+        private String mThirdChoiceNick = "";
 
         public NickStorage(final String firstChoice, final String secondChoice,
                 final String thirdChoice) {
-            firstChoiceNick = firstChoice;
-            secondChoiceNick = secondChoice;
-            thirdChoiceNick = thirdChoice;
+            mFirstChoiceNick = firstChoice;
+            mSecondChoiceNick = secondChoice;
+            mThirdChoiceNick = thirdChoice;
         }
 
         @Override
@@ -212,9 +324,9 @@ public class ServerConfiguration {
 
         @Override
         public void writeToParcel(Parcel parcel, int i) {
-            parcel.writeString(firstChoiceNick);
-            parcel.writeString(secondChoiceNick);
-            parcel.writeString(thirdChoiceNick);
+            parcel.writeString(mFirstChoiceNick);
+            parcel.writeString(mSecondChoiceNick);
+            parcel.writeString(mThirdChoiceNick);
         }
 
         public static final Parcelable.Creator<NickStorage> CREATOR = new Parcelable
@@ -227,5 +339,75 @@ public class ServerConfiguration {
                 return new NickStorage[size];
             }
         };
+
+        // Getters and setters
+        public String getFirstChoiceNick() {
+            return mFirstChoiceNick;
+        }
+
+        public String getSecondChoiceNick() {
+            return mSecondChoiceNick;
+        }
+
+        public String getThirdChoiceNick() {
+            return mThirdChoiceNick;
+        }
+    }
+
+    // Getters and setters
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public String getUrl() {
+        return mUrl;
+    }
+
+    public int getPort() {
+        return mPort;
+    }
+
+    public boolean isSsl() {
+        return mSsl;
+    }
+
+    public boolean isSslAcceptAllCertificates() {
+        return mSslAcceptAllCertificates;
+    }
+
+    public NickStorage getNickStorage() {
+        return mNickStorage;
+    }
+
+    public String getRealName() {
+        return mRealName;
+    }
+
+    public boolean isNickChangable() {
+        return mNickChangable;
+    }
+
+    public String getServerUserName() {
+        return mServerUserName;
+    }
+
+    public String getServerPassword() {
+        return mServerPassword;
+    }
+
+    public String getSaslUsername() {
+        return mSaslUsername;
+    }
+
+    public String getSaslPassword() {
+        return mSaslPassword;
+    }
+
+    public String getNickservPassword() {
+        return mNickservPassword;
+    }
+
+    public ArrayList<String> getAutoJoinChannels() {
+        return mAutoJoinChannels;
     }
 }

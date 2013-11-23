@@ -33,14 +33,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import lombok.Setter;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
         StickyListHeadersAdapter {
 
-    @Setter
-    private Channel channel;
+    private Channel mChannel;
 
     public UserListAdapter(Context context, SynchronizedCollection<ChannelUser> objects) {
         super(context, R.layout.default_listview_textview, objects);
@@ -50,7 +48,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
         view.setTypeface(UIUtils.getRobotoLight(getContext()));
-        view.setText(getItem(position).getSpannableNick(channel));
+        view.setText(getItem(position).getSpannableNick(mChannel));
         return view;
     }
 
@@ -60,11 +58,11 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
                 (getContext()).inflate(R.layout.sliding_menu_header, viewGroup, false));
         final char firstChar = getFirstCharacter(i);
         if (firstChar == '@') {
-            view.setText(channel.getNumberOfOwners() + " operators");
+            view.setText(mChannel.getNumberOfOwners() + " operators");
         } else if (firstChar == '+') {
-            view.setText(channel.getNumberOfVoices() + " voices");
+            view.setText(mChannel.getNumberOfVoices() + " voices");
         } else {
-            view.setText(channel.getNumberOfNormalUsers() + " users");
+            view.setText(mChannel.getNumberOfNormalUsers() + " users");
         }
         return view;
     }
@@ -76,7 +74,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
 
     char getFirstCharacter(final int position) {
         final ChannelUser user = getItem(position);
-        return user.getUserPrefix(channel);
+        return user.getUserPrefix(mChannel);
     }
 
     public void setInternalSet(SynchronizedCollection<ChannelUser> set) {
@@ -86,5 +84,9 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
         if (mNotifyOnChange) {
             notifyDataSetChanged();
         }
+    }
+
+    public void setChannel(Channel channel) {
+        mChannel = channel;
     }
 }
