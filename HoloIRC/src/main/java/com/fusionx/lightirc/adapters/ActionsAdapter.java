@@ -15,36 +15,34 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import lombok.Getter;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
 
-    private final LayoutInflater inflater;
+    private final LayoutInflater mInflater;
 
     private final int mServerItemCount;
 
-    @Getter
-    private boolean connected = false;
+    private boolean mConnected = false;
 
     private FragmentTypeEnum mFragmentType = FragmentTypeEnum.Server;
 
-    private final String[] channelArray;
+    private final String[] mChannelArray;
 
-    private final String[] userArray;
+    private final String[] mUserArray;
 
     public ActionsAdapter(final Context context) {
         super(context, R.layout.default_listview_textview, new ArrayList<String>(Arrays.asList
                 (context.getResources().getStringArray(R.array.server_actions))));
-        inflater = LayoutInflater.from(context);
+        mInflater = LayoutInflater.from(context);
         mServerItemCount = super.getCount();
-        channelArray = context.getResources().getStringArray(R.array.channel_actions);
-        userArray = context.getResources().getStringArray(R.array.user_actions);
+        mChannelArray = context.getResources().getStringArray(R.array.channel_actions);
+        mUserArray = context.getResources().getStringArray(R.array.user_actions);
     }
 
     @Override
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        final TextView otherHeader = (TextView) (convertView == null ? inflater.inflate(R.layout
+        final TextView otherHeader = (TextView) (convertView == null ? mInflater.inflate(R.layout
                 .sliding_menu_header, null, false) : convertView);
         if (i == 0 && convertView == null) {
             otherHeader.setText(getContext().getString(R.string.server));
@@ -59,11 +57,11 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView row = (TextView) convertView;
         if (row == null) {
-            row = (TextView) inflater.inflate(R.layout.default_listview_textview, parent, false);
+            row = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
         }
         UIUtils.setRobotoLight(getContext(), row);
         if (position == 2) {
-            row.setText(connected ? "Disconnect" : "Close");
+            row.setText(mConnected ? "Disconnect" : "Close");
         } else {
             row.setText(getItem(position));
         }
@@ -99,9 +97,9 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         if (position < mServerItemCount) {
             return super.getItem(position);
         } else if (mFragmentType == FragmentTypeEnum.Channel) {
-            return channelArray[getCount() - position - 1];
+            return mChannelArray[getCount() - position - 1];
         } else if (mFragmentType == FragmentTypeEnum.User) {
-            return userArray[getCount() - position - 1];
+            return mUserArray[getCount() - position - 1];
         } else {
             return "";
         }
@@ -112,18 +110,22 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         if (mFragmentType == FragmentTypeEnum.Server) {
             return mServerItemCount;
         } else if (mFragmentType == FragmentTypeEnum.Channel) {
-            return mServerItemCount + channelArray.length;
+            return mServerItemCount + mChannelArray.length;
         } else {
-            return mServerItemCount + userArray.length;
+            return mServerItemCount + mUserArray.length;
         }
     }
 
     @Override
     public boolean isEnabled(int position) {
-        return !((position == 0) || (position == 1)) || connected;
+        return !((position == 0) || (position == 1)) || mConnected;
+    }
+
+    public boolean isConnected() {
+        return mConnected;
     }
 
     public void setConnected(boolean connected) {
-        this.connected = connected;
+        mConnected = connected;
     }
 }

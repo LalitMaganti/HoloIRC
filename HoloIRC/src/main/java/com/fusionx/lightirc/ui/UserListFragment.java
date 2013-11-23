@@ -51,8 +51,6 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser> implements
         SlidingMenu.OnCloseListener {
 
@@ -110,7 +108,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 getListView().getWrappedList(), (ActionBarActivity) getActivity(), this, true);
     }
 
-    public void onMenuOpened(@NonNull final Channel channel) {
+    public void onMenuOpened(final Channel channel) {
         if (!channel.equals(mChannel)) {
             final UserListTreeSet userList = channel.getUsers();
             if (userList != null) {

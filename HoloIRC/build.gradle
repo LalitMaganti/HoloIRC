@@ -28,7 +28,6 @@ dependencies {
     compile project(':libraries:StickyListHeaders:library')
     compile project(':libraries:android-numberpicker:library')
     compile fileTree(dir: 'libs', include: '*.jar')
-    compile 'org.projectlombok:lombok:0.10.6'
 
     // TEST
     testCompile 'junit:junit:4.10'

@@ -38,8 +38,6 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import lombok.NonNull;
-
 public class IRCPagerAdapter extends PagerAdapter {
 
     private static final boolean DEBUG = false;
@@ -244,7 +242,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(@NonNull final int position) {
+    public CharSequence getPageTitle(final int position) {
         final IRCFragment fragment = mViews.get(position);
         return fragment.isAdded() ? fragment.getTitle() : fragment.getArguments().getString
                 ("title");
@@ -256,7 +254,7 @@ public class IRCPagerAdapter extends PagerAdapter {
         notifyDataSetChanged();
     }
 
-    public int getIndexFromTitle(@NonNull final String title) {
+    public int getIndexFromTitle(final String title) {
         for (final IRCFragment i : mViews) {
             if (title.equals(i.getTitle())) {
                 return mViews.indexOf(i);

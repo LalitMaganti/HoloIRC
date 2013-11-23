@@ -13,8 +13,6 @@ import android.widget.Checkable;
 
 import java.util.HashMap;
 
-import lombok.NonNull;
-
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
 
     private final HashMap<Channel, UserLevelEnum> mUserLevelMap
@@ -26,7 +24,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     protected final Server mServer;
 
-    public ChannelUser(@NonNull String nick, @NonNull UserChannelInterface userChannelInterface) {
+    public ChannelUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         mServer = userChannelInterface.getServer();
     }
