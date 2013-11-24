@@ -162,8 +162,8 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     }
 
     private void displaySettings() {
-        final Intent intent = new Intent(ServerListActivity.this,
-                AppPreferenceActivity.class);
+        final Intent intent = new Intent(this, AppPreferenceActivity.class);
+        intent.putExtra("connectedServers", mServerCardsAdapter.getNumberOfConnectedServers());
         startActivity(intent);
     }
 

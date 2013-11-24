@@ -66,6 +66,16 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
         return listOfTitles;
     }
 
+    public int getNumberOfConnectedServers() {
+        int i = 0;
+        for (ServerCardInterface builder : mObjects) {
+            if(mCallback.getServer(builder.getTitle()).isConnected(getContext())) {
+                i += 1;
+            }
+        }
+        return i;
+    }
+
     public interface BuilderAdapterCallback {
 
         public Server getServer(final String title);
