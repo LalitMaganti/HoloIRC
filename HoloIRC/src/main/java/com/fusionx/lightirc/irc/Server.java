@@ -168,7 +168,7 @@ public class Server {
         return mWriter;
     }
 
-    public void setWriter(ServerWriter writer) {
+    public void setWriter(final ServerWriter writer) {
         mWriter = writer;
     }
 
@@ -180,7 +180,7 @@ public class Server {
         return mUser;
     }
 
-    public void setUser(AppUser user) {
+    public void setUser(final AppUser user) {
         mUser = user;
     }
 
@@ -192,7 +192,7 @@ public class Server {
         return mStatus;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(final String status) {
         mStatus = status;
     }
 
@@ -200,7 +200,7 @@ public class Server {
         return mCached;
     }
 
-    public void setCached(boolean cached) {
+    public void setCached(final boolean cached) {
         mCached = cached;
     }
 }

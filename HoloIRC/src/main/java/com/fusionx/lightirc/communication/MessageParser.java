@@ -44,8 +44,7 @@ public class MessageParser {
                 ServerCommandSender.sendActionToChannel(server, channelName, action);
             } else if (command.equals("/part") || command.equals("/p")) {
                 if (parsedArray.size() == 0) {
-                    ServerCommandSender.sendPart(server, channelName,
-                            context.getApplicationContext());
+                    ServerCommandSender.sendPart(server, channelName);
                 } else {
                     sendUnknownEvent(server, message);
                 }
@@ -73,7 +72,6 @@ public class MessageParser {
             if (command.equals("/me")) {
                 final String action = MiscUtils.convertArrayListToString(parsedArray);
                 ServerCommandSender.sendActionToUser(server, userNick, action);
-
             } else if (command.equals("/close") || command.equals("/c")) {
                 if (parsedArray.size() == 0) {
                     ServerCommandSender.sendClosePrivateMessage(server,
@@ -83,7 +81,6 @@ public class MessageParser {
                 }
             } else {
                 serverCommandToParse(context, server, message);
-
             }
         } else {
             ServerCommandSender.sendMessageToUser(server, userNick, message);
@@ -111,7 +108,6 @@ public class MessageParser {
             } else {
                 sendUnknownEvent(server, rawLine);
             }
-
         } else if (command.equals("/msg")) {
             if (parsedArray.size() >= 1) {
                 final String nick = parsedArray.remove(0);
@@ -121,7 +117,6 @@ public class MessageParser {
             } else {
                 sendUnknownEvent(server, rawLine);
             }
-
         } else if (command.equals("/nick")) {
             if (parsedArray.size() == 1) {
                 final String newNick = parsedArray.get(0);
@@ -129,21 +124,24 @@ public class MessageParser {
             } else {
                 sendUnknownEvent(server, rawLine);
             }
-
         } else if (command.equals("/quit")) {
             if (parsedArray.size() == 0) {
                 ServerCommandSender.sendDisconnect(server, context);
             } else {
                 sendUnknownEvent(server, rawLine);
             }
-
         } else if (command.equals("/whois")) {
             if (parsedArray.size() == 1) {
                 ServerCommandSender.sendUserWhois(server, parsedArray.get(0));
             } else {
                 sendUnknownEvent(server, rawLine);
             }
-
+        } else if (command.equals("/raw")) {
+            ServerCommandSender.sendRawLine(server, MiscUtils.convertArrayListToString
+                    (parsedArray));
+        } else if (command.startsWith("/")) {
+            ServerCommandSender.sendRawLine(server, command.substring(1) + MiscUtils
+                    .convertArrayListToString(parsedArray));
         } else {
             sendUnknownEvent(server, rawLine);
         }
