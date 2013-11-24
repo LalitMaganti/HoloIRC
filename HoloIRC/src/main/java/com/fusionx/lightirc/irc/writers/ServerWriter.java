@@ -94,4 +94,14 @@ public class ServerWriter extends RawWriter {
         final String encoded = Base64.encodeToString(authentication.getBytes(), Base64.DEFAULT);
         writeLineToServer("AUTHENTICATE " + encoded);
     }
+
+    /**
+     * This is a very advanced feature that should only be called when the user specifically
+     * requests it using a /raw command or is a / message that we don't know how to parse
+     *
+     * @param rawLine - the line to send to the server
+     */
+    public void sendRawLineToServer(final String rawLine) {
+        writeLineToServer(rawLine);
+    }
 }

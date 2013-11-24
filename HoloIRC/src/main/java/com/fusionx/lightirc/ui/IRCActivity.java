@@ -370,8 +370,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
             mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
         } else {
-            ServerCommandSender.sendPart(server, mIRCPagerFragment.getCurrentTitle(),
-                    getApplicationContext());
+            ServerCommandSender.sendPart(server, mIRCPagerFragment.getCurrentTitle()
+            );
         }
     }
 

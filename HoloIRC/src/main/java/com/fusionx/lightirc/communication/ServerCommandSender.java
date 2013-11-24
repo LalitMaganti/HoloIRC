@@ -113,8 +113,7 @@ public class ServerCommandSender {
         }.execute();
     }
 
-    public static void sendPart(final Server server, final String channelName,
-            final Context applicationContext) {
+    public static void sendPart(final Server server, final String channelName) {
         final Channel channel = server.getUserChannelInterface().getChannel(channelName);
         sendPart(channel);
     }
@@ -179,6 +178,16 @@ public class ServerCommandSender {
             @Override
             protected Void doInBackground(Void... voids) {
                 server.getWriter().sendWhois(nick);
+                return null;
+            }
+        }.execute();
+    }
+
+    public static void sendRawLine(final Server server, final String rawLine) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                server.getWriter().sendRawLineToServer(rawLine);
                 return null;
             }
         }.execute();
