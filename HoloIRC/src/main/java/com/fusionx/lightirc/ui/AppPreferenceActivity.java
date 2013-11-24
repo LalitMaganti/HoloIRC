@@ -80,12 +80,14 @@ public class AppPreferenceActivity extends PreferenceActivity {
     }
 
     private void showAlertDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Modifying these settings while connected to server can cause " +
-                "unexpected behaviour - this is not a bug. It is strongly recommended that you " +
-                "close all connections before modifying these settings.").setTitle("Warning")
-                .setCancelable(false).setPositiveButton(getString(android.R.string.ok), null);
-        final AlertDialog alert = builder.create();
-        alert.show();
+        if(getIntent().getIntExtra("connectedServers", 0) != 0) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Modifying these settings while connected to server can cause " +
+                    "unexpected behaviour - this is not a bug. It is strongly recommended that you " +
+                    "close all connections before modifying these settings.").setTitle("Warning")
+                    .setCancelable(false).setPositiveButton(getString(android.R.string.ok), null);
+            final AlertDialog alert = builder.create();
+            alert.show();
+        }
     }
 }
