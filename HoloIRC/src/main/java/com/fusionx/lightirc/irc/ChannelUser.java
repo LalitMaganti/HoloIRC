@@ -16,18 +16,21 @@ import java.util.Set;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
 
-    private final HashMap<Channel, UserLevelEnum> mUserLevelMap
-            = new HashMap<Channel, UserLevelEnum>();
+    private final HashMap<Channel, UserLevelEnum> mUserLevelMap;
 
-    private final HashMap<Channel, Spanned> mChannelSpannedMap = new HashMap<Channel, Spanned>();
+    private final HashMap<Channel, Spanned> mChannelSpannedMap;
 
-    private boolean mChecked = false;
-
-    protected final Server mServer;
+    final Server mServer;
 
     public ChannelUser(final String nick, final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
+
+        mUserLevelMap = new HashMap<Channel, UserLevelEnum>();
+        mChannelSpannedMap = new HashMap<Channel, Spanned>();
         mServer = userChannelInterface.getServer();
+
+        // Checkable interface impl
+        mChecked = false;
     }
 
     public String getPrettyNick(final String channel) {
@@ -38,10 +41,10 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         return String.format(mColourCode, getUserPrefix(channel) + mNick);
     }
 
-    public Spanned getSpannableNick(final Channel channel) {
+    public Spanned getSpannedNick(final Channel channel) {
         final Spanned spannable = mChannelSpannedMap.get(channel);
         if (spannable == null) {
-            updateSpannableNick(channel);
+            updateSpannedNick(channel);
         }
         return spannable;
     }
@@ -52,7 +55,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public void onJoin(final Channel channel) {
         mUserLevelMap.put(channel, UserLevelEnum.NONE);
-        updateSpannableNick(channel);
+        updateSpannedNick(channel);
     }
 
     public void onRemove(final Channel channel) {
@@ -64,7 +67,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         return mUserLevelMap.get(channel);
     }
 
-    private void updateSpannableNick(final Channel channel) {
+    private void updateSpannedNick(final Channel channel) {
         Spanned spannable = ColourParserUtils.parseMarkup(getPrettyNick(channel));
         mChannelSpannedMap.put(channel, spannable);
     }
@@ -86,7 +89,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     public void putMode(final UserLevelEnum mode, final Channel channel) {
         mUserLevelMap.put(channel, mode);
-        updateSpannableNick(channel);
+        updateSpannedNick(channel);
     }
 
     public void processWhoMode(final String rawMode, final Channel channel) {
@@ -112,7 +115,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             channel.incrementVoices();
         }
         mUserLevelMap.put(channel, mode);
-        updateSpannableNick(channel);
+        updateSpannedNick(channel);
     }
 
     public String processModeChange(final Context context, final String sendingNick,
@@ -157,7 +160,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
             }
         }
 
-        updateSpannableNick(channel);
+        updateSpannedNick(channel);
 
         final String formattedSenderNick;
         final ChannelUser sendingUser = mUserChannelInterface.getUserIfExists(sendingNick);
@@ -173,7 +176,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
 
     @Override
     public void update() {
-        // used for nick changes
+        throw new RuntimeException();
     }
 
     @Override
@@ -185,14 +188,14 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
                 mUserLevelMap.put((Channel) list.get(0), (UserLevelEnum) list.get(1));
             }
         } else if (newValue instanceof Channel) {
-            updateSpannableNick((Channel) newValue);
+            updateSpannedNick((Channel) newValue);
         }
     }
 
     @Override
     public boolean equals(final Object o) {
         if (o instanceof ChannelUser) {
-            ChannelUser us = ((ChannelUser) o);
+            final ChannelUser us = (ChannelUser) o;
             return us.mNick.equals(mNick) && us.mServer.equals(mServer);
         } else {
             return false;
@@ -200,6 +203,8 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
     }
 
     // Checkable interface implementation
+    private boolean mChecked;
+
     @Override
     public void setChecked(boolean b) {
         mChecked = b;

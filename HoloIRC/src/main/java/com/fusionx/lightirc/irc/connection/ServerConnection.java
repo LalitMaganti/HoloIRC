@@ -46,7 +46,7 @@ import java.net.Socket;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
- * Class which carries out all the interesting connection stuff including the inital setting up
+ * Class which carries out all the interesting connection stuff including the initial setting up
  * logic
  *
  * @author Lalit Maganti
@@ -63,7 +63,7 @@ public class ServerConnection {
 
     private boolean mUserDisconnected;
 
-    private int reconnectAttempts = 0;
+    private int reconnectAttempts;
 
     /**
      * Constructor for the object - package local since this object should always be contained only
@@ -77,6 +77,7 @@ public class ServerConnection {
         server = serverObject;
         serverConfiguration = configuration;
         mContext = context;
+        reconnectAttempts = 0;
     }
 
     /**
@@ -94,10 +95,10 @@ public class ServerConnection {
                     "seconds.");
             try {
                 Thread.sleep(5000);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // This interrupt will *should* only ever occur if the user explicitly kills
                 // reconnection
-                break;
+                return;
             }
             connect();
             ++reconnectAttempts;
@@ -114,7 +115,12 @@ public class ServerConnection {
         try {
             setupSocket();
             setupServer();
-            useSaslIfAvailable();
+
+            if (serverConfiguration.isSaslAvailable()) {
+                // By sending this line, the server *should* wait until we end the CAP stuff with CAP
+                // END
+                server.getWriter().getSupportedCapabilities();
+            }
 
             if (StringUtils.isNotEmpty(serverConfiguration.getServerPassword())) {
                 server.getWriter().sendServerPassword(serverConfiguration.getServerPassword());
@@ -177,18 +183,6 @@ public class ServerConnection {
             server.setStatus(mContext.getString(R.string.status_disconnected));
             server.cleanup();
             closeSocket();
-        }
-    }
-
-    /**
-     * If the SASL is given by the user then try and authenticate with it
-     */
-    private void useSaslIfAvailable() {
-        // By sending this line, the server *should* wait until we end the CAP stuff with CAP
-        // END
-        if (StringUtils.isNotEmpty(serverConfiguration.getSaslPassword()) && StringUtils
-                .isNotEmpty(serverConfiguration.getSaslUsername())) {
-            server.getWriter().getSupportedCapabilities();
         }
     }
 

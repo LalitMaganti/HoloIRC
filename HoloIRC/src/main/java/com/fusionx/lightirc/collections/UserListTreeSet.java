@@ -12,7 +12,7 @@ public class UserListTreeSet extends UpdateableTreeSet<ChannelUser> implements
         super(comparator);
     }
 
-    private Object mLock = new Object();
+    private final Object mLock = new Object();
 
     @Override
     public Object getLock() {

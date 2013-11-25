@@ -30,13 +30,14 @@ import android.content.Context;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 public final class UserChannelInterface {
 
-    protected final HashMap<ChannelUser, LinkedHashSet<Channel>> mUserToChannelMap;
+    private final Map<ChannelUser, LinkedHashSet<Channel>> mUserToChannelMap;
 
-    protected final HashMap<Channel, UserListTreeSet> mChannelToUserMap;
+    private final Map<Channel, UserListTreeSet> mChannelToUserMap;
 
     private final OutputStreamWriter mOutputStream;
 
@@ -161,7 +162,7 @@ public final class UserChannelInterface {
                 this);
     }
 
-    public synchronized Channel getChannelIfExists(final String name) {
+    synchronized Channel getChannelIfExists(final String name) {
         for (final Channel channel : mChannelToUserMap.keySet()) {
             if (channel.getName().equals(name)) {
                 return channel;

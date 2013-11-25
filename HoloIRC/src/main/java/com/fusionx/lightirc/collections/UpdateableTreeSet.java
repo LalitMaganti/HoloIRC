@@ -2,6 +2,7 @@ package com.fusionx.lightirc.collections;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -77,11 +78,7 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
 
     private static final long serialVersionUID = 1170156554123865966L;
 
-    private HashSet<E> toBeAdded = new HashSet<E>();
-
-    public UpdateableTreeSet() {
-        super();
-    }
+    private final Set<E> toBeAdded = new HashSet<E>();
 
     UpdateableTreeSet(Comparator<? super E> comparator) {
         super(comparator);

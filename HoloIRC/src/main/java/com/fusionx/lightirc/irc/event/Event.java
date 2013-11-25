@@ -5,7 +5,7 @@ package com.fusionx.lightirc.irc.event;
  */
 public class Event {
 
-    private String baseMessage = "";
+    public String baseMessage = "";
 
     Event() {
     }

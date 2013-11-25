@@ -65,7 +65,7 @@ class NameParser {
         return event;
     }
 
-    public ChannelUser getNickFromNameReply(final String rawNameNick) {
+    ChannelUser getNickFromNameReply(final String rawNameNick) {
         UserLevelEnum mode;
         final char firstChar = rawNameNick.charAt(0);
         // THIS IS WRONG - TODO - fix this properly

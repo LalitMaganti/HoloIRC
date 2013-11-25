@@ -79,7 +79,7 @@ public class Server {
         }
     }
 
-    public Event privateMessageSent(final PrivateMessageUser userWhoIsNotUs,
+    public Event onPrivateMessage(final PrivateMessageUser userWhoIsNotUs,
             final String message, final boolean weAreSending) {
         final MessageSender sender = MessageSender.getSender(mTitle);
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;
@@ -100,7 +100,7 @@ public class Server {
         }
     }
 
-    public Event privateActionSent(final PrivateMessageUser userWhoIsNotUs, final String action,
+    public Event onPrivateAction(final PrivateMessageUser userWhoIsNotUs, final String action,
             final boolean weAreSending) {
         final MessageSender sender = MessageSender.getSender(mTitle);
         final User sendingUser = weAreSending ? mUser : userWhoIsNotUs;

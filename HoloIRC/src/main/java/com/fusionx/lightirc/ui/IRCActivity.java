@@ -88,25 +88,25 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     };
 
     // The Fragments
-    protected ServiceFragment mServiceFragment;
+    private ServiceFragment mServiceFragment;
 
-    protected UserListFragment mUserListFragment;
+    private UserListFragment mUserListFragment;
 
-    protected IRCPagerFragment mIRCPagerFragment;
+    private IRCPagerFragment mIRCPagerFragment;
 
     protected ActionsPagerFragment mActionsPagerFragment;
 
     // Sliding menus
-    protected SlidingMenu mUserSlidingMenu;
+    private SlidingMenu mUserSlidingMenu;
 
     protected SlidingMenu mActionsSlidingMenu;
 
     // Other objects
-    protected String mServerTitle;
+    private String mServerTitle;
 
     protected DrawerToggle mDrawerToggle;
 
-    protected Object mEventReceiver = new Object() {
+    private final Object mEventReceiver = new Object() {
 
         @Subscribe
         public void onDisconnected(final DisconnectEvent event) {
@@ -229,7 +229,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     // This is different for tablets and phones so get subclasses to do the work
     protected abstract void setUpActionsFragment();
 
-    protected void onUserListDisplayed() {
+    void onUserListDisplayed() {
         final Channel channel = getServer().getUserChannelInterface()
                 .getChannel(mIRCPagerFragment.getCurrentTitle());
         getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " users");

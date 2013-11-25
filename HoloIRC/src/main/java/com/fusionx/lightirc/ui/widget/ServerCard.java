@@ -108,7 +108,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
         return true;
     }
 
-    private View.OnClickListener overflowClickListener = new View.OnClickListener() {
+    private final View.OnClickListener overflowClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             final PopupMenu popup = new PopupMenu(mContext, view);

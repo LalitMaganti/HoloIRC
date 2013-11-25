@@ -25,7 +25,7 @@ import com.fusionx.lightirc.util.MiscUtils;
 
 public abstract class User {
 
-    protected String mNick;
+    String mNick;
 
     final String mColourCode;
 

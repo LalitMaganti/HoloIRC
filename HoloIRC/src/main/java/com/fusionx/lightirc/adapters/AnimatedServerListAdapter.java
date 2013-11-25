@@ -44,7 +44,7 @@ public class AnimatedServerListAdapter extends SingleAnimationAdapter {
         return ObjectAnimator.ofFloat(view, "translationY", 500, 0);
     }
 
-    private SingleDismissCallback mCallback;
+    private final SingleDismissCallback mCallback;
 
     /**
      * Animate dismissal of the item at given position.

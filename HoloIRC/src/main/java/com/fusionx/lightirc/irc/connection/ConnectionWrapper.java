@@ -29,7 +29,7 @@ import android.content.Context;
 import android.os.Handler;
 
 public class ConnectionWrapper extends Thread {
-    private Server mServer;
+    private final Server mServer;
 
     private final ServerConnection mConnection;
 

@@ -13,7 +13,7 @@ public final class PrivateMessageUser extends User {
     /**
      * This is the object that allows sending of messages directly to the server
      */
-    protected final UserWriter mWriter;
+    private final UserWriter mWriter;
 
     /**
      * Contains a copy of the messages when the conversation is not displayed to the user

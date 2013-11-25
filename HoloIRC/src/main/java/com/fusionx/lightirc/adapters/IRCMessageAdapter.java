@@ -20,9 +20,9 @@ import java.util.List;
 
 public class IRCMessageAdapter extends ArrayAdapter<Message> {
 
-    private Context mContext;
+    private final Context mContext;
 
-    private List<Message> mObjects;
+    private final List<Message> mObjects;
 
     public IRCMessageAdapter(Context context, final List<Message> objects) {
         super(context, R.layout.irc_listview_textview, objects);

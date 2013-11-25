@@ -42,7 +42,7 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
 
     private static final long INITIALDELAYMILLIS = 150;
 
-    private SparseArray<AnimationInfo> mAnimators;
+    private final SparseArray<AnimationInfo> mAnimators;
 
     private long mAnimationStartMillis;
 
@@ -233,9 +233,9 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
 
     private class AnimationInfo {
 
-        public int position;
+        public final int position;
 
-        public Animator animator;
+        public final Animator animator;
 
         public AnimationInfo(int position, Animator animator) {
             this.position = position;
