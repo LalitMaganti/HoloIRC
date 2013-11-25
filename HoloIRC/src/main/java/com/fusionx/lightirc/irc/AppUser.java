@@ -23,16 +23,19 @@ package com.fusionx.lightirc.irc;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class AppUser extends ChannelUser {
 
-    private ArrayList<PrivateMessageUser> mPrivateMessages = new ArrayList<PrivateMessageUser>();
+    private final List<PrivateMessageUser> mPrivateMessages;
 
     public AppUser(final String nick,
             final UserChannelInterface userChannelInterface) {
         super(nick, userChannelInterface);
         userChannelInterface.putAppUser(this);
+
+        mPrivateMessages = new ArrayList<PrivateMessageUser>();
     }
 
     public void createPrivateMessage(final PrivateMessageUser user) {
@@ -59,8 +62,8 @@ public class AppUser extends ChannelUser {
     @Override
     public boolean equals(final Object o) {
         if (o instanceof AppUser) {
-            AppUser us = ((AppUser) o);
-            return us.getNick().equals(mNick) && us.mServer.equals(mServer);
+            final AppUser us = ((AppUser) o);
+            return us.mNick.equals(mNick) && us.mServer.equals(mServer);
         } else {
             return false;
         }

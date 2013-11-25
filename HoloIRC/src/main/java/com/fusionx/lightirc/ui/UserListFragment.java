@@ -188,7 +188,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
         }
     }
 
-    public void onChannelClosed() {
+    void onChannelClosed() {
         mChannel = null;
         getRealAdapter().clear();
     }

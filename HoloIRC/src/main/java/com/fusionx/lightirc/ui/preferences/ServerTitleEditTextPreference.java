@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
 
-    public ArrayList<String> mListOfExistingServers;
+    private ArrayList<String> mListOfExistingServers;
 
     public ServerTitleEditTextPreference(Context context, AttributeSet attributes) {
         super(context, attributes);

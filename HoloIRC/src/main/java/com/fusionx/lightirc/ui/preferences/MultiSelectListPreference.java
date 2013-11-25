@@ -45,9 +45,9 @@ public class MultiSelectListPreference extends DialogPreference {
 
     private CharSequence[] mEntryValues;
 
-    private Set<String> mValues = new HashSet<String>();
+    private final Set<String> mValues = new HashSet<String>();
 
-    private Set<String> mNewValues = new HashSet<String>();
+    private final Set<String> mNewValues = new HashSet<String>();
 
     private boolean mPreferenceChanged;
 

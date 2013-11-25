@@ -63,7 +63,7 @@ public class ColourParserUtils {
         }
     }
 
-    public static boolean containsValidTag(final String text) {
+    private static boolean containsValidTag(final String text) {
         return text.contains("<color=") && text.contains("</color>") || text.contains("<b>") &&
                 text.contains("</b>");
     }

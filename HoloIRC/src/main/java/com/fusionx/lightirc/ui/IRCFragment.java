@@ -43,11 +43,11 @@ import java.util.List;
 
 public abstract class IRCFragment extends ListFragment implements TextView.OnEditorActionListener {
 
-    protected String mTitle = null;
+    String mTitle = null;
 
-    protected EditText mMessageBox = null;
+    EditText mMessageBox = null;
 
-    protected IRCMessageAdapter mMessageAdapter;
+    IRCMessageAdapter mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,

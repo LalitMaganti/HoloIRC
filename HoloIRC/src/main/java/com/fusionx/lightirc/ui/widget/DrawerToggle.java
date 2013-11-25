@@ -4,6 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
@@ -13,6 +14,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -141,6 +143,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
         public ImageView upIndicatorView;
 
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         SetIndicatorInfo(Activity activity) {
             try {
                 setHomeAsUpIndicator = ActionBar.class.getDeclaredMethod("setHomeAsUpIndicator",
@@ -201,7 +204,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     private Drawable mDrawerImage;
 
-    private SlideDrawable mSlider;
+    private final SlideDrawable mSlider;
 
     private final int mDrawerImageResource;
 
@@ -420,7 +423,7 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
 
     private static class SlideDrawable extends Drawable implements Drawable.Callback {
 
-        private Drawable mWrapped;
+        private final Drawable mWrapped;
 
         private float mOffset;
 
@@ -516,11 +519,6 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
         }
 
         @Override
-        public boolean setVisible(boolean visible, boolean restart) {
-            return super.setVisible(visible, restart);
-        }
-
-        @Override
         public int getOpacity() {
             return mWrapped.getOpacity();
         }
@@ -565,11 +563,6 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
         @Override
         public boolean getPadding(Rect padding) {
             return mWrapped.getPadding(padding);
-        }
-
-        @Override
-        public ConstantState getConstantState() {
-            return super.getConstantState();
         }
 
         @Override

@@ -48,7 +48,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         final TextView view = (TextView) super.getView(position, convertView, parent);
         view.setTypeface(UIUtils.getRobotoLight(getContext()));
-        view.setText(getItem(position).getSpannableNick(mChannel));
+        view.setText(getItem(position).getSpannedNick(mChannel));
         return view;
     }
 

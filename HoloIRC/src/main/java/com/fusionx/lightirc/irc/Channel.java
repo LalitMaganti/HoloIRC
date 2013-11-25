@@ -39,21 +39,20 @@ public class Channel {
     /**
      * Name of the channel
      */
-    protected final String mName;
+    private final String mName;
 
-    protected final ChannelWriter mWriter;
+    private final ChannelWriter mWriter;
 
     private final UserChannelInterface mUserChannelInterface;
 
-    private final List<Message> mBuffer = new ArrayList<Message>();
+    private final List<Message> mBuffer;
 
-    private final HashMap<UserLevelEnum, Integer> mNumberOfUsers = new HashMap<UserLevelEnum,
-            Integer>();
+    private final HashMap<UserLevelEnum, Integer> mNumberOfUsers;
 
     /**
      * Topic of the channel
      */
-    protected String mTopic;
+    private String mTopic;
 
     private boolean mCached;
 
@@ -62,6 +61,8 @@ public class Channel {
         mName = channelName;
         mWriter = new ChannelWriter(userChannelInterface.getOutputStream(), this);
         mUserChannelInterface = userChannelInterface;
+        mBuffer = new ArrayList<Message>();
+        mNumberOfUsers = new HashMap<UserLevelEnum, Integer>();
 
         // Number of users
         mNumberOfUsers.put(UserLevelEnum.OP, 0);
@@ -112,8 +113,7 @@ public class Channel {
     public void decrementOps() {
         synchronized (mNumberOfUsers) {
             Integer numberOfOps = mNumberOfUsers.get(UserLevelEnum.OP);
-            --numberOfOps;
-            mNumberOfUsers.put(UserLevelEnum.OP, numberOfOps);
+            mNumberOfUsers.put(UserLevelEnum.OP, --numberOfOps);
         }
     }
 
@@ -132,8 +132,7 @@ public class Channel {
     public void decrementVoices() {
         synchronized (mNumberOfUsers) {
             Integer numberOfVoices = mNumberOfUsers.get(UserLevelEnum.VOICE);
-            --numberOfVoices;
-            mNumberOfUsers.put(UserLevelEnum.VOICE, numberOfVoices);
+            mNumberOfUsers.put(UserLevelEnum.VOICE, --numberOfVoices);
         }
     }
 

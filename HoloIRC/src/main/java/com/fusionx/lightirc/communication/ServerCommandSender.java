@@ -82,7 +82,7 @@ public class ServerCommandSender {
                 if (StringUtils.isNotEmpty(message)) {
                     user.getWriter().sendMessage(message);
                 }
-                server.privateMessageSent(user, message, true);
+                server.onPrivateMessage(user, message, true);
                 return null;
             }
         }.execute();
@@ -97,7 +97,7 @@ public class ServerCommandSender {
                 if (StringUtils.isNotEmpty(action)) {
                     user.getWriter().sendAction(action);
                 }
-                server.privateActionSent(user, action, true);
+                server.onPrivateAction(user, action, true);
                 return null;
             }
         }.execute();

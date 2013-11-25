@@ -29,7 +29,7 @@ import java.io.OutputStreamWriter;
 
 public class ChannelWriter extends RawWriter {
 
-    private Channel mChannel;
+    private final Channel mChannel;
 
     public ChannelWriter(OutputStreamWriter out, Channel channel) {
         super(out);

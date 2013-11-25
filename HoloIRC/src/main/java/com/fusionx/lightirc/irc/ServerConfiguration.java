@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.irc;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -79,6 +81,10 @@ public class ServerConfiguration {
         mAutoJoinChannels = builder.getAutoJoinChannels();
     }
 
+    public boolean isSaslAvailable() {
+        return StringUtils.isNotEmpty(mSaslUsername) && StringUtils.isNotEmpty(mSaslPassword);
+    }
+
     public static class Builder implements Parcelable {
 
         // For app use only
@@ -110,7 +116,7 @@ public class ServerConfiguration {
 
         private String mNickservPassword;
 
-        private ArrayList<String> mAutoJoinChannels = new ArrayList<String>();
+        private final ArrayList<String> mAutoJoinChannels = new ArrayList<String>();
 
         public int describeContents() {
             return 0;

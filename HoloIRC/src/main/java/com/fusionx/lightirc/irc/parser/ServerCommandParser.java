@@ -43,7 +43,6 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static com.fusionx.lightirc.constants.Constants.DEBUG;
@@ -132,8 +131,8 @@ class ServerCommandParser {
         final ChannelUser kickedUser = mUserChannelInterface.getUser(kickedNick);
         final Channel channel = mUserChannelInterface.getChannel(channelName);
         if (kickedUser.equals(mServer.getUser())) {
-            String message = String.format(mContext.getString(R.string.parser_user_kicked_channel,
-                    channel.getName(), user.getPrettyNick(channel)));
+            String message = String.format(mContext.getString(R.string
+                    .parser_user_kicked_channel), channel.getName(), user.getPrettyNick(channel));
             // If you have 4 strings in the array, the last must be the reason for parting
             message += (parsedArray.size() == 5) ? " " + String.format(mContext.getString(R
                     .string.parser_reason),
@@ -176,7 +175,7 @@ class ServerCommandParser {
         } else if (recipient.equals(mServer.getUser().getNick())) {
             final PrivateMessageUser user = mServer.getPrivateMessageUser(sendingUser);
             if (mServer.getUser().isPrivateMessageOpen(user)) {
-                return mServer.privateMessageSent(user, notice, false);
+                return mServer.onPrivateMessage(user, notice, false);
             } else {
                 return mSender.sendSwitchToServerEvent(mServer, formattedNotice);
             }
@@ -218,7 +217,7 @@ class ServerCommandParser {
                         sendingUser.getBracketedNick(channel), message);
             } else {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
-                return mServer.privateMessageSent(sendingUser, message, false);
+                return mServer.onPrivateMessage(sendingUser, message, false);
             }
         } else {
             return new Event(message);
@@ -237,7 +236,7 @@ class ServerCommandParser {
                         mUserChannelInterface.getChannel(recipient), sendingUser, action);
             } else {
                 final PrivateMessageUser sendingUser = mServer.getPrivateMessageUser(nick);
-                return mServer.privateActionSent(sendingUser, action, false);
+                return mServer.onPrivateAction(sendingUser, action, false);
             }
         } else {
             return new Event(action);
@@ -252,7 +251,7 @@ class ServerCommandParser {
         final String newTopic = parsedArray.get(3);
 
         final String message = String
-                .format(mContext.getString(R.string.parser_topic_changed, newTopic, setterNick));
+                .format(mContext.getString(R.string.parser_topic_changed), newTopic, setterNick);
         return mSender.sendGenericChannelEvent(channel, message, false);
     }
 
