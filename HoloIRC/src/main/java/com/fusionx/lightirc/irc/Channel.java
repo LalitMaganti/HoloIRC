@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.irc;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.constants.UserLevelEnum;
 import com.fusionx.lightirc.irc.event.ChannelEvent;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateable {
+public class Channel {
 
     /**
      * Name of the channel
@@ -74,11 +73,6 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
         mBuffer.add(new Message(message));
     }
 
-    @Override
-    public int compareTo(final Channel channel) {
-        return mName.compareTo(channel.mName);
-    }
-
     public UserListTreeSet getUsers() {
         return mUserChannelInterface.getAllUsersInChannel(this);
     }
@@ -86,16 +80,6 @@ public class Channel implements Comparable<Channel>, UpdateableTreeSet.Updateabl
     @Override
     public boolean equals(final Object o) {
         return o instanceof Channel && ((Channel) o).mName.equals(mName);
-    }
-
-    @Override
-    public void update() {
-        throw new IllegalArgumentException();
-    }
-
-    @Override
-    public void update(final Object newValue) {
-        throw new IllegalArgumentException();
     }
 
     public void onChannelEvent(final ChannelEvent event) {

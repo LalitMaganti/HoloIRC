@@ -130,7 +130,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      *
      * @param userNick - the nick of the user we are PMing
      */
-    public void createPMFragment(final String userNick) {
+    public void createPMFragment(final String userNick, final boolean switchToTab) {
         final UserFragment userFragment = new UserFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", userNick);
@@ -138,7 +138,9 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
         final int position = mAdapter.addFragment(userFragment);
 
-        mViewPager.setCurrentItem(position, true);
+        if (switchToTab) {
+            mViewPager.setCurrentItem(position, true);
+        }
     }
 
     /**
@@ -262,7 +264,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onNewPrivateMessage(final PrivateMessageEvent event) {
-        createPMFragment(event.nick);
+        createPMFragment(event.nick, true);
     }
 
     @Subscribe

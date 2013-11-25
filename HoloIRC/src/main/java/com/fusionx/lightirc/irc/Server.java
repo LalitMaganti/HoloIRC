@@ -53,17 +53,22 @@ public class Server {
 
     private AppUser mUser;
 
-    private final List<Message> mBuffer = new ArrayList<Message>();
+    private final List<Message> mBuffer;
 
-    private String mStatus = "Disconnected";
+    private String mStatus;
 
     private boolean mCached;
+
+    private final ServerCache mServerCache;
 
     public Server(final String serverTitle, final ConnectionWrapper wrapper,
             final Context context) {
         mTitle = serverTitle;
         mWrapper = wrapper;
         mContext = context;
+        mBuffer = new ArrayList<Message>();
+        mStatus = "Disconnected";
+        mServerCache = new ServerCache();
     }
 
     public void onServerEvent(final ServerEvent event) {
@@ -202,5 +207,9 @@ public class Server {
 
     public void setCached(final boolean cached) {
         mCached = cached;
+    }
+
+    public ServerCache getServerCache() {
+        return mServerCache;
     }
 }
