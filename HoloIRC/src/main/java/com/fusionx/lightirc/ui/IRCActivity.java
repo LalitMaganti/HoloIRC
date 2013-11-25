@@ -35,7 +35,6 @@ import com.fusionx.lightirc.irc.event.ChannelEvent;
 import com.fusionx.lightirc.irc.event.ConnectedEvent;
 import com.fusionx.lightirc.irc.event.DisconnectEvent;
 import com.fusionx.lightirc.irc.event.MentionEvent;
-import com.fusionx.lightirc.ui.widget.ActionsSlidingMenu;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -89,25 +88,64 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     };
 
     // The Fragments
-    protected ServiceFragment mServiceFragment = null;
+    protected ServiceFragment mServiceFragment;
 
-    protected UserListFragment mUserListFragment = null;
+    protected UserListFragment mUserListFragment;
 
-    protected IRCPagerFragment mIRCPagerFragment = null;
+    protected IRCPagerFragment mIRCPagerFragment;
 
-    protected ActionsPagerFragment mActionsPagerFragment = null;
+    protected ActionsPagerFragment mActionsPagerFragment;
 
     // Sliding menus
-    protected SlidingMenu mUserSlidingMenu = null;
+    protected SlidingMenu mUserSlidingMenu;
 
-    protected ActionsSlidingMenu mActionsSlidingMenu = null;
+    protected SlidingMenu mActionsSlidingMenu;
 
     // Other objects
-    protected String mServerTitle = null;
-
-    protected EventReceiver mEventReceiver = new EventReceiver();
+    protected String mServerTitle;
 
     protected DrawerToggle mDrawerToggle;
+
+    protected Object mEventReceiver = new Object() {
+
+        @Subscribe
+        public void onDisconnected(final DisconnectEvent event) {
+            getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
+            closeAllSlidingMenus();
+            mIRCPagerFragment.onUnexpectedDisconnect();
+            mActionsPagerFragment.updateConnectionStatus(false);
+            if (!event.retryPending && getServer() != null) {
+                mServiceFragment.removeServiceReference(mServerTitle);
+            }
+        }
+
+        @Subscribe
+        public void onServerConnected(final ConnectedEvent event) {
+            mActionsPagerFragment.updateConnectionStatus(true);
+            getSupportActionBar().setSubtitle(getServer().getStatus());
+        }
+
+        @Subscribe
+        public void onChannelMessage(final ChannelEvent event) {
+            if (event.userListChanged) {
+                onUserListChanged(event.channelName);
+            }
+        }
+
+        @Subscribe
+        public void onMention(final MentionEvent event) {
+            if (!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
+                final String message = String.format(getString(R.string.activity_mentioned),
+                        event.destination);
+                final de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new
+                        de.keyboardsurfer.android.widget.crouton.Configuration.Builder();
+                builder.setDuration(2000);
+                final Crouton crouton = Crouton.makeText(IRCActivity.this, message,
+                        Style.INFO).setConfiguration(builder.build());
+                crouton.show();
+            }
+        }
+    };
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
@@ -218,6 +256,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected void onPause() {
         super.onPause();
         mServiceFragment.getSender().setDisplayed(false);
+        getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
     }
 
     @Override
@@ -235,8 +274,12 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.activity_server_channel_ab_users).setVisible(FragmentTypeEnum.Channel
-                .equals(mIRCPagerFragment.getCurrentType()) && mUserSlidingMenu != null);
+        final MenuItem userMenu = menu.findItem(R.id.activity_server_channel_ab_users);
+        final boolean isChannel = (FragmentTypeEnum.Channel.equals(mIRCPagerFragment
+                .getCurrentType()));
+        if (userMenu != null) {
+            userMenu.setVisible(isChannel && mUserSlidingMenu != null);
+        }
         return true;
     }
 
@@ -272,12 +315,16 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     public void repopulateFragmentsInPager() {
         if (isConnectedToServer()) {
             for (final Channel channel : getServer().getUser().getChannels()) {
-                mIRCPagerFragment.createChannelFragment(channel.getName(), false);
+                final boolean switchToTab = getServer().getServerCache().getIrcTitle().equals
+                        (channel.getName());
+                mIRCPagerFragment.createChannelFragment(channel.getName(), switchToTab);
             }
             final Iterator<PrivateMessageUser> iterator = getServer().getUser()
                     .getPrivateMessageIterator();
             while (iterator.hasNext()) {
-                mIRCPagerFragment.createPMFragment(iterator.next().getNick());
+                final boolean switchToTab = getServer().getServerCache().getIrcTitle().equals
+                        (iterator.next().getNick());
+                mIRCPagerFragment.createPMFragment(iterator.next().getNick(), switchToTab);
             }
         }
     }
@@ -328,6 +375,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     /**
      * Method called when the user disconnects
      */
+    @Override
     public void onDisconnect() {
         ServerCommandSender.sendDisconnect(getServer(), this);
         mServiceFragment.removeServiceReference(mServerTitle);
@@ -370,49 +418,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
             mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
         } else {
-            ServerCommandSender.sendPart(server, mIRCPagerFragment.getCurrentTitle()
-            );
-        }
-    }
-
-    private final class EventReceiver {
-
-        @Subscribe
-        public void onDisconnected(final DisconnectEvent event) {
-            getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
-            closeAllSlidingMenus();
-            mIRCPagerFragment.onUnexpectedDisconnect();
-            mActionsPagerFragment.updateConnectionStatus(false);
-            if (!event.retryPending && getServer() != null) {
-                mServiceFragment.removeServiceReference(mServerTitle);
-            }
-        }
-
-        @Subscribe
-        public void onServerConnected(final ConnectedEvent event) {
-            mActionsPagerFragment.updateConnectionStatus(true);
-            getSupportActionBar().setSubtitle(getServer().getStatus());
-        }
-
-        @Subscribe
-        public void onChannelMessage(final ChannelEvent event) {
-            if (event.userListChanged) {
-                onUserListChanged(event.channelName);
-            }
-        }
-
-        @Subscribe
-        public void onMention(final MentionEvent event) {
-            if (!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
-                final String message = String.format(getString(R.string.activity_mentioned),
-                        event.destination);
-                de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new de
-                        .keyboardsurfer.android.widget.crouton.Configuration.Builder();
-                builder.setDuration(2000);
-                Crouton crouton = Crouton.makeText(IRCActivity.this, message,
-                        Style.INFO).setConfiguration(builder.build());
-                crouton.show();
-            }
+            ServerCommandSender.sendPart(server, mIRCPagerFragment.getCurrentTitle());
         }
     }
 }

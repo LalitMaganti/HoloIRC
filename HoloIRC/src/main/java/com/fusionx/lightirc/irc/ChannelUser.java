@@ -12,6 +12,7 @@ import android.text.Spanned;
 import android.widget.Checkable;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class ChannelUser extends User implements UpdateableTreeSet.Updateable, Checkable {
 
@@ -79,7 +80,7 @@ public class ChannelUser extends User implements UpdateableTreeSet.Updateable, C
         }
     }
 
-    public UpdateableTreeSet<Channel> getChannels() {
+    public Set<Channel> getChannels() {
         return mUserChannelInterface.getAllChannelsInUser(this);
     }
 

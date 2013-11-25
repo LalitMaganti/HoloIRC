@@ -37,7 +37,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
     private final BuilderAdapterCallback mCallback;
 
     public ServerListAdapter(final Activity activity,
-            SynchronizedCollection<ServerCardInterface> list) {
+            final SynchronizedCollection<ServerCardInterface> list) {
         super(activity, R.layout.item_server_card, list);
 
         try {
@@ -68,8 +68,9 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
 
     public int getNumberOfConnectedServers() {
         int i = 0;
-        for (ServerCardInterface builder : mObjects) {
-            if(mCallback.getServer(builder.getTitle()).isConnected(getContext())) {
+        for (final ServerCardInterface builder : mObjects) {
+            final Server server = mCallback.getServer(builder.getTitle());
+            if(server != null && server.isConnected(getContext())) {
                 i += 1;
             }
         }

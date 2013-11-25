@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.irc;
 
-import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.collections.UserListTreeSet;
 import com.fusionx.lightirc.irc.misc.IRCUserComparator;
 import com.fusionx.lightirc.util.IRCUtils;
@@ -30,13 +29,14 @@ import android.content.Context;
 
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public final class UserChannelInterface {
 
-    protected final HashMap<ChannelUser, UpdateableTreeSet<Channel>> mUserToChannelMap;
+    protected final HashMap<ChannelUser, LinkedHashSet<Channel>> mUserToChannelMap;
 
-    protected final HashMap<Channel, UpdateableTreeSet<ChannelUser>> mChannelToUserMap;
+    protected final HashMap<Channel, UserListTreeSet> mChannelToUserMap;
 
     private final OutputStreamWriter mOutputStream;
 
@@ -50,8 +50,8 @@ public final class UserChannelInterface {
         mOutputStream = outputStream;
         mContext = context;
         mServer = server;
-        mUserToChannelMap = new HashMap<ChannelUser, UpdateableTreeSet<Channel>>();
-        mChannelToUserMap = new HashMap<Channel, UpdateableTreeSet<ChannelUser>>();
+        mUserToChannelMap = new HashMap<ChannelUser, LinkedHashSet<Channel>>();
+        mChannelToUserMap = new HashMap<Channel, UserListTreeSet>();
     }
 
     public synchronized void coupleUserAndChannel(final ChannelUser user,
@@ -63,9 +63,9 @@ public final class UserChannelInterface {
 
     public synchronized void addChannelToUser(final ChannelUser user,
             final Channel channel) {
-        UpdateableTreeSet<Channel> list = mUserToChannelMap.get(user);
+        LinkedHashSet<Channel> list = mUserToChannelMap.get(user);
         if (list == null) {
-            list = new UpdateableTreeSet<Channel>();
+            list = new LinkedHashSet<Channel>();
             mUserToChannelMap.put(user, list);
         }
         list.add(channel);
@@ -73,7 +73,7 @@ public final class UserChannelInterface {
 
     private synchronized void addUserToChannel(final ChannelUser user,
             final Channel channel) {
-        UserListTreeSet setOfUsers = (UserListTreeSet) mChannelToUserMap.get(channel);
+        UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers == null) {
             setOfUsers = new UserListTreeSet(new IRCUserComparator(channel));
             mChannelToUserMap.put(channel, setOfUsers);
@@ -93,7 +93,7 @@ public final class UserChannelInterface {
                 mUserToChannelMap.remove(user);
             }
         }
-        final UserListTreeSet setOfUsers = (UserListTreeSet) mChannelToUserMap.get(channel);
+        final UserListTreeSet setOfUsers = mChannelToUserMap.get(channel);
         if (setOfUsers != null) {
             synchronized (setOfUsers.getLock()) {
                 setOfUsers.remove(user);
@@ -108,7 +108,7 @@ public final class UserChannelInterface {
         final Set<Channel> removedSet = mUserToChannelMap.remove(user);
         if (removedSet != null) {
             for (final Channel channel : removedSet) {
-                final UserListTreeSet set = (UserListTreeSet) mChannelToUserMap.get(channel);
+                final UserListTreeSet set = mChannelToUserMap.get(channel);
                 synchronized (set.getLock()) {
                     set.remove(user);
                 }
@@ -119,7 +119,7 @@ public final class UserChannelInterface {
 
     public synchronized void removeChannel(final Channel channel) {
         for (final ChannelUser user : mChannelToUserMap.remove(channel)) {
-            final UpdateableTreeSet<Channel> channelMap = mUserToChannelMap.get(user);
+            final LinkedHashSet<Channel> channelMap = mUserToChannelMap.get(user);
             if (channelMap != null) {
                 channelMap.remove(channel);
                 user.onRemove(channel);
@@ -131,10 +131,10 @@ public final class UserChannelInterface {
     }
 
     synchronized UserListTreeSet getAllUsersInChannel(final Channel channel) {
-        return (UserListTreeSet) mChannelToUserMap.get(channel);
+        return mChannelToUserMap.get(channel);
     }
 
-    synchronized UpdateableTreeSet<Channel> getAllChannelsInUser(final ChannelUser user) {
+    synchronized LinkedHashSet<Channel> getAllChannelsInUser(final ChannelUser user) {
         return mUserToChannelMap.get(user);
     }
 
@@ -171,7 +171,7 @@ public final class UserChannelInterface {
     }
 
     synchronized void putAppUser(final AppUser user) {
-        mUserToChannelMap.put(user, new UpdateableTreeSet<Channel>());
+        mUserToChannelMap.put(user, new LinkedHashSet<Channel>());
     }
 
     // Getters and setters

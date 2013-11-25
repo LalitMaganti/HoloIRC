@@ -1,9 +1,7 @@
 package com.fusionx.lightirc.collections;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -85,16 +83,8 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
         super();
     }
 
-    public UpdateableTreeSet(Collection<? extends E> c) {
-        super(c);
-    }
-
     UpdateableTreeSet(Comparator<? super E> comparator) {
         super(comparator);
-    }
-
-    public UpdateableTreeSet(SortedSet<E> s) {
-        super(s);
     }
 
     /**
@@ -139,12 +129,5 @@ public class UpdateableTreeSet<E extends UpdateableTreeSet.Updateable> extends T
             return add(element);
         }
         return false;
-    }
-
-    /**
-     * Convenience method passing a null value to {@link #update(Updateable, Object)}
-     */
-    public boolean update(E element) {
-        return update(element, null);
     }
 }

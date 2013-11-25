@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.irc.parser;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.collections.UpdateableTreeSet;
 import com.fusionx.lightirc.communication.MessageSender;
 import com.fusionx.lightirc.constants.ServerCommands;
 import com.fusionx.lightirc.constants.UserLevelEnum;
@@ -44,6 +43,7 @@ import android.content.Context;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static com.fusionx.lightirc.constants.Constants.DEBUG;
@@ -258,7 +258,7 @@ class ServerCommandParser {
 
     private Event parseNickChange(ArrayList<String> parsedArray, String rawSource) {
         final ChannelUser user = mUserChannelInterface.getUserFromRaw(rawSource);
-        final UpdateableTreeSet<Channel> channels = user.getChannels();
+        final Set<Channel> channels = user.getChannels();
         final String oldNick = user.getColorfulNick();
         user.setNick(parsedArray.get(2));
 

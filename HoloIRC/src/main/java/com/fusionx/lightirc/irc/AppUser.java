@@ -21,10 +21,9 @@
 
 package com.fusionx.lightirc.irc;
 
-import com.fusionx.lightirc.collections.UpdateableTreeSet;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 public class AppUser extends ChannelUser {
 
@@ -53,7 +52,7 @@ public class AppUser extends ChannelUser {
     }
 
     @Override
-    public UpdateableTreeSet<Channel> getChannels() {
+    public Set<Channel> getChannels() {
         return mUserChannelInterface.getAllChannelsInUser(this);
     }
 
