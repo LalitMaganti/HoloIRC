@@ -80,7 +80,11 @@ public class ServerFragment extends IRCFragment {
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        return mCallback.getServer().getBuffer();
+        if(mCallback.getServer() != null) {
+            return mCallback.getServer().getBuffer();
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -97,6 +101,9 @@ public class ServerFragment extends IRCFragment {
     @Subscribe
     public void onServerEvent(final ServerEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
+            if(mMessageAdapter == null) {
+                setupListAdapter();
+            }
             synchronized (mMessageAdapter.getMessages()) {
                 mMessageAdapter.add(new Message(event.message));
             }

@@ -59,12 +59,18 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
     public void onResume() {
         super.onResume();
 
-        mMessageAdapter = new IRCMessageAdapter(getActivity(), onRetrieveMessages());
-        final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
-        adapter.setAbsListView(getListView());
-        setListAdapter(adapter);
-
+        setupListAdapter();
         getListView().setSelection(getListView().getCount());
+    }
+
+    void setupListAdapter() {
+        final List<Message> messages = onRetrieveMessages();
+        if(messages != null) {
+            mMessageAdapter = new IRCMessageAdapter(getActivity(), messages);
+            final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
+            adapter.setAbsListView(getListView());
+            setListAdapter(adapter);
+        }
     }
 
     @Override
