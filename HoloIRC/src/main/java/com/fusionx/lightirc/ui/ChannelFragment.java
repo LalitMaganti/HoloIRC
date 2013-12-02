@@ -123,6 +123,9 @@ public final class ChannelFragment extends IRCFragment {
     public void onChannelMessage(final ChannelEvent event) {
         if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
                 .isNotEmpty(event.message) && mTitle.equals(event.channelName)) {
+            if(mMessageAdapter == null) {
+                setupListAdapter();
+            }
             synchronized (mMessageAdapter.getMessages()) {
                 mMessageAdapter.add(new Message(event.message));
             }

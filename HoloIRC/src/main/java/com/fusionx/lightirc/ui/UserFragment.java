@@ -88,6 +88,9 @@ public class UserFragment extends IRCFragment {
     @Subscribe
     public void onUserEvent(final UserEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
+            if(mMessageAdapter == null) {
+                setupListAdapter();
+            }
             synchronized (mMessageAdapter.getMessages()) {
                 mMessageAdapter.add(new Message(event.message));
             }
