@@ -22,8 +22,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.SynchronizedCollection;
-import com.fusionx.lightirc.irc.Server;
+import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
+import com.fusionx.androidirclibrary.Server;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 
 import android.app.Activity;
@@ -70,7 +70,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
         int i = 0;
         for (final ServerCardInterface builder : mObjects) {
             final Server server = mCallback.getServer(builder.getTitle());
-            if(server != null && server.isConnected(getContext())) {
+            if(server != null && server.isConnected()) {
                 i += 1;
             }
         }

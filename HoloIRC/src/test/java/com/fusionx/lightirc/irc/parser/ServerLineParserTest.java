@@ -1,9 +1,9 @@
-package com.fusionx.lightirc.irc.parser;
+package com.fusionx.androidirclibrary.parser;
 
+import com.fusionx.androidirclibrary.connection.ServerConnection;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class ServerLineParserTest {
     public void setUp() throws Exception {
         final Handler handler = new Handler();
         ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
-        final ConnectionWrapper wrapper = new ConnectionWrapper(builder.build(),
+        final ServerConnection wrapper = new ServerConnection(builder.build(),
                 Robolectric.getShadowApplication().getApplicationContext(), handler);
         final Server server = new Server("", wrapper, Robolectric.getShadowApplication()
                 .getApplicationContext(), handler);

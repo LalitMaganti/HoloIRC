@@ -53,7 +53,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
 
@@ -205,6 +205,11 @@ public class ServerPreferenceActivity extends PreferenceActivity implements ISer
                 mCanSaveChanges = true;
             }
         }
+        return true;
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
         return true;
     }
 }

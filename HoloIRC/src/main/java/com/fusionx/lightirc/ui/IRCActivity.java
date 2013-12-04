@@ -23,18 +23,18 @@ package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.irc.Channel;
-import com.fusionx.lightirc.irc.ChannelUser;
-import com.fusionx.lightirc.irc.PrivateMessageUser;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.event.ChannelEvent;
-import com.fusionx.lightirc.irc.event.ConnectedEvent;
-import com.fusionx.lightirc.irc.event.DisconnectEvent;
-import com.fusionx.lightirc.irc.event.MentionEvent;
+import com.fusionx.androidirclibrary.Channel;
+import com.fusionx.androidirclibrary.ChannelUser;
+import com.fusionx.androidirclibrary.PrivateMessageUser;
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
+import com.fusionx.androidirclibrary.event.ChannelEvent;
+import com.fusionx.androidirclibrary.event.ConnectedEvent;
+import com.fusionx.androidirclibrary.event.DisconnectEvent;
+import com.fusionx.androidirclibrary.event.MentionEvent;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -149,7 +149,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_irc);
@@ -337,7 +337,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public Server getServer() {
-        return mServiceFragment.getServer(mServerTitle);
+        return mServiceFragment.getServer();
     }
 
     /**
@@ -369,7 +369,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public boolean isConnectedToServer() {
         final Server server = getServer();
-        return server != null && server.isConnected(this);
+        return server != null && server.isConnected();
     }
 
     /**

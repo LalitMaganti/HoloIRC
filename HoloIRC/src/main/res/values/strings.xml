@@ -90,7 +90,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_topic_changed">
         The topic for this channel has been changed to %1$s by %2$s
     </string>
-    <string name="parser_nick_in_use">Nickname is already in use.</string>
+    <string name="error_nick_in_use">Nickname is already in use.</string>
     <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
     <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
     <string name="parser_action" translatable="false">

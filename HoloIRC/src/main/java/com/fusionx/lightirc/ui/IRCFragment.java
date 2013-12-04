@@ -25,7 +25,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.irc.Message;
+import com.fusionx.androidirclibrary.Message;
 
 import org.apache.commons.lang3.StringUtils;
 

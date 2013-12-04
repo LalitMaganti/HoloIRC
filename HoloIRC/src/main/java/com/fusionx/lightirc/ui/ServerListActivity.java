@@ -21,17 +21,16 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
+import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.event.ConnectedEvent;
+import com.fusionx.androidirclibrary.event.DisconnectEvent;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedArrayList;
 import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.communication.MessageSender;
-import com.fusionx.lightirc.communication.ServerCommandSender;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.event.ConnectedEvent;
-import com.fusionx.lightirc.irc.event.DisconnectEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.widget.ServerCard;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
@@ -66,7 +65,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_list);
@@ -202,7 +201,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
             sender.getBus().unregister(this);
         }
 
-        ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
+        //ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
         mService.removeServerFromManager(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
@@ -236,7 +235,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     // ServerListAdapter callbacks
     @Override
     public Server getServer(final String title) {
-        return mService != null ? mService.getServer(title) : null;
+        return null;//mService != null ? mService.getServer(title) : null;
     }
 
     @SuppressWarnings("RedundantCast")

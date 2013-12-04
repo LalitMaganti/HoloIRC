@@ -1,11 +1,11 @@
-package com.fusionx.lightirc.irc.parser;
+package com.fusionx.androidirclibrary.parser;
 
+import com.fusionx.androidirclibrary.connection.ServerConnection;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
-import com.fusionx.lightirc.communication.MessageSender;
-import com.fusionx.lightirc.irc.AppUser;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.AppUser;
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +32,7 @@ public class ServerCommandParserTest {
         final Handler handler = new Handler();
         context = Robolectric.getShadowApplication().getApplicationContext();
         ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
-        final ConnectionWrapper wrapper = new ConnectionWrapper(builder.build(), context, handler);
+        final ServerConnection wrapper = new ServerConnection(builder.build(), context, handler);
         server = new Server("test", wrapper, context, handler);
         MessageSender.getSender("test").getBus();
         final OutputStreamWriter writer = new OutputStreamWriter(new ByteArrayOutputStream());

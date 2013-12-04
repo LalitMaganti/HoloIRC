@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.util;
 
+import com.fusionx.androidirclibrary.util.ColourParserUtils;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
 import com.fusionx.lightirc.misc.AppPreferences;
 

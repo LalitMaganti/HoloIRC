@@ -1,17 +1,16 @@
 package com.fusionx.lightirc.util;
 
+import com.fusionx.androidirclibrary.constants.Theme;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.IRCActivity;
 import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
 import com.fusionx.lightirc.ui.tablet.IRCTabletActivity;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.widget.TextView;
 
 public class UIUtils {
@@ -81,19 +80,17 @@ public class UIUtils {
         textView.setTypeface(font);
     }
 
-    public static int getThemeInt(final Context context) {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
-                (context);
-        final int theme = Integer.parseInt(preferences.getString(PreferenceConstants.Theme, "1"));
-        return theme != 0 ? R.style.Light : R.style.Dark;
+    public static int getThemeInt() {
+        return AppPreferences.theme != Theme.DARK ? R.style.Light : R.style.Dark;
     }
 
     public static int getThemedTextColor(final Context context) {
-        return isThemeLight(context) ? context.getResources().getColor(android.R.color.black) :
-                context.getResources().getColor(android.R.color.white);
+        return isThemeLight() ? context.getResources().getColor(android.R
+                .color.black) : context.getResources().getColor(android.R
+                .color.white);
     }
 
-    public static boolean isThemeLight(final Context context) {
-        return getThemeInt(context) == R.style.Light;
+    public static boolean isThemeLight() {
+        return getThemeInt() == R.style.Light;
     }
 }

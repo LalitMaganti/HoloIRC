@@ -22,7 +22,7 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.androidirclibrary.ServerConfiguration;
 
 import org.apache.commons.lang3.StringUtils;
 

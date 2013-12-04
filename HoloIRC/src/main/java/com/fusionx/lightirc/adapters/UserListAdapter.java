@@ -21,10 +21,11 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
 package com.fusionx.lightirc.adapters;
 
+import com.fusionx.androidirclibrary.constants.UserLevelEnum;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.SynchronizedCollection;
-import com.fusionx.lightirc.irc.Channel;
-import com.fusionx.lightirc.irc.ChannelUser;
+import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
+import com.fusionx.androidirclibrary.Channel;
+import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.content.Context;
@@ -56,23 +57,14 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
         final TextView view = (TextView) ((convertView != null) ? convertView : LayoutInflater.from
                 (getContext()).inflate(R.layout.sliding_menu_header, viewGroup, false));
-        final char firstChar = getFirstCharacter(i);
-        if (firstChar == '@') {
-            view.setText(mChannel.getNumberOfOwners() + " operators");
-        } else if (firstChar == '+') {
-            view.setText(mChannel.getNumberOfVoices() + " voices");
-        } else {
-            view.setText(mChannel.getNumberOfNormalUsers() + " users");
-        }
+
+        final UserLevelEnum levelEnum = getItem(i).getChannelPrivileges(mChannel);
+        view.setText(mChannel.getNumberOfUsersType(levelEnum) + " " + levelEnum.getName());
         return view;
     }
 
     @Override
-    public long getHeaderId(int i) {
-        return getFirstCharacter(i);
-    }
-
-    char getFirstCharacter(final int position) {
+    public long getHeaderId(int position) {
         final ChannelUser user = getItem(position);
         return user.getUserPrefix(mChannel);
     }
