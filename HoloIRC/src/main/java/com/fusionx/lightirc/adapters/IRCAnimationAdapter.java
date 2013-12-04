@@ -29,12 +29,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
 /**
  * A BaseAdapterDecorator class which applies multiple Animators at once to views when they are
  * first shown. The Animators applied include the animations specified in getAnimators(ViewGroup,
  * View), plus an alpha transition.
  */
-public class IRCAnimationAdapter extends BaseAdapterDecorator {
+public class IRCAnimationAdapter extends BaseAdapterDecorator implements StickyListHeadersAdapter {
 
     private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
 
@@ -101,6 +103,14 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator {
     @Override
     public View getHeaderView(int position, View convertView, ViewGroup parent) {
         return null;
+    }
+
+    @Override
+    public long getHeaderId(int position) {
+        if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
+            return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderId(position);
+        }
+        return 0;
     }
 
     private boolean cancelExistingAnimation(int position, View convertView) {

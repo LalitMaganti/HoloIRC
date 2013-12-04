@@ -55,6 +55,7 @@ import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
+import hugo.weaving.DebugLog;
 
 /**
  * Activity which contains all the communication code between the fragments It also implements a lot
@@ -147,6 +148,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
     };
 
+    @DebugLog
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt(this));

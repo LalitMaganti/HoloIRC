@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.adapters;
 
-
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nineoldandroids.animation.Animator;
@@ -22,12 +21,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+
 /**
  * A BaseAdapterDecorator class which applies multiple Animators at once to views when they are
  * first shown. The Animators applied include the animations specified in getAnimators(ViewGroup,
  * View), plus an alpha transition.
  */
-public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
+public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator implements StickyListHeadersAdapter {
 
     private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
 
@@ -112,13 +113,25 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator {
             alreadyStarted = cancelExistingAnimation(position, convertView);
         }
 
-        View itemView = super.getHeaderView(position, convertView, parent);
+        View itemView = null;
+        if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
+            itemView =  ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderView(position,
+                    convertView, parent);
+        }
 
         if (!mHasParentAnimationAdapter && !alreadyStarted) {
             animateHeaderViewIfNecessary(position, itemView, parent);
         }
 
         return itemView;
+    }
+
+    @Override
+    public long getHeaderId(int position) {
+        if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
+            return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderId(position);
+        }
+        return 0;
     }
 
     private boolean cancelExistingAnimation(int position, View convertView) {
