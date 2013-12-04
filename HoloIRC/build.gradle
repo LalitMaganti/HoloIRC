@@ -1,6 +1,15 @@
 apply plugin: 'android'
 apply plugin: 'android-test'
 
+buildscript {
+    dependencies {
+        repositories {
+            mavenCentral()
+        }
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.0.+'
+    }
+}
+
 apply plugin: 'hugo'
 
 repositories {
@@ -34,26 +43,32 @@ dependencies {
     // TEST
     testCompile 'junit:junit:4.10'
     testCompile 'org.robolectric:robolectric:2.1.+'
-    testCompile 'com.squareup:fest-android:1.0.+'
+    testCompile 'com.squareup:fest-android:1.0.+
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19"
+    buildToolsVersion '19'
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 18
+        targetSdkVersion 19
     }
 
-    signingConfigs {
-        release
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    signingConfigs {}
 
     buildTypes {
-        release {
-            signingConfig signingConfigs.release
+        debug {
+            packageNameSuffix '.debug'
+            debuggable true
+            jniDebugBuild true
         }
+        release {}
     }
 }
 
