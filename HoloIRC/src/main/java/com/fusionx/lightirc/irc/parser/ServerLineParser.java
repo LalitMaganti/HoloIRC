@@ -36,6 +36,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import hugo.weaving.DebugLog;
+
 public class ServerLineParser {
 
     private final Server mServer;
@@ -74,6 +76,7 @@ public class ServerLineParser {
      * @param rawLine - the raw line from the server
      * @return - returns a boolean which indicates whether the server has disconnected
      */
+    @DebugLog
     Event parseLine(final String rawLine) {
         final ArrayList<String> parsedArray = MiscUtils.splitRawLine(rawLine, true);
         String s = parsedArray.get(0);
