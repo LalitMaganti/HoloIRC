@@ -1,9 +1,9 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.communication.MessageSender;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -104,16 +104,11 @@ public class ServiceFragment extends Fragment {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
-
-            if (getServer(mCallback.getServerTitle()) != null) {
-                mCallback.setUpViewPager();
-                mCallback.repopulateFragmentsInPager();
-            } else {
-                final ServerConfiguration.Builder builder =
-                        getActivity().getIntent().getParcelableExtra("server");
-                mService.connectToServer(builder);
-                mCallback.setUpViewPager();
-            }
+            final ServerConfiguration.Builder builder =
+                    getActivity().getIntent().getParcelableExtra("server");
+            mServer = mService.connectToServer(builder);
+            mCallback.setUpViewPager();
+            mCallback.repopulateFragmentsInPager();
         }
 
         // Should never occur
@@ -125,10 +120,7 @@ public class ServiceFragment extends Fragment {
         }
     };
 
-    public Server getServer(final String serverTitle) {
-        if (mServer == null && mService != null) {
-            mServer = mService.getServer(serverTitle);
-        }
+    public Server getServer() {
         return mServer;
     }
 

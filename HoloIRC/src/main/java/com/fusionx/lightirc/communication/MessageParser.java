@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.lightirc.irc.Server;
+import com.fusionx.androidirclibrary.Server;
 import com.fusionx.lightirc.util.MiscUtils;
 
 import android.content.Context;

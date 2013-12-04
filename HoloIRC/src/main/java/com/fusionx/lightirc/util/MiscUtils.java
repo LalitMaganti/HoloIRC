@@ -23,20 +23,17 @@ package com.fusionx.lightirc.util;
 
 import com.google.common.base.CharMatcher;
 
+import com.fusionx.androidirclibrary.constants.UserLevelEnum;
 import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.constants.UserLevelEnum;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -95,28 +92,8 @@ public class MiscUtils {
         return builder.toString().trim();
     }
 
-    public static void removeFirstElementFromList(final List<String> list, final int noOfTimes) {
-        for (int i = 1; i <= noOfTimes; i++) {
-            list.remove(0);
-        }
-    }
-
-    public static int generateRandomColor(final int colorOffset) {
-        final Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-
-        // mix the color
-        red = (red + colorOffset) / 2;
-        green = (green + colorOffset) / 2;
-        blue = (blue + colorOffset) / 2;
-
-        return Color.rgb(red, green, blue);
-    }
-
     public static int getUserColorOffset(final Context context) {
-        return UIUtils.isThemeLight(context) ? 0 : 255;
+        return UIUtils.isThemeLight() ? 0 : 255;
     }
 
     public static boolean isChannel(char firstCharacter) {

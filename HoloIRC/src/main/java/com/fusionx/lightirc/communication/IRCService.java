@@ -21,11 +21,12 @@
 
 package com.fusionx.lightirc.communication;
 
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
+import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.connection.ConnectionManager;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
-import com.fusionx.lightirc.irc.connection.ConnectionManager;
-import com.fusionx.lightirc.irc.connection.ConnectionWrapper;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.ServerListActivity;
 
 import android.app.Notification;
@@ -48,45 +49,35 @@ import android.support.v4.app.NotificationCompat;
  */
 public class IRCService extends Service {
 
-    // Binder which returns this service
-    public class IRCBinder extends Binder {
-
-        public IRCService getService() {
-            return IRCService.this;
-        }
-    }
-
-    private ConnectionManager mConnectionManager = null;
-
     private final IRCBinder mBinder = new IRCBinder();
 
     private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
-    public void connectToServer(final ServerConfiguration.Builder server) {
-        if (mConnectionManager == null) {
-            // Means that this that a server is being connected to for the first time
-            mConnectionManager = new ConnectionManager(this);
-        }
+    private ConnectionManager mConnectionManager = null;
 
-        if (server != null) {
-            final ServerConfiguration configuration = server.build();
+    private final EventResponses mResponses = new EventResponses(this);
 
-            final MessageSender sender = MessageSender.getSender(server.getTitle());
-            sender.initialSetup(this);
-            sender.getBus().register(this);
-            final ConnectionWrapper thread = new ConnectionWrapper(configuration, this,
-                    mAdapterHandler);
-            mConnectionManager.put(server.getTitle(), thread);
+    private final AppPreferences mAppPreferences = new AppPreferences();
 
-            updateNotification();
+    public Server connectToServer(final ServerConfiguration.Builder builder) {
+        mConnectionManager = ConnectionManager.getConnectionManager(mResponses, mAppPreferences);
 
-            thread.start();
-        }
+        final ServerConfiguration configuration = builder.build();
+
+        final MessageSender sender = MessageSender.getSender(builder.getTitle());
+        sender.getBus().register(this);
+
+        final Server server = mConnectionManager.onConnectionRequested(configuration,
+                mAdapterHandler);
+        updateNotification();
+
+        return server;
     }
 
     private void updateNotification() {
         final String text = String.format(getResources().getQuantityString(R.plurals
-                .server_connection, mConnectionManager.size()), mConnectionManager.size());
+                .server_connection, mConnectionManager.getConnectedServerCount()),
+                mConnectionManager.getConnectedServerCount());
         final Intent intent = new Intent(this, ServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
@@ -110,17 +101,15 @@ public class IRCService extends Service {
 
     public void disconnectAll() {
         synchronized (mBinder) {
-            if (mConnectionManager != null) {
-                final AsyncTask<Void, Void, Void> disconnectAll = new AsyncTask<Void, Void,
-                        Void>() {
-                    @Override
-                    protected Void doInBackground(Void... params) {
-                        mConnectionManager.disconnectAll();
-                        return null;
-                    }
-                };
-                disconnectAll.execute();
-            }
+            final AsyncTask<Void, Void, Void> disconnectAll = new AsyncTask<Void, Void,
+                    Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    mConnectionManager.disconnectAll();
+                    return null;
+                }
+            };
+            disconnectAll.execute();
         }
         stopForeground(true);
 
@@ -133,26 +122,15 @@ public class IRCService extends Service {
 
     public void removeServerFromManager(final String serverName) {
         synchronized (mBinder) {
-            if (mConnectionManager.containsKey(serverName)) {
-                mConnectionManager.remove(serverName);
-                MessageSender.getSender(serverName).getBus().unregister(this);
-                if (mConnectionManager.isEmpty()) {
-                    stopForeground(true);
-                } else {
-                    updateNotification();
-                    final NotificationManager mNotificationManager = (NotificationManager)
-                            getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel(345);
-                }
+            MessageSender.getSender(serverName).getBus().unregister(this);
+            if (mConnectionManager.onDisconnectionRequested(serverName)) {
+                stopForeground(true);
+            } else {
+                updateNotification();
+                final NotificationManager mNotificationManager = (NotificationManager)
+                        getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.cancel(345);
             }
-        }
-    }
-
-    public Server getServer(final String serverName) {
-        if (mConnectionManager != null && mConnectionManager.get(serverName) != null) {
-            return mConnectionManager.get(serverName).getServer();
-        } else {
-            return null;
         }
     }
 
@@ -175,5 +153,13 @@ public class IRCService extends Service {
     @Override
     public boolean onUnbind(final Intent intent) {
         return true;
+    }
+
+    // Binder which returns this service
+    public class IRCBinder extends Binder {
+
+        public IRCService getService() {
+            return IRCService.this;
+        }
     }
 }

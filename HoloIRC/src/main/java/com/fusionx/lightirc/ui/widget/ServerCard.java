@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.ui.widget;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.ServerConfiguration;
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.ServerConfiguration;
 import com.fusionx.lightirc.ui.ServerPreferenceActivity;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;

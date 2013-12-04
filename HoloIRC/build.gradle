@@ -1,17 +1,6 @@
 apply plugin: 'android'
 apply plugin: 'android-test'
 
-buildscript {
-    dependencies {
-        repositories {
-            mavenCentral()
-        }
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.0.+'
-    }
-}
-
-apply plugin: 'hugo'
-
 repositories {
     mavenCentral()
 }
@@ -35,6 +24,7 @@ dependencies {
         exclude group: 'com.google.android'
     }
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
+    compile project(':libraries:android-irc-library')
     compile project(':libraries:PagerSlidingTabStrip:library')
     compile project(':libraries:SlidingMenu:library')
     compile project(':libraries:android-numberpicker:library')

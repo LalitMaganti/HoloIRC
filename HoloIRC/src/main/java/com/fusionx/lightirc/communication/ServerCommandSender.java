@@ -21,9 +21,10 @@
 
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.lightirc.irc.Channel;
-import com.fusionx.lightirc.irc.PrivateMessageUser;
-import com.fusionx.lightirc.irc.Server;
+import com.fusionx.androidirclibrary.Channel;
+import com.fusionx.androidirclibrary.communication.MessageSender;
+import com.fusionx.androidirclibrary.PrivateMessageUser;
+import com.fusionx.androidirclibrary.Server;
 import com.fusionx.lightirc.misc.AppPreferences;
 
 import org.apache.commons.lang3.StringUtils;
@@ -157,7 +158,7 @@ public class ServerCommandSender {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
-                server.disconnectFromServer(context);
+                server.disconnectFromServer();
                 return null;
             }
         }.execute();

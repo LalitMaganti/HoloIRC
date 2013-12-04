@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.util;
 
+import com.fusionx.androidirclibrary.util.IRCUtils;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
 
 import org.junit.Assert;

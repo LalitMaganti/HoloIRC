@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.irc.Message;
+import com.fusionx.androidirclibrary.Message;
 import com.fusionx.lightirc.util.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;

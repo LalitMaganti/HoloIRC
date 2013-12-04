@@ -22,11 +22,11 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.communication.MessageParser;
-import com.fusionx.lightirc.communication.MessageSender;
+import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.irc.Message;
-import com.fusionx.lightirc.irc.Server;
-import com.fusionx.lightirc.irc.event.ServerEvent;
+import com.fusionx.androidirclibrary.Message;
+import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.event.ServerEvent;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.squareup.otto.Subscribe;
 

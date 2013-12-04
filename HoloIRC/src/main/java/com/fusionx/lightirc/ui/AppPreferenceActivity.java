@@ -32,7 +32,7 @@ public class AppPreferenceActivity extends PreferenceActivity {
     @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
 
@@ -89,5 +89,10 @@ public class AppPreferenceActivity extends PreferenceActivity {
             final AlertDialog alert = builder.create();
             alert.show();
         }
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return true;
     }
 }

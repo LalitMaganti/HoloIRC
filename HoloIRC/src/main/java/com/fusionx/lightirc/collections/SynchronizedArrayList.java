@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.collections;
 
-import com.fusionx.lightirc.interfaces.SynchronizedCollection;
+import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
 
 import java.util.ArrayList;
 
