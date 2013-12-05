@@ -66,7 +66,7 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mTitle).getBus().register(this);
+        mCallback.getServer().getServerToFrontEndBus().register(this);
         mCallback.getServer().setCached(true);
     }
 
@@ -74,7 +74,7 @@ public class ServerFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        MessageSender.getSender(mTitle).getBus().unregister(this);
+        mCallback.getServer().getServerToFrontEndBus().unregister(this);
         mCallback.getServer().setCached(false);
     }
 
@@ -93,7 +93,7 @@ public class ServerFragment extends IRCFragment {
         MessageParser.serverMessageToParse(getActivity(), server, message);
     }
 
-    public void onConnectedToServer() {
+    public void onConnected() {
         mMessageBox.setEnabled(true);
     }
 

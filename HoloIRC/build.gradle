@@ -50,15 +50,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
-    signingConfigs {}
-
     buildTypes {
         debug {
             packageNameSuffix '.debug'
-            debuggable true
-            jniDebugBuild true
         }
-        release {}
     }
 }
 

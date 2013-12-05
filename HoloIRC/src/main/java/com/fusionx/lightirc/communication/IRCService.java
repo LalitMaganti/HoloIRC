@@ -23,7 +23,6 @@ package com.fusionx.lightirc.communication;
 
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.androidirclibrary.connection.ConnectionManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
@@ -64,11 +63,10 @@ public class IRCService extends Service {
 
         final ServerConfiguration configuration = builder.build();
 
-        final MessageSender sender = MessageSender.getSender(builder.getTitle());
-        sender.getBus().register(this);
-
         final Server server = mConnectionManager.onConnectionRequested(configuration,
                 mAdapterHandler);
+        server.getServerToFrontEndBus().register(this);
+
         updateNotification();
 
         return server;
@@ -105,7 +103,7 @@ public class IRCService extends Service {
                     Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    mConnectionManager.disconnectAll();
+                    mConnectionManager.onDisconnectAll();
                     return null;
                 }
             };
@@ -122,7 +120,8 @@ public class IRCService extends Service {
 
     public void removeServerFromManager(final String serverName) {
         synchronized (mBinder) {
-            MessageSender.getSender(serverName).getBus().unregister(this);
+            mConnectionManager.getServerIfExists(serverName).getServerToFrontEndBus().unregister
+                    (this);
             if (mConnectionManager.onDisconnectionRequested(serverName)) {
                 stopForeground(true);
             } else {
@@ -153,6 +152,15 @@ public class IRCService extends Service {
     @Override
     public boolean onUnbind(final Intent intent) {
         return true;
+    }
+
+
+    public Server getServerIfExists(final String title) {
+        if (mConnectionManager != null) {
+            return mConnectionManager.getServerIfExists(title);
+        } else {
+            return null;
+        }
     }
 
     // Binder which returns this service

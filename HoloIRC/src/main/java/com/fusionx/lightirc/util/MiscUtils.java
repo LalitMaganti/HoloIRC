@@ -23,8 +23,6 @@ package com.fusionx.lightirc.util;
 
 import com.google.common.base.CharMatcher;
 
-import com.fusionx.androidirclibrary.constants.UserLevelEnum;
-import com.fusionx.lightirc.constants.Constants;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 
 import android.content.Context;
@@ -92,14 +90,6 @@ public class MiscUtils {
         return builder.toString().trim();
     }
 
-    public static int getUserColorOffset(final Context context) {
-        return UIUtils.isThemeLight() ? 0 : 255;
-    }
-
-    public static boolean isChannel(char firstCharacter) {
-        return Constants.channelPrefixes.contains(firstCharacter);
-    }
-
     public static Set<String> getIgnoreList(final Context context, final String fileName) {
         if (ignoreList == null) {
             final SharedPreferences preferences = context.getSharedPreferences(fileName,
@@ -123,9 +113,5 @@ public class MiscUtils {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public static boolean isUserOwnerOrVoice(final UserLevelEnum level) {
-        return level.equals(UserLevelEnum.OP) || level.equals(UserLevelEnum.VOICE);
     }
 }

@@ -21,8 +21,6 @@
 
 package com.fusionx.lightirc.constants;
 
-import com.google.common.collect.ImmutableList;
-
 /**
  * Class containing generic constants
  */
@@ -31,9 +29,6 @@ public class Constants {
     public final static boolean DEBUG = false;
 
     public final static String LOG_TAG = "HoloIRC";
-
-    public final static ImmutableList<Character> channelPrefixes = ImmutableList.of('#', '&',
-            '+', '!');
 
     private Constants() {
     }

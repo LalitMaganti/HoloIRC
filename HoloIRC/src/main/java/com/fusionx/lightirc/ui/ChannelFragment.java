@@ -21,16 +21,15 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.communication.MessageParser;
-import com.fusionx.androidirclibrary.communication.MessageSender;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.Message;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.UserChannelInterface;
 import com.fusionx.androidirclibrary.event.ChannelEvent;
-import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.androidirclibrary.util.ColourParserUtils;
+import com.fusionx.lightirc.communication.MessageParser;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.squareup.otto.Subscribe;
 
@@ -65,8 +64,7 @@ public final class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServer().getTitle())
-                .getBus().register(this);
+        mCallback.getServer().getServerToFrontEndBus().register(this);
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(true);
     }
 
@@ -77,8 +75,7 @@ public final class ChannelFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        MessageSender.getSender(mCallback.getServer().getTitle())
-                .getBus().unregister(this);
+        mCallback.getServer().getServerToFrontEndBus().unregister(this);
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(false);
     }
 

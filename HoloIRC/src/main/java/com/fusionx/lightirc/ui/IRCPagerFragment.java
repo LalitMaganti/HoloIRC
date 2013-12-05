@@ -1,10 +1,6 @@
 package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.androidirclibrary.communication.MessageSender;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.event.ConnectedEvent;
@@ -14,6 +10,9 @@ import com.fusionx.androidirclibrary.event.NickInUseEvent;
 import com.fusionx.androidirclibrary.event.PartEvent;
 import com.fusionx.androidirclibrary.event.PrivateMessageEvent;
 import com.fusionx.androidirclibrary.event.SwitchToServerEvent;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
@@ -71,15 +70,13 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
-
-        MessageSender.getSender(mCallback.getServerTitle()).getBus().register(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        MessageSender.getSender(mCallback.getServerTitle()).getBus().unregister(this);
+        mCallback.getServer().getServerToFrontEndBus().unregister(this);
     }
 
     /**
@@ -130,7 +127,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      *
      * @param userNick - the nick of the user we are PMing
      */
-    public void createPMFragment(final String userNick, final boolean switchToTab) {
+    public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
         final UserFragment userFragment = new UserFragment();
         final Bundle bundle = new Bundle();
         bundle.putString("title", userNick);
@@ -182,7 +179,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * @param channelName - name of the channel joined
      * @param forceSwitch - whether the channel should be forcibly switched to
      */
-    public void createChannelFragment(final String channelName, final boolean forceSwitch) {
+    public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
         final boolean switchToTab = channelName.equals(getActivity().getIntent().getStringExtra
                 ("mention")) || forceSwitch;
 
@@ -230,9 +227,13 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return mCallback.getServer();
     }
 
-    void connectedToServer() {
+    void onConnected() {
         final ServerFragment fragment = (ServerFragment) mAdapter.getItem(0);
-        fragment.onConnectedToServer();
+        fragment.onConnected();
+    }
+
+    void onServerAvailable(final Server server) {
+        server.getServerToFrontEndBus().register(this);
     }
 
     public interface IRCPagerInterface {
@@ -240,8 +241,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         public Server getServer();
 
         public boolean isConnectedToServer();
-
-        public String getServerTitle();
     }
 
     /*
@@ -254,7 +253,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onChannelJoin(final JoinEvent event) {
-        createChannelFragment(event.channelToJoin, true);
+        onCreateChannelFragment(event.channelToJoin, true);
     }
 
     @Subscribe
@@ -264,7 +263,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onNewPrivateMessage(final PrivateMessageEvent event) {
-        createPMFragment(event.nick, true);
+        onCreateMessageFragment(event.nick, true);
     }
 
     @Subscribe
@@ -274,7 +273,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onServerConnected(final ConnectedEvent event) {
-        connectedToServer();
+        onConnected();
     }
 
     @Subscribe

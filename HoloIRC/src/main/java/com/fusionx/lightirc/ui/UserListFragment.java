@@ -21,17 +21,16 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
-import com.fusionx.androidirclibrary.collection.UserListTreeSet;
-import com.fusionx.androidirclibrary.communication.MessageSender;
-import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.collection.UserListTreeSet;
 import com.fusionx.androidirclibrary.event.KickEvent;
 import com.fusionx.androidirclibrary.event.PartEvent;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.collections.SynchronizedTreeSet;
+import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
@@ -74,14 +73,16 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onPause() {
         super.onPause();
 
-        MessageSender.getSender(mCallback.getServerTitle()).getBus().unregister(this);
+        mCallback.getServer().getServerToFrontEndBus().unregister(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        MessageSender.getSender(mCallback.getServerTitle()).getBus().register(this);
+        if (mCallback.getServer() != null) {
+            mCallback.getServer().getServerToFrontEndBus().register(this);
+        }
     }
 
     @Override
