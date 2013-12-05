@@ -22,10 +22,6 @@
 package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.lightirc.R;
-import com.fusionx.androidirclibrary.communication.MessageSender;
-import com.fusionx.lightirc.communication.ServerCommandSender;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.PrivateMessageUser;
@@ -35,6 +31,9 @@ import com.fusionx.androidirclibrary.event.ChannelEvent;
 import com.fusionx.androidirclibrary.event.ConnectedEvent;
 import com.fusionx.androidirclibrary.event.DisconnectEvent;
 import com.fusionx.androidirclibrary.event.MentionEvent;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.ServerCommandSender;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -184,13 +183,12 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         tabs.setTextColorResource(android.R.color.white);
 
         mServiceFragment.connectToServer(this, mServerTitle);
-        MessageSender.getSender(mServerTitle).getBus().register(mEventReceiver);
     }
 
     @Override
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
-        MessageSender.getSender(mServerTitle).getBus().unregister(mEventReceiver);
+        getServer().getServerToFrontEndBus().unregister(mEventReceiver);
 
         super.onDestroy();
     }
@@ -255,14 +253,16 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onPause() {
         super.onPause();
-        mServiceFragment.getSender().setDisplayed(false);
+        getServer().getServerToFrontEndBus().setDisplayed(false);
         getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mServiceFragment.getSender().setDisplayed(true);
+        if (getServer() != null) {
+            getServer().getServerToFrontEndBus().setDisplayed(true);
+        }
     }
 
     // Options Menu stuff
@@ -317,16 +317,24 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             for (final Channel channel : getServer().getUser().getChannels()) {
                 final boolean switchToTab = getServer().getServerCache().getIrcTitle().equals
                         (channel.getName());
-                mIRCPagerFragment.createChannelFragment(channel.getName(), switchToTab);
+                mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
             }
             final Iterator<PrivateMessageUser> iterator = getServer().getUser()
                     .getPrivateMessageIterator();
             while (iterator.hasNext()) {
                 final boolean switchToTab = getServer().getServerCache().getIrcTitle().equals
                         (iterator.next().getNick());
-                mIRCPagerFragment.createPMFragment(iterator.next().getNick(), switchToTab);
+                mIRCPagerFragment.onCreateMessageFragment(iterator.next().getNick(), switchToTab);
             }
         }
+    }
+
+    @Override
+    public void onServerAvailable(final Server server) {
+        server.getServerToFrontEndBus().register(mEventReceiver);
+        server.getServerToFrontEndBus().setDisplayed(true);
+        mIRCPagerFragment.onServerAvailable(server);
+        server.getServerToFrontEndBus().register(mUserListFragment);
     }
 
     @Override

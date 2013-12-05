@@ -23,7 +23,6 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.androidirclibrary.event.ConnectedEvent;
 import com.fusionx.androidirclibrary.event.DisconnectEvent;
 import com.fusionx.lightirc.R;
@@ -31,6 +30,7 @@ import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedArrayList;
 import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.widget.ServerCard;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
@@ -100,10 +100,10 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
 
         for (ServerCardInterface builder : mServerCardsAdapter.getListOfItems()) {
             if (builder.getTitle() != null) {
-                final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
+                final Server sender = getServer(builder.getTitle());
                 if (sender != null) {
                     try {
-                        sender.getBus().unregister(this);
+                        sender.getServerToFrontEndBus().unregister(this);
                     } catch (Exception ex) {
                         // Do nothing - we aren't registered it seems
                         // TODO - fix this properly
@@ -182,9 +182,9 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
                     (this, file);
             final ServerCard card = new ServerCard(this, builder, this);
             mServerCardsAdapter.add(card);
-            final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
+            final Server sender = getServer(builder.getTitle());
             if (sender != null) {
-                sender.getBus().register(this);
+                sender.getServerToFrontEndBus().register(this);
             }
         }
     }
@@ -196,12 +196,12 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
 
     @Override
     public void disconnectFromServer(final ServerCard builder) {
-        final MessageSender sender = MessageSender.getSender(builder.getTitle(), true);
-        if (sender != null) {
-            sender.getBus().unregister(this);
+        final Server server = getServer(builder.getTitle());
+        if (server != null) {
+            server.getServerToFrontEndBus().unregister(this);
+            ServerCommandSender.sendDisconnect(getServer(builder.getTitle()), this);
         }
 
-        //ServerCommandSender.sendDisconnect(mService.getServer(builder.getTitle()), this);
         mService.removeServerFromManager(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
@@ -235,7 +235,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     // ServerListAdapter callbacks
     @Override
     public Server getServer(final String title) {
-        return null;//mService != null ? mService.getServer(title) : null;
+        return mService != null ? mService.getServerIfExists(title) : null;
     }
 
     @SuppressWarnings("RedundantCast")

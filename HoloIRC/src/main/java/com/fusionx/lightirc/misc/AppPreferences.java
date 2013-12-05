@@ -60,4 +60,15 @@ public class AppPreferences implements EventPreferences {
     public Theme getTheme() {
         return theme;
     }
+
+    // TODO - this is broken - fixit
+    @Override
+    public boolean shouldIgnoreUser(String nick) {
+        return false;
+    }
+
+    @Override
+    public boolean shouldLogUserMessages() {
+        return !hideUserMessages;
+    }
 }

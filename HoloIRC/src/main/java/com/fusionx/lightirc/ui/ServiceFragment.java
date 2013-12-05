@@ -1,9 +1,8 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;
+import com.fusionx.lightirc.communication.IRCService;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -24,8 +23,6 @@ public class ServiceFragment extends Fragment {
 
     private ServiceFragmentCallback mCallback;
 
-    private MessageSender mSender;
-
     private Server mServer;
 
     /**
@@ -37,8 +34,6 @@ public class ServiceFragment extends Fragment {
 
         // Retain this fragment across configuration changes.
         setRetainInstance(true);
-
-        mSender = MessageSender.getSender(mCallback.getServerTitle());
     }
 
     public void connectToServer(Context context, final String serverTitle) {
@@ -68,9 +63,6 @@ public class ServiceFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
                     "ServiceFragmentCallback");
-        }
-        if (mSender == null) {
-            mSender = MessageSender.getSender(mCallback.getServerTitle());
         }
     }
 
@@ -104,9 +96,10 @@ public class ServiceFragment extends Fragment {
         @Override
         public void onServiceConnected(final ComponentName className, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
-            final ServerConfiguration.Builder builder =
-                    getActivity().getIntent().getParcelableExtra("server");
+            final ServerConfiguration.Builder builder = getActivity().getIntent()
+                    .getParcelableExtra("server");
             mServer = mService.connectToServer(builder);
+            mCallback.onServerAvailable(mServer);
             mCallback.setUpViewPager();
             mCallback.repopulateFragmentsInPager();
         }
@@ -137,16 +130,12 @@ public class ServiceFragment extends Fragment {
         disconnect.execute();
     }
 
-    public MessageSender getSender() {
-        return mSender;
-    }
-
     public interface ServiceFragmentCallback {
 
         public void setUpViewPager();
 
-        public String getServerTitle();
-
         public void repopulateFragmentsInPager();
+
+        public void onServerAvailable(final Server server);
     }
 }
