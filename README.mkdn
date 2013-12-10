@@ -1,3 +1,13 @@
+What is HoloIRC?
+=====
+HoloIRC is an open source IRC client for Android. It is intended to be very lightweight and easy to use while not sacrificing on features. It has been released on the Google Play Store.
+
+Forking
+=====
+Please feel free to fork the repo to add anything you want or fix any bugs you've spotted. I'd also very much appreciate if you could send a pull request to fix it my sources as well.
+
+License
+=====
     HoloIRC - Copyright (c) Lalit Maganti 2013
 
     HoloIRC is free software: you can redistribute it and/or modify
@@ -11,6 +21,8 @@
     You should have received a copy of the GNU General Public License
     along with HoloIRC.  If not, see <http://www.gnu.org/licenses/>.
 
+Credits
+=====
     This project depends on several libraries each of which have their own license and deserve sincere thanks:
     * Guava by Google - licensed under the Apache License v2
     * Android Support Library (v4 and v7) by Google - licensed under the Apache License v2
