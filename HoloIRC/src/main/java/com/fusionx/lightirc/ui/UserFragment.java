@@ -21,13 +21,13 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.androidirclibrary.Message;
-import com.fusionx.androidirclibrary.PrivateMessageUser;
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.parser.UserInputParser;
-import com.fusionx.androidirclibrary.event.PrivateActionEvent;
-import com.fusionx.androidirclibrary.event.PrivateEvent;
-import com.fusionx.androidirclibrary.event.PrivateMessageEvent;
+import com.fusionx.relay.Message;
+import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.parser.UserInputParser;
+import com.fusionx.relay.event.PrivateActionEvent;
+import com.fusionx.relay.event.PrivateEvent;
+import com.fusionx.relay.event.PrivateMessageEvent;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.squareup.otto.Subscribe;

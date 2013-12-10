@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.util;
 
-import com.fusionx.androidirclibrary.constants.Theme;
+import com.fusionx.relay.constants.Theme;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.IRCActivity;

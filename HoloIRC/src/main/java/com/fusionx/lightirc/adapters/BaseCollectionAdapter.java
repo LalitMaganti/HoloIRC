@@ -16,7 +16,7 @@
 
 package com.fusionx.lightirc.adapters;
 
-import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
+import com.fusionx.relay.interfaces.SynchronizedCollection;
 
 import android.content.Context;
 import android.util.Log;

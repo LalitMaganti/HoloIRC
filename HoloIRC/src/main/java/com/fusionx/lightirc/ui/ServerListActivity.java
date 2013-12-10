@@ -21,10 +21,10 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.event.ConnectedEvent;
-import com.fusionx.androidirclibrary.event.DisconnectEvent;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.event.ConnectedEvent;
+import com.fusionx.relay.event.DisconnectEvent;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;

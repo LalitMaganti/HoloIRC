@@ -21,13 +21,13 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.androidirclibrary.ChannelUser;
-import com.fusionx.androidirclibrary.Message;
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.UserChannelInterface;
-import com.fusionx.androidirclibrary.parser.UserInputParser;
-import com.fusionx.androidirclibrary.event.ChannelEvent;
-import com.fusionx.androidirclibrary.util.ColourParserUtils;
+import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.Message;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.UserChannelInterface;
+import com.fusionx.relay.parser.UserInputParser;
+import com.fusionx.relay.event.ChannelEvent;
+import com.fusionx.relay.util.ColourParserUtils;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;

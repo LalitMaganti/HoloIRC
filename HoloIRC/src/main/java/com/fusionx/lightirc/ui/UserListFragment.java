@@ -21,13 +21,12 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.androidirclibrary.Channel;
-import com.fusionx.androidirclibrary.ChannelUser;
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.collection.UserListTreeSet;
-import com.fusionx.androidirclibrary.communication.ServerReceiverBus;
-import com.fusionx.androidirclibrary.event.KickEvent;
-import com.fusionx.androidirclibrary.event.PartEvent;
+import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.collection.UserListTreeSet;
+import com.fusionx.relay.event.KickEvent;
+import com.fusionx.relay.event.PartEvent;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;

@@ -21,9 +21,9 @@
 
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.connection.ConnectionManager;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.connection.ConnectionManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.ServerListActivity;
