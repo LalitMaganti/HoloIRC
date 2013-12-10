@@ -76,7 +76,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     public void onDestroy() {
         super.onDestroy();
 
-        mCallback.getServer().getServerToFrontEndBus().unregister(this);
+        mCallback.getServer().getServerSenderBus().unregister(this);
     }
 
     /**
@@ -233,7 +233,12 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     void onServerAvailable(final Server server) {
-        server.getServerToFrontEndBus().register(this);
+        server.getServerSenderBus().register(this);
+    }
+
+    @Override
+    public void openPrivateMessage(String nick) {
+        onCreateMessageFragment(nick, true);
     }
 
     public interface IRCPagerInterface {
@@ -262,8 +267,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     @Subscribe
-    public void onNewPrivateMessage(final PrivateMessageEvent event) {
-        onCreateMessageFragment(event.nick, true);
+    public void onPrivateMessage(final PrivateMessageEvent event) {
+        if (event.newPrivateMessage) {
+            onCreateMessageFragment(event.userNick, true);
+        }
     }
 
     @Subscribe

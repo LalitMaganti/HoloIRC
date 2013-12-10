@@ -25,12 +25,12 @@ import com.fusionx.androidirclibrary.Channel;
 import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.collection.UserListTreeSet;
+import com.fusionx.androidirclibrary.communication.ServerReceiverBus;
 import com.fusionx.androidirclibrary.event.KickEvent;
 import com.fusionx.androidirclibrary.event.PartEvent;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;
-import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
@@ -73,7 +73,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerToFrontEndBus().unregister(this);
+        mCallback.getServer().getServerSenderBus().unregister(this);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
         super.onResume();
 
         if (mCallback.getServer() != null) {
-            mCallback.getServer().getServerToFrontEndBus().register(this);
+            mCallback.getServer().getServerSenderBus().register(this);
         }
     }
 
@@ -136,7 +136,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 return true;
             case R.id.fragment_userlist_cab_pm: {
                 if (isNickOtherUsers(nick)) {
-                    ServerCommandSender.sendMessageToUser(mCallback.getServer(), nick, "");
+                    mCallback.getServer().getServerReceiverBus().sendMessageToUser(nick, "");
                     mCallback.closeAllSlidingMenus();
                     mode.finish();
                 } else {
@@ -157,7 +157,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 return true;
             }
             case R.id.fragment_userlist_cab_whois:
-                ServerCommandSender.sendUserWhois(mCallback.getServer(), nick);
+                mCallback.getServer().getServerReceiverBus().sendUserWhois(nick);
                 return true;
             default:
                 return false;

@@ -21,8 +21,9 @@
 
 package com.fusionx.lightirc.util;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.androidirclibrary.ServerConfiguration;
+import com.fusionx.androidirclibrary.misc.NickStorage;
+import com.fusionx.lightirc.constants.PreferenceConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -86,8 +87,7 @@ public class SharedPreferencesUtils {
         for (final String fileName : folder.list()) {
             if (fileName.startsWith("server_")) {
                 array.add(migrateFileToNewSystem(context, fileName));
-            } else if (!fileName.equals("main.xml") && !fileName.equals("com.fusionx" +
-                    ".lightirc_preferences.xml") && !fileName.equals("showcase_internal.xml")) {
+            } else if (!isExcludedString(fileName)) {
                 array.add(fileName.replace(".xml", ""));
             }
         }
@@ -127,8 +127,7 @@ public class SharedPreferencesUtils {
                 "HoloIRCUser");
         final String secondChoice = serverSettings.getString(PreferenceConstants.SecondNick, "");
         final String thirdChoice = serverSettings.getString(PreferenceConstants.ThirdNick, "");
-        final ServerConfiguration.NickStorage nickStorage = new ServerConfiguration.NickStorage
-                (firstChoice, secondChoice, thirdChoice);
+        final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
         builder.setRealName(serverSettings.getString(PreferenceConstants.RealName, "HoloIRC"));
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.AutoNickChange,
@@ -154,11 +153,8 @@ public class SharedPreferencesUtils {
         // NickServ authorisation
         builder.setNickservPassword(serverSettings.getString(PreferenceConstants
                 .NickServPassword, ""));
-
-        builder.setFile(filename);
         return builder;
     }
-
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static void putStringSet(SharedPreferences preferences, final String key,
@@ -204,5 +200,10 @@ public class SharedPreferencesUtils {
                 return set;
             }
         }
+    }
+
+    private static boolean isExcludedString(final String fileName) {
+        return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
+                fileName.equals("showcase_internal.xml");
     }
 }

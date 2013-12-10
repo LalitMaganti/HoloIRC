@@ -23,7 +23,6 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
-import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
@@ -115,7 +114,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 callback.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendNickChange(callback.getServer(), input);
+                callback.getServer().getServerReceiverBus().sendNickChange(input);
             }
         };
         nickDialog.show();
@@ -126,7 +125,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 (getActivity()) {
             @Override
             public void onOkClicked(final String input) {
-                ServerCommandSender.sendJoin(callback.getServer(), input);
+                callback.getServer().getServerReceiverBus().sendJoin(input);
             }
         };
         builder.show();

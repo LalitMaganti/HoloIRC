@@ -68,7 +68,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
     @Override
     public void onCardDismiss() {
         final File folder = new File(SharedPreferencesUtils
-                .getSharedPreferencesPath(mContext) + mServer.getFile() + ".xml");
+                .getSharedPreferencesPath(mContext) + mServer.getTitle().toLowerCase() + ".xml");
         folder.delete();
     }
 
@@ -76,7 +76,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
     public void onCardEdit(final ArrayList<String> currentlyDisplayedCards) {
         final Intent intent = new Intent(mContext, ServerPreferenceActivity.class);
 
-        intent.putExtra("file", mServer.getFile());
+        intent.putExtra("file", mServer.getTitle().toLowerCase());
         intent.putExtra("server", mServer);
         intent.putStringArrayListExtra("list", currentlyDisplayedCards);
         mContext.startActivity(intent);
