@@ -2,7 +2,6 @@ package com.fusionx.androidirclibrary.parser;
 
 import com.fusionx.androidirclibrary.connection.ServerConnection;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
-import com.fusionx.androidirclibrary.communication.MessageSender;
 import com.fusionx.androidirclibrary.AppUser;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.ServerConfiguration;

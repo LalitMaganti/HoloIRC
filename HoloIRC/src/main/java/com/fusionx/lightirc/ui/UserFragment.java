@@ -24,8 +24,10 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.androidirclibrary.Message;
 import com.fusionx.androidirclibrary.PrivateMessageUser;
 import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.event.UserEvent;
-import com.fusionx.lightirc.communication.MessageParser;
+import com.fusionx.androidirclibrary.parser.UserInputParser;
+import com.fusionx.androidirclibrary.event.PrivateActionEvent;
+import com.fusionx.androidirclibrary.event.PrivateEvent;
+import com.fusionx.androidirclibrary.event.PrivateMessageEvent;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.squareup.otto.Subscribe;
@@ -53,7 +55,7 @@ public class UserFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        mCallback.getServer().getServerToFrontEndBus().register(this);
+        mCallback.getServer().getServerSenderBus().register(this);
         mCallback.getServer().getPrivateMessageUser(mTitle).setCached(true);
     }
 
@@ -61,7 +63,7 @@ public class UserFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerToFrontEndBus().unregister(this);
+        mCallback.getServer().getServerSenderBus().unregister(this);
         mCallback.getServer().getPrivateMessageUser(mTitle).setCached(false);
     }
 
@@ -78,12 +80,21 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void onSendMessage(final String message) {
-        MessageParser.userMessageToParse(getActivity(), mCallback.getServer(), mTitle,
-                message);
+        UserInputParser.userMessageToParse(mCallback.getServer(), mTitle,
+                message, mCallback);
     }
 
     @Subscribe
-    public void onUserEvent(final UserEvent event) {
+    public void onUserEvent(final PrivateMessageEvent event) {
+        processEvent(event);
+    }
+
+    @Subscribe
+    public void onPrivateAction(final PrivateActionEvent event) {
+        processEvent(event);
+    }
+
+    private void processEvent(final PrivateEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
             if(mMessageAdapter == null) {
                 setupListAdapter();
@@ -94,7 +105,7 @@ public class UserFragment extends IRCFragment {
         }
     }
 
-    public interface UserFragmentCallback {
+    public interface UserFragmentCallback extends UserInputParser.ParserCallbacks {
 
         public Server getServer();
     }

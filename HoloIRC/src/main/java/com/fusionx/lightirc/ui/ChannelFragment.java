@@ -25,9 +25,9 @@ import com.fusionx.androidirclibrary.ChannelUser;
 import com.fusionx.androidirclibrary.Message;
 import com.fusionx.androidirclibrary.Server;
 import com.fusionx.androidirclibrary.UserChannelInterface;
+import com.fusionx.androidirclibrary.parser.UserInputParser;
 import com.fusionx.androidirclibrary.event.ChannelEvent;
 import com.fusionx.androidirclibrary.util.ColourParserUtils;
-import com.fusionx.lightirc.communication.MessageParser;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;
@@ -64,7 +64,7 @@ public final class ChannelFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        mCallback.getServer().getServerToFrontEndBus().register(this);
+        mCallback.getServer().getServerSenderBus().register(this);
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(true);
     }
 
@@ -75,7 +75,7 @@ public final class ChannelFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerToFrontEndBus().unregister(this);
+        mCallback.getServer().getServerSenderBus().unregister(this);
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(false);
     }
 
@@ -111,8 +111,8 @@ public final class ChannelFragment extends IRCFragment {
      */
     @Override
     public void onSendMessage(final String message) {
-        MessageParser.channelMessageToParse(getActivity(), mCallback.getServer(), mTitle,
-                message);
+        UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle,
+                message, mCallback);
     }
 
     // Subscription methods
@@ -130,7 +130,7 @@ public final class ChannelFragment extends IRCFragment {
     }
 
     // Callback interface
-    public interface ChannelFragmentCallback {
+    public interface ChannelFragmentCallback extends UserInputParser.ParserCallbacks {
 
         public Server getServer();
     }

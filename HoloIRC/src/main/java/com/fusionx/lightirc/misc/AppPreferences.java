@@ -47,6 +47,11 @@ public class AppPreferences implements EventPreferences {
     }
 
     @Override
+    public String getPartReason() {
+        return partReason;
+    }
+
+    @Override
     public String getQuitReason() {
         return quitReason;
     }
@@ -68,7 +73,13 @@ public class AppPreferences implements EventPreferences {
     }
 
     @Override
-    public boolean shouldLogUserMessages() {
+    public boolean shouldLogUserListChanges() {
         return !hideUserMessages;
+    }
+
+    // We always want to display the messages that the app user sends
+    @Override
+    public boolean shouldSendSelfMessageEvent() {
+        return true;
     }
 }

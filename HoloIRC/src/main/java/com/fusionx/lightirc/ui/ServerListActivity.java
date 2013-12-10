@@ -30,7 +30,6 @@ import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
 import com.fusionx.lightirc.collections.SynchronizedArrayList;
 import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.communication.ServerCommandSender;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.widget.ServerCard;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
@@ -103,7 +102,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
                 final Server sender = getServer(builder.getTitle());
                 if (sender != null) {
                     try {
-                        sender.getServerToFrontEndBus().unregister(this);
+                        sender.getServerSenderBus().unregister(this);
                     } catch (Exception ex) {
                         // Do nothing - we aren't registered it seems
                         // TODO - fix this properly
@@ -184,7 +183,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
             mServerCardsAdapter.add(card);
             final Server sender = getServer(builder.getTitle());
             if (sender != null) {
-                sender.getServerToFrontEndBus().register(this);
+                sender.getServerSenderBus().register(this);
             }
         }
     }
@@ -198,8 +197,8 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     public void disconnectFromServer(final ServerCard builder) {
         final Server server = getServer(builder.getTitle());
         if (server != null) {
-            server.getServerToFrontEndBus().unregister(this);
-            ServerCommandSender.sendDisconnect(getServer(builder.getTitle()), this);
+            server.getServerSenderBus().unregister(this);
+            server.getServerReceiverBus().sendDisconnect();
         }
 
         mService.removeServerFromManager(builder.getTitle());

@@ -21,12 +21,11 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.communication.MessageParser;
-import com.fusionx.androidirclibrary.communication.MessageSender;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.androidirclibrary.Message;
 import com.fusionx.androidirclibrary.Server;
+import com.fusionx.androidirclibrary.parser.UserInputParser;
 import com.fusionx.androidirclibrary.event.ServerEvent;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.squareup.otto.Subscribe;
 
@@ -66,16 +65,16 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        mCallback.getServer().getServerToFrontEndBus().register(this);
-        mCallback.getServer().setCached(true);
+        mCallback.getServer().getServerSenderBus().register(this);
+        mCallback.getServer().getServerCache().setCached(true);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerToFrontEndBus().unregister(this);
-        mCallback.getServer().setCached(false);
+        mCallback.getServer().getServerSenderBus().unregister(this);
+        mCallback.getServer().getServerCache().setCached(false);
     }
 
     @Override
@@ -90,7 +89,7 @@ public class ServerFragment extends IRCFragment {
     @Override
     public void onSendMessage(final String message) {
         final Server server = mCallback.getServer();
-        MessageParser.serverMessageToParse(getActivity(), server, message);
+        UserInputParser.serverMessageToParse(server, message, mCallback);
     }
 
     public void onConnected() {
@@ -115,7 +114,7 @@ public class ServerFragment extends IRCFragment {
         return FragmentTypeEnum.Server;
     }
 
-    public interface ServerFragmentCallback {
+    public interface ServerFragmentCallback extends UserInputParser.ParserCallbacks {
 
         public Server getServer();
 
