@@ -3,7 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionPagerAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.androidirclibrary.Server;
+import com.fusionx.relay.Server;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.app.Activity;

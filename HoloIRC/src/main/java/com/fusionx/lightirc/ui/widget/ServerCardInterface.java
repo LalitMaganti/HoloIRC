@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.ui.widget;
 
-import com.fusionx.androidirclibrary.Server;
+import com.fusionx.relay.Server;
 
 import android.view.View;
 import android.view.ViewGroup;

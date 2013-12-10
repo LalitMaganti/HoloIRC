@@ -22,15 +22,15 @@
 package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
-import com.fusionx.androidirclibrary.Channel;
-import com.fusionx.androidirclibrary.ChannelUser;
-import com.fusionx.androidirclibrary.PrivateMessageUser;
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.ServerConfiguration;
-import com.fusionx.androidirclibrary.event.ChannelEvent;
-import com.fusionx.androidirclibrary.event.ConnectedEvent;
-import com.fusionx.androidirclibrary.event.DisconnectEvent;
-import com.fusionx.androidirclibrary.event.MentionEvent;
+import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.event.ChannelEvent;
+import com.fusionx.relay.event.ConnectedEvent;
+import com.fusionx.relay.event.DisconnectEvent;
+import com.fusionx.relay.event.MentionEvent;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;

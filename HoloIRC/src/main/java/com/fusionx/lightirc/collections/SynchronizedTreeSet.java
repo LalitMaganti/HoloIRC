@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.collections;
 
-import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
+import com.fusionx.relay.interfaces.SynchronizedCollection;
 
 import java.util.Collection;
 import java.util.TreeSet;

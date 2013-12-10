@@ -21,11 +21,11 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
 package com.fusionx.lightirc.adapters;
 
-import com.fusionx.androidirclibrary.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserLevelEnum;
 import com.fusionx.lightirc.R;
-import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
-import com.fusionx.androidirclibrary.Channel;
-import com.fusionx.androidirclibrary.ChannelUser;
+import com.fusionx.relay.interfaces.SynchronizedCollection;
+import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.content.Context;

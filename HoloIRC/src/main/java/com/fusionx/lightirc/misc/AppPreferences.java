@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.misc;
 
-import com.fusionx.androidirclibrary.constants.Theme;
-import com.fusionx.androidirclibrary.interfaces.EventPreferences;
+import com.fusionx.relay.constants.Theme;
+import com.fusionx.relay.interfaces.EventPreferences;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 
 import android.content.Context;

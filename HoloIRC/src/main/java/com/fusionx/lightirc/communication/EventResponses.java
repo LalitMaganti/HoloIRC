@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.androidirclibrary.interfaces.EventStringResponses;
+import com.fusionx.relay.interfaces.EventStringResponses;
 import com.fusionx.lightirc.R;
 
 import org.apache.commons.lang3.StringUtils;

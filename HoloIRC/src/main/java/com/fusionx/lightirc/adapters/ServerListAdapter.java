@@ -22,8 +22,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.androidirclibrary.interfaces.SynchronizedCollection;
-import com.fusionx.androidirclibrary.Server;
+import com.fusionx.relay.interfaces.SynchronizedCollection;
+import com.fusionx.relay.Server;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 
 import android.app.Activity;

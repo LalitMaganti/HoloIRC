@@ -1,10 +1,10 @@
-package com.fusionx.androidirclibrary.parser;
+package com.fusionx.relay.parser;
 
-import com.fusionx.androidirclibrary.connection.ServerConnection;
+import com.fusionx.relay.connection.ServerConnection;
 import com.fusionx.lightirc.RobolectricGradleTestRunner;
-import com.fusionx.androidirclibrary.AppUser;
-import com.fusionx.androidirclibrary.Server;
-import com.fusionx.androidirclibrary.ServerConfiguration;
+import com.fusionx.relay.AppUser;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
 
 import org.junit.Before;
 import org.junit.Test;
