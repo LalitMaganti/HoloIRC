@@ -5,14 +5,6 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    provided
-}
-
-android.applicationVariants.all {
-    variant -> variant.javaCompile.classpath += configurations.provided
-}
-
 dependencies {
     compile 'com.google.guava:guava:15.0'
     compile 'com.android.support:support-v4:19.0.0'
@@ -63,12 +55,11 @@ android {
             signingConfig signingConfigs.release
         }
     }
- }
-
+}
 
 def Properties props = new Properties()
 def propFile = new File('signing.properties')
-if (propFile.canRead()){
+if (propFile.canRead()) {
     props.load(new FileInputStream(propFile))
 
     if (props != null && props.containsKey('STORE_FILE') && props.containsKey('STORE_PASSWORD') &&
