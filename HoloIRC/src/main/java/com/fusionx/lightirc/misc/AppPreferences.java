@@ -82,6 +82,11 @@ public class AppPreferences implements EventPreferences {
         return motdAllowed;
     }
 
+    @Override
+    public boolean shouldHighlightLine() {
+        return highlightLine;
+    }
+
     // We always want to display the messages that the app user sends
     @Override
     public boolean shouldSendSelfMessageEvent() {

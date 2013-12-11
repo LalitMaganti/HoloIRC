@@ -30,7 +30,6 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.parser.UserInputParser;
-import com.fusionx.relay.util.ColourParserUtils;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,14 +40,8 @@ import java.util.List;
 
 public final class ChannelFragment extends IRCFragment {
 
-    /**
-     * Callback interface for the activity or parent fragment
-     */
     private ChannelFragmentCallback mCallback;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -58,9 +51,6 @@ public final class ChannelFragment extends IRCFragment {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onResume() {
         super.onResume();
@@ -69,9 +59,6 @@ public final class ChannelFragment extends IRCFragment {
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onPause() {
         super.onPause();
@@ -80,9 +67,6 @@ public final class ChannelFragment extends IRCFragment {
         mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected List<Message> onRetrieveMessages() {
         final UserChannelInterface uci = mCallback.getServer().getUserChannelInterface();
@@ -93,23 +77,17 @@ public final class ChannelFragment extends IRCFragment {
         final String text = String.valueOf(mMessageBox.getText());
         String nicks = "";
         for (final ChannelUser userNick : users) {
-            nicks += ColourParserUtils.parseMarkup(userNick.getPrettyNick(mTitle)) + ": ";
+            nicks += userNick.getNick() + ": ";
         }
         mMessageBox.clearComposingText();
         mMessageBox.append(nicks + text);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public FragmentTypeEnum getType() {
         return FragmentTypeEnum.Channel;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onSendMessage(final String message) {
         UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle,
@@ -119,8 +97,8 @@ public final class ChannelFragment extends IRCFragment {
     // Subscription methods
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
-                .isNotEmpty(event.message) && mTitle.equals(event.channelName)) {
+        if (mTitle.equals(event.channelName) && !(event.userListChanged && AppPreferences
+                .hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
             if (mMessageAdapter == null) {
                 setupListAdapter();
             }
