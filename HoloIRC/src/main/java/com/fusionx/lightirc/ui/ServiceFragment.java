@@ -122,7 +122,7 @@ public class ServiceFragment extends Fragment {
             @Override
             protected Void doInBackground(Void... voids) {
                 if (mService != null) {
-                    mService.removeServerFromManager(serverTitle);
+                    mService.onRemoveServer(serverTitle);
                 }
                 return null;
             }

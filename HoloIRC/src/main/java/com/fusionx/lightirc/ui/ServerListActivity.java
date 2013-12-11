@@ -134,6 +134,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
 
         @Override
         public void onServiceDisconnected(final ComponentName name) {
+            mServerCardsAdapter.notifyDataSetChanged();
         }
     };
 
@@ -201,7 +202,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
             server.getServerCallBus().sendDisconnect();
         }
 
-        mService.removeServerFromManager(builder.getTitle());
+        mService.onRemoveServer(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

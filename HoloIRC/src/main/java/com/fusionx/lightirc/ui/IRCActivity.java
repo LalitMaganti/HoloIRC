@@ -169,6 +169,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             fm.beginTransaction().add(mServiceFragment, "service").commit();
             actionBar.setSubtitle(getString(R.string.status_connecting));
         } else {
+            onServerAvailable(getServer());
             actionBar.setSubtitle(getServer().getStatus());
             setUpViewPager();
         }
