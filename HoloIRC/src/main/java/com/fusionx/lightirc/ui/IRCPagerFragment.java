@@ -76,7 +76,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     public void onDestroy() {
         super.onDestroy();
 
-        mCallback.getServer().getServerSenderBus().unregister(this);
+        mCallback.getServer().getServerEventBus().unregister(this);
     }
 
     /**
@@ -233,7 +233,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     void onServerAvailable(final Server server) {
-        server.getServerSenderBus().register(this);
+        server.getServerEventBus().register(this);
     }
 
     @Override

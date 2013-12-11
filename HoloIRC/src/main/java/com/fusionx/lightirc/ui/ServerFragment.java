@@ -65,7 +65,7 @@ public class ServerFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        mCallback.getServer().getServerSenderBus().register(this);
+        mCallback.getServer().getServerEventBus().register(this);
         mCallback.getServer().getServerCache().setCached(true);
     }
 
@@ -73,7 +73,7 @@ public class ServerFragment extends IRCFragment {
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerSenderBus().unregister(this);
+        mCallback.getServer().getServerEventBus().unregister(this);
         mCallback.getServer().getServerCache().setCached(false);
     }
 
