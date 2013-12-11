@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.IBinder;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -44,6 +45,29 @@ class PreferenceHelpers {
         }
         themePreference.setOnPreferenceChangeListener(new ThemeChangeListener(activity));
         themePreference.setSummary(themePreference.getEntry());
+    }
+
+    public static void setupAppVersionPreference(final PreferenceScreen screen,
+            final Context context) {
+        final Preference appVersionPreference = screen.findPreference(PreferenceConstants
+                .AppVersion);
+
+        if (appVersionPreference != null) {
+            appVersionPreference.setSummary(MiscUtils.getAppVersion(context));
+        }
+
+        final Preference source = screen.findPreference(PreferenceConstants.Source);
+        if (source != null) {
+            source.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent browserIntent = new Intent("android.intent.action.VIEW",
+                                    Uri.parse("http://github.com/tilal6991/HoloIRC"));
+                            context.startActivity(browserIntent);
+                            return true;
+                        }
+                    });
+        }
     }
 
     static class ThemeChangeListener implements Preference.OnPreferenceChangeListener {
@@ -87,15 +111,6 @@ class PreferenceHelpers {
                             });
             build.show();
             return true;
-        }
-    }
-
-    public static void setupAppVersionPreference(final PreferenceScreen screen,
-            final Context context) {
-        final Preference appVersionPreference = screen.findPreference(PreferenceConstants
-                .AppVersion);
-        if (appVersionPreference != null) {
-            appVersionPreference.setSummary(MiscUtils.getAppVersion(context));
         }
     }
 }
