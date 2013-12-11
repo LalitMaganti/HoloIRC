@@ -1,11 +1,11 @@
 package com.fusionx.lightirc.util;
 
-import com.fusionx.relay.constants.Theme;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.IRCActivity;
 import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
 import com.fusionx.lightirc.ui.tablet.IRCTabletActivity;
+import com.fusionx.relay.constants.Theme;
 
 import android.content.Context;
 import android.content.res.Configuration;

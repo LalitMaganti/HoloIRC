@@ -1,11 +1,11 @@
 package com.fusionx.lightirc.ui.widget;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.lightirc.ui.ServerPreferenceActivity;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
 
 import android.content.Context;
 import android.content.Intent;

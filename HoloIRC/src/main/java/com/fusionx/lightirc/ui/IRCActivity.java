@@ -22,6 +22,10 @@
 package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.ui.widget.DrawerToggle;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.PrivateMessageUser;
@@ -31,10 +35,6 @@ import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.ConnectedEvent;
 import com.fusionx.relay.event.DisconnectEvent;
 import com.fusionx.relay.event.MentionEvent;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.ui.widget.DrawerToggle;
-import com.fusionx.lightirc.util.UIUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 

@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.relay.Message;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.Message;
 
 import org.apache.commons.lang3.StringUtils;
 

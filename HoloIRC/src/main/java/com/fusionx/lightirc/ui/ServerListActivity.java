@@ -21,10 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.event.ConnectedEvent;
-import com.fusionx.relay.event.DisconnectEvent;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
@@ -35,6 +31,10 @@ import com.fusionx.lightirc.ui.widget.ServerCard;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.event.ConnectedEvent;
+import com.fusionx.relay.event.DisconnectEvent;
 import com.squareup.otto.Subscribe;
 
 import android.content.ComponentName;

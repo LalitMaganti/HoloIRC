@@ -21,9 +21,9 @@
 
 package com.fusionx.lightirc.util;
 
+import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.NickStorage;
-import com.fusionx.lightirc.constants.PreferenceConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
