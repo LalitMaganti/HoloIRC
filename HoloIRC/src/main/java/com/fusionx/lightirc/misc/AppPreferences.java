@@ -77,6 +77,11 @@ public class AppPreferences implements EventPreferences {
         return !hideUserMessages;
     }
 
+    @Override
+    public boolean isMOTDShown() {
+        return motdAllowed;
+    }
+
     // We always want to display the messages that the app user sends
     @Override
     public boolean shouldSendSelfMessageEvent() {
