@@ -34,38 +34,29 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 
-/**
- * A service which acts as a bridge between the pure IRC part of the code and the UI/frontend code
- *
- * @author Lalit Maganti
- */
 public class IRCService extends Service {
 
     private final IRCBinder mBinder = new IRCBinder();
 
     private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
-    private ConnectionManager mConnectionManager = null;
-
     private final EventResponses mResponses = new EventResponses(this);
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 
+    private ConnectionManager mConnectionManager = null;
+
     public Server connectToServer(final ServerConfiguration.Builder builder) {
         mConnectionManager = ConnectionManager.getConnectionManager(mResponses, mAppPreferences);
 
-        final ServerConfiguration configuration = builder.build();
-
-        final Server server = mConnectionManager.onConnectionRequested(configuration,
+        final Server server = mConnectionManager.onConnectionRequested(builder.build(),
                 mAdapterHandler);
-        server.getServerEventBus().register(this);
 
         updateNotification();
 
@@ -82,8 +73,7 @@ public class IRCService extends Service {
         final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
         final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.app_name)).setContentText(text).setTicker
-                        (text)
+                .setContentTitle(getString(R.string.app_name)).setContentText(text).setTicker(text)
                         // TODO - change to a proper icon
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent);
@@ -97,31 +87,21 @@ public class IRCService extends Service {
         startForeground(1337, notification);
     }
 
-    public void disconnectAll() {
+    public void onDisconnectAll() {
         synchronized (mBinder) {
-            final AsyncTask<Void, Void, Void> disconnectAll = new AsyncTask<Void, Void,
-                    Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    mConnectionManager.onDisconnectAll();
-                    return null;
-                }
-            };
-            disconnectAll.execute();
+            mConnectionManager.onDisconnectAll();
         }
         stopForeground(true);
 
-        final NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationManager mNotificationManager = (NotificationManager) getSystemService
+                (Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
 
         stopSelf();
     }
 
-    public void removeServerFromManager(final String serverName) {
+    public void onRemoveServer(final String serverName) {
         synchronized (mBinder) {
-            mConnectionManager.getServerIfExists(serverName).getServerEventBus().unregister
-                    (this);
             if (mConnectionManager.onDisconnectionRequested(serverName)) {
                 stopForeground(true);
             } else {
@@ -140,11 +120,9 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (intent != null) {
-            if (intent.getBooleanExtra("stop", false)) {
-                disconnectAll();
-                return 0;
-            }
+        if (intent.getBooleanExtra("stop", false)) {
+            onDisconnectAll();
+            return 0;
         }
         return START_STICKY;
     }
