@@ -107,8 +107,9 @@ public class MiscUtils {
     public static String getAppVersion(final Context context) {
         try {
             final PackageManager manager = context.getPackageManager();
-            final PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
-            return info.versionName;
+            final String packageName = context.getPackageName();
+            final PackageInfo info = manager.getPackageInfo(packageName, 0);
+            return info.versionName + (packageName.endsWith(".debug") ? "-debug" : "");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }

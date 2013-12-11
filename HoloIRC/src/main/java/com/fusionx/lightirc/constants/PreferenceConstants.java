@@ -94,4 +94,6 @@ public class PreferenceConstants {
 
     // About settings
     public final static String AppVersion = "pref_app_version";
+
+    public final static String Source = "pref_source";
 }

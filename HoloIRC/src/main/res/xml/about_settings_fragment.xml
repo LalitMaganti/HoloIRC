@@ -9,5 +9,9 @@
                 android:key="pref_author"
                 android:title="Author"
                 android:summary="Lalit Maganti (tilal6991)"/>
+        <Preference
+                android:key="pref_source"
+                android:title="Source"
+                android:summary="HoloIRC is an open source project - http://github.com/tilal6991/HoloIRC"/>
     </PreferenceCategory>
 </PreferenceScreen>
