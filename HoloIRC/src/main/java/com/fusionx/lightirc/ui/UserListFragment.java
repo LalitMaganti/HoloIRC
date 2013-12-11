@@ -21,16 +21,16 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.collections.SynchronizedTreeSet;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.collection.UserListTreeSet;
 import com.fusionx.relay.event.KickEvent;
 import com.fusionx.relay.event.PartEvent;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 

@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.lightirc.communication.IRCService;
 
 import android.app.Activity;
 import android.content.ComponentName;

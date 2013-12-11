@@ -21,16 +21,16 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Message;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.UserChannelInterface;
-import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.event.ChannelEvent;
+import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.util.ColourParserUtils;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.util.FragmentUtils;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +57,7 @@ public final class ChannelFragment extends IRCFragment {
             mCallback = FragmentUtils.getParent(this, ChannelFragmentCallback.class);
         }
     }
+
     /**
      * {@inheritDoc}
      */
@@ -120,7 +121,7 @@ public final class ChannelFragment extends IRCFragment {
     public void onChannelMessage(final ChannelEvent event) {
         if ((!event.userListChanged || !AppPreferences.hideUserMessages) && StringUtils
                 .isNotEmpty(event.message) && mTitle.equals(event.channelName)) {
-            if(mMessageAdapter == null) {
+            if (mMessageAdapter == null) {
                 setupListAdapter();
             }
             synchronized (mMessageAdapter.getMessages()) {

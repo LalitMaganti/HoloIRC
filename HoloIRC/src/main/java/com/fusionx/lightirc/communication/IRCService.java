@@ -21,12 +21,12 @@
 
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.connection.ConnectionManager;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.ServerListActivity;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.connection.ConnectionManager;
 
 import android.app.Notification;
 import android.app.NotificationManager;

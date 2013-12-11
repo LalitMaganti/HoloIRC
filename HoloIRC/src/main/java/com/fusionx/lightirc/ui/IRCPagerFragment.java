@@ -1,6 +1,9 @@
 package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.ConnectedEvent;
@@ -10,9 +13,6 @@ import com.fusionx.relay.event.NickInUseEvent;
 import com.fusionx.relay.event.PartEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
 import com.fusionx.relay.event.SwitchToServerEvent;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCPagerAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;

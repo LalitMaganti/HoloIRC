@@ -28,7 +28,8 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
  * first shown. The Animators applied include the animations specified in getAnimators(ViewGroup,
  * View), plus an alpha transition.
  */
-public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator implements StickyListHeadersAdapter {
+public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
+        implements StickyListHeadersAdapter {
 
     private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
 
@@ -115,7 +116,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator implements 
 
         View itemView = null;
         if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
-            itemView =  ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderView(position,
+            itemView = ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderView(position,
                     convertView, parent);
         }
 

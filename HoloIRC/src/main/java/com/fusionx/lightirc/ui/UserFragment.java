@@ -21,15 +21,15 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Message;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -96,7 +96,7 @@ public class UserFragment extends IRCFragment {
 
     private void processEvent(final PrivateEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            if(mMessageAdapter == null) {
+            if (mMessageAdapter == null) {
                 setupListAdapter();
             }
             synchronized (mMessageAdapter.getMessages()) {

@@ -21,12 +21,12 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.relay.Message;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.parser.UserInputParser;
-import com.fusionx.relay.event.ServerEvent;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.relay.Message;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.event.ServerEvent;
+import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +79,7 @@ public class ServerFragment extends IRCFragment {
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        if(mCallback.getServer() != null) {
+        if (mCallback.getServer() != null) {
             return mCallback.getServer().getBuffer();
         } else {
             return null;
@@ -100,7 +100,7 @@ public class ServerFragment extends IRCFragment {
     @Subscribe
     public void onServerEvent(final ServerEvent event) {
         if (StringUtils.isNotBlank(event.message)) {
-            if(mMessageAdapter == null) {
+            if (mMessageAdapter == null) {
                 setupListAdapter();
             }
             synchronized (mMessageAdapter.getMessages()) {
