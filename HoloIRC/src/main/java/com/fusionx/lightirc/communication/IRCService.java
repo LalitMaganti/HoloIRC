@@ -154,7 +154,6 @@ public class IRCService extends Service {
         return true;
     }
 
-
     public Server getServerIfExists(final String title) {
         if (mConnectionManager != null) {
             return mConnectionManager.getServerIfExists(title);
