@@ -75,7 +75,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Output for events -->
     <string name="parser_notice" translatable="false">
-        <![CDATA[<b>%1$s: %2$s</b>]]>
+        <![CDATA[<bold>%1$s: %2$s</bold>]]>
     </string>
     <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
     <string name="parser_message" translatable="false">%1$s: %2$s</string>
@@ -94,7 +94,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
     <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
     <string name="parser_action" translatable="false">
-        <![CDATA[<b>* %1$s %2$s</b>]]>
+        <![CDATA[<bold>* %1$s %2$s</bold>]]>
     </string>
 
     <!-- Prompt dialog -->
