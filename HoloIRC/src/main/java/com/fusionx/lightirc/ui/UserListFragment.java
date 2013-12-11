@@ -72,7 +72,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerSenderBus().unregister(this);
+        mCallback.getServer().getServerEventBus().unregister(this);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
         super.onResume();
 
         if (mCallback.getServer() != null) {
-            mCallback.getServer().getServerSenderBus().register(this);
+            mCallback.getServer().getServerEventBus().register(this);
         }
     }
 
@@ -135,7 +135,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 return true;
             case R.id.fragment_userlist_cab_pm: {
                 if (isNickOtherUsers(nick)) {
-                    mCallback.getServer().getServerReceiverBus().sendMessageToUser(nick, "");
+                    mCallback.getServer().getServerCallBus().sendMessageToUser(nick, "");
                     mCallback.closeAllSlidingMenus();
                     mode.finish();
                 } else {
@@ -156,7 +156,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                 return true;
             }
             case R.id.fragment_userlist_cab_whois:
-                mCallback.getServer().getServerReceiverBus().sendUserWhois(nick);
+                mCallback.getServer().getServerCallBus().sendUserWhois(nick);
                 return true;
             default:
                 return false;

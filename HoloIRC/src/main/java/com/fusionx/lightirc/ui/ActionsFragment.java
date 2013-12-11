@@ -114,7 +114,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 callback.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                callback.getServer().getServerReceiverBus().sendNickChange(input);
+                callback.getServer().getServerCallBus().sendNickChange(input);
             }
         };
         nickDialog.show();
@@ -125,7 +125,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 (getActivity()) {
             @Override
             public void onOkClicked(final String input) {
-                callback.getServer().getServerReceiverBus().sendJoin(input);
+                callback.getServer().getServerCallBus().sendJoin(input);
             }
         };
         builder.show();

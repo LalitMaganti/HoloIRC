@@ -65,7 +65,7 @@ public class IRCService extends Service {
 
         final Server server = mConnectionManager.onConnectionRequested(configuration,
                 mAdapterHandler);
-        server.getServerSenderBus().register(this);
+        server.getServerEventBus().register(this);
 
         updateNotification();
 
@@ -120,7 +120,7 @@ public class IRCService extends Service {
 
     public void removeServerFromManager(final String serverName) {
         synchronized (mBinder) {
-            mConnectionManager.getServerIfExists(serverName).getServerSenderBus().unregister
+            mConnectionManager.getServerIfExists(serverName).getServerEventBus().unregister
                     (this);
             if (mConnectionManager.onDisconnectionRequested(serverName)) {
                 stopForeground(true);

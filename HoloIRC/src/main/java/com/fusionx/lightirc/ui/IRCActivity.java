@@ -187,7 +187,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onDestroy() {
         Crouton.clearCroutonsForActivity(this);
-        getServer().getServerSenderBus().unregister(mEventReceiver);
+        getServer().getServerEventBus().unregister(mEventReceiver);
 
         super.onDestroy();
     }
@@ -252,7 +252,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onPause() {
         super.onPause();
-        getServer().getServerSenderBus().setDisplayed(false);
+        getServer().getServerEventBus().setDisplayed(false);
         getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
     }
 
@@ -260,7 +260,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected void onResume() {
         super.onResume();
         if (getServer() != null) {
-            getServer().getServerSenderBus().setDisplayed(true);
+            getServer().getServerEventBus().setDisplayed(true);
         }
     }
 
@@ -330,10 +330,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public void onServerAvailable(final Server server) {
-        server.getServerSenderBus().register(mEventReceiver);
-        server.getServerSenderBus().setDisplayed(true);
+        server.getServerEventBus().register(mEventReceiver);
+        server.getServerEventBus().setDisplayed(true);
         mIRCPagerFragment.onServerAvailable(server);
-        server.getServerSenderBus().register(mUserListFragment);
+        server.getServerEventBus().register(mUserListFragment);
     }
 
     @Override
@@ -384,7 +384,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
      */
     @Override
     public void onDisconnect() {
-        getServer().getServerReceiverBus().sendDisconnect();
+        getServer().getServerCallBus().sendDisconnect();
         mServiceFragment.removeServiceReference(mServerTitle);
 
         final Intent intent = new Intent(this, ServerListActivity.class);
@@ -420,12 +420,12 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     public void closeOrPartCurrentTab() {
         final Server server = getServer();
         if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
-            server.getServerReceiverBus().sendClosePrivateMessage(
+            server.getServerCallBus().sendClosePrivateMessage(
                     mIRCPagerFragment.getCurrentTitle());
 
             mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
         } else {
-            server.getServerReceiverBus().sendPart(mIRCPagerFragment.getCurrentTitle());
+            server.getServerCallBus().sendPart(mIRCPagerFragment.getCurrentTitle());
         }
     }
 }

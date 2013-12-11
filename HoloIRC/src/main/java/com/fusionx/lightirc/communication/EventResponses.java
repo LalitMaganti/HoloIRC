@@ -1,13 +1,12 @@
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.relay.interfaces.EventStringResponses;
 import com.fusionx.lightirc.R;
 
 import org.apache.commons.lang3.StringUtils;
 
 import android.content.Context;
 
-public class EventResponses implements EventStringResponses {
+public class EventResponses implements com.fusionx.relay.interfaces.EventResponses {
 
     private final Context mContext;
 
