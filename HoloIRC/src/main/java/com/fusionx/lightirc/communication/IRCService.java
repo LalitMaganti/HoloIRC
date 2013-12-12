@@ -120,9 +120,13 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (intent.getBooleanExtra("stop", false)) {
-            onDisconnectAll();
-            return 0;
+        // This check is needed because a null intent will be sent when the service is killed by
+        // the system and is restarted
+        if (intent != null) {
+            if (intent.getBooleanExtra("stop", false)) {
+                onDisconnectAll();
+                return 0;
+            }
         }
         return START_STICKY;
     }

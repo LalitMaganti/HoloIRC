@@ -314,17 +314,17 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void repopulateFragmentsInPager() {
         if (isConnectedToServer()) {
+            final String tabTitle = getServer().getServerCache().getIrcTitle();
             for (final Channel channel : getServer().getUser().getChannels()) {
-                final boolean switchToTab = getServer().getServerCache().getIrcTitle().equals
-                        (channel.getName());
+                final boolean switchToTab = tabTitle.equals(channel.getName());
                 mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
             }
             final Iterator<PrivateMessageUser> iterator = getServer().getUser()
                     .getPrivateMessageIterator();
             while (iterator.hasNext()) {
-                final boolean switchToTab = getServer().getServerCache().getIrcTitle().equals
-                        (iterator.next().getNick());
-                mIRCPagerFragment.onCreateMessageFragment(iterator.next().getNick(), switchToTab);
+                final String userNick = iterator.next().getNick();
+                final boolean switchToTab = tabTitle.equals(userNick);
+                mIRCPagerFragment.onCreateMessageFragment(userNick, switchToTab);
             }
         }
     }
