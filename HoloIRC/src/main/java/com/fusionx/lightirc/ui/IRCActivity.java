@@ -85,25 +85,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
     };
 
-    // The Fragments
-    private ServiceFragment mServiceFragment;
-
-    private UserListFragment mUserListFragment;
-
-    private IRCPagerFragment mIRCPagerFragment;
-
-    protected ActionsPagerFragment mActionsPagerFragment;
-
-    // Sliding menus
-    private SlidingMenu mUserSlidingMenu;
-
-    protected SlidingMenu mActionsSlidingMenu;
-
-    // Other objects
-    private String mServerTitle;
-
-    protected DrawerToggle mDrawerToggle;
-
     private final Object mEventReceiver = new Object() {
 
         @Subscribe
@@ -144,6 +125,25 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             }
         }
     };
+
+    protected ActionsPagerFragment mActionsPagerFragment;
+
+    protected SlidingMenu mActionsSlidingMenu;
+
+    protected DrawerToggle mDrawerToggle;
+
+    // The Fragments
+    private ServiceFragment mServiceFragment;
+
+    private UserListFragment mUserListFragment;
+
+    private IRCPagerFragment mIRCPagerFragment;
+
+    // Sliding menus
+    private SlidingMenu mUserSlidingMenu;
+
+    // Other objects
+    private String mServerTitle;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {

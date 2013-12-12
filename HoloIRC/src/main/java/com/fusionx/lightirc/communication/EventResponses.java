@@ -1,10 +1,17 @@
 package com.fusionx.lightirc.communication;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 
 public class EventResponses implements com.fusionx.relay.interfaces.EventResponses {
 
@@ -128,5 +135,29 @@ public class EventResponses implements com.fusionx.relay.interfaces.EventRespons
     @Override
     public String getNickInUserError() {
         return mContext.getString(R.string.error_nick_in_use);
+    }
+
+    @Override
+    public void onUserMentioned(final String serverName, final String messageDestination) {
+        final NotificationManager mNotificationManager =
+                (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        final Intent intent = new Intent(mContext, UIUtils.getIRCActivity(mContext));
+        intent.putExtra("serverTitle", serverName);
+        intent.putExtra("mention", messageDestination);
+        final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
+        taskStackBuilder.addParentStack(UIUtils.getIRCActivity(mContext));
+        taskStackBuilder.addNextIntent(intent);
+        final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        final Notification notification = new NotificationCompat.Builder(mContext)
+                .setContentTitle(mContext.getString(R.string.app_name))
+                .setContentText(mContext.getString(R.string.service_you_mentioned) + " " +
+                        messageDestination)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setAutoCancel(true)
+                .setTicker(mContext.getString(R.string.service_you_mentioned) + " " +
+                        messageDestination)
+                .setContentIntent(pIntent).build();
+        mNotificationManager.notify(345, notification);
     }
 }
