@@ -119,11 +119,6 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         mCallback.closeAllSlidingMenus();
     }
 
-    @Override
-    public void onDisconnect() {
-        mCallback.onDisconnect();
-    }
-
     public interface ActionsPagerFragmentCallback {
 
         public String getServerTitle();
@@ -137,7 +132,5 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         public Server getServer();
 
         public void closeAllSlidingMenus();
-
-        public void onDisconnect();
     }
 }

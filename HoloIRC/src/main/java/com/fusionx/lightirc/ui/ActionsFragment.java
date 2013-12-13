@@ -96,7 +96,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 nickChangeDialog();
                 break;
             case 2:
-                callback.onDisconnect();
+                callback.getServer().getServerCallBus().sendDisconnect();
                 return;
             case 3:
                 ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
@@ -163,7 +163,5 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         public Server getServer();
 
         public void closeAllSlidingMenus();
-
-        public void onDisconnect();
     }
 }

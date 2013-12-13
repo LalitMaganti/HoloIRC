@@ -11,6 +11,7 @@ import com.fusionx.relay.event.JoinEvent;
 import com.fusionx.relay.event.KickEvent;
 import com.fusionx.relay.event.NickInUseEvent;
 import com.fusionx.relay.event.PartEvent;
+import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
 import com.fusionx.relay.event.SwitchToServerEvent;
 import com.squareup.otto.Subscribe;
@@ -236,11 +237,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         server.getServerEventBus().register(this);
     }
 
-    @Override
-    public void openPrivateMessage(String nick) {
-        onCreateMessageFragment(nick, true);
-    }
-
     public interface IRCPagerInterface {
 
         public Server getServer();
@@ -268,6 +264,13 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onPrivateMessage(final PrivateMessageEvent event) {
+        if (event.newPrivateMessage) {
+            onCreateMessageFragment(event.userNick, true);
+        }
+    }
+
+    @Subscribe
+    public void onPrivateAction(final PrivateActionEvent event) {
         if (event.newPrivateMessage) {
             onCreateMessageFragment(event.userNick, true);
         }

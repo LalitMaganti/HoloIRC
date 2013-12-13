@@ -87,9 +87,15 @@ public class AppPreferences implements EventPreferences {
         return highlightLine;
     }
 
+    // We always want relay to handle the intial private message population
+    @Override
+    public boolean shouldHandleInitialPrivateMessage() {
+        return true;
+    }
+
     // We always want to display the messages that the app user sends
     @Override
-    public boolean shouldSendSelfMessageEvent() {
+    public boolean isSelfEventBroadcast() {
         return true;
     }
 }

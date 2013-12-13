@@ -91,7 +91,7 @@ public final class ChannelFragment extends IRCFragment {
     @Override
     public void onSendMessage(final String message) {
         UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle,
-                message, mCallback);
+                message);
     }
 
     // Subscription methods
@@ -109,7 +109,7 @@ public final class ChannelFragment extends IRCFragment {
     }
 
     // Callback interface
-    public interface ChannelFragmentCallback extends UserInputParser.ParserCallbacks {
+    public interface ChannelFragmentCallback {
 
         public Server getServer();
     }

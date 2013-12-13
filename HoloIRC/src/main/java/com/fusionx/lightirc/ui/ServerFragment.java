@@ -89,7 +89,7 @@ public class ServerFragment extends IRCFragment {
     @Override
     public void onSendMessage(final String message) {
         final Server server = mCallback.getServer();
-        UserInputParser.serverMessageToParse(server, message, mCallback);
+        UserInputParser.serverMessageToParse(server, message);
     }
 
     public void onConnected() {
@@ -114,7 +114,7 @@ public class ServerFragment extends IRCFragment {
         return FragmentTypeEnum.Server;
     }
 
-    public interface ServerFragmentCallback extends UserInputParser.ParserCallbacks {
+    public interface ServerFragmentCallback {
 
         public Server getServer();
 
