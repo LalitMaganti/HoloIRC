@@ -56,7 +56,7 @@ public class UserFragment extends IRCFragment {
         super.onResume();
 
         mCallback.getServer().getServerEventBus().register(this);
-        mCallback.getServer().getPrivateMessageUser(mTitle).setCached(true);
+        mCallback.getServer().getPrivateMessageUserIfExists(mTitle).setCached(true);
     }
 
     @Override
@@ -64,12 +64,12 @@ public class UserFragment extends IRCFragment {
         super.onPause();
 
         mCallback.getServer().getServerEventBus().unregister(this);
-        mCallback.getServer().getPrivateMessageUser(mTitle).setCached(false);
+        mCallback.getServer().getPrivateMessageUserIfExists(mTitle).setCached(false);
     }
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        final PrivateMessageUser uci = mCallback.getServer().getPrivateMessageUser(mTitle);
+        final PrivateMessageUser uci = mCallback.getServer().getPrivateMessageUserIfExists(mTitle);
         return uci.getBuffer();
     }
 
@@ -80,8 +80,7 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.userMessageToParse(mCallback.getServer(), mTitle,
-                message, mCallback);
+        UserInputParser.userMessageToParse(mCallback.getServer(), mTitle, message);
     }
 
     @Subscribe
@@ -105,7 +104,7 @@ public class UserFragment extends IRCFragment {
         }
     }
 
-    public interface UserFragmentCallback extends UserInputParser.ParserCallbacks {
+    public interface UserFragmentCallback {
 
         public Server getServer();
     }

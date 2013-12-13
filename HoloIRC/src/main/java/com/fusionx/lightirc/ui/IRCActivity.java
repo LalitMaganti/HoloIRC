@@ -89,12 +89,20 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onDisconnected(final DisconnectEvent event) {
-            getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
-            closeAllSlidingMenus();
-            mIRCPagerFragment.onUnexpectedDisconnect();
-            mActionsPagerFragment.updateConnectionStatus(false);
-            if (!event.retryPending && getServer() != null) {
+            if (event.userTriggered) {
                 mServiceFragment.removeServiceReference(mServerTitle);
+
+                final Intent intent = new Intent(IRCActivity.this, ServerListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            } else {
+                getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
+                closeAllSlidingMenus();
+                mIRCPagerFragment.onUnexpectedDisconnect();
+                mActionsPagerFragment.updateConnectionStatus(false);
+                if (!event.retryPending && getServer() != null) {
+                    mServiceFragment.removeServiceReference(mServerTitle);
+                }
             }
         }
 
@@ -381,19 +389,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     /**
-     * Method called when the user disconnects
-     */
-    @Override
-    public void onDisconnect() {
-        getServer().getServerCallBus().sendDisconnect();
-        mServiceFragment.removeServiceReference(mServerTitle);
-
-        final Intent intent = new Intent(this, ServerListActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-
-    /**
      * Method which is called when the user requests a mention from the UserListFragment
      *
      * @param users - the list of users which the app user wants to mentuin
@@ -421,10 +416,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     public void closeOrPartCurrentTab() {
         final Server server = getServer();
         if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
-            server.getServerCallBus().sendClosePrivateMessage(
-                    mIRCPagerFragment.getCurrentTitle());
-
+            // We want to remove the fragment before sending the close message to prevent a NPE
+            // when the UserFragment tries to set caching to false
             mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
+
+            server.getServerCallBus().sendClosePrivateMessage(mIRCPagerFragment.getCurrentTitle());
         } else {
             server.getServerCallBus().sendPart(mIRCPagerFragment.getCurrentTitle());
         }
