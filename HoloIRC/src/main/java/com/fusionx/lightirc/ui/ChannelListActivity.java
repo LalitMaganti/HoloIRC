@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.app.Activity;
@@ -9,7 +9,7 @@ import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBarActivity;
 
-public class ChannelListActivity extends ActionBarActivity implements IServerSettings {
+public class ChannelListActivity extends ActionBarActivity implements ServerSettingsCallbacks {
 
     private String mFileName;
 

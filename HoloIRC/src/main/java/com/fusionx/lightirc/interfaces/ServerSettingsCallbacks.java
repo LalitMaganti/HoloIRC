@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 
-public interface IServerSettings extends Preference.OnPreferenceChangeListener {
+public interface ServerSettingsCallbacks extends Preference.OnPreferenceChangeListener {
 
     public String getFileName();
 

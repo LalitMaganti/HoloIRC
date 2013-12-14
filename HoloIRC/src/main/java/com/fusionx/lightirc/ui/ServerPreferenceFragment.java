@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -13,13 +13,13 @@ import android.preference.PreferenceFragment;
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class ServerPreferenceFragment extends PreferenceFragment {
 
-    private IServerSettings mCallback = null;
+    private ServerSettingsCallbacks mCallback = null;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (IServerSettings) activity;
+            mCallback = (ServerSettingsCallbacks) activity;
         } catch (ClassCastException ex) {
             ex.printStackTrace();
         }

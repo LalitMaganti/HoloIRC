@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
@@ -30,13 +30,13 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
     private BaseCollectionAdapter<String> mAdapter;
 
-    private IServerSettings mCallbacks;
+    private ServerSettingsCallbacks mCallbacks;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallbacks = (IServerSettings) activity;
+            mCallbacks = (ServerSettingsCallbacks) activity;
         } catch (ClassCastException ex) {
             ex.printStackTrace();
         }
