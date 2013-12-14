@@ -2,7 +2,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.interfaces.IServerSettings;
+import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
@@ -31,7 +31,8 @@ import java.io.File;
 import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
 import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
 
-public class ServerPreferenceActivity extends PreferenceActivity implements IServerSettings,
+public class ServerPreferenceActivity extends PreferenceActivity implements
+        ServerSettingsCallbacks,
         Preference.OnPreferenceChangeListener {
 
     private boolean mCanSaveChanges = true;

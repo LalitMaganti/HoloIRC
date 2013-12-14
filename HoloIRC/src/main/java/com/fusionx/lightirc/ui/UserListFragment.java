@@ -219,8 +219,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
         public Server getServer();
 
         public void closeAllSlidingMenus();
-
-        public String getServerTitle();
     }
 
     /*

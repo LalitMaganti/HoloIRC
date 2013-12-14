@@ -87,7 +87,7 @@ public class AppPreferences implements EventPreferences {
         return highlightLine;
     }
 
-    // We always want relay to handle the intial private message population
+    // We always want relay to handle the initial private message population
     @Override
     public boolean shouldHandleInitialPrivateMessage() {
         return true;

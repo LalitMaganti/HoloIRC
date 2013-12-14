@@ -24,10 +24,10 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Message;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.UserChannelInterface;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
@@ -43,7 +43,7 @@ public final class ChannelFragment extends IRCFragment {
     private ChannelFragmentCallback mCallback;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
         if (mCallback == null) {
@@ -56,7 +56,7 @@ public final class ChannelFragment extends IRCFragment {
         super.onResume();
 
         mCallback.getServer().getServerEventBus().register(this);
-        mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(true);
+        getChannel().setCached(true);
     }
 
     @Override
@@ -64,13 +64,12 @@ public final class ChannelFragment extends IRCFragment {
         super.onPause();
 
         mCallback.getServer().getServerEventBus().unregister(this);
-        mCallback.getServer().getUserChannelInterface().getChannel(mTitle).setCached(false);
+        getChannel().setCached(false);
     }
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        final UserChannelInterface uci = mCallback.getServer().getUserChannelInterface();
-        return uci.getChannel(mTitle).getBuffer();
+        return getChannel().getBuffer();
     }
 
     public void onUserMention(final List<ChannelUser> users) {
@@ -90,8 +89,7 @@ public final class ChannelFragment extends IRCFragment {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle,
-                message);
+        UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle, message);
     }
 
     // Subscription methods
@@ -106,6 +104,10 @@ public final class ChannelFragment extends IRCFragment {
                 mMessageAdapter.add(new Message(event.message));
             }
         }
+    }
+
+    private Channel getChannel() {
+        return mCallback.getServer().getUserChannelInterface().getChannel(mTitle);
     }
 
     // Callback interface
