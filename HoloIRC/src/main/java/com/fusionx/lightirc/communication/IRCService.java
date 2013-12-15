@@ -88,8 +88,12 @@ public class IRCService extends Service {
     }
 
     public void onDisconnectAll() {
-        synchronized (mBinder) {
-            mConnectionManager.onDisconnectAll();
+        // Needed due to the fact that the connection manager can be null if the service was
+        // restarted or if the theme is being changed
+        if (mConnectionManager != null) {
+            synchronized (mBinder) {
+                mConnectionManager.onDisconnectAll();
+            }
         }
         stopForeground(true);
 
