@@ -42,6 +42,244 @@ import java.lang.reflect.Method;
  */
 public class DrawerToggle implements DrawerLayout.DrawerListener {
 
+    private static final ActionBarDrawerToggleImpl IMPL;
+
+    static {
+        IMPL = new ActionBarDrawerToggleImpl();
+    }
+
+    // android.R.id.home as defined by public API in v11
+    private static final int ID_HOME = 0x0102002c;
+
+    private final Activity mActivity;
+
+    private final Delegate mActivityImpl;
+
+    private final SlidingMenu mDrawerLayout;
+
+    private final SlideDrawable mSlider;
+
+    private final int mDrawerImageResource;
+
+    private final int mOpenDrawerContentDescRes;
+
+    private final int mCloseDrawerContentDescRes;
+
+    private boolean mDrawerIndicatorEnabled = true;
+
+    private Drawable mThemeImage;
+
+    private Drawable mDrawerImage;
+
+    private Object mSetIndicatorInfo;
+
+    /**
+     * Construct a new ActionBarDrawerToggle. <p/> <p>The given {@link Activity} will be linked to
+     * the specified {@link DrawerLayout}. The provided drawer indicator drawable will animate
+     * slightly off-screen as the drawer is opened, indicating that in the open state the drawer
+     * will move off-screen when pressed and in the closed state the drawer will move on-screen when
+     * pressed.</p> <p/> <p>String resources must be provided to describe the open/close drawer
+     * actions for accessibility services.</p>
+     *
+     * @param activity                  The Activity hosting the drawer
+     * @param drawerLayout              The DrawerLayout to link to the given Activity's ActionBar
+     * @param drawerImageRes            A Drawable resource to use as the drawer indicator
+     * @param openDrawerContentDescRes  A String resource to describe the "open drawer" action for
+     *                                  accessibility
+     * @param closeDrawerContentDescRes A String resource to describe the "close drawer" action for
+     *                                  accessibility
+     */
+    public DrawerToggle(Activity activity, SlidingMenu drawerLayout,
+            int drawerImageRes, int openDrawerContentDescRes,
+            int closeDrawerContentDescRes) {
+        mActivity = activity;
+        mDrawerLayout = drawerLayout;
+        mDrawerImageResource = drawerImageRes;
+        mOpenDrawerContentDescRes = openDrawerContentDescRes;
+        mCloseDrawerContentDescRes = closeDrawerContentDescRes;
+
+        mThemeImage = getThemeUpIndicator();
+        mDrawerImage = activity.getResources().getDrawable(drawerImageRes);
+        mSlider = new SlideDrawable(mDrawerImage);
+        mSlider.setOffsetBy(1.f / 3);
+
+        // Allow the Activity to provide an impl
+        if (activity instanceof DelegateProvider) {
+            mActivityImpl = ((DelegateProvider) activity).getDrawerToggleDelegate();
+        } else {
+            mActivityImpl = null;
+        }
+    }
+
+    /**
+     * Synchronize the state of the drawer indicator/affordance with the linked DrawerLayout. <p/>
+     * <p>This should be called from your <code>Activity</code>'s {@link
+     * Activity#onPostCreate(android.os.Bundle) onPostCreate} method to synchronize after the
+     * DrawerLayout's instance state has been restored, and any other time when the state may have
+     * diverged in such a way that the ActionBarDrawerToggle was not notified. (For example, if you
+     * stop forwarding appropriate drawer events for a period of time.)</p>
+     */
+    public void syncState() {
+        if (mDrawerLayout.isMenuShowing()) {
+            mSlider.setOffset(1.f);
+        } else {
+            mSlider.setOffset(0.f);
+        }
+
+        if (mDrawerIndicatorEnabled) {
+            setActionBarUpIndicator(mSlider, mDrawerLayout.isSlidingEnabled() ?
+                    mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
+        }
+    }
+
+    /**
+     * @return true if the enhanced drawer indicator is enabled, false otherwise
+     * @see #setDrawerIndicatorEnabled(boolean)
+     */
+    public boolean isDrawerIndicatorEnabled() {
+        return mDrawerIndicatorEnabled;
+    }
+
+    /**
+     * Enable or disable the drawer indicator. The indicator defaults to enabled. <p/> <p>When the
+     * indicator is disabled, the <code>ActionBar</code> will revert to displaying the home-as-up
+     * indicator provided by the <code>Activity</code>'s theme in the <code>android.R.attr.homeAsUpIndicator</code>
+     * attribute instead of the animated drawer glyph.</p>
+     *
+     * @param enable true to enable, false to disable
+     */
+    public void setDrawerIndicatorEnabled(boolean enable) {
+        if (enable != mDrawerIndicatorEnabled) {
+            if (enable) {
+                setActionBarUpIndicator(mSlider, mDrawerLayout.isSlidingEnabled() ?
+                        mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
+            } else {
+                setActionBarUpIndicator(mThemeImage, 0);
+            }
+            mDrawerIndicatorEnabled = enable;
+        }
+    }
+
+    /**
+     * This method should always be called by your <code>Activity</code>'s {@link
+     * Activity#onConfigurationChanged(android.content.res.Configuration) onConfigurationChanged}
+     * method.
+     *
+     * @param newConfig The new configuration
+     */
+    public void onConfigurationChanged(Configuration newConfig) {
+        // Reload drawables that can change with configuration
+        mThemeImage = getThemeUpIndicator();
+        mDrawerImage = mActivity.getResources().getDrawable(mDrawerImageResource);
+        syncState();
+    }
+
+    /**
+     * This method should be called by your <code>Activity</code>'s {@link
+     * Activity#onOptionsItemSelected(android.view.MenuItem) onOptionsItemSelected} method. If it
+     * returns true, your <code>onOptionsItemSelected</code> method should return true and skip
+     * further processing.
+     *
+     * @param item the MenuItem instance representing the selected menu item
+     * @return true if the event was handled and further processing should not occur
+     */
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item != null && item.getItemId() == ID_HOME && mDrawerIndicatorEnabled) {
+            if (mDrawerLayout.isMenuShowing()) {
+                mDrawerLayout.showContent();
+            } else {
+                mDrawerLayout.showMenu();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
+     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
+     * through to this method from your own listener object.
+     *
+     * @param drawerView  The child view that was moved
+     * @param slideOffset The new offset of this drawer within its range, from 0-1
+     */
+    @Override
+    public void onDrawerSlide(View drawerView, float slideOffset) {
+        float glyphOffset = mSlider.getOffset();
+        if (slideOffset > 0.5f) {
+            glyphOffset = Math.max(glyphOffset, Math.max(0.f, slideOffset - 0.5f) * 2);
+        } else {
+            glyphOffset = Math.min(glyphOffset, slideOffset * 2);
+        }
+        mSlider.setOffset(glyphOffset);
+    }
+
+    /**
+     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
+     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
+     * through to this method from your own listener object.
+     *
+     * @param drawerView Drawer view that is now open
+     */
+    @Override
+    public void onDrawerOpened(View drawerView) {
+        mSlider.setOffset(1.f);
+        if (mDrawerIndicatorEnabled) {
+            setActionBarDescription(mOpenDrawerContentDescRes);
+        }
+    }
+
+    /**
+     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
+     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
+     * through to this method from your own listener object.
+     *
+     * @param drawerView Drawer view that is now closed
+     */
+    @Override
+    public void onDrawerClosed(View drawerView) {
+        mSlider.setOffset(0.f);
+        if (mDrawerIndicatorEnabled) {
+            setActionBarDescription(mCloseDrawerContentDescRes);
+        }
+    }
+
+    /**
+     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
+     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
+     * through to this method from your own listener object.
+     *
+     * @param newState The new drawer motion state
+     */
+    @Override
+    public void onDrawerStateChanged(int newState) {
+    }
+
+    Drawable getThemeUpIndicator() {
+        if (mActivityImpl != null) {
+            return mActivityImpl.getThemeUpIndicator();
+        }
+        return IMPL.getThemeUpIndicator(mActivity);
+    }
+
+    void setActionBarUpIndicator(Drawable upDrawable, int contentDescRes) {
+        if (mActivityImpl != null) {
+            mActivityImpl.setActionBarUpIndicator(upDrawable, contentDescRes);
+            return;
+        }
+        mSetIndicatorInfo = IMPL
+                .setActionBarUpIndicator(mSetIndicatorInfo, mActivity, upDrawable, contentDescRes);
+    }
+
+    void setActionBarDescription(int contentDescRes) {
+        if (mActivityImpl != null) {
+            mActivityImpl.setActionBarDescription(contentDescRes);
+            return;
+        }
+        mSetIndicatorInfo = IMPL
+                .setActionBarDescription(mSetIndicatorInfo, mActivity, contentDescRes);
+    }
+
     /**
      * Allows an implementing Activity to return an {@link DrawerToggle.Delegate} to use with
      * ActionBarDrawerToggle.
@@ -183,265 +421,27 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
         }
     }
 
-    private static final ActionBarDrawerToggleImpl IMPL;
-
-    static {
-        IMPL = new ActionBarDrawerToggleImpl();
-    }
-
-    // android.R.id.home as defined by public API in v11
-    private static final int ID_HOME = 0x0102002c;
-
-    private final Activity mActivity;
-
-    private final Delegate mActivityImpl;
-
-    private final SlidingMenu mDrawerLayout;
-
-    private boolean mDrawerIndicatorEnabled = true;
-
-    private Drawable mThemeImage;
-
-    private Drawable mDrawerImage;
-
-    private final SlideDrawable mSlider;
-
-    private final int mDrawerImageResource;
-
-    private final int mOpenDrawerContentDescRes;
-
-    private final int mCloseDrawerContentDescRes;
-
-    private Object mSetIndicatorInfo;
-
-    /**
-     * Construct a new ActionBarDrawerToggle. <p/> <p>The given {@link Activity} will be linked to
-     * the specified {@link DrawerLayout}. The provided drawer indicator drawable will animate
-     * slightly off-screen as the drawer is opened, indicating that in the open state the drawer
-     * will move off-screen when pressed and in the closed state the drawer will move on-screen when
-     * pressed.</p> <p/> <p>String resources must be provided to describe the open/close drawer
-     * actions for accessibility services.</p>
-     *
-     * @param activity                  The Activity hosting the drawer
-     * @param drawerLayout              The DrawerLayout to link to the given Activity's ActionBar
-     * @param drawerImageRes            A Drawable resource to use as the drawer indicator
-     * @param openDrawerContentDescRes  A String resource to describe the "open drawer" action for
-     *                                  accessibility
-     * @param closeDrawerContentDescRes A String resource to describe the "close drawer" action for
-     *                                  accessibility
-     */
-    public DrawerToggle(Activity activity, SlidingMenu drawerLayout,
-            int drawerImageRes, int openDrawerContentDescRes,
-            int closeDrawerContentDescRes) {
-        mActivity = activity;
-        mDrawerLayout = drawerLayout;
-        mDrawerImageResource = drawerImageRes;
-        mOpenDrawerContentDescRes = openDrawerContentDescRes;
-        mCloseDrawerContentDescRes = closeDrawerContentDescRes;
-
-        mThemeImage = getThemeUpIndicator();
-        mDrawerImage = activity.getResources().getDrawable(drawerImageRes);
-        mSlider = new SlideDrawable(mDrawerImage);
-        mSlider.setOffsetBy(1.f / 3);
-
-        // Allow the Activity to provide an impl
-        if (activity instanceof DelegateProvider) {
-            mActivityImpl = ((DelegateProvider) activity).getDrawerToggleDelegate();
-        } else {
-            mActivityImpl = null;
-        }
-    }
-
-    /**
-     * Synchronize the state of the drawer indicator/affordance with the linked DrawerLayout. <p/>
-     * <p>This should be called from your <code>Activity</code>'s {@link
-     * Activity#onPostCreate(android.os.Bundle) onPostCreate} method to synchronize after the
-     * DrawerLayout's instance state has been restored, and any other time when the state may have
-     * diverged in such a way that the ActionBarDrawerToggle was not notified. (For example, if you
-     * stop forwarding appropriate drawer events for a period of time.)</p>
-     */
-    public void syncState() {
-        if (mDrawerLayout.isMenuShowing()) {
-            mSlider.setOffset(1.f);
-        } else {
-            mSlider.setOffset(0.f);
-        }
-
-        if (mDrawerIndicatorEnabled) {
-            setActionBarUpIndicator(mSlider, mDrawerLayout.isSlidingEnabled() ?
-                    mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
-        }
-    }
-
-    /**
-     * Enable or disable the drawer indicator. The indicator defaults to enabled. <p/> <p>When the
-     * indicator is disabled, the <code>ActionBar</code> will revert to displaying the home-as-up
-     * indicator provided by the <code>Activity</code>'s theme in the <code>android.R.attr.homeAsUpIndicator</code>
-     * attribute instead of the animated drawer glyph.</p>
-     *
-     * @param enable true to enable, false to disable
-     */
-    public void setDrawerIndicatorEnabled(boolean enable) {
-        if (enable != mDrawerIndicatorEnabled) {
-            if (enable) {
-                setActionBarUpIndicator(mSlider, mDrawerLayout.isSlidingEnabled() ?
-                        mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
-            } else {
-                setActionBarUpIndicator(mThemeImage, 0);
-            }
-            mDrawerIndicatorEnabled = enable;
-        }
-    }
-
-    /**
-     * @return true if the enhanced drawer indicator is enabled, false otherwise
-     * @see #setDrawerIndicatorEnabled(boolean)
-     */
-    public boolean isDrawerIndicatorEnabled() {
-        return mDrawerIndicatorEnabled;
-    }
-
-    /**
-     * This method should always be called by your <code>Activity</code>'s {@link
-     * Activity#onConfigurationChanged(android.content.res.Configuration) onConfigurationChanged}
-     * method.
-     *
-     * @param newConfig The new configuration
-     */
-    public void onConfigurationChanged(Configuration newConfig) {
-        // Reload drawables that can change with configuration
-        mThemeImage = getThemeUpIndicator();
-        mDrawerImage = mActivity.getResources().getDrawable(mDrawerImageResource);
-        syncState();
-    }
-
-    /**
-     * This method should be called by your <code>Activity</code>'s {@link
-     * Activity#onOptionsItemSelected(android.view.MenuItem) onOptionsItemSelected} method. If it
-     * returns true, your <code>onOptionsItemSelected</code> method should return true and skip
-     * further processing.
-     *
-     * @param item the MenuItem instance representing the selected menu item
-     * @return true if the event was handled and further processing should not occur
-     */
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item != null && item.getItemId() == ID_HOME && mDrawerIndicatorEnabled) {
-            if (mDrawerLayout.isMenuShowing()) {
-                mDrawerLayout.showContent();
-            } else {
-                mDrawerLayout.showMenu();
-            }
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
-     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
-     * through to this method from your own listener object.
-     *
-     * @param drawerView  The child view that was moved
-     * @param slideOffset The new offset of this drawer within its range, from 0-1
-     */
-    @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-        float glyphOffset = mSlider.getOffset();
-        if (slideOffset > 0.5f) {
-            glyphOffset = Math.max(glyphOffset, Math.max(0.f, slideOffset - 0.5f) * 2);
-        } else {
-            glyphOffset = Math.min(glyphOffset, slideOffset * 2);
-        }
-        mSlider.setOffset(glyphOffset);
-    }
-
-    /**
-     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
-     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
-     * through to this method from your own listener object.
-     *
-     * @param drawerView Drawer view that is now open
-     */
-    @Override
-    public void onDrawerOpened(View drawerView) {
-        mSlider.setOffset(1.f);
-        if (mDrawerIndicatorEnabled) {
-            setActionBarDescription(mOpenDrawerContentDescRes);
-        }
-    }
-
-    /**
-     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
-     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
-     * through to this method from your own listener object.
-     *
-     * @param drawerView Drawer view that is now closed
-     */
-    @Override
-    public void onDrawerClosed(View drawerView) {
-        mSlider.setOffset(0.f);
-        if (mDrawerIndicatorEnabled) {
-            setActionBarDescription(mCloseDrawerContentDescRes);
-        }
-    }
-
-    /**
-     * {@link DrawerLayout.DrawerListener} callback method. If you do not use your
-     * ActionBarDrawerToggle instance directly as your DrawerLayout's listener, you should call
-     * through to this method from your own listener object.
-     *
-     * @param newState The new drawer motion state
-     */
-    @Override
-    public void onDrawerStateChanged(int newState) {
-    }
-
-    Drawable getThemeUpIndicator() {
-        if (mActivityImpl != null) {
-            return mActivityImpl.getThemeUpIndicator();
-        }
-        return IMPL.getThemeUpIndicator(mActivity);
-    }
-
-    void setActionBarUpIndicator(Drawable upDrawable, int contentDescRes) {
-        if (mActivityImpl != null) {
-            mActivityImpl.setActionBarUpIndicator(upDrawable, contentDescRes);
-            return;
-        }
-        mSetIndicatorInfo = IMPL
-                .setActionBarUpIndicator(mSetIndicatorInfo, mActivity, upDrawable, contentDescRes);
-    }
-
-    void setActionBarDescription(int contentDescRes) {
-        if (mActivityImpl != null) {
-            mActivityImpl.setActionBarDescription(contentDescRes);
-            return;
-        }
-        mSetIndicatorInfo = IMPL
-                .setActionBarDescription(mSetIndicatorInfo, mActivity, contentDescRes);
-    }
-
     private static class SlideDrawable extends Drawable implements Drawable.Callback {
 
         private final Drawable mWrapped;
+
+        private final Rect mTmpRect = new Rect();
 
         private float mOffset;
 
         private float mOffsetBy;
 
-        private final Rect mTmpRect = new Rect();
-
         public SlideDrawable(Drawable wrapped) {
             mWrapped = wrapped;
+        }
+
+        public float getOffset() {
+            return mOffset;
         }
 
         public void setOffset(float offset) {
             mOffset = offset;
             invalidateSelf();
-        }
-
-        public float getOffset() {
-            return mOffset;
         }
 
         public void setOffsetBy(float offsetBy) {
@@ -459,13 +459,13 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
         }
 
         @Override
-        public void setChangingConfigurations(int configs) {
-            mWrapped.setChangingConfigurations(configs);
+        public int getChangingConfigurations() {
+            return mWrapped.getChangingConfigurations();
         }
 
         @Override
-        public int getChangingConfigurations() {
-            return mWrapped.getChangingConfigurations();
+        public void setChangingConfigurations(int configs) {
+            mWrapped.setChangingConfigurations(configs);
         }
 
         @Override
