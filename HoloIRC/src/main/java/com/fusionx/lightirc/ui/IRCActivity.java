@@ -320,7 +320,18 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     @Override
-    public void repopulateFragmentsInPager() {
+    public void onServerAvailable(final Server server) {
+        server.getServerEventBus().register(mEventReceiver);
+        server.getServerEventBus().setDisplayed(true);
+        mIRCPagerFragment.onServerAvailable(server);
+        server.getServerEventBus().register(mUserListFragment);
+    }
+
+    @Override
+    public void setUpViewPager() {
+        mIRCPagerFragment.createServerFragment(mServerTitle);
+        getSupportActionBar().setSubtitle(getServer().getStatus());
+
         if (isConnectedToServer()) {
             final String tabTitle = getServer().getServerCache().getIrcTitle();
             for (final Channel channel : getServer().getUser().getChannels()) {
@@ -335,20 +346,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 mIRCPagerFragment.onCreateMessageFragment(userNick, switchToTab);
             }
         }
-    }
-
-    @Override
-    public void onServerAvailable(final Server server) {
-        server.getServerEventBus().register(mEventReceiver);
-        server.getServerEventBus().setDisplayed(true);
-        mIRCPagerFragment.onServerAvailable(server);
-        server.getServerEventBus().register(mUserListFragment);
-    }
-
-    @Override
-    public void setUpViewPager() {
-        mIRCPagerFragment.createServerFragment(mServerTitle);
-        getSupportActionBar().setSubtitle(getServer().getStatus());
     }
 
     @Override
@@ -418,7 +415,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
             // We want to remove the fragment before sending the close message to prevent a NPE
             // when the UserFragment tries to set caching to false
-            mIRCPagerFragment.switchFragmentAndRemove(mIRCPagerFragment.getCurrentTitle());
+            mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());
 
             server.getServerCallBus().sendClosePrivateMessage(mIRCPagerFragment.getCurrentTitle());
         } else {

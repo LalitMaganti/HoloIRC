@@ -156,7 +156,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      *
      * @param fragmentTitle - name of the fragment to be removed
      */
-    public void switchFragmentAndRemove(final String fragmentTitle) {
+    public void onRemoveFragment(final String fragmentTitle) {
         final int index = mAdapter.getIndexFromTitle(fragmentTitle);
         if (fragmentTitle.equals(getCurrentTitle())) {
             mViewPager.setCurrentItem(index - 1, true);
@@ -181,8 +181,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * @param forceSwitch - whether the channel should be forcibly switched to
      */
     public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
-        final boolean switchToTab = channelName.equals(getActivity().getIntent().getStringExtra
-                ("mention")) || forceSwitch;
+        final String mention = getActivity().getIntent().getStringExtra("mention");
+        final boolean switchToTab = channelName.equals(mention) || forceSwitch;
 
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
@@ -237,19 +237,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         server.getServerEventBus().register(this);
     }
 
-    public interface IRCPagerInterface {
-
-        public Server getServer();
-
-        public boolean isConnectedToServer();
-    }
-
-    /*
-     * Events start here
-     */
+    // Subscribe events start here
     @Subscribe
     public void onChannelPart(final PartEvent event) {
-        switchFragmentAndRemove(event.channelName);
+        onRemoveFragment(event.channelName);
     }
 
     @Subscribe
@@ -289,5 +280,14 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     @Subscribe
     public void onNickInUse(final NickInUseEvent event) {
         switchToServerFragment();
+    }
+    // Subscribe events end here
+
+    // Interface for callbacks
+    public interface IRCPagerInterface {
+
+        public Server getServer();
+
+        public boolean isConnectedToServer();
     }
 }
