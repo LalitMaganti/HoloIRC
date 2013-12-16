@@ -107,7 +107,7 @@ public final class ChannelFragment extends IRCFragment {
     }
 
     private Channel getChannel() {
-        return mCallback.getServer().getUserChannelInterface().getChannel(mTitle);
+        return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
     }
 
     // Callback interface

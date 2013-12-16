@@ -94,7 +94,7 @@ public class UserFragment extends IRCFragment {
     }
 
     private void processEvent(final PrivateEvent event) {
-        if (StringUtils.isNotBlank(event.message)) {
+        if (event.userNick.equals(mTitle) && StringUtils.isNotBlank(event.message)) {
             if (mMessageAdapter == null) {
                 setupListAdapter();
             }
