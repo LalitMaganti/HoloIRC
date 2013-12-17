@@ -65,7 +65,9 @@ public final class ChannelFragment extends IRCFragment {
         super.onPause();
 
         mCallback.getServer().getServerEventBus().unregister(this);
-        getChannel().setCached(false);
+        if (mCachingImportant) {
+            getChannel().setCached(false);
+        }
     }
 
     @Override

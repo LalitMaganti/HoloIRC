@@ -49,6 +49,8 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
 
     IRCMessageAdapter mMessageAdapter;
 
+    boolean mCachingImportant = true;
+
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
@@ -99,6 +101,10 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         } else {
             return false;
         }
+    }
+
+    public void setCachingImportant(boolean cachingImportant) {
+        mCachingImportant = cachingImportant;
     }
 
     // Abstract methods

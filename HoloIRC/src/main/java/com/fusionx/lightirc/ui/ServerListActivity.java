@@ -64,12 +64,12 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        AppPreferences.setUpPreferences(this);
         setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_list);
 
-        AppPreferences.setUpPreferences(this);
         mServerCardsAdapter = new ServerListAdapter(this,
                 new SynchronizedArrayList<ServerCardInterface>());
     }

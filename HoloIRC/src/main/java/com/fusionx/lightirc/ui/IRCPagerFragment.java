@@ -161,6 +161,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         if (fragmentTitle.equals(getCurrentTitle())) {
             mViewPager.setCurrentItem(index - 1, true);
         }
+        final IRCFragment fragment = mAdapter.getItem(index);
+        fragment.setCachingImportant(false);
         mAdapter.removeFragment(index);
     }
 
