@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ChannelFragment extends IRCFragment {
@@ -69,7 +70,12 @@ public final class ChannelFragment extends IRCFragment {
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        return getChannel().getBuffer();
+        if (getChannel() == null) {
+            // This is an error - should not occur but seems to be doing so
+            return new ArrayList<>();
+        } else {
+            return getChannel().getBuffer();
+        }
     }
 
     public void onUserMention(final List<ChannelUser> users) {
