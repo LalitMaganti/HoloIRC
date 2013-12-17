@@ -199,7 +199,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public void onMentionRequested(final List<ChannelUser> users) {
-        if (getCurrentType().equals(FragmentTypeEnum.Channel)) {
+        if (FragmentTypeEnum.Channel.equals(getCurrentType())) {
             final ChannelFragment channel = (ChannelFragment) getCurrentItem();
             channel.onUserMention(users);
         }
@@ -217,7 +217,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public FragmentTypeEnum getCurrentType() {
-        return getCurrentItem().getType();
+        if (mAdapter.getCount() > 0) {
+            return getCurrentItem().getType();
+        } else {
+            return null;
+        }
     }
 
     public void setTabStrip(PagerSlidingTabStrip tabs) {
