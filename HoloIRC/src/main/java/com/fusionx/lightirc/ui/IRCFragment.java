@@ -84,7 +84,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         mTitle = getArguments().getString("title");
     }
 
-    public void disableEditText() {
+    public final void disableEditText() {
         mMessageBox.setEnabled(false);
     }
 

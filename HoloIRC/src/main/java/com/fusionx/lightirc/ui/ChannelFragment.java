@@ -28,6 +28,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Message;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.constants.UserListChangeType;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
@@ -103,8 +104,8 @@ public final class ChannelFragment extends IRCFragment {
     // Subscription methods
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if (mTitle.equals(event.channelName) && !(event.userListChanged && AppPreferences
-                .hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
+        if (mTitle.equals(event.channelName) && (event.changeType == UserListChangeType.NONE
+                || !AppPreferences.hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
             if (mMessageAdapter == null) {
                 setupListAdapter();
             }

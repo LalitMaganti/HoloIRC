@@ -26,13 +26,15 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.constants.UserLevelEnum;
-import com.fusionx.relay.interfaces.SynchronizedCollection;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
@@ -41,7 +43,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
 
     private Channel mChannel;
 
-    public UserListAdapter(Context context, SynchronizedCollection<ChannelUser> objects) {
+    public UserListAdapter(Context context, Set<ChannelUser> objects) {
         super(context, R.layout.default_listview_textview, objects);
     }
 
@@ -69,8 +71,8 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
         return user.getUserPrefix(mChannel);
     }
 
-    public void setInternalSet(SynchronizedCollection<ChannelUser> set) {
-        synchronized (mObjects.getLock()) {
+    public void setInternalSet(TreeSet<ChannelUser> set) {
+        synchronized (mLock) {
             mObjects = set;
         }
         if (mNotifyOnChange) {

@@ -222,7 +222,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
 
     @Override
     public void deleteServer(final ServerCard builder) {
-        mAnimationAdapter.animateDismiss(mServerCardsAdapter.getPosition(builder));
+        mAnimationAdapter.animateDismiss(mServerCardsAdapter.getListOfItems().indexOf(builder));
     }
 
     @Override

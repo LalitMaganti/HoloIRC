@@ -31,6 +31,8 @@ import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.communication.ServerEventBus;
+import com.fusionx.relay.constants.UserListChangeType;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.ConnectedEvent;
 import com.fusionx.relay.event.DisconnectEvent;
@@ -114,8 +116,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onChannelMessage(final ChannelEvent event) {
-            if (event.userListChanged) {
-                onUserListChanged(event.channelName);
+            if (event.user != null && event.changeType != UserListChangeType.NONE) {
+                onUserListChanged(event);
             }
         }
 
@@ -236,9 +238,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected abstract void setUpActionsFragment();
 
     void onUserListDisplayed() {
-        final Channel channel = getServer().getUserChannelInterface()
-                .getChannel(mIRCPagerFragment.getCurrentTitle());
-        getSupportActionBar().setSubtitle(channel.getNumberOfUsers() + " users");
+        getSupportActionBar().setSubtitle(mUserListFragment.getRealAdapter().getCount() + " users");
     }
 
     @Override
@@ -305,26 +305,20 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
     }
 
-    /**
-     * Called when a user list update occurs
-     *
-     * @param channelName - name of channel which was updated
-     */
-    private void onUserListChanged(final String channelName) {
-        if (channelName != null && channelName.equals(mIRCPagerFragment.getCurrentTitle())) {
-            mUserListFragment.onUserListUpdated();
-            if (mUserSlidingMenu.isMenuShowing()) {
-                onUserListDisplayed();
-            }
+    private void onUserListChanged(final ChannelEvent event) {
+        mUserListFragment.onUserListChanged(event);
+        if (mUserSlidingMenu.isMenuShowing()) {
+            onUserListDisplayed();
         }
     }
 
     @Override
     public void onServerAvailable(final Server server) {
-        server.getServerEventBus().register(mEventReceiver);
-        server.getServerEventBus().setDisplayed(true);
-        mIRCPagerFragment.onServerAvailable(server);
-        server.getServerEventBus().register(mUserListFragment);
+        final ServerEventBus bus = server.getServerEventBus();
+        bus.register(mEventReceiver);
+        bus.setDisplayed(true);
+        bus.register(mIRCPagerFragment);
+        bus.register(mUserListFragment);
     }
 
     @Override

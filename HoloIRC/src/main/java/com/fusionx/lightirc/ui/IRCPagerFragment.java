@@ -217,6 +217,9 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public FragmentTypeEnum getCurrentType() {
+        // Since the activity waits for a callback to be received from the service before adding
+        // the serverfragment we may end up not having a fragment in the adapter by the time the
+        // options menu is prepare - return null in this cas
         if (mAdapter.getCount() > 0) {
             return getCurrentItem().getType();
         } else {
@@ -226,7 +229,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     public void setTabStrip(PagerSlidingTabStrip tabs) {
         tabs.setViewPager(mViewPager);
-        mAdapter.setmTabStrip(tabs);
+        mAdapter.setTabStrip(tabs);
     }
 
     @Override
@@ -237,10 +240,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     void onConnected() {
         final ServerFragment fragment = (ServerFragment) mAdapter.getItem(0);
         fragment.onConnected();
-    }
-
-    void onServerAvailable(final Server server) {
-        server.getServerEventBus().register(this);
     }
 
     // Subscribe events start here

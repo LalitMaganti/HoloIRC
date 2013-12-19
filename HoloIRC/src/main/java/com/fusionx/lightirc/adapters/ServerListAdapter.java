@@ -24,20 +24,19 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.interfaces.SynchronizedCollection;
 
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface> {
 
     private final BuilderAdapterCallback mCallback;
 
-    public ServerListAdapter(final Activity activity,
-            final SynchronizedCollection<ServerCardInterface> list) {
+    public ServerListAdapter(final Activity activity, final List<ServerCardInterface> list) {
         super(activity, R.layout.item_server_card, list);
 
         try {
@@ -57,7 +56,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
     }
 
     public ArrayList<String> getListOfTitles(final ServerCardInterface exclusion) {
-        final ArrayList<String> listOfTitles = new ArrayList<String>();
+        final ArrayList<String> listOfTitles = new ArrayList<>();
         for (ServerCardInterface builder : mObjects) {
             if (!builder.equals(exclusion) && builder.getTitle() != null) {
                 listOfTitles.add(builder.getTitle());
