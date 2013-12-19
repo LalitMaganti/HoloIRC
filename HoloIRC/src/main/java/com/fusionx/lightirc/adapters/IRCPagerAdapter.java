@@ -54,7 +54,7 @@ public class IRCPagerAdapter extends PagerAdapter {
 
     private final ArrayList<Fragment.SavedState> mSavedState = new ArrayList<Fragment.SavedState>();
 
-    private final ArrayList<IRCFragment> mViews = new ArrayList<IRCFragment>();
+    private final ArrayList<IRCFragment> mViews = new ArrayList<>();
 
     private PagerSlidingTabStrip mTabStrip;
 
@@ -284,7 +284,7 @@ public class IRCPagerAdapter extends PagerAdapter {
     }
 
     // Getters and setters
-    public void setmTabStrip(PagerSlidingTabStrip mTabStrip) {
-        this.mTabStrip = mTabStrip;
+    public void setTabStrip(PagerSlidingTabStrip tabStrip) {
+        mTabStrip = tabStrip;
     }
 }

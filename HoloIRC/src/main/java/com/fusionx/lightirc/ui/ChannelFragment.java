@@ -28,6 +28,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Message;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.constants.UserListChangeType;
 import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
@@ -36,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class ChannelFragment extends IRCFragment {
@@ -64,12 +66,19 @@ public final class ChannelFragment extends IRCFragment {
         super.onPause();
 
         mCallback.getServer().getServerEventBus().unregister(this);
-        getChannel().setCached(false);
+        if (mCachingImportant) {
+            getChannel().setCached(false);
+        }
     }
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        return getChannel().getBuffer();
+        if (getChannel() == null) {
+            // This is an error - should not occur but seems to be doing so
+            return new ArrayList<>();
+        } else {
+            return getChannel().getBuffer();
+        }
     }
 
     public void onUserMention(final List<ChannelUser> users) {
@@ -95,8 +104,8 @@ public final class ChannelFragment extends IRCFragment {
     // Subscription methods
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if (mTitle.equals(event.channelName) && !(event.userListChanged && AppPreferences
-                .hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
+        if (mTitle.equals(event.channelName) && (event.changeType == UserListChangeType.NONE
+                || !AppPreferences.hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
             if (mMessageAdapter == null) {
                 setupListAdapter();
             }
@@ -107,7 +116,7 @@ public final class ChannelFragment extends IRCFragment {
     }
 
     private Channel getChannel() {
-        return mCallback.getServer().getUserChannelInterface().getChannel(mTitle);
+        return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
     }
 
     // Callback interface

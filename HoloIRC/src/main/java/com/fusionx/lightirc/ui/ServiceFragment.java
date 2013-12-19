@@ -39,10 +39,8 @@ public class ServiceFragment extends Fragment {
     public void connectToServer(Context context, final String serverTitle) {
         if (mService == null) {
             final Intent service = new Intent(context, IRCService.class);
-            service.putExtra("server", true);
             service.putExtra("serverName", serverTitle);
             service.putExtra("stop", false);
-            service.putExtra("setBound", serverTitle);
 
             context.getApplicationContext().startService(service);
             context.getApplicationContext().bindService(service, mConnection, 0);
@@ -101,7 +99,6 @@ public class ServiceFragment extends Fragment {
             mServer = mService.connectToServer(builder);
             mCallback.onServerAvailable(mServer);
             mCallback.setUpViewPager();
-            mCallback.repopulateFragmentsInPager();
         }
 
         // Should never occur
@@ -133,8 +130,6 @@ public class ServiceFragment extends Fragment {
     public interface ServiceFragmentCallback {
 
         public void setUpViewPager();
-
-        public void repopulateFragmentsInPager();
 
         public void onServerAvailable(final Server server);
     }

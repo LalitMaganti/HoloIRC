@@ -156,11 +156,13 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      *
      * @param fragmentTitle - name of the fragment to be removed
      */
-    public void switchFragmentAndRemove(final String fragmentTitle) {
+    public void onRemoveFragment(final String fragmentTitle) {
         final int index = mAdapter.getIndexFromTitle(fragmentTitle);
         if (fragmentTitle.equals(getCurrentTitle())) {
             mViewPager.setCurrentItem(index - 1, true);
         }
+        final IRCFragment fragment = mAdapter.getItem(index);
+        fragment.setCachingImportant(false);
         mAdapter.removeFragment(index);
     }
 
@@ -181,8 +183,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * @param forceSwitch - whether the channel should be forcibly switched to
      */
     public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
-        final boolean switchToTab = channelName.equals(getActivity().getIntent().getStringExtra
-                ("mention")) || forceSwitch;
+        final String mention = getActivity().getIntent().getStringExtra("mention");
+        final boolean switchToTab = channelName.equals(mention) || forceSwitch;
 
         final ChannelFragment channel = new ChannelFragment();
         final Bundle bundle = new Bundle();
@@ -197,7 +199,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public void onMentionRequested(final List<ChannelUser> users) {
-        if (getCurrentType().equals(FragmentTypeEnum.Channel)) {
+        if (FragmentTypeEnum.Channel.equals(getCurrentType())) {
             final ChannelFragment channel = (ChannelFragment) getCurrentItem();
             channel.onUserMention(users);
         }
@@ -215,12 +217,19 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     public FragmentTypeEnum getCurrentType() {
-        return getCurrentItem().getType();
+        // Since the activity waits for a callback to be received from the service before adding
+        // the serverfragment we may end up not having a fragment in the adapter by the time the
+        // options menu is prepare - return null in this cas
+        if (mAdapter.getCount() > 0) {
+            return getCurrentItem().getType();
+        } else {
+            return null;
+        }
     }
 
     public void setTabStrip(PagerSlidingTabStrip tabs) {
         tabs.setViewPager(mViewPager);
-        mAdapter.setmTabStrip(tabs);
+        mAdapter.setTabStrip(tabs);
     }
 
     @Override
@@ -233,23 +242,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         fragment.onConnected();
     }
 
-    void onServerAvailable(final Server server) {
-        server.getServerEventBus().register(this);
-    }
-
-    public interface IRCPagerInterface {
-
-        public Server getServer();
-
-        public boolean isConnectedToServer();
-    }
-
-    /*
-     * Events start here
-     */
+    // Subscribe events start here
     @Subscribe
     public void onChannelPart(final PartEvent event) {
-        switchFragmentAndRemove(event.channelName);
+        onRemoveFragment(event.channelName);
     }
 
     @Subscribe
@@ -289,5 +285,14 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     @Subscribe
     public void onNickInUse(final NickInUseEvent event) {
         switchToServerFragment();
+    }
+    // Subscribe events end here
+
+    // Interface for callbacks
+    public interface IRCPagerInterface {
+
+        public Server getServer();
+
+        public boolean isConnectedToServer();
     }
 }

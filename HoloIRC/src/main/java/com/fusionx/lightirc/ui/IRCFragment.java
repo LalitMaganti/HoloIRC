@@ -49,6 +49,8 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
 
     IRCMessageAdapter mMessageAdapter;
 
+    boolean mCachingImportant = true;
+
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         mTitle = getArguments().getString("title");
     }
 
-    public void disableEditText() {
+    public final void disableEditText() {
         mMessageBox.setEnabled(false);
     }
 
@@ -99,6 +101,10 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         } else {
             return false;
         }
+    }
+
+    public void setCachingImportant(boolean cachingImportant) {
+        mCachingImportant = cachingImportant;
     }
 
     // Abstract methods

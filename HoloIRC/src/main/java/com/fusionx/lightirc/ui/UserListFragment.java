@@ -23,12 +23,12 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.collection.UserListTreeSet;
+import com.fusionx.relay.collection.UpdateableTreeSet;
+import com.fusionx.relay.event.ChannelEvent;
 import com.fusionx.relay.event.KickEvent;
 import com.fusionx.relay.event.PartEvent;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -47,6 +47,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser> implements
@@ -95,8 +96,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new UserListAdapter(view.getContext(),
-                new SynchronizedTreeSet<ChannelUser>());
+        mAdapter = new UserListAdapter(view.getContext(), new HashSet<ChannelUser>());
         getListView().setAdapter(mAdapter);
 
         getListView().setFastScrollEnabled(true);
@@ -110,16 +110,19 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
 
     public void onMenuOpened(final Channel channel) {
         if (!channel.equals(mChannel)) {
-            final UserListTreeSet userList = channel.getUsers();
-            if (userList != null) {
-                mChannel = channel;
-                getListView().setAdapter(null);
-                mAdapter.setInternalSet(userList);
-                mAdapter.setChannel(channel);
-                getListView().setAdapter(mAdapter);
-            } else {
-                getRealAdapter().clear();
+            final UpdateableTreeSet<ChannelUser> userList = channel.getUsers();
+
+            if (mChannel != null) {
+                mChannel.setObserving(false);
             }
+            channel.setObserving(true);
+
+            mChannel = channel;
+
+            getListView().setAdapter(null);
+            mAdapter.setInternalSet(userList);
+            mAdapter.setChannel(channel);
+            getListView().setAdapter(mAdapter);
         }
     }
 
@@ -170,13 +173,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
         return true;
     }
 
-    public void onUserListUpdated() {
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.finish();
-        }
-        getRealAdapter().notifyDataSetChanged();
-    }
-
     boolean isNickOtherUsers(final String nick) {
         return !mCallback.getServer().getUser().getNick().equals(nick);
     }
@@ -212,15 +208,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
         return mAdapter;
     }
 
-    public interface UserListCallback {
-
-        public void onUserMention(final List<ChannelUser> users);
-
-        public Server getServer();
-
-        public void closeAllSlidingMenus();
-    }
-
     /*
      * Subscribed events
      */
@@ -232,5 +219,31 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     @Subscribe
     public void onKicked(final KickEvent event) {
         onChannelClosed();
+    }
+
+    public void onUserListChanged(ChannelEvent event) {
+        switch (event.changeType) {
+            case ADD:
+                mAdapter.add(event.user);
+                break;
+            case REMOVE:
+                mAdapter.remove(event.user);
+                break;
+            case MODIFIED:
+                mAdapter.notifyDataSetChanged();
+                break;
+        }
+        if (mMultiSelectionController != null) {
+            mMultiSelectionController.finish();
+        }
+    }
+
+    public interface UserListCallback {
+
+        public void onUserMention(final List<ChannelUser> users);
+
+        public Server getServer();
+
+        public void closeAllSlidingMenus();
     }
 }
