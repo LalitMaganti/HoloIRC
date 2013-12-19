@@ -166,11 +166,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         mAdapter.removeFragment(index);
     }
 
-    void switchToServerAndRemove(final String fragmentTitle) {
-        switchToServerFragment();
-        mAdapter.removeFragment(mAdapter.getIndexFromTitle(fragmentTitle));
-    }
-
     @Override
     public boolean isConnectedToServer() {
         return mCallback.isConnectedToServer();
@@ -255,7 +250,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onKicked(final KickEvent event) {
-        switchToServerAndRemove(event.channelName);
+        onRemoveFragment(event.channelName);
+        switchToServerFragment();
     }
 
     @Subscribe
