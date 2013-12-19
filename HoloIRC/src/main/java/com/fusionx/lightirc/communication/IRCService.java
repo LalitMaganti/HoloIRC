@@ -52,10 +52,10 @@ public class IRCService extends Service {
 
     private ConnectionManager mConnectionManager = null;
 
-    public Server connectToServer(final ServerConfiguration.Builder builder) {
+    public Server connectToServer(final ServerConfiguration configuration) {
         mConnectionManager = ConnectionManager.getConnectionManager(mResponses, mAppPreferences);
 
-        final Server server = mConnectionManager.onConnectionRequested(builder.build(),
+        final Server server = mConnectionManager.onConnectionRequested(configuration,
                 mAdapterHandler);
 
         updateNotification();

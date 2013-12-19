@@ -2,6 +2,7 @@ package com.fusionx.lightirc.communication;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.Server;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -138,11 +139,12 @@ public class EventResponses implements com.fusionx.relay.interfaces.EventRespons
     }
 
     @Override
-    public void onUserMentioned(final String serverName, final String messageDestination) {
+    public void onUserMentioned(final Server server, final String messageDestination) {
         final NotificationManager mNotificationManager =
                 (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         final Intent intent = new Intent(mContext, UIUtils.getIRCActivity(mContext));
-        intent.putExtra("serverTitle", serverName);
+        intent.putExtra("serverTitle", server.getConfiguration().getTitle());
+        intent.putExtra("serverConfig", server.getConfiguration());
         intent.putExtra("mention", messageDestination);
         final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(mContext);
         taskStackBuilder.addParentStack(UIUtils.getIRCActivity(mContext));

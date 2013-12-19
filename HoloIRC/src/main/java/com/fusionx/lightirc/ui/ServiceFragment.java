@@ -96,7 +96,13 @@ public class ServiceFragment extends Fragment {
             mService = ((IRCService.IRCBinder) binder).getService();
             final ServerConfiguration.Builder builder = getActivity().getIntent()
                     .getParcelableExtra("server");
-            mServer = mService.connectToServer(builder);
+            if (builder == null) {
+                final ServerConfiguration configuration = getActivity().getIntent()
+                        .getParcelableExtra("serverConfig");
+                mServer = mService.connectToServer(configuration);
+            } else {
+                mServer = mService.connectToServer(builder.build());
+            }
             mCallback.onServerAvailable(mServer);
             mCallback.setUpViewPager();
         }
