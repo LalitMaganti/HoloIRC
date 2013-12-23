@@ -213,7 +213,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     public FragmentTypeEnum getCurrentType() {
         // Since the activity waits for a callback to be received from the service before adding
-        // the serverfragment we may end up not having a fragment in the adapter by the time the
+        // the ServerFragment we may end up not having a fragment in the adapter by the time the
         // options menu is prepare - return null in this cas
         if (mAdapter.getCount() > 0) {
             return getCurrentItem().getType();
@@ -230,11 +230,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     @Override
     public Server getServer() {
         return mCallback.getServer();
-    }
-
-    void onConnected() {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getItem(0);
-        fragment.onConnected();
     }
 
     // Subscribe events start here
@@ -274,13 +269,14 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     @Subscribe
-    public void onServerConnected(final ConnectedEvent event) {
-        onConnected();
+    public void onNickInUse(final NickInUseEvent event) {
+        switchToServerFragment();
     }
 
     @Subscribe
-    public void onNickInUse(final NickInUseEvent event) {
-        switchToServerFragment();
+    public void onServerConnected(final ConnectedEvent event) {
+        final ServerFragment fragment = (ServerFragment) mAdapter.getItem(0);
+        fragment.onConnected();
     }
     // Subscribe events end here
 

@@ -167,21 +167,23 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 ("serverTitle");
 
         final FragmentManager fm = getSupportFragmentManager();
-        mServiceFragment = (ServiceFragment) fm.findFragmentByTag("service");
 
         setUpSlidingMenu(fm);
 
         mIRCPagerFragment = (IRCPagerFragment) fm.findFragmentById(R.id.pager_fragment);
+        mServiceFragment = (ServiceFragment) fm.findFragmentByTag("service");
 
+        final boolean isFirstStart = mServiceFragment == null;
         final ActionBar actionBar = getSupportActionBar();
-        if (mServiceFragment == null) {
+        if (isFirstStart) {
             mServiceFragment = new ServiceFragment();
             fm.beginTransaction().add(mServiceFragment, "service").commit();
             actionBar.setSubtitle(getString(R.string.status_connecting));
         } else {
-            onServerAvailable(getServer());
+            final ServerEventBus bus = getServer().getServerEventBus();
+            bus.register(mEventReceiver);
+            bus.register(mUserListFragment);
             actionBar.setSubtitle(getServer().getStatus());
-            setUpViewPager();
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mServerTitle);
@@ -192,7 +194,9 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         tabs.setOnPageChangeListener(mListener);
         tabs.setTextColorResource(android.R.color.white);
 
-        mServiceFragment.connectToServer(this, mServerTitle);
+        if (isFirstStart) {
+            mServiceFragment.connectToServer(this, mServerTitle);
+        }
     }
 
     @Override
