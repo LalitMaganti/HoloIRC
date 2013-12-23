@@ -1,5 +1,13 @@
 Changelog for HoloIRC
 ======
+Version 2.8.6:
+    Fix more crashes which were reported
+    Some other bugfixes
+
+Version 2.8.5:
+    Fix a lot more crashes which were reported
+    Some other misc. bugfixes
+
 Version 2.8.4:
     Fix some major crashes
 
