@@ -1,5 +1,8 @@
 Changelog for HoloIRC
 ======
+Version 2.8.7:
+    Fix a major tablet-specific crash issue
+
 Version 2.8.6:
     Fix more crashes which were reported
     Some other bugfixes
