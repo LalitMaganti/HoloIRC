@@ -37,7 +37,7 @@ public class ServiceFragment extends Fragment {
     }
 
     public void connectToServer(Context context, final String serverTitle) {
-        if (mService == null) {
+        if (mService == null || mServer == null) {
             final Intent service = new Intent(context, IRCService.class);
             service.putExtra("serverName", serverTitle);
             service.putExtra("stop", false);

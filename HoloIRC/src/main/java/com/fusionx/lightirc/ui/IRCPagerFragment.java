@@ -2,7 +2,7 @@ package com.fusionx.lightirc.ui;
 
 import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCPagerAdapter;
+import com.fusionx.lightirc.adapters.IRCAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
@@ -34,7 +34,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     private IRCPagerInterface mCallback = null;
 
-    private IRCPagerAdapter mAdapter = null;
+    private IRCAdapter mAdapter = null;
 
     /**
      * Hold a reference to the parent Activity so we can report the task's current progress and
@@ -93,16 +93,20 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mViewPager = (ViewPager) getView().findViewById(R.id.pager);
+
+        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity().findViewById(R.id
+                .pager_tabs);
         if (mAdapter == null) {
-            mAdapter = new IRCPagerAdapter(getChildFragmentManager());
+            mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
         }
+        mViewPager.setAdapter(mAdapter);
+        tabs.setViewPager(mViewPager);
 
         final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
                 {android.R.attr.windowBackground});
         final int background = a.getResourceId(0, 0);
-        mViewPager = (ViewPager) getView().findViewById(R.id.pager);
         mViewPager.setBackgroundResource(background);
-        mViewPager.setAdapter(mAdapter);
     }
 
     /**
@@ -110,17 +114,9 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      */
     public void createServerFragment(final String serverTitle) {
         if (mAdapter.getCount() == 0) {
-            mAdapter.addServerFragment(serverTitle);
+            mAdapter.onNewFragment(serverTitle, FragmentTypeEnum.Server);
+            //mAdapter.addServerFragment(serverTitle);
         }
-    }
-
-    /**
-     * Get the currently displayed fragment
-     *
-     * @return - returns the currently displayed fragment
-     */
-    private IRCFragment getCurrentItem() {
-        return mAdapter.getItem(mViewPager.getCurrentItem());
     }
 
     /**
@@ -129,12 +125,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
      * @param userNick - the nick of the user we are PMing
      */
     public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
-        final UserFragment userFragment = new UserFragment();
-        final Bundle bundle = new Bundle();
-        bundle.putString("title", userNick);
-        userFragment.setArguments(bundle);
-
-        final int position = mAdapter.addFragment(userFragment);
+        final int position = mAdapter.onNewFragment(userNick, FragmentTypeEnum.User);
 
         if (switchToTab) {
             mViewPager.setCurrentItem(position, true);
@@ -161,9 +152,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         if (fragmentTitle.equals(getCurrentTitle())) {
             mViewPager.setCurrentItem(index - 1, true);
         }
-        final IRCFragment fragment = mAdapter.getItem(index);
-        fragment.setCachingImportant(false);
-        mAdapter.removeFragment(index);
+        final IRCFragment fragment = mAdapter.getRegisteredFragment(index);
+        if (fragment != null) {
+            fragment.setCachingImportant(false);
+        }
+        mAdapter.onRemoveFragment(index);
     }
 
     @Override
@@ -181,12 +174,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         final String mention = getActivity().getIntent().getStringExtra("mention");
         final boolean switchToTab = channelName.equals(mention) || forceSwitch;
 
-        final ChannelFragment channel = new ChannelFragment();
-        final Bundle bundle = new Bundle();
-        bundle.putString("title", channelName);
-        channel.setArguments(bundle);
-
-        final int position = mAdapter.addFragment(channel);
+        final int position = mAdapter.onNewFragment(channelName, FragmentTypeEnum.Channel);
 
         if (switchToTab) {
             mViewPager.setCurrentItem(position, true);
@@ -195,36 +183,32 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     public void onMentionRequested(final List<ChannelUser> users) {
         if (FragmentTypeEnum.Channel.equals(getCurrentType())) {
-            final ChannelFragment channel = (ChannelFragment) getCurrentItem();
+            final ChannelFragment channel = (ChannelFragment) mAdapter
+                    .getRegisteredFragment(mViewPager.getCurrentItem());
             channel.onUserMention(users);
         }
     }
 
     public void onUnexpectedDisconnect() {
-        mViewPager.setCurrentItem(0, true);
+        mAdapter.onUnexpectedDisconnect();
 
-        mAdapter.removeAllButServer();
-        mAdapter.disableAllEditTexts();
+        mViewPager.setCurrentItem(0, true);
     }
 
     public String getCurrentTitle() {
-        return getCurrentItem().getTitle();
+        return mAdapter.getRegisteredFragment(mViewPager.getCurrentItem()).getTitle();
     }
 
     public FragmentTypeEnum getCurrentType() {
         // Since the activity waits for a callback to be received from the service before adding
         // the ServerFragment we may end up not having a fragment in the adapter by the time the
-        // options menu is prepare - return null in this cas
-        if (mAdapter.getCount() > 0) {
-            return getCurrentItem().getType();
+        // options menu is prepare - return null in this case
+        final IRCFragment fragment = mAdapter.getRegisteredFragment(mViewPager.getCurrentItem());
+        if (fragment != null) {
+            return fragment.getType();
         } else {
             return null;
         }
-    }
-
-    public void setTabStrip(PagerSlidingTabStrip tabs) {
-        tabs.setViewPager(mViewPager);
-        mAdapter.setTabStrip(tabs);
     }
 
     @Override
@@ -275,7 +259,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onServerConnected(final ConnectedEvent event) {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getItem(0);
+        final ServerFragment fragment = (ServerFragment) mAdapter.getRegisteredFragment(0);
         fragment.onConnected();
     }
     // Subscribe events end here

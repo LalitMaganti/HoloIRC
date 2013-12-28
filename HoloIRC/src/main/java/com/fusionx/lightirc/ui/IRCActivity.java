@@ -155,6 +155,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     // Other objects
     private String mServerTitle;
 
+    // Do not do any IRC work here - views may not have been set up, activities not instantiated
+    // etc.
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
@@ -179,7 +181,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             mServiceFragment = new ServiceFragment();
             fm.beginTransaction().add(mServiceFragment, "service").commit();
             actionBar.setSubtitle(getString(R.string.status_connecting));
-        } else {
+        } else if (getServer() != null) {
             final ServerEventBus bus = getServer().getServerEventBus();
             bus.register(mEventReceiver);
             bus.register(mUserListFragment);
@@ -190,13 +192,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id
                 .pager_tabs);
-        mIRCPagerFragment.setTabStrip(tabs);
         tabs.setOnPageChangeListener(mListener);
         tabs.setTextColorResource(android.R.color.white);
-
-        if (isFirstStart) {
-            mServiceFragment.connectToServer(this, mServerTitle);
-        }
     }
 
     @Override
@@ -272,6 +269,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onResume() {
         super.onResume();
+        // Call this regardless of whether this is a resumption or not - the correct checks to
+        // whether to bind to the service will be done in the ServiceFragment
+        mServiceFragment.connectToServer(this, mServerTitle);
+
         if (getServer() != null) {
             getServer().getServerEventBus().setDisplayed(true);
         }
@@ -319,8 +320,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void onServerAvailable(final Server server) {
         final ServerEventBus bus = server.getServerEventBus();
+
+        // Register and then display
         bus.register(mEventReceiver);
         bus.setDisplayed(true);
+
         bus.register(mIRCPagerFragment);
         bus.register(mUserListFragment);
     }

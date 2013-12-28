@@ -54,7 +54,15 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflate.inflate(R.layout.fragment_irc, container, false);
+        final View view = inflate.inflate(R.layout.fragment_irc, container, false);
+
+        // This is done here rather than in onViewCreated as a NoSaveStateFramelayout will be
+        // inserted by the support library
+        mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
+        mMessageBox.setOnEditorActionListener(this);
+        mTitle = getArguments().getString("title");
+
+        return view;
     }
 
     @Override
@@ -75,16 +83,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         }
     }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mMessageBox = (EditText) getView().findViewById(R.id.fragment_irc_message_box);
-        mMessageBox.setOnEditorActionListener(this);
-        mTitle = getArguments().getString("title");
-    }
-
-    public final void disableEditText() {
+    public final void onDisableInput() {
         mMessageBox.setEnabled(false);
     }
 
