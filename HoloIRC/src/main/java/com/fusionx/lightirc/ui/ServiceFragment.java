@@ -104,7 +104,7 @@ public class ServiceFragment extends Fragment {
                 mServer = mService.connectToServer(builder.build());
             }
             mCallback.onServerAvailable(mServer);
-            mCallback.setUpViewPager();
+            mCallback.onSetupViewPager();
         }
 
         // Should never occur
@@ -135,7 +135,7 @@ public class ServiceFragment extends Fragment {
 
     public interface ServiceFragmentCallback {
 
-        public void setUpViewPager();
+        public void onSetupViewPager();
 
         public void onServerAvailable(final Server server);
     }

@@ -210,33 +210,44 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
 
     /*
      * Subscribed events
+     *
+     * Only perform an action if the channel that is being observed currently is the one the
+     * event is referring to
      */
     @Subscribe
     public void onChannelPart(final PartEvent event) {
-        onChannelClosed();
+        if (event.channelName.equals(mChannel.getName())) {
+            onChannelClosed();
+        }
     }
 
     @Subscribe
     public void onKicked(final KickEvent event) {
-        onChannelClosed();
+        if (event.channelName.equals(mChannel.getName())) {
+            onChannelClosed();
+        }
     }
 
-    public void onUserListChanged(ChannelEvent event) {
-        switch (event.changeType) {
-            case ADD:
-                mAdapter.add(event.user);
-                break;
-            case REMOVE:
-                mAdapter.remove(event.user);
-                break;
-            case MODIFIED:
-                mAdapter.notifyDataSetChanged();
-                break;
-        }
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.finish();
+    @Subscribe
+    public void onUserListChanged(final ChannelEvent event) {
+        if (event.channelName.equals(mChannel.getName())) {
+            switch (event.changeType) {
+                case ADD:
+                    mAdapter.add(event.user);
+                    break;
+                case REMOVE:
+                    mAdapter.remove(event.user);
+                    break;
+                case MODIFIED:
+                    mAdapter.notifyDataSetChanged();
+                    break;
+            }
+            if (mMultiSelectionController != null) {
+                mMultiSelectionController.finish();
+            }
         }
     }
+    // End of subscribed events
 
     public interface UserListCallback {
 

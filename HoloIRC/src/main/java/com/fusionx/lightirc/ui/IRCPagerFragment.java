@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.ui;
 
-import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
@@ -30,17 +30,12 @@ import java.util.List;
 public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
         ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallback {
 
-    private ViewPager mViewPager = null;
+    private ViewPager mViewPager;
 
-    private IRCPagerInterface mCallback = null;
+    private IRCPagerInterface mCallback;
 
-    private IRCAdapter mAdapter = null;
+    private IRCAdapter mAdapter;
 
-    /**
-     * Hold a reference to the parent Activity so we can report the task's current progress and
-     * results. The Android framework will pass us a reference to the newly created Activity after
-     * each configuration change.
-     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -52,20 +47,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         }
     }
 
-    /**
-     * Since the fragment is retained, when the activity detaches, a new activity is created so null
-     * the callback when the old activity detaches
-     */
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        mCallback = null;
-    }
-
-    /**
-     * Retain the fragment through config changes
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,16 +54,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         setRetainInstance(true);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mCallback.getServer().getServerEventBus().unregister(this);
-    }
-
-    /**
-     * Create the view by inflating a generic view pager
-     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
@@ -95,35 +66,44 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
         mViewPager = (ViewPager) getView().findViewById(R.id.pager);
 
-        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity().findViewById(R.id
-                .pager_tabs);
-        if (mAdapter == null) {
-            mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
-        }
-        mViewPager.setAdapter(mAdapter);
-        tabs.setViewPager(mViewPager);
-
         final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
                 {android.R.attr.windowBackground});
         final int background = a.getResourceId(0, 0);
         mViewPager.setBackgroundResource(background);
     }
 
-    /**
-     * Creates the ServerFragment object
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mCallback.getServer().getServerEventBus().unregister(this);
+    }
+
+    /*
+     * Since the fragment is retained, when the activity detaches, a new activity is created so null
+     * the callback when the old activity detaches
      */
-    public void createServerFragment(final String serverTitle) {
-        if (mAdapter.getCount() == 0) {
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mCallback = null;
+    }
+
+    // Don't setup the adapter or the tab strip until we know we're going to add a server fragment
+    // This is to stop an issue in PagerSlidingTabStrip
+    public void onCreateServerFragment(final String serverTitle) {
+        if (mAdapter == null) {
+            final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity().findViewById(R.id
+                    .pager_tabs);
+            mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
             mAdapter.onNewFragment(serverTitle, FragmentTypeEnum.Server);
-            //mAdapter.addServerFragment(serverTitle);
+
+            mViewPager.setAdapter(mAdapter);
+            tabs.setViewPager(mViewPager);
         }
     }
 
-    /**
-     * Creates a UserFragment with the specified nick
-     *
-     * @param userNick - the nick of the user we are PMing
-     */
     public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
         final int position = mAdapter.onNewFragment(userNick, FragmentTypeEnum.User);
 
@@ -132,21 +112,12 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         }
     }
 
-    /**
-     * Selects the ServerFragment regardless of what is currently selected in the ViewPager
-     */
     void switchToServerFragment() {
         if (mViewPager.getCurrentItem() != 0) {
             mViewPager.setCurrentItem(0, true);
         }
     }
 
-    /**
-     * If the currently displayed fragment is the one being removed then switch to one tab back.
-     * Then remove the fragment regardless.
-     *
-     * @param fragmentTitle - name of the fragment to be removed
-     */
     public void onRemoveFragment(final String fragmentTitle) {
         final int index = mAdapter.getIndexFromTitle(fragmentTitle);
         if (fragmentTitle.equals(getCurrentTitle())) {
@@ -164,12 +135,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         return mCallback.isConnectedToServer();
     }
 
-    /**
-     * Method called when a new ChannelFragment is to be created
-     *
-     * @param channelName - name of the channel joined
-     * @param forceSwitch - whether the channel should be forcibly switched to
-     */
     public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
         final String mention = getActivity().getIntent().getStringExtra("mention");
         final boolean switchToTab = channelName.equals(mention) || forceSwitch;

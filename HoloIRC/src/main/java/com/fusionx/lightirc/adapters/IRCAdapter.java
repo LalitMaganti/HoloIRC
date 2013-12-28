@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.adapters;
 
-import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.lightirc.ui.IRCFragment;
@@ -80,8 +80,10 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         final Pair<String, FragmentTypeEnum> enumPair = new Pair<>(title, typeEnum);
         mFragmentList.add(enumPair);
 
+        if (typeEnum != FragmentTypeEnum.Server) {
+            mTabStrip.notifyDataSetChanged();
+        }
         notifyDataSetChanged();
-        mTabStrip.notifyDataSetChanged();
 
         return mFragmentList.size() - 1;
     }
@@ -108,8 +110,8 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
             iterator.next();
             iterator.remove();
         }
-        notifyDataSetChanged();
         mTabStrip.notifyDataSetChanged();
+        notifyDataSetChanged();
 
         final ServerFragment fragment = (ServerFragment) mRegisteredFragments.get(0);
         if (fragment != null) {

@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.astuetz.viewpager.extensions.PagerSlidingTabStrip;
+import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
@@ -50,7 +50,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
@@ -66,7 +66,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         .UserListCallback, ServiceFragment.ServiceFragmentCallback,
         ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
-    /**
+    /*
      * Listener used when the view pages changes pages
      */
     private final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
@@ -196,14 +196,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         tabs.setTextColorResource(android.R.color.white);
     }
 
-    @Override
-    protected void onDestroy() {
-        Crouton.clearCroutonsForActivity(this);
-        getServer().getServerEventBus().unregister(mEventReceiver);
-
-        super.onDestroy();
-    }
-
     private void setUpSlidingMenu(final FragmentManager manager) {
         mUserSlidingMenu = (SlidingMenu) findViewById(R.id.user_sliding_menu);
         mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
@@ -238,10 +230,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     // This is different for tablets and phones so get subclasses to do the work
     protected abstract void setUpActionsFragment();
 
-    void onUserListDisplayed() {
-        getSupportActionBar().setSubtitle(mUserListFragment.getRealAdapter().getCount() + " users");
-    }
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -249,21 +237,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             // Sync the toggle state after onRestoreInstanceState has occurred.
             mDrawerToggle.syncState();
         }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (mDrawerToggle != null) {
-            mDrawerToggle.onConfigurationChanged(newConfig);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        getServer().getServerEventBus().setDisplayed(false);
-        getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
     }
 
     @Override
@@ -276,6 +249,29 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         if (getServer() != null) {
             getServer().getServerEventBus().setDisplayed(true);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getServer().getServerEventBus().setDisplayed(false);
+        getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (mDrawerToggle != null) {
+            mDrawerToggle.onConfigurationChanged(newConfig);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Crouton.clearCroutonsForActivity(this);
+        getServer().getServerEventBus().unregister(mEventReceiver);
+
+        super.onDestroy();
     }
 
     // Options Menu stuff
@@ -309,6 +305,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 return false;
         }
     }
+    // Options menu end
+
+    void onUserListDisplayed() {
+        getSupportActionBar().setSubtitle(mUserListFragment.getRealAdapter().getCount() + " users");
+    }
 
     private void onUserListChanged(final ChannelEvent event) {
         mUserListFragment.onUserListChanged(event);
@@ -330,8 +331,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     @Override
-    public void setUpViewPager() {
-        mIRCPagerFragment.createServerFragment(mServerTitle);
+    public void onSetupViewPager() {
+        mIRCPagerFragment.onCreateServerFragment(mServerTitle);
         getSupportActionBar().setSubtitle(getServer().getStatus());
 
         if (isConnectedToServer()) {
@@ -340,10 +341,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 final boolean switchToTab = tabTitle.equals(channel.getName());
                 mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
             }
-            final Iterator<PrivateMessageUser> iterator = getServer().getUser()
-                    .getPrivateMessageIterator();
-            while (iterator.hasNext()) {
-                final String userNick = iterator.next().getNick();
+            final Iterable<PrivateMessageUser> privateMessages = getServer().getUser()
+                    .getPrivateMessages();
+            for (final PrivateMessageUser user : privateMessages) {
+                final String userNick = user.getNick();
                 final boolean switchToTab = tabTitle.equals(userNick);
                 mIRCPagerFragment.onCreateMessageFragment(userNick, switchToTab);
             }
@@ -355,19 +356,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         return mServiceFragment.getServer();
     }
 
-    /**
-     * Get the name of the currently displayed server
-     *
-     * @return - the current server title
-     */
-    @Override
-    public String getServerTitle() {
-        return mServerTitle;
-    }
-
-    /**
-     * Close all SlidingMenus (if open)
-     */
     @Override
     public void closeAllSlidingMenus() {
         if (mActionsSlidingMenu != null) {
@@ -376,43 +364,25 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         mUserSlidingMenu.showContent();
     }
 
-    /**
-     * Checks if the app is connected to the server
-     *
-     * @return whether the app is connected to the server
-     */
     @Override
     public boolean isConnectedToServer() {
         final Server server = getServer();
         return server != null && server.isConnected();
     }
 
-    /**
-     * Method which is called when the user requests a mention from the UserListFragment
-     *
-     * @param users - the list of users which the app user wants to mentuin
-     */
     @Override
     public void onUserMention(final List<ChannelUser> users) {
         mIRCPagerFragment.onMentionRequested(users);
         closeAllSlidingMenus();
     }
 
-    /**
-     * Method which returns the nick of the user
-     *
-     * @return - the nick of the user
-     */
     @Override
     public String getNick() {
         return getServer().getUser().getNick();
     }
 
-    /**
-     * Close the currently displayed PM or parts from the currently displayed channel
-     */
     @Override
-    public void closeOrPartCurrentTab() {
+    public void onRemoveCurrentFragment() {
         final Server server = getServer();
         if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
             // We want to remove the fragment before sending the close message to prevent a NPE
@@ -423,5 +393,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         } else {
             server.getServerCallBus().sendPart(mIRCPagerFragment.getCurrentTitle());
         }
+    }
+
+    // Getters and setters
+    @Override
+    public String getServerTitle() {
+        return mServerTitle;
     }
 }

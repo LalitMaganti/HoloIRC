@@ -3,8 +3,7 @@ package com.fusionx.lightirc.communication;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
-
-import org.apache.commons.lang3.StringUtils;
+import com.fusionx.relay.util.Utils;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -110,7 +109,7 @@ public class EventResponses implements com.fusionx.relay.interfaces.EventRespons
     }
 
     private String appendReasonIfNeeded(final String response, final String reason) {
-        return StringUtils.isEmpty(reason) ? response :
+        return Utils.isEmpty(reason) ? response :
                 response + " " + String.format(mContext.getString(R.string.parser_reason), reason);
     }
 

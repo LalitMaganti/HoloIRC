@@ -71,7 +71,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
         return user.getUserPrefix(mChannel);
     }
 
-    public void setInternalSet(TreeSet<ChannelUser> set) {
+    public void setInternalSet(final TreeSet<ChannelUser> set) {
         synchronized (mLock) {
             mObjects = set;
         }

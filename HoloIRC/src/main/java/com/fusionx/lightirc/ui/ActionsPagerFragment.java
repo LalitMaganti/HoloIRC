@@ -101,7 +101,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     @Override
     public void closeOrPartCurrentTab() {
-        mCallback.closeOrPartCurrentTab();
+        mCallback.onRemoveCurrentFragment();
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
         public String getNick();
 
-        public void closeOrPartCurrentTab();
+        public void onRemoveCurrentFragment();
 
         public boolean isConnectedToServer();
 
