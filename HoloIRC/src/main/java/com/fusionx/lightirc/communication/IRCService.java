@@ -46,7 +46,7 @@ public class IRCService extends Service {
 
     private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
-    private final EventResponses mResponses = new EventResponses(this);
+    private final EventResponsesImpl mResponses = new EventResponsesImpl(this);
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 

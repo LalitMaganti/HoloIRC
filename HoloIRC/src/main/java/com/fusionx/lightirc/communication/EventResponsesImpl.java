@@ -3,6 +3,7 @@ package com.fusionx.lightirc.communication;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.interfaces.EventResponses;
 import com.fusionx.relay.util.Utils;
 
 import android.app.Notification;
@@ -13,11 +14,11 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-public class EventResponses implements com.fusionx.relay.interfaces.EventResponses {
+public class EventResponsesImpl implements EventResponses {
 
     private final Context mContext;
 
-    EventResponses(final Context context) {
+    EventResponsesImpl(final Context context) {
         mContext = context;
     }
 
@@ -39,9 +40,15 @@ public class EventResponses implements com.fusionx.relay.interfaces.EventRespons
 
     // Messages
     @Override
-    public String getInitialTopicMessage(String topic, String topicSetter) {
+    public String getInitialTopicMessage(final String topic, final String topicSetter) {
         final String response = mContext.getString(R.string.parser_new_topic);
         return String.format(response, topic, topicSetter);
+    }
+
+    @Override
+    public String getSlapMessage(final String receivingNick) {
+        final String response = mContext.getString(R.string.parser_slap_message);
+        return String.format(response, receivingNick);
     }
 
     @Override
