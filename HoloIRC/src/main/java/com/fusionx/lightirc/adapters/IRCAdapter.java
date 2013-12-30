@@ -76,10 +76,23 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
+    public void onUpdateFragmentTitle(final String oldName, final String newName) {
+        final int index = getIndexFromTitle(oldName);
+        final Pair<String, FragmentTypeEnum> pair = mFragmentList.get(index);
+        final Pair<String, FragmentTypeEnum> newPair = new Pair<>(newName, pair.second);
+        mFragmentList.set(index, newPair);
+
+        mTabStrip.notifyDataSetChanged();
+        notifyDataSetChanged();
+    }
+
     public int onNewFragment(final String title, final FragmentTypeEnum typeEnum) {
         final Pair<String, FragmentTypeEnum> enumPair = new Pair<>(title, typeEnum);
         mFragmentList.add(enumPair);
 
+        // We don't want to notify the tab strip because the TabStrip doesn't even know that this
+        // is the adapter it's meant to be monitoring - it only knows after the ServerFragment
+        // has been added
         if (typeEnum != FragmentTypeEnum.Server) {
             mTabStrip.notifyDataSetChanged();
         }
@@ -103,7 +116,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
 
     public void onUnexpectedDisconnect() {
         final Iterator iterator = mFragmentList.iterator();
-        // We don't want to mess with the server fragment
+        // We don't want to remove the server fragment
         iterator.next();
 
         while (iterator.hasNext()) {
@@ -112,11 +125,6 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         }
         mTabStrip.notifyDataSetChanged();
         notifyDataSetChanged();
-
-        final ServerFragment fragment = (ServerFragment) mRegisteredFragments.get(0);
-        if (fragment != null) {
-            fragment.onDisableInput();
-        }
     }
 
     public void onRemoveFragment(final int index) {

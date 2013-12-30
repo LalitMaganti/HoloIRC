@@ -83,7 +83,7 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         }
     }
 
-    public final void onDisableInput() {
+    public final void onDisableUserInput() {
         mMessageBox.setEnabled(false);
     }
 

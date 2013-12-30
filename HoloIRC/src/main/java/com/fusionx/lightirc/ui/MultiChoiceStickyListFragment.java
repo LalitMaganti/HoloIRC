@@ -15,8 +15,8 @@ import java.util.List;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-abstract class MultiChoiceStickyListFragment<T> extends Fragment implements
-        MultiSelectionUtils.MultiChoiceModeListener {
+abstract class MultiChoiceStickyListFragment<T> extends Fragment implements MultiSelectionUtils
+        .MultiChoiceModeListener {
 
     MultiSelectionUtils.Controller mMultiSelectionController;
 
@@ -39,31 +39,14 @@ abstract class MultiChoiceStickyListFragment<T> extends Fragment implements
 
     protected abstract void attachSelectionController();
 
-    List<Integer> getCheckedPositions() {
-        List<Integer> checkedSessionPositions = new ArrayList<Integer>();
-        StickyListHeadersListView listView = getListView();
-        if (listView == null) {
-            return checkedSessionPositions;
-        }
-
-        SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(checkedPositionsBool.keyAt(i));
-            }
-        }
-
-        return checkedSessionPositions;
-    }
-
     List<T> getCheckedItems() {
-        List<T> checkedSessionPositions = new ArrayList<T>();
+        final List<T> checkedSessionPositions = new ArrayList<T>();
         StickyListHeadersListView listView = getListView();
         if (listView == null) {
             return checkedSessionPositions;
         }
 
-        SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
+        final SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
         for (int i = 0; i < checkedPositionsBool.size(); i++) {
             if (checkedPositionsBool.valueAt(i)) {
                 checkedSessionPositions.add(getRealAdapter().getItem(checkedPositionsBool

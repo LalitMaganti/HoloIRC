@@ -29,6 +29,8 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
+import com.fusionx.relay.event.PrivateNickChangeEvent;
+import com.fusionx.relay.event.PrivateQuitEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
@@ -40,14 +42,14 @@ import java.util.List;
 
 public class UserFragment extends IRCFragment {
 
-    private UserFragmentCallback mCallback;
+    private Callbacks mCallbacks;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, UserFragmentCallback.class);
+        if (mCallbacks == null) {
+            mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
         }
     }
 
@@ -55,21 +57,33 @@ public class UserFragment extends IRCFragment {
     public void onResume() {
         super.onResume();
 
-        mCallback.getServer().getServerEventBus().register(this);
-        mCallback.getServer().getPrivateMessageUserIfExists(mTitle).setCached(true);
+        final Server server = mCallbacks.getServer();
+        final PrivateMessageUser user = server.getPrivateMessageUserIfExists(mTitle);
+
+        if (user.isUserQuit()) {
+            onDisableUserInput();
+        } else {
+            server.getServerEventBus().register(this);
+            user.setCached(true);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        mCallback.getServer().getServerEventBus().unregister(this);
-        mCallback.getServer().getPrivateMessageUserIfExists(mTitle).setCached(false);
+        final Server server = mCallbacks.getServer();
+        final PrivateMessageUser user = server.getPrivateMessageUserIfExists(mTitle);
+
+        if (!user.isUserQuit()) {
+            server.getServerEventBus().unregister(this);
+            user.setCached(false);
+        }
     }
 
     @Override
     protected List<Message> onRetrieveMessages() {
-        final PrivateMessageUser uci = mCallback.getServer().getPrivateMessageUserIfExists(mTitle);
+        final PrivateMessageUser uci = mCallbacks.getServer().getPrivateMessageUserIfExists(mTitle);
         return uci.getBuffer();
     }
 
@@ -80,20 +94,32 @@ public class UserFragment extends IRCFragment {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.userMessageToParse(mCallback.getServer(), mTitle, message);
+        UserInputParser.onParseUserMessage(mCallbacks.getServer(), mTitle, message);
     }
 
     @Subscribe
     public void onUserEvent(final PrivateMessageEvent event) {
-        processEvent(event);
+        onProcessPrivateEvent(event);
     }
 
     @Subscribe
     public void onPrivateAction(final PrivateActionEvent event) {
-        processEvent(event);
+        onProcessPrivateEvent(event);
     }
 
-    private void processEvent(final PrivateEvent event) {
+    @Subscribe
+    public void onPrivateQuit(final PrivateQuitEvent event) {
+        onProcessPrivateEvent(event);
+
+        onDisableUserInput();
+    }
+
+    @Subscribe
+    public void onPrivateNickChange(final PrivateNickChangeEvent event) {
+        onProcessPrivateEvent(event);
+    }
+
+    private void onProcessPrivateEvent(final PrivateEvent event) {
         if (event.userNick.equals(mTitle) && StringUtils.isNotBlank(event.message)) {
             if (mMessageAdapter == null) {
                 setupListAdapter();
@@ -104,7 +130,7 @@ public class UserFragment extends IRCFragment {
         }
     }
 
-    public interface UserFragmentCallback {
+    public interface Callbacks {
 
         public Server getServer();
     }

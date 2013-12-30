@@ -1,3 +1,3 @@
-include ':HoloIRC', 'libraries:relay'
+include ':HoloIRC', 'libraries:relay:library'
 include ':libraries:SlidingMenu:library'
 include ':libraries:android-numberpicker:library'

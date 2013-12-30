@@ -41,24 +41,37 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
         StickyListHeadersAdapter {
 
+    private final LayoutInflater mInflater;
+
     private Channel mChannel;
 
     public UserListAdapter(Context context, Set<ChannelUser> objects) {
         super(context, R.layout.default_listview_textview, objects);
+
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        final TextView view = (TextView) super.getView(position, convertView, parent);
-        view.setTypeface(UIUtils.getRobotoLight(getContext()));
+        final TextView view;
+        if (convertView == null) {
+            view = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
+            view.setTypeface(UIUtils.getRobotoLight(getContext()));
+        } else {
+            view = (TextView) convertView;
+        }
         view.setText(getItem(position).getSpannedNick(mChannel));
         return view;
     }
 
     @Override
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        final TextView view = (TextView) ((convertView != null) ? convertView : LayoutInflater.from
-                (getContext()).inflate(R.layout.sliding_menu_header, viewGroup, false));
+        final TextView view;
+        if (convertView != null) {
+            view = (TextView) convertView;
+        } else {
+            view = (TextView) mInflater.inflate(R.layout.sliding_menu_header, viewGroup, false);
+        }
 
         final UserLevelEnum levelEnum = getItem(i).getChannelPrivileges(mChannel);
         view.setText(mChannel.getNumberOfUsersType(levelEnum) + " " + levelEnum.getName());
@@ -80,7 +93,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
         }
     }
 
-    public void setChannel(Channel channel) {
+    public void setChannel(final Channel channel) {
         mChannel = channel;
     }
 }

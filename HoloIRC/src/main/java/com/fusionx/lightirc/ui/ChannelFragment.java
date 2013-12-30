@@ -98,7 +98,7 @@ public final class ChannelFragment extends IRCFragment {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle, message);
+        UserInputParser.onParseChannelMessage(mCallback.getServer(), mTitle, message);
     }
 
     // Subscription methods

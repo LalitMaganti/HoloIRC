@@ -62,9 +62,9 @@ import de.keyboardsurfer.android.widget.crouton.Style;
  *
  * @author Lalit Maganti
  */
-public abstract class IRCActivity extends ActionBarActivity implements UserListFragment
-        .UserListCallback, ServiceFragment.ServiceFragmentCallback,
-        ActionsPagerFragment.ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
+public abstract class IRCActivity extends ActionBarActivity implements UserListFragment.Callbacks,
+        ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
+                .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
 
     /*
      * Listener used when the view pages changes pages
@@ -82,8 +82,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
                         .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
             }
-            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
-                    .TOUCHMODE_NONE : SlidingMenu.TOUCHMODE_MARGIN);
+            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu.TOUCHMODE_NONE :
+                    SlidingMenu.TOUCHMODE_MARGIN);
         }
     };
 
@@ -117,7 +117,9 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         @Subscribe
         public void onChannelMessage(final ChannelEvent event) {
             if (event.user != null && event.changeType != UserListChangeType.NONE) {
-                onUserListChanged(event);
+                if (mUserSlidingMenu.isMenuShowing()) {
+                    onUserListDisplayed();
+                }
             }
         }
 
@@ -142,15 +144,15 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     protected DrawerToggle mDrawerToggle;
 
+    // Sliding menus
+    protected SlidingMenu mUserSlidingMenu;
+
     // The Fragments
     private ServiceFragment mServiceFragment;
 
     private UserListFragment mUserListFragment;
 
     private IRCPagerFragment mIRCPagerFragment;
-
-    // Sliding menus
-    private SlidingMenu mUserSlidingMenu;
 
     // Other objects
     private String mServerTitle;
@@ -184,7 +186,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         } else if (getServer() != null) {
             final ServerEventBus bus = getServer().getServerEventBus();
             bus.register(mEventReceiver);
-            bus.register(mUserListFragment);
             actionBar.setSubtitle(getServer().getStatus());
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -276,46 +277,38 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     // Options Menu stuff
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.activity_server_channel_ab, menu);
         return true;
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem userMenu = menu.findItem(R.id.activity_server_channel_ab_users);
         final boolean isChannel = (FragmentTypeEnum.Channel.equals(mIRCPagerFragment
                 .getCurrentType()));
-        if (userMenu != null) {
-            userMenu.setVisible(isChannel && mUserSlidingMenu != null);
-        }
+        userMenu.setVisible(isChannel && mUserSlidingMenu != null);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
+        if (mDrawerToggle == null || !mDrawerToggle.onOptionsItemSelected(item)) {
+            switch (item.getItemId()) {
+                case R.id.activity_server_channel_ab_users:
+                    mUserSlidingMenu.toggle();
+                    return true;
+                default:
+                    return false;
+            }
+        } else {
             return true;
-        }
-        switch (item.getItemId()) {
-            case R.id.activity_server_channel_ab_users:
-                mUserSlidingMenu.toggle();
-                return true;
-            default:
-                return false;
         }
     }
     // Options menu end
 
     void onUserListDisplayed() {
         getSupportActionBar().setSubtitle(mUserListFragment.getRealAdapter().getCount() + " users");
-    }
-
-    private void onUserListChanged(final ChannelEvent event) {
-        mUserListFragment.onUserListChanged(event);
-        if (mUserSlidingMenu.isMenuShowing()) {
-            onUserListDisplayed();
-        }
     }
 
     @Override
@@ -327,7 +320,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         bus.setDisplayed(true);
 
         bus.register(mIRCPagerFragment);
-        bus.register(mUserListFragment);
     }
 
     @Override
@@ -341,13 +333,15 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 final boolean switchToTab = tabTitle.equals(channel.getName());
                 mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
             }
-            final Iterable<PrivateMessageUser> privateMessages = getServer().getUser()
+            final Collection<PrivateMessageUser> privateMessages = getServer().getUser()
                     .getPrivateMessages();
             for (final PrivateMessageUser user : privateMessages) {
-                final String userNick = user.getNick();
-                final boolean switchToTab = tabTitle.equals(userNick);
-                mIRCPagerFragment.onCreateMessageFragment(userNick, switchToTab);
+                final boolean switchToTab = tabTitle.equals(user.getNick());
+                mIRCPagerFragment.onCreateMessageFragment(user.getNick(), switchToTab);
             }
+            // Do this so that the options menu can pick up whether to display the user button
+            // or not
+            supportInvalidateOptionsMenu();
         }
     }
 
@@ -362,6 +356,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             mActionsSlidingMenu.showContent();
         }
         mUserSlidingMenu.showContent();
+    }
+
+    @Override
+    public boolean isUserSlidingMenuOpen() {
+        return mUserSlidingMenu.isMenuShowing();
     }
 
     @Override

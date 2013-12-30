@@ -13,6 +13,7 @@ import com.fusionx.relay.event.NickInUseEvent;
 import com.fusionx.relay.event.PartEvent;
 import com.fusionx.relay.event.PrivateActionEvent;
 import com.fusionx.relay.event.PrivateMessageEvent;
+import com.fusionx.relay.event.PrivateNickChangeEvent;
 import com.fusionx.relay.event.SwitchToServerEvent;
 import com.squareup.otto.Subscribe;
 
@@ -28,7 +29,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
-        ChannelFragment.ChannelFragmentCallback, UserFragment.UserFragmentCallback {
+        ChannelFragment.ChannelFragmentCallback, UserFragment.Callbacks {
 
     private ViewPager mViewPager;
 
@@ -210,6 +211,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         if (event.newPrivateMessage) {
             onCreateMessageFragment(event.userNick, true);
         }
+    }
+
+    @Subscribe
+    public void onPrivateNickChanged(final PrivateNickChangeEvent event) {
+        mAdapter.onUpdateFragmentTitle(event.userNick, event.newNick);
     }
 
     @Subscribe

@@ -67,6 +67,10 @@ public class ServerFragment extends IRCFragment {
 
         getServer().getServerEventBus().register(this);
         getServer().getServerCache().setCached(true);
+
+        if (!getServer().isConnected()) {
+            onDisableUserInput();
+        }
     }
 
     @Override
@@ -89,7 +93,7 @@ public class ServerFragment extends IRCFragment {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.serverMessageToParse(getServer(), message);
+        UserInputParser.onParseServerMessage(getServer(), message);
     }
 
     public void onConnected() {

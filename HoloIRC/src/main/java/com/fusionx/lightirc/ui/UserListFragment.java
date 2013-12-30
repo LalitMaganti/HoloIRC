@@ -29,8 +29,6 @@ import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.collection.UpdateableTreeSet;
 import com.fusionx.relay.event.ChannelEvent;
-import com.fusionx.relay.event.KickEvent;
-import com.fusionx.relay.event.PartEvent;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
@@ -53,7 +51,7 @@ import java.util.List;
 public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser> implements
         SlidingMenu.OnCloseListener {
 
-    private UserListCallback mCallback;
+    private Callbacks mCallback;
 
     private Channel mChannel;
 
@@ -62,26 +60,11 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
+
         try {
-            mCallback = (UserListCallback) activity;
+            mCallback = (Callbacks) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement UserListCallback");
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        mCallback.getServer().getServerEventBus().unregister(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (mCallback.getServer() != null) {
-            mCallback.getServer().getServerEventBus().register(this);
+            throw new ClassCastException(activity.toString() + " must implement Callbacks");
         }
     }
 
@@ -103,27 +86,39 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (mCallback.isUserSlidingMenuOpen()) {
+            onStartObserving();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mChannel != null) {
+            onStopObserving();
+        }
+    }
+
+    @Override
     protected void attachSelectionController() {
         mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
                 getListView().getWrappedList(), (ActionBarActivity) getActivity(), this, true);
     }
 
     public void onMenuOpened(final Channel channel) {
-        if (!channel.equals(mChannel)) {
-            final UpdateableTreeSet<ChannelUser> userList = channel.getUsers();
+        mChannel = channel;
 
-            if (mChannel != null) {
-                mChannel.setObserving(false);
-            }
-            channel.setObserving(true);
+        final UpdateableTreeSet<ChannelUser> userList = channel.getUsers();
 
-            mChannel = channel;
+        mAdapter.setInternalSet(userList);
+        mAdapter.setChannel(channel);
+        getListView().setAdapter(mAdapter);
 
-            getListView().setAdapter(null);
-            mAdapter.setInternalSet(userList);
-            mAdapter.setChannel(channel);
-            getListView().setAdapter(mAdapter);
-        }
+        onStartObserving();
     }
 
     @Override
@@ -179,14 +174,13 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
 
     @Override
     public void onClose() {
+        onStopObserving();
+
+        getListView().setAdapter(null);
+
         if (mMultiSelectionController != null) {
             mMultiSelectionController.finish();
         }
-    }
-
-    void onChannelClosed() {
-        mChannel = null;
-        getRealAdapter().clear();
     }
 
     @Override
@@ -215,22 +209,8 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
      * event is referring to
      */
     @Subscribe
-    public void onChannelPart(final PartEvent event) {
-        if (event.channelName.equals(mChannel.getName())) {
-            onChannelClosed();
-        }
-    }
-
-    @Subscribe
-    public void onKicked(final KickEvent event) {
-        if (event.channelName.equals(mChannel.getName())) {
-            onChannelClosed();
-        }
-    }
-
-    @Subscribe
     public void onUserListChanged(final ChannelEvent event) {
-        if (event.channelName.equals(mChannel.getName())) {
+        if (isChannelEqual(event.channelName)) {
             switch (event.changeType) {
                 case ADD:
                     mAdapter.add(event.user);
@@ -249,12 +229,28 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     }
     // End of subscribed events
 
-    public interface UserListCallback {
+    public void onStartObserving() {
+        mCallback.getServer().getServerEventBus().register(this);
+        mChannel.setObserving(true);
+    }
+
+    public void onStopObserving() {
+        mCallback.getServer().getServerEventBus().unregister(this);
+        mChannel.setObserving(false);
+    }
+
+    private boolean isChannelEqual(final String channelName) {
+        return channelName.equals(mChannel.getName());
+    }
+
+    public interface Callbacks {
 
         public void onUserMention(final List<ChannelUser> users);
 
         public Server getServer();
 
         public void closeAllSlidingMenus();
+
+        public boolean isUserSlidingMenuOpen();
     }
 }
