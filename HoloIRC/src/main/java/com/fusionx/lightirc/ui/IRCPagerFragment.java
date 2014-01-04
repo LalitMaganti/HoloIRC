@@ -7,11 +7,13 @@ import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.channel.MentionEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ImportantServerEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
+import com.fusionx.relay.event.user.WorldPrivateEvent;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
@@ -25,6 +27,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+
+import de.keyboardsurfer.android.widget.crouton.Configuration;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class IRCPagerFragment extends Fragment implements ServerFragment.Callbacks,
         ChannelFragment.Callbacks, UserFragment.Callbacks {
@@ -200,6 +206,32 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
             onCreateMessageFragment(event.nick, true);
         } else {
             mViewPager.setCurrentItem(index);
+        }
+    }
+
+    @Subscribe
+    public void onPrivateMessage(final WorldPrivateEvent event) {
+        if (!getCurrentTitle().equals(event.user.getNick())) {
+            final String message = String.format(getString(R.string.activity_pm),
+                    event.user.getNick());
+            final Configuration.Builder builder = new Configuration.Builder();
+            builder.setDuration(2000);
+            final Crouton crouton = Crouton.makeText(getActivity(), message,
+                    Style.INFO).setConfiguration(builder.build());
+            crouton.show();
+        }
+    }
+
+    @Subscribe
+    public void onPrivateMessage(final MentionEvent event) {
+        if (!getCurrentTitle().equals(event.channelName)) {
+            final String message = String.format(getString(R.string.activity_mentioned),
+                    event.channelName);
+            final Configuration.Builder builder = new Configuration.Builder();
+            builder.setDuration(2000);
+            final Crouton crouton = Crouton.makeText(getActivity(), message,
+                    Style.INFO).setConfiguration(builder.build());
+            crouton.show();
         }
     }
 

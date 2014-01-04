@@ -22,16 +22,17 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.loaders.UserLoader;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.parser.UserInputParser;
-import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.content.Loader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserFragment extends IRCFragment<UserEvent> {
@@ -51,35 +52,16 @@ public class UserFragment extends IRCFragment<UserEvent> {
     public void onResume() {
         super.onResume();
 
-        final Server server = mCallbacks.getServer();
-        final PrivateMessageUser user = server.getUserChannelInterface()
-                .getPrivateMessageUserIfExists(mTitle);
+        final PrivateMessageUser user = getPrivateMessageUser();
 
         if (user.isUserQuit()) {
             onDisableUserInput();
-        } else {
-            server.getServerEventBus().register(this);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
-        final Server server = mCallbacks.getServer();
-        final PrivateMessageUser user = server.getUserChannelInterface()
-                .getPrivateMessageUserIfExists(mTitle);
-
-        if (!user.isUserQuit()) {
-            server.getServerEventBus().unregister(this);
-        }
-    }
-
-    @Override
-    protected List<UserEvent> onRetrieveMessages() {
-        final PrivateMessageUser user = mCallbacks.getServer().getUserChannelInterface()
-                .getPrivateMessageUserIfExists(mTitle);
-        return new ArrayList<>(user.getBuffer());
     }
 
     @Override
@@ -92,11 +74,17 @@ public class UserFragment extends IRCFragment<UserEvent> {
         UserInputParser.onParseUserMessage(mCallbacks.getServer(), mTitle, message);
     }
 
-    @Subscribe
-    public void onPrivateEvent(final UserEvent event) {
-        if (event.user.getNick().equals(mTitle)) {
-            mMessageAdapter.add(event);
-        }
+    public Server getServer() {
+        return mCallbacks.getServer();
+    }
+
+    public PrivateMessageUser getPrivateMessageUser() {
+        return getServer().getUserChannelInterface().getPrivateMessageUserIfExists(mTitle);
+    }
+
+    @Override
+    public Loader<List<UserEvent>> onCreateLoader(int id, Bundle args) {
+        return new UserLoader(getActivity(), getServer(), getPrivateMessageUser());
     }
 
     public interface Callbacks {

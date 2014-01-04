@@ -36,10 +36,12 @@ import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.squareup.otto.Subscribe;
 
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
@@ -51,9 +53,27 @@ import android.widget.GridView;
 
 import java.util.ArrayList;
 
-public class ServerListActivity extends ActionBarActivity implements ServerListAdapter
-        .BuilderAdapterCallback, AnimatedServerListAdapter.SingleDismissCallback,
-        ServerCard.ServerCardCallback {
+public class ServerListActivity extends ActionBarActivity implements ServerListAdapter.Callbacks,
+        AnimatedServerListAdapter.SingleDismissCallback, ServerCard.Callbacks {
+
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(final ComponentName className, final IBinder binder) {
+            mService = ((IRCService.IRCBinder) binder).getService();
+            setUpServerList();
+
+            final GridView listView = (GridView) findViewById(R.id.server_list);
+            mAnimationAdapter = new AnimatedServerListAdapter(mServerCardsAdapter,
+                    ServerListActivity.this);
+            mAnimationAdapter.setAbsListView(listView);
+            listView.setAdapter(mAnimationAdapter);
+        }
+
+        @Override
+        public void onServiceDisconnected(final ComponentName name) {
+            mServerCardsAdapter.notifyDataSetChanged();
+        }
+    };
 
     private IRCService mService = null;
 
@@ -89,6 +109,10 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         if (mService != null) {
             setUpServerList();
         }
+
+        if (mAnimationAdapter != null) {
+            mAnimationAdapter.reset();
+        }
     }
 
     @Override
@@ -111,30 +135,6 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         unbindService(mConnection);
         mService = null;
     }
-
-    @Subscribe
-    public void onDisconnect(final DisconnectEvent event) {
-        mServerCardsAdapter.notifyDataSetChanged();
-    }
-
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCService.IRCBinder) binder).getService();
-            setUpServerList();
-
-            final GridView listView = (GridView) findViewById(R.id.server_list);
-            mAnimationAdapter = new AnimatedServerListAdapter
-                    (mServerCardsAdapter, ServerListActivity.this);
-            mAnimationAdapter.setAbsListView(listView);
-            listView.setAdapter(mAnimationAdapter);
-        }
-
-        @Override
-        public void onServiceDisconnected(final ComponentName name) {
-            mServerCardsAdapter.notifyDataSetChanged();
-        }
-    };
 
     // Action bar
     @Override
@@ -187,11 +187,6 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         }
     }
 
-    @Subscribe
-    public void onServerConnected(final ConnectEvent event) {
-        mServerCardsAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void disconnectFromServer(final ServerCard builder) {
         final Server server = getServer(builder.getTitle());
@@ -236,15 +231,26 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         return mService != null ? mService.getServerIfExists(title) : null;
     }
 
-    @SuppressWarnings("RedundantCast")
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
-    public void onDismiss(AbsListView listView, int position) {
+    public void onDismiss(final AbsListView listView, int position) {
         final ServerCardInterface builder = mServerCardsAdapter.getItem(position);
         builder.onCardDismiss();
 
-        ((GridView) listView).setAdapter(null);
+        listView.setAdapter(null);
         mServerCardsAdapter.remove(builder);
         mAnimationAdapter.notifyDataSetChanged();
-        ((GridView) listView).setAdapter(mAnimationAdapter);
+        listView.setAdapter(mAnimationAdapter);
+    }
+
+    // Subscribe events
+    @Subscribe
+    public void onDisconnect(final DisconnectEvent event) {
+        mServerCardsAdapter.notifyDataSetChanged();
+    }
+
+    @Subscribe
+    public void onServerConnected(final ConnectEvent event) {
+        mServerCardsAdapter.notifyDataSetChanged();
     }
 }

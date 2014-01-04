@@ -22,21 +22,19 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.loaders.ServerLoader;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerStatus;
-import com.fusionx.relay.event.server.JoinEvent;
-import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
-import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ServerFragment extends IRCFragment<ServerEvent> {
@@ -66,27 +64,8 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     public void onResume() {
         super.onResume();
 
-        getServer().getServerEventBus().register(this);
-
         if (getServer().getStatus() != ServerStatus.CONNECTED) {
             onDisableUserInput();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        getServer().getServerEventBus().unregister(this);
-    }
-
-    @Override
-    protected List<ServerEvent> onRetrieveMessages() {
-        final Server server = getServer();
-        if (server != null) {
-            return new ArrayList<>(server.getBuffer());
-        } else {
-            return null;
         }
     }
 
@@ -99,14 +78,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
         mMessageBox.setEnabled(true);
     }
 
-    // Subscription event
-    @Subscribe
-    public void onServerEvent(final ServerEvent event) {
-        if (!(event instanceof JoinEvent) && !(event instanceof PartEvent)) {
-            mMessageAdapter.add(event);
-        }
-    }
-
     public Server getServer() {
         return mCallback.getServer();
     }
@@ -114,6 +85,11 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     @Override
     public FragmentTypeEnum getType() {
         return FragmentTypeEnum.Server;
+    }
+
+    @Override
+    public Loader<List<ServerEvent>> onCreateLoader(int id, Bundle args) {
+        return new ServerLoader(getActivity(), getServer());
     }
 
     public interface Callbacks {

@@ -104,6 +104,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="service_disconnect_all">Disconnect all</string>
     <string name="service_you_mentioned">You have been mentioned on</string>
     <string name="activity_mentioned">You have been mentioned on %1$s</string>
+    <string name="activity_pm">You have a new private message from 51$s</string>
 
     <!-- User list fragment -->
     <string name="user_list_not_possible">Not possible</string>

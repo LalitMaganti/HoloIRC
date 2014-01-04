@@ -23,16 +23,16 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     private final int mServerItemCount;
 
-    private boolean mConnected = false;
-
-    private FragmentTypeEnum mFragmentType = FragmentTypeEnum.Server;
-
     private final String[] mChannelArray;
 
     private final String[] mUserArray;
 
+    private boolean mConnected = false;
+
+    private FragmentTypeEnum mFragmentType = FragmentTypeEnum.Server;
+
     public ActionsAdapter(final Context context) {
-        super(context, R.layout.default_listview_textview, new ArrayList<String>(Arrays.asList
+        super(context, R.layout.default_listview_textview, new ArrayList<>(Arrays.asList
                 (context.getResources().getStringArray(R.array.server_actions))));
         mInflater = LayoutInflater.from(context);
         mServerItemCount = super.getCount();
@@ -80,7 +80,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         return i < mServerItemCount ? 0 : 1;
     }
 
-    public void setFragmentType(FragmentTypeEnum fragmentType) {
+    public void setFragmentType(final FragmentTypeEnum fragmentType) {
         if (mFragmentType != fragmentType) {
             mFragmentType = fragmentType;
             notifyDataSetChanged();

@@ -27,7 +27,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
 
     private final ServerConfiguration.Builder mServer;
 
-    private final ServerCardCallback mCallback;
+    private final Callbacks mCallback;
 
     private final View.OnClickListener overflowClickListener = new View.OnClickListener() {
         @Override
@@ -49,7 +49,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
 
     public ServerCard(final Context context,
             final ServerConfiguration.Builder server,
-            final ServerCardCallback callback) {
+            final Callbacks callback) {
         mContext = context;
         mServer = server;
         mCallback = callback;
@@ -127,7 +127,7 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
         return true;
     }
 
-    public interface ServerCardCallback {
+    public interface Callbacks {
 
         public boolean isServerAvailable(final String title);
 

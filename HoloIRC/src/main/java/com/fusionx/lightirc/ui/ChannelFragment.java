@@ -22,20 +22,18 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.loaders.ChannelLoader;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.NameEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.parser.UserInputParser;
-import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.content.Loader;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent> {
@@ -49,25 +47,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> {
         if (mCallback == null) {
             mCallback = FragmentUtils.getParent(this, Callbacks.class);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mCallback.getServer().getServerEventBus().register(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        mCallback.getServer().getServerEventBus().unregister(this);
-    }
-
-    @Override
-    protected List<ChannelEvent> onRetrieveMessages() {
-        return new ArrayList<>(getChannel().getBuffer());
     }
 
     public void onUserMention(final List<WorldUser> users) {
@@ -90,18 +69,13 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> {
         UserInputParser.onParseChannelMessage(mCallback.getServer(), mTitle, message);
     }
 
-    // Subscription methods
-    @Subscribe
-    public void onChannelMessage(final ChannelEvent event) {
-        if (!(event instanceof WorldUserEvent) || !AppPreferences.hideUserMessages) {
-            if (event.channelName.equals(mTitle) && !(event instanceof NameEvent)) {
-                mMessageAdapter.add(event);
-            }
-        }
-    }
-
     private Channel getChannel() {
         return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
+    }
+
+    @Override
+    public Loader<List<ChannelEvent>> onCreateLoader(final int id, final Bundle args) {
+        return new ChannelLoader(getActivity(), mCallback.getServer(), getChannel());
     }
 
 

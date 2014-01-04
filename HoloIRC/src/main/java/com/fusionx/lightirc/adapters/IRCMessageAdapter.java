@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
@@ -26,9 +28,9 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
     private List<T> mObjects;
 
-    public IRCMessageAdapter(Context context, final List<T> objects) {
+    public IRCMessageAdapter(Context context) {
         mContext = context;
-        mObjects = objects;
+        mObjects = new ArrayList<>();
     }
 
     @Override
@@ -96,7 +98,14 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void setInternalList(final List<T> list) {
+    public void addAll(final Collection<T> events) {
+        synchronized (mLock) {
+            mObjects.addAll(events);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setData(final List<T> list) {
         synchronized (mLock) {
             mObjects = list;
         }

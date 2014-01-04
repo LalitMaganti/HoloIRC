@@ -35,16 +35,16 @@ import java.util.List;
 
 public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface> {
 
-    private final BuilderAdapterCallback mCallback;
+    private final Callbacks mCallbacks;
 
     public ServerListAdapter(final Activity activity, final List<ServerCardInterface> list) {
         super(activity, R.layout.item_server_card, list);
 
         try {
-            mCallback = (BuilderAdapterCallback) activity;
+            mCallbacks = (Callbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
-                    "BuilderAdapterCallback");
+                    "ServerListAdapter.Callbacks");
         }
     }
 
@@ -52,7 +52,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
     public View getView(final int position, final View convertView, final ViewGroup parent) {
         final ServerCardInterface card = getItem(position);
         final Server server = card.getTitle() == null ? null :
-                mCallback.getServer(card.getTitle());
+                mCallbacks.getServer(card.getTitle());
         return getItem(position).getView(convertView, parent, server);
     }
 
@@ -69,7 +69,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
     public int getNumberOfConnectedServers() {
         int i = 0;
         for (final ServerCardInterface builder : mObjects) {
-            final Server server = mCallback.getServer(builder.getTitle());
+            final Server server = mCallbacks.getServer(builder.getTitle());
             if (server != null && server.getStatus() == ServerStatus.CONNECTED) {
                 i += 1;
             }
@@ -77,7 +77,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
         return i;
     }
 
-    public interface BuilderAdapterCallback {
+    public interface Callbacks {
 
         public Server getServer(final String title);
     }

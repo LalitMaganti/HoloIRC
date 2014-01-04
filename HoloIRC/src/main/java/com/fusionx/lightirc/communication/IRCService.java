@@ -24,9 +24,12 @@ package com.fusionx.lightirc.communication;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.ServerListActivity;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
+import com.fusionx.relay.event.channel.MentionEvent;
+import com.squareup.otto.Subscribe;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -39,6 +42,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Pair;
 
 import java.util.HashMap;
@@ -174,6 +178,10 @@ public class IRCService extends Service {
         }
     }
 
+    public void setNoMention(String noMention) {
+        mNoMention = noMention;
+    }
+
     public class MentionHelper {
 
         private final ServerConfiguration mConfiguration;
@@ -183,7 +191,7 @@ public class IRCService extends Service {
         }
 
         // Subscribe events
-        /*@Subscribe
+        @Subscribe
         public void onMention(final MentionEvent event) {
             if (!mConfiguration.getTitle().equals(mNoMention)) {
                 final NotificationManager mNotificationManager = (NotificationManager)
@@ -192,7 +200,7 @@ public class IRCService extends Service {
                         .this));
                 intent.putExtra("serverTitle", mConfiguration.getTitle());
                 intent.putExtra("serverConfig", mConfiguration);
-                intent.putExtra("mention", event.destination);
+                intent.putExtra("mention", event.channelName);
                 final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(IRCService.this);
                 taskStackBuilder.addParentStack(UIUtils.getIRCActivity(IRCService.this));
                 taskStackBuilder.addNextIntent(intent);
@@ -200,21 +208,17 @@ public class IRCService extends Service {
                         PendingIntent.FLAG_UPDATE_CURRENT);
                 final Notification notification = new NotificationCompat.Builder(IRCService.this)
                         .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.service_you_mentioned) + " " +
-                                event.destination)
+                        .setContentText(getString(R.string.service_you_mentioned) + " " + event
+                                .channelName)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setAutoCancel(true)
-                        .setTicker(getString(R.string.service_you_mentioned) + " " +
-                                event.destination)
+                        .setTicker(getString(R.string.service_you_mentioned) + " " + event
+                                .channelName)
                         .setContentIntent(pIntent).build();
                 mNotificationManager.notify(345, notification);
             }
-        }*/
+        }
         // Subscribe events end
-    }
-
-    public void setNoMention(String noMention) {
-        mNoMention = noMention;
     }
 
     // Binder which returns this service

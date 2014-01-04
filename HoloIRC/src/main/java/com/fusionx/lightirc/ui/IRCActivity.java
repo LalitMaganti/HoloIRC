@@ -119,20 +119,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 onUserListDisplayed();
             }
         }
-
-        /*@Subscribe
-        public void onMention(final MentionEvent event) {
-            if (!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
-                final String message = String.format(getString(R.string.activity_mentioned),
-                        event.destination);
-                final de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder
-                        = new de.keyboardsurfer.android.widget.crouton.Configuration.Builder();
-                builder.setDuration(2000);
-                final Crouton crouton = Crouton.makeText(IRCActivity.this, message,
-                        Style.INFO).setConfiguration(builder.build());
-                crouton.show();
-            }
-        }*/
     };
 
     protected ActionsPagerFragment mActionsPagerFragment;
@@ -321,7 +307,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         getSupportActionBar().setSubtitle(MiscUtils.getStatusString(this, getServer().getStatus()));
 
         if (isConnectedToServer()) {
-            final String tabTitle = getServer().getServerCache().getIrcTitle();
+            String tabTitle = getIntent().getStringExtra("mention");
+            if (tabTitle == null) {
+                tabTitle = getServer().getServerCache().getIrcTitle();
+            }
             for (final Channel channel : getServer().getUser().getChannels()) {
                 final boolean switchToTab = tabTitle.equals(channel.getName());
                 mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
