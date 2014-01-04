@@ -25,7 +25,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.constants.UserLevel;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -73,7 +73,7 @@ public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
             view = (TextView) mInflater.inflate(R.layout.sliding_menu_header, viewGroup, false);
         }
 
-        final UserLevelEnum levelEnum = getItem(i).getChannelPrivileges(mChannel);
+        final UserLevel levelEnum = getItem(i).getChannelPrivileges(mChannel);
         view.setText(mChannel.getNumberOfUsersType(levelEnum) + " " + levelEnum.getName());
         return view;
     }

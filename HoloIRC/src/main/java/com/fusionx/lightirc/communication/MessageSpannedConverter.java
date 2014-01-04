@@ -8,9 +8,11 @@ import com.fusionx.relay.event.channel.InitialTopicEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
 import com.fusionx.relay.event.channel.NickChangeEvent;
 import com.fusionx.relay.event.channel.TopicEvent;
+import com.fusionx.relay.event.channel.UserLevelChangeEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.channel.WorldJoinEvent;
 import com.fusionx.relay.event.channel.WorldKickEvent;
+import com.fusionx.relay.event.channel.WorldLevelChangeEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.channel.WorldNickChangeEvent;
 import com.fusionx.relay.event.channel.WorldPartEvent;
@@ -88,11 +90,17 @@ public class MessageSpannedConverter {
         setupEvent(event, String.format(response, event.nick));
     }
 
-    /*public void getModeChangedMessage(final String mode, final String triggerNick,
-            final String recipientNick) {
+    @Subscribe
+    public void getModeChangedMessage(final UserLevelChangeEvent event) {
         final String response = mContext.getString(R.string.parser_mode_changed);
-        String.format(response, mode, triggerNick, recipientNick);
-    }*/
+        setupEvent(event, String.format(response, event.rawMode, event.nick, event.changingNick));
+    }
+
+    @Subscribe
+    public void getModeChangedMessage(final WorldLevelChangeEvent event) {
+        final String response = mContext.getString(R.string.parser_mode_changed);
+        setupEvent(event, String.format(response, event.rawMode, event.nick, event.changingNick));
+    }
 
     @Subscribe
     public void getNickChangedMessage(final WorldNickChangeEvent event) {
