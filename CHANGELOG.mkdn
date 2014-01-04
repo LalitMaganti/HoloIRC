@@ -1,5 +1,11 @@
 Changelog for HoloIRC
 ======
+Version 2.9.0:
+    Major stability improvements
+    Multiple memory and performance optimzations
+    Many bug fixes
+    Overhaul base IRC code for all round improved performance
+
 Version 2.8.7:
     Fix a major tablet-specific crash issue
 
