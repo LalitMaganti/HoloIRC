@@ -24,7 +24,6 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.AnimatedServerListAdapter;
 import com.fusionx.lightirc.adapters.ServerListAdapter;
-import com.fusionx.lightirc.collections.SynchronizedArrayList;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.widget.ServerCard;
@@ -70,8 +69,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_server_list);
 
-        mServerCardsAdapter = new ServerListAdapter(this,
-                new SynchronizedArrayList<ServerCardInterface>());
+        mServerCardsAdapter = new ServerListAdapter(this, new ArrayList<ServerCardInterface>());
     }
 
     @Override

@@ -22,6 +22,7 @@ import com.fusionx.relay.event.server.ErrorEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.MotdEvent;
+import com.fusionx.relay.event.server.PrivateNoticeEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
@@ -224,17 +225,18 @@ public class MessageSpannedConverter {
         setupEvent(event, String.format(response, event.oldNick, event.newNick));
     }
 
+    @Subscribe
+    public void getPrivateNoticeMessage(final PrivateNoticeEvent event) {
+        final String response = mContext.getString(R.string.parser_notice);
+        setupEvent(event, String.format(response, event.sendingNick, event.message));
+    }
+
     private String appendReasonIfNeeded(final String response, final String reason) {
-        return Utils.isEmpty(reason) ? response :
-                response + " " + String.format(mContext.getString(R.string.parser_reason), reason);
+        return Utils.isEmpty(reason) ? response : response + " " + String.format(mContext
+                .getString(R.string.parser_reason), reason);
     }
 
     private void setupEvent(final Event event, final String message) {
         event.store = ColourParserUtils.onParseMarkup(message);
-    }
-
-    // Errors
-    public String getNickInUseEvent() {
-        return mContext.getString(R.string.error_nick_in_use);
     }
 }

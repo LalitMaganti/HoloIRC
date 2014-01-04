@@ -2,7 +2,6 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
@@ -23,6 +22,7 @@ import android.view.View;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static com.fusionx.lightirc.constants.PreferenceConstants.AutoJoin;
 
@@ -49,8 +49,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
                 Context.MODE_PRIVATE);
         final Set<String> set = SharedPreferencesUtils.getStringSet(settings,
                 PreferenceConstants.AutoJoin, new HashSet<String>());
-        mAdapter = new BaseCollectionAdapter<String>(getActivity(),
-                R.layout.default_listview_textview, new SynchronizedTreeSet<String>(set));
+        mAdapter = new BaseCollectionAdapter<>(getActivity(),
+                R.layout.default_listview_textview, new TreeSet<>(set));
 
         setListAdapter(mAdapter);
         setHasOptionsMenu(true);

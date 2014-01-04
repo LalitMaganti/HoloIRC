@@ -3,7 +3,6 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
@@ -25,6 +24,7 @@ import android.view.View;
 import android.widget.AbsListView;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 public class IgnoreListFragment extends MultiChoiceListFragment<String> implements SlidingMenu
         .OnCloseListener, OnDismissCallback {
@@ -36,7 +36,7 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
 
-        final SynchronizedTreeSet<String> arrayList = new SynchronizedTreeSet<String>(MiscUtils
+        final TreeSet<String> arrayList = new TreeSet<>(MiscUtils
                 .getIgnoreList(getActivity(), callback.getServerTitle().toLowerCase()));
         final BaseCollectionAdapter<String> ignoreAdapter = new BaseCollectionAdapter<String>
                 (getActivity(), R.layout.default_listview_textview, arrayList);

@@ -8,6 +8,7 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.SwitchToPrivateMessage;
 import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.ImportantServerEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
@@ -202,29 +203,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
         }
     }
 
-    /*@Subscribe
-    public void onPrivateMessage(final  event) {
-        if (event.newPrivateMessage) {
-            onCreateMessageFragment(event.userNick, true);
-        }
-    }
-
     @Subscribe
-    public void onPrivateAction(final WorldPrivateActionEvent event) {
-        if (event.newPrivateMessage) {
-            onCreateMessageFragment(event.userNick, true);
-        }
-    }*/
-
-    /*@Subscribe
-    public void onSwitchToServer(final SwitchToServerEvent event) {
+    public void onImportantServerEvent(final ImportantServerEvent event) {
         switchToServerFragment();
     }
-
-    @Subscribe
-    public void onNickInUse(final NickInUseEvent event) {
-        switchToServerFragment();
-    }*/
 
     @Subscribe
     public void onServerConnected(final ConnectEvent event) {
