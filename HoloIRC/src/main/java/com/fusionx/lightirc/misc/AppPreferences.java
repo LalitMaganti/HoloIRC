@@ -56,10 +56,10 @@ public class AppPreferences implements EventPreferences {
         return quitReason;
     }
 
-    @Override
-    public boolean getShouldTimestampMessages() {
-        return timestamp;
-    }
+    //@Override
+    //public boolean getShouldTimestampMessages() {
+    //    return timestamp;
+    //}
 
     @Override
     public Theme getTheme() {
@@ -87,11 +87,16 @@ public class AppPreferences implements EventPreferences {
         return highlightLine;
     }
 
-    // We always want relay to handle the initial private message population
     @Override
-    public boolean shouldHandleInitialPrivateMessage() {
+    public boolean shouldNickBeColourful() {
         return true;
     }
+
+    // We always want relay to handle the initial private message population
+    /*@Override
+    public boolean shouldHandleInitialPrivateMessage() {
+        return true;
+    }*/
 
     // We always want to display the messages that the app user sends
     @Override

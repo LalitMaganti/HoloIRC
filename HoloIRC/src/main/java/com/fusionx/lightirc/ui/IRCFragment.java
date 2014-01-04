@@ -25,7 +25,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.relay.Message;
+import com.fusionx.relay.event.Event;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -41,15 +41,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
-public abstract class IRCFragment extends ListFragment implements TextView.OnEditorActionListener {
+public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
+        .OnEditorActionListener {
 
     String mTitle = null;
 
     EditText mMessageBox = null;
 
-    IRCMessageAdapter mMessageAdapter;
-
-    boolean mCachingImportant = true;
+    IRCMessageAdapter<T> mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
@@ -66,21 +65,29 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        setupListAdapter();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
-        setupListAdapter();
         getListView().setSelection(getListView().getCount());
     }
 
     void setupListAdapter() {
-        final List<Message> messages = onRetrieveMessages();
-        if (messages != null) {
-            mMessageAdapter = new IRCMessageAdapter(getActivity(), messages);
+        final List<T> messages = onRetrieveMessages();
+        if (mMessageAdapter == null) {
+            mMessageAdapter = new IRCMessageAdapter<>(getActivity(), messages);
+
             final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
             adapter.setAbsListView(getListView());
             setListAdapter(adapter);
         }
+        mMessageAdapter.setInternalList(messages);
     }
 
     public final void onDisableUserInput() {
@@ -102,14 +109,10 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
         }
     }
 
-    public void setCachingImportant(boolean cachingImportant) {
-        mCachingImportant = cachingImportant;
-    }
-
     // Abstract methods
     protected abstract void onSendMessage(final String message);
 
-    protected abstract List<Message> onRetrieveMessages();
+    protected abstract List<T> onRetrieveMessages();
 
     public abstract FragmentTypeEnum getType();
 

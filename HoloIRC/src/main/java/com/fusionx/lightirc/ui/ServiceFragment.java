@@ -19,9 +19,37 @@ import android.view.ViewGroup;
 
 public class ServiceFragment extends Fragment {
 
+    private final ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(final ComponentName className, final IBinder binder) {
+            mService = ((IRCService.IRCBinder) binder).getService();
+            final ServerConfiguration.Builder builder = getActivity().getIntent()
+                    .getParcelableExtra("server");
+            if (builder == null) {
+                final ServerConfiguration configuration = getActivity().getIntent()
+                        .getParcelableExtra("serverConfig");
+                mServer = mService.connectToServer(configuration);
+            } else {
+                mServer = mService.connectToServer(builder.build());
+            }
+            mCallback.onServerAvailable(mServer);
+            mCallback.onSetupViewPager();
+
+            mService.setNoMention(mServer.getConfiguration().getTitle());
+        }
+
+        // Should never occur
+        @Override
+        public void onServiceDisconnected(final ComponentName name) {
+            final Intent intent = new Intent(getActivity(), ServerListActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
+    };
+
     private IRCService mService;
 
-    private ServiceFragmentCallback mCallback;
+    private Callbacks mCallback;
 
     private Server mServer;
 
@@ -41,6 +69,7 @@ public class ServiceFragment extends Fragment {
             final Intent service = new Intent(context, IRCService.class);
             service.putExtra("serverName", serverTitle);
             service.putExtra("stop", false);
+            service.putExtra(IRCService.MENTIONACTIVITY, serverTitle);
 
             context.getApplicationContext().startService(service);
             context.getApplicationContext().bindService(service, mConnection, 0);
@@ -57,10 +86,10 @@ public class ServiceFragment extends Fragment {
         super.onAttach(activity);
 
         try {
-            mCallback = (ServiceFragmentCallback) activity;
+            mCallback = (Callbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
-                    "ServiceFragmentCallback");
+                    "Callbacks");
         }
     }
 
@@ -78,6 +107,7 @@ public class ServiceFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
+        mService.setNoMention(null);
         getActivity().getApplicationContext().unbindService(mConnection);
     }
 
@@ -89,32 +119,6 @@ public class ServiceFragment extends Fragment {
             Bundle savedInstanceState) {
         return null;
     }
-
-    private final ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(final ComponentName className, final IBinder binder) {
-            mService = ((IRCService.IRCBinder) binder).getService();
-            final ServerConfiguration.Builder builder = getActivity().getIntent()
-                    .getParcelableExtra("server");
-            if (builder == null) {
-                final ServerConfiguration configuration = getActivity().getIntent()
-                        .getParcelableExtra("serverConfig");
-                mServer = mService.connectToServer(configuration);
-            } else {
-                mServer = mService.connectToServer(builder.build());
-            }
-            mCallback.onServerAvailable(mServer);
-            mCallback.onSetupViewPager();
-        }
-
-        // Should never occur
-        @Override
-        public void onServiceDisconnected(final ComponentName name) {
-            final Intent intent = new Intent(getActivity(), ServerListActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        }
-    };
 
     public Server getServer() {
         return mServer;
@@ -133,7 +137,7 @@ public class ServiceFragment extends Fragment {
         disconnect.execute();
     }
 
-    public interface ServiceFragmentCallback {
+    public interface Callbacks {
 
         public void onSetupViewPager();
 

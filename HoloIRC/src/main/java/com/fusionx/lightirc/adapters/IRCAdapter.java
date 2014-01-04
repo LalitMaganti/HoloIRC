@@ -76,34 +76,24 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
-    public void onUpdateFragmentTitle(final String oldName, final String newName) {
-        final int index = getIndexFromTitle(oldName);
-        final Pair<String, FragmentTypeEnum> pair = mFragmentList.get(index);
-        final Pair<String, FragmentTypeEnum> newPair = new Pair<>(newName, pair.second);
-        mFragmentList.set(index, newPair);
-
-        mTabStrip.notifyDataSetChanged();
-        notifyDataSetChanged();
-    }
-
     public int onNewFragment(final String title, final FragmentTypeEnum typeEnum) {
         final Pair<String, FragmentTypeEnum> enumPair = new Pair<>(title, typeEnum);
         mFragmentList.add(enumPair);
 
+        notifyDataSetChanged();
         // We don't want to notify the tab strip because the TabStrip doesn't even know that this
         // is the adapter it's meant to be monitoring - it only knows after the ServerFragment
         // has been added
         if (typeEnum != FragmentTypeEnum.Server) {
             mTabStrip.notifyDataSetChanged();
         }
-        notifyDataSetChanged();
 
         return mFragmentList.size() - 1;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        Fragment fragment = (Fragment) super.instantiateItem(container, position);
+        final Fragment fragment = (Fragment) super.instantiateItem(container, position);
         mRegisteredFragments.put(position, fragment);
         return fragment;
     }
@@ -134,14 +124,13 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         mTabStrip.notifyDataSetChanged();
     }
 
-    // ONLY CALL THIS METHOD IF YOU WANT THE CURRENTLY DISPLAYED FRAGMENT
-    public IRCFragment getRegisteredFragment(int position) {
-        return (IRCFragment) mRegisteredFragments.get(position);
-    }
-
-    // ONLY CALL THIS METHOD IF YOU WANT THE CURRENTLY DISPLAYED FRAGMENT
     @Override
     public CharSequence getPageTitle(final int position) {
         return mFragmentList.get(position).first;
+    }
+
+    // ONLY CALL THIS METHOD IF YOU WANT THE CURRENTLY DISPLAYED FRAGMENT
+    public IRCFragment getRegisteredFragment(int position) {
+        return (IRCFragment) mRegisteredFragments.get(position);
     }
 }

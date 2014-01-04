@@ -25,10 +25,10 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.collection.UpdateableTreeSet;
-import com.fusionx.relay.event.ChannelEvent;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.misc.IRCUserComparator;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
@@ -45,10 +45,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 
-public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser> implements
+public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> implements
         SlidingMenu.OnCloseListener {
 
     private Callbacks mCallback;
@@ -56,6 +57,8 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     private Channel mChannel;
 
     private UserListAdapter mAdapter;
+
+    private TreeSet<WorldUser> worldUsers;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -69,6 +72,13 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        worldUsers = new TreeSet<>(new IRCUserComparator(mChannel));
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_userlist_listview, container,
@@ -79,7 +89,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new UserListAdapter(view.getContext(), new HashSet<ChannelUser>());
+        mAdapter = new UserListAdapter(view.getContext(), worldUsers);
         getListView().setAdapter(mAdapter);
 
         getListView().setFastScrollEnabled(true);
@@ -98,7 +108,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onPause() {
         super.onPause();
 
-        if (mChannel != null) {
+        if (mCallback.isUserSlidingMenuOpen()) {
             onStopObserving();
         }
     }
@@ -112,9 +122,12 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
     public void onMenuOpened(final Channel channel) {
         mChannel = channel;
 
-        final UpdateableTreeSet<ChannelUser> userList = channel.getUsers();
+        final Collection<WorldUser> userList = channel.getUsers();
 
-        mAdapter.setInternalSet(userList);
+        worldUsers = new TreeSet<>(new IRCUserComparator(mChannel));
+        worldUsers.addAll(userList);
+
+        mAdapter.setInternalSet(worldUsers);
         mAdapter.setChannel(channel);
         getListView().setAdapter(mAdapter);
 
@@ -123,7 +136,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final List<ChannelUser> selectedItems = getCheckedItems();
+        final List<WorldUser> selectedItems = getCheckedItems();
         final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
@@ -208,7 +221,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
      * Only perform an action if the channel that is being observed currently is the one the
      * event is referring to
      */
-    @Subscribe
+    /*@Subscribe
     public void onUserListChanged(final ChannelEvent event) {
         if (isChannelEqual(event.channelName)) {
             switch (event.changeType) {
@@ -219,9 +232,25 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
                     mAdapter.remove(event.user);
                     break;
                 case MODIFIED:
+                    // Someone's nick has changed
                     mAdapter.notifyDataSetChanged();
                     break;
             }
+            if (mMultiSelectionController != null) {
+                mMultiSelectionController.finish();
+            }
+        }
+    }*/
+    @Subscribe
+    public void onWorldUserEvent(final WorldUserEvent event) {
+        if (event.channelName.equals(mChannel.getName())) {
+            final Collection<WorldUser> userList = mChannel.getUsers();
+
+            getListView().setAdapter(null);
+            worldUsers.clear();
+            worldUsers.addAll(userList);
+            getListView().setAdapter(mAdapter);
+
             if (mMultiSelectionController != null) {
                 mMultiSelectionController.finish();
             }
@@ -231,21 +260,15 @@ public class UserListFragment extends MultiChoiceStickyListFragment<ChannelUser>
 
     public void onStartObserving() {
         mCallback.getServer().getServerEventBus().register(this);
-        mChannel.setObserving(true);
     }
 
     public void onStopObserving() {
         mCallback.getServer().getServerEventBus().unregister(this);
-        mChannel.setObserving(false);
-    }
-
-    private boolean isChannelEqual(final String channelName) {
-        return channelName.equals(mChannel.getName());
     }
 
     public interface Callbacks {
 
-        public void onUserMention(final List<ChannelUser> users);
+        public void onUserMention(final List<WorldUser> users);
 
         public Server getServer();
 

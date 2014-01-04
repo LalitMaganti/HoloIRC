@@ -25,31 +25,29 @@ import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Message;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.constants.UserListChangeType;
-import com.fusionx.relay.event.ChannelEvent;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.NameEvent;
+import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ChannelFragment extends IRCFragment {
+public final class ChannelFragment extends IRCFragment<ChannelEvent> {
 
-    private ChannelFragmentCallback mCallback;
+    private Callbacks mCallback;
 
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
         if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, ChannelFragmentCallback.class);
+            mCallback = FragmentUtils.getParent(this, Callbacks.class);
         }
     }
 
@@ -58,7 +56,6 @@ public final class ChannelFragment extends IRCFragment {
         super.onResume();
 
         mCallback.getServer().getServerEventBus().register(this);
-        getChannel().setCached(true);
     }
 
     @Override
@@ -66,25 +63,17 @@ public final class ChannelFragment extends IRCFragment {
         super.onPause();
 
         mCallback.getServer().getServerEventBus().unregister(this);
-        if (mCachingImportant) {
-            getChannel().setCached(false);
-        }
     }
 
     @Override
-    protected List<Message> onRetrieveMessages() {
-        if (getChannel() == null) {
-            // This is an error - should not occur but seems to be doing so
-            return new ArrayList<>();
-        } else {
-            return getChannel().getBuffer();
-        }
+    protected List<ChannelEvent> onRetrieveMessages() {
+        return new ArrayList<>(getChannel().getBuffer());
     }
 
-    public void onUserMention(final List<ChannelUser> users) {
+    public void onUserMention(final List<WorldUser> users) {
         final String text = String.valueOf(mMessageBox.getText());
         String nicks = "";
-        for (final ChannelUser userNick : users) {
+        for (final WorldUser userNick : users) {
             nicks += userNick.getNick() + ": ";
         }
         mMessageBox.clearComposingText();
@@ -104,13 +93,9 @@ public final class ChannelFragment extends IRCFragment {
     // Subscription methods
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if (mTitle.equals(event.channelName) && (event.changeType == UserListChangeType.NONE
-                || !AppPreferences.hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
-            if (mMessageAdapter == null) {
-                setupListAdapter();
-            }
-            synchronized (mMessageAdapter.getMessages()) {
-                mMessageAdapter.add(new Message(event.message));
+        if (!(event instanceof WorldUserEvent) || !AppPreferences.hideUserMessages) {
+            if (event.channelName.equals(mTitle) && !(event instanceof NameEvent)) {
+                mMessageAdapter.add(event);
             }
         }
     }
@@ -119,8 +104,9 @@ public final class ChannelFragment extends IRCFragment {
         return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
     }
 
+
     // Callback interface
-    public interface ChannelFragmentCallback {
+    public interface Callbacks {
 
         public Server getServer();
     }

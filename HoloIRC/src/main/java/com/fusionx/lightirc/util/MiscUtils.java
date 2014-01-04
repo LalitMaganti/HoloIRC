@@ -21,7 +21,9 @@
 
 package com.fusionx.lightirc.util;
 
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.relay.ServerStatus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -70,5 +72,18 @@ public class MiscUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String getStatusString(final Context context, final ServerStatus serverStatus) {
+        switch (serverStatus) {
+            case CONNECTED:
+                return context.getString(R.string.status_connected);
+            case CONNECTING:
+                return context.getString(R.string.status_connecting);
+            case DISCONNECTED:
+                return context.getString(R.string.status_disconnected);
+            default:
+                return null;
+        }
     }
 }

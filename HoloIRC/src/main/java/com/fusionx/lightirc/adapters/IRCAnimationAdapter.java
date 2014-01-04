@@ -56,7 +56,7 @@ public class IRCAnimationAdapter extends BaseAdapterDecorator implements StickyL
 
     public IRCAnimationAdapter(BaseAdapter baseAdapter) {
         super(baseAdapter);
-        mAnimators = new SparseArray<AnimationInfo>();
+        mAnimators = new SparseArray<>();
 
         mAnimationStartMillis = -1;
         mLastAnimatedPosition = baseAdapter.getCount();

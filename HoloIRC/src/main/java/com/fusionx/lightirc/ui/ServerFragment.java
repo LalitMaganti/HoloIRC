@@ -23,31 +23,32 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Message;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.ServerEvent;
+import com.fusionx.relay.ServerStatus;
+import com.fusionx.relay.event.server.JoinEvent;
+import com.fusionx.relay.event.server.PartEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ServerFragment extends IRCFragment {
+public class ServerFragment extends IRCFragment<ServerEvent> {
 
-    private ServerFragmentCallback mCallback;
+    private Callbacks mCallback;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, ServerFragmentCallback.class);
+            mCallback = FragmentUtils.getParent(this, Callbacks.class);
         }
     }
 
@@ -66,9 +67,8 @@ public class ServerFragment extends IRCFragment {
         super.onResume();
 
         getServer().getServerEventBus().register(this);
-        getServer().getServerCache().setCached(true);
 
-        if (!getServer().isConnected()) {
+        if (getServer().getStatus() != ServerStatus.CONNECTED) {
             onDisableUserInput();
         }
     }
@@ -78,14 +78,13 @@ public class ServerFragment extends IRCFragment {
         super.onPause();
 
         getServer().getServerEventBus().unregister(this);
-        getServer().getServerCache().setCached(false);
     }
 
     @Override
-    protected List<Message> onRetrieveMessages() {
+    protected List<ServerEvent> onRetrieveMessages() {
         final Server server = getServer();
         if (server != null) {
-            return server.getBuffer();
+            return new ArrayList<>(server.getBuffer());
         } else {
             return null;
         }
@@ -103,13 +102,8 @@ public class ServerFragment extends IRCFragment {
     // Subscription event
     @Subscribe
     public void onServerEvent(final ServerEvent event) {
-        if (StringUtils.isNotBlank(event.message)) {
-            if (mMessageAdapter == null) {
-                setupListAdapter();
-            }
-            synchronized (mMessageAdapter.getMessages()) {
-                mMessageAdapter.add(new Message(event.message));
-            }
+        if (!(event instanceof JoinEvent) && !(event instanceof PartEvent)) {
+            mMessageAdapter.add(event);
         }
     }
 
@@ -122,7 +116,7 @@ public class ServerFragment extends IRCFragment {
         return FragmentTypeEnum.Server;
     }
 
-    public interface ServerFragmentCallback {
+    public interface Callbacks {
 
         public Server getServer();
 

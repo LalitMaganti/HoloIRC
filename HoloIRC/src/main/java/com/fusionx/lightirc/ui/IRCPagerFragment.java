@@ -4,23 +4,20 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.ConnectedEvent;
-import com.fusionx.relay.event.JoinEvent;
-import com.fusionx.relay.event.KickEvent;
-import com.fusionx.relay.event.NickInUseEvent;
-import com.fusionx.relay.event.PartEvent;
-import com.fusionx.relay.event.PrivateActionEvent;
-import com.fusionx.relay.event.PrivateMessageEvent;
-import com.fusionx.relay.event.PrivateNickChangeEvent;
-import com.fusionx.relay.event.SwitchToServerEvent;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.SwitchToPrivateMessage;
+import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.JoinEvent;
+import com.fusionx.relay.event.server.KickEvent;
+import com.fusionx.relay.event.server.PartEvent;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,23 +25,24 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-public class IRCPagerFragment extends Fragment implements ServerFragment.ServerFragmentCallback,
-        ChannelFragment.ChannelFragmentCallback, UserFragment.Callbacks {
+public class IRCPagerFragment extends Fragment implements ServerFragment.Callbacks,
+        ChannelFragment.Callbacks, UserFragment.Callbacks {
 
     private ViewPager mViewPager;
 
-    private IRCPagerInterface mCallback;
+    private Callbacks mCallbacks;
 
     private IRCAdapter mAdapter;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
         try {
-            mCallback = (IRCPagerInterface) activity;
+            mCallbacks = (Callbacks) activity;
         } catch (ClassCastException ex) {
-            throw new ClassCastException(activity.toString() + " must implement IRCPagerInterface");
+            throw new ClassCastException(activity.toString() + " must implement IRCPagerFragment"
+                    + ".Callbacks");
         }
     }
 
@@ -77,7 +75,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     public void onDestroy() {
         super.onDestroy();
 
-        mCallback.getServer().getServerEventBus().unregister(this);
+        mCallbacks.getServer().getServerEventBus().unregister(this);
     }
 
     /*
@@ -88,21 +86,20 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     public void onDetach() {
         super.onDetach();
 
-        mCallback = null;
+        mCallbacks = null;
     }
 
     // Don't setup the adapter or the tab strip until we know we're going to add a server fragment
     // This is to stop an issue in PagerSlidingTabStrip
     public void onCreateServerFragment(final String serverTitle) {
+        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity()
+                .findViewById(R.id.pager_tabs);
         if (mAdapter == null) {
-            final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity().findViewById(R.id
-                    .pager_tabs);
             mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
             mAdapter.onNewFragment(serverTitle, FragmentTypeEnum.Server);
-
-            mViewPager.setAdapter(mAdapter);
-            tabs.setViewPager(mViewPager);
         }
+        mViewPager.setAdapter(mAdapter);
+        tabs.setViewPager(mViewPager);
     }
 
     public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
@@ -124,16 +121,12 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         if (fragmentTitle.equals(getCurrentTitle())) {
             mViewPager.setCurrentItem(index - 1, true);
         }
-        final IRCFragment fragment = mAdapter.getRegisteredFragment(index);
-        if (fragment != null) {
-            fragment.setCachingImportant(false);
-        }
         mAdapter.onRemoveFragment(index);
     }
 
     @Override
     public boolean isConnectedToServer() {
-        return mCallback.isConnectedToServer();
+        return mCallbacks.isConnectedToServer();
     }
 
     public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
@@ -147,7 +140,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
         }
     }
 
-    public void onMentionRequested(final List<ChannelUser> users) {
+    public void onMentionRequested(final List<WorldUser> users) {
         if (FragmentTypeEnum.Channel.equals(getCurrentType())) {
             final ChannelFragment channel = (ChannelFragment) mAdapter
                     .getRegisteredFragment(mViewPager.getCurrentItem());
@@ -179,7 +172,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Override
     public Server getServer() {
-        return mCallback.getServer();
+        return mCallbacks.getServer();
     }
 
     // Subscribe events start here
@@ -190,7 +183,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
 
     @Subscribe
     public void onChannelJoin(final JoinEvent event) {
-        onCreateChannelFragment(event.channelToJoin, true);
+        onCreateChannelFragment(event.channelName, true);
     }
 
     @Subscribe
@@ -200,25 +193,30 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     }
 
     @Subscribe
-    public void onPrivateMessage(final PrivateMessageEvent event) {
+    public void onSwitchToPrivateMessage(final SwitchToPrivateMessage event) {
+        final int index = mAdapter.getIndexFromTitle(event.nick);
+        if (index == PagerAdapter.POSITION_NONE) {
+            onCreateMessageFragment(event.nick, true);
+        } else {
+            mViewPager.setCurrentItem(index);
+        }
+    }
+
+    /*@Subscribe
+    public void onPrivateMessage(final  event) {
         if (event.newPrivateMessage) {
             onCreateMessageFragment(event.userNick, true);
         }
     }
 
     @Subscribe
-    public void onPrivateAction(final PrivateActionEvent event) {
+    public void onPrivateAction(final WorldPrivateActionEvent event) {
         if (event.newPrivateMessage) {
             onCreateMessageFragment(event.userNick, true);
         }
-    }
+    }*/
 
-    @Subscribe
-    public void onPrivateNickChanged(final PrivateNickChangeEvent event) {
-        mAdapter.onUpdateFragmentTitle(event.userNick, event.newNick);
-    }
-
-    @Subscribe
+    /*@Subscribe
     public void onSwitchToServer(final SwitchToServerEvent event) {
         switchToServerFragment();
     }
@@ -226,17 +224,17 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.ServerF
     @Subscribe
     public void onNickInUse(final NickInUseEvent event) {
         switchToServerFragment();
-    }
+    }*/
 
     @Subscribe
-    public void onServerConnected(final ConnectedEvent event) {
+    public void onServerConnected(final ConnectEvent event) {
         final ServerFragment fragment = (ServerFragment) mAdapter.getRegisteredFragment(0);
         fragment.onConnected();
     }
     // Subscribe events end here
 
     // Interface for callbacks
-    public interface IRCPagerInterface {
+    public interface Callbacks {
 
         public Server getServer();
 

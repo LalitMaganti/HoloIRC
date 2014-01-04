@@ -39,24 +39,40 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
+import android.util.Pair;
+
+import java.util.HashMap;
 
 public class IRCService extends Service {
+
+    public static final String MENTIONACTIVITY = "MENTIONACTIVITY";
 
     private final IRCBinder mBinder = new IRCBinder();
 
     private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
 
-    private final EventResponsesImpl mResponses = new EventResponsesImpl(this);
-
     private final AppPreferences mAppPreferences = new AppPreferences();
+
+    private final HashMap<String, MentionHelper> mMentionHelperHashMap = new HashMap<>();
 
     private ConnectionManager mConnectionManager = null;
 
-    public Server connectToServer(final ServerConfiguration configuration) {
-        mConnectionManager = ConnectionManager.getConnectionManager(mResponses, mAppPreferences);
+    private String mNoMention;
 
-        final Server server = mConnectionManager.onConnectionRequested(configuration,
-                mAdapterHandler);
+    public Server connectToServer(final ServerConfiguration configuration) {
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
+
+        final Pair<Boolean, Server> serverPair = mConnectionManager.onConnectionRequested
+                (configuration, mAdapterHandler);
+        // The second element is the server itself
+        final Server server = serverPair.second;
+
+        // The first element is true if the server exists
+        if (!serverPair.first) {
+            final MentionHelper helper = new MentionHelper(configuration);
+            mMentionHelperHashMap.put(configuration.getTitle(), helper);
+            server.getServerEventBus().register(helper);
+        }
 
         updateNotification();
 
@@ -65,8 +81,8 @@ public class IRCService extends Service {
 
     private void updateNotification() {
         final String text = String.format(getResources().getQuantityString(R.plurals
-                .server_connection, mConnectionManager.getConnectedServerCount()),
-                mConnectionManager.getConnectedServerCount());
+                .server_connection, mConnectionManager.getServerCount()),
+                mConnectionManager.getServerCount());
         final Intent intent = new Intent(this, ServerListActivity.class);
         final Intent intent2 = new Intent(this, IRCService.class);
         intent2.putExtra("stop", true);
@@ -92,6 +108,12 @@ public class IRCService extends Service {
         // restarted or if the theme is being changed
         if (mConnectionManager != null) {
             synchronized (mBinder) {
+                for (final String title : mMentionHelperHashMap.keySet()) {
+                    final Server server = mConnectionManager.getServerIfExists(title);
+                    server.getServerEventBus().unregister(mMentionHelperHashMap.get(title));
+                }
+                mMentionHelperHashMap.clear();
+
                 mConnectionManager.onDisconnectAll();
             }
         }
@@ -106,6 +128,10 @@ public class IRCService extends Service {
 
     public void onRemoveServer(final String serverName) {
         synchronized (mBinder) {
+            final Server server = mConnectionManager.getServerIfExists(serverName);
+            server.getServerEventBus().unregister(mMentionHelperHashMap.get(serverName));
+            mMentionHelperHashMap.remove(serverName);
+
             if (mConnectionManager.onDisconnectionRequested(serverName)) {
                 stopForeground(true);
             } else {
@@ -115,11 +141,6 @@ public class IRCService extends Service {
                 mNotificationManager.cancel(345);
             }
         }
-    }
-
-    @Override
-    public IBinder onBind(final Intent intent) {
-        return mBinder;
     }
 
     @Override
@@ -136,6 +157,11 @@ public class IRCService extends Service {
     }
 
     @Override
+    public IBinder onBind(final Intent intent) {
+        return mBinder;
+    }
+
+    @Override
     public boolean onUnbind(final Intent intent) {
         return true;
     }
@@ -146,6 +172,49 @@ public class IRCService extends Service {
         } else {
             return null;
         }
+    }
+
+    public class MentionHelper {
+
+        private final ServerConfiguration mConfiguration;
+
+        private MentionHelper(final ServerConfiguration configuration) {
+            mConfiguration = configuration;
+        }
+
+        // Subscribe events
+        /*@Subscribe
+        public void onMention(final MentionEvent event) {
+            if (!mConfiguration.getTitle().equals(mNoMention)) {
+                final NotificationManager mNotificationManager = (NotificationManager)
+                        getSystemService(Context.NOTIFICATION_SERVICE);
+                final Intent intent = new Intent(IRCService.this, UIUtils.getIRCActivity(IRCService
+                        .this));
+                intent.putExtra("serverTitle", mConfiguration.getTitle());
+                intent.putExtra("serverConfig", mConfiguration);
+                intent.putExtra("mention", event.destination);
+                final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(IRCService.this);
+                taskStackBuilder.addParentStack(UIUtils.getIRCActivity(IRCService.this));
+                taskStackBuilder.addNextIntent(intent);
+                final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
+                final Notification notification = new NotificationCompat.Builder(IRCService.this)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(getString(R.string.service_you_mentioned) + " " +
+                                event.destination)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setAutoCancel(true)
+                        .setTicker(getString(R.string.service_you_mentioned) + " " +
+                                event.destination)
+                        .setContentIntent(pIntent).build();
+                mNotificationManager.notify(345, notification);
+            }
+        }*/
+        // Subscribe events end
+    }
+
+    public void setNoMention(String noMention) {
+        mNoMention = noMention;
     }
 
     // Binder which returns this service

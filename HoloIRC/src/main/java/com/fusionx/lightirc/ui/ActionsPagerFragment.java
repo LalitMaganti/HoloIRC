@@ -22,13 +22,13 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     private ActionPagerAdapter mActionsPagerAdapter;
 
-    private ActionsPagerFragmentCallback mCallback;
+    private Callbacks mCallbacks;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mCallback = (ActionsPagerFragmentCallback) activity;
+            mCallbacks = (Callbacks) activity;
         } catch (ClassCastException ex) {
             ex.printStackTrace();
         }
@@ -75,7 +75,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     @Override
     public String getServerTitle() {
-        return mCallback.getServerTitle();
+        return mCallbacks.getServerTitle();
     }
 
     public SlidingMenu.OnCloseListener getIgnoreFragmentListener() {
@@ -96,30 +96,30 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     @Override
     public String getNick() {
-        return mCallback.getNick();
+        return mCallbacks.getNick();
     }
 
     @Override
     public void closeOrPartCurrentTab() {
-        mCallback.onRemoveCurrentFragment();
+        mCallbacks.onRemoveCurrentFragment();
     }
 
     @Override
     public boolean isConnectedToServer() {
-        return mCallback.isConnectedToServer();
+        return mCallbacks.isConnectedToServer();
     }
 
     @Override
     public Server getServer() {
-        return mCallback.getServer();
+        return mCallbacks.getServer();
     }
 
     @Override
     public void closeAllSlidingMenus() {
-        mCallback.closeAllSlidingMenus();
+        mCallbacks.closeAllSlidingMenus();
     }
 
-    public interface ActionsPagerFragmentCallback {
+    public interface Callbacks {
 
         public String getServerTitle();
 

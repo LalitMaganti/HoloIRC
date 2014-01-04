@@ -25,18 +25,18 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.ServerStatus;
+import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.communication.ServerEventBus;
-import com.fusionx.relay.constants.UserListChangeType;
-import com.fusionx.relay.event.ChannelEvent;
-import com.fusionx.relay.event.ConnectedEvent;
-import com.fusionx.relay.event.DisconnectEvent;
-import com.fusionx.relay.event.MentionEvent;
+import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.DisconnectEvent;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
@@ -54,7 +54,6 @@ import java.util.Collection;
 import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 /**
  * Activity which contains all the communication code between the fragments It also implements a lot
@@ -63,8 +62,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
  * @author Lalit Maganti
  */
 public abstract class IRCActivity extends ActionBarActivity implements UserListFragment.Callbacks,
-        ServiceFragment.ServiceFragmentCallback, ActionsPagerFragment
-                .ActionsPagerFragmentCallback, IRCPagerFragment.IRCPagerInterface {
+        ServiceFragment.Callbacks, ActionsPagerFragment.Callbacks, IRCPagerFragment.Callbacks {
 
     /*
      * Listener used when the view pages changes pages
@@ -91,7 +89,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         @Subscribe
         public void onDisconnected(final DisconnectEvent event) {
-            if (event.userTriggered) {
+            if (event.userSent) {
                 mServiceFragment.removeServiceReference(mServerTitle);
 
                 final Intent intent = new Intent(IRCActivity.this, ServerListActivity.class);
@@ -109,33 +107,32 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
 
         @Subscribe
-        public void onServerConnected(final ConnectedEvent event) {
+        public void onServerConnected(final ConnectEvent event) {
             mActionsPagerFragment.updateConnectionStatus(true);
-            getSupportActionBar().setSubtitle(getServer().getStatus());
+            getSupportActionBar().setSubtitle(MiscUtils.getStatusString(IRCActivity.this,
+                    getServer().getStatus()));
         }
 
         @Subscribe
-        public void onChannelMessage(final ChannelEvent event) {
-            if (event.user != null && event.changeType != UserListChangeType.NONE) {
-                if (mUserSlidingMenu.isMenuShowing()) {
-                    onUserListDisplayed();
-                }
+        public void onChannelMessage(final WorldUserEvent event) {
+            if (mUserSlidingMenu.isMenuShowing()) {
+                onUserListDisplayed();
             }
         }
 
-        @Subscribe
+        /*@Subscribe
         public void onMention(final MentionEvent event) {
             if (!mIRCPagerFragment.getCurrentTitle().equals(event.destination)) {
                 final String message = String.format(getString(R.string.activity_mentioned),
                         event.destination);
-                final de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder = new
-                        de.keyboardsurfer.android.widget.crouton.Configuration.Builder();
+                final de.keyboardsurfer.android.widget.crouton.Configuration.Builder builder
+                        = new de.keyboardsurfer.android.widget.crouton.Configuration.Builder();
                 builder.setDuration(2000);
                 final Crouton crouton = Crouton.makeText(IRCActivity.this, message,
                         Style.INFO).setConfiguration(builder.build());
                 crouton.show();
             }
-        }
+        }*/
     };
 
     protected ActionsPagerFragment mActionsPagerFragment;
@@ -186,7 +183,9 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         } else if (getServer() != null) {
             final ServerEventBus bus = getServer().getServerEventBus();
             bus.register(mEventReceiver);
-            actionBar.setSubtitle(getServer().getStatus());
+
+            mIRCPagerFragment.onCreateServerFragment(mServerTitle);
+            actionBar.setSubtitle(MiscUtils.getStatusString(this, getServer().getStatus()));
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mServerTitle);
@@ -213,14 +212,15 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             @Override
             public void onOpen() {
                 mUserListFragment.onMenuOpened(getServer().getUserChannelInterface()
-                        .getChannel(mIRCPagerFragment.getCurrentTitle()));
+                        .getChannelIfExists(mIRCPagerFragment.getCurrentTitle()));
                 onUserListDisplayed();
             }
         });
         mUserSlidingMenu.setOnCloseListener(new SlidingMenu.OnCloseListener() {
             @Override
             public void onClose() {
-                getSupportActionBar().setSubtitle(getServer().getStatus());
+                getSupportActionBar().setSubtitle(MiscUtils.getStatusString(IRCActivity.this,
+                        getServer().getStatus()));
                 mUserListFragment.onClose();
             }
         });
@@ -243,19 +243,16 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     protected void onResume() {
         super.onResume();
+
         // Call this regardless of whether this is a resumption or not - the correct checks to
         // whether to bind to the service will be done in the ServiceFragment
         mServiceFragment.connectToServer(this, mServerTitle);
-
-        if (getServer() != null) {
-            getServer().getServerEventBus().setDisplayed(true);
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        getServer().getServerEventBus().setDisplayed(false);
+
         getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
     }
 
@@ -307,25 +304,21 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
     // Options menu end
 
-    void onUserListDisplayed() {
+    private void onUserListDisplayed() {
         getSupportActionBar().setSubtitle(mUserListFragment.getRealAdapter().getCount() + " users");
     }
 
     @Override
     public void onServerAvailable(final Server server) {
         final ServerEventBus bus = server.getServerEventBus();
-
-        // Register and then display
         bus.register(mEventReceiver);
-        bus.setDisplayed(true);
-
         bus.register(mIRCPagerFragment);
     }
 
     @Override
     public void onSetupViewPager() {
         mIRCPagerFragment.onCreateServerFragment(mServerTitle);
-        getSupportActionBar().setSubtitle(getServer().getStatus());
+        getSupportActionBar().setSubtitle(MiscUtils.getStatusString(this, getServer().getStatus()));
 
         if (isConnectedToServer()) {
             final String tabTitle = getServer().getServerCache().getIrcTitle();
@@ -333,8 +326,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 final boolean switchToTab = tabTitle.equals(channel.getName());
                 mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
             }
-            final Collection<PrivateMessageUser> privateMessages = getServer().getUser()
-                    .getPrivateMessages();
+            final Collection<PrivateMessageUser> privateMessages = getServer()
+                    .getUserChannelInterface().getPrivateMessageUsers();
             for (final PrivateMessageUser user : privateMessages) {
                 final boolean switchToTab = tabTitle.equals(user.getNick());
                 mIRCPagerFragment.onCreateMessageFragment(user.getNick(), switchToTab);
@@ -366,11 +359,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public boolean isConnectedToServer() {
         final Server server = getServer();
-        return server != null && server.isConnected();
+        return server != null && server.getStatus() == ServerStatus.CONNECTED;
     }
 
     @Override
-    public void onUserMention(final List<ChannelUser> users) {
+    public void onUserMention(final List<WorldUser> users) {
         mIRCPagerFragment.onMentionRequested(users);
         closeAllSlidingMenus();
     }
@@ -388,7 +381,9 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             // when the UserFragment tries to set caching to false
             mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());
 
-            server.getServerCallBus().sendClosePrivateMessage(mIRCPagerFragment.getCurrentTitle());
+            final PrivateMessageUser user = server.getUserChannelInterface()
+                    .getPrivateMessageUserIfExists(mIRCPagerFragment.getCurrentTitle());
+            server.getServerCallBus().sendClosePrivateMessage(user);
         } else {
             server.getServerCallBus().sendPart(mIRCPagerFragment.getCurrentTitle());
         }

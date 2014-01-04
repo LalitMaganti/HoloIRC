@@ -2,6 +2,7 @@ package com.fusionx.lightirc.ui.widget;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.ui.ServerPreferenceActivity;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
@@ -27,6 +28,24 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
     private final ServerConfiguration.Builder mServer;
 
     private final ServerCardCallback mCallback;
+
+    private final View.OnClickListener overflowClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            final PopupMenu popup = new PopupMenu(mContext, view);
+            popup.inflate(R.menu.activity_server_list_popup);
+
+            if (mCallback.isServerAvailable(mServer.getTitle())) {
+                popup.getMenu().getItem(1).setEnabled(false);
+                popup.getMenu().getItem(2).setEnabled(false);
+            } else {
+                popup.getMenu().getItem(0).setEnabled(false);
+            }
+
+            popup.setOnMenuItemClickListener(ServerCard.this);
+            popup.show();
+        }
+    };
 
     public ServerCard(final Context context,
             final ServerConfiguration.Builder server,
@@ -54,8 +73,8 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
             title.setText(mServer.getTitle());
         }
         if (description != null) {
-            description.setText(server != null && server.getStatus() != null ? server.getStatus()
-                    : mContext.getString(R.string.status_disconnected));
+            description.setText(server != null ? MiscUtils.getStatusString(mContext,
+                    server.getStatus()) : mContext.getString(R.string.status_disconnected));
         }
         content.setOnClickListener(this);
 
@@ -107,24 +126,6 @@ public class ServerCard implements ServerCardInterface, View.OnClickListener,
         }
         return true;
     }
-
-    private final View.OnClickListener overflowClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            final PopupMenu popup = new PopupMenu(mContext, view);
-            popup.inflate(R.menu.activity_server_list_popup);
-
-            if (mCallback.isServerAvailable(mServer.getTitle())) {
-                popup.getMenu().getItem(1).setEnabled(false);
-                popup.getMenu().getItem(2).setEnabled(false);
-            } else {
-                popup.getMenu().getItem(0).setEnabled(false);
-            }
-
-            popup.setOnMenuItemClickListener(ServerCard.this);
-            popup.show();
-        }
-    };
 
     public interface ServerCardCallback {
 

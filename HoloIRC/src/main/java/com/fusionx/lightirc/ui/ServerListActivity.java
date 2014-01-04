@@ -33,8 +33,8 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.event.ConnectedEvent;
-import com.fusionx.relay.event.DisconnectEvent;
+import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.DisconnectEvent;
 import com.squareup.otto.Subscribe;
 
 import android.content.ComponentName;
@@ -190,7 +190,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     }
 
     @Subscribe
-    public void onServerConnected(final ConnectedEvent event) {
+    public void onServerConnected(final ConnectEvent event) {
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

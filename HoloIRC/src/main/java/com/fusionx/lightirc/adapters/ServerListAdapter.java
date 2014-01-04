@@ -24,6 +24,7 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.ui.widget.ServerCardInterface;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerStatus;
 
 import android.app.Activity;
 import android.view.View;
@@ -69,7 +70,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
         int i = 0;
         for (final ServerCardInterface builder : mObjects) {
             final Server server = mCallback.getServer(builder.getTitle());
-            if (server != null && server.isConnected()) {
+            if (server != null && server.getStatus() == ServerStatus.CONNECTED) {
                 i += 1;
             }
         }

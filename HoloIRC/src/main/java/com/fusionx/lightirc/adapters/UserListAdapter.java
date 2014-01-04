@@ -24,7 +24,7 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevelEnum;
 
 import android.content.Context;
@@ -38,14 +38,14 @@ import java.util.TreeSet;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
+public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
         StickyListHeadersAdapter {
 
     private final LayoutInflater mInflater;
 
     private Channel mChannel;
 
-    public UserListAdapter(Context context, Set<ChannelUser> objects) {
+    public UserListAdapter(Context context, Set<WorldUser> objects) {
         super(context, R.layout.default_listview_textview, objects);
 
         mInflater = LayoutInflater.from(context);
@@ -80,11 +80,11 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
 
     @Override
     public long getHeaderId(int position) {
-        final ChannelUser user = getItem(position);
+        final WorldUser user = getItem(position);
         return user.getUserPrefix(mChannel);
     }
 
-    public void setInternalSet(final TreeSet<ChannelUser> set) {
+    public void setInternalSet(final TreeSet<WorldUser> set) {
         synchronized (mLock) {
             mObjects = set;
         }

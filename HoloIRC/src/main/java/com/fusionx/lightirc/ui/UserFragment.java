@@ -23,24 +23,18 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Message;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.PrivateActionEvent;
-import com.fusionx.relay.event.PrivateEvent;
-import com.fusionx.relay.event.PrivateMessageEvent;
-import com.fusionx.relay.event.PrivateNickChangeEvent;
-import com.fusionx.relay.event.PrivateQuitEvent;
+import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
-import org.apache.commons.lang3.StringUtils;
-
 import android.app.Activity;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class UserFragment extends IRCFragment {
+public class UserFragment extends IRCFragment<UserEvent> {
 
     private Callbacks mCallbacks;
 
@@ -58,13 +52,13 @@ public class UserFragment extends IRCFragment {
         super.onResume();
 
         final Server server = mCallbacks.getServer();
-        final PrivateMessageUser user = server.getPrivateMessageUserIfExists(mTitle);
+        final PrivateMessageUser user = server.getUserChannelInterface()
+                .getPrivateMessageUserIfExists(mTitle);
 
         if (user.isUserQuit()) {
             onDisableUserInput();
         } else {
             server.getServerEventBus().register(this);
-            user.setCached(true);
         }
     }
 
@@ -73,18 +67,19 @@ public class UserFragment extends IRCFragment {
         super.onPause();
 
         final Server server = mCallbacks.getServer();
-        final PrivateMessageUser user = server.getPrivateMessageUserIfExists(mTitle);
+        final PrivateMessageUser user = server.getUserChannelInterface()
+                .getPrivateMessageUserIfExists(mTitle);
 
         if (!user.isUserQuit()) {
             server.getServerEventBus().unregister(this);
-            user.setCached(false);
         }
     }
 
     @Override
-    protected List<Message> onRetrieveMessages() {
-        final PrivateMessageUser uci = mCallbacks.getServer().getPrivateMessageUserIfExists(mTitle);
-        return uci.getBuffer();
+    protected List<UserEvent> onRetrieveMessages() {
+        final PrivateMessageUser user = mCallbacks.getServer().getUserChannelInterface()
+                .getPrivateMessageUserIfExists(mTitle);
+        return new ArrayList<>(user.getBuffer());
     }
 
     @Override
@@ -98,35 +93,9 @@ public class UserFragment extends IRCFragment {
     }
 
     @Subscribe
-    public void onUserEvent(final PrivateMessageEvent event) {
-        onProcessPrivateEvent(event);
-    }
-
-    @Subscribe
-    public void onPrivateAction(final PrivateActionEvent event) {
-        onProcessPrivateEvent(event);
-    }
-
-    @Subscribe
-    public void onPrivateQuit(final PrivateQuitEvent event) {
-        onProcessPrivateEvent(event);
-
-        onDisableUserInput();
-    }
-
-    @Subscribe
-    public void onPrivateNickChange(final PrivateNickChangeEvent event) {
-        onProcessPrivateEvent(event);
-    }
-
-    private void onProcessPrivateEvent(final PrivateEvent event) {
-        if (event.userNick.equals(mTitle) && StringUtils.isNotBlank(event.message)) {
-            if (mMessageAdapter == null) {
-                setupListAdapter();
-            }
-            synchronized (mMessageAdapter.getMessages()) {
-                mMessageAdapter.add(new Message(event.message));
-            }
+    public void onPrivateEvent(final UserEvent event) {
+        if (event.user.getNick().equals(mTitle)) {
+            mMessageAdapter.add(event);
         }
     }
 
