@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static com.fusionx.lightirc.constants.PreferenceConstants.AutoJoin;
+import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_AUTOJOIN;
 
 public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
@@ -48,7 +48,7 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         SharedPreferences settings = getActivity().getSharedPreferences(mCallbacks.getFileName(),
                 Context.MODE_PRIVATE);
         final Set<String> set = SharedPreferencesUtils.getStringSet(settings,
-                PreferenceConstants.AutoJoin, new HashSet<String>());
+                PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>());
         mAdapter = new BaseCollectionAdapter<>(getActivity(),
                 R.layout.default_listview_textview, new TreeSet<>(set));
 
@@ -138,7 +138,7 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
     @Override
     public void onPause() {
         SharedPreferencesUtils.putStringSet(getActivity().getSharedPreferences(mCallbacks
-                .getFileName(), Context.MODE_PRIVATE), AutoJoin, mAdapter.getSetOfItems());
+                .getFileName(), Context.MODE_PRIVATE), PREF_AUTOJOIN, mAdapter.getSetOfItems());
         super.onPause();
     }
 

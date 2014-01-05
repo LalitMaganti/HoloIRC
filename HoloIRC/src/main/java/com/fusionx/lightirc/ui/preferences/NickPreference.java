@@ -16,37 +16,37 @@ public class NickPreference extends AbstractNickPreference {
     @Override
     protected void retrieveNick() {
         final SharedPreferences sharedPreferences = getSharedPreferences();
-        mFirstChoice.setText(sharedPreferences.getString(PreferenceConstants.FirstNick,
+        mFirstChoice.setText(sharedPreferences.getString(PreferenceConstants.PREF_NICK,
                 "HoloIRCUser"));
-        mSecondChoice.setText(sharedPreferences.getString(PreferenceConstants.SecondNick, ""));
-        mThirdChoice.setText(sharedPreferences.getString(PreferenceConstants.ThirdNick, ""));
+        mSecondChoice.setText(sharedPreferences.getString(PreferenceConstants.PREF_SECOND_NICK, ""));
+        mThirdChoice.setText(sharedPreferences.getString(PreferenceConstants.PREF_THIRD_NICK, ""));
     }
 
     // TODO - make parent return Editor
     @Override
     protected void persistNick() {
         final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PreferenceConstants.FirstNick, mFirstChoice.getText().toString());
-        editor.putString(PreferenceConstants.SecondNick, mSecondChoice.getText().toString());
-        editor.putString(PreferenceConstants.ThirdNick, mThirdChoice.getText().toString());
+        editor.putString(PreferenceConstants.PREF_NICK, mFirstChoice.getText().toString());
+        editor.putString(PreferenceConstants.PREF_SECOND_NICK, mSecondChoice.getText().toString());
+        editor.putString(PreferenceConstants.PREF_THIRD_NICK, mThirdChoice.getText().toString());
         editor.commit();
     }
 
     public void setFirstChoice(final String first) {
         final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PreferenceConstants.FirstNick, first);
+        editor.putString(PreferenceConstants.PREF_NICK, first);
         editor.commit();
     }
 
     public void setSecondChoice(final String second) {
         final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PreferenceConstants.SecondNick, second);
+        editor.putString(PreferenceConstants.PREF_SECOND_NICK, second);
         editor.commit();
     }
 
     public void setThirdChoice(final String third) {
         final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PreferenceConstants.ThirdNick, third);
+        editor.putString(PreferenceConstants.PREF_THIRD_NICK, third);
         editor.commit();
     }
 }

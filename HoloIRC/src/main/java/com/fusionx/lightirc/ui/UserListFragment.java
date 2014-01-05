@@ -221,26 +221,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
      * Only perform an action if the channel that is being observed currently is the one the
      * event is referring to
      */
-    /*@Subscribe
-    public void onUserListChanged(final ChannelEvent event) {
-        if (isChannelEqual(event.channelName)) {
-            switch (event.changeType) {
-                case ADD:
-                    mAdapter.add(event.user);
-                    break;
-                case REMOVE:
-                    mAdapter.remove(event.user);
-                    break;
-                case MODIFIED:
-                    // Someone's nick has changed
-                    mAdapter.notifyDataSetChanged();
-                    break;
-            }
-            if (mMultiSelectionController != null) {
-                mMultiSelectionController.finish();
-            }
-        }
-    }*/
     @Subscribe
     public void onWorldUserEvent(final WorldUserEvent event) {
         if (event.channelName.equals(mChannel.getName())) {

@@ -299,6 +299,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         final ServerEventBus bus = server.getServerEventBus();
         bus.register(mEventReceiver);
         bus.register(mIRCPagerFragment);
+        server.setIgnoreList(MiscUtils.getIgnoreList(getApplicationContext(), mServerTitle));
     }
 
     @Override

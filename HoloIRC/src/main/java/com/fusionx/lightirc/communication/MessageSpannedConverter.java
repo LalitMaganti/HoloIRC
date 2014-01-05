@@ -24,6 +24,7 @@ import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.MotdEvent;
 import com.fusionx.relay.event.server.PrivateNoticeEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
+import com.fusionx.relay.event.server.WhoisEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
@@ -78,6 +79,11 @@ public class MessageSpannedConverter {
         final String response = mContext.getString(R.string.parser_slap_message);
         return String.format(response, receivingNick);
     }*/
+
+    @Subscribe
+    public void getOnWhoisMessage(final WhoisEvent event) {
+        setupEvent(event, event.whoisMessage);
+    }
 
     @Subscribe
     public void getOnConnectedMessage(final ConnectEvent event) {

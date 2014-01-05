@@ -15,18 +15,18 @@ public class DefaultNickPreference extends AbstractNickPreference {
     @Override
     protected void retrieveNick() {
         final SharedPreferences preferences = getSharedPreferences();
-        mFirstChoice.setText(preferences.getString(PreferenceConstants.DefaultFirstNick,
+        mFirstChoice.setText(preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
                 "HoloIRCUser"));
-        mSecondChoice.setText(preferences.getString(PreferenceConstants.DefaultSecondNick, ""));
-        mThirdChoice.setText(preferences.getString(PreferenceConstants.DefaultThirdNick, ""));
+        mSecondChoice.setText(preferences.getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, ""));
+        mThirdChoice.setText(preferences.getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, ""));
     }
 
     @Override
     protected void persistNick() {
         final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PreferenceConstants.DefaultFirstNick, mFirstChoice.getText().toString());
-        editor.putString(PreferenceConstants.DefaultSecondNick, mSecondChoice.getText().toString());
-        editor.putString(PreferenceConstants.DefaultThirdNick, mThirdChoice.getText().toString());
+        editor.putString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK, mFirstChoice.getText().toString());
+        editor.putString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, mSecondChoice.getText().toString());
+        editor.putString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, mThirdChoice.getText().toString());
         editor.commit();
     }
 }

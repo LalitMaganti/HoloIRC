@@ -79,7 +79,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         final Event message = getEvent(position);
         if (AppPreferences.timestamp) {
             holder.timestamp.setVisibility(View.VISIBLE);
-            holder.timestamp.setText(message.timestamp.format("%hh:Mm"));
+            holder.timestamp.setText(message.timestamp.format("%H:%M"));
         } else {
             holder.timestamp.setVisibility(View.GONE);
         }

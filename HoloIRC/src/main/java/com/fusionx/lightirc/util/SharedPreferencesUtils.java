@@ -42,7 +42,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
+import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_TITLE;
 
 public class SharedPreferencesUtils {
 
@@ -99,7 +99,7 @@ public class SharedPreferencesUtils {
         final File file = new File(getSharedPreferencesPath(context), fileName);
         final SharedPreferences sharedPreferences = context.getSharedPreferences(StringUtils
                 .remove(fileName, ".xml"), Context.MODE_PRIVATE);
-        final String newName = sharedPreferences.getString(Title, "").toLowerCase();
+        final String newName = sharedPreferences.getString(PREF_TITLE, "").toLowerCase();
         file.renameTo(new File(getSharedPreferencesPath(context),
                 newName + ".xml"));
         return newName;
@@ -112,47 +112,47 @@ public class SharedPreferencesUtils {
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
 
         // Server connection
-        builder.setTitle(serverSettings.getString(PreferenceConstants.Title, ""));
-        builder.setUrl(serverSettings.getString(PreferenceConstants.URL, "").trim());
-        builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceConstants.Port,
+        builder.setTitle(serverSettings.getString(PreferenceConstants.PREF_TITLE, ""));
+        builder.setUrl(serverSettings.getString(PreferenceConstants.PREF_URL, "").trim());
+        builder.setPort(Integer.parseInt(serverSettings.getString(PreferenceConstants.PREF_PORT,
                 "6667")));
 
         // SSL
-        builder.setSsl(serverSettings.getBoolean(PreferenceConstants.SSL, false));
+        builder.setSsl(serverSettings.getBoolean(PreferenceConstants.PREF_SSL, false));
         builder.setSslAcceptAllCertificates(serverSettings.getBoolean(PreferenceConstants
-                .SSLAcceptAll, false));
+                .PREF_SSL_ACCEPT_ALL_CONNECTIONS, false));
 
         // User settings
-        final String firstChoice = serverSettings.getString(PreferenceConstants.FirstNick,
+        final String firstChoice = serverSettings.getString(PreferenceConstants.PREF_NICK,
                 "HoloIRCUser");
-        final String secondChoice = serverSettings.getString(PreferenceConstants.SecondNick, "");
-        final String thirdChoice = serverSettings.getString(PreferenceConstants.ThirdNick, "");
+        final String secondChoice = serverSettings.getString(PreferenceConstants.PREF_SECOND_NICK, "");
+        final String thirdChoice = serverSettings.getString(PreferenceConstants.PREF_THIRD_NICK, "");
         final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
-        builder.setRealName(serverSettings.getString(PreferenceConstants.RealName, "HoloIRC"));
-        builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.AutoNickChange,
+        builder.setRealName(serverSettings.getString(PreferenceConstants.PREF_REALNAME, "HoloIRC"));
+        builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.PREF_AUTO_NICK,
                 true));
 
         // Autojoin channels
         final ArrayList<String> auto = new ArrayList<String>(getStringSet(serverSettings,
-                PreferenceConstants.AutoJoin, new HashSet<String>()));
+                PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
         }
 
         // Server authorisation
-        builder.setServerUserName(serverSettings.getString(PreferenceConstants.ServerUserName,
+        builder.setServerUserName(serverSettings.getString(PreferenceConstants.PREF_LOGIN_USERNAME,
                 "holoirc"));
-        builder.setServerPassword(serverSettings.getString(PreferenceConstants.ServerPassword,
+        builder.setServerPassword(serverSettings.getString(PreferenceConstants.PREF_LOGIN_PASSWORD,
                 ""));
 
         // SASL authorisation
-        builder.setSaslUsername(serverSettings.getString(PreferenceConstants.SaslUsername, ""));
-        builder.setSaslPassword(serverSettings.getString(PreferenceConstants.SaslPassword, ""));
+        builder.setSaslUsername(serverSettings.getString(PreferenceConstants.PREF_SASL_USERNAME, ""));
+        builder.setSaslPassword(serverSettings.getString(PreferenceConstants.PREF_SASL_PASSWORD, ""));
 
         // NickServ authorisation
         builder.setNickservPassword(serverSettings.getString(PreferenceConstants
-                .NickServPassword, ""));
+                .PREF_NICKSERV_PASSWORD, ""));
         return builder;
     }
 

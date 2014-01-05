@@ -23,7 +23,7 @@ class PreferenceHelpers {
 
     public static void setupNumberPicker(final PreferenceScreen screen) {
         final NumberPickerPreference numberPickerDialogPreference = (NumberPickerPreference)
-                screen.findPreference(PreferenceConstants.ReconnectTries);
+                screen.findPreference(PreferenceConstants.PREF_RECONNECT_TRIES);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
                 .getValue()));
         numberPickerDialogPreference.setOnPreferenceChangeListener(new Preference
@@ -39,7 +39,7 @@ class PreferenceHelpers {
     public static void setupThemePreference(final PreferenceScreen screen,
             final Activity activity) {
         final ListPreference themePreference = (ListPreference) screen.findPreference
-                (PreferenceConstants.Theme);
+                (PreferenceConstants.FRAGMENT_SETTINGS_THEME);
         if (themePreference.getEntry() == null) {
             themePreference.setValue("1");
         }
@@ -50,13 +50,13 @@ class PreferenceHelpers {
     public static void setupAppVersionPreference(final PreferenceScreen screen,
             final Context context) {
         final Preference appVersionPreference = screen.findPreference(PreferenceConstants
-                .AppVersion);
+                .PREF_APP_VERSION);
 
         if (appVersionPreference != null) {
             appVersionPreference.setSummary(MiscUtils.getAppVersion(context));
         }
 
-        final Preference source = screen.findPreference(PreferenceConstants.Source);
+        final Preference source = screen.findPreference(PreferenceConstants.PREF_SOURCE);
         if (source != null) {
             source.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {

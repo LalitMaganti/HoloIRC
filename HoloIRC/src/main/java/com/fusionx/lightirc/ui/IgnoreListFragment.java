@@ -9,6 +9,7 @@ import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.relay.Server;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -36,8 +37,8 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
 
-        final TreeSet<String> arrayList = new TreeSet<>(MiscUtils
-                .getIgnoreList(getActivity(), callback.getServerTitle().toLowerCase()));
+        final TreeSet<String> arrayList = new TreeSet<>(MiscUtils.getIgnoreList(getActivity(),
+                callback.getServerTitle().toLowerCase()));
         final BaseCollectionAdapter<String> ignoreAdapter = new BaseCollectionAdapter<String>
                 (getActivity(), R.layout.default_listview_textview, arrayList);
         final DecoratedIgnoreListAdapter listAdapter = new DecoratedIgnoreListAdapter
@@ -48,13 +49,6 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         getListAdapter().setAbsListView(getListView());
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        MiscUtils.forceUpdateIgnoreList(null);
     }
 
     @Override
@@ -120,16 +114,17 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         final IgnoreListCallback callback = FragmentUtils.getParent(this,
                 IgnoreListCallback.class);
         callback.switchToIRCActionFragment();
-        final SharedPreferences preferences = getActivity().getSharedPreferences(
-                callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
+        final SharedPreferences preferences = getActivity()
+                .getSharedPreferences(callback.getServerTitle().toLowerCase(),
+                        Context.MODE_PRIVATE);
         final Set<String> set = getIgnoreAdapter().getSetOfItems();
-        SharedPreferencesUtils.putStringSet(preferences, PreferenceConstants.IgnoreList, set);
-        MiscUtils.forceUpdateIgnoreList(set);
+        SharedPreferencesUtils.putStringSet(preferences, PreferenceConstants.PREF_IGNORE_LIST, set);
+        MiscUtils.onUpdateIgnoreList(callback.getServer(), set);
     }
 
     @Override
     public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
-        for (int position : reverseSortedPositions) {
+        for (final int position : reverseSortedPositions) {
             getIgnoreAdapter().remove(getIgnoreAdapter().getItem(position));
         }
     }
@@ -157,5 +152,7 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         public void switchToIRCActionFragment();
 
         public String getServerTitle();
+
+        public Server getServer();
     }
 }

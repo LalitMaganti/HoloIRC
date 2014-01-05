@@ -28,8 +28,8 @@ import android.widget.Toast;
 
 import java.io.File;
 
-import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
-import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
+import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_TITLE;
+import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_URL;
 
 public class ServerPreferenceActivity extends PreferenceActivity implements
         ServerSettingsCallbacks,
@@ -133,7 +133,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     public void setupPreferences(final PreferenceScreen screen, final Activity activity) {
         mScreen = screen;
 
-        mTitle = (ServerTitleEditTextPreference) screen.findPreference(Title);
+        mTitle = (ServerTitleEditTextPreference) screen.findPreference(PREF_TITLE);
         mTitle.setOnPreferenceChangeListener(this);
         mTitle.setListOfExistingServers(activity.getIntent().getStringArrayListExtra("list"));
 
@@ -141,7 +141,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mCompletePreference = (ViewPreference) screen.findPreference("must_be_complete");
 
         // URL of server
-        mUrl = (EditTextPreference) screen.findPreference(URL);
+        mUrl = (EditTextPreference) screen.findPreference(PREF_URL);
         mUrl.setOnPreferenceChangeListener(this);
 
         Preference preference = screen.findPreference("pref_autojoin_intent");
@@ -168,15 +168,15 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     private void setupNewServer(final PreferenceScreen screen, final Activity activity) {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (activity);
-        final String firstNick = preferences.getString(PreferenceConstants.DefaultFirstNick,
+        final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
                 "holoirc");
-        final String secondNick = preferences.getString(PreferenceConstants.DefaultSecondNick, "");
-        final String thirdNick = preferences.getString(PreferenceConstants.DefaultThirdNick, "");
+        final String secondNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
+        final String thirdNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
 
-        final String realName = preferences.getString(PreferenceConstants.DefaultRealName,
+        final String realName = preferences.getString(PreferenceConstants.PREF_DEFAULT_REALNAME,
                 "HoloIRCUser");
         final boolean autoNick = preferences.getBoolean(PreferenceConstants
-                .DefaultAutoNickChange, true);
+                .PREF_DEFAULT_AUTO_NICK, true);
 
         final NickPreference nickPreference = (NickPreference) screen.findPreference
                 ("pref_nick_storage");
@@ -185,10 +185,10 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         nickPreference.setThirdChoice(thirdNick);
 
         final EditTextPreference realNamePref = (EditTextPreference) screen
-                .findPreference(PreferenceConstants.RealName);
+                .findPreference(PreferenceConstants.PREF_REALNAME);
         realNamePref.setText(realName);
         final CheckBoxPreference autoNickPref = (CheckBoxPreference) screen
-                .findPreference(PreferenceConstants.AutoNickChange);
+                .findPreference(PreferenceConstants.PREF_AUTO_NICK);
         autoNickPref.setChecked(autoNick);
     }
 

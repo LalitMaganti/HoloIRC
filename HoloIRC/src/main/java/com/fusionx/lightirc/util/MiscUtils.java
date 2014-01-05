@@ -23,6 +23,7 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerStatus;
 
 import android.content.Context;
@@ -53,13 +54,14 @@ public class MiscUtils {
             final SharedPreferences preferences = context.getSharedPreferences(fileName,
                     Context.MODE_PRIVATE);
             ignoreList = SharedPreferencesUtils.getStringSet(preferences,
-                    PreferenceConstants.IgnoreList, new HashSet<String>());
+                    PreferenceConstants.PREF_IGNORE_LIST, new HashSet<String>());
         }
         return ignoreList;
     }
 
-    public static void forceUpdateIgnoreList(final Set<String> set) {
+    public static void onUpdateIgnoreList(final Server server, final Set<String> set) {
         ignoreList = set;
+        server.setIgnoreList(set);
     }
 
     public static String getAppVersion(final Context context) {

@@ -47,8 +47,6 @@ android {
 
         release {
             signingConfig signingConfigs.release
-            runProguard true
-            proguardFile getDefaultProguardFile('holoirc-proguard.txt')
         }
     }
 }
