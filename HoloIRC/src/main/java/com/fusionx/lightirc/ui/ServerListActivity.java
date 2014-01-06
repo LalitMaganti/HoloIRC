@@ -52,6 +52,7 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ServerListActivity extends ActionBarActivity implements ServerListAdapter.Callbacks,
         AnimatedServerListAdapter.SingleDismissCallback, ServerCard.Callbacks {
@@ -174,7 +175,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         }
 
         mServerCardsAdapter.clear();
-        ArrayList<String> serverFiles = SharedPreferencesUtils.getServersFromPreferences(this);
+        Collection<String> serverFiles = SharedPreferencesUtils.getServersFromPreferences(this);
         for (final String file : serverFiles) {
             ServerConfiguration.Builder builder = SharedPreferencesUtils.convertPrefsToBuilder
                     (this, file);

@@ -38,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -75,13 +76,13 @@ public class SharedPreferencesUtils {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    public static ArrayList<String> getServersFromPreferences(final Context context) {
+    public static Collection<String> getServersFromPreferences(final Context context) {
         final ArrayList<String> array = new ArrayList<String>();
         final File folder = new File(getSharedPreferencesPath(context));
         for (final String fileName : folder.list()) {
@@ -125,8 +126,10 @@ public class SharedPreferencesUtils {
         // User settings
         final String firstChoice = serverSettings.getString(PreferenceConstants.PREF_NICK,
                 "HoloIRCUser");
-        final String secondChoice = serverSettings.getString(PreferenceConstants.PREF_SECOND_NICK, "");
-        final String thirdChoice = serverSettings.getString(PreferenceConstants.PREF_THIRD_NICK, "");
+        final String secondChoice = serverSettings
+                .getString(PreferenceConstants.PREF_SECOND_NICK, "");
+        final String thirdChoice = serverSettings
+                .getString(PreferenceConstants.PREF_THIRD_NICK, "");
         final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
         builder.setRealName(serverSettings.getString(PreferenceConstants.PREF_REALNAME, "HoloIRC"));
@@ -147,8 +150,10 @@ public class SharedPreferencesUtils {
                 ""));
 
         // SASL authorisation
-        builder.setSaslUsername(serverSettings.getString(PreferenceConstants.PREF_SASL_USERNAME, ""));
-        builder.setSaslPassword(serverSettings.getString(PreferenceConstants.PREF_SASL_PASSWORD, ""));
+        builder.setSaslUsername(
+                serverSettings.getString(PreferenceConstants.PREF_SASL_USERNAME, ""));
+        builder.setSaslPassword(
+                serverSettings.getString(PreferenceConstants.PREF_SASL_PASSWORD, ""));
 
         // NickServ authorisation
         builder.setNickservPassword(serverSettings.getString(PreferenceConstants
