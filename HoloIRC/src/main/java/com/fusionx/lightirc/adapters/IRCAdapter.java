@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class IRCAdapter extends FragmentStatePagerAdapter {
+
     private final SparseArray<Fragment> mRegisteredFragments = new SparseArray<>();
+
     private final ArrayList<Pair<String, FragmentTypeEnum>> mFragmentList = new ArrayList<>();
+
     private final PagerSlidingTabStrip mTabStrip;
 
     public IRCAdapter(FragmentManager fm, final PagerSlidingTabStrip tabStrip) {
@@ -113,8 +116,8 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
             iterator.next();
             iterator.remove();
         }
-        mTabStrip.notifyDataSetChanged();
         notifyDataSetChanged();
+        mTabStrip.notifyDataSetChanged();
     }
 
     public void onRemoveFragment(final int index) {

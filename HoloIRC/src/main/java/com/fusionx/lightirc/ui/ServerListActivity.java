@@ -32,6 +32,7 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.ServerStatus;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.squareup.otto.Subscribe;
@@ -222,8 +223,8 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     @Override
     public boolean isServerAvailable(final String title) {
         final Server server = getServer(title);
-        return mService != null && server != null && !server.getStatus().equals(getString(R
-                .string.status_disconnected));
+        return mService != null && server != null && server.getStatus() != ServerStatus
+                .DISCONNECTED;
     }
 
     // ServerListAdapter callbacks

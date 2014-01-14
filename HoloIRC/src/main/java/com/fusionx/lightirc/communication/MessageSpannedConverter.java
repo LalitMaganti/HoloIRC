@@ -6,6 +6,7 @@ import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
 import com.fusionx.relay.event.channel.InitialTopicEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
+import com.fusionx.relay.event.channel.ModeEvent;
 import com.fusionx.relay.event.channel.NickChangeEvent;
 import com.fusionx.relay.event.channel.TopicEvent;
 import com.fusionx.relay.event.channel.UserLevelChangeEvent;
@@ -235,6 +236,13 @@ public class MessageSpannedConverter {
     public void getPrivateNoticeMessage(final PrivateNoticeEvent event) {
         final String response = mContext.getString(R.string.parser_notice);
         setupEvent(event, String.format(response, event.sendingNick, event.message));
+    }
+
+    @Subscribe
+    public void getModeMessage(final ModeEvent event) {
+        final String response = mContext.getString(R.string.parser_mode_changed);
+        setupEvent(event, String.format(response, event.mode, event.recipient,
+                event.sendingUserNick));
     }
 
     private String appendReasonIfNeeded(final String response, final String reason) {

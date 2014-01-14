@@ -9,7 +9,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
@@ -125,16 +124,9 @@ public class ServiceFragment extends Fragment {
     }
 
     public void removeServiceReference(final String serverTitle) {
-        final AsyncTask<Void, Void, Void> disconnect = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                if (mService != null) {
-                    mService.onRemoveServer(serverTitle);
-                }
-                return null;
-            }
-        };
-        disconnect.execute();
+        if (mService != null) {
+            mService.onRemoveServer(serverTitle);
+        }
     }
 
     public interface Callbacks {

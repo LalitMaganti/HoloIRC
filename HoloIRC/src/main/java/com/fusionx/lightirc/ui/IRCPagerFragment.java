@@ -223,7 +223,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     @Subscribe
-    public void onPrivateMessage(final MentionEvent event) {
+    public void onMentioned(final MentionEvent event) {
         if (!getCurrentTitle().equals(event.channelName)) {
             final String message = String.format(getString(R.string.activity_mentioned),
                     event.channelName);
