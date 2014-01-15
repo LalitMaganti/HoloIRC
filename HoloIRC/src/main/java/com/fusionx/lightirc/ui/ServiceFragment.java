@@ -40,9 +40,6 @@ public class ServiceFragment extends Fragment {
         // Should never occur
         @Override
         public void onServiceDisconnected(final ComponentName name) {
-            final Intent intent = new Intent(getActivity(), ServerListActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
         }
     };
 

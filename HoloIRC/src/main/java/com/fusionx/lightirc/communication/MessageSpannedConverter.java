@@ -19,6 +19,7 @@ import com.fusionx.relay.event.channel.WorldNickChangeEvent;
 import com.fusionx.relay.event.channel.WorldPartEvent;
 import com.fusionx.relay.event.channel.WorldQuitEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.ErrorEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.KickEvent;
@@ -243,6 +244,11 @@ public class MessageSpannedConverter {
         final String response = mContext.getString(R.string.parser_mode_changed);
         setupEvent(event, String.format(response, event.mode, event.recipient,
                 event.sendingUserNick));
+    }
+
+    @Subscribe
+    public void getDeisconnectEvent(final DisconnectEvent event) {
+        setupEvent(event, event.serverMessage);
     }
 
     private String appendReasonIfNeeded(final String response, final String reason) {

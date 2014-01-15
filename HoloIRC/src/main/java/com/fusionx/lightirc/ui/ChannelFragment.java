@@ -21,22 +21,29 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.google.common.collect.ImmutableList;
+
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.loaders.ChannelLoader;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.MentionEvent;
+import com.fusionx.relay.event.channel.NameEvent;
+import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.parser.UserInputParser;
+import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.support.v4.content.Loader;
 
 import java.util.List;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent> {
+
+    private static ImmutableList<? extends Class<? extends ChannelEvent>> sClasses = ImmutableList
+            .of(NameEvent.class, MentionEvent.class);
 
     private Callbacks mCallback;
 
@@ -65,6 +72,16 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> {
     }
 
     @Override
+    protected Server getServer() {
+        return mCallback.getServer();
+    }
+
+    @Override
+    protected List<ChannelEvent> getAdapterData() {
+        return getChannel().getBuffer();
+    }
+
+    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseChannelMessage(mCallback.getServer(), mTitle, message);
     }
@@ -73,11 +90,16 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> {
         return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
     }
 
-    @Override
-    public Loader<List<ChannelEvent>> onCreateLoader(final int id, final Bundle args) {
-        return new ChannelLoader(getActivity(), mCallback.getServer(), getChannel());
+    // Subscription methods
+    @Subscribe
+    public void onChannelMessage(final ChannelEvent event) {
+        if (event.channelName.equals(getChannel().getName()) && !(sClasses
+                .contains(event.getClass()))) {
+            if (!(event instanceof WorldUserEvent && AppPreferences.hideUserMessages)) {
+                mMessageAdapter.add(event);
+            }
+        }
     }
-
 
     // Callback interface
     public interface Callbacks {

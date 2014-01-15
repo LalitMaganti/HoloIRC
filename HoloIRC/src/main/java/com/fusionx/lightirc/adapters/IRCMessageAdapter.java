@@ -112,6 +112,12 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        synchronized (mLock) {
+            mObjects.clear();
+        }
+    }
+
     private static class ViewHolder {
 
         public final TextView timestamp;

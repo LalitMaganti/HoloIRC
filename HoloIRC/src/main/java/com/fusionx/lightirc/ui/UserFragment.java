@@ -22,16 +22,14 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.loaders.UserLoader;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.parser.UserInputParser;
+import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
-import android.os.Bundle;
-import android.support.v4.content.Loader;
 
 import java.util.List;
 
@@ -78,13 +76,21 @@ public class UserFragment extends IRCFragment<UserEvent> {
         return mCallbacks.getServer();
     }
 
+    @Override
+    protected List<UserEvent> getAdapterData() {
+        return getPrivateMessageUser().getBuffer();
+    }
+
     public PrivateMessageUser getPrivateMessageUser() {
         return getServer().getUserChannelInterface().getPrivateMessageUserIfExists(mTitle);
     }
 
-    @Override
-    public Loader<List<UserEvent>> onCreateLoader(int id, Bundle args) {
-        return new UserLoader(getActivity(), getServer(), getPrivateMessageUser());
+    // Subscription methods
+    @Subscribe
+    public void onPrivateEvent(final UserEvent event) {
+        if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
+            mMessageAdapter.add(event);
+        }
     }
 
     public interface Callbacks {

@@ -169,7 +169,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         } else if (getServer() != null) {
             final ServerEventBus bus = getServer().getServerEventBus();
             bus.register(mEventReceiver);
-
+            // TODO - this is misnamed - rename it
             mIRCPagerFragment.onCreateServerFragment(mServerTitle);
             actionBar.setSubtitle(MiscUtils.getStatusString(this, getServer().getStatus()));
         }

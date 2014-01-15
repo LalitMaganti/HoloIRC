@@ -4,6 +4,7 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.model.FragmentStorage;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.SwitchToPrivateMessage;
@@ -26,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Configuration;
@@ -34,6 +36,8 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 
 public class IRCPagerFragment extends Fragment implements ServerFragment.Callbacks,
         ChannelFragment.Callbacks, UserFragment.Callbacks {
+
+    private final static String ADAPTER_STORAGE = "ADAPTER_STROAGE";
 
     private ViewPager mViewPager;
 
@@ -54,10 +58,19 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-        setRetainInstance(true);
+        outState.putParcelableArrayList(ADAPTER_STORAGE, mAdapter.getFragments());
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mCallbacks.getServer().getServerEventBus().register(this);
+        }
     }
 
     @Override
@@ -76,6 +89,20 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
                 {android.R.attr.windowBackground});
         final int background = a.getResourceId(0, 0);
         mViewPager.setBackgroundResource(background);
+
+        if (savedInstanceState != null) {
+            final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity()
+                    .findViewById(R.id.pager_tabs);
+            mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
+
+            final ArrayList<FragmentStorage> list = savedInstanceState.getParcelableArrayList
+                    (ADAPTER_STORAGE);
+            mAdapter.setFragmentList(list);
+
+            // The view pager's adapter needs to be set before the TabStrip is assigned
+            mViewPager.setAdapter(mAdapter);
+            tabs.setViewPager(mViewPager);
+        }
     }
 
     @Override
@@ -105,6 +132,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
             mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
             mAdapter.onNewFragment(serverTitle, FragmentTypeEnum.Server);
         }
+        // The view pager's adapter needs to be set before the TabStrip is assigned
         mViewPager.setAdapter(mAdapter);
         tabs.setViewPager(mViewPager);
     }

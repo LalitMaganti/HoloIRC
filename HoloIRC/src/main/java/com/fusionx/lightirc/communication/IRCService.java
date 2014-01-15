@@ -126,8 +126,6 @@ public class IRCService extends Service {
         final NotificationManager mNotificationManager = (NotificationManager) getSystemService
                 (Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancelAll();
-
-        stopSelf();
     }
 
     public void onRemoveServer(final String serverName) {

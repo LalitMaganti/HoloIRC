@@ -2,6 +2,7 @@ package com.fusionx.lightirc.adapters;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.model.FragmentStorage;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.lightirc.ui.IRCFragment;
 import com.fusionx.lightirc.ui.ServerFragment;
@@ -11,22 +12,22 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Pair;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class IRCAdapter extends FragmentStatePagerAdapter {
 
     private final SparseArray<Fragment> mRegisteredFragments = new SparseArray<>();
 
-    private final ArrayList<Pair<String, FragmentTypeEnum>> mFragmentList = new ArrayList<>();
+    private final ArrayList<FragmentStorage> mFragmentList = new ArrayList<>();
 
     private final PagerSlidingTabStrip mTabStrip;
 
-    public IRCAdapter(FragmentManager fm, final PagerSlidingTabStrip tabStrip) {
+    public IRCAdapter(final FragmentManager fm, final PagerSlidingTabStrip tabStrip) {
         super(fm);
 
         mTabStrip = tabStrip;
@@ -34,13 +35,13 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(final int i) {
-        final Pair<String, FragmentTypeEnum> pair = mFragmentList.get(i);
+        final FragmentStorage pair = mFragmentList.get(i);
 
         final Bundle bundle = new Bundle();
-        bundle.putString("title", pair.first);
+        bundle.putString("title", pair.getTitle());
 
         final Fragment fragment;
-        switch (pair.second) {
+        switch (pair.getFragmentTypeEnum()) {
             case Server:
                 fragment = new ServerFragment();
                 break;
@@ -71,8 +72,8 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
     }
 
     public int getIndexFromTitle(final String title) {
-        for (final Pair<String, FragmentTypeEnum> pair : mFragmentList) {
-            if (pair.first.equals(title)) {
+        for (final FragmentStorage pair : mFragmentList) {
+            if (pair.getTitle().equals(title)) {
                 return mFragmentList.indexOf(pair);
             }
         }
@@ -80,7 +81,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
     }
 
     public int onNewFragment(final String title, final FragmentTypeEnum typeEnum) {
-        final Pair<String, FragmentTypeEnum> enumPair = new Pair<>(title, typeEnum);
+        final FragmentStorage enumPair = new FragmentStorage(title, typeEnum);
         mFragmentList.add(enumPair);
 
         notifyDataSetChanged();
@@ -129,7 +130,16 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(final int position) {
-        return mFragmentList.get(position).first;
+        return mFragmentList.get(position).getTitle();
+    }
+
+    public ArrayList<FragmentStorage> getFragments() {
+        return mFragmentList;
+    }
+
+    public void setFragmentList(final List<FragmentStorage> fragmentList) {
+        mFragmentList.clear();
+        mFragmentList.addAll(fragmentList);
     }
 
     // ONLY CALL THIS METHOD IF YOU WANT THE CURRENTLY DISPLAYED FRAGMENT

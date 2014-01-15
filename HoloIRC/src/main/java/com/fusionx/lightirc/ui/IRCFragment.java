@@ -24,6 +24,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
@@ -32,8 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,33 +41,17 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
-        .OnEditorActionListener, LoaderManager.LoaderCallbacks<List<T>> {
+        .OnEditorActionListener {
 
     String mTitle;
 
     EditText mMessageBox;
 
     IRCMessageAdapter<T> mMessageAdapter;
-
-    @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mMessageAdapter = new IRCMessageAdapter<>(getActivity());
-        final AnimationAdapter adapter = new AlphaInAnimationAdapter(mMessageAdapter);
-        adapter.setAbsListView(getListView());
-        if (savedInstanceState != null) {
-            adapter.setShouldAnimateFromPosition(savedInstanceState.getInt("NUMBEROFITEMS"));
-        }
-        setListAdapter(adapter);
-
-        // Initialize a Loader with id '1'. If the Loader with this id already
-        // exists, then the LoaderManager will reuse the existing Loader.
-        getLoaderManager().initLoader(1, null, this);
-    }
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
@@ -82,6 +65,29 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         mTitle = getArguments().getString("title");
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mMessageAdapter = new IRCMessageAdapter<>(getActivity());
+        final AnimationAdapter adapter = new AlphaInAnimationAdapter(mMessageAdapter);
+        adapter.setAbsListView(getListView());
+        setListAdapter(adapter);
+
+        if (savedInstanceState != null) {
+            adapter.setShouldAnimateFromPosition(savedInstanceState.getInt("NUMBEROFITEMS"));
+        }
+        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
+        getServer().getServerEventBus().register(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        getServer().getServerEventBus().unregister(this);
     }
 
     @Override
@@ -117,14 +123,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         outState.putInt("NUMBEROFITEMS", mMessageAdapter.getCount());
     }
 
-    @Override
-    public void onLoadFinished(final Loader<List<T>> loader, final List<T> data) {
-        mMessageAdapter.addAll(data);
-    }
+    protected abstract Server getServer();
 
-    @Override
-    public void onLoaderReset(final Loader<List<T>> loader) {
-    }
+    protected abstract List<T> getAdapterData();
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);
