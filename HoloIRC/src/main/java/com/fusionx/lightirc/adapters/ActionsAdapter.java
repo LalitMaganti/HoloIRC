@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.content.Context;
@@ -29,7 +29,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     private boolean mConnected = false;
 
-    private FragmentTypeEnum mFragmentType = FragmentTypeEnum.Server;
+    private FragmentType mFragmentType = FragmentType.Server;
 
     public ActionsAdapter(final Context context) {
         super(context, R.layout.default_listview_textview, new ArrayList<>(Arrays.asList
@@ -47,7 +47,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         if (i == 0 && convertView == null) {
             otherHeader.setText(getContext().getString(R.string.server));
         } else if (i == mServerItemCount) {
-            otherHeader.setText(mFragmentType == FragmentTypeEnum.Channel ? getContext()
+            otherHeader.setText(mFragmentType == FragmentType.Channel ? getContext()
                     .getString(R.string.channel) : getContext().getString(R.string.user));
         }
         return otherHeader;
@@ -80,7 +80,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         return i < mServerItemCount ? 0 : 1;
     }
 
-    public void setFragmentType(final FragmentTypeEnum fragmentType) {
+    public void setFragmentType(final FragmentType fragmentType) {
         if (mFragmentType != fragmentType) {
             mFragmentType = fragmentType;
             notifyDataSetChanged();
@@ -96,9 +96,9 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     public String getItem(int position) {
         if (position < mServerItemCount) {
             return super.getItem(position);
-        } else if (mFragmentType == FragmentTypeEnum.Channel) {
+        } else if (mFragmentType == FragmentType.Channel) {
             return mChannelArray[getCount() - position - 1];
-        } else if (mFragmentType == FragmentTypeEnum.User) {
+        } else if (mFragmentType == FragmentType.User) {
             return mUserArray[getCount() - position - 1];
         } else {
             return "";
@@ -107,9 +107,9 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public int getCount() {
-        if (mFragmentType == FragmentTypeEnum.Server) {
+        if (mFragmentType == FragmentType.Server) {
             return mServerItemCount;
-        } else if (mFragmentType == FragmentTypeEnum.Channel) {
+        } else if (mFragmentType == FragmentType.Channel) {
             return mServerItemCount + mChannelArray.length;
         } else {
             return mServerItemCount + mUserArray.length;

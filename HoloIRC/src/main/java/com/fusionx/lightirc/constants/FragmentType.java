@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.constants;
 
-public enum FragmentTypeEnum {
+public enum FragmentType {
     Server,
     Channel,
     User

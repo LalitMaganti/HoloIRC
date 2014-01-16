@@ -2,7 +2,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionPagerAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.relay.Server;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
-        .IgnoreListCallback, ActionsFragment.IRCActionsCallback {
+        .IgnoreListCallback, ActionsFragment.Callbacks {
 
     private ViewPager mActionViewPager;
 
@@ -90,7 +90,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         getActionFragment().updateConnectionStatus(isConnected);
     }
 
-    public void onPageChanged(FragmentTypeEnum type) {
+    public void onPageChanged(FragmentType type) {
         getActionFragment().onTabChanged(type);
     }
 
@@ -119,6 +119,11 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         mCallbacks.closeAllSlidingMenus();
     }
 
+    @Override
+    public void disconnectFromServer() {
+        mCallbacks.disconnectFromServer();
+    }
+
     public interface Callbacks {
 
         public String getServerTitle();
@@ -132,5 +137,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         public Server getServer();
 
         public void closeAllSlidingMenus();
+
+        public void disconnectFromServer();
     }
 }

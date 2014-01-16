@@ -197,7 +197,7 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
             server.getServerCallBus().sendDisconnect();
         }
 
-        mService.onRemoveServer(builder.getTitle());
+        mService.disconnect(builder.getTitle());
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

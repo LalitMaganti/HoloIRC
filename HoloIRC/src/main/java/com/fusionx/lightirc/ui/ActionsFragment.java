@@ -23,7 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
@@ -43,9 +43,9 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener,
         SlidingMenu.OnOpenListener {
 
-    private IRCActionsCallback callback;
+    private Callbacks mCallbacks;
 
-    private FragmentTypeEnum type;
+    private FragmentType mFragmentType;
 
     private StickyListHeadersListView mListView;
 
@@ -55,7 +55,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        callback = FragmentUtils.getParent(this, IRCActionsCallback.class);
+        mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
     }
 
     @Override
@@ -78,9 +78,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mAdapter = new ActionsAdapter(getActivity());
         mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
-        if (type != null) {
-            mAdapter.setFragmentType(type);
-            type = null;
+        if (mFragmentType != null) {
+            mAdapter.setFragmentType(mFragmentType);
+            mFragmentType = null;
         }
         onOpen();
     }
@@ -96,25 +96,25 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 nickChangeDialog();
                 break;
             case 2:
-                callback.getServer().getServerCallBus().sendDisconnect();
+                mCallbacks.disconnectFromServer();
                 return;
             case 3:
                 ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
                 fragment.switchToIgnoreFragment();
                 return;
             case 4:
-                callback.closeOrPartCurrentTab();
+                mCallbacks.closeOrPartCurrentTab();
                 break;
         }
-        callback.closeAllSlidingMenus();
+        mCallbacks.closeAllSlidingMenus();
     }
 
     private void nickChangeDialog() {
         final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(),
-                callback.getNick()) {
+                mCallbacks.getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                callback.getServer().getServerCallBus().sendNickChange(input);
+                mCallbacks.getServer().getServerCallBus().sendNickChange(input);
             }
         };
         nickDialog.show();
@@ -125,7 +125,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 (getActivity()) {
             @Override
             public void onOkClicked(final String input) {
-                callback.getServer().getServerCallBus().sendJoin(input);
+                mCallbacks.getServer().getServerCallBus().sendJoin(input);
             }
         };
         builder.show();
@@ -133,8 +133,8 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     @Override
     public void onOpen() {
-        if (callback.isConnectedToServer() != mAdapter.isConnected()) {
-            mAdapter.setConnected(callback.isConnectedToServer());
+        if (mCallbacks.isConnectedToServer() != mAdapter.isConnected()) {
+            mAdapter.setConnected(mCallbacks.isConnectedToServer());
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -144,15 +144,15 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mAdapter.notifyDataSetChanged();
     }
 
-    public void onTabChanged(final FragmentTypeEnum selectedType) {
+    public void onTabChanged(final FragmentType selectedType) {
         if (mAdapter == null) {
-            type = selectedType;
+            mFragmentType = selectedType;
         } else {
             mAdapter.setFragmentType(selectedType);
         }
     }
 
-    public interface IRCActionsCallback {
+    public interface Callbacks {
 
         public String getNick();
 
@@ -163,5 +163,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         public Server getServer();
 
         public void closeAllSlidingMenus();
+
+        public void disconnectFromServer();
     }
 }

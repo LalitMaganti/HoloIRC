@@ -3,7 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.model.FragmentStorage;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
@@ -130,7 +130,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
                 .findViewById(R.id.pager_tabs);
         if (mAdapter == null) {
             mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
-            mAdapter.onNewFragment(serverTitle, FragmentTypeEnum.Server);
+            mAdapter.onNewFragment(serverTitle, FragmentType.Server);
         }
         // The view pager's adapter needs to be set before the TabStrip is assigned
         mViewPager.setAdapter(mAdapter);
@@ -138,7 +138,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
-        final int position = mAdapter.onNewFragment(userNick, FragmentTypeEnum.User);
+        final int position = mAdapter.onNewFragment(userNick, FragmentType.User);
 
         if (switchToTab) {
             mViewPager.setCurrentItem(position, true);
@@ -168,7 +168,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
         final String mention = getActivity().getIntent().getStringExtra("mention");
         final boolean switchToTab = channelName.equals(mention) || forceSwitch;
 
-        final int position = mAdapter.onNewFragment(channelName, FragmentTypeEnum.Channel);
+        final int position = mAdapter.onNewFragment(channelName, FragmentType.Channel);
 
         if (switchToTab) {
             mViewPager.setCurrentItem(position, true);
@@ -176,7 +176,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     public void onMentionRequested(final List<WorldUser> users) {
-        if (FragmentTypeEnum.Channel.equals(getCurrentType())) {
+        if (FragmentType.Channel.equals(getCurrentType())) {
             final ChannelFragment channel = (ChannelFragment) mAdapter
                     .getRegisteredFragment(mViewPager.getCurrentItem());
             channel.onUserMention(users);
@@ -193,7 +193,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
         return mAdapter.getRegisteredFragment(mViewPager.getCurrentItem()).getTitle();
     }
 
-    public FragmentTypeEnum getCurrentType() {
+    public FragmentType getCurrentType() {
         // Since the activity waits for a callback to be received from the service before adding
         // the ServerFragment we may end up not having a fragment in the adapter by the time the
         // options menu is prepare - return null in this case

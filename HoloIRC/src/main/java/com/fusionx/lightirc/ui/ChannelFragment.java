@@ -23,7 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.google.common.collect.ImmutableList;
 
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
@@ -67,8 +67,8 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> {
     }
 
     @Override
-    public FragmentTypeEnum getType() {
-        return FragmentTypeEnum.Channel;
+    public FragmentType getType() {
+        return FragmentType.Channel;
     }
 
     @Override

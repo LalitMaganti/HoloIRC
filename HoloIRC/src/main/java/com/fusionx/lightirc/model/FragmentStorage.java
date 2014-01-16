@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.model;
 
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -20,16 +20,16 @@ public class FragmentStorage implements Parcelable {
 
     private final String mTitle;
 
-    private final FragmentTypeEnum mFragmentTypeEnum;
+    private final FragmentType mFragmentType;
 
-    public FragmentStorage(final String title, final FragmentTypeEnum typeEnum) {
+    public FragmentStorage(final String title, final FragmentType typeEnum) {
         mTitle = title;
-        mFragmentTypeEnum = typeEnum;
+        mFragmentType = typeEnum;
     }
 
     private FragmentStorage(final Parcel in) {
         mTitle = in.readString();
-        mFragmentTypeEnum = (FragmentTypeEnum) in.readSerializable();
+        mFragmentType = (FragmentType) in.readSerializable();
     }
 
     @Override
@@ -40,14 +40,14 @@ public class FragmentStorage implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mTitle);
-        dest.writeSerializable(mFragmentTypeEnum);
+        dest.writeSerializable(mFragmentType);
     }
 
     public String getTitle() {
         return mTitle;
     }
 
-    public FragmentTypeEnum getFragmentTypeEnum() {
-        return mFragmentTypeEnum;
+    public FragmentType getFragmentType() {
+        return mFragmentType;
     }
 }

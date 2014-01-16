@@ -78,12 +78,12 @@ public class IRCService extends Service {
             server.getServerEventBus().register(helper);
         }
 
-        updateNotification();
+        updateServiceNotification();
 
         return server;
     }
 
-    private void updateNotification() {
+    private void updateServiceNotification() {
         final String text = String.format(getResources().getQuantityString(R.plurals
                 .server_connection, mConnectionManager.getServerCount()),
                 mConnectionManager.getServerCount());
@@ -107,7 +107,7 @@ public class IRCService extends Service {
         startForeground(1337, notification);
     }
 
-    public void onDisconnectAll() {
+    public void disconnectAll() {
         // Needed due to the fact that the connection manager can be null if the service was
         // restarted or if the theme is being changed
         if (mConnectionManager != null) {
@@ -117,8 +117,7 @@ public class IRCService extends Service {
                     server.getServerEventBus().unregister(mMentionHelperHashMap.get(title));
                 }
                 mMentionHelperHashMap.clear();
-
-                mConnectionManager.onDisconnectAll();
+                mConnectionManager.disconnectAll();
             }
         }
         stopForeground(true);
@@ -128,16 +127,33 @@ public class IRCService extends Service {
         mNotificationManager.cancelAll();
     }
 
-    public void onRemoveServer(final String serverName) {
+    public void disconnect(final Server server) {
         synchronized (mBinder) {
-            final Server server = mConnectionManager.getServerIfExists(serverName);
+            final String serverName = server.getConfiguration().getTitle();
             server.getServerEventBus().unregister(mMentionHelperHashMap.get(serverName));
             mMentionHelperHashMap.remove(serverName);
 
             if (mConnectionManager.onDisconnectionRequested(serverName)) {
                 stopForeground(true);
             } else {
-                updateNotification();
+                updateServiceNotification();
+                final NotificationManager mNotificationManager = (NotificationManager)
+                        getSystemService(Context.NOTIFICATION_SERVICE);
+                mNotificationManager.cancel(345);
+            }
+        }
+    }
+
+    public void onFinalUnexpectedDisconnect(final Server server) {
+        synchronized (mBinder) {
+            final String serverName = server.getConfiguration().getTitle();
+            server.getServerEventBus().unregister(mMentionHelperHashMap.get(serverName));
+            mMentionHelperHashMap.remove(serverName);
+
+            if (mConnectionManager.onFinalUnexpectedDisconnect(serverName)) {
+                stopForeground(true);
+            } else {
+                updateServiceNotification();
                 final NotificationManager mNotificationManager = (NotificationManager)
                         getSystemService(Context.NOTIFICATION_SERVICE);
                 mNotificationManager.cancel(345);
@@ -151,7 +167,7 @@ public class IRCService extends Service {
         // the system and is restarted
         if (intent != null) {
             if (intent.getBooleanExtra("stop", false)) {
-                onDisconnectAll();
+                disconnectAll();
                 return 0;
             }
         }
