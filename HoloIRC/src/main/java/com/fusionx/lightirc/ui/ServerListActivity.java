@@ -192,12 +192,8 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
     @Override
     public void disconnectFromServer(final ServerCard builder) {
         final Server server = getServer(builder.getTitle());
-        if (server != null) {
-            server.getServerEventBus().unregister(this);
-            server.getServerCallBus().sendDisconnect();
-        }
-
-        mService.onRemoveServer(builder.getTitle());
+        server.getServerEventBus().unregister(this);
+        mService.disconnect(server);
         mServerCardsAdapter.notifyDataSetChanged();
     }
 

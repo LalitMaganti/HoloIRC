@@ -23,7 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
@@ -90,8 +90,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         @Subscribe
         public void onDisconnected(final DisconnectEvent event) {
             if (event.userSent) {
-                mServiceFragment.removeServiceReference(mServerTitle);
-
                 final Intent intent = new Intent(IRCActivity.this, ServerListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -101,7 +99,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 mIRCPagerFragment.onUnexpectedDisconnect();
                 mActionsPagerFragment.updateConnectionStatus(false);
                 if (!event.retryPending && getServer() != null) {
-                    mServiceFragment.removeServiceReference(mServerTitle);
+                    mServiceFragment.onFinalUnexpectedDisconnect();
                 }
             }
         }
@@ -268,7 +266,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem userMenu = menu.findItem(R.id.activity_server_channel_ab_users);
-        final boolean isChannel = (FragmentTypeEnum.Channel.equals(mIRCPagerFragment
+        final boolean isChannel = (FragmentType.Channel.equals(mIRCPagerFragment
                 .getCurrentType()));
         userMenu.setVisible(isChannel && mUserSlidingMenu != null);
         return true;
@@ -342,6 +340,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     @Override
+    public void disconnectFromServer() {
+        mServiceFragment.disconnectFromServer();
+    }
+
+    @Override
     public boolean isUserSlidingMenuOpen() {
         return mUserSlidingMenu.isMenuShowing();
     }
@@ -366,7 +369,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void onRemoveCurrentFragment() {
         final Server server = getServer();
-        if (FragmentTypeEnum.User.equals(mIRCPagerFragment.getCurrentType())) {
+        if (FragmentType.User.equals(mIRCPagerFragment.getCurrentType())) {
             // We want to remove the fragment before sending the close message to prevent a NPE
             // when the UserFragment tries to set caching to false
             mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());

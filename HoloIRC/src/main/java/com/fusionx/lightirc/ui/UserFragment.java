@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -63,8 +63,8 @@ public class UserFragment extends IRCFragment<UserEvent> {
     }
 
     @Override
-    public FragmentTypeEnum getType() {
-        return FragmentTypeEnum.User;
+    public FragmentType getType() {
+        return FragmentType.User;
     }
 
     @Override

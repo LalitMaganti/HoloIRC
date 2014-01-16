@@ -120,9 +120,15 @@ public class ServiceFragment extends Fragment {
         return mServer;
     }
 
-    public void removeServiceReference(final String serverTitle) {
+    public void disconnectFromServer() {
         if (mService != null) {
-            mService.onRemoveServer(serverTitle);
+            mService.disconnect(mServer);
+        }
+    }
+
+    public void onFinalUnexpectedDisconnect() {
+        if (mService != null) {
+            mService.onFinalUnexpectedDisconnect(mServer);
         }
     }
 

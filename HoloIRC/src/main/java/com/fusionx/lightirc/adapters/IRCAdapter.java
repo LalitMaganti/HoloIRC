@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
 import com.astuetz.PagerSlidingTabStrip;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.model.FragmentStorage;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.lightirc.ui.IRCFragment;
@@ -41,7 +41,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         bundle.putString("title", pair.getTitle());
 
         final Fragment fragment;
-        switch (pair.getFragmentTypeEnum()) {
+        switch (pair.getFragmentType()) {
             case Server:
                 fragment = new ServerFragment();
                 break;
@@ -80,7 +80,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
-    public int onNewFragment(final String title, final FragmentTypeEnum typeEnum) {
+    public int onNewFragment(final String title, final FragmentType typeEnum) {
         final FragmentStorage enumPair = new FragmentStorage(title, typeEnum);
         mFragmentList.add(enumPair);
 
@@ -88,7 +88,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         // We don't want to notify the tab strip because the TabStrip doesn't even know that this
         // is the adapter it's meant to be monitoring - it only knows after the ServerFragment
         // has been added
-        if (typeEnum != FragmentTypeEnum.Server) {
+        if (typeEnum != FragmentType.Server) {
             mTabStrip.notifyDataSetChanged();
         }
 

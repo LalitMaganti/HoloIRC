@@ -21,7 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerStatus;
@@ -89,8 +89,8 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
-    public FragmentTypeEnum getType() {
-        return FragmentTypeEnum.Server;
+    public FragmentType getType() {
+        return FragmentType.Server;
     }
 
     // Subscription methods

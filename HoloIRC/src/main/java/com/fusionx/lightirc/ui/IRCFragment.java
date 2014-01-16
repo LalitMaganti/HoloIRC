@@ -23,7 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
@@ -130,7 +130,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     // Abstract methods
     protected abstract void onSendMessage(final String message);
 
-    public abstract FragmentTypeEnum getType();
+    public abstract FragmentType getType();
 
     // Getters and setters
     public String getTitle() {
