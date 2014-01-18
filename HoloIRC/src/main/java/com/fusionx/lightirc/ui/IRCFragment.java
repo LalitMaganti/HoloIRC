@@ -44,25 +44,26 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
         .OnEditorActionListener {
 
-    String mTitle;
-
+    @InjectView(R.id.fragment_irc_message_box)
     EditText mMessageBox;
+
+    String mTitle;
 
     IRCMessageAdapter<T> mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        final View view = inflate.inflate(R.layout.fragment_irc, container, false);
+        final View view = createView(container, inflate);
 
-        // This is done here rather than in onViewCreated as a NoSaveStateFramelayout will be
-        // inserted by the support library
-        mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
-        mMessageBox.setOnEditorActionListener(this);
-        mTitle = getArguments().getString("title");
+        // Sets up the views
+        ButterKnife.inject(this, view);
 
         return view;
     }
@@ -70,6 +71,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mMessageBox.setOnEditorActionListener(this);
+        mTitle = getArguments().getString("title");
 
         mMessageAdapter = new IRCMessageAdapter<>(getActivity());
         final AnimationAdapter adapter = new AlphaInAnimationAdapter(mMessageAdapter);
@@ -87,6 +91,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public void onDestroyView() {
         super.onDestroyView();
 
+        ButterKnife.reset(this);
         getServer().getServerEventBus().unregister(this);
     }
 
@@ -97,8 +102,11 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         getListView().setSelection(getListView().getCount());
     }
 
-    public final void onDisableUserInput() {
-        mMessageBox.setEnabled(false);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("NUMBEROFITEMS", mMessageAdapter.getCount());
     }
 
     @Override
@@ -111,16 +119,16 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
             mMessageBox.setText("");
             onSendMessage(message);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public final void onDisableUserInput() {
+        mMessageBox.setEnabled(false);
+    }
 
-        outState.putInt("NUMBEROFITEMS", mMessageAdapter.getCount());
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_irc, container, false);
     }
 
     protected abstract Server getServer();

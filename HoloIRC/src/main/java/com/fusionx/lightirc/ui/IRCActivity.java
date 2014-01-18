@@ -55,6 +55,8 @@ import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
+import static butterknife.ButterKnife.findById;
+
 /**
  * Activity which contains all the communication code between the fragments It also implements a lot
  * of callbacks to stop exposing objects to the fragments
@@ -174,14 +176,13 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mServerTitle);
 
-        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id
-                .pager_tabs);
+        final PagerSlidingTabStrip tabs = findById(this, R.id.pager_tabs);
         tabs.setOnPageChangeListener(mListener);
         tabs.setTextColorResource(android.R.color.white);
     }
 
     private void setUpSlidingMenu(final FragmentManager manager) {
-        mUserSlidingMenu = (SlidingMenu) findViewById(R.id.user_sliding_menu);
+        mUserSlidingMenu = findById(this, R.id.user_sliding_menu);
         mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
         mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
         mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
@@ -266,8 +267,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem userMenu = menu.findItem(R.id.activity_server_channel_ab_users);
-        final boolean isChannel = (FragmentType.Channel.equals(mIRCPagerFragment
-                .getCurrentType()));
+        final boolean isChannel = FragmentType.Channel == mIRCPagerFragment.getCurrentType();
         userMenu.setVisible(isChannel && mUserSlidingMenu != null);
         return true;
     }
@@ -370,8 +370,6 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     public void onRemoveCurrentFragment() {
         final Server server = getServer();
         if (FragmentType.User.equals(mIRCPagerFragment.getCurrentType())) {
-            // We want to remove the fragment before sending the close message to prevent a NPE
-            // when the UserFragment tries to set caching to false
             mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());
 
             final PrivateMessageUser user = server.getUserChannelInterface()

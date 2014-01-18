@@ -89,6 +89,24 @@ public class ServiceFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onPause();
+
+        if (mService != null) {
+            mService.setNoMention(mServer.getConfiguration().getTitle());
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (mService != null) {
+            mService.setNoMention(null);
+        }
+    }
+
     /**
      * Set the callback to null so we don't accidentally leak the Activity instance.
      */
@@ -103,7 +121,6 @@ public class ServiceFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        mService.setNoMention(null);
         getActivity().getApplicationContext().unbindService(mConnection);
     }
 
