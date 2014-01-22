@@ -37,19 +37,16 @@ import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.squareup.otto.Subscribe;
 
-import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.AbsListView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -229,16 +226,15 @@ public class ServerListActivity extends ActionBarActivity implements ServerListA
         return mService != null ? mService.getServerIfExists(title) : null;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
-    public void onDismiss(final AbsListView listView, int position) {
+    public void onDismiss(final GridView gridView, int position) {
         final ServerCardInterface builder = mServerCardsAdapter.getItem(position);
         builder.onCardDismiss();
 
-        listView.setAdapter(null);
+        gridView.setAdapter(null);
         mServerCardsAdapter.remove(builder);
         mAnimationAdapter.notifyDataSetChanged();
-        listView.setAdapter(mAnimationAdapter);
+        gridView.setAdapter(mAnimationAdapter);
     }
 
     // Subscribe events

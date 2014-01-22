@@ -65,10 +65,10 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null) {
             mCallbacks.getServer().getServerEventBus().register(this);
         }
     }

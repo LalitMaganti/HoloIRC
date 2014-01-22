@@ -6,8 +6,8 @@ import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
 
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 
 public class AnimatedServerListAdapter extends SwingBottomInAnimationAdapter {
 
@@ -61,11 +61,11 @@ public class AnimatedServerListAdapter extends SwingBottomInAnimationAdapter {
     }
 
     private void invokeCallback(final int position) {
-        mCallback.onDismiss(getAbsListView(), position);
+        mCallback.onDismiss((GridView) getAbsListView(), position);
     }
 
     public interface SingleDismissCallback {
 
-        public void onDismiss(AbsListView listView, int position);
+        public void onDismiss(GridView listView, int position);
     }
 }
