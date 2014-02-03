@@ -22,7 +22,7 @@
 package com.fusionx.lightirc.constants;
 
 public enum FragmentType {
-    Server,
-    Channel,
-    User
+    SERVER,
+    CHANNEL,
+    USER
 }

@@ -16,8 +16,7 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 
 public class IRCAdapter extends FragmentStatePagerAdapter {
 
@@ -42,13 +41,13 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
 
         final Fragment fragment;
         switch (pair.getFragmentType()) {
-            case Server:
+            case SERVER:
                 fragment = new ServerFragment();
                 break;
-            case Channel:
+            case CHANNEL:
                 fragment = new ChannelFragment();
                 break;
-            case User:
+            case USER:
                 fragment = new UserFragment();
                 break;
             default:
@@ -88,7 +87,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         // We don't want to notify the tab strip because the TabStrip doesn't even know that this
         // is the adapter it's meant to be monitoring - it only knows after the ServerFragment
         // has been added
-        if (typeEnum != FragmentType.Server) {
+        if (typeEnum != FragmentType.SERVER) {
             mTabStrip.notifyDataSetChanged();
         }
 
@@ -108,17 +107,18 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         super.destroyItem(container, position, object);
     }
 
-    public void onUnexpectedDisconnect() {
-        final Iterator iterator = mFragmentList.iterator();
-        // We don't want to remove the server fragment
-        iterator.next();
-
-        while (iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
+    public void onConnected() {
+        for(int i = 0, size = mRegisteredFragments.size(); i < size; i++) {
+            IRCFragment obj = (IRCFragment) mRegisteredFragments.valueAt(i);
+            obj.onConnected();
         }
-        notifyDataSetChanged();
-        mTabStrip.notifyDataSetChanged();
+    }
+
+    public void onUnexpectedDisconnect() {
+        for(int i = 0, size = mRegisteredFragments.size(); i < size; i++) {
+            IRCFragment obj = (IRCFragment) mRegisteredFragments.valueAt(i);
+            obj.onDisconnected();
+        }
     }
 
     public void onRemoveFragment(final int index) {
@@ -133,11 +133,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
         return mFragmentList.get(position).getTitle();
     }
 
-    public ArrayList<FragmentStorage> getFragments() {
-        return mFragmentList;
-    }
-
-    public void setFragmentList(final List<FragmentStorage> fragmentList) {
+    public void setFragmentList(final Collection<FragmentStorage> fragmentList) {
         mFragmentList.clear();
         mFragmentList.addAll(fragmentList);
     }
@@ -145,5 +141,9 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
     // ONLY CALL THIS METHOD IF YOU WANT THE CURRENTLY DISPLAYED FRAGMENT
     public IRCFragment getRegisteredFragment(int position) {
         return (IRCFragment) mRegisteredFragments.get(position);
+    }
+
+    public ArrayList<FragmentStorage> getFragments() {
+        return mFragmentList;
     }
 }

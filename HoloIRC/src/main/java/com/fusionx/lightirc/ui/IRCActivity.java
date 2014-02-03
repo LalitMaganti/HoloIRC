@@ -238,7 +238,10 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected void onPause() {
         super.onPause();
 
-        getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
+        // Server may be null if we are switching back and forth quickly
+        if (getServer() != null) {
+            getServer().getServerCache().setIrcTitle(mIRCPagerFragment.getCurrentTitle());
+        }
     }
 
     @Override
@@ -267,8 +270,8 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem userMenu = menu.findItem(R.id.activity_server_channel_ab_users);
-        final boolean isChannel = FragmentType.Channel == mIRCPagerFragment.getCurrentType();
-        userMenu.setVisible(isChannel && mUserSlidingMenu != null);
+        final boolean isChannel = FragmentType.CHANNEL == mIRCPagerFragment.getCurrentType();
+        userMenu.setVisible(isChannel && isConnectedToServer() && mUserSlidingMenu != null);
         return true;
     }
 
@@ -369,7 +372,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void onRemoveCurrentFragment() {
         final Server server = getServer();
-        if (FragmentType.User.equals(mIRCPagerFragment.getCurrentType())) {
+        if (FragmentType.USER.equals(mIRCPagerFragment.getCurrentType())) {
             mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());
 
             final PrivateMessageUser user = server.getUserChannelInterface()

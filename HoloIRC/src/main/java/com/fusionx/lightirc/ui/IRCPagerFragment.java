@@ -68,7 +68,8 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if (savedInstanceState == null) {
+        // Register when we return to this and there is a saved state
+        if (savedInstanceState != null) {
             mCallbacks.getServer().getServerEventBus().register(this);
         }
     }
@@ -130,7 +131,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
                 .findViewById(R.id.pager_tabs);
         if (mAdapter == null) {
             mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
-            mAdapter.onNewFragment(serverTitle, FragmentType.Server);
+            mAdapter.onNewFragment(serverTitle, FragmentType.SERVER);
         }
         // The view pager's adapter needs to be set before the TabStrip is assigned
         mViewPager.setAdapter(mAdapter);
@@ -138,7 +139,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
-        final int position = mAdapter.onNewFragment(userNick, FragmentType.User);
+        final int position = mAdapter.onNewFragment(userNick, FragmentType.USER);
 
         if (switchToTab) {
             mViewPager.setCurrentItem(position, true);
@@ -165,18 +166,37 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
-        final String mention = getActivity().getIntent().getStringExtra("mention");
-        final boolean switchToTab = channelName.equals(mention) || forceSwitch;
+        // The channel may already exist and be using a snapshot - check this first
+        int index = -1;
+        ArrayList<FragmentStorage> fragments = mAdapter.getFragments();
+        for (int i = 0, fragmentsSize = fragments.size(); i < fragmentsSize; i++) {
+            final FragmentStorage storage = fragments.get(i);
+            if (storage.getFragmentType() == FragmentType.CHANNEL
+                    && storage.getTitle().equals(channelName)) {
+                index = i;
+                break;
+            }
+        }
 
-        final int position = mAdapter.onNewFragment(channelName, FragmentType.Channel);
+        if (index != -1) {
+            final IRCFragment fragment = mAdapter.getRegisteredFragment(index);
+            if (fragment != null) {
+                fragment.onResetBuffer();
+            }
+        } else {
+            final String mention = getActivity().getIntent().getStringExtra("mention");
+            final boolean switchToTab = channelName.equals(mention) || forceSwitch;
 
-        if (switchToTab) {
-            mViewPager.setCurrentItem(position, true);
+            final int position = mAdapter.onNewFragment(channelName, FragmentType.CHANNEL);
+
+            if (switchToTab) {
+                mViewPager.setCurrentItem(position, true);
+            }
         }
     }
 
     public void onMentionRequested(final List<WorldUser> users) {
-        if (FragmentType.Channel.equals(getCurrentType())) {
+        if (FragmentType.CHANNEL.equals(getCurrentType())) {
             final ChannelFragment channel = (ChannelFragment) mAdapter
                     .getRegisteredFragment(mViewPager.getCurrentItem());
             channel.onUserMention(users);
@@ -270,8 +290,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
 
     @Subscribe
     public void onServerConnected(final ConnectEvent event) {
-        final ServerFragment fragment = (ServerFragment) mAdapter.getRegisteredFragment(0);
-        fragment.onConnected();
+        mAdapter.onConnected();
     }
     // Subscribe events end here
 

@@ -65,6 +65,8 @@ import butterknife.OnClick;
 public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
 
+    private Channel mChannel;
+
     private PopupMenu mPopupMenu;
 
     private boolean isPopupShown;
@@ -72,8 +74,8 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     @InjectView(R.id.auto_complete_button)
     ImageButton mAutoButton;
 
-    private static ImmutableList<? extends Class<? extends ChannelEvent>> sClasses = ImmutableList
-            .of(NameEvent.class, MentionEvent.class);
+    private static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
+            ImmutableList.of(NameEvent.class, MentionEvent.class);
 
     private Callbacks mCallback;
 
@@ -113,7 +115,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     public FragmentType getType() {
-        return FragmentType.Channel;
+        return FragmentType.CHANNEL;
     }
 
     @Override
@@ -127,19 +129,26 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     @Override
+    protected List<ChannelEvent> getDisconnectedAdapterData() {
+        return getServer().getUser().getChannelSnapshot(mTitle).getBuffer();
+    }
+
+    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseChannelMessage(mCallback.getServer(), mTitle, message);
     }
 
     private Channel getChannel() {
-        return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
+        if (mChannel == null) {
+            mChannel = mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
+        }
+        return mChannel;
     }
 
     // Subscription methods
     @Subscribe
     public void onChannelMessage(final ChannelEvent event) {
-        if (event.channelName.equals(getChannel().getName()) && !(sClasses
-                .contains(event.getClass()))) {
+        if (event.channelName.equals(mTitle) && !(sClasses.contains(event.getClass()))) {
             if (!(event instanceof WorldUserEvent && AppPreferences.hideUserMessages)) {
                 mMessageAdapter.add(event);
             }

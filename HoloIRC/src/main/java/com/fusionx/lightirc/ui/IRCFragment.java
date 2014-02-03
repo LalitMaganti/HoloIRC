@@ -25,6 +25,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerStatus;
 import com.fusionx.relay.event.Event;
 import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
@@ -68,6 +69,10 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         return view;
     }
 
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_irc, container, false);
+    }
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -83,8 +88,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         if (savedInstanceState != null) {
             adapter.setShouldAnimateFromPosition(savedInstanceState.getInt("NUMBEROFITEMS"));
         }
-        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
+        onResetBuffer();
         getServer().getServerEventBus().register(this);
+        onResetUserInput();
     }
 
     @Override
@@ -98,6 +104,10 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     @Override
     public void onResume() {
         super.onResume();
+
+        if (getServer().getStatus() != ServerStatus.CONNECTED) {
+            onResetUserInput();
+        }
 
         getListView().setSelection(getListView().getCount());
     }
@@ -123,17 +133,33 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         return false;
     }
 
-    public final void onDisableUserInput() {
-        mMessageBox.setEnabled(false);
+    public final void onResetUserInput() {
+        mMessageBox.setEnabled(getServer() != null && getServer().getStatus() == ServerStatus
+                .CONNECTED);
     }
 
-    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
-        return inflater.inflate(R.layout.fragment_irc, container, false);
+    public void onResetBuffer() {
+        if (getServer().getStatus() == ServerStatus.CONNECTED) {
+            mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
+        } else {
+            mMessageAdapter.setData(new ArrayList<>(getDisconnectedAdapterData()));
+        }
+    }
+
+    public void onConnected() {
+        onResetUserInput();
+    }
+
+    public void onDisconnected() {
+        onResetUserInput();
+        onResetBuffer();
     }
 
     protected abstract Server getServer();
 
     protected abstract List<T> getAdapterData();
+
+    protected abstract List<T> getDisconnectedAdapterData();
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);

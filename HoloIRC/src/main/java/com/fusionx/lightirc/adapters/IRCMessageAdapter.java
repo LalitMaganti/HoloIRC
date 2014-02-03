@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.MessageSpannedConverter;
+import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
@@ -84,7 +84,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
             holder.timestamp.setVisibility(View.GONE);
         }
         if (message.store == null) {
-            MessageSpannedConverter.getConverter(mContext).getEventMessage(message);
+            MessageConversionUtils.getConverter(mContext).getEventMessage(message);
         }
         holder.message.setText((CharSequence) message.store);
         Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);

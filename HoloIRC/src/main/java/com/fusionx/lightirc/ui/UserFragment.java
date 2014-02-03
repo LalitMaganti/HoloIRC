@@ -53,7 +53,7 @@ public class UserFragment extends IRCFragment<UserEvent> {
         final PrivateMessageUser user = getPrivateMessageUser();
 
         if (user.isUserQuit()) {
-            onDisableUserInput();
+            onResetUserInput();
         }
     }
 
@@ -64,7 +64,7 @@ public class UserFragment extends IRCFragment<UserEvent> {
 
     @Override
     public FragmentType getType() {
-        return FragmentType.User;
+        return FragmentType.USER;
     }
 
     @Override
@@ -79,6 +79,11 @@ public class UserFragment extends IRCFragment<UserEvent> {
     @Override
     protected List<UserEvent> getAdapterData() {
         return getPrivateMessageUser().getBuffer();
+    }
+
+    @Override
+    protected List<UserEvent> getDisconnectedAdapterData() {
+        return getAdapterData();
     }
 
     public PrivateMessageUser getPrivateMessageUser() {
