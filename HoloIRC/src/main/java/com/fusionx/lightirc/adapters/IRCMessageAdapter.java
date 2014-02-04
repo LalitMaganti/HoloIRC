@@ -1,14 +1,6 @@
 package com.fusionx.lightirc.adapters;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.MessageConversionUtils;
-import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.event.Event;
-
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +8,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.util.MessageConversionUtils;
+import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.event.Event;
+
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
@@ -25,12 +22,15 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
     private final Object mLock = new Object();
 
     private final Context mContext;
-
+    private final LayoutInflater mInflater;
+    private final MessageConversionUtils mConverter;
     private List<T> mObjects;
 
     public IRCMessageAdapter(Context context) {
         mContext = context;
         mObjects = new ArrayList<>();
+        mInflater = LayoutInflater.from(mContext);
+        mConverter = MessageConversionUtils.getConverter(mContext);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public Object getItem(final int position) {
         return getEvent(position);
     }
 
@@ -56,51 +56,53 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         return position;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view;
-        ViewHolder holder;
-        if (convertView == null) {
-            view = LayoutInflater.from(mContext)
-                    .inflate(R.layout.irc_listview_textview, parent, false);
-            final TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
-            timestamp.setTypeface(UIUtils.getRobotoLight(mContext));
+    public View getView(final int position, final View convertView, final ViewGroup parent) {
+        final View view = convertView == null ? initView(parent) : convertView;
+        final ViewHolder holder = (ViewHolder) view.getTag();
 
-            final TextView message = (TextView) view.findViewById(R.id.message);
-            message.setTypeface(UIUtils.getRobotoLight(mContext));
+        final Event event = getEvent(position);
+        addTimestampIfRequired(holder, event);
+        setUpMessage(holder, event);
 
-            holder = new ViewHolder(timestamp, message);
-            view.setTag(holder);
-        } else {
-            view = convertView;
-            holder = (ViewHolder) view.getTag();
+        Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+        return view;
+    }
+
+    private View initView(final ViewGroup parent) {
+        final View view = mInflater.inflate(R.layout.irc_listview_textview, parent, false);
+
+        final TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
+        timestamp.setTypeface(UIUtils.getRobotoLight(mContext));
+
+        final TextView message = (TextView) view.findViewById(R.id.message);
+        message.setTypeface(UIUtils.getRobotoLight(mContext));
+
+        final ViewHolder holder = new ViewHolder(timestamp, message);
+        view.setTag(holder);
+
+        return view;
+    }
+
+    private void setUpMessage(ViewHolder holder, Event event) {
+        if (event.store == null) {
+            mConverter.setEventMessage(event);
         }
-        final Event message = getEvent(position);
+        holder.message.setText((CharSequence) event.store);
+    }
+
+    private void addTimestampIfRequired(ViewHolder holder, final Event event) {
         if (AppPreferences.timestamp) {
             holder.timestamp.setVisibility(View.VISIBLE);
-            holder.timestamp.setText(message.timestamp.format("%H:%M"));
+            holder.timestamp.setText(event.timestamp.format("%H:%M"));
         } else {
             holder.timestamp.setVisibility(View.GONE);
         }
-        if (message.store == null) {
-            MessageConversionUtils.getConverter(mContext).getEventMessage(message);
-        }
-        holder.message.setText((CharSequence) message.store);
-        Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
-        return view;
     }
 
     public void add(final T event) {
         synchronized (mLock) {
             mObjects.add(event);
-        }
-        notifyDataSetChanged();
-    }
-
-    public void addAll(final Collection<T> events) {
-        synchronized (mLock) {
-            mObjects.addAll(events);
         }
         notifyDataSetChanged();
     }

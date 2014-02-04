@@ -87,7 +87,7 @@ public class UserFragment extends IRCFragment<UserEvent> {
     }
 
     public PrivateMessageUser getPrivateMessageUser() {
-        return getServer().getUserChannelInterface().getPrivateMessageUserIfExists(mTitle);
+        return getServer().getUserChannelInterface().getPrivateMessageUser(mTitle);
     }
 
     // Subscription methods

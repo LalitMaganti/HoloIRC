@@ -79,6 +79,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     </string>
     <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
     <string name="parser_message" translatable="false">%1$s: %2$s</string>
+    <string name="parser_connected_generic">Connected to server</string>
     <string name="parser_connected">Connected to %1$s</string>
     <string name="parser_joined_channel">%1$s joined the channel</string>
     <string name="parser_quit_server">%1$s quit the server</string>

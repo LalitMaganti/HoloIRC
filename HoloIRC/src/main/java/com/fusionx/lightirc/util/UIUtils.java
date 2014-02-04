@@ -86,9 +86,8 @@ public class UIUtils {
     }
 
     public static int getThemedTextColor(final Context context) {
-        return isThemeLight() ? context.getResources().getColor(android.R
-                .color.black) : context.getResources().getColor(android.R
-                .color.white);
+        return isThemeLight() ? context.getResources().getColor(android.R.color.black)
+                : context.getResources().getColor(android.R.color.white);
     }
 
     public static boolean isThemeLight() {

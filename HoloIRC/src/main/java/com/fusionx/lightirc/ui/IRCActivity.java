@@ -197,7 +197,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             @Override
             public void onOpen() {
                 mUserListFragment.onMenuOpened(getServer().getUserChannelInterface()
-                        .getChannelIfExists(mIRCPagerFragment.getCurrentTitle()));
+                        .getChannel(mIRCPagerFragment.getCurrentTitle()));
                 onUserListDisplayed();
             }
         });
@@ -314,13 +314,13 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 tabTitle = getServer().getServerCache().getIrcTitle();
             }
             for (final Channel channel : getServer().getUser().getChannels()) {
-                final boolean switchToTab = tabTitle.equals(channel.getName());
+                final boolean switchToTab = channel.getName().equals(tabTitle);
                 mIRCPagerFragment.onCreateChannelFragment(channel.getName(), switchToTab);
             }
             final Collection<PrivateMessageUser> privateMessages = getServer()
                     .getUserChannelInterface().getPrivateMessageUsers();
             for (final PrivateMessageUser user : privateMessages) {
-                final boolean switchToTab = tabTitle.equals(user.getNick());
+                final boolean switchToTab = user.getNick().equals(tabTitle);
                 mIRCPagerFragment.onCreateMessageFragment(user.getNick(), switchToTab);
             }
             // Do this so that the options menu can pick up whether to display the user button
@@ -376,7 +376,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());
 
             final PrivateMessageUser user = server.getUserChannelInterface()
-                    .getPrivateMessageUserIfExists(mIRCPagerFragment.getCurrentTitle());
+                    .getPrivateMessageUser(mIRCPagerFragment.getCurrentTitle());
             server.getServerCallBus().sendClosePrivateMessage(user);
         } else {
             server.getServerCallBus().sendPart(mIRCPagerFragment.getCurrentTitle());

@@ -6,6 +6,8 @@ import android.util.Log;
 import com.fusionx.lightirc.R;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ActionEvent;
+import com.fusionx.relay.event.channel.ChannelConnectEvent;
+import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
 import com.fusionx.relay.event.channel.InitialTopicEvent;
 import com.fusionx.relay.event.channel.MessageEvent;
@@ -32,6 +34,8 @@ import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.event.server.WhoisEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
+import com.fusionx.relay.event.user.UserConnectEvent;
+import com.fusionx.relay.event.user.UserDisconnectEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.util.ColourParserUtils;
@@ -52,7 +56,7 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void debugDeadEvent(final DeadEvent deadEvent) {
-            Log.e("HoloIRC", "Dead event of type " + deadEvent.event.getClass() + " received");
+            Log.d("HoloIRC", "Dead event of type " + deadEvent.event.getClass() + " received");
         }
 
         // Messages
@@ -76,6 +80,18 @@ public class MessageConversionUtils {
         public void getOnConnectedMessage(final ConnectEvent event) {
             final String response = mContext.getString(R.string.parser_connected);
             setupEvent(event, String.format(response, event.serverUrl));
+        }
+
+        @Subscribe
+        public void getOnConnectedMessage(final ChannelConnectEvent event) {
+            final String response = mContext.getString(R.string.parser_connected_generic);
+            setupEvent(event, response);
+        }
+
+        @Subscribe
+        public void getOnConnectedMessage(final UserConnectEvent event) {
+            final String response = mContext.getString(R.string.parser_connected_generic);
+            setupEvent(event, response);
         }
 
         @Subscribe
@@ -235,6 +251,16 @@ public class MessageConversionUtils {
         public void getDisconnectEvent(final DisconnectEvent event) {
             setupEvent(event, event.serverMessage);
         }
+
+        @Subscribe
+        public void getDisconnectEvent(final ChannelDisconnectEvent event) {
+            setupEvent(event, event.message);
+        }
+
+        @Subscribe
+        public void getDisconnectEvent(final UserDisconnectEvent event) {
+            setupEvent(event, event.message);
+        }
     };
 
     private MessageConversionUtils(final Context context) {
@@ -250,7 +276,7 @@ public class MessageConversionUtils {
         return sConverter;
     }
 
-    public void getEventMessage(final Event event) {
+    public void setEventMessage(final Event event) {
         mConverter.post(event);
     }
 

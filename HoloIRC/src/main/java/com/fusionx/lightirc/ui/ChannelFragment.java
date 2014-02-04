@@ -140,7 +140,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     private Channel getChannel() {
         if (mChannel == null) {
-            mChannel = mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
+            mChannel = mCallback.getServer().getUserChannelInterface().getChannel(mTitle);
         }
         return mChannel;
     }
