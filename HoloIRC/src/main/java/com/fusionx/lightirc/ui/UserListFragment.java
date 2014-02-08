@@ -215,6 +215,10 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
         return mAdapter;
     }
 
+    public int getUserCount() {
+        return getRealAdapter().getCount();
+    }
+
     /*
      * Subscribed events
      *
@@ -245,6 +249,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
     public void onStopObserving() {
         mCallback.getServer().getServerEventBus().unregister(this);
     }
+
 
     public interface Callbacks {
 

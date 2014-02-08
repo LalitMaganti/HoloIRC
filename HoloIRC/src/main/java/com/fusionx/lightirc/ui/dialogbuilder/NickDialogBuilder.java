@@ -25,10 +25,9 @@ import com.fusionx.lightirc.R;
 
 import android.content.Context;
 
-public abstract class NickPromptDialogBuilder extends PromptDialogBuilder {
+public abstract class NickDialogBuilder extends DialogBuilder {
 
-    public NickPromptDialogBuilder(final Context context, final String nick) {
-        super(context, context.getString(R.string.nickname), context.getString(R.string.new_nick),
-                nick);
+    public NickDialogBuilder(final Context context, final String nick) {
+        super(context, context.getString(R.string.nickname), context.getString(R.string.new_nick), nick);
     }
 }

@@ -160,5 +160,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     </string>
     <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="notification_settings_title">Notification Settings</string>
+    <string name="ignore_nick_title">Nick to ignore</string>
+    <string name="ignore_nick_description">Nickname of the user to be ignored</string>
+    <string name="ignore_list">Ignore List</string>
+    <string name="items_checked">items checked</string>
 
 </resources>

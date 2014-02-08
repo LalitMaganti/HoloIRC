@@ -87,7 +87,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public void updateConnectionStatus(final boolean isConnected) {
-        getActionFragment().updateConnectionStatus(isConnected);
+        getActionFragment().onConnectionStatusChange(isConnected);
     }
 
     public void onPageChanged(FragmentType type) {
@@ -100,8 +100,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public void closeOrPartCurrentTab() {
-        mCallbacks.onRemoveCurrentFragment();
+    public void removeCurrentFragment() {
+        mCallbacks.removeCurrentFragment();
     }
 
     @Override
@@ -115,8 +115,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public void closeAllSlidingMenus() {
-        mCallbacks.closeAllSlidingMenus();
+    public void closeSlidingMenus() {
+        mCallbacks.closeSlidingMenus();
     }
 
     @Override
@@ -130,13 +130,13 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
         public String getNick();
 
-        public void onRemoveCurrentFragment();
+        public void removeCurrentFragment();
 
         public boolean isConnectedToServer();
 
         public Server getServer();
 
-        public void closeAllSlidingMenus();
+        public void closeSlidingMenus();
 
         public void disconnectFromServer();
     }

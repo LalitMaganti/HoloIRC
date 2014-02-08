@@ -24,8 +24,8 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
 import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Server;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
@@ -90,10 +90,10 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
             final long l) {
         switch (i) {
             case 0:
-                channelNameDialog();
+                showChannelDialog();
                 break;
             case 1:
-                nickChangeDialog();
+                showNickDialog();
                 break;
             case 2:
                 mCallbacks.disconnectFromServer();
@@ -103,14 +103,14 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 fragment.switchToIgnoreFragment();
                 return;
             case 4:
-                mCallbacks.closeOrPartCurrentTab();
+                mCallbacks.removeCurrentFragment();
                 break;
         }
-        mCallbacks.closeAllSlidingMenus();
+        mCallbacks.closeSlidingMenus();
     }
 
-    private void nickChangeDialog() {
-        final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(),
+    private void showNickDialog() {
+        final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
                 mCallbacks.getNick()) {
             @Override
             public void onOkClicked(final String input) {
@@ -120,14 +120,8 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         nickDialog.show();
     }
 
-    private void channelNameDialog() {
-        final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder
-                (getActivity()) {
-            @Override
-            public void onOkClicked(final String input) {
-                mCallbacks.getServer().getServerCallBus().sendJoin(input);
-            }
-        };
+    private void showChannelDialog() {
+        final ChannelDialogBuilder builder = new ChannelDialogBuilder();
         builder.show();
     }
 
@@ -139,7 +133,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         }
     }
 
-    public void updateConnectionStatus(final boolean isConnected) {
+    public void onConnectionStatusChange(final boolean isConnected) {
         mAdapter.setConnected(isConnected);
         mAdapter.notifyDataSetChanged();
     }
@@ -156,14 +150,27 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         public String getNick();
 
-        public void closeOrPartCurrentTab();
+        public void removeCurrentFragment();
 
         public boolean isConnectedToServer();
 
         public Server getServer();
 
-        public void closeAllSlidingMenus();
+        public void closeSlidingMenus();
 
         public void disconnectFromServer();
+    }
+
+    public class ChannelDialogBuilder extends DialogBuilder {
+
+        public ChannelDialogBuilder() {
+            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
+                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
+        }
+
+        @Override
+        public void onOkClicked(final String input) {
+            mCallbacks.getServer().getServerCallBus().sendJoin(input);
+        }
     }
 }

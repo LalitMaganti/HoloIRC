@@ -58,34 +58,14 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import static butterknife.ButterKnife.findById;
 
 /**
- * Activity which contains all the communication code between the fragments It also implements a lot
+ * Activity which contains all the communication code between the fragments It also implements a
+ * lot
  * of callbacks to stop exposing objects to the fragments
  *
  * @author Lalit Maganti
  */
 public abstract class IRCActivity extends ActionBarActivity implements UserListFragment.Callbacks,
         ServiceFragment.Callbacks, ActionsPagerFragment.Callbacks, IRCPagerFragment.Callbacks {
-
-    /*
-     * Listener used when the view pages changes pages
-     */
-    private final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
-            .SimpleOnPageChangeListener() {
-        @Override
-        public void onPageSelected(final int position) {
-            supportInvalidateOptionsMenu();
-            closeAllSlidingMenus();
-
-            mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
-
-            if (mActionsSlidingMenu != null) {
-                mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
-                        .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
-            }
-            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu.TOUCHMODE_NONE :
-                    SlidingMenu.TOUCHMODE_MARGIN);
-        }
-    };
 
     private final Object mEventReceiver = new Object() {
 
@@ -97,7 +77,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
                 startActivity(intent);
             } else {
                 getSupportActionBar().setSubtitle(getString(R.string.status_disconnected));
-                closeAllSlidingMenus();
+                closeSlidingMenus();
                 mIRCPagerFragment.onUnexpectedDisconnect();
                 mActionsPagerFragment.updateConnectionStatus(false);
                 if (!event.retryPending && getServer() != null) {
@@ -124,6 +104,27 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     protected ActionsPagerFragment mActionsPagerFragment;
 
     protected SlidingMenu mActionsSlidingMenu;
+
+    /*
+     * Listener used when the view pages changes pages
+     */
+    private final ViewPager.SimpleOnPageChangeListener mListener = new ViewPager
+            .SimpleOnPageChangeListener() {
+        @Override
+        public void onPageSelected(final int position) {
+            supportInvalidateOptionsMenu();
+            closeSlidingMenus();
+
+            mActionsPagerFragment.onPageChanged(mIRCPagerFragment.getCurrentType());
+
+            if (mActionsSlidingMenu != null) {
+                mActionsSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu
+                        .TOUCHMODE_FULLSCREEN : SlidingMenu.TOUCHMODE_MARGIN);
+            }
+            mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu.TOUCHMODE_NONE :
+                    SlidingMenu.TOUCHMODE_MARGIN);
+        }
+    };
 
     protected DrawerToggle mDrawerToggle;
 
@@ -277,22 +278,22 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        if (mDrawerToggle == null || !mDrawerToggle.onOptionsItemSelected(item)) {
-            switch (item.getItemId()) {
-                case R.id.activity_server_channel_ab_users:
-                    mUserSlidingMenu.toggle();
-                    return true;
-                default:
-                    return false;
-            }
-        } else {
+        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }
+        switch (item.getItemId()) {
+            case R.id.activity_server_channel_ab_users:
+                mUserSlidingMenu.toggle();
+                return true;
+            default:
+                return false;
         }
     }
     // Options menu end
 
     private void onUserListDisplayed() {
-        getSupportActionBar().setSubtitle(mUserListFragment.getRealAdapter().getCount() + " users");
+        final String text = String.format("%d users", mUserListFragment.getUserCount());
+        getSupportActionBar().setSubtitle(text);
     }
 
     @Override
@@ -335,7 +336,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     @Override
-    public void closeAllSlidingMenus() {
+    public void closeSlidingMenus() {
         if (mActionsSlidingMenu != null) {
             mActionsSlidingMenu.showContent();
         }
@@ -361,7 +362,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     @Override
     public void onUserMention(final List<WorldUser> users) {
         mIRCPagerFragment.onMentionRequested(users);
-        closeAllSlidingMenus();
+        closeSlidingMenus();
     }
 
     @Override
@@ -370,7 +371,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     }
 
     @Override
-    public void onRemoveCurrentFragment() {
+    public void removeCurrentFragment() {
         final Server server = getServer();
         if (FragmentType.USER.equals(mIRCPagerFragment.getCurrentType())) {
             mIRCPagerFragment.onRemoveFragment(mIRCPagerFragment.getCurrentTitle());

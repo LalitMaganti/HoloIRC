@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
@@ -85,13 +85,7 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
     public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.ignore_list_cab_add:
-                final IgnoreNickPromptDialogBuilder builder = new IgnoreNickPromptDialogBuilder
-                        (getActivity(), "") {
-                    @Override
-                    public void onOkClicked(final String input) {
-                        getIgnoreAdapter().add(input);
-                    }
-                };
+                final IgnoreListDialogBuilder builder = new IgnoreListDialogBuilder();
                 builder.show();
                 return true;
             case R.id.ignore_list_cab_remove:
@@ -104,7 +98,7 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
 
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        mode.setTitle("Ignore List");
+        mode.setTitle(getActivity().getString(R.string.ignore_list));
         mode.getMenu().getItem(1).setVisible(false);
         return super.onPrepareActionMode(mode, menu);
     }
@@ -139,9 +133,9 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         final int checkedItemCount = getCheckedPositions().size();
 
         if (checkedItemCount != 0) {
-            mode.setTitle(checkedItemCount + " items checked");
+            mode.setTitle(checkedItemCount + getActivity().getString(R.string.items_checked));
         } else {
-            mode.setTitle("Ignore List");
+            mode.setTitle(getActivity().getString(R.string.ignore_list));
         }
         mode.getMenu().getItem(0).setVisible(checkedItemCount == 0);
         mode.getMenu().getItem(1).setVisible(checkedItemCount > 0);
@@ -154,5 +148,18 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         public String getServerTitle();
 
         public Server getServer();
+    }
+
+    public class IgnoreListDialogBuilder extends DialogBuilder {
+
+        public IgnoreListDialogBuilder() {
+            super(getActivity(), getActivity().getString(R.string.ignore_nick_title),
+                    getActivity().getString(R.string.ignore_nick_description), "");
+        }
+
+        @Override
+        public void onOkClicked(final String input) {
+            getIgnoreAdapter().add(input);
+        }
     }
 }

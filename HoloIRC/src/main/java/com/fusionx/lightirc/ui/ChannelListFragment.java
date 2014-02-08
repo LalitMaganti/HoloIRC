@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
-import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.ChannelDialogBuilder;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 
@@ -76,7 +76,7 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         switch (item.getItemId()) {
             case R.id.activity_server_settings_cab_edit:
                 final String edited = mAdapter.getItem(0);
-                final ChannelNamePromptDialogBuilder dialog = new ChannelNamePromptDialogBuilder
+                final ChannelDialogBuilder dialog = new ChannelDialogBuilder
                         (getActivity(), edited) {
                     @Override
                     public void onOkClicked(final String input) {
@@ -121,8 +121,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.activity_server_settings_ab_add:
-                final ChannelNamePromptDialogBuilder dialog =
-                        new ChannelNamePromptDialogBuilder(getActivity()) {
+                final ChannelDialogBuilder dialog =
+                        new ChannelDialogBuilder(getActivity()) {
                             @Override
                             public void onOkClicked(final String input) {
                                 mAdapter.add(input);
