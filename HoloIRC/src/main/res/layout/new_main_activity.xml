@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.SlidingPaneLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/sliding_pane_layout">
+
+    <RelativeLayout
+            android:id="@+id/sliding_list_frame"
+            android:layout_width="220dp"
+            android:layout_height="match_parent"/>
+
+    <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <RelativeLayout
+                android:id="@+id/content_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#e1e1e1">
+            <TextView
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/content_frame_empty_textview"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:text="Click a server on the right to connect :)"
+                    android:textColor="@android:color/darker_gray"
+                    android:textAppearance="@android:style/TextAppearance.Large"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:id="@+id/right_drawer"
+                android:layout_width="250dip"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:divider="@android:color/transparent"/>
+
+    </android.support.v4.widget.DrawerLayout>
+</android.support.v4.widget.SlidingPaneLayout>

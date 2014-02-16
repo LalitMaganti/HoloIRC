@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:background="@drawable/group_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <com.fusionx.lightirc.ui.widget.NoParentPressImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button_expand"
+            android:contentDescription="expander_status"
+            android:scaleType="center"
+            android:clickable="true"
+            android:background="@drawable/activatable_item_background"
+            android:layout_gravity="center_vertical"
+            android:src="?expand_close_menu_drawable"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"/>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/card_server_overflow"
+            android:layout_toRightOf="@id/button_expand">
+        <TextView
+                android:textColor="@android:color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/server_title"
+                android:textAppearance="@android:style/TextAppearance.Medium"
+                android:paddingTop="@dimen/margin_medium"
+                android:text="Text"/>
+        <TextView
+                android:textColor="@android:color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:id="@+id/server_status"
+                android:paddingRight="@dimen/margin_small"
+                android:paddingTop="@dimen/margin_small"
+                android:paddingBottom="@dimen/margin_medium"
+                android:text="Disconnected"/>
+    </LinearLayout>
+
+    <com.fusionx.lightirc.ui.widget.NoParentPressImageView
+            android:id="@+id/overflow_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/overflow"
+            android:src="?overflow_menu_drawable"
+            android:background="@drawable/activatable_item_background"
+            android:layout_gravity="center"
+            android:scaleType="center"
+            android:clickable="true"
+            android:layout_alignBottom="@+id/button_expand"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"/>
+</RelativeLayout>

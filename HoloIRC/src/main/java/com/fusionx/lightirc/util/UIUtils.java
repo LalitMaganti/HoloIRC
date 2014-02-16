@@ -6,10 +6,15 @@ import com.fusionx.lightirc.ui.IRCActivity;
 import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
 import com.fusionx.relay.constants.Theme;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
+import android.view.View;
 import android.widget.TextView;
 
 public class UIUtils {
@@ -92,5 +97,13 @@ public class UIUtils {
 
     public static boolean isThemeLight() {
         return getThemeInt() == R.style.Light;
+    }
+
+    public static void setWindowBackgroundOnView(final Context context, final View view) {
+        final TypedArray a = context.getTheme().obtainStyledAttributes(new int[]
+                {android.R.attr.windowBackground});
+        final int background = a.getResourceId(0, 0);
+        view.setBackgroundResource(background);
+        a.recycle();
     }
 }

@@ -1,35 +1,48 @@
 package com.fusionx.lightirc.adapters;
 
-import com.astuetz.PagerSlidingTabStrip;
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.model.FragmentStorage;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.lightirc.ui.IRCFragment;
 import com.fusionx.lightirc.ui.ServerFragment;
 import com.fusionx.lightirc.ui.UserFragment;
+import com.fusionx.slidingtabs.model.OnTabClickListener;
+import com.fusionx.slidingtabs.model.Tab;
+import com.fusionx.slidingtabs.model.TabAdapter;
+import com.fusionx.slidingtabs.model.TextTab;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-public class IRCAdapter extends FragmentStatePagerAdapter {
+public class IRCAdapter extends FragmentStatePagerAdapter implements TabAdapter {
 
-    private final SparseArray<Fragment> mRegisteredFragments = new SparseArray<>();
+    private final OnTabClickListener mOnClickListener;
+
+    private final SparseArray<IRCFragment> mRegisteredFragments = new SparseArray<>();
 
     private final ArrayList<FragmentStorage> mFragmentList = new ArrayList<>();
 
-    private final PagerSlidingTabStrip mTabStrip;
+    private final Map<String, Integer> mFragmentIndices = new HashMap<>();
 
-    public IRCAdapter(final FragmentManager fm, final PagerSlidingTabStrip tabStrip) {
+    public IRCAdapter(final FragmentManager fm, final ViewPager pager) {
         super(fm);
-
-        mTabStrip = tabStrip;
+        mOnClickListener = new OnTabClickListener() {
+            @Override
+            public void onClick(int position) {
+                pager.setCurrentItem(position);
+            }
+        };
     }
 
     @Override
@@ -54,6 +67,7 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
                 fragment = null;
         }
         fragment.setArguments(bundle);
+        mFragmentIndices.put(pair.getTitle(), i);
 
         return fragment;
     }
@@ -66,66 +80,55 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getItemPosition(final Object object) {
         final IRCFragment fragment = (IRCFragment) object;
-
         return getIndexFromTitle(fragment.getTitle());
     }
 
     public int getIndexFromTitle(final String title) {
-        for (final FragmentStorage pair : mFragmentList) {
-            if (pair.getTitle().equals(title)) {
-                return mFragmentList.indexOf(pair);
-            }
+        final Integer position = mFragmentIndices.get(title);
+        if (position == null) {
+            return POSITION_NONE;
         }
-        return POSITION_NONE;
+        return position;
     }
 
     public int onNewFragment(final String title, final FragmentType typeEnum) {
         final FragmentStorage enumPair = new FragmentStorage(title, typeEnum);
         mFragmentList.add(enumPair);
-
         notifyDataSetChanged();
-        // We don't want to notify the tab strip because the TabStrip doesn't even know that this
-        // is the adapter it's meant to be monitoring - it only knows after the ServerFragment
-        // has been added
-        if (typeEnum != FragmentType.SERVER) {
-            mTabStrip.notifyDataSetChanged();
-        }
-
         return mFragmentList.size() - 1;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         final Fragment fragment = (Fragment) super.instantiateItem(container, position);
-        mRegisteredFragments.put(position, fragment);
+        mRegisteredFragments.put(position, (IRCFragment) fragment);
         return fragment;
     }
 
     @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    public void destroyItem(final ViewGroup container, final int position, final Object object) {
         mRegisteredFragments.remove(position);
         super.destroyItem(container, position, object);
     }
 
     public void onConnected() {
-        for(int i = 0, size = mRegisteredFragments.size(); i < size; i++) {
-            IRCFragment obj = (IRCFragment) mRegisteredFragments.valueAt(i);
+        for (int i = 0, size = mRegisteredFragments.size(); i < size; i++) {
+            final IRCFragment obj = mRegisteredFragments.valueAt(i);
             obj.onConnected();
         }
     }
 
     public void onUnexpectedDisconnect() {
-        for(int i = 0, size = mRegisteredFragments.size(); i < size; i++) {
-            IRCFragment obj = (IRCFragment) mRegisteredFragments.valueAt(i);
+        for (int i = 0, size = mRegisteredFragments.size(); i < size; i++) {
+            final IRCFragment obj = mRegisteredFragments.valueAt(i);
             obj.onDisconnected();
         }
     }
 
     public void onRemoveFragment(final int index) {
-        mFragmentList.remove(index);
-
+        final FragmentStorage storage = mFragmentList.remove(index);
+        mFragmentIndices.remove(storage.getTitle());
         notifyDataSetChanged();
-        mTabStrip.notifyDataSetChanged();
     }
 
     @Override
@@ -139,8 +142,17 @@ public class IRCAdapter extends FragmentStatePagerAdapter {
     }
 
     // ONLY CALL THIS METHOD IF YOU WANT THE CURRENTLY DISPLAYED FRAGMENT
-    public IRCFragment getRegisteredFragment(int position) {
-        return (IRCFragment) mRegisteredFragments.get(position);
+    public IRCFragment getRegisteredFragment(final int position) {
+        return mRegisteredFragments.get(position);
+    }
+
+    // TabAdapter Stuff
+    @Override
+    public Tab getTab(int position) {
+        final String title = mFragmentList.get(position).getTitle();
+        final Tab tab = new TextTab(title, R.layout.tab_layout);
+        tab.setTabClickListener(mOnClickListener);
+        return tab;
     }
 
     public ArrayList<FragmentStorage> getFragments() {

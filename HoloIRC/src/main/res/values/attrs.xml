@@ -23,6 +23,8 @@
     <attr name="card_server_background" format="reference|color"/>
     <attr name="server_card_text" format="reference|color"/>
     <attr name="overflow_menu_drawable" format="reference"/>
+    <attr name="expand_close_menu_drawable" format="reference"/>
+    <attr name="expand_open_menu_drawable" format="reference"/>
 
     <!-- Don't touch this -->
     <attr name="numberPickerStyle" format="reference"/>

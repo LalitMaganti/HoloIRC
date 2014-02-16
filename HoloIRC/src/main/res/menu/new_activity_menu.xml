@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu
+        xmlns:holoirc="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/open_actions"
+        android:title="Actions"
+        holoirc:showAsAction="always|withText"/>
+    <item
+            android:id="@+id/add_server"
+            android:title="Add"
+            holoirc:showAsAction="always|withText"/>
+</menu>

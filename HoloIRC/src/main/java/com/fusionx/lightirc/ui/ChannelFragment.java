@@ -77,8 +77,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     private static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
             ImmutableList.of(NameEvent.class, MentionEvent.class);
 
-    private Callbacks mCallback;
-
     @Override
     protected View createView(final ViewGroup container, final LayoutInflater inflater) {
         return inflater.inflate(R.layout.fragment_channel, container, false);
@@ -90,15 +88,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
         mAutoButton.setEnabled(StringUtils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
-    }
-
-    @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-
-        if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, Callbacks.class);
-        }
     }
 
     public void onUserMention(final List<WorldUser> users) {
@@ -119,11 +108,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     @Override
-    protected Server getServer() {
-        return mCallback.getServer();
-    }
-
-    @Override
     protected List<ChannelEvent> getAdapterData() {
         return getChannel().getBuffer();
     }
@@ -135,12 +119,12 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseChannelMessage(mCallback.getServer(), mTitle, message);
+        UserInputParser.onParseChannelMessage(getServer(), mTitle, message);
     }
 
     private Channel getChannel() {
         if (mChannel == null) {
-            mChannel = mCallback.getServer().getUserChannelInterface().getChannel(mTitle);
+            mChannel = getServer().getUserChannelInterface().getChannel(mTitle);
         }
         return mChannel;
     }
@@ -224,11 +208,5 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         list.set(list.size() - 1, newWord);
         mMessageBox.setText("");
         mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
-    }
-
-    // Callback interface
-    public interface Callbacks {
-
-        public Server getServer();
     }
 }

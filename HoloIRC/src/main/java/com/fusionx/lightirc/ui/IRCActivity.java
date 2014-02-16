@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.ui.widget.DrawerToggle;
@@ -53,6 +52,8 @@ import android.view.MenuItem;
 import java.util.Collection;
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 import static butterknife.ButterKnife.findById;
@@ -124,11 +125,17 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
             mUserSlidingMenu.setTouchModeAbove(position == 0 ? SlidingMenu.TOUCHMODE_NONE :
                     SlidingMenu.TOUCHMODE_MARGIN);
         }
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            mIRCPagerFragment.onPageScrolled(position, positionOffset);
+        }
     };
 
     protected DrawerToggle mDrawerToggle;
 
     // Sliding menus
+    @InjectView(R.id.user_sliding_menu)
     protected SlidingMenu mUserSlidingMenu;
 
     // The Fragments
@@ -149,6 +156,7 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_irc);
+        ButterKnife.inject(this);
 
         final ServerConfiguration.Builder builder = getIntent().getParcelableExtra("server");
         mServerTitle = builder != null ? builder.getTitle() : getIntent().getStringExtra
@@ -176,14 +184,9 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
         }
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mServerTitle);
-
-        final PagerSlidingTabStrip tabs = findById(this, R.id.pager_tabs);
-        tabs.setOnPageChangeListener(mListener);
-        tabs.setTextColorResource(android.R.color.white);
     }
 
     private void setUpSlidingMenu(final FragmentManager manager) {
-        mUserSlidingMenu = findById(this, R.id.user_sliding_menu);
         mUserSlidingMenu.setContent(R.layout.view_pager_fragment);
         mUserSlidingMenu.setMenu(R.layout.sliding_menu_fragment_userlist);
         mUserSlidingMenu.setShadowDrawable(R.drawable.shadow);
@@ -357,6 +360,11 @@ public abstract class IRCActivity extends ActionBarActivity implements UserListF
     public boolean isConnectedToServer() {
         final Server server = getServer();
         return server != null && server.getStatus() == ServerStatus.CONNECTED;
+    }
+
+    @Override
+    public ViewPager.OnPageChangeListener getPagerChangeListener() {
+        return mListener;
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.DisconnectEvent;
+import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
@@ -35,41 +36,26 @@ import com.squareup.otto.Subscribe;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 
 import java.util.List;
+
+import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 
 public class ServerFragment extends IRCFragment<ServerEvent> {
 
     private static final ImmutableList<? extends Class<? extends ServerEvent>> sClasses =
-            ImmutableList.of(DisconnectEvent.class, PartEvent.class, DisconnectEvent.class);
-
-    private Callbacks mCallback;
+            ImmutableList.of(JoinEvent.class, PartEvent.class, DisconnectEvent.class);
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, Callbacks.class);
-        }
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
-                .SOFT_INPUT_STATE_HIDDEN);
+        getActivity().getWindow().setSoftInputMode(SOFT_INPUT_STATE_HIDDEN);
     }
 
     @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseServerMessage(getServer(), message);
-    }
-
-    public Server getServer() {
-        return mCallback.getServer();
     }
 
     @Override
@@ -93,12 +79,5 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
         if (!sClasses.contains(event.getClass())) {
             mMessageAdapter.add(event);
         }
-    }
-
-    public interface Callbacks {
-
-        public Server getServer();
-
-        public boolean isConnectedToServer();
     }
 }

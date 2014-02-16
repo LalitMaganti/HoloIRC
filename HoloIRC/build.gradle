@@ -66,10 +66,10 @@ dependencies {
         exclude group: 'com.google.android'
     }
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
-    compile 'com.astuetz:pagerslidingtabstrip:1.0.1'
 
     compile "com.jakewharton:butterknife:4.0.1"
 
+    compile project(':libraries:sliding-tabs')
     compile project(':libraries:relay:library')
     compile project(':libraries:SlidingMenu:library')
     compile project(':libraries:android-numberpicker:library')

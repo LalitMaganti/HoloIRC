@@ -85,7 +85,7 @@ public class ServiceFragment extends Fragment {
             mCallback = (Callbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
-                    "Callbacks");
+                    "Callback");
         }
     }
 

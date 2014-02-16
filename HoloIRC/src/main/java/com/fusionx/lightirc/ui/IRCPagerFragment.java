@@ -1,24 +1,25 @@
 package com.fusionx.lightirc.ui;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCAdapter;
 import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.model.FragmentStorage;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.SwitchToPrivateMessage;
 import com.fusionx.relay.event.channel.MentionEvent;
+import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ImportantServerEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.user.WorldPrivateEvent;
+import com.fusionx.slidingtabs.view.ViewPagerSlidingTabLayout;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
@@ -30,16 +31,22 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
-public class IRCPagerFragment extends Fragment implements ServerFragment.Callbacks,
-        ChannelFragment.Callbacks, UserFragment.Callbacks {
+import static butterknife.ButterKnife.findById;
+
+public class IRCPagerFragment extends Fragment implements IRCFragment.Callback {
 
     private final static String ADAPTER_STORAGE = "ADAPTER_STROAGE";
 
-    private ViewPager mViewPager;
+    @InjectView(R.id.pager)
+    protected ViewPager mViewPager;
+
+    private ViewPagerSlidingTabLayout mSlidingTabLayout;
 
     private Callbacks mCallbacks;
 
@@ -53,7 +60,7 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
             mCallbacks = (Callbacks) activity;
         } catch (ClassCastException ex) {
             throw new ClassCastException(activity.toString() + " must implement IRCPagerFragment"
-                    + ".Callbacks");
+                    + ".Callback");
         }
     }
 
@@ -81,29 +88,36 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mViewPager = (ViewPager) getView().findViewById(R.id.pager);
+        ButterKnife.inject(this, view);
+        UIUtils.setWindowBackgroundOnView(getActivity(), mViewPager);
 
-        final TypedArray a = getActivity().getTheme().obtainStyledAttributes(new int[]
-                {android.R.attr.windowBackground});
-        final int background = a.getResourceId(0, 0);
-        mViewPager.setBackgroundResource(background);
+        mSlidingTabLayout = findById(getActivity(), R.id.pager_tabs);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
 
         if (savedInstanceState != null) {
-            final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity()
-                    .findViewById(R.id.pager_tabs);
-            mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
+            mAdapter = new IRCAdapter(getChildFragmentManager(), mViewPager);
 
             final ArrayList<FragmentStorage> list = savedInstanceState.getParcelableArrayList
                     (ADAPTER_STORAGE);
             mAdapter.setFragmentList(list);
 
-            // The view pager's adapter needs to be set before the TabStrip is assigned
             mViewPager.setAdapter(mAdapter);
-            tabs.setViewPager(mViewPager);
+            mViewPager.setOnPageChangeListener(mCallbacks.getPagerChangeListener());
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        ButterKnife.reset(this);
     }
 
     @Override
@@ -127,15 +141,15 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     // Don't setup the adapter or the tab strip until we know we're going to add a server fragment
     // This is to stop an issue in PagerSlidingTabStrip
     public void onCreateServerFragment(final String serverTitle) {
-        final PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) getActivity()
-                .findViewById(R.id.pager_tabs);
         if (mAdapter == null) {
-            mAdapter = new IRCAdapter(getChildFragmentManager(), tabs);
+            mAdapter = new IRCAdapter(getChildFragmentManager(), mViewPager);
             mAdapter.onNewFragment(serverTitle, FragmentType.SERVER);
         }
+        mSlidingTabLayout.setTabAdapter(mAdapter);
+
         // The view pager's adapter needs to be set before the TabStrip is assigned
         mViewPager.setAdapter(mAdapter);
-        tabs.setViewPager(mViewPager);
+        mViewPager.setOnPageChangeListener(mCallbacks.getPagerChangeListener());
     }
 
     public void onCreateMessageFragment(final String userNick, final boolean switchToTab) {
@@ -158,11 +172,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
             mViewPager.setCurrentItem(index - 1, true);
         }
         mAdapter.onRemoveFragment(index);
-    }
-
-    @Override
-    public boolean isConnectedToServer() {
-        return mCallbacks.isConnectedToServer();
     }
 
     public void onCreateChannelFragment(final String channelName, final boolean forceSwitch) {
@@ -205,7 +214,6 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
 
     public void onUnexpectedDisconnect() {
         mAdapter.onUnexpectedDisconnect();
-
         mViewPager.setCurrentItem(0, true);
     }
 
@@ -231,6 +239,11 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
 
     // Subscribe events start here
+    @Subscribe
+    public void onChannelEvent(final WorldMessageEvent event) {
+        //mAdapter.updateTabTitleColour(event);
+    }
+
     @Subscribe
     public void onChannelPart(final PartEvent event) {
         onRemoveFragment(event.channelName);
@@ -294,11 +307,17 @@ public class IRCPagerFragment extends Fragment implements ServerFragment.Callbac
     }
     // Subscribe events end here
 
+    public void onPageScrolled(int position, float positionOffset) {
+        mSlidingTabLayout.onPageScrolled(position, positionOffset);
+    }
+
     // Interface for callbacks
     public interface Callbacks {
 
         public Server getServer();
 
         public boolean isConnectedToServer();
+
+        public ViewPager.OnPageChangeListener getPagerChangeListener();
     }
 }

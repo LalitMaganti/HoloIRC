@@ -69,7 +69,8 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
         } else {
-            row.setTextColor(UIUtils.getThemedTextColor(getContext()));
+            row.setTextColor(getContext().getResources().getColor(android.R.color.white));
+            //row.setTextColor(UIUtils.getThemedTextColor(getContext()));
         }
 
         return row;

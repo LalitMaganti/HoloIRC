@@ -44,7 +44,7 @@ public class ServerListAdapter extends BaseCollectionAdapter<ServerCardInterface
             mCallbacks = (Callbacks) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement " +
-                    "ServerListAdapter.Callbacks");
+                    "ServerListAdapter.Callback");
         }
     }
 

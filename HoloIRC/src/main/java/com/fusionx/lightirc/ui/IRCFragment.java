@@ -24,6 +24,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.constants.FragmentType;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerStatus;
 import com.fusionx.relay.event.Event;
@@ -32,6 +33,7 @@ import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationA
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
@@ -58,15 +60,26 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
 
     IRCMessageAdapter<T> mMessageAdapter;
 
+    private Callback mCallback;
+
+    @Override
+    public void onAttach(final Activity activity) {
+        super.onAttach(activity);
+
+        mCallback = (Callback) activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+        mCallback = null;
+    }
+
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        final View view = createView(container, inflate);
-
-        // Sets up the views
-        ButterKnife.inject(this, view);
-
-        return view;
+        return createView(container, inflate);
     }
 
     protected View createView(final ViewGroup container, final LayoutInflater inflater) {
@@ -76,6 +89,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Sets up the views
+        ButterKnife.inject(this, view);
 
         mMessageBox.setOnEditorActionListener(this);
         mTitle = getArguments().getString("title");
@@ -98,7 +114,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         super.onDestroyView();
 
         ButterKnife.reset(this);
-        getServer().getServerEventBus().unregister(this);
     }
 
     @Override
@@ -139,7 +154,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     }
 
     public void onResetBuffer() {
-        if (getServer().getStatus() == ServerStatus.CONNECTED) {
+         if (getServer().getStatus() == ServerStatus.CONNECTED) {
             mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
         } else {
             mMessageAdapter.setData(new ArrayList<>(getDisconnectedAdapterData()));
@@ -155,7 +170,13 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         onResetBuffer();
     }
 
-    protected abstract Server getServer();
+    public Server getServer() {
+        return mCallback.getServer();
+    }
+
+    protected Callback getCallback() {
+        return mCallback;
+    }
 
     protected abstract List<T> getAdapterData();
 
@@ -169,5 +190,10 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     // Getters and setters
     public String getTitle() {
         return mTitle;
+    }
+
+    public interface Callback {
+
+        public Server getServer();
     }
 }

@@ -67,7 +67,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
         try {
             mCallback = (Callbacks) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement Callbacks");
+            throw new ClassCastException(activity.toString() + " must implement Callback");
         }
     }
 
@@ -142,12 +142,12 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
             case R.id.fragment_userlist_cab_mention:
                 mCallback.onUserMention(selectedItems);
                 mode.finish();
-                mCallback.closeAllSlidingMenus();
+                mCallback.closeSlidingMenus();
                 return true;
             case R.id.fragment_userlist_cab_pm: {
                 if (isNickOtherUsers(nick)) {
                     mCallback.getServer().getServerCallBus().sendMessageToUser(nick, "");
-                    mCallback.closeAllSlidingMenus();
+                    mCallback.closeSlidingMenus();
                     mode.finish();
                 } else {
                     final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
@@ -257,7 +257,7 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
 
         public Server getServer();
 
-        public void closeAllSlidingMenus();
+        public void closeSlidingMenus();
 
         public boolean isUserSlidingMenuOpen();
     }

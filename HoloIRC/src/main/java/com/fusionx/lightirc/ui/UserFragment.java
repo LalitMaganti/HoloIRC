@@ -35,17 +35,6 @@ import java.util.List;
 
 public class UserFragment extends IRCFragment<UserEvent> {
 
-    private Callbacks mCallbacks;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (mCallbacks == null) {
-            mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -69,11 +58,7 @@ public class UserFragment extends IRCFragment<UserEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(mCallbacks.getServer(), mTitle, message);
-    }
-
-    public Server getServer() {
-        return mCallbacks.getServer();
+        UserInputParser.onParseUserMessage(getServer(), mTitle, message);
     }
 
     @Override
@@ -96,10 +81,5 @@ public class UserFragment extends IRCFragment<UserEvent> {
         if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
             mMessageAdapter.add(event);
         }
-    }
-
-    public interface Callbacks {
-
-        public Server getServer();
     }
 }

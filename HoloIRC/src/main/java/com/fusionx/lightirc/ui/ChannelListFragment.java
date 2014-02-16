@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
-import com.fusionx.lightirc.ui.dialogbuilder.ChannelDialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 
@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,8 +50,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
                 Context.MODE_PRIVATE);
         final Set<String> set = SharedPreferencesUtils.getStringSet(settings,
                 PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>());
-        mAdapter = new BaseCollectionAdapter<>(getActivity(),
-                R.layout.default_listview_textview, new TreeSet<>(set));
+        mAdapter = new BaseCollectionAdapter<>(getActivity(), R.layout.default_listview_textview,
+                new TreeSet<>(set));
 
         setListAdapter(mAdapter);
         setHasOptionsMenu(true);
@@ -76,8 +77,7 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         switch (item.getItemId()) {
             case R.id.activity_server_settings_cab_edit:
                 final String edited = mAdapter.getItem(0);
-                final ChannelDialogBuilder dialog = new ChannelDialogBuilder
-                        (getActivity(), edited) {
+                final ChannelDialogBuilder dialog = new ChannelDialogBuilder(edited) {
                     @Override
                     public void onOkClicked(final String input) {
                         mAdapter.remove(edited);
@@ -121,13 +121,12 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.activity_server_settings_ab_add:
-                final ChannelDialogBuilder dialog =
-                        new ChannelDialogBuilder(getActivity()) {
-                            @Override
-                            public void onOkClicked(final String input) {
-                                mAdapter.add(input);
-                            }
-                        };
+                final ChannelDialogBuilder dialog = new ChannelDialogBuilder() {
+                    @Override
+                    public void onOkClicked(final String input) {
+                        mAdapter.add(input);
+                    }
+                };
                 dialog.show();
                 return true;
             default:
@@ -145,5 +144,19 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
     @Override
     protected BaseCollectionAdapter<String> getRealAdapter() {
         return mAdapter;
+    }
+
+    public abstract class ChannelDialogBuilder extends DialogBuilder {
+
+        public ChannelDialogBuilder() {
+            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
+                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
+        }
+
+        public ChannelDialogBuilder(String defaultText) {
+            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
+                    getActivity().getString(R.string.prompt_dialog_including_starting),
+                    defaultText);
+        }
     }
 }

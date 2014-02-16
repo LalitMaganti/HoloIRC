@@ -82,7 +82,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
             mAdapter.setFragmentType(mFragmentType);
             mFragmentType = null;
         }
-        onOpen();
+        //onOpen();
     }
 
     @Override

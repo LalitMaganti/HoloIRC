@@ -35,10 +35,6 @@ public class NumberPickerPreference extends DialogPreference {
 
     private NumberPicker mNumberPicker;
 
-    public NumberPickerPreference(Context context) {
-        this(context, null);
-    }
-
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 

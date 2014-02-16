@@ -33,8 +33,6 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
-import org.jetbrains.annotations.NotNull;
-
 public abstract class DialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {
 
@@ -69,7 +67,6 @@ public abstract class DialogBuilder extends AlertDialog.Builder implements Dialo
         dialog.dismiss();
     }
 
-    @NotNull
     @Override
     public AlertDialog show() {
         dialog = super.show();
