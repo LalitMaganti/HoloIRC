@@ -3,16 +3,20 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
+import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
 
 import org.apache.commons.lang3.StringUtils;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,11 +26,14 @@ import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_TITLE;
 import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_URL;
@@ -35,13 +42,11 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         ServerSettingsCallbacks,
         Preference.OnPreferenceChangeListener {
 
+    public static final String NEW_SERVER = "new";
+
+    public static final String SERVER = "server";
+
     private boolean mCanSaveChanges = true;
-
-    private boolean mNewServer = false;
-
-    private String mFileName = null;
-
-    private boolean backPressed = false;
 
     private ViewPreference mCompletePreference = null;
 
@@ -51,6 +56,12 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private PreferenceScreen mScreen;
 
+    private BuilderDatabaseSource mSource;
+
+    private ServerConfiguration.Builder mBuilder;
+
+    private boolean mNewServer;
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +69,8 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
         super.onCreate(savedInstanceState);
 
-        mFileName = getIntent().getStringExtra("file");
-        mNewServer = getIntent().getBooleanExtra("new", false);
+        mBuilder = getIntent().getParcelableExtra(SERVER);
+        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
         mCanSaveChanges = !mNewServer;
 
         if (UIUtils.hasHoneycomb()) {
@@ -68,65 +79,40 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                     fragment).commit();
         } else {
             getPreferenceManager().setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
-            getPreferenceManager().setSharedPreferencesName(mFileName);
+            getPreferenceManager().setSharedPreferencesName("temp");
 
             addPreferencesFromResource(R.xml.activty_server_settings_prefs);
             setupPreferences(getPreferenceScreen(), this);
         }
-    }
 
-    @Override
-    public void onBackPressed() {
-        if (!mCanSaveChanges) {
-            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                    (this) + "server.xml");
-            if (folder.exists()) {
-                folder.delete();
-            }
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
-                    Toast.LENGTH_SHORT).show();
-            backPressed = true;
-        } else if (mNewServer) {
-            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-            backPressed = true;
+        mSource = new BuilderDatabaseSource(this);
+        mSource.open();
+
+        if (mNewServer) {
+            mBuilder = new ServerConfiguration.Builder();
+            mSource.addBuilder(mBuilder);
+        } else {
         }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (mCanSaveChanges || !mNewServer) {
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-        }
+        final ContentValues values = mSource.getContentValuesFromBuilder(mBuilder);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        if (!mCanSaveChanges && !backPressed) {
-            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                    (getApplicationContext()) + "server.xml");
-            if (folder.exists()) {
-                folder.delete();
-            }
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
-                    Toast.LENGTH_SHORT).show();
-        } else if (mNewServer && !backPressed) {
-            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
+                (this) + "temp.xml");
+        if (folder.exists()) {
+            folder.delete();
         }
-    }
 
-    @Override
-    public String getFileName() {
-        return mFileName;
+        if (!mCanSaveChanges) {
+            Toast.makeText(this, getString(R.string.server_settings_changes_discarded), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved), Toast.LENGTH_SHORT).show();
+        }
+
+        mSource.close();
     }
 
     @Override
@@ -134,7 +120,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mScreen = screen;
 
         mTitle = (ServerTitleEditTextPreference) screen.findPreference(PREF_TITLE);
-        mTitle.setOnPreferenceChangeListener(this);
         mTitle.setListOfExistingServers(activity.getIntent().getStringArrayListExtra("list"));
 
         // URL of server
@@ -142,7 +127,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
         // URL of server
         mUrl = (EditTextPreference) screen.findPreference(PREF_URL);
-        mUrl.setOnPreferenceChangeListener(this);
 
         Preference preference = screen.findPreference("pref_autojoin_intent");
         assert preference != null;
@@ -151,15 +135,16 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             public boolean onPreferenceClick(final Preference preference) {
                 final Intent intent = new Intent(ServerPreferenceActivity.this,
                         ChannelListActivity.class);
-                intent.putExtra("filename", mFileName);
                 startActivity(intent);
                 return false;
             }
         });
 
+        setPreferenceOnChangeListeners(screen);
+
         if (!mCanSaveChanges) {
             setupNewServer(screen, activity);
-            mCompletePreference.setInitialText(mTitle.getTitle().toString());
+            mCompletePreference.setInitialText(mTitle.getTitle());
         } else {
             screen.removePreference(mCompletePreference);
         }
@@ -170,8 +155,10 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                 (activity);
         final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
                 "holoirc");
-        final String secondNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
-        final String thirdNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
+        final String secondNick = preferences
+                .getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
+        final String thirdNick = preferences
+                .getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
 
         final String realName = preferences.getString(PreferenceConstants.PREF_DEFAULT_REALNAME,
                 "HoloIRCUser");
@@ -209,8 +196,39 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         return true;
     }
 
+    private void setPreferenceOnChangeListeners(final PreferenceScreen preferenceScreen) {
+        final ArrayList<Preference> list = new ArrayList<>();
+        getPreferenceList(preferenceScreen, list);
+
+        for (final Preference p : list) {
+            p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    final int index = list.indexOf(preference);
+                    if (preference == mUrl || preference == mTitle) {
+                        ServerPreferenceActivity.this.onPreferenceChange(preference, newValue);
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
+    private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
+        if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
+            final PreferenceGroup pGroup = (PreferenceGroup) p;
+            int pCount = pGroup.getPreferenceCount();
+            for (int i = 0; i < pCount; i++) {
+                getPreferenceList(pGroup.getPreference(i), list);
+            }
+        } else {
+            list.add(p);
+        }
+    }
+
     @Override
-    protected boolean isValidFragment(String fragmentName) {
+    protected boolean isValidFragment(final String fragmentName) {
+        // TODO - this is a hack - fixit
         return true;
     }
 }

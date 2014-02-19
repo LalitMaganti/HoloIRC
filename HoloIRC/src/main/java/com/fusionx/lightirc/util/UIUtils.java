@@ -2,18 +2,13 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.ui.IRCActivity;
-import com.fusionx.lightirc.ui.phone.IRCPhoneActivity;
 import com.fusionx.relay.constants.Theme;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.TextView;
 
@@ -61,13 +56,6 @@ public class UIUtils {
         return mRobotoLightTypeface;
     }
 
-    public static Class<? extends IRCActivity> getIRCActivity(final Context context) {
-        // TODO - fix this
-        return IRCPhoneActivity.class;
-        //return UIUtils.isHoneycombTablet(context) ? IRCTabletActivity.class : IRCPhoneActivity
-        //        .class;
-    }
-
     public static void setRobotoLight(final Context context, final TextView textView) {
         final Typeface font = getRobotoLight(context);
         textView.setTypeface(font);
@@ -88,22 +76,5 @@ public class UIUtils {
 
     public static int getThemeInt() {
         return AppPreferences.theme != Theme.DARK ? R.style.Light : R.style.Dark;
-    }
-
-    public static int getThemedTextColor(final Context context) {
-        return isThemeLight() ? context.getResources().getColor(android.R.color.black)
-                : context.getResources().getColor(android.R.color.white);
-    }
-
-    public static boolean isThemeLight() {
-        return getThemeInt() == R.style.Light;
-    }
-
-    public static void setWindowBackgroundOnView(final Context context, final View view) {
-        final TypedArray a = context.getTheme().obtainStyledAttributes(new int[]
-                {android.R.attr.windowBackground});
-        final int background = a.getResourceId(0, 0);
-        view.setBackgroundResource(background);
-        a.recycle();
     }
 }

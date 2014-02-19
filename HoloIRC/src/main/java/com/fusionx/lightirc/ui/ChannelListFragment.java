@@ -46,7 +46,7 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        SharedPreferences settings = getActivity().getSharedPreferences(mCallbacks.getFileName(),
+        SharedPreferences settings = getActivity().getSharedPreferences("temp",
                 Context.MODE_PRIVATE);
         final Set<String> set = SharedPreferencesUtils.getStringSet(settings,
                 PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>());
@@ -136,8 +136,8 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
     @Override
     public void onPause() {
-        SharedPreferencesUtils.putStringSet(getActivity().getSharedPreferences(mCallbacks
-                .getFileName(), Context.MODE_PRIVATE), PREF_AUTOJOIN, mAdapter.getSetOfItems());
+        SharedPreferencesUtils.putStringSet(getActivity().getSharedPreferences("temp",
+                Context.MODE_PRIVATE), PREF_AUTOJOIN, mAdapter.getSetOfItems());
         super.onPause();
     }
 

@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -77,9 +76,9 @@ class PreferenceHelpers {
         private final ServiceConnection mConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
-                final IRCService service = ((IRCService.IRCBinder) binder).getService();
+                /*final IRCService service = ((IRCService.IRCBinder) binder).getService();
                 service.disconnectAll();
-                mActivity.unbindService(mConnection);
+                mActivity.unbindService(mConnection);*/
                 final Intent intent = mActivity.getBaseContext().getPackageManager()
                         .getLaunchIntentForPackage(mActivity.getBaseContext().getPackageName());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -103,10 +102,10 @@ class PreferenceHelpers {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    final Intent service = new Intent(mActivity,
-                                            IRCService.class);
-                                    service.putExtra("stop", false);
-                                    mActivity.bindService(service, mConnection, 0);
+                                    //final Intent service = new Intent(mActivity,
+                                    //        IRCService.class);
+                                    //service.putExtra("stop", false);
+                                    //mActivity.bindService(service, mConnection, 0);
                                 }
                             });
             build.show();

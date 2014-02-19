@@ -4,7 +4,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionPagerAdapter;
 import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.relay.Server;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -76,14 +75,6 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     @Override
     public String getServerTitle() {
         return mCallbacks.getServerTitle();
-    }
-
-    public SlidingMenu.OnCloseListener getIgnoreFragmentListener() {
-        return getIgnoreFragment();
-    }
-
-    public SlidingMenu.OnOpenListener getActionFragmentListener() {
-        return getActionFragment();
     }
 
     public void updateConnectionStatus(final boolean isConnected) {

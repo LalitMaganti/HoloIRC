@@ -38,6 +38,6 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
 
     // Getters and setters
     public void setListOfExistingServers(ArrayList<String> listOfExistingServers) {
-        this.mListOfExistingServers = listOfExistingServers;
+        mListOfExistingServers = listOfExistingServers;
     }
 }

@@ -21,35 +21,6 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.ServerListActivity"
-                android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-            </intent-filter>
-        </activity>
-        <activity
-                android:name=".ui.phone.IRCPhoneActivity"
-                android:parentActivityName=".ui.ServerListActivity">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.ServerListActivity"/>
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-            </intent-filter>
-        </activity>
-        <activity
-                android:name=".ui.tablet.IRCTabletActivity"
-                android:parentActivityName=".ui.ServerListActivity">
-            <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".ui.ServerListActivity"/>
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-            </intent-filter>
-        </activity>
-        <activity
                 android:name=".ui.ChannelListActivity"
                 android:label="@string/server_settings_auto_join_title">
             <intent-filter>
@@ -70,8 +41,6 @@
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
-
-        <service android:name=".communication.IRCService"/>
 
         <service android:name=".communication.NewIRCService"/>
     </application>

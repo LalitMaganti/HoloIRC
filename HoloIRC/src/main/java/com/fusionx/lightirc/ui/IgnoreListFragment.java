@@ -11,7 +11,6 @@ import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Server;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -27,8 +26,8 @@ import android.widget.AbsListView;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class IgnoreListFragment extends MultiChoiceListFragment<String> implements SlidingMenu
-        .OnCloseListener, OnDismissCallback {
+public class IgnoreListFragment extends MultiChoiceListFragment<String>
+        implements OnDismissCallback {
 
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
@@ -57,7 +56,6 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
                 getListView(), (ActionBarActivity) getActivity(), this, true);
     }
 
-    @Override
     public void onClose() {
         if (mMultiSelectionController != null) {
             mMultiSelectionController.finish();

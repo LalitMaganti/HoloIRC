@@ -16,6 +16,7 @@ import com.fusionx.relay.interfaces.SubServerObject;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -36,7 +37,7 @@ import static butterknife.ButterKnife.findById;
 
 public class ServerListFragment extends Fragment implements LoaderManager
         .LoaderCallbacks<NewIRCService>, ExpandableListView.OnGroupClickListener,
-        ExpandableListView.OnChildClickListener {
+        ExpandableListView.OnChildClickListener, ExpandableServerListAdapter.Callback {
 
     private int mLastGroup = -1;
 
@@ -117,7 +118,8 @@ public class ServerListFragment extends Fragment implements LoaderManager
                     .convertPrefsToBuilder(getActivity(), file);
             listItems.add(new WrappedServerListItem(builder, service.getServerIfExists(builder)));
         }
-        mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mServerList);
+        mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mServerList,
+                this);
 
         mServerList.setAdapter(mListAdapter);
         mServerList.setOnGroupClickListener(this);
@@ -156,6 +158,14 @@ public class ServerListFragment extends Fragment implements LoaderManager
             return mListAdapter.getGroup(mLastGroup).getServer();
         }
         return null;
+    }
+
+    @Override
+    public void onEditServer(final WrappedServerListItem builder) {
+        final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
+        intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
+        intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
+        startActivity(intent);
     }
 
     public interface Callback {

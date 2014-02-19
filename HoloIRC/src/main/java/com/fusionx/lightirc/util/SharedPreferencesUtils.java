@@ -79,31 +79,18 @@ public class SharedPreferencesUtils {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public static Collection<String> getServersFromPreferences(final Context context) {
         final ArrayList<String> array = new ArrayList<String>();
         final File folder = new File(getSharedPreferencesPath(context));
         for (final String fileName : folder.list()) {
-            if (fileName.startsWith("server_")) {
-                array.add(migrateFileToNewSystem(context, fileName));
-            } else if (!isExcludedString(fileName)) {
+            if (!isExcludedString(fileName)) {
                 array.add(fileName.replace(".xml", ""));
             }
         }
         Collections.sort(array);
         return array;
-    }
-
-    public static String migrateFileToNewSystem(final Context context, final String fileName) {
-        final File file = new File(getSharedPreferencesPath(context), fileName);
-        final SharedPreferences sharedPreferences = context.getSharedPreferences(StringUtils
-                .remove(fileName, ".xml"), Context.MODE_PRIVATE);
-        final String newName = sharedPreferences.getString(PREF_TITLE, "").toLowerCase();
-        file.renameTo(new File(getSharedPreferencesPath(context),
-                newName + ".xml"));
-        return newName;
     }
 
     public static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
@@ -207,7 +194,7 @@ public class SharedPreferencesUtils {
         }
     }
 
-    private static boolean isExcludedString(final String fileName) {
+    public static boolean isExcludedString(final String fileName) {
         return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
                 fileName.equals("showcase_internal.xml");
     }

@@ -6,7 +6,5 @@ import android.preference.PreferenceScreen;
 
 public interface ServerSettingsCallbacks extends Preference.OnPreferenceChangeListener {
 
-    public String getFileName();
-
     public void setupPreferences(final PreferenceScreen screen, final Activity activity);
 }

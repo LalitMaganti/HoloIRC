@@ -26,11 +26,6 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
     }
 
     @Override
-    public String getFileName() {
-        return mFileName;
-    }
-
-    @Override
     public void setupPreferences(PreferenceScreen screen, Activity activity) {
         throw new IllegalArgumentException();
     }

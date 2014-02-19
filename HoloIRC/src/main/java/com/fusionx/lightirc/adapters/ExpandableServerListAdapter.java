@@ -3,10 +3,12 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.WrappedServerListItem;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.ServerStatus;
 import com.fusionx.relay.interfaces.SubServerObject;
 
 import android.content.Context;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.PopupMenu;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -22,6 +24,8 @@ import java.util.List;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
+    private final Callback mCallback;
+
     private final LayoutInflater mInflater;
 
     private final ExpandableListView mListView;
@@ -31,11 +35,12 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     private List<WrappedServerListItem> mServerListItems;
 
     public ExpandableServerListAdapter(final Context context, final List<WrappedServerListItem>
-            builders, final ExpandableListView listView) {
+            builders, final ExpandableListView listView, final Callback callback) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
         mServerListItems = builders;
         mListView = listView;
+        mCallback = callback;
     }
 
     @Override
@@ -125,7 +130,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
 
         final ImageView overflow = (ImageView) convertView.findViewById(R.id.overflow_menu);
-        overflow.setOnClickListener(new OverflowListener());
+        overflow.setOnClickListener(new OverflowListener(groupPos));
         overflow.setTag(listItem);
 
         return convertView;
@@ -164,11 +169,17 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     public final class OverflowListener implements View.OnClickListener,
             PopupMenu.OnMenuItemClickListener {
 
+        private final int mGroupPos;
+
+        private OverflowListener(final int group) {
+            mGroupPos = group;
+        }
+
         @Override
-        public boolean onMenuItemClick(MenuItem menuItem) {
+        public boolean onMenuItemClick(final MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 case R.id.activity_server_list_popup_edit:
-                    //onCardEdit(mCallback.getServerTitles(this));
+                    mCallback.onEditServer(mServerListItems.get(mGroupPos));
                     break;
                 case R.id.activity_server_list_popup_disconnect:
                     //mCallback.disconnectFromServer(this);
@@ -189,15 +200,20 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             final PopupMenu popup = new PopupMenu(mContext, v);
             popup.inflate(R.menu.activity_server_list_popup);
 
-            if (listItem.getServer() != null) {
+            if (listItem.getServer() == null) {
+                popup.getMenu().getItem(0).setEnabled(false);
+            } else {
                 popup.getMenu().getItem(1).setEnabled(false);
                 popup.getMenu().getItem(2).setEnabled(false);
-            } else {
-                popup.getMenu().getItem(0).setEnabled(false);
             }
 
             popup.setOnMenuItemClickListener(this);
             popup.show();
         }
+    }
+
+    public interface Callback {
+
+        public void onEditServer(final WrappedServerListItem builder);
     }
 }
