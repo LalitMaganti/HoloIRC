@@ -14,40 +14,37 @@ public final class DatabaseContract {
 
         public static final String TABLE_NAME = "servers";
 
-        // Common columns
-        public static final String COLUMN_ID = "_id";
+        public static final String COLUMN_TITLE = "pref_title";
 
-        public static final String COLUMN_TITLE = "title";
+        public static final String COLUMN_URL = "pref_url";
 
-        public static final String COLUMN_URL = "url";
+        public static final String COLUMN_PORT = "pref_port";
 
-        public static final String COLUMN_PORT = "port";
+        public static final String COLUMN_SSL = "pref_ssl";
 
-        public static final String COLUMN_SSL = "ssl";
+        public static final String COLUMN_SSL_ACCEPT_ALL = "pref_ssl_accept_all_connections";
 
-        public static final String COLUMN_SSL_ACCEPT_ALL = "ssl_accept_all";
+        public static final String COLUMN_NICK_ONE = "pref_nick";
 
-        public static final String COLUMN_NICK_ONE = "nick_one";
+        public static final String COLUMN_NICK_TWO = "pref_second_nick";
 
-        public static final String COLUMN_NICK_TWO = "nick_two";
+        public static final String COLUMN_NICK_THREE = "pref_third_nick";
 
-        public static final String COLUMN_NICK_THREE = "nick_three";
+        public static final String COLUMN_REAL_NAME = "pref_realname";
 
-        public static final String COLUMN_REAL_NAME = "real_name";
+        public static final String COLUMN_NICK_CHANGEABLE = "pref_auto_nick";
 
-        public static final String COLUMN_NICK_CHANGEABLE = "nick_changeable";
+        public static final String COLUMN_AUTOJOIN = "pref_autojoin";
 
-        public static final String COLUMN_AUTOJOIN = "autojoin";
+        public static final String COLUMN_SERVER_USERNAME = "pref_login_username";
 
-        public static final String COLUMN_SERVER_USERNAME = "server_username";
+        public static final String COLUMN_SERVER_PASSWORD = "pref_login_password";
 
-        public static final String COLUMN_SERVER_PASSWORD = "server_password";
+        public static final String COLUMN_SASL_USERNAME = "pref_sasl_username";
 
-        public static final String COLUMN_SASL_USERNAME = "sasl_username";
+        public static final String COLUMN_SASL_PASSWORD = "pref_sasl_password";
 
-        public static final String COLUMN_SASL_PASSWORD = "sasl_password";
-
-        public static final String COLUMN_NICK_SERV_PASSWORD = "nick_serv_password";
+        public static final String COLUMN_NICK_SERV_PASSWORD = "pref_nickserv_password";
 
         // Database creation sql statement
         public static final String TABLE_CREATE = String
@@ -57,7 +54,7 @@ public final class DatabaseContract {
                         + "%s text not null, %s integer, %s text not null, %s text not null,"
                         + " %s text not null, %s text not null, %s text not null, "
                         + "%s text not null);",
-                        TABLE_NAME, COLUMN_ID, COLUMN_TITLE, COLUMN_URL,
+                        TABLE_NAME, ServerTable._ID, COLUMN_TITLE, COLUMN_URL,
                         COLUMN_PORT, COLUMN_SSL, COLUMN_SSL_ACCEPT_ALL, COLUMN_NICK_ONE,
                         COLUMN_NICK_TWO, COLUMN_NICK_THREE, COLUMN_REAL_NAME,
                         COLUMN_NICK_CHANGEABLE, COLUMN_AUTOJOIN, COLUMN_SERVER_USERNAME,

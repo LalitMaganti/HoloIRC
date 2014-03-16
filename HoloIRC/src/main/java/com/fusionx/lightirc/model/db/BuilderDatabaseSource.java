@@ -107,6 +107,11 @@ public class BuilderDatabaseSource {
         return builders;
     }
 
+    public void updateBuilder(final ContentValues values) {
+        final int id = values.getAsInteger(ServerTable._ID);
+        mDatabase.update(ServerTable.TABLE_NAME, values, ServerTable._ID + "=" + id, null);
+    }
+
     public void addBuilder(final ServerConfiguration.Builder builder) {
         final ContentValues values = getContentValuesFromBuilder(builder);
 

@@ -3,8 +3,10 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.communication.NewIRCService;
+import com.fusionx.lightirc.loader.AbstractLoader;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.model.WrappedServerListItem;
+import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
@@ -16,8 +18,11 @@ import com.fusionx.relay.interfaces.SubServerObject;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -27,8 +32,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import gnu.trove.set.hash.THashSet;
@@ -59,13 +64,6 @@ public class ServerListFragment extends Fragment implements LoaderManager
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setRetainInstance(true);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
 
@@ -81,22 +79,65 @@ public class ServerListFragment extends Fragment implements LoaderManager
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        setRetainInstance(true);
 
         mServerList = findById(view, R.id.server_list);
         mServerList.setGroupIndicator(null);
         mServerList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
-        // This can not-happen when rotation has occurred - the view has been redrawn but the
-        // comms layer should be constant
-        if (mService == null) {
-            getLoaderManager().initLoader(1, null, this);
-        } else {
-            mServerList.setAdapter(mListAdapter);
-            mServerList.setOnGroupClickListener(this);
-            mServerList.setOnChildClickListener(this);
-        }
+        getLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Object>() {
+            @Override
+            public Loader<Object> onCreateLoader(int i, Bundle bundle) {
+                final Handler handler = new Handler();
+                final Dialog dialog = new Dialog(getActivity());
+                return new AbstractLoader<Object>(getActivity()) {
+                    @Override
+                    public Object loadInBackground() {
+                        final List<File> fileList = SharedPreferencesUtils.getOldServers
+                                (getActivity());
+                        if (!fileList.isEmpty()) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dialog.setCancelable(false);
+                                    dialog.setCanceledOnTouchOutside(false);
+                                    dialog.setTitle("Please wait...");
+                                    dialog.show();
+                                }
+                            });
+                            SharedPreferencesUtils.migrateToDatabase(fileList, getActivity());
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dialog.cancel();
+                                }
+                            });
+                        }
+                        return null;
+                    }
+                };
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Object> objectLoader, Object o) {
+                // This can happen when rotation has occurred - the view has been redrawn but the
+                // comms layer should be constant
+                if (mService != null) {
+                    mServerList.setAdapter(mListAdapter);
+                    mServerList.setOnGroupClickListener(ServerListFragment.this);
+                    mServerList.setOnChildClickListener(ServerListFragment.this);
+                } else {
+                    getLoaderManager().initLoader(1, null, ServerListFragment.this);
+                }
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Object> objectLoader) {
+            }
+        });
     }
 
     @Override
@@ -110,14 +151,15 @@ public class ServerListFragment extends Fragment implements LoaderManager
         mService = service;
 
         final List<WrappedServerListItem> listItems = new ArrayList<>();
-        final Collection<String> servers = SharedPreferencesUtils
-                .getServersFromPreferences(getActivity());
 
-        for (final String file : servers) {
-            final ServerConfiguration.Builder builder = SharedPreferencesUtils
-                    .convertPrefsToBuilder(getActivity(), file);
+        final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
+
+        source.open();
+        for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
             listItems.add(new WrappedServerListItem(builder, service.getServerIfExists(builder)));
         }
+        source.close();
+
         mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mServerList,
                 this);
 

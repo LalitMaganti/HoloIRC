@@ -22,10 +22,9 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.NickStorage;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -38,12 +37,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_TITLE;
 
 public class SharedPreferencesUtils {
 
@@ -81,19 +77,7 @@ public class SharedPreferencesUtils {
         }
     }
 
-    public static Collection<String> getServersFromPreferences(final Context context) {
-        final ArrayList<String> array = new ArrayList<String>();
-        final File folder = new File(getSharedPreferencesPath(context));
-        for (final String fileName : folder.list()) {
-            if (!isExcludedString(fileName)) {
-                array.add(fileName.replace(".xml", ""));
-            }
-        }
-        Collections.sort(array);
-        return array;
-    }
-
-    public static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
+    private static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
             final String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 Context.MODE_PRIVATE);
@@ -192,6 +176,30 @@ public class SharedPreferencesUtils {
                 return set;
             }
         }
+    }
+
+    public static List<File> getOldServers(final Context context) {
+        final ArrayList<File> array = new ArrayList<>();
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(context));
+
+        for (final File file : folder.listFiles()) {
+            if (!SharedPreferencesUtils.isExcludedString(file.getName())) {
+                array.add(file);
+            }
+        }
+        return array;
+    }
+
+    public static void migrateToDatabase(final List<File> array, final Context context) {
+        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
+        source.open();
+        for (final File file : array) {
+            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context,
+                    file.getName().replace(".xml", ""));
+            source.addBuilder(builder);
+            file.delete();
+        }
+        source.close();
     }
 
     public static boolean isExcludedString(final String fileName) {

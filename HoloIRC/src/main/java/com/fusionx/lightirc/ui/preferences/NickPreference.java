@@ -2,6 +2,7 @@ package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.constants.PreferenceConstants;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.AttributeSet;
@@ -48,5 +49,11 @@ public class NickPreference extends AbstractNickPreference {
         final SharedPreferences.Editor editor = getEditor();
         editor.putString(PreferenceConstants.PREF_THIRD_NICK, third);
         editor.commit();
+    }
+
+    public void commitToContentValues(final ContentValues values) {
+        values.put(PreferenceConstants.PREF_NICK, mFirstChoice.getText().toString());
+        values.put(PreferenceConstants.PREF_SECOND_NICK, mSecondChoice.getText().toString());
+        values.put(PreferenceConstants.PREF_THIRD_NICK, mThirdChoice.getText().toString());
     }
 }

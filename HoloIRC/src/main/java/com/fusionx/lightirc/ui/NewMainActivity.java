@@ -20,7 +20,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import static butterknife.ButterKnife.findById;
@@ -47,6 +46,7 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
         super.onCreate(savedInstanceState);
 
         AppPreferences.setUpPreferences(getApplicationContext());
+        initialSetup();
 
         setContentView(R.layout.new_main_activity);
 
@@ -85,8 +85,6 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
                 findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
             }
         }
-
-        setUpServerList();
     }
 
     @Override
@@ -140,7 +138,7 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
         startActivity(intent);
     }
 
-    private void setUpServerList() {
+    private void initialSetup() {
         final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
 

@@ -1,9 +1,6 @@
 package com.fusionx.lightirc.loader;
 
 import com.fusionx.lightirc.communication.NewIRCService;
-import com.fusionx.lightirc.model.WrappedServerListItem;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.fusionx.relay.ServerConfiguration;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,10 +8,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.support.v4.content.Loader;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class ServiceLoader extends Loader<NewIRCService> {
 

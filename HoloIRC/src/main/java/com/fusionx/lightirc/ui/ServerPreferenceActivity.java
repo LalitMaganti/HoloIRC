@@ -9,7 +9,6 @@ import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +61,20 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private boolean mNewServer;
 
+    private ContentValues mContentValues;
+
+    private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
+        if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
+            final PreferenceGroup pGroup = (PreferenceGroup) p;
+            int pCount = pGroup.getPreferenceCount();
+            for (int i = 0; i < pCount; i++) {
+                getPreferenceList(pGroup.getPreference(i), list);
+            }
+        } else {
+            list.add(p);
+        }
+    }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +85,14 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mBuilder = getIntent().getParcelableExtra(SERVER);
         mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
         mCanSaveChanges = !mNewServer;
+
+        mSource = new BuilderDatabaseSource(this);
+        mSource.open();
+
+        if (mNewServer) {
+            mBuilder = new ServerConfiguration.Builder();
+            mSource.addBuilder(mBuilder);
+        }
 
         if (UIUtils.hasHoneycomb()) {
             final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
@@ -84,16 +105,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             addPreferencesFromResource(R.xml.activty_server_settings_prefs);
             setupPreferences(getPreferenceScreen(), this);
         }
-
-        mSource = new BuilderDatabaseSource(this);
-        mSource.open();
-
-        if (mNewServer) {
-            mBuilder = new ServerConfiguration.Builder();
-            mSource.addBuilder(mBuilder);
-        } else {
-        }
-        final ContentValues values = mSource.getContentValuesFromBuilder(mBuilder);
     }
 
     @Override
@@ -107,9 +118,12 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         }
 
         if (!mCanSaveChanges) {
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
+                    Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved), Toast.LENGTH_SHORT).show();
+            mSource.updateBuilder(mContentValues);
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                    Toast.LENGTH_SHORT).show();
         }
 
         mSource.close();
@@ -128,8 +142,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         // URL of server
         mUrl = (EditTextPreference) screen.findPreference(PREF_URL);
 
-        Preference preference = screen.findPreference("pref_autojoin_intent");
-        assert preference != null;
+        final Preference preference = screen.findPreference("pref_autojoin_intent");
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
@@ -141,13 +154,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         });
 
         setPreferenceOnChangeListeners(screen);
-
-        if (!mCanSaveChanges) {
-            setupNewServer(screen, activity);
-            mCompletePreference.setInitialText(mTitle.getTitle());
-        } else {
-            screen.removePreference(mCompletePreference);
-        }
     }
 
     private void setupNewServer(final PreferenceScreen screen, final Activity activity) {
@@ -200,29 +206,34 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         final ArrayList<Preference> list = new ArrayList<>();
         getPreferenceList(preferenceScreen, list);
 
+        mContentValues = mSource.getContentValuesFromBuilder(mBuilder);
         for (final Preference p : list) {
+            if (p instanceof EditTextPreference) {
+                final EditTextPreference editTextPreference = (EditTextPreference) p;
+                final String text = mContentValues.getAsString(p.getKey());
+                editTextPreference.setText(text);
+            } else if (p instanceof CheckBoxPreference) {
+                final CheckBoxPreference checkBoxPreference = (CheckBoxPreference) p;
+                final boolean bool = mContentValues.getAsBoolean(checkBoxPreference.getKey());
+                checkBoxPreference.setChecked(bool);
+            }
+
             p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    final int index = list.indexOf(preference);
                     if (preference == mUrl || preference == mTitle) {
                         ServerPreferenceActivity.this.onPreferenceChange(preference, newValue);
+                    }
+                    if (preference instanceof EditTextPreference) {
+                        mContentValues.put(preference.getKey(), (String) newValue);
+                    } else if (preference instanceof CheckBoxPreference) {
+                        mContentValues.put(preference.getKey(), (boolean) newValue);
+                    } else if (preference instanceof NickPreference) {
+                        ((NickPreference) preference).commitToContentValues(mContentValues);
                     }
                     return false;
                 }
             });
-        }
-    }
-
-    private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
-        if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
-            final PreferenceGroup pGroup = (PreferenceGroup) p;
-            int pCount = pGroup.getPreferenceCount();
-            for (int i = 0; i < pCount; i++) {
-                getPreferenceList(pGroup.getPreference(i), list);
-            }
-        } else {
-            list.add(p);
         }
     }
 
