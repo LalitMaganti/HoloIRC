@@ -3,7 +3,7 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.WrappedServerListItem;
 import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.relay.ServerStatus;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.interfaces.SubServerObject;
 
 import android.content.Context;
@@ -114,7 +114,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final TextView status = ((TextView) convertView.findViewById(R.id.server_status));
         status.setText(MiscUtils.getStatusString(mContext, listItem.getServer() != null
                 ? listItem.getServer().getStatus()
-                : ServerStatus.DISCONNECTED));
+                : ConnectionStatus.DISCONNECTED));
 
         final View divider = convertView.findViewById(R.id.divider);
         final ImageView expandButton = (ImageView) convertView.findViewById(R.id.button_expand);

@@ -24,8 +24,8 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerStatus;
 import com.fusionx.relay.event.Event;
 import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
@@ -119,7 +119,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public void onResume() {
         super.onResume();
 
-        if (getServer().getStatus() != ServerStatus.CONNECTED) {
+        if (getServer().getStatus() != ConnectionStatus.CONNECTED) {
             onResetUserInput();
         }
 
@@ -148,12 +148,12 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     }
 
     public final void onResetUserInput() {
-        mMessageBox.setEnabled(getServer() != null && getServer().getStatus() == ServerStatus
+        mMessageBox.setEnabled(getServer() != null && getServer().getStatus() == ConnectionStatus
                 .CONNECTED);
     }
 
     public void onResetBuffer() {
-        if (getServer().getStatus() == ServerStatus.CONNECTED) {
+        if (getServer().getStatus() == ConnectionStatus.CONNECTED) {
             mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
         } else {
             mMessageAdapter.setData(new ArrayList<>(getDisconnectedAdapterData()));

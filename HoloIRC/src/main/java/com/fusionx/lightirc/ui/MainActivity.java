@@ -5,6 +5,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.ConnectEvent;
@@ -29,6 +30,10 @@ import static butterknife.ButterKnife.findById;
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener {
 
+    // Constants
+    public static final int SETTINGS_ACTIVITY = 0;
+
+    // Fields
     private Server mServer;
 
     private IRCFragment mCurrentFragment;
@@ -47,8 +52,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppPreferences.setUpPreferences(getApplicationContext());
-        initialSetup();
+        AppPreferences.setUpPreferences(this);
+        SharedPreferencesUtils.onInitialSetup(this);
 
         setContentView(R.layout.new_main_activity);
 
@@ -122,18 +127,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         switch (item.getItemId()) {
             case android.R.id.home:
             case R.id.home:
-                if (mSlidingPane.isOpen()) {
-                    mSlidingPane.closePane();
-                } else {
-                    mSlidingPane.openPane();
-                }
+                UIUtils.toggleSlidingPane(mSlidingPane);
                 return true;
             case R.id.open_actions:
-                if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
-                    mDrawerLayout.closeDrawer(mRightDrawer);
-                } else {
-                    mDrawerLayout.openDrawer(mRightDrawer);
-                }
+                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
                 return true;
             case R.id.add_server:
                 addNewServer();
@@ -147,25 +144,25 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
-        startActivity(intent);
+        startActivityForResult(intent, SETTINGS_ACTIVITY);
     }
 
-    private void initialSetup() {
-        final SharedPreferences globalSettings = getSharedPreferences("main", MODE_PRIVATE);
-        final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-
-        if (firstRun) {
-            SharedPreferencesUtils.firstTimeServerSetup(this);
-            globalSettings.edit().putBoolean("firstrun", false).commit();
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case SETTINGS_ACTIVITY:
+                    mServerListFragment.refreshServers();
+                    break;
+            }
         }
     }
 
     @Override
     public void onServerClicked(final Server server) {
-        if (mCurrentFragment == null || mServer != server ||
-                !mCurrentFragment.getType().equals(FragmentType.SERVER)) {
+        if (shouldReplaceFragment(server)) {
             final Bundle bundle = new Bundle();
-            bundle.putString("title", server.getConfiguration().getTitle());
+            bundle.putString("title", server.getTitle());
 
             final IRCFragment fragment = new ServerFragment();
             fragment.setArguments(bundle);
@@ -182,25 +179,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
             onChangeCurrentFragment(fragment);
 
-            setActionBarTitle(server.getConfiguration().getTitle());
+            setActionBarTitle(server.getTitle());
             setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
         }
-
         mSlidingPane.closePane();
     }
 
     @Override
     public void onSubServerClicked(final SubServerObject object) {
-        if (mCurrentFragment == null || !object.getServer().getConfiguration().getTitle().equals
-                (mServer.getConfiguration().getTitle()) || !mCurrentFragment.getTitle().equals
-                (object.getId())) {
-            if (mServer != object.getServer()) {
-                if (mServer != null) {
-                    mServer.getServerEventBus().unregister(this);
-                }
-                object.getServer().getServerEventBus().register(this);
-            }
-
+        if (shouldReplaceFragment(object)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
@@ -213,13 +200,20 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             }
             fragment.setArguments(bundle);
 
+            if (mServer != object.getServer()) {
+                if (mServer != null) {
+                    mServer.getServerEventBus().unregister(this);
+                }
+                object.getServer().getServerEventBus().register(this);
+            }
+
             mCurrentFragment = fragment;
             mServer = object.getServer();
 
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(object.getId());
-            setActionBarSubtitle(object.getServer().getConfiguration().getTitle());
+            setActionBarSubtitle(object.getServer().getTitle());
         }
         mSlidingPane.closePane();
     }
@@ -232,6 +226,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onServerDisconnected(final Server server) {
+    }
+
+    private boolean shouldReplaceFragment(final Server server) {
+        return mCurrentFragment == null || !mServer.equals(server)
+                || !mCurrentFragment.getType().equals(FragmentType.SERVER);
+    }
+
+    private boolean shouldReplaceFragment(final SubServerObject object) {
+        return mCurrentFragment == null
+                || !object.getServer().equals(mServer)
+                || !mCurrentFragment.getTitle().equals(object.getId());
     }
 
     @Override

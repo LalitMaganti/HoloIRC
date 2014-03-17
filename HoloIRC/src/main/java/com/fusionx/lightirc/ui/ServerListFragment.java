@@ -28,7 +28,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,6 +61,40 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
     private MultiSelectionUtils.Controller mController;
 
+    private MultiSelectionUtils.MultiChoiceModeListener mListener = new MultiSelectionUtils
+            .MultiChoiceModeListener() {
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                boolean checked) {
+
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater()
+                    .inflate(R.menu.activity_server_list_popup, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.activity_server_list_popup_disconnect:
+                    return false;
+            }
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+        }
+    };
+
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
@@ -93,40 +126,7 @@ public class ServerListFragment extends Fragment implements LoaderManager
         mListView = findById(view, R.id.server_list);
         mListView.setGroupIndicator(null);
         mController = MultiSelectionUtils.attachMultiSelectionController(mListView,
-                (ActionBarActivity) getActivity(), new MultiSelectionUtils
-                        .MultiChoiceModeListener() {
-                    @Override
-                    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-                            boolean checked) {
-
-                    }
-
-                    @Override
-                    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                        actionMode.getMenuInflater()
-                                .inflate(R.menu.activity_server_list_popup, menu);
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.activity_server_list_popup_disconnect:
-                                return false;
-                        }
-                        return true;
-                    }
-
-                    @Override
-                    public void onDestroyActionMode(ActionMode actionMode) {
-                    }
-                }, false
-        );
+                (ActionBarActivity) getActivity(), mListener, false);
 
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
@@ -193,23 +193,24 @@ public class ServerListFragment extends Fragment implements LoaderManager
     public void onLoadFinished(final Loader<NewIRCService> ircBinderLoader,
             final NewIRCService service) {
         mService = service;
+        refreshServers();
 
+        mListView.setOnGroupClickListener(this);
+        mListView.setOnChildClickListener(this);
+    }
+
+    void refreshServers() {
         final List<WrappedServerListItem> listItems = new ArrayList<>();
         final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
 
         source.open();
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
-            listItems.add(new WrappedServerListItem(builder,
-                    service.getServerIfExists(builder)));
+            listItems.add(new WrappedServerListItem(builder, mService.getServerIfExists(builder)));
         }
         source.close();
 
-        mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mListView,
-                this);
-
+        mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mListView, this);
         mListView.setAdapter(mListAdapter);
-        mListView.setOnGroupClickListener(this);
-        mListView.setOnChildClickListener(this);
     }
 
     @Override

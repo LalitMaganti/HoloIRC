@@ -8,6 +8,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SlidingPaneLayout;
+import android.view.View;
 import android.widget.TextView;
 
 public class UIUtils {
@@ -74,5 +77,21 @@ public class UIUtils {
 
     public static int getThemeInt() {
         return AppPreferences.theme != Theme.DARK ? R.style.Light : R.style.Dark;
+    }
+
+    public static void toggleSlidingPane(final SlidingPaneLayout slidingPaneLayout) {
+        if (slidingPaneLayout.isOpen()) {
+            slidingPaneLayout.closePane();
+        } else {
+            slidingPaneLayout.openPane();
+        }
+    }
+
+    public static void toggleDrawerLayout(final DrawerLayout drawerLayout, final View drawer) {
+        if (drawerLayout.isDrawerOpen(drawer)) {
+            drawerLayout.closeDrawer(drawer);
+        } else {
+            drawerLayout.openDrawer(drawer);
+        }
     }
 }

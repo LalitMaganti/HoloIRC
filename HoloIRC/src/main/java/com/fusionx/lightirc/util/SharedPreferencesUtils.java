@@ -31,6 +31,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,6 +41,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class SharedPreferencesUtils {
 
@@ -80,7 +83,7 @@ public class SharedPreferencesUtils {
     private static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
             final String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
-                Context.MODE_PRIVATE);
+                MODE_PRIVATE);
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
 
         // Server connection
@@ -196,7 +199,7 @@ public class SharedPreferencesUtils {
         for (final File file : array) {
             final ServerConfiguration.Builder builder = convertPrefsToBuilder(context,
                     file.getName().replace(".xml", ""));
-            source.addBuilder(builder);
+            source.addServer(builder);
             file.delete();
         }
         source.close();
@@ -205,5 +208,38 @@ public class SharedPreferencesUtils {
     public static boolean isExcludedString(final String fileName) {
         return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
                 fileName.equals("showcase_internal.xml");
+    }
+
+    public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
+        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (context);
+        final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
+                "holoirc");
+        final String secondNick = preferences
+                .getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
+        final String thirdNick = preferences
+                .getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
+        builder.setNickStorage(new NickStorage(firstNick, secondNick, thirdNick));
+
+        final String realName = preferences.getString(PreferenceConstants.PREF_DEFAULT_REALNAME,
+                "HoloIRCUser");
+        builder.setRealName(realName);
+
+        final boolean autoNick = preferences.getBoolean(PreferenceConstants
+                .PREF_DEFAULT_AUTO_NICK, true);
+        builder.setNickChangeable(autoNick);
+
+        return builder;
+    }
+
+    public static void onInitialSetup(final Context context) {
+        final SharedPreferences globalSettings = context.getSharedPreferences("main", MODE_PRIVATE);
+        final boolean firstRun = globalSettings.getBoolean("firstrun", true);
+
+        if (firstRun) {
+            firstTimeServerSetup(context);
+            globalSettings.edit().putBoolean("firstrun", false).commit();
+        }
     }
 }

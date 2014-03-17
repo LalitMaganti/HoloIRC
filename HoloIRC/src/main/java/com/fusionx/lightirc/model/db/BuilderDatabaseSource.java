@@ -107,20 +107,24 @@ public class BuilderDatabaseSource {
         return builders;
     }
 
-    public void updateBuilder(final ContentValues values) {
+    public void updateServer(final ContentValues values) {
         final int id = values.getAsInteger(ServerTable._ID);
         mDatabase.update(ServerTable.TABLE_NAME, values, ServerTable._ID + "=" + id, null);
     }
 
-    public void addBuilder(final ServerConfiguration.Builder builder) {
-        final ContentValues values = getContentValuesFromBuilder(builder);
-
+    public void addServer(final ServerConfiguration.Builder builder) {
+        final ContentValues values = getContentValuesFromBuilder(builder, false);
         final int id = (int) mDatabase.insert(ServerTable.TABLE_NAME, null, values);
         builder.setId(id);
     }
 
-    public ContentValues getContentValuesFromBuilder(final ServerConfiguration.Builder builder) {
+    public ContentValues getContentValuesFromBuilder(final ServerConfiguration.Builder builder,
+            final boolean id) {
         final ContentValues values = new ContentValues();
+
+        if (id) {
+            values.put(DatabaseContract.ServerTable._ID, builder.getId());
+        }
 
         // Server connection
         values.put(ServerTable.COLUMN_TITLE, builder.getTitle());
@@ -156,5 +160,10 @@ public class BuilderDatabaseSource {
         values.put(ServerTable.COLUMN_NICK_SERV_PASSWORD, builder.getNickservPassword());
 
         return values;
+    }
+
+    public void removeServer(ContentValues values) {
+        final int id = values.getAsInteger(ServerTable._ID);
+        mDatabase.delete(ServerTable.TABLE_NAME, ServerTable._ID + "=" + id, null);
     }
 }

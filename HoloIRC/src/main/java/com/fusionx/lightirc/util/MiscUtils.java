@@ -23,8 +23,8 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceConstants;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerStatus;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -76,8 +76,8 @@ public class MiscUtils {
         return null;
     }
 
-    public static String getStatusString(final Context context, final ServerStatus serverStatus) {
-        switch (serverStatus) {
+    public static String getStatusString(final Context context, final ConnectionStatus connectionStatus) {
+        switch (connectionStatus) {
             case CONNECTED:
                 return context.getString(R.string.status_connected);
             case CONNECTING:
