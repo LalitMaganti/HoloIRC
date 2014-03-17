@@ -6,6 +6,7 @@ import com.fusionx.lightirc.communication.NewIRCService;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.model.WrappedServerListItem;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
@@ -25,10 +26,14 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 
 import java.io.File;
@@ -43,9 +48,9 @@ public class ServerListFragment extends Fragment implements LoaderManager
         .LoaderCallbacks<NewIRCService>, ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, ExpandableServerListAdapter.Callback {
 
-    private int mLastGroup = -1;
+    private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
-    private THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
+    private int mLastGroup = -1;
 
     private NewIRCService mService;
 
@@ -54,6 +59,8 @@ public class ServerListFragment extends Fragment implements LoaderManager
     private ExpandableListView mListView;
 
     private ExpandableServerListAdapter mListAdapter;
+
+    private MultiSelectionUtils.Controller mController;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -85,7 +92,41 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
         mListView = findById(view, R.id.server_list);
         mListView.setGroupIndicator(null);
-        mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        mController = MultiSelectionUtils.attachMultiSelectionController(mListView,
+                (ActionBarActivity) getActivity(), new MultiSelectionUtils
+                        .MultiChoiceModeListener() {
+                    @Override
+                    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                            boolean checked) {
+
+                    }
+
+                    @Override
+                    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                        actionMode.getMenuInflater()
+                                .inflate(R.menu.activity_server_list_popup, menu);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.activity_server_list_popup_disconnect:
+                                return false;
+                        }
+                        return true;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode actionMode) {
+                    }
+                }, false
+        );
 
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
@@ -158,7 +199,8 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
         source.open();
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
-            listItems.add(new WrappedServerListItem(builder, service.getServerIfExists(builder)));
+            listItems.add(new WrappedServerListItem(builder,
+                    service.getServerIfExists(builder)));
         }
         source.close();
 
@@ -177,6 +219,12 @@ public class ServerListFragment extends Fragment implements LoaderManager
     @Override
     public boolean onGroupClick(final ExpandableListView parent, final View v,
             final int groupPosition, final long id) {
+        if (mController.isActionModeStarted()) {
+            mController.onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
+                    .getPackedPositionForGroup(groupPosition)), id);
+            return true;
+        }
+
         mLastGroup = groupPosition;
 
         final WrappedServerListItem item = mListAdapter.getGroup(groupPosition);
@@ -191,9 +239,15 @@ public class ServerListFragment extends Fragment implements LoaderManager
     @Override
     public boolean onChildClick(final ExpandableListView parent, final View v,
             final int groupPosition, final int childPosition, final long id) {
-        mLastGroup = groupPosition;
+        if (mController.isActionModeStarted()) {
+            mController.onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
+                    .getPackedPositionForChild(groupPosition, childPosition)), id);
+            return true;
+        }
 
+        mLastGroup = groupPosition;
         mCallback.onSubServerClicked(mListAdapter.getChild(groupPosition, childPosition));
+
         return true;
     }
 
@@ -241,6 +295,10 @@ public class ServerListFragment extends Fragment implements LoaderManager
             mListAdapter.getGroup(mServerIndex).getServerObjects().add(channel);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
+
+            // Switch current fragment to the joined channel
+            mLastGroup = mServerIndex;
+            mCallback.onSubServerClicked(channel);
         }
 
         @Subscribe

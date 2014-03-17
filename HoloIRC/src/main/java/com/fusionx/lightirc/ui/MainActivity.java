@@ -3,16 +3,17 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.SubServerObject;
 import com.squareup.otto.Subscribe;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -55,7 +56,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSlidingPane.setParallaxDistance(100);
         mSlidingPane.openPane();
         mSlidingPane.setPanelSlideListener(this);
-        //mSlidingPane.setSliderFadeColor(Color.parseColor("#E5E4E2"));
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
@@ -162,12 +162,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onServerClicked(final Server server) {
-        if (mCurrentFragment == null || mServer != server || !mCurrentFragment.getType().equals
-                (FragmentType.SERVER)) {
-            if (mServer != null && mServer != server) {
-                mServer.getServerEventBus().unregister(this);
-            }
-
+        if (mCurrentFragment == null || mServer != server ||
+                !mCurrentFragment.getType().equals(FragmentType.SERVER)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", server.getConfiguration().getTitle());
 
@@ -175,6 +171,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             fragment.setArguments(bundle);
 
             if (mServer != server) {
+                if (mServer != null) {
+                    mServer.getServerEventBus().unregister(this);
+                }
                 server.getServerEventBus().register(this);
             }
 
@@ -182,6 +181,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mServer = server;
 
             onChangeCurrentFragment(fragment);
+
+            setActionBarTitle(server.getConfiguration().getTitle());
+            setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
         }
 
         mSlidingPane.closePane();
@@ -192,8 +194,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (mCurrentFragment == null || !object.getServer().getConfiguration().getTitle().equals
                 (mServer.getConfiguration().getTitle()) || !mCurrentFragment.getTitle().equals
                 (object.getId())) {
-            if (mServer != null && mServer != object.getServer()) {
-                mServer.getServerEventBus().unregister(this);
+            if (mServer != object.getServer()) {
+                if (mServer != null) {
+                    mServer.getServerEventBus().unregister(this);
+                }
+                object.getServer().getServerEventBus().register(this);
             }
 
             final Bundle bundle = new Bundle();
@@ -208,14 +213,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             }
             fragment.setArguments(bundle);
 
-            if (mServer != object.getServer()) {
-                object.getServer().getServerEventBus().register(this);
-            }
-
             mCurrentFragment = fragment;
             mServer = object.getServer();
 
             onChangeCurrentFragment(fragment);
+
+            setActionBarTitle(object.getId());
+            setActionBarSubtitle(object.getServer().getConfiguration().getTitle());
         }
         mSlidingPane.closePane();
     }
@@ -227,7 +231,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onServerDisconnected(Server server) {
+    public void onServerDisconnected(final Server server) {
     }
 
     @Override
@@ -237,6 +241,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     public void setActionBarTitle(final String title) {
         getSupportActionBar().setTitle(title);
+    }
+
+    public void setActionBarSubtitle(final String subtitle) {
+        getSupportActionBar().setSubtitle(subtitle);
+    }
+
+    // Subscribe events
+    @Subscribe
+    public void onStatusChanged(final StatusChangeEvent event) {
+        if (mCurrentFragment.getType() == FragmentType.SERVER) {
+            setActionBarSubtitle(MiscUtils.getStatusString(this, mServer.getStatus()));
+        }
     }
 
     @Subscribe
