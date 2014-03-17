@@ -4,6 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.model.db.DatabaseContract;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
@@ -111,8 +112,8 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     protected void onDestroy() {
         super.onDestroy();
 
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                (this) + "temp.xml");
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
+                "temp.xml");
         if (folder.exists()) {
             folder.delete();
         }
@@ -206,34 +207,53 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         final ArrayList<Preference> list = new ArrayList<>();
         getPreferenceList(preferenceScreen, list);
 
+        // We need to put the ID manually as the called method does not do so
         mContentValues = mSource.getContentValuesFromBuilder(mBuilder);
+        mContentValues.put(DatabaseContract.ServerTable._ID, mBuilder.getId());
+
         for (final Preference p : list) {
+            final Preference.OnPreferenceChangeListener listener;
+
             if (p instanceof EditTextPreference) {
                 final EditTextPreference editTextPreference = (EditTextPreference) p;
                 final String text = mContentValues.getAsString(p.getKey());
                 editTextPreference.setText(text);
+
+                listener = new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        if (preference == mUrl || preference == mTitle) {
+                            ServerPreferenceActivity.this.onPreferenceChange(preference, newValue);
+                        }
+                        mContentValues.put(preference.getKey(), (String) newValue);
+                        return true;
+                    }
+                };
             } else if (p instanceof CheckBoxPreference) {
                 final CheckBoxPreference checkBoxPreference = (CheckBoxPreference) p;
                 final boolean bool = mContentValues.getAsBoolean(checkBoxPreference.getKey());
                 checkBoxPreference.setChecked(bool);
+
+                listener = new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        mContentValues.put(preference.getKey(), (boolean) newValue);
+                        return true;
+                    }
+                };
+            } else if (p instanceof NickPreference) {
+                listener = new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        ((NickPreference) preference).commitToContentValues(mContentValues);
+                        return true;
+                    }
+                };
+            } else {
+                listener = null;
             }
 
-            p.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    if (preference == mUrl || preference == mTitle) {
-                        ServerPreferenceActivity.this.onPreferenceChange(preference, newValue);
-                    }
-                    if (preference instanceof EditTextPreference) {
-                        mContentValues.put(preference.getKey(), (String) newValue);
-                    } else if (preference instanceof CheckBoxPreference) {
-                        mContentValues.put(preference.getKey(), (boolean) newValue);
-                    } else if (preference instanceof NickPreference) {
-                        ((NickPreference) preference).commitToContentValues(mContentValues);
-                    }
-                    return false;
-                }
-            });
+            p.setOnPreferenceChangeListener(listener);
         }
     }
 
