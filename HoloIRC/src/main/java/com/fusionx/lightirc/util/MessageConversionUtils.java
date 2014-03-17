@@ -36,12 +36,12 @@ import com.fusionx.relay.event.user.UserDisconnectEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
 import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
 import com.fusionx.relay.util.ColourParserUtils;
-import com.fusionx.relay.util.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.DeadEvent;
 import com.squareup.otto.Subscribe;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class MessageConversionUtils {
@@ -283,7 +283,7 @@ public class MessageConversionUtils {
     }
 
     private String appendReasonIfNeeded(final String response, final String reason) {
-        return Utils.isEmpty(reason) ? response : response + " " + String.format(mContext
+        return TextUtils.isEmpty(reason) ? response : response + " " + String.format(mContext
                 .getString(R.string.parser_reason), reason);
     }
 

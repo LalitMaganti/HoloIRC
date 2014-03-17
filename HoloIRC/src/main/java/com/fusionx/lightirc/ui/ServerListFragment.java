@@ -296,10 +296,6 @@ public class ServerListFragment extends Fragment implements LoaderManager
             mListAdapter.getGroup(mServerIndex).getServerObjects().add(channel);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
-
-            // Switch current fragment to the joined channel
-            mLastGroup = mServerIndex;
-            mCallback.onSubServerClicked(channel);
         }
 
         @Subscribe

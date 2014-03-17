@@ -28,7 +28,6 @@ import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Server;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -40,8 +39,7 @@ import android.widget.AdapterView;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener,
-        SlidingMenu.OnOpenListener {
+public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     private Callbacks mCallbacks;
 
@@ -125,7 +123,6 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         builder.show();
     }
 
-    @Override
     public void onOpen() {
         if (mCallbacks.isConnectedToServer() != mAdapter.isConnected()) {
             mAdapter.setConnected(mCallbacks.isConnectedToServer());

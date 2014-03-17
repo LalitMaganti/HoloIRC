@@ -29,7 +29,6 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
@@ -49,8 +48,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
-public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> implements
-        SlidingMenu.OnCloseListener {
+public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  {
 
     private Callbacks mCallback;
 
@@ -186,7 +184,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
         return !mCallback.getServer().getUser().getNick().equals(nick);
     }
 
-    @Override
     public void onClose() {
         onStopObserving();
 

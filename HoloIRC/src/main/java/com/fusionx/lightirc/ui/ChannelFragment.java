@@ -36,6 +36,7 @@ import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Utils;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -83,7 +85,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAutoButton.setEnabled(StringUtils.isNotEmpty(mMessageBox.getText()));
+        mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
     }
 
@@ -196,7 +198,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     public void afterTextChanged(final Editable s) {
-        mAutoButton.setEnabled(StringUtils.isNotEmpty(s));
+        mAutoButton.setEnabled(Utils.isNotEmpty(s));
     }
 
     private void changeLastWord(final String newWord) {
