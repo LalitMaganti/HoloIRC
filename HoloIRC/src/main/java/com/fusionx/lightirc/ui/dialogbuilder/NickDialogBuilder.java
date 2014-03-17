@@ -28,7 +28,6 @@ import android.content.Context;
 public abstract class NickDialogBuilder extends DialogBuilder {
 
     public NickDialogBuilder(final Context context, final String nick) {
-        super(context, context.getString(R.string.nickname), context.getString(R.string.new_nick),
-                nick);
+        super(context, context.getString(R.string.nickname), context.getString(R.string.new_nick), nick);
     }
 }

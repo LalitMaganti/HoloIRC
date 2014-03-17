@@ -12,8 +12,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,7 +28,74 @@ import java.util.TreeSet;
 
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_AUTOJOIN;
 
-public class ChannelListFragment extends MultiChoiceListFragment<String> {
+public class ChannelListFragment extends ListFragment {
+
+    private MultiChoiceFragmentListener mListener = new MultiChoiceFragmentListener() {
+
+        @Override
+        protected void attachSelectionController() {
+            mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
+                    getListView(), (ActionBarActivity) getActivity(), this, true);
+        }
+
+        @Override
+        protected BaseCollectionAdapter getRealAdapter() {
+            return mAdapter;
+        }
+
+        @Override
+        protected SparseBooleanArray getCheckedItemPositions() {
+            return getListView().getCheckedItemPositions();
+        }
+
+        @Override
+        public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
+            final MenuInflater inflate = mode.getMenuInflater();
+            inflate.inflate(R.menu.activty_server_settings_cab, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            final List<String> positions = getCheckedItems();
+
+            switch (item.getItemId()) {
+                case R.id.activity_server_settings_cab_edit:
+                    final String edited = mAdapter.getItem(0);
+                    final ChannelDialogBuilder dialog = new ChannelDialogBuilder(edited) {
+                        @Override
+                        public void onOkClicked(final String input) {
+                            mAdapter.remove(edited);
+                            mAdapter.add(input);
+                        }
+                    };
+                    dialog.show();
+
+                    mode.finish();
+                    return true;
+                case R.id.activity_server_settings_cab_delete:
+                    for (String selected : positions) {
+                        mAdapter.remove(selected);
+                    }
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position,
+                long id, boolean checked) {
+            int selectedItemCount = getCheckedItems().size();
+            if (selectedItemCount != 0) {
+                final String quantityString = getResources().getQuantityString(R.plurals
+                        .channel_selection, selectedItemCount, selectedItemCount);
+                mode.setTitle(quantityString);
+                mode.getMenu().getItem(0).setVisible(selectedItemCount == 1);
+            }
+        }
+    };
 
     private BaseCollectionAdapter<String> mAdapter;
 
@@ -54,60 +123,26 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
 
         setListAdapter(mAdapter);
         setHasOptionsMenu(true);
+
+        mListener.onViewCreated(view, savedInstanceState);
     }
 
     @Override
-    protected void attachSelectionController() {
-        mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                getListView(), (ActionBarActivity) getActivity(), this, true);
+    public void onDestroyView() {
+        super.onDestroyView();
+        mListener.onDestroyView();
     }
 
     @Override
-    public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
-        final MenuInflater inflate = mode.getMenuInflater();
-        inflate.inflate(R.menu.activty_server_settings_cab, menu);
-        return true;
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mListener.onSaveInstanceState(outState);
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        final List<String> positions = getCheckedItems();
-
-        switch (item.getItemId()) {
-            case R.id.activity_server_settings_cab_edit:
-                final String edited = mAdapter.getItem(0);
-                final ChannelDialogBuilder dialog = new ChannelDialogBuilder(edited) {
-                    @Override
-                    public void onOkClicked(final String input) {
-                        mAdapter.remove(edited);
-                        mAdapter.add(input);
-                    }
-                };
-                dialog.show();
-
-                mode.finish();
-                return true;
-            case R.id.activity_server_settings_cab_delete:
-                for (String selected : positions) {
-                    mAdapter.remove(selected);
-                }
-                mode.finish();
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position,
-            long id, boolean checked) {
-        int selectedItemCount = getCheckedItems().size();
-        if (selectedItemCount != 0) {
-            final String quantityString = getResources().getQuantityString(R.plurals
-                    .channel_selection, selectedItemCount, selectedItemCount);
-            mode.setTitle(quantityString);
-            mode.getMenu().getItem(0).setVisible(selectedItemCount == 1);
-        }
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        mListener.setMenuVisibility(menuVisible);
     }
 
     @Override
@@ -138,11 +173,6 @@ public class ChannelListFragment extends MultiChoiceListFragment<String> {
         SharedPreferencesUtils.putStringSet(getActivity().getSharedPreferences("temp",
                 Context.MODE_PRIVATE), PREF_AUTOJOIN, mAdapter.getSetOfItems());
         super.onPause();
-    }
-
-    @Override
-    protected BaseCollectionAdapter<String> getRealAdapter() {
-        return mAdapter;
     }
 
     public abstract class ChannelDialogBuilder extends DialogBuilder {

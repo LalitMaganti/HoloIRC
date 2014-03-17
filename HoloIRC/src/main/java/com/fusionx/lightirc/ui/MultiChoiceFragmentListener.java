@@ -4,24 +4,25 @@ import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-abstract class MultiChoiceListFragment<T> extends ListFragment implements
-        MultiSelectionUtils.MultiChoiceModeListener {
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
+public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
+        .MultiChoiceModeListener {
 
     MultiSelectionUtils.Controller mMultiSelectionController;
 
-    @Override
+    private View mListView;
+
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        mListView = view.findViewById(android.R.id.list);
 
         attachSelectionController();
 
@@ -35,13 +36,12 @@ abstract class MultiChoiceListFragment<T> extends ListFragment implements
     protected abstract void attachSelectionController();
 
     List<Integer> getCheckedPositions() {
-        List<Integer> checkedSessionPositions = new ArrayList<Integer>();
-        ListView listView = getListView();
-        if (listView == null) {
+        List<Integer> checkedSessionPositions = new ArrayList<>();
+        if (mListView == null) {
             return checkedSessionPositions;
         }
 
-        SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
+        SparseBooleanArray checkedPositionsBool = getCheckedItemPositions();
         for (int i = 0; i < checkedPositionsBool.size(); i++) {
             if (checkedPositionsBool.valueAt(i)) {
                 checkedSessionPositions.add(checkedPositionsBool.keyAt(i));
@@ -51,14 +51,13 @@ abstract class MultiChoiceListFragment<T> extends ListFragment implements
         return checkedSessionPositions;
     }
 
-    List<T> getCheckedItems() {
-        List<T> checkedSessionPositions = new ArrayList<T>();
-        ListView listView = getListView();
-        if (listView == null) {
+    protected List<T> getCheckedItems() {
+        final List<T> checkedSessionPositions = new ArrayList<>();
+        if (mListView == null) {
             return checkedSessionPositions;
         }
 
-        SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
+        final SparseBooleanArray checkedPositionsBool = getCheckedItemPositions();
         for (int i = 0; i < checkedPositionsBool.size(); i++) {
             if (checkedPositionsBool.valueAt(i)) {
                 checkedSessionPositions.add(getRealAdapter().getItem(checkedPositionsBool
@@ -69,26 +68,20 @@ abstract class MultiChoiceListFragment<T> extends ListFragment implements
         return checkedSessionPositions;
     }
 
-    @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (mMultiSelectionController != null) {
             mMultiSelectionController.finish();
             mMultiSelectionController = null;
         }
     }
 
-    @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         if (mMultiSelectionController != null) {
             mMultiSelectionController.saveInstanceState(outState);
         }
     }
 
-    @Override
     public void setMenuVisibility(boolean menuVisible) {
-        super.setMenuVisibility(menuVisible);
         if (mMultiSelectionController == null) {
             return;
         }
@@ -111,4 +104,6 @@ abstract class MultiChoiceListFragment<T> extends ListFragment implements
     }
 
     protected abstract BaseCollectionAdapter<T> getRealAdapter();
+
+    protected abstract SparseBooleanArray getCheckedItemPositions();
 }

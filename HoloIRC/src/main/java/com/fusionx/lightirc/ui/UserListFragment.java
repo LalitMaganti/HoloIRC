@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.relay.Channel;
@@ -35,8 +36,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -48,7 +51,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
-public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  {
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
+public class UserListFragment extends Fragment {
 
     private Callbacks mCallback;
 
@@ -56,7 +61,97 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
 
     private UserListAdapter mAdapter;
 
+    private final MultiChoiceFragmentListener<WorldUser> mMultiChoiceFragmentListener = new
+            MultiChoiceFragmentListener<WorldUser>() {
+                @Override
+                protected void attachSelectionController() {
+                    mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
+                            getListView().getWrappedList(), (ActionBarActivity) getActivity(), this,
+                            true);
+                }
+
+                @Override
+                protected BaseCollectionAdapter getRealAdapter() {
+                    return mAdapter;
+                }
+
+                @Override
+                protected SparseBooleanArray getCheckedItemPositions() {
+                    return mStickyListView.getCheckedItemPositions();
+                }
+
+                @Override
+                public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
+                    final List<WorldUser> selectedItems = getCheckedItems();
+                    final String nick = selectedItems.get(0).getNick();
+                    switch (item.getItemId()) {
+                        case R.id.fragment_userlist_cab_mention:
+                            mCallback.onUserMention(selectedItems);
+                            mode.finish();
+                            mCallback.closeSlidingMenus();
+                            return true;
+                        case R.id.fragment_userlist_cab_pm: {
+                            if (isNickOtherUsers(nick)) {
+                                mCallback.getServer().getServerCallBus()
+                                        .sendMessageToUser(nick, "");
+                                mCallback.closeSlidingMenus();
+                                mode.finish();
+                            } else {
+                                final AlertDialog.Builder build = new AlertDialog.Builder(
+                                        getActivity());
+                                build.setTitle(getActivity()
+                                        .getString(R.string.user_list_not_possible))
+                                        .setMessage(getActivity()
+                                                .getString(R.string.user_list_pm_self_not_possible))
+                                        .setPositiveButton(getActivity().getString(R.string.ok),
+                                                new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(
+                                                            DialogInterface dialogInterface,
+                                                            int i) {
+                                                        dialogInterface.dismiss();
+                                                    }
+                                                }
+                                        );
+                                build.show();
+                            }
+                            return true;
+                        }
+                        case R.id.fragment_userlist_cab_whois:
+                            mCallback.getServer().getServerCallBus().sendUserWhois(nick);
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+
+                @Override
+                public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
+                    final MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.fragment_userlist_cab, menu);
+                    return true;
+                }
+
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                        boolean checked) {
+                    int selectedItemCount = getCheckedItems().size();
+
+                    if (selectedItemCount != 0) {
+                        final String quantityString = getResources()
+                                .getQuantityString(R.plurals.user_selection,
+                                        selectedItemCount, selectedItemCount);
+                        mode.setTitle(quantityString);
+
+                        mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
+                        mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
+                    }
+                }
+            };
+
     private TreeSet<WorldUser> worldUsers;
+
+    private StickyListHeadersListView mStickyListView;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -87,10 +182,31 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mStickyListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
+        mMultiChoiceFragmentListener.onViewCreated(view, savedInstanceState);
+
         mAdapter = new UserListAdapter(view.getContext(), worldUsers);
         getListView().setAdapter(mAdapter);
 
         getListView().setFastScrollEnabled(true);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mMultiChoiceFragmentListener.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mMultiChoiceFragmentListener.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        mMultiChoiceFragmentListener.setMenuVisibility(menuVisible);
     }
 
     @Override
@@ -111,12 +227,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
         }
     }
 
-    @Override
-    protected void attachSelectionController() {
-        mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                getListView().getWrappedList(), (ActionBarActivity) getActivity(), this, true);
-    }
-
     public void onMenuOpened(final Channel channel) {
         mChannel = channel;
 
@@ -132,54 +242,6 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
         onStartObserving();
     }
 
-    @Override
-    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final List<WorldUser> selectedItems = getCheckedItems();
-        final String nick = selectedItems.get(0).getNick();
-        switch (item.getItemId()) {
-            case R.id.fragment_userlist_cab_mention:
-                mCallback.onUserMention(selectedItems);
-                mode.finish();
-                mCallback.closeSlidingMenus();
-                return true;
-            case R.id.fragment_userlist_cab_pm: {
-                if (isNickOtherUsers(nick)) {
-                    mCallback.getServer().getServerCallBus().sendMessageToUser(nick, "");
-                    mCallback.closeSlidingMenus();
-                    mode.finish();
-                } else {
-                    final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
-                    build.setTitle(getActivity()
-                            .getString(R.string.user_list_not_possible)).setMessage(getActivity()
-                            .getString(R.string.user_list_pm_self_not_possible))
-                            .setPositiveButton(getActivity().getString(R.string.ok),
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialogInterface,
-                                                int i) {
-                                            dialogInterface.dismiss();
-                                        }
-                                    }
-                            );
-                    build.show();
-                }
-                return true;
-            }
-            case R.id.fragment_userlist_cab_whois:
-                mCallback.getServer().getServerCallBus().sendUserWhois(nick);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        final MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.fragment_userlist_cab, menu);
-        return true;
-    }
-
     boolean isNickOtherUsers(final String nick) {
         return !mCallback.getServer().getUser().getNick().equals(nick);
     }
@@ -189,32 +251,9 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
 
         getListView().setAdapter(null);
 
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.finish();
+        if (mMultiChoiceFragmentListener.mMultiSelectionController != null) {
+            mMultiChoiceFragmentListener.mMultiSelectionController.finish();
         }
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        int selectedItemCount = getCheckedItems().size();
-
-        if (selectedItemCount != 0) {
-            final String quantityString = getResources().getQuantityString(R.plurals.user_selection,
-                    selectedItemCount, selectedItemCount);
-            mode.setTitle(quantityString);
-
-            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
-        }
-    }
-
-    @Override
-    protected UserListAdapter getRealAdapter() {
-        return mAdapter;
-    }
-
-    public int getUserCount() {
-        return getRealAdapter().getCount();
     }
 
     /*
@@ -233,8 +272,8 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
             worldUsers.addAll(userList);
             getListView().setAdapter(mAdapter);
 
-            if (mMultiSelectionController != null) {
-                mMultiSelectionController.finish();
+            if (mMultiChoiceFragmentListener.mMultiSelectionController != null) {
+                mMultiChoiceFragmentListener.mMultiSelectionController.finish();
             }
         }
     }
@@ -248,6 +287,10 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser>  
         mCallback.getServer().getServerEventBus().unregister(this);
     }
 
+
+    public StickyListHeadersListView getListView() {
+        return mStickyListView;
+    }
 
     public interface Callbacks {
 
