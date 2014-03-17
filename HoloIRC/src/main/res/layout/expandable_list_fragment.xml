@@ -6,5 +6,6 @@
         android:groupIndicator="@null"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
-        android:background="#ffffff"
+        android:background="#f9f9f9"
+        android:cacheColorHint="@android:color/transparent"
         android:id="@+id/server_list"/>

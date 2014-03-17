@@ -12,6 +12,7 @@ import com.squareup.otto.Subscribe;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -24,7 +25,7 @@ import android.widget.RelativeLayout;
 
 import static butterknife.ButterKnife.findById;
 
-public class NewMainActivity extends ActionBarActivity implements ServerListFragment.Callback,
+public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener {
 
     private Server mServer;
@@ -51,14 +52,17 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
         setContentView(R.layout.new_main_activity);
 
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
-        mSlidingPane.setParallaxDistance(150);
+        mSlidingPane.setParallaxDistance(100);
         mSlidingPane.openPane();
         mSlidingPane.setPanelSlideListener(this);
+        //mSlidingPane.setSliderFadeColor(Color.parseColor("#E5E4E2"));
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
         mRightDrawer = findById(this, R.id.right_drawer);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState == null) {
             mServerListFragment = new ServerListFragment();
@@ -116,6 +120,14 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+            case R.id.home:
+                if (mSlidingPane.isOpen()) {
+                    mSlidingPane.closePane();
+                } else {
+                    mSlidingPane.openPane();
+                }
+                return true;
             case R.id.open_actions:
                 if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
                     mDrawerLayout.closeDrawer(mRightDrawer);

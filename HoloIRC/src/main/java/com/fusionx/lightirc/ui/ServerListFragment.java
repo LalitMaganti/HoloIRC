@@ -51,7 +51,7 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
     private Callback mCallback;
 
-    private ExpandableListView mServerList;
+    private ExpandableListView mListView;
 
     private ExpandableServerListAdapter mListAdapter;
 
@@ -83,9 +83,9 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
         setRetainInstance(true);
 
-        mServerList = findById(view, R.id.server_list);
-        mServerList.setGroupIndicator(null);
-        mServerList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+        mListView = findById(view, R.id.server_list);
+        mListView.setGroupIndicator(null);
+        mListView.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
@@ -130,9 +130,11 @@ public class ServerListFragment extends Fragment implements LoaderManager
                 // This can happen when rotation has occurred - the view has been redrawn but the
                 // comms layer should be constant
                 if (mService != null) {
-                    mServerList.setAdapter(mListAdapter);
-                    mServerList.setOnGroupClickListener(ServerListFragment.this);
-                    mServerList.setOnChildClickListener(ServerListFragment.this);
+                    mListAdapter.setListView(mListView);
+
+                    mListView.setAdapter(mListAdapter);
+                    mListView.setOnGroupClickListener(ServerListFragment.this);
+                    mListView.setOnChildClickListener(ServerListFragment.this);
                 } else {
                     getLoaderManager().initLoader(1, null, ServerListFragment.this);
                 }
@@ -160,12 +162,12 @@ public class ServerListFragment extends Fragment implements LoaderManager
         }
         source.close();
 
-        mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mServerList,
+        mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mListView,
                 this);
 
-        mServerList.setAdapter(mListAdapter);
-        mServerList.setOnGroupClickListener(this);
-        mServerList.setOnChildClickListener(this);
+        mListView.setAdapter(mListAdapter);
+        mListView.setOnGroupClickListener(this);
+        mListView.setOnChildClickListener(this);
     }
 
     @Override
@@ -237,13 +239,13 @@ public class ServerListFragment extends Fragment implements LoaderManager
             final Channel channel = mServer.getUserChannelInterface().getChannel(event
                     .channelName);
             mListAdapter.getGroup(mServerIndex).getServerObjects().add(channel);
-            mServerList.setAdapter(mListAdapter);
-            mServerList.expandGroup(mServerIndex);
+            mListView.setAdapter(mListAdapter);
+            mListView.expandGroup(mServerIndex);
         }
 
         @Subscribe
         public void onConnect(final ConnectEvent event) {
-            mServerList.invalidateViews();
+            mListView.invalidateViews();
         }
 
         @Subscribe

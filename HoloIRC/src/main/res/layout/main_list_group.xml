@@ -58,7 +58,8 @@
             android:layout_alignBottom="@+id/button_expand"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:visibility="gone"/>
 
     <View
             android:id="@+id/divider"

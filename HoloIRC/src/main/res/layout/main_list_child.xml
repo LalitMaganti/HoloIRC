@@ -26,12 +26,11 @@
             android:paddingTop="@dimen/margin_small"
             android:paddingBottom="@dimen/margin_small"
             android:text="Disconnected"
-            android:layout_below="@+id/server_title"
-            android:textStyle="italic"/>
+            android:layout_below="@+id/server_title"/>
     <View
             android:id="@+id/divider"
             android:background="#e2e2e2"
             android:layout_width="fill_parent"
             android:layout_height="1.2dp"
-            android:layout_below="@+id/server_status" />
+            android:layout_below="@+id/server_status"/>
 </RelativeLayout>

@@ -26,11 +26,11 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final LayoutInflater mInflater;
 
-    private final ExpandableListView mListView;
-
     private final Context mContext;
 
     private final List<WrappedServerListItem> mServerListItems;
+
+    private ExpandableListView mListView;
 
     public ExpandableServerListAdapter(final Context context, final List<WrappedServerListItem>
             builders, final ExpandableListView listView, final Callback callback) {
@@ -142,6 +142,15 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
+    public void setListView(ExpandableListView listView) {
+        mListView = listView;
+    }
+
+    public interface Callback {
+
+        public void onEditServer(final WrappedServerListItem builder);
+    }
+
     public final class ExpandListener implements View.OnClickListener {
 
         private final int mGroupPos;
@@ -216,10 +225,5 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             popup.setOnMenuItemClickListener(this);
             popup.show();
         }
-    }
-
-    public interface Callback {
-
-        public void onEditServer(final WrappedServerListItem builder);
     }
 }
