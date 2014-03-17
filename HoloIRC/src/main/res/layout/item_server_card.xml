@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dip"
                 android:text="@string/title"
-                android:textColor="?server_card_text"
+                android:textColor="?default_text_colour"
                 android:textSize="24sp"/>
 
         <com.fusionx.lightirc.ui.widget.RobotoLightTextView
@@ -58,7 +58,7 @@
                 android:ellipsize="end"
                 android:maxLines="3"
                 android:text="@string/description"
-                android:textColor="?server_card_text"
+                android:textColor="?default_text_colour"
                 android:textSize="16sp"/>
     </LinearLayout>
 

@@ -19,13 +19,14 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
     <LinearLayout
+            android:id="@+id/group_content"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/card_server_overflow"
             android:layout_toRightOf="@id/button_expand">
         <TextView
-                android:textColor="@android:color/white"
+                android:textColor="#cc222222"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/server_title"
@@ -33,7 +34,7 @@
                 android:paddingTop="@dimen/margin_medium"
                 android:text="Text"/>
         <TextView
-                android:textColor="@android:color/white"
+                android:textColor="#cc222222"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="11sp"
@@ -58,4 +59,11 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"/>
+
+    <View
+            android:id="@+id/divider"
+            android:background="#e2e2e2"
+            android:layout_width="fill_parent"
+            android:layout_height="1.2dp"
+            android:layout_below="@+id/group_content" />
 </RelativeLayout>

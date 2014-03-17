@@ -1,5 +1,11 @@
 package com.fusionx.lightirc.adapters;
 
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.util.MessageConversionUtils;
+import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.event.Event;
+
 import android.content.Context;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -7,12 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.util.MessageConversionUtils;
-import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.event.Event;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,11 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
     private final Object mLock = new Object();
 
     private final Context mContext;
+
     private final LayoutInflater mInflater;
+
     private final MessageConversionUtils mConverter;
+
     private List<T> mObjects;
 
     public IRCMessageAdapter(Context context) {

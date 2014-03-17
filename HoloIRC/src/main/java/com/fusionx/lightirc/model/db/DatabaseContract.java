@@ -49,16 +49,17 @@ public final class DatabaseContract {
         // Database creation sql statement
         public static final String TABLE_CREATE = String
                 .format("create table %s(%s integer primary key autoincrement, %s text not null, "
-                        + "%s text not null, %s integer, %s integer, %s integer, "
-                        + "%s text not null, %s text not null, %s text not null, "
-                        + "%s text not null, %s integer, %s text not null, %s text not null,"
-                        + " %s text not null, %s text not null, %s text not null, "
-                        + "%s text not null);",
+                                + "%s text not null, %s integer, %s integer, %s integer, "
+                                + "%s text not null, %s text not null, %s text not null, "
+                                + "%s text not null, %s integer, %s text not null, %s text not null,"
+                                + " %s text not null, %s text not null, %s text not null, "
+                                + "%s text not null);",
                         TABLE_NAME, ServerTable._ID, COLUMN_TITLE, COLUMN_URL,
                         COLUMN_PORT, COLUMN_SSL, COLUMN_SSL_ACCEPT_ALL, COLUMN_NICK_ONE,
                         COLUMN_NICK_TWO, COLUMN_NICK_THREE, COLUMN_REAL_NAME,
                         COLUMN_NICK_CHANGEABLE, COLUMN_AUTOJOIN, COLUMN_SERVER_USERNAME,
                         COLUMN_SERVER_PASSWORD, COLUMN_SASL_USERNAME, COLUMN_SASL_PASSWORD,
-                        COLUMN_NICK_SERV_PASSWORD);
+                        COLUMN_NICK_SERV_PASSWORD
+                );
     }
 }

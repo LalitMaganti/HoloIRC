@@ -22,7 +22,7 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerStatus;
 

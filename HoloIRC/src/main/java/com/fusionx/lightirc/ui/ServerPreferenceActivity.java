@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
+import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
@@ -34,8 +34,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.ArrayList;
 
-import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_TITLE;
-import static com.fusionx.lightirc.constants.PreferenceConstants.PREF_URL;
+import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
+import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_URL;
 
 public class ServerPreferenceActivity extends PreferenceActivity implements
         ServerSettingsCallbacks,

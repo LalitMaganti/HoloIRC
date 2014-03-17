@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
 
@@ -65,7 +65,8 @@ class PreferenceHelpers {
                             context.startActivity(browserIntent);
                             return true;
                         }
-                    });
+                    }
+            );
         }
     }
 
@@ -107,7 +108,8 @@ class PreferenceHelpers {
                                     //service.putExtra("stop", false);
                                     //mActivity.bindService(service, mConnection, 0);
                                 }
-                            });
+                            }
+                    );
             build.show();
             return true;
         }

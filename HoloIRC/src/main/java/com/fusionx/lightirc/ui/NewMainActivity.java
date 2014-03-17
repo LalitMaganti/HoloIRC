@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.FragmentType;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
@@ -169,7 +169,7 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
             mCurrentFragment = fragment;
             mServer = server;
 
-            replaceContentFrame(fragment);
+            onChangeCurrentFragment(fragment);
         }
 
         mSlidingPane.closePane();
@@ -188,6 +188,7 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
             bundle.putString("title", object.getId());
 
             final IRCFragment fragment;
+            // TODO - fix this awful code
             if (object instanceof Channel) {
                 fragment = new ChannelFragment();
             } else {
@@ -202,12 +203,12 @@ public class NewMainActivity extends ActionBarActivity implements ServerListFrag
             mCurrentFragment = fragment;
             mServer = object.getServer();
 
-            replaceContentFrame(fragment);
+            onChangeCurrentFragment(fragment);
         }
         mSlidingPane.closePane();
     }
 
-    private void replaceContentFrame(final Fragment fragment) {
+    private void onChangeCurrentFragment(final Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
                 fragment).commit();
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);

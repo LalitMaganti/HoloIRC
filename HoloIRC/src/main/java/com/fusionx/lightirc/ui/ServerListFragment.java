@@ -3,7 +3,6 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.communication.NewIRCService;
-import com.fusionx.lightirc.loader.AbstractLoader;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.model.WrappedServerListItem;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
@@ -20,9 +19,9 @@ import com.squareup.otto.Subscribe;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -88,41 +87,46 @@ public class ServerListFragment extends Fragment implements LoaderManager
         mServerList.setGroupIndicator(null);
         mServerList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
-        getLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Object>() {
+        final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+            private Handler mHandler;
+
+            private Dialog mDialog;
+
             @Override
-            public Loader<Object> onCreateLoader(int i, Bundle bundle) {
-                final Handler handler = new Handler();
-                final Dialog dialog = new Dialog(getActivity());
-                return new AbstractLoader<Object>(getActivity()) {
-                    @Override
-                    public Object loadInBackground() {
-                        final List<File> fileList = SharedPreferencesUtils.getOldServers
-                                (getActivity());
-                        if (!fileList.isEmpty()) {
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.setCancelable(false);
-                                    dialog.setCanceledOnTouchOutside(false);
-                                    dialog.setTitle("Please wait...");
-                                    dialog.show();
-                                }
-                            });
-                            SharedPreferencesUtils.migrateToDatabase(fileList, getActivity());
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.cancel();
-                                }
-                            });
-                        }
-                        return null;
-                    }
-                };
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                mHandler = new Handler();
+                mDialog = new Dialog(getActivity());
             }
 
             @Override
-            public void onLoadFinished(Loader<Object> objectLoader, Object o) {
+            protected Void doInBackground(Void... params) {
+                final List<File> fileList = SharedPreferencesUtils.getOldServers(getActivity());
+                if (!fileList.isEmpty()) {
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDialog.setCancelable(false);
+                            mDialog.setCanceledOnTouchOutside(false);
+                            mDialog.setTitle("Please wait...");
+                            mDialog.show();
+                        }
+                    });
+                    SharedPreferencesUtils.migrateToDatabase(fileList, getActivity());
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDialog.cancel();
+                        }
+                    });
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
                 // This can happen when rotation has occurred - the view has been redrawn but the
                 // comms layer should be constant
                 if (mService != null) {
@@ -133,11 +137,8 @@ public class ServerListFragment extends Fragment implements LoaderManager
                     getLoaderManager().initLoader(1, null, ServerListFragment.this);
                 }
             }
-
-            @Override
-            public void onLoaderReset(Loader<Object> objectLoader) {
-            }
-        });
+        };
+        asyncTask.execute();
     }
 
     @Override
@@ -151,7 +152,6 @@ public class ServerListFragment extends Fragment implements LoaderManager
         mService = service;
 
         final List<WrappedServerListItem> listItems = new ArrayList<>();
-
         final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
 
         source.open();

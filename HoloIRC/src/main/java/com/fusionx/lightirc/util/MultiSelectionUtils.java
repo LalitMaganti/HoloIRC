@@ -33,7 +33,8 @@ import android.widget.ListView;
 import java.util.HashSet;
 
 /**
- * Utilities for handling multiple selection in list views. Contains functionality similar to {@link
+ * Utilities for handling multiple selection in list views. Contains functionality similar to
+ * {@link
  * AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link ActionBarActivity} and
  * backward-compatible action bars.
  */
@@ -236,8 +237,8 @@ public class MultiSelectionUtils {
                 return false;
             }
 
-            mItemsToCheck = new HashSet<Pair<Integer, Long>>();
-            mItemsToCheck.add(new Pair<Integer, Long>(position, id));
+            mItemsToCheck = new HashSet<>();
+            mItemsToCheck.add(new Pair<>(position, id));
             mActionMode = mActivity.startSupportActionMode(Controller.this);
             return true;
         }

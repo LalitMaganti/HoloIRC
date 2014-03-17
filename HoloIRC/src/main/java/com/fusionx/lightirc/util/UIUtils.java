@@ -6,10 +6,8 @@ import com.fusionx.relay.constants.Theme;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.view.View;
 import android.widget.TextView;
 
 public class UIUtils {

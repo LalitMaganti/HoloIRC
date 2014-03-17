@@ -14,7 +14,8 @@ import android.view.View;
 import android.widget.TextView;
 
 /**
- * A {@link DialogPreference} that provides a user with the means to select an integer from a {@link
+ * A {@link DialogPreference} that provides a user with the means to select an integer from a
+ * {@link
  * NumberPicker}, and persist it.
  *
  * @author lukehorvat

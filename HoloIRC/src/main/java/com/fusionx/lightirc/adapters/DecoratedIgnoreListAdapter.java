@@ -64,7 +64,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
     }
 
     /**
-     * Call this method to reset animation status on all views. The next time notifyDataSetChanged()
+     * Call this method to reset animation status on all views. The next time
+     * notifyDataSetChanged()
      * is called on the base adapter, all views will animate again. Will also call
      * setShouldAnimate(true).
      */

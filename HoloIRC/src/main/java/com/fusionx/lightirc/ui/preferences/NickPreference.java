@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.ui.preferences;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.misc.PreferenceConstants;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -19,7 +19,8 @@ public class NickPreference extends AbstractNickPreference {
         final SharedPreferences sharedPreferences = getSharedPreferences();
         mFirstChoice.setText(sharedPreferences.getString(PreferenceConstants.PREF_NICK,
                 "HoloIRCUser"));
-        mSecondChoice.setText(sharedPreferences.getString(PreferenceConstants.PREF_SECOND_NICK, ""));
+        mSecondChoice
+                .setText(sharedPreferences.getString(PreferenceConstants.PREF_SECOND_NICK, ""));
         mThirdChoice.setText(sharedPreferences.getString(PreferenceConstants.PREF_THIRD_NICK, ""));
     }
 

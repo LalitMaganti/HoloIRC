@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.misc;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 

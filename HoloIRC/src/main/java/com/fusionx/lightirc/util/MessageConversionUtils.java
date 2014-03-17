@@ -1,8 +1,5 @@
 package com.fusionx.lightirc.util;
 
-import android.content.Context;
-import android.util.Log;
-
 import com.fusionx.lightirc.R;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ActionEvent;
@@ -43,6 +40,9 @@ import com.fusionx.relay.util.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.DeadEvent;
 import com.squareup.otto.Subscribe;
+
+import android.content.Context;
+import android.util.Log;
 
 public class MessageConversionUtils {
 
@@ -103,13 +103,15 @@ public class MessageConversionUtils {
         @Subscribe
         public void getModeChangedMessage(final UserLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
-            setupEvent(event, String.format(response, event.rawMode, event.nick, event.changingNick));
+            setupEvent(event,
+                    String.format(response, event.rawMode, event.nick, event.changingNick));
         }
 
         @Subscribe
         public void getModeChangedMessage(final WorldLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
-            setupEvent(event, String.format(response, event.rawMode, event.nick, event.changingNick));
+            setupEvent(event,
+                    String.format(response, event.rawMode, event.nick, event.changingNick));
         }
 
         @Subscribe

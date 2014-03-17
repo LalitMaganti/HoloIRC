@@ -27,15 +27,19 @@ import android.widget.ImageView;
 import java.lang.reflect.Method;
 
 /**
- * This class provides a handy way to tie together the functionality of {@link DrawerLayout} and the
- * framework <code>ActionBar</code> to implement the recommended design for navigation drawers. <p/>
- * <p>To use <code>ActionBarDrawerToggle</code>, create one in your Activity and call through to the
+ * This class provides a handy way to tie together the functionality of {@link DrawerLayout} and
+ * the
+ * framework <code>ActionBar</code> to implement the recommended design for navigation drawers.
+ * <p/>
+ * <p>To use <code>ActionBarDrawerToggle</code>, create one in your Activity and call through to
+ * the
  * following methods corresponding to your Activity callbacks:</p> <p/> <ul> <li>{@link
  * Activity#onConfigurationChanged(android.content.res.Configuration) onConfigurationChanged}</li>
  * <li>{@link Activity#onOptionsItemSelected(android.view.MenuItem) onOptionsItemSelected}</li>
  * </ul> <p/> <p>Call {@link #syncState()} from your <code>Activity</code>'s {@link
  * Activity#onPostCreate(android.os.Bundle) onPostCreate} to synchronize the indicator with the
- * state of the linked DrawerLayout after <code>onRestoreInstanceState</code> has occurred.</p> <p/>
+ * state of the linked DrawerLayout after <code>onRestoreInstanceState</code> has occurred.</p>
+ * <p/>
  * <p><code>ActionBarDrawerToggle</code> can be used directly as a {@link
  * DrawerLayout.DrawerListener}, or if you are already providing your own listener, call through to
  * each of the listener methods from your own.</p>
@@ -77,7 +81,8 @@ public class DrawerToggle implements DrawerLayout.DrawerListener {
      * Construct a new ActionBarDrawerToggle. <p/> <p>The given {@link Activity} will be linked to
      * the specified {@link DrawerLayout}. The provided drawer indicator drawable will animate
      * slightly off-screen as the drawer is opened, indicating that in the open state the drawer
-     * will move off-screen when pressed and in the closed state the drawer will move on-screen when
+     * will move off-screen when pressed and in the closed state the drawer will move on-screen
+     * when
      * pressed.</p> <p/> <p>String resources must be provided to describe the open/close drawer
      * actions for accessibility services.</p>
      *

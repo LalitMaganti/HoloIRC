@@ -161,7 +161,8 @@ public class UserListFragment extends MultiChoiceStickyListFragment<WorldUser> i
                                                 int i) {
                                             dialogInterface.dismiss();
                                         }
-                                    });
+                                    }
+                            );
                     build.show();
                 }
                 return true;

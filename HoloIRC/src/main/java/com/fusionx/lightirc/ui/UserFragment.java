@@ -21,15 +21,11 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.PrivateMessageUser;
-import com.fusionx.relay.Server;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
-
-import android.app.Activity;
 
 import java.util.List;
 

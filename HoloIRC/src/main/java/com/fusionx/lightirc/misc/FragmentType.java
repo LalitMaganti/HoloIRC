@@ -19,7 +19,7 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.fusionx.lightirc.constants;
+package com.fusionx.lightirc.misc;
 
 public enum FragmentType {
     SERVER,

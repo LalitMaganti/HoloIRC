@@ -23,8 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerStatus;
 import com.fusionx.relay.event.Event;
@@ -154,7 +153,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     }
 
     public void onResetBuffer() {
-         if (getServer().getStatus() == ServerStatus.CONNECTED) {
+        if (getServer().getStatus() == ServerStatus.CONNECTED) {
             mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
         } else {
             mMessageAdapter.setData(new ArrayList<>(getDisconnectedAdapterData()));

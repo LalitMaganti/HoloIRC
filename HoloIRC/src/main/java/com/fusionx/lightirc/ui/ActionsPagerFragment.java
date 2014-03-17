@@ -2,7 +2,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionPagerAdapter;
-import com.fusionx.lightirc.constants.FragmentType;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Server;
 
 import android.app.Activity;

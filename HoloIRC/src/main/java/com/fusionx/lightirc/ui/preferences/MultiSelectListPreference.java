@@ -167,7 +167,8 @@ public class MultiSelectListPreference extends DialogPreference {
         if (mEntries == null || mEntryValues == null) {
             throw new IllegalStateException(
                     "MultiSelectListPreference requires an entries array and " +
-                            "an entryValues array.");
+                            "an entryValues array."
+            );
         }
 
         boolean[] checkedItems = getSelectedItems();
@@ -180,7 +181,8 @@ public class MultiSelectListPreference extends DialogPreference {
                             mPreferenceChanged |= mNewValues.remove(mEntryValues[which].toString());
                         }
                     }
-                });
+                }
+        );
         mNewValues.clear();
         mNewValues.addAll(mValues);
     }

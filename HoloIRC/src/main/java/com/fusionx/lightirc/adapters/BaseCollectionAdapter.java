@@ -71,7 +71,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     private int mResource;
 
     /**
-     * The resource indicating what views to inflate to display the content of this array adapter in
+     * The resource indicating what views to inflate to display the content of this array adapter
+     * in
      * a drop down widget.
      */
     private int mDropDownResource;
@@ -215,7 +216,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
 
     /**
      * Control whether methods that change the list ({@link #add}, {@link #remove}, {@link #clear})
-     * automatically call {@link #notifyDataSetChanged}.  If set to false, caller must manually call
+     * automatically call {@link #notifyDataSetChanged}.  If set to false, caller must manually
+     * call
      * notifyDataSetChanged() to have the changes reflected in the attached view.
      *
      * The default is true, and calling notifyDataSetChanged() resets the flag to true.

@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.model;
 
-import com.fusionx.lightirc.constants.FragmentType;
+import com.fusionx.lightirc.misc.FragmentType;
 
 import android.os.Parcel;
 import android.os.Parcelable;

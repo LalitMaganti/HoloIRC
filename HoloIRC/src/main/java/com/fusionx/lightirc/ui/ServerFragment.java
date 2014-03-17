@@ -23,9 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.google.common.collect.ImmutableList;
 
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Server;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
@@ -33,7 +31,6 @@ import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 
