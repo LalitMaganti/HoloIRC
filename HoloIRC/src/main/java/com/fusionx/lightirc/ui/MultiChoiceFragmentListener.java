@@ -8,6 +8,8 @@ import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.View;
+import android.widget.BaseAdapter;
+import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +62,7 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
         final SparseBooleanArray checkedPositionsBool = getCheckedItemPositions();
         for (int i = 0; i < checkedPositionsBool.size(); i++) {
             if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(getRealAdapter().getItem(checkedPositionsBool
+                checkedSessionPositions.add((T) getRealAdapter().getItem(checkedPositionsBool
                         .keyAt(i)));
             }
         }
@@ -103,7 +105,7 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
     public void onDestroyActionMode(ActionMode arg0) {
     }
 
-    protected abstract BaseCollectionAdapter<T> getRealAdapter();
+    protected abstract ListAdapter getRealAdapter();
 
     protected abstract SparseBooleanArray getCheckedItemPositions();
 }

@@ -24,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.ListAdapter;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -83,7 +84,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         }
 
         @Override
-        protected BaseCollectionAdapter<String> getRealAdapter() {
+        protected ListAdapter getRealAdapter() {
             return getIgnoreAdapter();
         }
 

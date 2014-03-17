@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListAdapter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +40,7 @@ public class ChannelListFragment extends ListFragment {
         }
 
         @Override
-        protected BaseCollectionAdapter getRealAdapter() {
+        protected ListAdapter getRealAdapter() {
             return mAdapter;
         }
 

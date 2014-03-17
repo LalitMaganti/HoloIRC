@@ -22,7 +22,6 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.relay.Channel;
@@ -46,6 +45,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListAdapter;
 
 import java.util.Collection;
 import java.util.List;
@@ -71,7 +71,7 @@ public class UserListFragment extends Fragment {
                 }
 
                 @Override
-                protected BaseCollectionAdapter getRealAdapter() {
+                protected ListAdapter getRealAdapter() {
                     return mAdapter;
                 }
 

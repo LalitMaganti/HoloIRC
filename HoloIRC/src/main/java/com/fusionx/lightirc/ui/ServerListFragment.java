@@ -28,12 +28,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
+import android.widget.ListAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,42 +60,6 @@ public class ServerListFragment extends Fragment implements LoaderManager
     private ExpandableListView mListView;
 
     private ExpandableServerListAdapter mListAdapter;
-
-    private MultiSelectionUtils.Controller mController;
-
-    private MultiSelectionUtils.MultiChoiceModeListener mListener = new MultiSelectionUtils
-            .MultiChoiceModeListener() {
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-                boolean checked) {
-
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            actionMode.getMenuInflater()
-                    .inflate(R.menu.activity_server_list_popup, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.activity_server_list_popup_disconnect:
-                    return false;
-            }
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-        }
-    };
 
     @Override
     public void onAttach(final Activity activity) {
@@ -125,8 +91,6 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
         mListView = findById(view, R.id.server_list);
         mListView.setGroupIndicator(null);
-        mController = MultiSelectionUtils.attachMultiSelectionController(mListView,
-                (ActionBarActivity) getActivity(), mListener, false);
 
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
@@ -182,6 +146,26 @@ public class ServerListFragment extends Fragment implements LoaderManager
             }
         };
         asyncTask.execute();
+
+        mListener.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mListener.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mListener.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void setMenuVisibility(boolean menuVisible) {
+        super.setMenuVisibility(menuVisible);
+        mListener.setMenuVisibility(menuVisible);
     }
 
     @Override
@@ -220,9 +204,10 @@ public class ServerListFragment extends Fragment implements LoaderManager
     @Override
     public boolean onGroupClick(final ExpandableListView parent, final View v,
             final int groupPosition, final long id) {
-        if (mController.isActionModeStarted()) {
-            mController.onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
-                    .getPackedPositionForGroup(groupPosition)), id);
+        if (mListener.mMultiSelectionController.isActionModeStarted()) {
+            mListener.mMultiSelectionController
+                    .onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
+                            .getPackedPositionForGroup(groupPosition)), id);
             return true;
         }
 
@@ -240,9 +225,10 @@ public class ServerListFragment extends Fragment implements LoaderManager
     @Override
     public boolean onChildClick(final ExpandableListView parent, final View v,
             final int groupPosition, final int childPosition, final long id) {
-        if (mController.isActionModeStarted()) {
-            mController.onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
-                    .getPackedPositionForChild(groupPosition, childPosition)), id);
+        if (mListener.mMultiSelectionController.isActionModeStarted()) {
+            mListener.mMultiSelectionController
+                    .onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
+                            .getPackedPositionForChild(groupPosition, childPosition)), id);
             return true;
         }
 
@@ -315,4 +301,54 @@ public class ServerListFragment extends Fragment implements LoaderManager
             mServer.getServerEventBus().unregister(this);
         }
     }
+
+    private final MultiChoiceFragmentListener mListener = new MultiChoiceFragmentListener() {
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                boolean checked) {
+
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater()
+                    .inflate(R.menu.activity_server_list_popup, menu);
+            return true;
+        }
+
+        @Override
+        protected void attachSelectionController() {
+            mMultiSelectionController = MultiSelectionUtils
+                    .attachMultiSelectionController(mListView,
+                            (ActionBarActivity) getActivity(), mListener, false);
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.activity_server_list_popup_disconnect:
+                    return false;
+            }
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+        }
+
+        @Override
+        protected ListAdapter getRealAdapter() {
+            return mListView.getAdapter();
+        }
+
+        @Override
+        protected SparseBooleanArray getCheckedItemPositions() {
+            return mListView.getCheckedItemPositions();
+        }
+    };
 }
