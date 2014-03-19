@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 
 import android.app.Activity;
@@ -19,14 +20,14 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     private IgnoreListFragment mIgnoreListFragment;
 
-    private Callbacks mCallbacks;
+    private Callback mCallback;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
         try {
-            mCallbacks = (Callbacks) activity;
+            mCallback = (Callback) activity;
         } catch (final ClassCastException ex) {
             ex.printStackTrace();
         }
@@ -77,33 +78,23 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public String getNick() {
-        return getServer().getUser().getNick();
-    }
-
-    @Override
     public void onRemoveCurrentFragment() {
-        mCallbacks.onRemoveCurrentFragment();
-    }
-
-    @Override
-    public boolean isConnectedToServer() {
-        return mCallbacks.isConnectedToServer();
+        mCallback.onRemoveCurrentFragment();
     }
 
     @Override
     public Server getServer() {
-        return mCallbacks.getServer();
+        return mCallback.getServer();
     }
 
     @Override
-    public void closeSlidingMenus() {
-
+    public void closeDrawer() {
+        mCallback.closeDrawer();
     }
 
     @Override
     public void disconnectFromServer() {
-        mCallbacks.disconnectFromServer();
+        mCallback.disconnectFromServer();
     }
 
     @Override
@@ -114,21 +105,22 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         transaction.replace(R.id.card_server_content, mIgnoreListFragment, "Ignore").commit();
     }
 
-    public void onDrawerOpened() {
+    public void onConnectionStatusChanged(final ConnectionStatus status) {
+        mActionFragment.onConnectionStatusChanged(status);
     }
 
     public void onDrawerClosed() {
         mIgnoreListFragment.mListener.finish();
     }
 
-    public interface Callbacks {
+    public interface Callback {
 
         public void onRemoveCurrentFragment();
-
-        public boolean isConnectedToServer();
 
         public Server getServer();
 
         public void disconnectFromServer();
+
+        public void closeDrawer();
     }
 }

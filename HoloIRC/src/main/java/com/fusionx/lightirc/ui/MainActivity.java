@@ -16,38 +16,40 @@ import com.squareup.otto.Subscribe;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 
 import static butterknife.ButterKnife.findById;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
-        ActionsPagerFragment.Callbacks {
+        ActionsPagerFragment.Callback {
 
     // Constants
     public static final int SETTINGS_ACTIVITY = 0;
 
     // Fields
+    // IRC
     private Server mServer;
 
+    // Fragments
     private IRCFragment mCurrentFragment;
-
-    private DrawerLayout mDrawerLayout;
-
-    private View mRightDrawer;
-
-    private SlidingPaneLayout mSlidingPane;
 
     private ActionsPagerFragment mActionsFragment;
 
     private ServerListFragment mServerListFragment;
+
+    // Views
+    private SlidingPaneLayout mSlidingPane;
+
+    private DrawerLayout mDrawerLayout;
+
+    private View mRightDrawer;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -221,8 +223,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     private void onChangeCurrentFragment(final Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame,
-                fragment).commit();
+        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.replace(R.id.content_frame, fragment).commit();
+
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
     }
 
@@ -247,12 +251,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public boolean isConnectedToServer() {
-        // TODO
-        return false;
-    }
-
-    @Override
     public Server getServer() {
         return mServer;
     }
@@ -260,6 +258,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void disconnectFromServer() {
         // TODO
+    }
+
+    @Override
+    public void closeDrawer() {
+        mDrawerLayout.closeDrawers();
     }
 
     public void setActionBarTitle(final String title) {
@@ -286,13 +289,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onPanelOpened(final View view) {
         supportInvalidateOptionsMenu();
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setTitle(R.string.app_name);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
     @Override
     public void onPanelClosed(final View view) {
         supportInvalidateOptionsMenu();
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -302,12 +306,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onDrawerSlide(final View drawerView, final float slideOffset) {
-
     }
 
     @Override
     public void onDrawerOpened(final View drawerView) {
-        mActionsFragment.onDrawerOpened();
+
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 
 import android.app.Activity;
@@ -41,9 +42,11 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
+    private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
+
     private Callbacks mCallbacks;
 
-    private FragmentType mFragmentType;
+    private FragmentType mFragmentType = FragmentType.SERVER;
 
     private StickyListHeadersListView mListView;
 
@@ -76,6 +79,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mAdapter = new ActionsAdapter(getActivity());
         mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
+
         if (mFragmentType != null) {
             mAdapter.setFragmentType(mFragmentType);
             mFragmentType = null;
@@ -102,12 +106,12 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 mCallbacks.onRemoveCurrentFragment();
                 break;
         }
-        mCallbacks.closeSlidingMenus();
+        mCallbacks.closeDrawer();
     }
 
     private void showNickDialog() {
         final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
-                mCallbacks.getNick()) {
+                mCallbacks.getServer().getUser().getNick()) {
             @Override
             public void onOkClicked(final String input) {
                 mCallbacks.getServer().getServerCallBus().sendNickChange(input);
@@ -121,29 +125,18 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         builder.show();
     }
 
-    public void onOpen() {
-        if (mCallbacks.isConnectedToServer() != mAdapter.isConnected()) {
-            mAdapter.setConnected(mCallbacks.isConnectedToServer());
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    public void onConnectionStatusChange(final boolean isConnected) {
-        mAdapter.setConnected(isConnected);
+    public void onConnectionStatusChanged(ConnectionStatus status) {
+        mStatus = status;
         mAdapter.notifyDataSetChanged();
     }
 
     public interface Callbacks {
 
-        public String getNick();
-
         public void onRemoveCurrentFragment();
-
-        public boolean isConnectedToServer();
 
         public Server getServer();
 
-        public void closeSlidingMenus();
+        public void closeDrawer();
 
         public void disconnectFromServer();
 

@@ -76,7 +76,8 @@ public class MiscUtils {
         return null;
     }
 
-    public static String getStatusString(final Context context, final ConnectionStatus connectionStatus) {
+    public static String getStatusString(final Context context,
+            final ConnectionStatus connectionStatus) {
         switch (connectionStatus) {
             case CONNECTED:
                 return context.getString(R.string.status_connected);
