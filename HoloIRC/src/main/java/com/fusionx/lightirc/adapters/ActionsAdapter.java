@@ -3,6 +3,7 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.ConnectionStatus;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -27,7 +28,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     private final String[] mUserArray;
 
-    private boolean mConnected = false;
+    private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
     private FragmentType mFragmentType = FragmentType.SERVER;
 
@@ -61,7 +62,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             UIUtils.setRobotoLight(getContext(), row);
         }
         if (position == 2) {
-            row.setText(mConnected ? "Disconnect" : "Close");
+            row.setText(isConnected() ? "Disconnect" : "Close");
         } else {
             row.setText(getItem(position));
         }
@@ -70,7 +71,6 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             row.setTextColor(Color.GRAY);
         } else {
             row.setTextColor(getContext().getResources().getColor(android.R.color.black));
-            //row.setTextColor(UIUtils.getThemedTextColor(getContext()));
         }
 
         return row;
@@ -119,14 +119,14 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public boolean isEnabled(int position) {
-        return !((position == 0) || (position == 1)) || mConnected;
+        return !((position == 0) || (position == 1)) || isConnected();
     }
 
     public boolean isConnected() {
-        return mConnected;
+        return mStatus == ConnectionStatus.CONNECTED;
     }
 
-    public void setConnected(boolean connected) {
-        mConnected = connected;
+    public void setConnected(ConnectionStatus connected) {
+        mStatus = connected;
     }
 }

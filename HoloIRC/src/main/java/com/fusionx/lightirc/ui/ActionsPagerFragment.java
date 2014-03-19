@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 
@@ -110,7 +111,11 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public void onDrawerClosed() {
-        mIgnoreListFragment.mListener.finish();
+        mIgnoreListFragment.getListener().finish();
+    }
+
+    public void onFragmentTypeChanged(final FragmentType type) {
+        mActionFragment.onFragmentTypeChanged(type);
     }
 
     public interface Callback {

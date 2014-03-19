@@ -162,8 +162,12 @@ public class BuilderDatabaseSource {
         return values;
     }
 
-    public void removeServer(ContentValues values) {
+    public void removeServer(final ContentValues values) {
         final int id = values.getAsInteger(ServerTable._ID);
+        removeServer(id);
+    }
+
+    public void removeServer(final int id) {
         mDatabase.delete(ServerTable.TABLE_NAME, ServerTable._ID + "=" + id, null);
     }
 }

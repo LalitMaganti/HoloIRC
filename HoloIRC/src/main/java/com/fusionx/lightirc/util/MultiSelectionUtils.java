@@ -109,7 +109,7 @@ public class MultiSelectionUtils {
             if (savedInstanceState != null) {
                 long[] checkedIds = savedInstanceState.getLongArray(getStateKey());
                 if (checkedIds != null && checkedIds.length > 0) {
-                    mTempIdsToCheckOnRestore = new HashSet<Long>();
+                    mTempIdsToCheckOnRestore = new HashSet<>();
                     for (long id : checkedIds) {
                         mTempIdsToCheckOnRestore.add(id);
                     }

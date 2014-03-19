@@ -33,7 +33,7 @@ import java.util.TreeSet;
 
 public class IgnoreListFragment extends ListFragment implements OnDismissCallback {
 
-    public MultiChoiceFragmentListener<String> mListener = new
+    private final MultiChoiceFragmentListener<String> mListener = new
             MultiChoiceFragmentListener<String>() {
                 @Override
                 protected void attachSelectionController() {
@@ -135,26 +135,26 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         getListAdapter().setAbsListView(getListView());
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
-        mListener.onViewCreated(view, savedInstanceState);
-        mListener.startActionMode();
+        getListener().onViewCreated(view, savedInstanceState);
+        getListener().startActionMode();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mListener.onDestroyView();
+        getListener().onDestroyView();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mListener.onSaveInstanceState(outState);
+        getListener().onSaveInstanceState(outState);
     }
 
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
-        mListener.setMenuVisibility(menuVisible);
+        getListener().setMenuVisibility(menuVisible);
     }
 
     @Override
@@ -171,6 +171,10 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         for (final int position : reverseSortedPositions) {
             getIgnoreAdapter().remove(getIgnoreAdapter().getItem(position));
         }
+    }
+
+    public MultiChoiceFragmentListener<String> getListener() {
+        return mListener;
     }
 
     public interface IgnoreListCallback {

@@ -118,7 +118,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem item = menu.findItem(R.id.open_actions);
-        item.setVisible(!mSlidingPane.isOpen());
+        item.setVisible(!mSlidingPane.isOpen() && mServer != null);
 
         final MenuItem addServer = menu.findItem(R.id.add_server);
         addServer.setVisible(mSlidingPane.isOpen());
@@ -178,15 +178,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 server.getServerEventBus().register(this);
             }
 
-            mCurrentFragment = fragment;
             mServer = server;
-
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(server.getTitle());
             setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
+            mActionsFragment.onFragmentTypeChanged(fragment.getType());
         }
         mSlidingPane.closePane();
+        supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -211,18 +211,21 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 object.getServer().getServerEventBus().register(this);
             }
 
-            mCurrentFragment = fragment;
             mServer = object.getServer();
 
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(object.getId());
             setActionBarSubtitle(object.getServer().getTitle());
+            mActionsFragment.onFragmentTypeChanged(fragment.getType());
         }
         mSlidingPane.closePane();
+        supportInvalidateOptionsMenu();
     }
 
-    private void onChangeCurrentFragment(final Fragment fragment) {
+    private void onChangeCurrentFragment(final IRCFragment fragment) {
+        mCurrentFragment = fragment;
+
         final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.replace(R.id.content_frame, fragment).commit();
@@ -230,8 +233,22 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
     }
 
+    private void onRemoveFragment() {
+        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.remove(mCurrentFragment).commit();
+
+        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
+        setTitle(getString(R.string.app_name));
+        setActionBarSubtitle(null);
+        mCurrentFragment = null;
+    }
+
     @Override
     public void onServerDisconnected(final Server server) {
+        closeDrawer();
+        supportInvalidateOptionsMenu();
+        onRemoveFragment();
     }
 
     private boolean shouldReplaceFragment(final Server server) {
@@ -257,7 +274,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void disconnectFromServer() {
-        // TODO
+        mServerListFragment.disconnectFromServer(mServer);
     }
 
     @Override
@@ -276,8 +293,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     // Subscribe events
     @Subscribe
     public void onStatusChanged(final StatusChangeEvent event) {
-        if (mCurrentFragment.getType() == FragmentType.SERVER) {
+        // Null happens when the disconnect handler is called first & the fragment has already been
+        // removed by the disconnect handler
+        if (mCurrentFragment != null && mCurrentFragment.getType() == FragmentType.SERVER) {
             setActionBarSubtitle(MiscUtils.getStatusString(this, mServer.getStatus()));
+            mActionsFragment.onConnectionStatusChanged(mServer.getStatus());
         }
     }
 
@@ -289,7 +309,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onPanelOpened(final View view) {
         supportInvalidateOptionsMenu();
-        getSupportActionBar().setTitle(R.string.app_name);
+        // TODO - write the opposing code in onPanelClosed so this is done
+        //getSupportActionBar().setTitle(R.string.app_name);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
     }
 
@@ -310,7 +331,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onDrawerOpened(final View drawerView) {
-
     }
 
     @Override
@@ -320,6 +340,5 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onDrawerStateChanged(final int newState) {
-
     }
 }

@@ -22,8 +22,6 @@ import java.util.List;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
-    private final Callback mCallback;
-
     private final LayoutInflater mInflater;
 
     private final Context mContext;
@@ -33,12 +31,11 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     private ExpandableListView mListView;
 
     public ExpandableServerListAdapter(final Context context, final List<WrappedServerListItem>
-            builders, final ExpandableListView listView, final Callback callback) {
+            builders, final ExpandableListView listView) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
         mServerListItems = builders;
         mListView = listView;
-        mCallback = callback;
     }
 
     @Override
@@ -134,21 +131,11 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
             expandButton.setOnClickListener(new ExpandListener(groupPos));
         }
-
-        final ImageView overflow = (ImageView) convertView.findViewById(R.id.overflow_menu);
-        overflow.setOnClickListener(new OverflowListener(groupPos));
-        overflow.setTag(listItem);
-
         return convertView;
     }
 
     public void setListView(ExpandableListView listView) {
         mListView = listView;
-    }
-
-    public interface Callback {
-
-        public void onEditServer(final WrappedServerListItem builder);
     }
 
     public final class ExpandListener implements View.OnClickListener {
@@ -178,52 +165,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             imageView.setImageDrawable(mContext.getResources().getDrawable(typedvalueattr
                     .resourceId));
             v.setTag(!collapsed);
-        }
-    }
-
-    public final class OverflowListener implements View.OnClickListener,
-            PopupMenu.OnMenuItemClickListener {
-
-        private final int mGroupPos;
-
-        private OverflowListener(final int group) {
-            mGroupPos = group;
-        }
-
-        @Override
-        public boolean onMenuItemClick(final MenuItem menuItem) {
-            switch (menuItem.getItemId()) {
-                case R.id.activity_server_list_popup_edit:
-                    mCallback.onEditServer(mServerListItems.get(mGroupPos));
-                    break;
-                case R.id.activity_server_list_popup_disconnect:
-                    //mCallback.disconnectFromServer(this);
-                    break;
-                case R.id.activity_server_list_popup_delete:
-                    //mCallback.deleteServer(this);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
-        @Override
-        public void onClick(final View v) {
-            final WrappedServerListItem listItem = (WrappedServerListItem) v.getTag();
-
-            final PopupMenu popup = new PopupMenu(mContext, v);
-            popup.inflate(R.menu.activity_server_list_popup);
-
-            if (listItem.getServer() == null) {
-                popup.getMenu().getItem(0).setEnabled(false);
-            } else {
-                popup.getMenu().getItem(1).setEnabled(false);
-                popup.getMenu().getItem(2).setEnabled(false);
-            }
-
-            popup.setOnMenuItemClickListener(this);
-            popup.show();
         }
     }
 }

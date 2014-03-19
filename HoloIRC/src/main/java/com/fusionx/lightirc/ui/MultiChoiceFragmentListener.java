@@ -15,17 +15,21 @@ import java.util.List;
 public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
         .MultiChoiceModeListener {
 
-    MultiSelectionUtils.Controller mMultiSelectionController;
+    protected MultiSelectionUtils.Controller mMultiSelectionController;
 
     private View mListView;
+
+    public MultiSelectionUtils.Controller getMultiSelectionController() {
+        return mMultiSelectionController;
+    }
 
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mListView = view.findViewById(android.R.id.list);
 
         attachSelectionController();
 
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.tryRestoreInstanceState(savedInstanceState);
+        if (getMultiSelectionController() != null) {
+            getMultiSelectionController().tryRestoreInstanceState(savedInstanceState);
         } else {
             throw new IllegalArgumentException();
         }
@@ -71,33 +75,33 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
     }
 
     public void finish() {
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.finish();
+        if (getMultiSelectionController() != null) {
+            getMultiSelectionController().finish();
             mMultiSelectionController = null;
         }
     }
 
     public void onSaveInstanceState(Bundle outState) {
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.saveInstanceState(outState);
+        if (getMultiSelectionController() != null) {
+            getMultiSelectionController().saveInstanceState(outState);
         }
     }
 
     public void setMenuVisibility(boolean menuVisible) {
-        if (mMultiSelectionController == null) {
+        if (getMultiSelectionController() == null) {
             return;
         }
         // Hide the action mode when the fragment becomes invisible
         if (!menuVisible) {
             Bundle bundle = new Bundle();
-            if (mMultiSelectionController.saveInstanceState(bundle)) {
-                mMultiSelectionController.finish();
+            if (getMultiSelectionController().saveInstanceState(bundle)) {
+                getMultiSelectionController().finish();
             }
         }
     }
 
     public void startActionMode() {
-        mMultiSelectionController.startActionMode();
+        getMultiSelectionController().startActionMode();
     }
 
     @Override

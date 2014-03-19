@@ -42,11 +42,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
-    private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
-
     private Callbacks mCallbacks;
-
-    private FragmentType mFragmentType = FragmentType.SERVER;
 
     private StickyListHeadersListView mListView;
 
@@ -79,11 +75,6 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mAdapter = new ActionsAdapter(getActivity());
         mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
-
-        if (mFragmentType != null) {
-            mAdapter.setFragmentType(mFragmentType);
-            mFragmentType = null;
-        }
     }
 
     @Override
@@ -126,8 +117,12 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     public void onConnectionStatusChanged(ConnectionStatus status) {
-        mStatus = status;
+        mAdapter.setConnected(status);
         mAdapter.notifyDataSetChanged();
+    }
+
+    public void onFragmentTypeChanged(FragmentType type) {
+        mAdapter.setFragmentType(type);
     }
 
     public interface Callbacks {

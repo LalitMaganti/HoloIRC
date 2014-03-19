@@ -40,6 +40,10 @@ public class NewIRCService extends Service {
         return mBinder;
     }
 
+    public void requestDisconnectionFromServer(Server server) {
+        mConnectionManager.onDisconnectionRequested(server.getTitle());
+    }
+
     // Binder which returns this service
     public class NewIRCBinder extends Binder {
 

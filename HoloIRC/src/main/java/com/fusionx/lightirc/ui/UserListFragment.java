@@ -251,8 +251,8 @@ public class UserListFragment extends Fragment {
 
         getListView().setAdapter(null);
 
-        if (mMultiChoiceFragmentListener.mMultiSelectionController != null) {
-            mMultiChoiceFragmentListener.mMultiSelectionController.finish();
+        if (mMultiChoiceFragmentListener.getMultiSelectionController() != null) {
+            mMultiChoiceFragmentListener.getMultiSelectionController().finish();
         }
     }
 
@@ -272,8 +272,8 @@ public class UserListFragment extends Fragment {
             worldUsers.addAll(userList);
             getListView().setAdapter(mAdapter);
 
-            if (mMultiChoiceFragmentListener.mMultiSelectionController != null) {
-                mMultiChoiceFragmentListener.mMultiSelectionController.finish();
+            if (mMultiChoiceFragmentListener.getMultiSelectionController() != null) {
+                mMultiChoiceFragmentListener.getMultiSelectionController().finish();
             }
         }
     }
