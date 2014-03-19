@@ -96,6 +96,10 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
         }
     }
 
+    public void startActionMode() {
+        mMultiSelectionController.startActionMode();
+    }
+
     @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         return true;

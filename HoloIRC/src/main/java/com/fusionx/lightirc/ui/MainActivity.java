@@ -14,7 +14,6 @@ import com.fusionx.relay.interfaces.SubServerObject;
 import com.squareup.otto.Subscribe;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -23,12 +22,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import static butterknife.ButterKnife.findById;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
-        IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener {
+        IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
+        ActionsPagerFragment.Callbacks {
 
     // Constants
     public static final int SETTINGS_ACTIVITY = 0;
@@ -40,11 +41,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private DrawerLayout mDrawerLayout;
 
-    private RelativeLayout mRightDrawer;
+    private View mRightDrawer;
 
     private SlidingPaneLayout mSlidingPane;
 
-    private ActionsFragment mActionsFragment;
+    private ActionsPagerFragment mActionsFragment;
 
     private ServerListFragment mServerListFragment;
 
@@ -64,6 +65,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+        mDrawerLayout.setDrawerListener(this);
 
         mRightDrawer = findById(this, R.id.right_drawer);
 
@@ -74,13 +76,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getSupportFragmentManager().beginTransaction().replace(R.id.sliding_list_frame,
                     mServerListFragment).commit();
 
-            mActionsFragment = new ActionsFragment();
+            mActionsFragment = new ActionsPagerFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.right_drawer,
                     mActionsFragment).commit();
         } else {
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
-            mActionsFragment = (ActionsFragment) getSupportFragmentManager().findFragmentById(R
+            mActionsFragment = (ActionsPagerFragment) getSupportFragmentManager().findFragmentById(R
                     .id.right_drawer);
 
             mServer = mServerListFragment.onActivityRestored();
@@ -240,8 +242,24 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    public void onRemoveCurrentFragment() {
+        // TODO
+    }
+
+    @Override
+    public boolean isConnectedToServer() {
+        // TODO
+        return false;
+    }
+
+    @Override
     public Server getServer() {
         return mServer;
+    }
+
+    @Override
+    public void disconnectFromServer() {
+        // TODO
     }
 
     public void setActionBarTitle(final String title) {
@@ -278,5 +296,25 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onPanelSlide(final View view, final float v) {
         // Empty
+    }
+
+    @Override
+    public void onDrawerSlide(final View drawerView, final float slideOffset) {
+
+    }
+
+    @Override
+    public void onDrawerOpened(final View drawerView) {
+        mActionsFragment.onDrawerOpened();
+    }
+
+    @Override
+    public void onDrawerClosed(final View drawerView) {
+        mActionsFragment.onDrawerClosed();
+    }
+
+    @Override
+    public void onDrawerStateChanged(final int newState) {
+
     }
 }

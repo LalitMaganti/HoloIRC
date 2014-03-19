@@ -97,11 +97,10 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 mCallbacks.disconnectFromServer();
                 return;
             case 3:
-                ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
-                fragment.switchToIgnoreFragment();
+                mCallbacks.switchToIgnoreFragment();
                 return;
             case 4:
-                mCallbacks.removeCurrentFragment();
+                mCallbacks.onRemoveCurrentFragment();
                 break;
         }
         mCallbacks.closeSlidingMenus();
@@ -135,19 +134,11 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mAdapter.notifyDataSetChanged();
     }
 
-    public void onTabChanged(final FragmentType selectedType) {
-        if (mAdapter == null) {
-            mFragmentType = selectedType;
-        } else {
-            mAdapter.setFragmentType(selectedType);
-        }
-    }
-
     public interface Callbacks {
 
         public String getNick();
 
-        public void removeCurrentFragment();
+        public void onRemoveCurrentFragment();
 
         public boolean isConnectedToServer();
 
@@ -156,13 +147,14 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         public void closeSlidingMenus();
 
         public void disconnectFromServer();
+
+        public void switchToIgnoreFragment();
     }
 
     public class ChannelDialogBuilder extends DialogBuilder {
 
         public ChannelDialogBuilder() {
-            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
-                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
+            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name), getActivity().getString(R.string.prompt_dialog_including_starting), "");
         }
 
         @Override

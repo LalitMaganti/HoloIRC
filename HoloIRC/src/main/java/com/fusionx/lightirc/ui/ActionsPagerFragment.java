@@ -1,34 +1,33 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.ActionPagerAdapter;
-import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Server;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         .IgnoreListCallback, ActionsFragment.Callbacks {
 
-    private ViewPager mActionViewPager;
+    private ActionsFragment mActionFragment;
 
-    private ActionPagerAdapter mActionsPagerAdapter;
+    private IgnoreListFragment mIgnoreListFragment;
 
     private Callbacks mCallbacks;
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+
         try {
             mCallbacks = (Callbacks) activity;
-        } catch (ClassCastException ex) {
+        } catch (final ClassCastException ex) {
             ex.printStackTrace();
         }
     }
@@ -38,61 +37,53 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
-
-        mActionsPagerAdapter = new ActionPagerAdapter(getChildFragmentManager());
     }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.non_scrollable_view_pager, container);
-
-        mActionViewPager = (ViewPager) view;
-        mActionViewPager.setAdapter(mActionsPagerAdapter);
-
-        return view;
+        final FrameLayout layout = new FrameLayout(getActivity());
+        layout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        layout.setId(R.id.card_server_content);
+        return layout;
     }
 
-    private ActionsFragment getActionFragment() {
-        return (ActionsFragment) mActionsPagerAdapter.getItem(0);
-    }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-    private IgnoreListFragment getIgnoreFragment() {
-        return (IgnoreListFragment) mActionsPagerAdapter.getItem(1);
-    }
-
-    public void switchToIgnoreFragment() {
-        ((ActionBarActivity) getActivity()).startSupportActionMode(getIgnoreFragment()
-                .mListener.mMultiSelectionController);
-        mActionViewPager.setCurrentItem(1, true);
+        if (savedInstanceState == null) {
+            mActionFragment = new ActionsFragment();
+            mIgnoreListFragment = new IgnoreListFragment();
+            final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.add(R.id.card_server_content, mActionFragment, "Actions").commit();
+        } else {
+            mActionFragment = (ActionsFragment) getChildFragmentManager().findFragmentByTag(
+                    "Actions");
+            mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager().findFragmentByTag(
+                    "Ignore");
+        }
     }
 
     @Override
     public void switchToIRCActionFragment() {
-        mActionViewPager.setCurrentItem(0, true);
+        getChildFragmentManager().popBackStackImmediate();
     }
 
     @Override
     public String getServerTitle() {
-        return mCallbacks.getServerTitle();
-    }
-
-    public void updateConnectionStatus(final boolean isConnected) {
-        getActionFragment().onConnectionStatusChange(isConnected);
-    }
-
-    public void onPageChanged(FragmentType type) {
-        getActionFragment().onTabChanged(type);
+        return getServer().getTitle();
     }
 
     @Override
     public String getNick() {
-        return mCallbacks.getNick();
+        return getServer().getUser().getNick();
     }
 
     @Override
-    public void removeCurrentFragment() {
-        mCallbacks.removeCurrentFragment();
+    public void onRemoveCurrentFragment() {
+        mCallbacks.onRemoveCurrentFragment();
     }
 
     @Override
@@ -107,7 +98,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
     @Override
     public void closeSlidingMenus() {
-        mCallbacks.closeSlidingMenus();
+
     }
 
     @Override
@@ -115,19 +106,28 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
         mCallbacks.disconnectFromServer();
     }
 
+    @Override
+    public void switchToIgnoreFragment() {
+        final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        transaction.addToBackStack(null);
+        transaction.replace(R.id.card_server_content, mIgnoreListFragment, "Ignore").commit();
+    }
+
+    public void onDrawerOpened() {
+    }
+
+    public void onDrawerClosed() {
+        mIgnoreListFragment.mListener.mMultiSelectionController.finish();
+    }
+
     public interface Callbacks {
 
-        public String getServerTitle();
-
-        public String getNick();
-
-        public void removeCurrentFragment();
+        public void onRemoveCurrentFragment();
 
         public boolean isConnectedToServer();
 
         public Server getServer();
-
-        public void closeSlidingMenus();
 
         public void disconnectFromServer();
     }

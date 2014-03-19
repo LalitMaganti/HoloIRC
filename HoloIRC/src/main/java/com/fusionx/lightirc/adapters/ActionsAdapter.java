@@ -58,8 +58,8 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         TextView row = (TextView) convertView;
         if (row == null) {
             row = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
+            UIUtils.setRobotoLight(getContext(), row);
         }
-        UIUtils.setRobotoLight(getContext(), row);
         if (position == 2) {
             row.setText(mConnected ? "Disconnect" : "Close");
         } else {
@@ -69,7 +69,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
         } else {
-            row.setTextColor(getContext().getResources().getColor(android.R.color.white));
+            row.setTextColor(getContext().getResources().getColor(android.R.color.black));
             //row.setTextColor(UIUtils.getThemedTextColor(getContext()));
         }
 

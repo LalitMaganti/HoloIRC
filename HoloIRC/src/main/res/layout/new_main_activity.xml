@@ -6,7 +6,7 @@
         android:layout_height="match_parent"
         android:id="@+id/sliding_pane_layout">
 
-    <RelativeLayout
+    <FrameLayout
             android:id="@+id/sliding_list_frame"
             android:layout_width="240dp"
             android:layout_height="match_parent"/>
@@ -32,12 +32,13 @@
                     android:textAppearance="@android:style/TextAppearance.Large"/>
         </RelativeLayout>
 
-        <RelativeLayout
+        <FrameLayout
                 android:id="@+id/right_drawer"
                 android:layout_width="250dip"
                 android:layout_height="match_parent"
                 android:layout_gravity="end"
-                android:divider="@android:color/transparent"/>
+                android:divider="@android:color/transparent"
+                android:background="@android:color/white"/>
 
     </android.support.v4.widget.DrawerLayout>
 </android.support.v4.widget.SlidingPaneLayout>
