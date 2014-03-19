@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import android.os.Bundle;
@@ -8,13 +7,10 @@ import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.View;
-import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
         .MultiChoiceModeListener {
@@ -71,6 +67,10 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
     }
 
     public void onDestroyView() {
+        finish();
+    }
+
+    public void finish() {
         if (mMultiSelectionController != null) {
             mMultiSelectionController.finish();
             mMultiSelectionController = null;

@@ -118,7 +118,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public void onDrawerClosed() {
-        mIgnoreListFragment.mListener.mMultiSelectionController.finish();
+        mIgnoreListFragment.mListener.finish();
     }
 
     public interface Callbacks {

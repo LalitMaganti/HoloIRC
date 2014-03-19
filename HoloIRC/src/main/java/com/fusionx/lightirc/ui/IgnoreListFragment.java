@@ -15,7 +15,6 @@ import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.view.ActionMode;
@@ -31,8 +30,6 @@ import android.widget.ListAdapter;
 
 import java.util.Set;
 import java.util.TreeSet;
-
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class IgnoreListFragment extends ListFragment implements OnDismissCallback {
 
@@ -95,7 +92,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
 
                 @Override
                 protected SparseBooleanArray getCheckedItemPositions() {
-                    return null;
+                    return getListView().getCheckedItemPositions();
                 }
 
                 @Override
@@ -104,7 +101,8 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
                     final int checkedItemCount = getCheckedPositions().size();
 
                     if (checkedItemCount != 0) {
-                        mode.setTitle(checkedItemCount + getActivity().getString(R.string.items_checked));
+                        mode.setTitle(
+                                checkedItemCount + getActivity().getString(R.string.items_checked));
                     } else {
                         mode.setTitle(getActivity().getString(R.string.ignore_list));
                     }

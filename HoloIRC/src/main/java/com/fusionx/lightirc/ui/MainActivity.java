@@ -286,11 +286,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onPanelOpened(final View view) {
         supportInvalidateOptionsMenu();
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
     }
 
     @Override
     public void onPanelClosed(final View view) {
         supportInvalidateOptionsMenu();
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
