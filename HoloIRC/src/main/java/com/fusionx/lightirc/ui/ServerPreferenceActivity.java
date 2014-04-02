@@ -56,6 +56,8 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private ContentValues mContentValues;
 
+    private boolean mNewServer;
+
     private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
         if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
             final PreferenceGroup pGroup = (PreferenceGroup) p;
@@ -74,16 +76,21 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         setTheme(UIUtils.getThemeInt());
         super.onCreate(savedInstanceState);
 
-        boolean newServer = getIntent().getBooleanExtra(NEW_SERVER, false);
-        mCanSaveChanges = !newServer;
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
+                "temp.xml");
+        if (folder.exists()) {
+            folder.delete();
+        }
+
+        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
+        mCanSaveChanges = !mNewServer;
 
         mSource = new BuilderDatabaseSource(this);
         mSource.open();
 
         final ServerConfiguration.Builder builder;
-        if (newServer) {
+        if (mNewServer) {
             builder = SharedPreferencesUtils.getDefaultNewServer(this);
-            mSource.addServer(builder);
         } else {
             builder = getIntent().getParcelableExtra(SERVER);
         }
@@ -103,26 +110,41 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mCanSaveChanges) {
+            if (mNewServer) {
+                mSource.addServer(mContentValues);
+            } else {
+                mSource.updateServer(mContentValues);
+            }
+            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // In onPause we added the new server if it was new so don't add it again
+        if (mCanSaveChanges) {
+            mNewServer = false;
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
-                "temp.xml");
-        if (folder.exists()) {
-            folder.delete();
-        }
-
-        if (!mCanSaveChanges) {
-            mSource.removeServer(mContentValues);
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            mSource.updateServer(mContentValues);
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-        }
-
         mSource.close();
+
+        setResult(RESULT_OK, new Intent());
+        finish();
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.fusionx.lightirc.communication.NewIRCService;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.model.WrappedServerListItem;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
@@ -26,16 +25,15 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
-import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ExpandableListView;
-import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,9 +45,11 @@ import static butterknife.ButterKnife.findById;
 
 public class ServerListFragment extends Fragment implements LoaderManager
         .LoaderCallbacks<NewIRCService>, ExpandableListView.OnGroupClickListener,
-        ExpandableListView.OnChildClickListener {
+        ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
+
+    private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
     private int mLastGroup = -1;
 
@@ -60,6 +60,8 @@ public class ServerListFragment extends Fragment implements LoaderManager
     private ExpandableListView mListView;
 
     private ExpandableServerListAdapter mListAdapter;
+
+    private boolean mActionModeStarted;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -91,6 +93,7 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
         mListView = findById(view, R.id.server_list);
         mListView.setGroupIndicator(null);
+        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
@@ -147,25 +150,7 @@ public class ServerListFragment extends Fragment implements LoaderManager
         };
         asyncTask.execute();
 
-        mListener.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mListener.onDestroyView();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mListener.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void setMenuVisibility(boolean menuVisible) {
-        super.setMenuVisibility(menuVisible);
-        mListener.setMenuVisibility(menuVisible);
+        mListView.setMultiChoiceModeListener(this);
     }
 
     @Override
@@ -205,11 +190,11 @@ public class ServerListFragment extends Fragment implements LoaderManager
     @Override
     public boolean onGroupClick(final ExpandableListView parent, final View v,
             final int groupPosition, final long id) {
-        if (mListener.getMultiSelectionController().isActionModeStarted()) {
-            mListener.getMultiSelectionController().onItemClick(parent, v,
-                    mListView.getFlatListPosition(ExpandableListView.getPackedPositionForGroup(
-                            groupPosition)), id
-            );
+        if (mActionModeStarted && mSelectionType == ExpandableListView
+                .PACKED_POSITION_TYPE_GROUP) {
+            int flatPosition = parent.getFlatListPosition(ExpandableListView
+                    .getPackedPositionForGroup(groupPosition));
+            parent.setItemChecked(flatPosition, !parent.isItemChecked(flatPosition));
             return true;
         }
 
@@ -227,10 +212,11 @@ public class ServerListFragment extends Fragment implements LoaderManager
     @Override
     public boolean onChildClick(final ExpandableListView parent, final View v,
             final int groupPosition, final int childPosition, final long id) {
-        if (mListener.getMultiSelectionController().isActionModeStarted()) {
-            mListener.getMultiSelectionController()
-                    .onItemClick(parent, v, mListView.getFlatListPosition(ExpandableListView
-                            .getPackedPositionForChild(groupPosition, childPosition)), id);
+        if (mActionModeStarted && mSelectionType == ExpandableListView
+                .PACKED_POSITION_TYPE_CHILD) {
+            int flatPosition = parent.getFlatListPosition(ExpandableListView
+                    .getPackedPositionForChild(groupPosition, childPosition));
+            parent.setItemChecked(flatPosition, !parent.isItemChecked(flatPosition));
             return true;
         }
 
@@ -256,6 +242,79 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
     public void disconnectFromServer(Server server) {
         mService.requestDisconnectionFromServer(server);
+    }
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        final int count = mListView.getCheckedItemCount();
+        final Menu menu = mode.getMenu();
+        final boolean singleItemChecked = count == 1;
+        final boolean connected = singleItemChecked && getFirstCheckedItem().isConnected();
+
+        if (checked && singleItemChecked) {
+            mSelectionType = ExpandableListView.getPackedPositionType(mListView
+                    .getExpandableListPosition(position));
+        }
+
+        menu.findItem(R.id.activity_server_list_popup_disconnect)
+                .setVisible(singleItemChecked && connected);
+        menu.findItem(R.id.activity_server_list_popup_edit).setVisible(singleItemChecked &&
+                !connected);
+
+        boolean deleteEnabled = !connected;
+        for (int i = 1; i < count && deleteEnabled; i++) {
+            final int pos = mListView.getCheckedItemPositions().keyAt(i);
+            final WrappedServerListItem listItem = (WrappedServerListItem) mListView
+                    .getItemAtPosition(pos);
+            deleteEnabled = !listItem.isConnected();
+        }
+        menu.findItem(R.id.activity_server_list_popup_delete).setVisible(deleteEnabled);
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mode.getMenuInflater().inflate(R.menu.activity_server_list_popup, menu);
+        mActionModeStarted = true;
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return true;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        final WrappedServerListItem listItem = getFirstCheckedItem();
+
+        switch (item.getItemId()) {
+            case R.id.activity_server_list_popup_disconnect:
+                mCallback.onServerDisconnected(listItem.getServer());
+                break;
+            case R.id.activity_server_list_popup_delete:
+                // TODO - AsyncTask this
+                final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
+                source.open();
+                source.removeServer(listItem.getBuilder().getId());
+                source.close();
+                refreshServers();
+                break;
+            case R.id.activity_server_list_popup_edit:
+                onEditServer(listItem);
+        }
+
+        mode.finish();
+        return true;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mActionModeStarted = false;
+    }
+
+    private WrappedServerListItem getFirstCheckedItem() {
+        final int position = mListView.getCheckedItemPositions().keyAt(0);
+        return (WrappedServerListItem) mListView.getItemAtPosition(position);
     }
 
     public interface Callback {
@@ -307,72 +366,4 @@ public class ServerListFragment extends Fragment implements LoaderManager
             mServer.getServerEventBus().unregister(this);
         }
     }
-
-    private final MultiChoiceFragmentListener mListener = new MultiChoiceFragmentListener() {
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-                boolean checked) {
-            mode.getMenu().findItem(R.id.activity_server_list_popup_disconnect).setVisible
-                    (mListView.getCheckedItemCount() == 1);
-            mode.getMenu().findItem(R.id.activity_server_list_popup_edit).setVisible
-                    (mListView.getCheckedItemCount() == 1);
-            mode.getMenu().findItem(R.id.activity_server_list_popup_delete).setVisible
-                    (mListView.getCheckedItemCount() == 1);
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-            actionMode.getMenuInflater()
-                    .inflate(R.menu.activity_server_list_popup, menu);
-            return true;
-        }
-
-        @Override
-        protected void attachSelectionController() {
-            mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                    mListView, (ActionBarActivity) getActivity(), mListener, false);
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-            final WrappedServerListItem listItem = (WrappedServerListItem) mListView
-                    .getItemAtPosition(getCheckedItemPositions().keyAt(0));
-            finish();
-            switch (item.getItemId()) {
-                case R.id.activity_server_list_popup_disconnect:
-                    mCallback.onServerDisconnected(listItem.getServer());
-                    break;
-                case R.id.activity_server_list_popup_delete:
-                    // TODO - AsyncTask this
-                    final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
-                    source.open();
-                    source.removeServer(listItem.getBuilder().getId());
-                    source.close();
-                    refreshServers();
-                    break;
-                case R.id.activity_server_list_popup_edit:
-                    onEditServer(listItem);
-            }
-            return true;
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode actionMode) {
-        }
-
-        @Override
-        protected ListAdapter getRealAdapter() {
-            return mListView.getAdapter();
-        }
-
-        @Override
-        protected SparseBooleanArray getCheckedItemPositions() {
-            return mListView.getCheckedItemPositions();
-        }
-    };
 }

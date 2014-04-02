@@ -112,7 +112,12 @@ public class BuilderDatabaseSource {
         mDatabase.update(ServerTable.TABLE_NAME, values, ServerTable._ID + "=" + id, null);
     }
 
-    public void addServer(final ServerConfiguration.Builder builder) {
+    public void addServer(final ContentValues values) {
+        final long id = mDatabase.insert(ServerTable.TABLE_NAME, null, values);
+        values.put(ServerTable._ID, (int) id);
+    }
+
+    public void addServer(ServerConfiguration.Builder builder) {
         final ContentValues values = getContentValuesFromBuilder(builder, false);
         final int id = (int) mDatabase.insert(ServerTable.TABLE_NAME, null, values);
         builder.setId(id);

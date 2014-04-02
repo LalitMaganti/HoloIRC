@@ -31,7 +31,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         ActionsPagerFragment.Callback {
 
     // Constants
-    public static final int SETTINGS_ACTIVITY = 0;
+    public static final int SETTINGS_ACTIVITY = 1;
 
     // Fields
     // IRC
@@ -145,7 +145,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private void addNewServer() {
         final Intent intent = new Intent(this, ServerPreferenceActivity.class);
-
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
         startActivityForResult(intent, SETTINGS_ACTIVITY);
@@ -239,7 +238,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         transaction.remove(mCurrentFragment).commit();
 
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
-        setTitle(getString(R.string.app_name));
+        setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
         mCurrentFragment = null;
     }

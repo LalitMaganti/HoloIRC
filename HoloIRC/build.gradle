@@ -22,7 +22,7 @@ android {
     buildToolsVersion '19.0.3'
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 11
         targetSdkVersion 19
         packageName "com.fusionx.lightirc"
     }

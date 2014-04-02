@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.model;
 
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.interfaces.SubServerObject;
@@ -24,6 +25,10 @@ public class WrappedServerListItem {
             mServerObjects.addAll(server.getUser().getChannels());
             mServerObjects.addAll(server.getUserChannelInterface().getPrivateMessageUsers());
         }
+    }
+
+    public boolean isConnected() {
+        return mServer != null && mServer.getStatus() == ConnectionStatus.CONNECTED;
     }
 
     public String getTitle() {
