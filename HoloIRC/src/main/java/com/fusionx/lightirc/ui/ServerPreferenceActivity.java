@@ -76,12 +76,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         setTheme(UIUtils.getThemeInt());
         super.onCreate(savedInstanceState);
 
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
-                "temp.xml");
-        if (folder.exists()) {
-            folder.delete();
-        }
-
         mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
         mCanSaveChanges = !mNewServer;
 
@@ -102,7 +96,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                     fragment).commit();
         } else {
             getPreferenceManager().setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
-            getPreferenceManager().setSharedPreferencesName("temp");
+            getPreferenceManager().setSharedPreferencesName("tempUselessFile");
 
             addPreferencesFromResource(R.xml.activty_server_settings_prefs);
             setupPreferences(getPreferenceScreen(), this);
@@ -141,6 +135,11 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     protected void onDestroy() {
         super.onDestroy();
 
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
+                "temp.xml");
+        if (folder.exists()) {
+            folder.delete();
+        }
         mSource.close();
 
         setResult(RESULT_OK, new Intent());

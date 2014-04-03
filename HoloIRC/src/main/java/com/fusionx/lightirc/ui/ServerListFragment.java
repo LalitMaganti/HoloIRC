@@ -92,7 +92,6 @@ public class ServerListFragment extends Fragment implements LoaderManager
         setRetainInstance(true);
 
         mListView = findById(view, R.id.server_list);
-        mListView.setGroupIndicator(null);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
@@ -246,10 +245,14 @@ public class ServerListFragment extends Fragment implements LoaderManager
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        if (!checked) {
+            mListView.getCheckedItemPositions().delete(position);
+        }
+
         final int count = mListView.getCheckedItemCount();
         final Menu menu = mode.getMenu();
         final boolean singleItemChecked = count == 1;
-        final boolean connected = singleItemChecked && getFirstCheckedItem().isConnected();
+        final boolean connected = count > 0 && getFirstCheckedItem().isConnected();
 
         if (checked && singleItemChecked) {
             mSelectionType = ExpandableListView.getPackedPositionType(mListView
@@ -313,6 +316,10 @@ public class ServerListFragment extends Fragment implements LoaderManager
     }
 
     private WrappedServerListItem getFirstCheckedItem() {
+        if (mListView.getCheckedItemCount() == 0) {
+            return null;
+        }
+
         final int position = mListView.getCheckedItemPositions().keyAt(0);
         return (WrappedServerListItem) mListView.getItemAtPosition(position);
     }

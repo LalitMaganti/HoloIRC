@@ -207,7 +207,7 @@ public class SharedPreferencesUtils {
 
     public static boolean isExcludedString(final String fileName) {
         return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
-                fileName.equals("showcase_internal.xml");
+                fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
     }
 
     public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
