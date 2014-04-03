@@ -39,6 +39,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
 
     private final SparseArray<AnimationInfo> mAnimators;
 
+    private final OnDismissCallback mCallback;
+
     private long mAnimationStartMillis;
 
     private int mLastAnimatedPosition;
@@ -271,21 +273,6 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
         return new Animator[0];
     }
 
-    private class AnimationInfo {
-
-        public final int position;
-
-        public final Animator animator;
-
-        public AnimationInfo(int position, Animator animator) {
-            this.position = position;
-            this.animator = animator;
-        }
-    }
-
-
-    private final OnDismissCallback mCallback;
-
     /**
      * Animate dismissal of the item at given position.
      */
@@ -401,5 +388,17 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
         });
 
         return animator;
+    }
+
+    private class AnimationInfo {
+
+        public final int position;
+
+        public final Animator animator;
+
+        public AnimationInfo(int position, Animator animator) {
+            this.position = position;
+            this.animator = animator;
+        }
     }
 }

@@ -69,5 +69,5 @@
             android:background="#e2e2e2"
             android:layout_width="fill_parent"
             android:layout_height="1.2dp"
-            android:layout_below="@+id/group_content" />
+            android:layout_below="@+id/group_content"/>
 </RelativeLayout>

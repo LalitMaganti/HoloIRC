@@ -41,13 +41,13 @@ import java.util.Set;
  */
 public class MultiSelectListPreference extends DialogPreference {
 
-    private CharSequence[] mEntries;
-
-    private CharSequence[] mEntryValues;
-
     private final Set<String> mValues = new HashSet<String>();
 
     private final Set<String> mNewValues = new HashSet<String>();
+
+    private CharSequence[] mEntries;
+
+    private CharSequence[] mEntryValues;
 
     private boolean mPreferenceChanged;
 

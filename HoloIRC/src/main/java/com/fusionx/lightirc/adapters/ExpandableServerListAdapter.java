@@ -7,10 +7,8 @@ import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.interfaces.SubServerObject;
 
 import android.content.Context;
-import android.support.v7.widget.PopupMenu;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;

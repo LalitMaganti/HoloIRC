@@ -141,7 +141,8 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public class ChannelDialogBuilder extends DialogBuilder {
 
         public ChannelDialogBuilder() {
-            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name), getActivity().getString(R.string.prompt_dialog_including_starting), "");
+            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
+                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
         }
 
         @Override

@@ -153,6 +153,20 @@ public class NumberPickerPreference extends DialogPreference {
 
     private static class SavedState extends BaseSavedState {
 
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable
+                .Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+
         int minValue;
 
         int maxValue;
@@ -179,20 +193,6 @@ public class NumberPickerPreference extends DialogPreference {
             dest.writeInt(maxValue);
             dest.writeInt(value);
         }
-
-        @SuppressWarnings("unused")
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable
-                .Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 }
 

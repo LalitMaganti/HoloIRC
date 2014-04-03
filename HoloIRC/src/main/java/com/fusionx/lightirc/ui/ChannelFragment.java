@@ -44,7 +44,6 @@ import org.apache.commons.lang3.StringUtils;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -64,17 +63,17 @@ import butterknife.OnClick;
 public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
 
+    private static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
+            ImmutableList.of(NameEvent.class, MentionEvent.class);
+
+    @InjectView(R.id.auto_complete_button)
+    ImageButton mAutoButton;
+
     private Channel mChannel;
 
     private PopupMenu mPopupMenu;
 
     private boolean isPopupShown;
-
-    @InjectView(R.id.auto_complete_button)
-    ImageButton mAutoButton;
-
-    private static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
-            ImmutableList.of(NameEvent.class, MentionEvent.class);
 
     @Override
     protected View createView(final ViewGroup container, final LayoutInflater inflater) {

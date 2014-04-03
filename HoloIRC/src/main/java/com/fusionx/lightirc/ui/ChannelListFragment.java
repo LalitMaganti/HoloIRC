@@ -31,6 +31,8 @@ import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_AUTOJOIN;
 
 public class ChannelListFragment extends ListFragment {
 
+    private BaseCollectionAdapter<String> mAdapter;
+
     private MultiChoiceFragmentListener mListener = new MultiChoiceFragmentListener() {
 
         @Override
@@ -97,8 +99,6 @@ public class ChannelListFragment extends ListFragment {
             }
         }
     };
-
-    private BaseCollectionAdapter<String> mAdapter;
 
     private ServerSettingsCallbacks mCallbacks;
 
