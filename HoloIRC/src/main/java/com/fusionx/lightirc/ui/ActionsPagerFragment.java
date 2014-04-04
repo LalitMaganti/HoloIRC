@@ -112,7 +112,7 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     public void onDrawerClosed() {
-        mIgnoreListFragment.getListener().finish();
+        mIgnoreListFragment.finishActionMode();
     }
 
     public void onFragmentTypeChanged(final FragmentType type) {

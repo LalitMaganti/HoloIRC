@@ -98,6 +98,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
 
+            mConversation = mWorkerFragment.getSavedConversation();
             if (mConversation != null) {
                 mConversation.getServer().getServerEventBus().register(this);
             }
@@ -114,9 +115,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     protected void onPause() {
         super.onPause();
 
-        if (mCurrentFragment != null) {
-            mWorkerFragment.getService().setSavedConversation(mCurrentFragment.getConversation());
+        if (mConversation != null) {
+            mWorkerFragment.getService().setSavedConversation(mConversation);
         }
+        mWorkerFragment.setSavedConversation(mConversation);
     }
 
     @Override
@@ -275,6 +277,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
         mCurrentFragment = null;
+        mConversation = null;
     }
 
     @Override

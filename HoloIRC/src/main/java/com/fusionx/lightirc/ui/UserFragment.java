@@ -68,11 +68,6 @@ public class UserFragment extends IRCFragment<UserEvent> {
         return getAdapterData();
     }
 
-    @Override
-    protected Conversation<UserEvent> getConversation() {
-        return getPrivateMessageUser();
-    }
-
     public PrivateMessageUser getPrivateMessageUser() {
         return getServer().getUserChannelInterface().getPrivateMessageUser(mTitle);
     }

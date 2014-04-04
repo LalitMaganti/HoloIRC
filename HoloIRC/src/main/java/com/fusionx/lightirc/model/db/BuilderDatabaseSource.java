@@ -10,10 +10,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_IGNORE_LIST;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_CHANGEABLE;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_ONE;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_SERV_PASSWORD;
@@ -31,12 +31,12 @@ import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_URL;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.TABLE_NAME;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable._ID;
+import static com.fusionx.lightirc.util.DatabaseUtils.convertStringListToString;
+import static com.fusionx.lightirc.util.DatabaseUtils.convertStringToArray;
 import static com.fusionx.lightirc.util.DatabaseUtils.getIntByName;
 import static com.fusionx.lightirc.util.DatabaseUtils.getStringByName;
 
 public class BuilderDatabaseSource {
-
-    public static String strSeparator = "__,__";
 
     private final ServerDatabase mServerDatabase;
 
@@ -44,21 +44,6 @@ public class BuilderDatabaseSource {
 
     public BuilderDatabaseSource(final Context context) {
         mServerDatabase = new ServerDatabase(context);
-    }
-
-    private static String convertArrayToString(final List<String> list) {
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            builder.append(list.get(i));
-            if (i < list.size() - 1) {
-                builder.append(strSeparator);
-            }
-        }
-        return builder.toString();
-    }
-
-    private static List<String> convertStringToArray(final String str) {
-        return Arrays.asList(str.split(strSeparator));
     }
 
     public void open() throws SQLException {
@@ -70,10 +55,26 @@ public class BuilderDatabaseSource {
         mDatabase = null;
     }
 
+    public void addServer(final ContentValues values) {
+        final long id = mDatabase.insert(TABLE_NAME, null, values);
+        values.put(_ID, (int) id);
+    }
+
+    public void addServer(final ServerConfiguration.Builder builder,
+            final List<String> ignoreList) {
+        final ContentValues values = getContentValuesFromBuilder(builder, false);
+
+        values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
+                convertStringListToString(ignoreList));
+
+        final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
+        builder.setId(id);
+    }
+
     public List<ServerConfiguration.Builder> getAllBuilders() {
         final List<ServerConfiguration.Builder> builders = new ArrayList<>();
         // Select All Query
-        final String selectQuery = "SELECT  * FROM " + TABLE_NAME;
+        final String selectQuery = "SELECT * FROM " + TABLE_NAME;
 
         final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
 
@@ -129,20 +130,23 @@ public class BuilderDatabaseSource {
         return builders;
     }
 
+    public List<String> getIgnoreListByName(final String serverName) {
+        final Cursor cursor = mDatabase.query(TABLE_NAME, new String[]{COLUMN_IGNORE_LIST},
+                String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
+        cursor.moveToFirst();
+
+        return convertStringToArray(getStringByName(cursor, COLUMN_IGNORE_LIST));
+    }
+
     public void updateServer(final ContentValues values) {
         final int id = values.getAsInteger(_ID);
         mDatabase.update(TABLE_NAME, values, _ID + "=" + id, null);
     }
 
-    public void addServer(final ContentValues values) {
-        final long id = mDatabase.insert(TABLE_NAME, null, values);
-        values.put(_ID, (int) id);
-    }
-
-    public void addServer(ServerConfiguration.Builder builder) {
-        final ContentValues values = getContentValuesFromBuilder(builder, false);
-        final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
-        builder.setId(id);
+    public void updateIgnoreList(final String serverName, final List<String> ignoreList) {
+        final ContentValues values = new ContentValues();
+        values.put(COLUMN_IGNORE_LIST, convertStringListToString(ignoreList));
+        mDatabase.update(TABLE_NAME, values, COLUMN_TITLE + "=?", new String[]{serverName});
     }
 
     public ContentValues getContentValuesFromBuilder(final ServerConfiguration.Builder builder,
@@ -173,7 +177,7 @@ public class BuilderDatabaseSource {
 
         // Autojoin channels
         values.put(COLUMN_AUTOJOIN,
-                convertArrayToString(builder.getAutoJoinChannels()));
+                convertStringListToString(builder.getAutoJoinChannels()));
 
         // Server authorisation
         values.put(COLUMN_SERVER_USERNAME, builder.getServerUserName());

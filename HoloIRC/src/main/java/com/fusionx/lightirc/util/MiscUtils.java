@@ -41,27 +41,10 @@ import java.util.Set;
  */
 public class MiscUtils {
 
-    private static Set<String> ignoreList = null;
-
     /**
      * Static utility methods only - can't instantiate this class
      */
     private MiscUtils() {
-    }
-
-    public static Set<String> getIgnoreList(final Context context, final String fileName) {
-        if (ignoreList == null) {
-            final SharedPreferences preferences = context.getSharedPreferences(fileName,
-                    Context.MODE_PRIVATE);
-            ignoreList = preferences
-                    .getStringSet(PreferenceConstants.PREF_IGNORE_LIST, new HashSet<String>());
-        }
-        return ignoreList;
-    }
-
-    public static void onUpdateIgnoreList(final Server server, final Set<String> set) {
-        ignoreList = set;
-        server.setIgnoreList(set);
     }
 
     public static String getAppVersion(final Context context) {

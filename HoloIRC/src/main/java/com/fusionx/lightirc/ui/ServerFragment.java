@@ -67,11 +67,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
-    protected Conversation<ServerEvent> getConversation() {
-        return getServer();
-    }
-
-    @Override
     public FragmentType getType() {
         return FragmentType.SERVER;
     }

@@ -3,6 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -25,6 +26,8 @@ public class WorkerFragment extends Fragment implements LoaderManager
     private IRCService mService;
 
     private Callback mCallback;
+
+    private Conversation mSavedConversation;
 
     @Override
     public void onAttach(Activity activity) {
@@ -105,6 +108,14 @@ public class WorkerFragment extends Fragment implements LoaderManager
 
     public IRCService getService() {
         return mService;
+    }
+
+    public Conversation getSavedConversation() {
+        return mSavedConversation;
+    }
+
+    public void setSavedConversation(Conversation savedConversation) {
+        mSavedConversation = savedConversation;
     }
 
     public interface Callback {

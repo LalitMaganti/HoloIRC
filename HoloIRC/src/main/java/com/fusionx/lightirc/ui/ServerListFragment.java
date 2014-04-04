@@ -6,6 +6,7 @@ import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.ConnectEvent;
@@ -40,6 +41,8 @@ import static butterknife.ButterKnife.findById;
 public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
+    private static final String EXPAND_SAVE_STATE = "expand_save_state";
+
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
     private IRCService mService;
@@ -71,14 +74,24 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the expand state of the ListView
+        final boolean[] expandStatus = UIUtils.saveExpandableListViewExpandState(mListAdapter,
+                mListView);
+        outState.putBooleanArray(EXPAND_SAVE_STATE, expandStatus);
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.expandable_list_fragment, container, false);
     }
 
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onViewCreated(final View view, final Bundle bundle) {
+        super.onViewCreated(view, bundle);
 
         mListView = findById(view, R.id.server_list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -87,13 +100,18 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         // If we are restoring a savedInstanceSate then a ServiceConnection is already present -
         // ask for that to be returned
-        if (savedInstanceState != null) {
+        if (bundle != null) {
             final IRCService service = mCallback.getService();
             // The service could be null if the rotation was done so quickly after start that a
             // connection to the service has not been established - in that case our callback is
             // still to come
             if (service != null) {
                 onServiceConnected(service);
+
+                // TODO - fix this
+                // Restore the expand state of the ListView
+                // final boolean[] groupExpandedArray = bundle.getBooleanArray(EXPAND_SAVE_STATE);
+                // UIUtils.restoreExpandableListViewExpandState(groupExpandedArray, mListView);
             }
         }
     }
@@ -107,8 +125,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
 
             @Override
-            public void onLoadFinished(Loader<List<ServerWrapper>> loader,
-                    List<ServerWrapper> listItems) {
+            public void onLoadFinished(final Loader<List<ServerWrapper>> loader,
+                    final List<ServerWrapper> listItems) {
                 for (final ServerEventHandler handler : mEventHandlers) {
                     handler.unregister();
                 }

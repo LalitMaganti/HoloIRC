@@ -38,8 +38,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_IGNORE_LIST;
 
 public class SharedPreferencesUtils {
 
@@ -148,12 +150,23 @@ public class SharedPreferencesUtils {
         final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
         source.open();
         for (final File file : array) {
-            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context,
-                    file.getName().replace(".xml", ""));
-            source.addServer(builder);
+            final String prefsName = file.getName().replace(".xml", "");
+            // Get builder to transfer
+            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
+            // Also transfer over ignore list
+            final List<String> ignoreList = getIgnoreList(context, prefsName);
+            source.addServer(builder, ignoreList);
             file.delete();
         }
         source.close();
+    }
+
+    private static List<String> getIgnoreList(Context context, String filename) {
+        final SharedPreferences serverSettings = context.getSharedPreferences(filename,
+                MODE_PRIVATE);
+        final Set<String> ignoreSet = serverSettings.getStringSet(PREF_IGNORE_LIST,
+                new HashSet<String>());
+        return new ArrayList<>(ignoreSet);
     }
 
     public static boolean isExcludedString(final String fileName) {

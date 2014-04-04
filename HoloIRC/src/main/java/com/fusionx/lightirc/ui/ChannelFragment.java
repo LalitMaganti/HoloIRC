@@ -117,11 +117,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     @Override
-    protected Conversation<ChannelEvent> getConversation() {
-        return getChannel();
-    }
-
-    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseChannelMessage(getServer(), mTitle, message);
     }

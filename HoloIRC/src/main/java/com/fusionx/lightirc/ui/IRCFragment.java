@@ -174,15 +174,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         return mCallback.getServer();
     }
 
-    protected Callback getCallback() {
-        return mCallback;
-    }
-
     protected abstract List<T> getAdapterData();
 
     protected abstract List<T> getDisconnectedAdapterData();
-
-    protected abstract Conversation<T> getConversation();
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);
