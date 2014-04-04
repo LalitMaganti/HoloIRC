@@ -87,7 +87,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         return view;
     }
 
-    private void setUpMessage(ViewHolder holder, Event event) {
+    private void setUpMessage(final ViewHolder holder, final Event event) {
         if (event.store == null) {
             mConverter.setEventMessage(event);
         }

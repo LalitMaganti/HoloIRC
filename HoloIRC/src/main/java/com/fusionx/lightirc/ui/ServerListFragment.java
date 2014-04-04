@@ -4,16 +4,21 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
+import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.event.Event;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
-import com.fusionx.relay.event.server.StatusChangeEvent;
+import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
 
@@ -33,7 +38,7 @@ import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import gnu.trove.set.hash.THashSet;
 
@@ -52,6 +57,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     // IRC
     private IRCService mService;
+
+    private MessageConversionUtils mConverter;
 
     // Expandable ListView
     private ExpandableListView mListView;
@@ -87,6 +94,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         final boolean[] expandStatus = UIUtils.saveExpandableListViewExpandState(mListAdapter,
                 mListView);
         outState.putBooleanArray(EXPAND_SAVE_STATE, expandStatus);
+
+        mListAdapter.onParcelImportantData(outState);
     }
 
     @Override
@@ -99,10 +108,15 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onViewCreated(final View view, final Bundle bundle) {
         super.onViewCreated(view, bundle);
 
+        mConverter = MessageConversionUtils.getConverter(getActivity());
+
         mListView = findById(view, R.id.server_list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
         mListView.setMultiChoiceModeListener(this);
+
+        mListView.setOnGroupClickListener(this);
+        mListView.setOnChildClickListener(this);
 
         // If we are restoring a savedInstanceSate then a ServiceConnection is already present -
         // ask for that to be returned
@@ -112,27 +126,27 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             // connection to the service has not been established - in that case our callback is
             // still to come
             if (service != null) {
-                onServiceConnected(service);
+                mService = service;
 
-                // TODO - fix this
                 // Restore the expand state of the ListView
-                // final boolean[] groupExpandedArray = bundle.getBooleanArray(EXPAND_SAVE_STATE);
-                // UIUtils.restoreExpandableListViewExpandState(groupExpandedArray, mListView);
+                //final boolean[] groupExpandedArray = savedState
+                //        .getBooleanArray(EXPAND_SAVE_STATE);
+                //UIUtils.restoreExpandableListViewExpandState(groupExpandedArray, mListView);
             }
         }
     }
 
     public void refreshServers() {
-        final LoaderManager.LoaderCallbacks<List<ServerWrapper>> callbacks = new LoaderManager
-                .LoaderCallbacks<List<ServerWrapper>>() {
+        final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
+                .LoaderCallbacks<ArrayList<ServerWrapper>>() {
             @Override
-            public Loader<List<ServerWrapper>> onCreateLoader(int id, Bundle args) {
+            public Loader<ArrayList<ServerWrapper>> onCreateLoader(int id, Bundle args) {
                 return new ServerWrapperLoader(getActivity(), mService);
             }
 
             @Override
-            public void onLoadFinished(final Loader<List<ServerWrapper>> loader,
-                    final List<ServerWrapper> listItems) {
+            public void onLoadFinished(final Loader<ArrayList<ServerWrapper>> loader,
+                    final ArrayList<ServerWrapper> listItems) {
                 for (final ServerEventHandler handler : mEventHandlers) {
                     handler.unregister();
                 }
@@ -142,12 +156,13 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                         mEventHandlers.add(new ServerEventHandler(wrapper.getServer(), i));
                     }
                 }
-                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mListView);
+                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
+                        mListView);
                 mListView.setAdapter(mListAdapter);
             }
 
             @Override
-            public void onLoaderReset(Loader<List<ServerWrapper>> loader) {
+            public void onLoaderReset(Loader<ArrayList<ServerWrapper>> loader) {
             }
         };
 
@@ -173,6 +188,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mEventHandlers.add(new ServerEventHandler(item.getServer(), groupPosition));
         }
         mCallback.onServerClicked(item.getServer());
+        item.clearMessagePriority();
+        mListView.invalidateViews();
         return true;
     }
 
@@ -189,7 +206,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             return true;
         }
 
-        mCallback.onSubServerClicked(mListAdapter.getChild(groupPosition, childPosition));
+        final Conversation conversation = mListAdapter.getChild(groupPosition, childPosition);
+        mCallback.onSubServerClicked(conversation);
+
+        final ServerWrapper wrapper = mListAdapter.getGroup(groupPosition);
+        wrapper.clearMessagePriority(conversation);
+        mListView.invalidateViews();
 
         return true;
     }
@@ -286,9 +308,25 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mService = service;
 
         refreshServers();
+    }
 
-        mListView.setOnGroupClickListener(this);
-        mListView.setOnChildClickListener(this);
+    public void onIRCEvent(final MessagePriority priority, final Conversation conversation,
+            final Event event) {
+        final ServerWrapper wrapper = mListAdapter.getServerWrapperFromTitle(conversation
+                .getServer().getTitle());
+        if (!conversation.equals(mCallback.getConversation())) {
+            if (conversation.equals(conversation.getServer())) {
+                wrapper.setMessagePriority(priority);
+            } else {
+                wrapper.setSubMessagePriority(conversation.getId(), priority);
+                wrapper.setSubEvent(conversation.getId(), event);
+            }
+        } else {
+            if (!conversation.equals(conversation.getServer())) {
+                wrapper.setSubEvent(conversation.getId(), event);
+            }
+        }
+        mListView.invalidateViews();
     }
 
     public interface Callback {
@@ -300,6 +338,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onServerDisconnected(final Server server);
 
         public IRCService getService();
+
+        public Conversation getConversation();
     }
 
     public class ServerEventHandler {
@@ -322,6 +362,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
+
+            onIRCEvent(MessagePriority.LOW, channel, channel.getBuffer().get(channel.getBuffer()
+                    .size() - 1));
         }
 
         @Subscribe
@@ -329,6 +372,24 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
+        }
+
+        @Subscribe
+        public void onChannelMessage(final ChannelEvent event) {
+            if (!ChannelFragment.sClasses.contains(event.getClass())) {
+                final Conversation conversation = mServer.getUserChannelInterface()
+                        .getChannel(event.channelName);
+
+                if (event instanceof WorldMessageEvent) {
+                    onIRCEvent(MessagePriority.MEDIUM, conversation, event);
+                } else {
+                    onIRCEvent(MessagePriority.LOW, conversation, event);
+                }
+            }
+        }
+
+        @Subscribe
+        public void onServerMessage(final ServerEvent event) {
         }
 
         @Subscribe

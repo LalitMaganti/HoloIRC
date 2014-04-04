@@ -4,11 +4,13 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
@@ -322,8 +324,23 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    public Conversation getConversation() {
+        return mConversation;
+    }
+
+    /**
+     * Removes the current displayed fragment
+     *
+     * Pre: this method is only called when mCurrentFragment and mConversation are not null
+     * Post: the current fragment is removed - either by parting or removing the PM
+     */
+    @Override
     public void onRemoveCurrentFragment() {
-        // TODO
+        if (mCurrentFragment.getType() == FragmentType.CHANNEL) {
+            mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
+        } else {
+            // TODO - fix this up
+        }
     }
 
     @Override

@@ -71,6 +71,11 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
         return FragmentType.SERVER;
     }
 
+    @Override
+    public Conversation getConversation() {
+        return getServer();
+    }
+
     // Subscription methods
     @Subscribe
     public void onServerEvent(final ServerEvent event) {

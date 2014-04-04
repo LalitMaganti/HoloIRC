@@ -9,7 +9,7 @@
             android:textColor="#cc222222"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/server_title"
+            android:id="@+id/child_title"
             android:textAppearance="@android:style/TextAppearance.Small"
             android:paddingRight="@dimen/margin_small"
             android:paddingLeft="40dip"
@@ -20,17 +20,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:id="@+id/server_status"
+            android:id="@+id/child_event"
             android:paddingRight="@dimen/margin_medium"
             android:paddingLeft="40dip"
             android:paddingTop="@dimen/margin_small"
             android:paddingBottom="@dimen/margin_small"
-            android:text="Disconnected"
-            android:layout_below="@+id/server_title"/>
+            android:text="Text"
+            android:singleLine="true"
+            android:layout_below="@+id/child_title"/>
     <View
             android:id="@+id/divider"
             android:background="#e2e2e2"
             android:layout_width="fill_parent"
             android:layout_height="1.2dp"
-            android:layout_below="@+id/server_status"/>
+            android:layout_below="@+id/child_event"/>
 </RelativeLayout>

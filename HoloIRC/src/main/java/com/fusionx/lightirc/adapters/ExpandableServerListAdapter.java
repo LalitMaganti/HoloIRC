@@ -2,11 +2,16 @@ package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.ServerWrapper;
+import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.text.SpannableStringBuilder;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,21 +21,27 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
+
+    private static final String ADAPTER_DATA = "adapter_data";
 
     private final LayoutInflater mInflater;
 
     private final Context mContext;
 
-    private final List<ServerWrapper> mServerListItems;
+    private final ArrayList<ServerWrapper> mServerListItems;
+
+    private final MessageConversionUtils mMessageConverter;
 
     private ExpandableListView mListView;
 
-    public ExpandableServerListAdapter(final Context context, final List<ServerWrapper>
+    public ExpandableServerListAdapter(final Context context, final ArrayList<ServerWrapper>
             builders, final ExpandableListView listView) {
         mInflater = LayoutInflater.from(context);
+        mMessageConverter = MessageConversionUtils.getConverter(context);
         mContext = context;
         mServerListItems = builders;
         mListView = listView;
@@ -64,8 +75,21 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_child, parent, false);
         }
 
-        final TextView textView = (TextView) convertView.findViewById(R.id.server_title);
-        textView.setText(getChild(groupPos, childPos).getId());
+        final ServerWrapper listItem = getGroup(groupPos);
+        final Conversation conversation = getChild(groupPos, childPos);
+
+        final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
+        final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
+        builder.setSpan(UIUtils.getSpanFromPriority(listItem.getSubMessagePriority(conversation
+                .getId())), 0, conversation.getId().length(), 0);
+        textView.setText(builder);
+
+        final Event event = listItem.getSubEvent(conversation.getId());
+        final TextView textEvent = (TextView) convertView.findViewById(R.id.child_event);
+        if (event.store == null) {
+            mMessageConverter.setEventMessage(event);
+        }
+        textEvent.setText((CharSequence) event.store);
 
         final View divider = convertView.findViewById(R.id.divider);
         divider.setVisibility(isLastChild ? View.VISIBLE : View.INVISIBLE);
@@ -103,9 +127,13 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
         final ServerWrapper listItem = getGroup(groupPos);
 
-        final TextView title = (TextView) convertView.findViewById(R.id.server_title);
+        final TextView title = (TextView) convertView.findViewById(R.id.child_title);
+        final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
+        builder.setSpan(UIUtils.getSpanFromPriority(listItem.getMessagePriority()), 0,
+                listItem.getTitle().length(), 0);
+
         title.setText(listItem.getTitle());
-        final TextView status = ((TextView) convertView.findViewById(R.id.server_status));
+        final TextView status = ((TextView) convertView.findViewById(R.id.child_event));
         status.setText(MiscUtils.getStatusString(mContext, listItem.getServer() != null
                 ? listItem.getServer().getStatus()
                 : ConnectionStatus.DISCONNECTED));
@@ -129,6 +157,19 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             expandButton.setOnClickListener(new ExpandListener(groupPos));
         }
         return convertView;
+    }
+
+    public ServerWrapper getServerWrapperFromTitle(final String title) {
+        for (final ServerWrapper wrapper : mServerListItems) {
+            if (wrapper.getTitle().equals(title)) {
+                return wrapper;
+            }
+        }
+        return null;
+    }
+
+    public void onParcelImportantData(Bundle outState) {
+        outState.putParcelableArrayList(ADAPTER_DATA, mServerListItems);
     }
 
     public final class ExpandListener implements View.OnClickListener {

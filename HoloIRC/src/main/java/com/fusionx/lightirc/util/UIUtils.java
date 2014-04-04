@@ -2,13 +2,17 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.constants.Theme;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.text.style.CharacterStyle;
+import android.text.style.ForegroundColorSpan;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
@@ -115,5 +119,28 @@ public class UIUtils {
                 listView.expandGroup(i);
             }
         }
+    }
+
+    public static CharacterStyle getSpanFromPriority(final MessagePriority priority) {
+        if (priority == null) {
+            // TODO - export this colour
+            return new ForegroundColorSpan(Color.parseColor("#CC222222"));
+        }
+        final int color;
+        switch (priority) {
+            case LOW:
+                color = Color.parseColor("#00994C");
+                break;
+            case MEDIUM:
+                color = Color.parseColor("#004C99");
+                break;
+            case HIGH:
+                color = Color.parseColor("#CC0000");
+                break;
+            default:
+                color = Color.parseColor("#CC222222");
+                break;
+        }
+        return new ForegroundColorSpan(color);
     }
 }

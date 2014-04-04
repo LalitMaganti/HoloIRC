@@ -6,11 +6,12 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.relay.ServerConfiguration;
 
 import android.content.Context;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServerWrapperLoader extends AbstractLoader<List<ServerWrapper>> {
+public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>> {
 
     private final IRCService mService;
 
@@ -21,8 +22,8 @@ public class ServerWrapperLoader extends AbstractLoader<List<ServerWrapper>> {
     }
 
     @Override
-    public List<ServerWrapper> loadInBackground() {
-        final List<ServerWrapper> listItems = new ArrayList<>();
+    public ArrayList<ServerWrapper> loadInBackground() {
+        final ArrayList<ServerWrapper> listItems = new ArrayList<>();
         final BuilderDatabaseSource source = new BuilderDatabaseSource(getContext());
 
         source.open();

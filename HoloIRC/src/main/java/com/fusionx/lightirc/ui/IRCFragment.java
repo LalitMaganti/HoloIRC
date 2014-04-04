@@ -24,6 +24,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
@@ -168,6 +169,8 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public String getTitle() {
         return mTitle;
     }
+
+    public abstract Conversation getConversation();
 
     public interface Callback {
 

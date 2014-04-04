@@ -55,6 +55,11 @@ public class UserFragment extends IRCFragment<UserEvent> {
     }
 
     @Override
+    public Conversation getConversation() {
+        return getPrivateMessageUser();
+    }
+
+    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseUserMessage(getServer(), mTitle, message);
     }
