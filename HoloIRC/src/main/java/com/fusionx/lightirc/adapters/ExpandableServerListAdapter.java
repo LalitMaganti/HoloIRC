@@ -101,7 +101,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_group, parent, false);
         }
 
-        final ServerWrapper listItem = mServerListItems.get(groupPos);
+        final ServerWrapper listItem = getGroup(groupPos);
 
         final TextView title = (TextView) convertView.findViewById(R.id.server_title);
         title.setText(listItem.getTitle());
@@ -129,10 +129,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             expandButton.setOnClickListener(new ExpandListener(groupPos));
         }
         return convertView;
-    }
-
-    public void setListView(ExpandableListView listView) {
-        mListView = listView;
     }
 
     public final class ExpandListener implements View.OnClickListener {

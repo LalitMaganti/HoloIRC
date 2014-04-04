@@ -24,6 +24,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
@@ -65,6 +66,11 @@ public class UserFragment extends IRCFragment<UserEvent> {
     @Override
     protected List<UserEvent> getDisconnectedAdapterData() {
         return getAdapterData();
+    }
+
+    @Override
+    protected Conversation<UserEvent> getConversation() {
+        return getPrivateMessageUser();
     }
 
     public PrivateMessageUser getPrivateMessageUser() {

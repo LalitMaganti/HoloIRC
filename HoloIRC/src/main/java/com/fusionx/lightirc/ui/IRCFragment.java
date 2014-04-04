@@ -27,6 +27,7 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
+import com.fusionx.relay.interfaces.Conversation;
 import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
 import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
@@ -180,6 +181,8 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     protected abstract List<T> getAdapterData();
 
     protected abstract List<T> getDisconnectedAdapterData();
+
+    protected abstract Conversation<T> getConversation();
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);

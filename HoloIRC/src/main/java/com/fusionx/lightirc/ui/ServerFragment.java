@@ -28,6 +28,7 @@ import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
@@ -63,6 +64,11 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     @Override
     protected List<ServerEvent> getDisconnectedAdapterData() {
         return getAdapterData();
+    }
+
+    @Override
+    protected Conversation<ServerEvent> getConversation() {
+        return getServer();
     }
 
     @Override

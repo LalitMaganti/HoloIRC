@@ -46,8 +46,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
-    private int mLastGroup = -1;
-
     private Callback mCallback;
 
     private ExpandableListView mListView;
@@ -111,6 +109,15 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             @Override
             public void onLoadFinished(Loader<List<ServerWrapper>> loader,
                     List<ServerWrapper> listItems) {
+                for (final ServerEventHandler handler : mEventHandlers) {
+                    handler.unregister();
+                }
+                for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
+                    ServerWrapper wrapper = listItems.get(i);
+                    if (wrapper.getServer() != null) {
+                        mEventHandlers.add(new ServerEventHandler(wrapper.getServer(), i));
+                    }
+                }
                 mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems, mListView);
                 mListView.setAdapter(mListAdapter);
             }
@@ -119,6 +126,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             public void onLoaderReset(Loader<List<ServerWrapper>> loader) {
             }
         };
+
         getLoaderManager().restartLoader(21, null, callbacks);
     }
 
@@ -134,8 +142,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         } else if (mActionModeStarted) {
             return true;
         }
-
-        mLastGroup = groupPosition;
 
         final ServerWrapper item = mListAdapter.getGroup(groupPosition);
         if (item.getServer() == null) {
@@ -159,17 +165,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             return true;
         }
 
-        mLastGroup = groupPosition;
         mCallback.onSubServerClicked(mListAdapter.getChild(groupPosition, childPosition));
 
         return true;
-    }
-
-    public Server onActivityRestored() {
-        if (mLastGroup != -1) {
-            return mListAdapter.getGroup(mLastGroup).getServer();
-        }
-        return null;
     }
 
     public void onEditServer(final ServerWrapper builder) {
@@ -320,7 +318,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe
         public void onDisconnect(final DisconnectEvent event) {
-            mLastGroup = -1;
             refreshServers();
 
             unregister();

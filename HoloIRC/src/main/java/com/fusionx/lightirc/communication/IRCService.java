@@ -4,6 +4,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Service;
 import android.content.Intent;
@@ -20,6 +21,8 @@ public class IRCService extends Service {
     private final AppPreferences mAppPreferences = new AppPreferences();
 
     private ConnectionManager mConnectionManager;
+
+    private Conversation mSavedConversation;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -42,6 +45,14 @@ public class IRCService extends Service {
 
     public void requestDisconnectionFromServer(Server server) {
         mConnectionManager.onDisconnectionRequested(server.getTitle());
+    }
+
+    public Conversation getSavedConversation() {
+        return mSavedConversation;
+    }
+
+    public void setSavedConversation(Conversation savedConversation) {
+        mSavedConversation = savedConversation;
     }
 
     // Binder which returns this service

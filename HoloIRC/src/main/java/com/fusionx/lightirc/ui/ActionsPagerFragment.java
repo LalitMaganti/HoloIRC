@@ -101,7 +101,8 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     @Override
     public void switchToIgnoreFragment() {
         final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left);
+        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left, R.anim.slide_out_right);
         transaction.addToBackStack(null);
         transaction.replace(R.id.card_server_content, mIgnoreListFragment, "Ignore").commit();
     }

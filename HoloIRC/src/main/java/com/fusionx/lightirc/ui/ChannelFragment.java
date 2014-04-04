@@ -33,6 +33,7 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MentionEvent;
 import com.fusionx.relay.event.channel.NameEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.util.IRCUtils;
@@ -113,6 +114,11 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     @Override
     protected List<ChannelEvent> getDisconnectedAdapterData() {
         return getServer().getUser().getChannelSnapshot(mTitle).getBuffer();
+    }
+
+    @Override
+    protected Conversation<ChannelEvent> getConversation() {
+        return getChannel();
     }
 
     @Override

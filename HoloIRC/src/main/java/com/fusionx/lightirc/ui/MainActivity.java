@@ -16,6 +16,8 @@ import com.squareup.otto.Subscribe;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -36,7 +38,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     // Fields
     // IRC
-    private Server mServer;
+    private Conversation mConversation;
 
     // Fragments
     private WorkerFragment mWorkerFragment;
@@ -65,7 +67,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
-        mSlidingPane.openPane();
         mSlidingPane.setPanelSlideListener(this);
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
@@ -97,9 +98,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
 
-            mServer = mServerListFragment.onActivityRestored();
-            if (mServer != null) {
-                mServer.getServerEventBus().register(this);
+            if (mConversation != null) {
+                mConversation.getServer().getServerEventBus().register(this);
             }
 
             mCurrentFragment = (IRCFragment) getSupportFragmentManager().findFragmentById(R.id
@@ -111,11 +111,20 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mCurrentFragment != null) {
+            mWorkerFragment.getService().setSavedConversation(mCurrentFragment.getConversation());
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mServer != null) {
-            mServer.getServerEventBus().unregister(this);
+        if (mConversation != null) {
+            mConversation.getServer().getServerEventBus().unregister(this);
         }
     }
 
@@ -128,7 +137,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(!mSlidingPane.isOpen() && mServer != null);
+        item.setVisible(!mSlidingPane.isOpen() && mConversation != null);
 
         final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());
@@ -184,21 +193,23 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onServerClicked(final Server server) {
-        if (shouldReplaceFragment(server)) {
+        if (!server.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", server.getTitle());
 
             final IRCFragment fragment = new ServerFragment();
             fragment.setArguments(bundle);
 
-            if (mServer != server) {
-                if (mServer != null) {
-                    mServer.getServerEventBus().unregister(this);
+            if (mConversation != null) {
+                if (mConversation.getServer() != server) {
+                    mConversation.getServer().getServerEventBus().unregister(this);
+                    server.getServerEventBus().register(this);
                 }
+            } else {
                 server.getServerEventBus().register(this);
             }
 
-            mServer = server;
+            mConversation = server;
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(server.getTitle());
@@ -211,7 +222,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onSubServerClicked(final Conversation object) {
-        if (shouldReplaceFragment(object)) {
+        if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
@@ -224,14 +235,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             }
             fragment.setArguments(bundle);
 
-            if (mServer != object.getServer()) {
-                if (mServer != null) {
-                    mServer.getServerEventBus().unregister(this);
+            if (mConversation != null) {
+                if (mConversation.getServer() != object.getServer()) {
+                    mConversation.getServer().getServerEventBus().unregister(this);
+                    object.getServer().getServerEventBus().register(this);
                 }
+            } else {
                 object.getServer().getServerEventBus().register(this);
             }
 
-            mServer = object.getServer();
+            mConversation = object;
 
             onChangeCurrentFragment(fragment);
 
@@ -276,17 +289,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         return mWorkerFragment.getService();
     }
 
-    private boolean shouldReplaceFragment(final Server server) {
-        return mCurrentFragment == null || !mServer.equals(server)
-                || !mCurrentFragment.getType().equals(FragmentType.SERVER);
-    }
-
-    private boolean shouldReplaceFragment(final Conversation object) {
-        return mCurrentFragment == null
-                || !object.getServer().equals(mServer)
-                || !mCurrentFragment.getTitle().equals(object.getId());
-    }
-
     @Override
     public void onRemoveCurrentFragment() {
         // TODO
@@ -294,12 +296,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public Server getServer() {
-        return mServer;
+        if (mConversation == null) {
+            return null;
+        }
+        return mConversation.getServer();
     }
 
     @Override
     public void disconnectFromServer() {
-        mServerListFragment.disconnectFromServer(mServer);
+        mServerListFragment.disconnectFromServer(mConversation.getServer());
     }
 
     @Override
@@ -321,8 +326,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // Null happens when the disconnect handler is called first & the fragment has already been
         // removed by the disconnect handler
         if (mCurrentFragment != null && mCurrentFragment.getType() == FragmentType.SERVER) {
-            setActionBarSubtitle(MiscUtils.getStatusString(this, mServer.getStatus()));
-            mActionsFragment.onConnectionStatusChanged(mServer.getStatus());
+            setActionBarSubtitle(MiscUtils.getStatusString(this,
+                    mConversation.getServer().getStatus()));
+            mActionsFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
         }
     }
 
@@ -370,5 +376,23 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                final Conversation conversation = service.getSavedConversation();
+                if (conversation != null) {
+                    // TODO - what if disconnection occurred when not attached
+                    if (conversation.getServer().equals(conversation)) {
+                        onServerClicked(conversation.getServer());
+                    } else {
+                        onSubServerClicked(conversation);
+                    }
+                } else {
+                    mSlidingPane.openPane();
+                }
+            }
+        });
     }
 }
