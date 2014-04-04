@@ -78,7 +78,8 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
                             .getSharedPreferences(callback.getServerTitle().toLowerCase(),
                                     Context.MODE_PRIVATE);
                     final Set<String> set = getIgnoreAdapter().getSetOfItems();
-                    preferences.edit().putStringSet(PreferenceConstants.PREF_IGNORE_LIST, set).commit();
+                    preferences.edit().putStringSet(PreferenceConstants.PREF_IGNORE_LIST, set)
+                            .commit();
                     MiscUtils.onUpdateIgnoreList(callback.getServer(), set);
                     callback.switchToIRCActionFragment();
                 }

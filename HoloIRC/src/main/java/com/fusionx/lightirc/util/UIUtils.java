@@ -7,7 +7,6 @@ import com.fusionx.relay.constants.Theme;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.view.View;

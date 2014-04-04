@@ -16,7 +16,6 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.Collection;
 import java.util.List;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {

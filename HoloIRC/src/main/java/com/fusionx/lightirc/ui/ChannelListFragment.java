@@ -171,7 +171,8 @@ public class ChannelListFragment extends ListFragment {
     @Override
     public void onPause() {
         getActivity().getSharedPreferences("temp",
-                Context.MODE_PRIVATE).edit().putStringSet(PREF_AUTOJOIN, mAdapter.getSetOfItems()).commit();
+                Context.MODE_PRIVATE).edit().putStringSet(PREF_AUTOJOIN, mAdapter.getSetOfItems())
+                .commit();
         super.onPause();
     }
 

@@ -7,13 +7,9 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.interfaces.Conversation;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import gnu.trove.map.hash.THashMap;
 
 public class ServerWrapper {
 
