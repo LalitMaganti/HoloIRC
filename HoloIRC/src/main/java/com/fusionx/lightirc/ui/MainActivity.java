@@ -121,7 +121,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // Save the action bar title & sub-title
         if (outState != null) {
             outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
-            outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle().toString());
+            // It's null if there's no fragment currently displayed
+            if (getSupportActionBar().getSubtitle() != null) {
+                outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle()
+                        .toString());
+            }
         }
     }
 

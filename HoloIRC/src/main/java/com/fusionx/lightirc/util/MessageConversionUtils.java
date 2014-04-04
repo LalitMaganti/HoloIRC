@@ -21,6 +21,7 @@ import com.fusionx.relay.event.channel.WorldNickChangeEvent;
 import com.fusionx.relay.event.channel.WorldPartEvent;
 import com.fusionx.relay.event.channel.WorldQuitEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.ErrorEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
@@ -74,6 +75,12 @@ public class MessageConversionUtils {
         @Subscribe
         public void getOnWhoisMessage(final WhoisEvent event) {
             setupEvent(event, event.whoisMessage);
+        }
+
+        @Subscribe
+        public void getOnConnectingMessage(final ConnectingEvent event) {
+            final String response = mContext.getString(R.string.parser_connecting);
+            setupEvent(event, response);
         }
 
         @Subscribe
