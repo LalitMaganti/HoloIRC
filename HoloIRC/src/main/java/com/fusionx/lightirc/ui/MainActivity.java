@@ -9,8 +9,6 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.server.ConnectEvent;
-import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
@@ -308,7 +306,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void disconnectFromServer() {
-        mServerListFragment.disconnectFromServer(mConversation.getServer());
+        mWorkerFragment.disconnectFromServer(mConversation.getServer());
     }
 
     @Override
@@ -329,9 +327,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onStatusChanged(final StatusChangeEvent event) {
         // Null happens when the disconnect handler is called first & the fragment has already been
         // removed by the disconnect handler
-        if (mCurrentFragment != null && mCurrentFragment.getType() == FragmentType.SERVER) {
-            setActionBarSubtitle(MiscUtils.getStatusString(this,
-                    mConversation.getServer().getStatus()));
+        if (mCurrentFragment != null) {
+            if (mCurrentFragment.getType() == FragmentType.SERVER) {
+                setActionBarSubtitle(MiscUtils.getStatusString(this,
+                        mConversation.getServer().getStatus()));
+            }
             mActionsFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
         }
     }

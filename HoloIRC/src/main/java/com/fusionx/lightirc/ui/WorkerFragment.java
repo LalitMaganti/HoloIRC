@@ -3,6 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.relay.Server;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -116,6 +117,10 @@ public class WorkerFragment extends Fragment implements LoaderManager
 
     public void setSavedConversation(Conversation savedConversation) {
         mSavedConversation = savedConversation;
+    }
+
+    public void disconnectFromServer(final Server server) {
+        mService.requestDisconnectionFromServer(server);
     }
 
     public interface Callback {

@@ -126,7 +126,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         return mStatus == ConnectionStatus.CONNECTED;
     }
 
-    public void setConnected(ConnectionStatus connected) {
+    public void setStatus(ConnectionStatus connected) {
         mStatus = connected;
     }
 }

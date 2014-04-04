@@ -201,10 +201,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         getActivity().startActivityForResult(intent, MainActivity.SERVER_SETTINGS);
     }
 
-    public void disconnectFromServer(Server server) {
-        mService.requestDisconnectionFromServer(server);
-    }
-
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         if (!checked) {

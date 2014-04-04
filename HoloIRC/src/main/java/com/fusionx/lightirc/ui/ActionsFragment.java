@@ -117,7 +117,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     public void onConnectionStatusChanged(ConnectionStatus status) {
-        mAdapter.setConnected(status);
+        mAdapter.setStatus(status);
         mAdapter.notifyDataSetChanged();
     }
 
