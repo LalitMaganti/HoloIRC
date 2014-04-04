@@ -35,6 +35,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     public static final String WORKER_FRAGMENT = "WorkerFragment";
 
+    private static final String ACTION_BAR_TITLE = "action_bar_title";
+
+    private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
+
     // Fields
     // IRC
     private Conversation mConversation;
@@ -107,6 +111,28 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             if (mCurrentFragment != null) {
                 findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
             }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the action bar title & sub-title
+        if (outState != null) {
+            outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
+            outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle().toString());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore the action bar title & sub-title
+        if (savedInstanceState != null) {
+            getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
+            getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
         }
     }
 
