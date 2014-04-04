@@ -1,10 +1,10 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.model.WrappedServerListItem;
+import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.interfaces.SubServerObject;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.content.Context;
 import android.util.TypedValue;
@@ -16,6 +16,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.Collection;
 import java.util.List;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
@@ -24,11 +25,11 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final Context mContext;
 
-    private final List<WrappedServerListItem> mServerListItems;
+    private final List<ServerWrapper> mServerListItems;
 
     private ExpandableListView mListView;
 
-    public ExpandableServerListAdapter(final Context context, final List<WrappedServerListItem>
+    public ExpandableServerListAdapter(final Context context, final List<ServerWrapper>
             builders, final ExpandableListView listView) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
@@ -37,8 +38,8 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public SubServerObject getChild(final int groupPos, final int childPos) {
-        return mServerListItems.get(groupPos).getServerObjects().get(childPos);
+    public Conversation getChild(final int groupPos, final int childPos) {
+        return mServerListItems.get(groupPos).getSubServer(childPos);
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(final int groupPos) {
-        return mServerListItems.get(groupPos).getServerObjects().size();
+        return mServerListItems.get(groupPos).getSubServerSize();
     }
 
     // TODO - ViewHolder pattern
@@ -64,9 +65,8 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_child, parent, false);
         }
 
-        final List<SubServerObject> list = mServerListItems.get(groupPos).getServerObjects();
         final TextView textView = (TextView) convertView.findViewById(R.id.server_title);
-        textView.setText(list.get(childPos).getId());
+        textView.setText(getChild(groupPos, childPos).getId());
 
         final View divider = convertView.findViewById(R.id.divider);
         divider.setVisibility(isLastChild ? View.VISIBLE : View.INVISIBLE);
@@ -80,7 +80,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public WrappedServerListItem getGroup(final int groupPos) {
+    public ServerWrapper getGroup(final int groupPos) {
         return mServerListItems.get(groupPos);
     }
 
@@ -102,7 +102,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_group, parent, false);
         }
 
-        final WrappedServerListItem listItem = mServerListItems.get(groupPos);
+        final ServerWrapper listItem = mServerListItems.get(groupPos);
 
         final TextView title = (TextView) convertView.findViewById(R.id.server_title);
         title.setText(listItem.getTitle());
@@ -113,7 +113,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
         final View divider = convertView.findViewById(R.id.divider);
         final ImageView expandButton = (ImageView) convertView.findViewById(R.id.button_expand);
-        if (listItem.getServerObjects().size() == 0) {
+        if (listItem.getSubServerSize() == 0) {
             expandButton.setVisibility(View.INVISIBLE);
             divider.setVisibility(View.VISIBLE);
         } else {

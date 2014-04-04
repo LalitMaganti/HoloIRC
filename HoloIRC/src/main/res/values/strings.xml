@@ -164,5 +164,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="ignore_nick_description">Nickname of the user to be ignored</string>
     <string name="ignore_list">Ignore List</string>
     <string name="items_checked">items checked</string>
+    <string name="actions">Actions</string>
 
 </resources>

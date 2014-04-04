@@ -13,7 +13,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_CHANGEABLE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_ONE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_SERV_PASSWORD;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_THREE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_TWO;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_PORT;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_REAL_NAME;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_SASL_PASSWORD;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_SASL_USERNAME;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_SERVER_PASSWORD;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_SERVER_USERNAME;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_SSL;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_SSL_ACCEPT_ALL;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_TITLE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_URL;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.TABLE_NAME;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable._ID;
+import static com.fusionx.lightirc.util.DatabaseUtils.getIntByName;
+import static com.fusionx.lightirc.util.DatabaseUtils.getStringByName;
 
 public class BuilderDatabaseSource {
 
@@ -28,14 +47,14 @@ public class BuilderDatabaseSource {
     }
 
     private static String convertArrayToString(final List<String> list) {
-        String str = "";
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
-            str = str + list.get(i);
+            builder.append(list.get(i));
             if (i < list.size() - 1) {
-                str = str + strSeparator;
+                builder.append(strSeparator);
             }
         }
-        return str;
+        return builder.toString();
     }
 
     private static List<String> convertStringToArray(final String str) {
@@ -54,7 +73,7 @@ public class BuilderDatabaseSource {
     public List<ServerConfiguration.Builder> getAllBuilders() {
         final List<ServerConfiguration.Builder> builders = new ArrayList<>();
         // Select All Query
-        final String selectQuery = "SELECT  * FROM " + ServerTable.TABLE_NAME;
+        final String selectQuery = "SELECT  * FROM " + TABLE_NAME;
 
         final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
 
@@ -63,40 +82,43 @@ public class BuilderDatabaseSource {
             do {
                 final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
 
-                builder.setId(cursor.getInt(0));
+                builder.setId(getIntByName(cursor, _ID));
 
                 // Server connection
-                builder.setTitle(cursor.getString(1));
-                builder.setUrl(cursor.getString(2));
-                builder.setPort(cursor.getInt(3));
+                builder.setTitle(getStringByName(cursor, COLUMN_TITLE));
+                builder.setUrl(getStringByName(cursor, COLUMN_URL));
+                builder.setPort(getIntByName(cursor, COLUMN_PORT));
 
                 // SSL
-                builder.setSsl(cursor.getInt(4) > 0);
-                builder.setSslAcceptAllCertificates(cursor.getInt(5) > 0);
+                builder.setSsl(getIntByName(cursor, COLUMN_SSL) > 0);
+                builder.setSslAcceptAllCertificates(getIntByName(cursor,
+                        COLUMN_SSL_ACCEPT_ALL) > 0);
 
                 // User settings
-                final String firstChoice = cursor.getString(6);
-                final String secondChoice = cursor.getString(7);
-                final String thirdChoice = cursor.getString(8);
+                final String firstChoice = getStringByName(cursor, COLUMN_NICK_ONE);
+                final String secondChoice = getStringByName(cursor, COLUMN_NICK_TWO);
+                final String thirdChoice = getStringByName(cursor, COLUMN_NICK_THREE);
                 final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice,
                         thirdChoice);
                 builder.setNickStorage(nickStorage);
-                builder.setRealName(cursor.getString(9));
-                builder.setNickChangeable(cursor.getInt(10) > 0);
+                builder.setRealName(getStringByName(cursor, COLUMN_REAL_NAME));
+                builder.setNickChangeable(getIntByName(cursor, COLUMN_NICK_CHANGEABLE) > 0);
 
                 // Autojoin channels
-                builder.getAutoJoinChannels().addAll(convertStringToArray(cursor.getString(11)));
+                final List<String> channels = convertStringToArray(getStringByName(cursor,
+                        COLUMN_AUTOJOIN));
+                builder.getAutoJoinChannels().addAll(channels);
 
                 // Server authorisation
-                builder.setServerUserName(cursor.getString(12));
-                builder.setServerPassword(cursor.getString(13));
+                builder.setServerUserName(getStringByName(cursor, COLUMN_SERVER_USERNAME));
+                builder.setServerPassword(getStringByName(cursor, COLUMN_SERVER_PASSWORD));
 
                 // SASL authorisation
-                builder.setSaslUsername(cursor.getString(14));
-                builder.setSaslPassword(cursor.getString(15));
+                builder.setSaslUsername(getStringByName(cursor, COLUMN_SASL_USERNAME));
+                builder.setSaslPassword(getStringByName(cursor, COLUMN_SASL_PASSWORD));
 
                 // NickServ authorisation
-                builder.setNickservPassword(cursor.getString(16));
+                builder.setNickservPassword(getStringByName(cursor, COLUMN_NICK_SERV_PASSWORD));
 
                 // Adding contact to list
                 builders.add(builder);
@@ -108,18 +130,18 @@ public class BuilderDatabaseSource {
     }
 
     public void updateServer(final ContentValues values) {
-        final int id = values.getAsInteger(ServerTable._ID);
-        mDatabase.update(ServerTable.TABLE_NAME, values, ServerTable._ID + "=" + id, null);
+        final int id = values.getAsInteger(_ID);
+        mDatabase.update(TABLE_NAME, values, _ID + "=" + id, null);
     }
 
     public void addServer(final ContentValues values) {
-        final long id = mDatabase.insert(ServerTable.TABLE_NAME, null, values);
-        values.put(ServerTable._ID, (int) id);
+        final long id = mDatabase.insert(TABLE_NAME, null, values);
+        values.put(_ID, (int) id);
     }
 
     public void addServer(ServerConfiguration.Builder builder) {
         final ContentValues values = getContentValuesFromBuilder(builder, false);
-        final int id = (int) mDatabase.insert(ServerTable.TABLE_NAME, null, values);
+        final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
         builder.setId(id);
     }
 
@@ -128,51 +150,46 @@ public class BuilderDatabaseSource {
         final ContentValues values = new ContentValues();
 
         if (id) {
-            values.put(DatabaseContract.ServerTable._ID, builder.getId());
+            values.put(_ID, builder.getId());
         }
 
         // Server connection
-        values.put(ServerTable.COLUMN_TITLE, builder.getTitle());
-        values.put(ServerTable.COLUMN_URL, builder.getUrl());
-        values.put(ServerTable.COLUMN_PORT, builder.getPort());
+        values.put(COLUMN_TITLE, builder.getTitle());
+        values.put(COLUMN_URL, builder.getUrl());
+        values.put(COLUMN_PORT, builder.getPort());
 
         // SSL
-        values.put(ServerTable.COLUMN_SSL, builder.isSsl() ? 1 : 0);
-        values.put(ServerTable.COLUMN_SSL_ACCEPT_ALL, builder.isSslAcceptAllCertificates() ? 1 : 0);
+        values.put(COLUMN_SSL, builder.isSsl() ? 1 : 0);
+        values.put(COLUMN_SSL_ACCEPT_ALL, builder.isSslAcceptAllCertificates() ? 1 : 0);
 
         // User settings
         final NickStorage storage = builder.getNickStorage();
-        values.put(ServerTable.COLUMN_NICK_ONE, storage.getFirstChoiceNick());
-        values.put(ServerTable.COLUMN_NICK_TWO, storage.getSecondChoiceNick());
-        values.put(ServerTable.COLUMN_NICK_THREE, storage.getThirdChoiceNick());
+        values.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
+        values.put(COLUMN_NICK_TWO, storage.getSecondChoiceNick());
+        values.put(COLUMN_NICK_THREE, storage.getThirdChoiceNick());
 
-        values.put(ServerTable.COLUMN_REAL_NAME, builder.getRealName());
-        values.put(ServerTable.COLUMN_NICK_CHANGEABLE, builder.isNickChangeable() ? 1 : 0);
+        values.put(COLUMN_REAL_NAME, builder.getRealName());
+        values.put(COLUMN_NICK_CHANGEABLE, builder.isNickChangeable() ? 1 : 0);
 
         // Autojoin channels
-        values.put(ServerTable.COLUMN_AUTOJOIN,
+        values.put(COLUMN_AUTOJOIN,
                 convertArrayToString(builder.getAutoJoinChannels()));
 
         // Server authorisation
-        values.put(ServerTable.COLUMN_SERVER_USERNAME, builder.getServerUserName());
-        values.put(ServerTable.COLUMN_SERVER_PASSWORD, builder.getServerPassword());
+        values.put(COLUMN_SERVER_USERNAME, builder.getServerUserName());
+        values.put(COLUMN_SERVER_PASSWORD, builder.getServerPassword());
 
         // SASL authorisation
-        values.put(ServerTable.COLUMN_SASL_USERNAME, builder.getSaslUsername());
-        values.put(ServerTable.COLUMN_SASL_PASSWORD, builder.getSaslPassword());
+        values.put(COLUMN_SASL_USERNAME, builder.getSaslUsername());
+        values.put(COLUMN_SASL_PASSWORD, builder.getSaslPassword());
 
         // NickServ authorisation
-        values.put(ServerTable.COLUMN_NICK_SERV_PASSWORD, builder.getNickservPassword());
+        values.put(COLUMN_NICK_SERV_PASSWORD, builder.getNickservPassword());
 
         return values;
     }
 
-    public void removeServer(final ContentValues values) {
-        final int id = values.getAsInteger(ServerTable._ID);
-        removeServer(id);
-    }
-
     public void removeServer(final int id) {
-        mDatabase.delete(ServerTable.TABLE_NAME, ServerTable._ID + "=" + id, null);
+        mDatabase.delete(TABLE_NAME, _ID + "=" + id, null);
     }
 }

@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.relay.misc.NickStorage;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,7 +26,7 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     AbstractNickPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
 
-        setPersistent(false);
+        setPersistent(true);
         setDialogLayoutResource(R.layout.nick_choices_edit_texts);
     }
 
@@ -47,14 +48,18 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
         super.onDialogClosed(positiveResult);
 
         if (positiveResult) {
-            persistNick();
+            final boolean persist = getOnPreferenceChangeListener().onPreferenceChange(this,
+                    getNickStorageFromText());
+            if (persist) {
+                persistNick();
+            }
         }
     }
 
     protected abstract void persistNick();
 
     void onEditTextChanged() {
-        final boolean enable = !mFirstChoice.getText().toString().isEmpty();
+        final boolean enable = !getFirstNickText().isEmpty();
         final Dialog dlg = getDialog();
         final AlertDialog alertDlg = (AlertDialog) dlg;
         if (alertDlg != null) {
@@ -90,5 +95,21 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     @Override
     public void afterTextChanged(Editable editable) {
         onEditTextChanged();
+    }
+
+    private NickStorage getNickStorageFromText() {
+        return new NickStorage(getFirstNickText(), getSecondNickText(), getThirdNickText());
+    }
+
+    protected String getFirstNickText() {
+        return mFirstChoice.getText().toString();
+    }
+
+    protected String getSecondNickText() {
+        return mSecondChoice.getText().toString();
+    }
+
+    protected String getThirdNickText() {
+        return mThirdChoice.getText().toString();
     }
 }

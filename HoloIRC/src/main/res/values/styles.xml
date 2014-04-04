@@ -25,7 +25,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item name="card_server_background">@color/server_card_background_light</item>
         <item name="default_text_colour">@android:color/black</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
-        <item name="numberPickerStyle">@style/NPWidget.Holo.NumberPicker</item>
         <item name="activatableItemBackground">@drawable/activatable_item_background</item>
         <item name="expand_close_menu_drawable">@drawable/expander_close_holo_light</item>
         <item name="expand_open_menu_drawable">@drawable/expander_open_holo_light</item>
@@ -35,7 +34,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item name="card_server_background">@color/server_card_background_dark</item>
         <item name="default_text_colour">@android:color/white</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
-        <item name="numberPickerStyle">@style/NPWidget.Holo.Light.NumberPicker</item>
         <item name="activatableItemBackground">@drawable/activatable_item_background</item>
         <item name="expand_close_menu_drawable">@drawable/expander_close_holo_dark</item>
         <item name="expand_open_menu_drawable">@drawable/expander_open_holo_dark</item>

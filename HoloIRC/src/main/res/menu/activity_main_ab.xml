@@ -22,13 +22,17 @@
 <menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-            android:id="@+id/activity_server_list_ab_add"
-            holoirc:showAsAction="withText|ifRoom"
+            android:id="@+id/activity_main_ab_actions"
+            android:title="@string/actions"
+            holoirc:showAsAction="always|withText"/>
+    <item
+            android:id="@+id/activity_main_ab_add"
+            holoirc:showAsAction="ifRoom"
             android:icon="@drawable/ic_menu_add"
             android:title="@string/add"/>
     <item
-            android:id="@+id/activity_server_list_ab_settings"
-            holoirc:showAsAction="withText|ifRoom"
+            android:id="@+id/activity_main_ab_settings"
+            holoirc:showAsAction="ifRoom"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/settings_title"/>
 </menu>

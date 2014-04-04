@@ -8,7 +8,6 @@ import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Server;
 import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
@@ -79,8 +78,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
                             .getSharedPreferences(callback.getServerTitle().toLowerCase(),
                                     Context.MODE_PRIVATE);
                     final Set<String> set = getIgnoreAdapter().getSetOfItems();
-                    SharedPreferencesUtils
-                            .putStringSet(preferences, PreferenceConstants.PREF_IGNORE_LIST, set);
+                    preferences.edit().putStringSet(PreferenceConstants.PREF_IGNORE_LIST, set).commit();
                     MiscUtils.onUpdateIgnoreList(callback.getServer(), set);
                     callback.switchToIRCActionFragment();
                 }

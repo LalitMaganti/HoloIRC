@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 
-public interface ServerSettingsCallbacks extends Preference.OnPreferenceChangeListener {
+public interface ServerSettingsCallbacks {
 
     public void setupPreferences(final PreferenceScreen screen, final Activity activity);
+
+    public boolean onPreferenceChange(final Preference preference);
 }

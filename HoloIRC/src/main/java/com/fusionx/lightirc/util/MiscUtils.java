@@ -53,8 +53,8 @@ public class MiscUtils {
         if (ignoreList == null) {
             final SharedPreferences preferences = context.getSharedPreferences(fileName,
                     Context.MODE_PRIVATE);
-            ignoreList = SharedPreferencesUtils.getStringSet(preferences,
-                    PreferenceConstants.PREF_IGNORE_LIST, new HashSet<String>());
+            ignoreList = preferences
+                    .getStringSet(PreferenceConstants.PREF_IGNORE_LIST, new HashSet<String>());
         }
         return ignoreList;
     }

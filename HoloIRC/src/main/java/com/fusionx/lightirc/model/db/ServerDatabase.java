@@ -24,9 +24,8 @@ public class ServerDatabase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.ServerTable.TABLE_NAME);
-
+        // db.execSQL("DROP TABLE IF EXISTS " + DatabaseContract.ServerTable.TABLE_NAME);
         // Create tables again
-        onCreate(db);
+        // onCreate(db);
     }
 }

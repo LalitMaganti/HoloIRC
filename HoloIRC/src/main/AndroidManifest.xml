@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.AppPreferenceActivity"
+                android:name=".ui.SettingsActivity"
                 android:label="@string/settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -42,6 +42,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".communication.NewIRCService"/>
+        <service android:name=".communication.IRCService"/>
     </application>
 </manifest>

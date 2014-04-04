@@ -31,6 +31,7 @@ public class PreferenceConstants {
     // Server settings
     public final static String PREF_IGNORE_LIST = "pref_ignore_list";
 
+    // TODO - get rid of these
     public final static String PREF_TITLE = "pref_title";
 
     public final static String PREF_URL = "pref_url";

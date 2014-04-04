@@ -26,11 +26,9 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.NickStorage;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
 
 import java.io.File;
@@ -40,7 +38,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -111,8 +108,8 @@ public class SharedPreferencesUtils {
                 true));
 
         // Autojoin channels
-        final ArrayList<String> auto = new ArrayList<String>(getStringSet(serverSettings,
-                PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>()));
+        final ArrayList<String> auto = new ArrayList<String>(serverSettings
+                .getStringSet(PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
         }
@@ -133,52 +130,6 @@ public class SharedPreferencesUtils {
         builder.setNickservPassword(serverSettings.getString(PreferenceConstants
                 .PREF_NICKSERV_PASSWORD, ""));
         return builder;
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static void putStringSet(SharedPreferences preferences, final String key,
-            final Set<String> set) {
-        final SharedPreferences.Editor editor = preferences.edit();
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-            editor.putStringSet(key, set);
-        } else {
-            // removes old occurrences of key
-            for (String k : preferences.getAll().keySet()) {
-                if (k.startsWith(key)) {
-                    editor.remove(k);
-                }
-            }
-
-            int i = 0;
-            for (String value : set) {
-                editor.putString(key + i++, value);
-            }
-        }
-        editor.commit();
-    }
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static Set<String> getStringSet(final SharedPreferences pref, final String key,
-            final Set<String> defaultValue) {
-        if (UIUtils.hasHoneycomb()) {
-            return pref.getStringSet(key, defaultValue);
-        } else {
-            final Set<String> set = new HashSet<String>();
-
-            int i = 0;
-
-            Set<String> keySet = pref.getAll().keySet();
-            while (keySet.contains(key + i)) {
-                set.add(pref.getString(key + i, ""));
-                i++;
-            }
-
-            if (set.isEmpty()) {
-                return defaultValue;
-            } else {
-                return set;
-            }
-        }
     }
 
     public static List<File> getOldServers(final Context context) {
@@ -210,6 +161,7 @@ public class SharedPreferencesUtils {
                 fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
     }
 
+    // TODO - make these static somewhere
     public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
@@ -229,6 +181,8 @@ public class SharedPreferencesUtils {
         final boolean autoNick = preferences.getBoolean(PreferenceConstants
                 .PREF_DEFAULT_AUTO_NICK, true);
         builder.setNickChangeable(autoNick);
+
+        builder.setServerUserName("holoirc");
 
         return builder;
     }

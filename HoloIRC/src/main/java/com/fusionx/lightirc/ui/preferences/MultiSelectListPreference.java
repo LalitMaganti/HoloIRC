@@ -17,7 +17,6 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
 
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -249,8 +248,7 @@ public class MultiSelectListPreference extends DialogPreference {
             return defaultReturnValue;
         }
 
-        return SharedPreferencesUtils.getStringSet(getSharedPreferences(), getKey(),
-                defaultReturnValue);
+        return getSharedPreferences().getStringSet(getKey(), defaultReturnValue);
     }
 
     protected boolean persistStringSet(Set<String> values) {
@@ -261,7 +259,7 @@ public class MultiSelectListPreference extends DialogPreference {
                 return true;
             }
 
-            SharedPreferencesUtils.putStringSet(getSharedPreferences(), getKey(), values);
+            getSharedPreferences().edit().putStringSet(getKey(), values).commit();
             return true;
         }
         return false;

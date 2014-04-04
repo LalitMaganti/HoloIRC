@@ -6,7 +6,6 @@ import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -117,8 +116,8 @@ public class ChannelListFragment extends ListFragment {
         super.onViewCreated(view, savedInstanceState);
         SharedPreferences settings = getActivity().getSharedPreferences("temp",
                 Context.MODE_PRIVATE);
-        final Set<String> set = SharedPreferencesUtils.getStringSet(settings,
-                PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>());
+        final Set<String> set = settings
+                .getStringSet(PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>());
         mAdapter = new BaseCollectionAdapter<>(getActivity(), R.layout.default_listview_textview,
                 new TreeSet<>(set));
 
@@ -171,8 +170,8 @@ public class ChannelListFragment extends ListFragment {
 
     @Override
     public void onPause() {
-        SharedPreferencesUtils.putStringSet(getActivity().getSharedPreferences("temp",
-                Context.MODE_PRIVATE), PREF_AUTOJOIN, mAdapter.getSetOfItems());
+        getActivity().getSharedPreferences("temp",
+                Context.MODE_PRIVATE).edit().putStringSet(PREF_AUTOJOIN, mAdapter.getSetOfItems()).commit();
         super.onPause();
     }
 

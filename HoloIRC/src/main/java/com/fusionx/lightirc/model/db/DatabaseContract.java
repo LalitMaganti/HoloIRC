@@ -54,7 +54,7 @@ public final class DatabaseContract {
                                 + "%s text not null, %s integer, %s text not null, %s text not null,"
                                 + " %s text not null, %s text not null, %s text not null, "
                                 + "%s text not null);",
-                        TABLE_NAME, ServerTable._ID, COLUMN_TITLE, COLUMN_URL,
+                        TABLE_NAME, _ID, COLUMN_TITLE, COLUMN_URL,
                         COLUMN_PORT, COLUMN_SSL, COLUMN_SSL_ACCEPT_ALL, COLUMN_NICK_ONE,
                         COLUMN_NICK_TWO, COLUMN_NICK_THREE, COLUMN_REAL_NAME,
                         COLUMN_NICK_CHANGEABLE, COLUMN_AUTOJOIN, COLUMN_SERVER_USERNAME,

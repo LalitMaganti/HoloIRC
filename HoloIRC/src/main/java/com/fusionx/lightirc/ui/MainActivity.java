@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -10,7 +11,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
-import com.fusionx.relay.interfaces.SubServerObject;
+import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
 
 import android.content.Intent;
@@ -27,16 +28,19 @@ import static butterknife.ButterKnife.findById;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
-        ActionsPagerFragment.Callback {
+        ActionsPagerFragment.Callback, WorkerFragment.Callback {
 
-    // Constants
-    public static final int SETTINGS_ACTIVITY = 1;
+    public static final int SERVER_SETTINGS = 1;
+
+    public static final String WORKER_FRAGMENT = "WorkerFragment";
 
     // Fields
     // IRC
     private Server mServer;
 
     // Fragments
+    private WorkerFragment mWorkerFragment;
+
     private IRCFragment mCurrentFragment;
 
     private ActionsPagerFragment mActionsFragment;
@@ -73,18 +77,25 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         if (savedInstanceState == null) {
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
             mServerListFragment = new ServerListFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.sliding_list_frame,
-                    mServerListFragment).commit();
+            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
 
             mActionsFragment = new ActionsPagerFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.right_drawer,
-                    mActionsFragment).commit();
+            transaction.add(R.id.right_drawer, mActionsFragment);
+
+            mWorkerFragment = new WorkerFragment();
+            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
+
+            transaction.commit();
         } else {
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
             mActionsFragment = (ActionsPagerFragment) getSupportFragmentManager().findFragmentById(R
                     .id.right_drawer);
+            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
+                    .findFragmentByTag(WORKER_FRAGMENT);
 
             mServer = mServerListFragment.onActivityRestored();
             if (mServer != null) {
@@ -110,17 +121,20 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.new_activity_menu, menu);
+        getMenuInflater().inflate(R.menu.activity_main_ab, menu);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        final MenuItem item = menu.findItem(R.id.open_actions);
+        final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
         item.setVisible(!mSlidingPane.isOpen() && mServer != null);
 
-        final MenuItem addServer = menu.findItem(R.id.add_server);
+        final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());
+
+        final MenuItem settings = menu.findItem(R.id.activity_main_ab_settings);
+        settings.setVisible(mSlidingPane.isOpen());
 
         return true;
     }
@@ -132,30 +146,38 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             case R.id.home:
                 UIUtils.toggleSlidingPane(mSlidingPane);
                 return true;
-            case R.id.open_actions:
+            case R.id.activity_main_ab_actions:
                 UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
                 return true;
-            case R.id.add_server:
+            case R.id.activity_main_ab_add:
                 addNewServer();
+                return true;
+            case R.id.activity_main_ab_settings:
+                openAppSettings();
                 return true;
         }
         return false;
+    }
+
+    private void openAppSettings() {
+        final Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     private void addNewServer() {
         final Intent intent = new Intent(this, ServerPreferenceActivity.class);
         intent.putExtra("new", true);
         intent.putExtra("file", "server");
-        startActivityForResult(intent, SETTINGS_ACTIVITY);
+        startActivityForResult(intent, SERVER_SETTINGS);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case SETTINGS_ACTIVITY:
-                    mServerListFragment.refreshServers();
-                    break;
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (RESULT_OK == resultCode) {
+            if (requestCode == SERVER_SETTINGS) {
+                mServerListFragment.refreshServers();
             }
         }
     }
@@ -188,7 +210,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onSubServerClicked(final SubServerObject object) {
+    public void onSubServerClicked(final Conversation object) {
         if (shouldReplaceFragment(object)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
@@ -249,12 +271,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveFragment();
     }
 
+    @Override
+    public IRCService getService() {
+        return mWorkerFragment.getService();
+    }
+
     private boolean shouldReplaceFragment(final Server server) {
         return mCurrentFragment == null || !mServer.equals(server)
                 || !mCurrentFragment.getType().equals(FragmentType.SERVER);
     }
 
-    private boolean shouldReplaceFragment(final SubServerObject object) {
+    private boolean shouldReplaceFragment(final Conversation object) {
         return mCurrentFragment == null
                 || !object.getServer().equals(mServer)
                 || !mCurrentFragment.getTitle().equals(object.getId());
@@ -338,5 +365,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onDrawerStateChanged(final int newState) {
+    }
+
+    @Override
+    public void onServiceConnected(final IRCService service) {
+        mServerListFragment.onServiceConnected(service);
     }
 }

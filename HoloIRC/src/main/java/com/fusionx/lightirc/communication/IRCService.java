@@ -11,7 +11,7 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 
-public class NewIRCService extends Service {
+public class IRCService extends Service {
 
     private final Handler mHandler = new Handler();
 
@@ -47,8 +47,8 @@ public class NewIRCService extends Service {
     // Binder which returns this service
     public class NewIRCBinder extends Binder {
 
-        public NewIRCService getService() {
-            return NewIRCService.this;
+        public IRCService getService() {
+            return IRCService.this;
         }
     }
 }

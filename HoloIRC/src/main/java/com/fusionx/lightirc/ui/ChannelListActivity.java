@@ -30,8 +30,7 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
         throw new IllegalArgumentException();
     }
 
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object o) {
+    public boolean onPreferenceChange(Preference preference) {
         throw new IllegalArgumentException();
     }
 }

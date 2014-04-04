@@ -9,15 +9,13 @@ import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -33,10 +31,12 @@ import java.util.ArrayList;
 
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_URL;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_ONE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_THREE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_TWO;
 
 public class ServerPreferenceActivity extends PreferenceActivity implements
-        ServerSettingsCallbacks,
-        Preference.OnPreferenceChangeListener {
+        ServerSettingsCallbacks {
 
     public static final String NEW_SERVER = "new";
 
@@ -70,7 +70,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
@@ -85,22 +84,16 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         final ServerConfiguration.Builder builder;
         if (mNewServer) {
             builder = SharedPreferencesUtils.getDefaultNewServer(this);
+            setResult(RESULT_CANCELED);
         } else {
             builder = getIntent().getParcelableExtra(SERVER);
+            setResult(RESULT_OK);
         }
         mContentValues = mSource.getContentValuesFromBuilder(builder, true);
 
-        if (UIUtils.hasHoneycomb()) {
-            final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
-            getFragmentManager().beginTransaction().replace(android.R.id.content,
-                    fragment).commit();
-        } else {
-            getPreferenceManager().setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
-            getPreferenceManager().setSharedPreferencesName("tempUselessFile");
-
-            addPreferencesFromResource(R.xml.activty_server_settings_prefs);
-            setupPreferences(getPreferenceScreen(), this);
-        }
+        final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                fragment).commit();
     }
 
     @Override
@@ -136,14 +129,11 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         super.onDestroy();
 
         final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
-                "temp.xml");
+                "tempUselessFile.xml");
         if (folder.exists()) {
             folder.delete();
         }
         mSource.close();
-
-        setResult(RESULT_OK, new Intent());
-        finish();
     }
 
     @Override
@@ -179,7 +169,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     }
 
     @Override
-    public boolean onPreferenceChange(final Preference preference, final Object newValue) {
+    public boolean onPreferenceChange(final Preference preference) {
         if (!mCanSaveChanges) {
             if (preference == mTitle && StringUtils.isEmpty(mUrl.getText())) {
                 mCompletePreference.setInitialText(mUrl.getTitle());
@@ -190,6 +180,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             } else {
                 mScreen.removePreference(mCompletePreference);
                 mCanSaveChanges = true;
+                setResult(RESULT_OK);
             }
         }
         return true;
@@ -211,7 +202,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
                         if (preference == mUrl || preference == mTitle) {
-                            ServerPreferenceActivity.this.onPreferenceChange(preference, newValue);
+                            ServerPreferenceActivity.this.onPreferenceChange(preference);
                         }
                         mContentValues.put(preference.getKey(), (String) newValue);
                         return true;
@@ -230,10 +221,18 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                     }
                 };
             } else if (p instanceof NickPreference) {
+                final NickPreference nickPreference = (NickPreference) p;
+                nickPreference.setNickChoices(mContentValues.getAsString(COLUMN_NICK_ONE),
+                        mContentValues.getAsString(COLUMN_NICK_TWO),
+                        mContentValues.getAsString(COLUMN_NICK_THREE));
+
                 listener = new Preference.OnPreferenceChangeListener() {
                     @Override
                     public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        ((NickPreference) preference).commitToContentValues(mContentValues);
+                        final NickStorage storage = (NickStorage) newValue;
+                        mContentValues.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
+                        mContentValues.put(COLUMN_NICK_TWO, storage.getSecondChoiceNick());
+                        mContentValues.put(COLUMN_NICK_THREE, storage.getThirdChoiceNick());
                         return true;
                     }
                 };
