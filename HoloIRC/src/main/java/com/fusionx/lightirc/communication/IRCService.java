@@ -11,8 +11,12 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Pair;
 
-public class IRCService extends Service {
+import java.util.HashMap;
+import java.util.Map;
+
+public class IRCService extends Service implements EventPriorityHelper.Callback {
 
     private final Handler mHandler = new Handler();
 
@@ -20,9 +24,11 @@ public class IRCService extends Service {
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 
+    private final Map<String, EventPriorityHelper> mEventHelperMap = new HashMap<>();
+
     private ConnectionManager mConnectionManager;
 
-    private Conversation mSavedConversation;
+    private Conversation mConversation;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -30,7 +36,18 @@ public class IRCService extends Service {
     }
 
     public Server connectToServer(final ServerConfiguration.Builder builder) {
-        return mConnectionManager.onConnectionRequested(builder.build(), mHandler).second;
+        final Pair<Boolean, Server> pair = mConnectionManager.onConnectionRequested(builder
+                .build(), mHandler);
+
+        final boolean exists = pair.first;
+        final Server server = pair.second;
+
+        if (!exists) {
+            final EventPriorityHelper eventPriorityHelper = new EventPriorityHelper(server,
+                    this);
+            mEventHelperMap.put(server.getTitle(), eventPriorityHelper);
+        }
+        return server;
     }
 
     public Server getServerIfExists(final ServerConfiguration.Builder builder) {
@@ -39,20 +56,26 @@ public class IRCService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(final Intent intent) {
         return mBinder;
     }
 
-    public void requestDisconnectionFromServer(Server server) {
+    public void requestDisconnectionFromServer(final Server server) {
+        mEventHelperMap.remove(server.getTitle());
         mConnectionManager.onDisconnectionRequested(server.getTitle());
     }
 
-    public Conversation getSavedConversation() {
-        return mSavedConversation;
+    @Override
+    public Conversation getConversation() {
+        return mConversation;
     }
 
-    public void setSavedConversation(Conversation savedConversation) {
-        mSavedConversation = savedConversation;
+    public void setConversation(final Conversation conversation) {
+        mConversation = conversation;
+    }
+
+    public EventPriorityHelper getEventHelper(String title) {
+        return mEventHelperMap.get(title);
     }
 
     // Binder which returns this service

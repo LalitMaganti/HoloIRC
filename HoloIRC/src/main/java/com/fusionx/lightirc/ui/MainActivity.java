@@ -4,13 +4,11 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
@@ -40,6 +38,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private static final String ACTION_BAR_TITLE = "action_bar_title";
 
     private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
+
+    // IRC
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     // Fields
     // IRC
@@ -103,7 +104,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
 
-            mConversation = mWorkerFragment.getSavedConversation();
+            mConversation = getService().getConversation();
             if (mConversation != null) {
                 mConversation.getServer().getServerEventBus().register(this);
             }
@@ -140,16 +141,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
             getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (mConversation != null) {
-            mWorkerFragment.getService().setSavedConversation(mConversation);
-        }
-        mWorkerFragment.setSavedConversation(mConversation);
     }
 
     @Override
@@ -242,7 +233,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 server.getServerEventBus().register(this);
             }
 
-            mConversation = server;
+            setConversation(server);
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(server.getTitle());
@@ -277,8 +268,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 object.getServer().getServerEventBus().register(this);
             }
 
-            mConversation = object;
-
+            setConversation(object);
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(object.getId());
@@ -308,7 +298,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
         mCurrentFragment = null;
-        mConversation = null;
+        setConversation(null);
     }
 
     @Override
@@ -321,11 +311,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public IRCService getService() {
         return mWorkerFragment.getService();
-    }
-
-    @Override
-    public Conversation getConversation() {
-        return mConversation;
     }
 
     /**
@@ -369,20 +354,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    // Subscribe events
-    @Subscribe
-    public void onStatusChanged(final StatusChangeEvent event) {
-        // Null happens when the disconnect handler is called first & the fragment has already been
-        // removed by the disconnect handler
-        if (mCurrentFragment != null) {
-            if (mCurrentFragment.getType() == FragmentType.SERVER) {
-                setActionBarSubtitle(MiscUtils.getStatusString(this,
-                        mConversation.getServer().getStatus()));
-            }
-            mActionsFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
-        }
-    }
-
     @Override
     public void onPanelOpened(final View view) {
         supportInvalidateOptionsMenu();
@@ -423,11 +394,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
 
-        Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
             public void run() {
-                final Conversation conversation = service.getSavedConversation();
+                final Conversation conversation = service.getConversation();
                 if (conversation != null) {
                     // TODO - what if disconnection occurred when not attached
                     if (conversation.getServer().equals(conversation)) {
@@ -440,5 +410,24 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 }
             }
         });
+    }
+
+    public void setConversation(final Conversation conversation) {
+        mConversation = conversation;
+        getService().setConversation(conversation);
+    }
+
+    // Subscribe events
+    @Subscribe
+    public void onEventMainThread(final StatusChangeEvent event) {
+        // Null happens when the disconnect handler is called first & the fragment has already been
+        // removed by the disconnect handler
+        if (mCurrentFragment != null) {
+            if (mCurrentFragment.getType() == FragmentType.SERVER) {
+                setActionBarSubtitle(MiscUtils.getStatusString(this,
+                        mConversation.getServer().getStatus()));
+            }
+            mActionsFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
+        }
     }
 }

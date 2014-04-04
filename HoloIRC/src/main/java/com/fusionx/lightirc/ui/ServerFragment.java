@@ -28,7 +28,6 @@ import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
@@ -71,14 +70,9 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
         return FragmentType.SERVER;
     }
 
-    @Override
-    public Conversation getConversation() {
-        return getServer();
-    }
-
     // Subscription methods
     @Subscribe
-    public void onServerEvent(final ServerEvent event) {
+    public void onEventMainThread(final ServerEvent event) {
         if (!sClasses.contains(event.getClass())) {
             mMessageAdapter.add(event);
         }

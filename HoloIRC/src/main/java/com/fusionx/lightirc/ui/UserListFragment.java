@@ -263,7 +263,7 @@ public class UserListFragment extends Fragment {
      * event is referring to
      */
     @Subscribe
-    public void onWorldUserEvent(final WorldUserEvent event) {
+    public void onEventMainThread(final WorldUserEvent event) {
         if (event.channelName.equals(mChannel.getName())) {
             final Collection<WorldUser> userList = mChannel.getUsers();
 

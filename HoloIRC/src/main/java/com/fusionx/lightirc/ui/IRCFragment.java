@@ -170,8 +170,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         return mTitle;
     }
 
-    public abstract Conversation getConversation();
-
     public interface Callback {
 
         public Server getServer();

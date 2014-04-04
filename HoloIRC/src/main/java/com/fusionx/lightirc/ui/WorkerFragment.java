@@ -28,8 +28,6 @@ public class WorkerFragment extends Fragment implements LoaderManager
 
     private Callback mCallback;
 
-    private Conversation mSavedConversation;
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -109,14 +107,6 @@ public class WorkerFragment extends Fragment implements LoaderManager
 
     public IRCService getService() {
         return mService;
-    }
-
-    public Conversation getSavedConversation() {
-        return mSavedConversation;
-    }
-
-    public void setSavedConversation(Conversation savedConversation) {
-        mSavedConversation = savedConversation;
     }
 
     public void disconnectFromServer(final Server server) {

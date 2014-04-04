@@ -27,15 +27,12 @@ import com.google.common.collect.Iterables;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.MentionEvent;
 import com.fusionx.relay.event.channel.NameEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
-import com.fusionx.relay.interfaces.Conversation;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.util.IRCUtils;
@@ -109,11 +106,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     @Override
-    public Conversation getConversation() {
-        return getChannel();
-    }
-
-    @Override
     protected List<ChannelEvent> getAdapterData() {
         return getChannel().getBuffer();
     }
@@ -133,17 +125,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
             mChannel = getServer().getUserChannelInterface().getChannel(mTitle);
         }
         return mChannel;
-    }
-
-    // Subscription methods
-    @Subscribe
-    public void onChannelMessage(final ChannelEvent event) {
-        if (event.channelName.equals(mTitle) && !(sClasses.contains(event.getClass()))) {
-            if (event instanceof WorldUserEvent && AppPreferences.hideUserMessages) {
-                return;
-            }
-            mMessageAdapter.add(event);
-        }
     }
 
     @OnClick(R.id.auto_complete_button)
@@ -215,5 +196,17 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         list.set(list.size() - 1, newWord);
         mMessageBox.setText("");
         mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
+    }
+
+
+    // Subscription methods
+    @Subscribe
+    public void onEventMainThread(final ChannelEvent event) {
+        if (event.channelName.equals(mTitle) && !(sClasses.contains(event.getClass()))) {
+            if (event instanceof WorldUserEvent && AppPreferences.hideUserMessages) {
+                return;
+            }
+            mMessageAdapter.add(event);
+        }
     }
 }

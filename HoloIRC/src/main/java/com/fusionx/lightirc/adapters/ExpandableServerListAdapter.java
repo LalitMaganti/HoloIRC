@@ -1,6 +1,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.communication.EventPriorityHelper;
+import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -10,7 +12,6 @@ import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -22,11 +23,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
-
-    private static final String ADAPTER_DATA = "adapter_data";
 
     private final LayoutInflater mInflater;
 
@@ -36,15 +34,18 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final MessageConversionUtils mMessageConverter;
 
+    private final IRCService mIRCService;
+
     private ExpandableListView mListView;
 
     public ExpandableServerListAdapter(final Context context, final ArrayList<ServerWrapper>
-            builders, final ExpandableListView listView) {
+            builders, final ExpandableListView listView, final IRCService service) {
         mInflater = LayoutInflater.from(context);
         mMessageConverter = MessageConversionUtils.getConverter(context);
         mContext = context;
         mServerListItems = builders;
         mListView = listView;
+        mIRCService = service;
     }
 
     @Override
@@ -78,13 +79,15 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final ServerWrapper listItem = getGroup(groupPos);
         final Conversation conversation = getChild(groupPos, childPos);
 
+        final EventPriorityHelper helper = mIRCService.getEventHelper(listItem.getTitle());
+
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
-        builder.setSpan(UIUtils.getSpanFromPriority(listItem.getSubMessagePriority(conversation
+        builder.setSpan(UIUtils.getSpanFromPriority(helper.getSubMessagePriority(conversation
                 .getId())), 0, conversation.getId().length(), 0);
         textView.setText(builder);
 
-        final Event event = listItem.getSubEvent(conversation.getId());
+        final Event event = helper.getSubEvent(conversation.getId());
         final TextView textEvent = (TextView) convertView.findViewById(R.id.child_event);
         if (event.store == null) {
             mMessageConverter.setEventMessage(event);
@@ -126,11 +129,14 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
 
         final ServerWrapper listItem = getGroup(groupPos);
+        final EventPriorityHelper helper = mIRCService.getEventHelper(listItem.getTitle());
 
         final TextView title = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
-        builder.setSpan(UIUtils.getSpanFromPriority(listItem.getMessagePriority()), 0,
-                listItem.getTitle().length(), 0);
+        if (helper != null) {
+            builder.setSpan(UIUtils.getSpanFromPriority(helper.getMessagePriority()), 0,
+                    listItem.getTitle().length(), 0);
+        }
 
         title.setText(listItem.getTitle());
         final TextView status = ((TextView) convertView.findViewById(R.id.child_event));
@@ -157,19 +163,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             expandButton.setOnClickListener(new ExpandListener(groupPos));
         }
         return convertView;
-    }
-
-    public ServerWrapper getServerWrapperFromTitle(final String title) {
-        for (final ServerWrapper wrapper : mServerListItems) {
-            if (wrapper.getTitle().equals(title)) {
-                return wrapper;
-            }
-        }
-        return null;
-    }
-
-    public void onParcelImportantData(Bundle outState) {
-        outState.putParcelableArrayList(ADAPTER_DATA, mServerListItems);
     }
 
     public final class ExpandListener implements View.OnClickListener {

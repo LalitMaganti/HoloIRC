@@ -20,7 +20,6 @@ import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.interfaces.Conversation;
-import com.squareup.otto.Subscribe;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -58,8 +57,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     // IRC
     private IRCService mService;
 
-    private MessageConversionUtils mConverter;
-
     // Expandable ListView
     private ExpandableListView mListView;
 
@@ -94,8 +91,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         final boolean[] expandStatus = UIUtils.saveExpandableListViewExpandState(mListAdapter,
                 mListView);
         outState.putBooleanArray(EXPAND_SAVE_STATE, expandStatus);
-
-        mListAdapter.onParcelImportantData(outState);
     }
 
     @Override
@@ -107,8 +102,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     @Override
     public void onViewCreated(final View view, final Bundle bundle) {
         super.onViewCreated(view, bundle);
-
-        mConverter = MessageConversionUtils.getConverter(getActivity());
 
         mListView = findById(view, R.id.server_list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -126,7 +119,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             // connection to the service has not been established - in that case our callback is
             // still to come
             if (service != null) {
-                mService = service;
+                onServiceConnected(service);
 
                 // Restore the expand state of the ListView
                 //final boolean[] groupExpandedArray = savedState
@@ -157,7 +150,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     }
                 }
                 mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
-                        mListView);
+                        mListView, mService);
                 mListView.setAdapter(mListAdapter);
             }
 
@@ -188,8 +181,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mEventHandlers.add(new ServerEventHandler(item.getServer(), groupPosition));
         }
         mCallback.onServerClicked(item.getServer());
-        item.clearMessagePriority();
+
+        final String title = item.getServer().getTitle();
+        mService.getEventHelper(title).clearMessagePriority();
         mListView.invalidateViews();
+
         return true;
     }
 
@@ -209,8 +205,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         final Conversation conversation = mListAdapter.getChild(groupPosition, childPosition);
         mCallback.onSubServerClicked(conversation);
 
-        final ServerWrapper wrapper = mListAdapter.getGroup(groupPosition);
-        wrapper.clearMessagePriority(conversation);
+        final String title = conversation.getServer().getTitle();
+        mService.getEventHelper(title).clearMessagePriority(conversation);
         mListView.invalidateViews();
 
         return true;
@@ -310,25 +306,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         refreshServers();
     }
 
-    public void onIRCEvent(final MessagePriority priority, final Conversation conversation,
-            final Event event) {
-        final ServerWrapper wrapper = mListAdapter.getServerWrapperFromTitle(conversation
-                .getServer().getTitle());
-        if (!conversation.equals(mCallback.getConversation())) {
-            if (conversation.equals(conversation.getServer())) {
-                wrapper.setMessagePriority(priority);
-            } else {
-                wrapper.setSubMessagePriority(conversation.getId(), priority);
-                wrapper.setSubEvent(conversation.getId(), event);
-            }
-        } else {
-            if (!conversation.equals(conversation.getServer())) {
-                wrapper.setSubEvent(conversation.getId(), event);
-            }
-        }
-        mListView.invalidateViews();
-    }
-
     public interface Callback {
 
         public void onServerClicked(final Server server);
@@ -338,8 +315,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onServerDisconnected(final Server server);
 
         public IRCService getService();
-
-        public Conversation getConversation();
     }
 
     public class ServerEventHandler {
@@ -355,50 +330,42 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             server.getServerEventBus().register(this);
         }
 
-        @Subscribe
-        public void onJoin(final JoinEvent event) throws InterruptedException {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final JoinEvent event) throws InterruptedException {
             final Channel channel = mServer.getUserChannelInterface().getChannel(event
                     .channelName);
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
 
-            onIRCEvent(MessagePriority.LOW, channel, channel.getBuffer().get(channel.getBuffer()
-                    .size() - 1));
+            mListView.invalidateViews();
         }
 
-        @Subscribe
-        public void onPart(final PartEvent event) throws InterruptedException {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final PartEvent event) throws InterruptedException {
             mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
         }
 
-        @Subscribe
-        public void onChannelMessage(final ChannelEvent event) {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final ChannelEvent event) {
             if (!ChannelFragment.sClasses.contains(event.getClass())) {
-                final Conversation conversation = mServer.getUserChannelInterface()
-                        .getChannel(event.channelName);
-
-                if (event instanceof WorldMessageEvent) {
-                    onIRCEvent(MessagePriority.MEDIUM, conversation, event);
-                } else {
-                    onIRCEvent(MessagePriority.LOW, conversation, event);
-                }
+                mListView.invalidateViews();
             }
         }
 
-        @Subscribe
-        public void onServerMessage(final ServerEvent event) {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final ServerEvent event) {
         }
 
-        @Subscribe
-        public void onConnect(final ConnectEvent event) {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final ConnectEvent event) {
             mListView.invalidateViews();
         }
 
-        @Subscribe
-        public void onDisconnect(final DisconnectEvent event) {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final DisconnectEvent event) {
             if (event.userSent) {
                 refreshServers();
 
