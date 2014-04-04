@@ -106,7 +106,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         }
         onResetBuffer();
         getServer().getServerEventBus().register(this);
-        onResetUserInput();
     }
 
     @Override
@@ -119,10 +118,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     @Override
     public void onResume() {
         super.onResume();
-
-        if (getServer().getStatus() != ConnectionStatus.CONNECTED) {
-            onResetUserInput();
-        }
 
         getListView().setSelection(getListView().getCount());
     }
@@ -148,26 +143,12 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         return false;
     }
 
-    public final void onResetUserInput() {
-        mMessageBox.setEnabled(getServer() != null && getServer().getStatus() == ConnectionStatus
-                .CONNECTED);
-    }
-
     public void onResetBuffer() {
         if (getServer().getStatus() == ConnectionStatus.CONNECTED) {
             mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
         } else {
             mMessageAdapter.setData(new ArrayList<>(getDisconnectedAdapterData()));
         }
-    }
-
-    public void onConnected() {
-        onResetUserInput();
-    }
-
-    public void onDisconnected() {
-        onResetUserInput();
-        onResetBuffer();
     }
 
     public Server getServer() {

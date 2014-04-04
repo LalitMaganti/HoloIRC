@@ -39,7 +39,8 @@ public class UserFragment extends IRCFragment<UserEvent> {
         final PrivateMessageUser user = getPrivateMessageUser();
 
         if (user.isUserQuit()) {
-            onResetUserInput();
+            // TODO - fix this
+            //onResetUserInput();
         }
     }
 

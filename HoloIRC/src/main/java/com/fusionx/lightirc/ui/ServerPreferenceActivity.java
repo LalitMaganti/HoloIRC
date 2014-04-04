@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_URL;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_IGNORE_LIST;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_ONE;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_THREE;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_TWO;
@@ -89,7 +90,12 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             builder = getIntent().getParcelableExtra(SERVER);
             setResult(RESULT_OK);
         }
-        mContentValues = mSource.getContentValuesFromBuilder(builder, true);
+        mContentValues = mSource.getContentValuesFromBuilder(builder, !mNewServer);
+        // If it's a new server, we can't allow ignore list to be null - just put an empty string
+        // in for now - TODO - fix this
+        if (mNewServer) {
+            mContentValues.put(COLUMN_IGNORE_LIST, "");
+        }
 
         final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
         getFragmentManager().beginTransaction().replace(android.R.id.content,

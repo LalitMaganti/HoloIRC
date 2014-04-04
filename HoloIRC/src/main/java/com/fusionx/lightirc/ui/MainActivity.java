@@ -10,6 +10,7 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.ConnectEvent;
+import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
@@ -333,11 +334,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     mConversation.getServer().getStatus()));
             mActionsFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
         }
-    }
-
-    @Subscribe
-    public void onConnected(final ConnectEvent event) {
-        mCurrentFragment.onResetUserInput();
     }
 
     @Override

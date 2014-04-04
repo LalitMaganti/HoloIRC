@@ -13,6 +13,7 @@ import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
+import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.squareup.otto.Subscribe;
 
@@ -41,21 +42,26 @@ import static butterknife.ButterKnife.findById;
 public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
+    // Constants
     private static final String EXPAND_SAVE_STATE = "expand_save_state";
 
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
-    private IRCService mService;
-
-    private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
-
+    // Callbacks
     private Callback mCallback;
 
+    // IRC
+    private IRCService mService;
+
+    // Expandable ListView
     private ExpandableListView mListView;
 
     private ExpandableServerListAdapter mListAdapter;
 
+    // Action mode
     private boolean mActionModeStarted;
+
+    private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -336,11 +342,16 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe
         public void onDisconnect(final DisconnectEvent event) {
-            refreshServers();
+            if (event.userSent) {
+                refreshServers();
 
-            unregister();
-            mCallback.onServerDisconnected(mServer);
-            mEventHandlers.remove(this);
+                unregister();
+                mCallback.onServerDisconnected(mServer);
+                mEventHandlers.remove(this);
+            } else {
+                // TODO - check what needs to be done here
+                mListView.invalidateViews();
+            }
         }
 
         public void unregister() {
