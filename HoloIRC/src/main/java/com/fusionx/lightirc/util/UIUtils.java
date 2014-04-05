@@ -17,8 +17,6 @@ import android.text.style.ForegroundColorSpan;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ExpandableListAdapter;
-import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;

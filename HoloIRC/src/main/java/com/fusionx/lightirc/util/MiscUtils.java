@@ -22,17 +22,11 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Server;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Full of static utility methods

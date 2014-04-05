@@ -4,17 +4,11 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
-
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static com.fusionx.relay.ServerConfiguration.Builder;
 

@@ -6,10 +6,8 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.relay.ServerConfiguration;
 
 import android.content.Context;
-import android.os.Bundle;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>> {
 

@@ -3,20 +3,13 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
-import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
-import com.fusionx.lightirc.model.db.DatabaseContract;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
-import com.fusionx.lightirc.util.DatabaseUtils;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Server;
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
@@ -31,10 +24,6 @@ import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_IGNORE_LIST;
 
 public class IgnoreListFragment extends ListFragment implements OnDismissCallback,
         AbsListView.MultiChoiceModeListener, AbsListView.OnItemClickListener {

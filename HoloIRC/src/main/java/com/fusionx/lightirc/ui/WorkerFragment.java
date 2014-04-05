@@ -4,7 +4,6 @@ import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.app.Dialog;

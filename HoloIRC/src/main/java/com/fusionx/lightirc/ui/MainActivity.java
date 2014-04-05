@@ -99,8 +99,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         } else {
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
-            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R
-                    .id.right_drawer);
+            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                    .findFragmentById(R
+                            .id.right_drawer);
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
 
@@ -428,7 +429,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 setActionBarSubtitle(MiscUtils.getStatusString(this,
                         mConversation.getServer().getStatus()));
             }
-            mNavigationDrawerFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
+            mNavigationDrawerFragment
+                    .onConnectionStatusChanged(mConversation.getServer().getStatus());
         }
     }
 }

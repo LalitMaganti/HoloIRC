@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
-import com.haarman.listviewanimations.BaseAdapterDecorator;
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.nhaarman.listviewanimations.BaseAdapterDecorator;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
