@@ -4,21 +4,20 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
-import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
-import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.Event;
+import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
+import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -120,11 +119,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             // still to come
             if (service != null) {
                 onServiceConnected(service);
-
-                // Restore the expand state of the ListView
-                //final boolean[] groupExpandedArray = savedState
-                //        .getBooleanArray(EXPAND_SAVE_STATE);
-                //UIUtils.restoreExpandableListViewExpandState(groupExpandedArray, mListView);
             }
         }
     }
@@ -140,6 +134,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             @Override
             public void onLoadFinished(final Loader<ArrayList<ServerWrapper>> loader,
                     final ArrayList<ServerWrapper> listItems) {
+                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
+                        mListView, mService);
+                mListView.setAdapter(mListAdapter);
                 for (final ServerEventHandler handler : mEventHandlers) {
                     handler.unregister();
                 }
@@ -148,10 +145,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     if (wrapper.getServer() != null) {
                         mEventHandlers.add(new ServerEventHandler(wrapper.getServer(), i));
                     }
+                    // Expand all the groups - TODO - fix this properly
+                    mListView.expandGroup(i);
                 }
-                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
-                        mListView, mService);
-                mListView.setAdapter(mListAdapter);
             }
 
             @Override
@@ -331,6 +327,17 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @SuppressWarnings("unused")
+        public void onEventMainThread(final NewPrivateMessage event) throws InterruptedException {
+            final PrivateMessageUser user = mServer.getUserChannelInterface()
+                    .getPrivateMessageUser(event.nick);
+            mListAdapter.getGroup(mServerIndex).addServerObject(user);
+            mListView.setAdapter(mListAdapter);
+            mListView.expandGroup(mServerIndex);
+
+            mListView.invalidateViews();
+        }
+
+        @SuppressWarnings("unused")
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
             final Channel channel = mServer.getUserChannelInterface().getChannel(event
                     .channelName);
@@ -353,6 +360,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             if (!ChannelFragment.sClasses.contains(event.getClass())) {
                 mListView.invalidateViews();
             }
+        }
+
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final UserEvent event) {
+            mListView.invalidateViews();
         }
 
         @SuppressWarnings("unused")

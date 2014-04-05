@@ -70,6 +70,51 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     // TODO - ViewHolder pattern
     @Override
+    public View getGroupView(final int groupPos, final boolean isExpanded, View convertView,
+            final ViewGroup parent) {
+        if (convertView == null) {
+            convertView = mInflater.inflate(R.layout.main_list_group, parent, false);
+        }
+
+        final ServerWrapper listItem = getGroup(groupPos);
+        final EventPriorityHelper helper = mIRCService.getEventHelper(listItem.getTitle());
+
+        final TextView title = (TextView) convertView.findViewById(R.id.child_title);
+        final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
+        if (helper != null) {
+            builder.setSpan(UIUtils.getSpanFromPriority(helper.getMessagePriority()), 0,
+                    listItem.getTitle().length(), 0);
+        }
+
+        title.setText(listItem.getTitle());
+        final TextView status = ((TextView) convertView.findViewById(R.id.child_event));
+        status.setText(MiscUtils.getStatusString(mContext, listItem.getServer() != null
+                ? listItem.getServer().getStatus()
+                : ConnectionStatus.DISCONNECTED));
+
+        final View divider = convertView.findViewById(R.id.divider);
+        final ImageView expandButton = (ImageView) convertView.findViewById(R.id.button_expand);
+        if (listItem.getSubServerSize() == 0) {
+            expandButton.setVisibility(View.INVISIBLE);
+            divider.setVisibility(View.VISIBLE);
+        } else {
+            expandButton.setVisibility(View.VISIBLE);
+            divider.setVisibility(isExpanded ? View.INVISIBLE : View.VISIBLE);
+            expandButton.setTag(!isExpanded);
+
+            final TypedValue typedvalueattr = new TypedValue();
+            mContext.getTheme().resolveAttribute(isExpanded ? R.attr.expand_close_menu_drawable
+                    : R.attr.expand_open_menu_drawable, typedvalueattr, true);
+            expandButton.setImageDrawable(mContext.getResources().getDrawable(typedvalueattr
+                    .resourceId));
+
+            expandButton.setOnClickListener(new ExpandListener(groupPos));
+        }
+        return convertView;
+    }
+
+    // TODO - ViewHolder pattern
+    @Override
     public View getChildView(final int groupPos, final int childPos, final boolean isLastChild,
             View convertView, final ViewGroup parent) {
         if (convertView == null) {
@@ -118,51 +163,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     @Override
     public long getGroupId(final int groupPos) {
         return groupPos;
-    }
-
-    // TODO - ViewHolder pattern
-    @Override
-    public View getGroupView(final int groupPos, final boolean isExpanded, View convertView,
-            final ViewGroup parent) {
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.main_list_group, parent, false);
-        }
-
-        final ServerWrapper listItem = getGroup(groupPos);
-        final EventPriorityHelper helper = mIRCService.getEventHelper(listItem.getTitle());
-
-        final TextView title = (TextView) convertView.findViewById(R.id.child_title);
-        final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
-        if (helper != null) {
-            builder.setSpan(UIUtils.getSpanFromPriority(helper.getMessagePriority()), 0,
-                    listItem.getTitle().length(), 0);
-        }
-
-        title.setText(listItem.getTitle());
-        final TextView status = ((TextView) convertView.findViewById(R.id.child_event));
-        status.setText(MiscUtils.getStatusString(mContext, listItem.getServer() != null
-                ? listItem.getServer().getStatus()
-                : ConnectionStatus.DISCONNECTED));
-
-        final View divider = convertView.findViewById(R.id.divider);
-        final ImageView expandButton = (ImageView) convertView.findViewById(R.id.button_expand);
-        if (listItem.getSubServerSize() == 0) {
-            expandButton.setVisibility(View.INVISIBLE);
-            divider.setVisibility(View.VISIBLE);
-        } else {
-            expandButton.setVisibility(View.VISIBLE);
-            divider.setVisibility(isExpanded ? View.INVISIBLE : View.VISIBLE);
-            expandButton.setTag(!isExpanded);
-
-            final TypedValue typedvalueattr = new TypedValue();
-            mContext.getTheme().resolveAttribute(isExpanded ? R.attr.expand_close_menu_drawable
-                    : R.attr.expand_open_menu_drawable, typedvalueattr, true);
-            expandButton.setImageDrawable(mContext.getResources().getDrawable(typedvalueattr
-                    .resourceId));
-
-            expandButton.setOnClickListener(new ExpandListener(groupPos));
-        }
-        return convertView;
     }
 
     public final class ExpandListener implements View.OnClickListener {

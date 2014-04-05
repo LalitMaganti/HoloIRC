@@ -113,6 +113,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     .content_frame);
             if (mCurrentFragment != null) {
                 findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
+                supportInvalidateOptionsMenu();
             }
         }
     }
@@ -394,10 +395,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
 
+        final Conversation conversation = service.getConversation();
         handler.post(new Runnable() {
             @Override
             public void run() {
-                final Conversation conversation = service.getConversation();
                 if (conversation != null) {
                     // TODO - what if disconnection occurred when not attached
                     if (conversation.getServer().equals(conversation)) {
