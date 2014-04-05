@@ -3,11 +3,12 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
+import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.interfaces.Conversation;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
 import android.os.Bundle;
@@ -25,8 +26,19 @@ import android.widget.AdapterView;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 public class IgnoreListFragment extends ListFragment implements OnDismissCallback,
         AbsListView.MultiChoiceModeListener, AbsListView.OnItemClickListener {
+
+    private Conversation mConversation;
+
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+        }
+    };
 
     private ActionMode mActionMode;
 
@@ -57,11 +69,10 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final IgnoreListCallback callback = FragmentUtils.getParent(this,
-                IgnoreListCallback.class);
+        EventBus.getDefault().registerSticky(mEventHandler);
 
         final List<String> arrayList = new ArrayList<>(mDatabaseSource.getIgnoreListByName(
-                callback.getServerTitle()));
+                mConversation.getServer().getTitle()));
         final BaseCollectionAdapter<String> ignoreAdapter = new BaseCollectionAdapter<>
                 (getActivity(), R.layout.default_listview_textview, arrayList);
         final DecoratedIgnoreListAdapter listAdapter = new DecoratedIgnoreListAdapter
@@ -144,7 +155,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         final IgnoreListCallback callback = FragmentUtils.getParent(IgnoreListFragment.this,
                 IgnoreListCallback.class);
         final List<String> list = getIgnoreAdapter().getListOfItems();
-        mDatabaseSource.updateIgnoreList(callback.getServerTitle(), list);
+        mDatabaseSource.updateIgnoreList(mConversation.getServer().getTitle(), list);
 
         callback.switchToIRCActionFragment();
     }
@@ -164,10 +175,6 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public interface IgnoreListCallback {
 
         public void switchToIRCActionFragment();
-
-        public String getServerTitle();
-
-        public Server getServer();
     }
 
     public class IgnoreListDialogBuilder extends DialogBuilder {

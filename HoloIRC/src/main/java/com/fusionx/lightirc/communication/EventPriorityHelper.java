@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.communication;
 
+import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.relay.Channel;
@@ -15,6 +16,8 @@ import com.fusionx.relay.interfaces.Conversation;
 
 import java.util.HashMap;
 
+import de.greenrobot.event.EventBus;
+
 public final class EventPriorityHelper {
 
     private static final int EVENT_PRIORITY = 100;
@@ -25,15 +28,21 @@ public final class EventPriorityHelper {
 
     private final Server mServer;
 
-    private final Callback mCallback;
+    private Conversation mConversation;
 
     private MessagePriority mMessagePriority;
 
-    public EventPriorityHelper(final Server server, final Callback callback) {
+    public EventPriorityHelper(final Server server) {
         mServer = server;
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
-        mCallback = callback;
+
+        EventBus.getDefault().registerSticky(new Object() {
+            @SuppressWarnings("unused")
+            public void onEvent(final OnConversationChanged conversationChanged) {
+                mConversation = conversationChanged.conversation;
+            }
+        });
 
         server.getServerEventBus().register(this, EVENT_PRIORITY);
     }
@@ -77,15 +86,15 @@ public final class EventPriorityHelper {
 
     public void onIRCEvent(final MessagePriority priority, final Conversation conversation,
             final Event event) {
-        if (!conversation.equals(mCallback.getConversation())) {
+        if (conversation.equals(mConversation)) {
+            if (!conversation.equals(conversation.getServer())) {
+                setSubEvent(conversation.getId(), event);
+            }
+        } else {
             if (conversation.equals(conversation.getServer())) {
                 setMessagePriority(priority);
             } else {
                 setSubMessagePriority(conversation.getId(), priority);
-                setSubEvent(conversation.getId(), event);
-            }
-        } else {
-            if (!conversation.equals(conversation.getServer())) {
                 setSubEvent(conversation.getId(), event);
             }
         }
@@ -126,10 +135,5 @@ public final class EventPriorityHelper {
                 .getPrivateMessageUser(event.user.getNick());
 
         onIRCEvent(MessagePriority.HIGH, conversation, event);
-    }
-
-    public interface Callback {
-
-        public Conversation getConversation();
     }
 }

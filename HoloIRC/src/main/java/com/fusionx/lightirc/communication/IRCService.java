@@ -16,7 +16,7 @@ import android.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IRCService extends Service implements EventPriorityHelper.Callback {
+public class IRCService extends Service {
 
     private final Handler mHandler = new Handler();
 
@@ -27,8 +27,6 @@ public class IRCService extends Service implements EventPriorityHelper.Callback 
     private final Map<String, EventPriorityHelper> mEventHelperMap = new HashMap<>();
 
     private ConnectionManager mConnectionManager;
-
-    private Conversation mConversation;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -44,8 +42,7 @@ public class IRCService extends Service implements EventPriorityHelper.Callback 
         final Server server = pair.second;
 
         if (!exists) {
-            final EventPriorityHelper eventPriorityHelper = new EventPriorityHelper(server,
-                    this);
+            final EventPriorityHelper eventPriorityHelper = new EventPriorityHelper(server);
             mEventHelperMap.put(server.getTitle(), eventPriorityHelper);
         }
         return server;
@@ -64,15 +61,6 @@ public class IRCService extends Service implements EventPriorityHelper.Callback 
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server.getTitle());
         mConnectionManager.onDisconnectionRequested(server.getTitle());
-    }
-
-    @Override
-    public Conversation getConversation() {
-        return mConversation;
-    }
-
-    public void setConversation(final Conversation conversation) {
-        mConversation = conversation;
     }
 
     public EventPriorityHelper getEventHelper(String title) {

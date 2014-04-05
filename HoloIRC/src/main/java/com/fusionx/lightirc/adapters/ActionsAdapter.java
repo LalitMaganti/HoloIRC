@@ -1,6 +1,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ConnectionStatus;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
@@ -32,6 +35,22 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     private FragmentType mFragmentType = FragmentType.SERVER;
 
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            if (mFragmentType != conversationChanged.fragmentType) {
+                mFragmentType = conversationChanged.fragmentType;
+                notifyDataSetChanged();
+            }
+        }
+
+        @SuppressWarnings("unused")
+        public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
+            mStatus = statusChanged.status;
+            notifyDataSetChanged();
+        }
+    };
+
     public ActionsAdapter(final Context context) {
         super(context, R.layout.default_listview_textview, new ArrayList<>(Arrays.asList
                 (context.getResources().getStringArray(R.array.server_actions))));
@@ -39,12 +58,14 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         mServerItemCount = super.getCount();
         mChannelArray = context.getResources().getStringArray(R.array.channel_actions);
         mUserArray = context.getResources().getStringArray(R.array.user_actions);
+
+        EventBus.getDefault().registerSticky(mEventHandler);
     }
 
     @Override
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
         final TextView otherHeader = (TextView) (convertView == null ? mInflater.inflate(R.layout
-                .sliding_menu_header, null, false) : convertView);
+                .sliding_menu_header, viewGroup, false) : convertView);
         if (i == 0 && convertView == null) {
             otherHeader.setText(getContext().getString(R.string.server));
         } else if (i == mServerItemCount) {
@@ -79,13 +100,6 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     @Override
     public long getHeaderId(int i) {
         return i < mServerItemCount ? 0 : 1;
-    }
-
-    public void setFragmentType(final FragmentType fragmentType) {
-        if (mFragmentType != fragmentType) {
-            mFragmentType = fragmentType;
-            notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -125,17 +139,4 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     public boolean isConnected() {
         return mStatus == ConnectionStatus.CONNECTED;
     }
-
-    public void setStatus(ConnectionStatus connected) {
-        mStatus = connected;
-    }
-
-    public ConnectionStatus getStatus() {
-        return mStatus;
-    }
-
-    public FragmentType getFragmentType() {
-        return mFragmentType;
-    }
-
 }

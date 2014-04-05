@@ -2,16 +2,18 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
-import com.squareup.otto.Subscribe;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,6 +27,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import de.greenrobot.event.EventBus;
+
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
@@ -33,11 +37,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     public static final int SERVER_SETTINGS = 1;
 
-    public static final String WORKER_FRAGMENT = "WorkerFragment";
+    private static final String WORKER_FRAGMENT = "WorkerFragment";
 
     private static final String ACTION_BAR_TITLE = "action_bar_title";
 
     private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
+
+    private static final EventBus mEventBus = EventBus.getDefault();
 
     // IRC
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -45,6 +51,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     // Fields
     // IRC
     private Conversation mConversation;
+
+    private final Object mConversationChanged = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged event) {
+            mConversation = event.conversation;
+        }
+    };
 
     // Fragments
     private WorkerFragment mWorkerFragment;
@@ -80,8 +93,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         mRightDrawer = findById(this, R.id.right_drawer);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        mEventBus.registerSticky(mConversationChanged);
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -104,25 +116,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
 
-            // Service can be null if we rotate straight after entering the app
-            if (getService() != null) {
-                mConversation = getService().getConversation();
-            }
             if (mConversation != null) {
                 mConversation.getServer().getServerEventBus().register(this);
                 mCurrentFragment = (IRCFragment) getSupportFragmentManager().findFragmentById(R.id
                         .content_frame);
 
-                // After restoring the server, tell the NavigationDrawerFragment what the
-                // status of the current server is and the current fragment's type
-                mNavigationDrawerFragment.onConnectionStatusChanged(mConversation.getServer()
-                        .getStatus());
-                mNavigationDrawerFragment.onFragmentTypeChanged(mCurrentFragment.getType());
-
                 findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
                 supportInvalidateOptionsMenu();
             }
         }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -241,12 +244,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 server.getServerEventBus().register(this);
             }
 
-            setConversation(server);
+            mEventBus.postSticky(new OnConversationChanged(server, FragmentType.SERVER));
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(server.getTitle());
             setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
-            mNavigationDrawerFragment.onFragmentTypeChanged(fragment.getType());
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
@@ -276,12 +278,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 object.getServer().getServerEventBus().register(this);
             }
 
-            setConversation(object);
+            mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
             onChangeCurrentFragment(fragment);
 
             setActionBarTitle(object.getId());
             setActionBarSubtitle(object.getServer().getTitle());
-            mNavigationDrawerFragment.onFragmentTypeChanged(fragment.getType());
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
@@ -303,10 +304,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         transaction.remove(mCurrentFragment).commit();
 
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
+
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
+
         mCurrentFragment = null;
-        setConversation(null);
+        mEventBus.post(new OnConversationChanged(null, null));
     }
 
     @Override
@@ -334,16 +337,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         } else {
             // TODO - fix this up
         }
-    }
-
-    @Override
-    public Conversation getConversation() {
-        return mConversation;
-    }
-
-    public void setConversation(final Conversation conversation) {
-        mConversation = conversation;
-        getService().setConversation(conversation);
     }
 
     @Override
@@ -412,21 +405,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
 
-        final Conversation conversation = service.getConversation();
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if (conversation != null) {
+                if (mConversation != null) {
                     // TODO - what if disconnection occurred when not attached
-                    if (conversation.getServer().equals(conversation)) {
-                        onServerClicked(conversation.getServer());
+                    if (mConversation.getServer().equals(mConversation)) {
+                        onServerClicked(mConversation.getServer());
                     } else {
-                        onSubServerClicked(conversation);
+                        onSubServerClicked(mConversation);
                     }
-                    // After restoring the server, tell the NavigationDrawerFragment what the
-                    // status of the current server is
-                    mNavigationDrawerFragment.onConnectionStatusChanged(mConversation.getServer()
-                            .getStatus());
                 } else {
                     mSlidingPane.openPane();
                 }
@@ -435,17 +423,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     // Subscribe events
-    @Subscribe
+    @SuppressWarnings("unused")
     public void onEventMainThread(final StatusChangeEvent event) {
         // Null happens when the disconnect handler is called first & the fragment has already been
         // removed by the disconnect handler
         if (mCurrentFragment != null) {
+            final ConnectionStatus status = mConversation.getServer().getStatus();
             if (mCurrentFragment.getType() == FragmentType.SERVER) {
-                setActionBarSubtitle(MiscUtils.getStatusString(this,
-                        mConversation.getServer().getStatus()));
+                setActionBarSubtitle(MiscUtils.getStatusString(this, status));
             }
-            mNavigationDrawerFragment
-                    .onConnectionStatusChanged(mConversation.getServer().getStatus());
+            mEventBus.postSticky(new OnCurrentServerStatusChanged(status));
         }
     }
 }

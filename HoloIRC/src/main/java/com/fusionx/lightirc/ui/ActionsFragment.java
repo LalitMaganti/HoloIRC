@@ -23,12 +23,11 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
-import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Server;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -38,15 +37,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
+    private Conversation mConversation;
+
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+        }
+    };
+
     private Callbacks mCallbacks;
 
     private StickyListHeadersListView mListView;
-
-    private ActionsAdapter mAdapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -72,24 +79,11 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAdapter = new ActionsAdapter(getActivity());
+        EventBus.getDefault().registerSticky(mEventHandler);
+
+        final ActionsAdapter adapter = new ActionsAdapter(getActivity());
         mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
-
-        if (savedInstanceState != null) {
-            mAdapter.setStatus((ConnectionStatus) savedInstanceState.getSerializable("STATUS"));
-            mAdapter.setFragmentType((FragmentType) savedInstanceState.getSerializable("TYPE"));
-
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putSerializable("STATUS", mAdapter.getStatus());
-        outState.putSerializable("TYPE", mAdapter.getFragmentType());
+        mListView.setAdapter(adapter);
     }
 
     @Override
@@ -117,10 +111,10 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     private void showNickDialog() {
         final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
-                mCallbacks.getServer().getUser().getNick()) {
+                mConversation.getServer().getUser().getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                mCallbacks.getServer().getServerCallBus().sendNickChange(input);
+                mConversation.getServer().getServerCallBus().sendNickChange(input);
             }
         };
         nickDialog.show();
@@ -131,21 +125,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         builder.show();
     }
 
-    public void onConnectionStatusChanged(ConnectionStatus status) {
-        mAdapter.setStatus(status);
-        mAdapter.notifyDataSetChanged();
-    }
-
-    public void onFragmentTypeChanged(FragmentType type) {
-        mAdapter.setFragmentType(type);
-        mAdapter.notifyDataSetChanged();
-    }
-
     public interface Callbacks {
 
         public void onRemoveCurrentFragment();
-
-        public Server getServer();
 
         public void closeDrawer();
 
@@ -163,7 +145,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public void onOkClicked(final String input) {
-            mCallbacks.getServer().getServerCallBus().sendJoin(input);
+            mConversation.getServer().getServerCallBus().sendJoin(input);
         }
     }
 }

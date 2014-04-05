@@ -1,10 +1,11 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.interfaces.Conversation;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class NavigationDrawerFragment extends Fragment implements IgnoreListFragment
@@ -29,15 +32,34 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
 
     private FragmentType mFragmentType;
 
-    private SlidingUpPanelLayout mSlidingUpPanelLayout;
+    private Conversation mConversation;
 
-    private ActionsFragment mActionFragment;
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+            mFragmentType = conversationChanged.fragmentType;
+            refreshUserList();
+        }
+
+        @SuppressWarnings("unused")
+        public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
+            mStatus = statusChanged.status;
+            refreshUserList();
+        }
+    };
+
+    private TextView mTextView;
+
+    private View mSlideUpLayout;
+
+    private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
     private IgnoreListFragment mIgnoreListFragment;
 
     private Callback mCallback;
 
-    private UserListFragment mUserFragment;
+    private UserListFragment mUserListFragment;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -63,36 +85,36 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
         mSlidingUpPanelLayout.setSlidingEnabled(false);
 
-        findById(getView(), R.id.bottom_panel).setOnClickListener(new View.OnClickListener() {
+        mTextView = findById(getView(), R.id.user_text_view);
+        mSlideUpLayout = findById(view, R.id.bottom_panel);
+
+        EventBus.getDefault().registerSticky(mEventHandler);
+
+        mSlideUpLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mSlidingUpPanelLayout.isExpanded()) {
                     mSlidingUpPanelLayout.collapsePane();
-                    mUserFragment.onPanelClosed();
+                    mUserListFragment.onPanelClosed();
                 } else {
-                    // This is guaranteed to be a Channel so while casting is ugly, it is correct
-                    mUserFragment.onMenuOpened((Channel) mCallback.getConversation());
+                    mUserListFragment.onPanelOpened();
                     mSlidingUpPanelLayout.expandPane();
                 }
             }
         });
 
         if (savedInstanceState == null) {
-            mUserFragment = new UserListFragment();
-            mActionFragment = new ActionsFragment();
+            mUserListFragment = new UserListFragment();
 
             final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.add(R.id.actions_list_layout, mActionFragment, "Actions");
-            transaction.replace(R.id.user_list_frame_layout, mUserFragment);
+            transaction.add(R.id.actions_list_layout, new ActionsFragment(), "Actions");
+            transaction.replace(R.id.user_list_frame_layout, mUserListFragment);
             transaction.commit();
         } else {
-            mUserFragment = (UserListFragment) getChildFragmentManager().findFragmentById(R.id
+            mUserListFragment = (UserListFragment) getChildFragmentManager().findFragmentById(R.id
                     .user_list_frame_layout);
-            mActionFragment = (ActionsFragment) getChildFragmentManager().findFragmentByTag(
-                    "Actions");
             mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager().findFragmentByTag(
                     "Ignore");
-            refreshUserList();
         }
 
         if (mIgnoreListFragment == null) {
@@ -106,29 +128,12 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
     }
 
     @Override
-    public String getServerTitle() {
-        return getServer().getTitle();
-    }
-
-    @Override
     public void onRemoveCurrentFragment() {
         mCallback.onRemoveCurrentFragment();
     }
 
     @Override
-    public void onUserMention(List<WorldUser> users) {
-
-    }
-
-    @Override
-    public Server getServer() {
-        final Conversation conversation = mCallback.getConversation();
-        return conversation == null ? null : conversation.getServer();
-    }
-
-    @Override
-    public boolean isDrawerOpen() {
-        return false;
+    public void onUserMention(final List<WorldUser> users) {
     }
 
     @Override
@@ -154,48 +159,25 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
         mIgnoreListFragment.finishActionMode();
     }
 
-    public void onFragmentTypeChanged(final FragmentType type) {
-        mFragmentType = type;
-        // If this is null then we are rotating and the actions fragment takes care of its own
-        // saving
-        if (mActionFragment != null) {
-            mActionFragment.onFragmentTypeChanged(type);
-            refreshUserList();
-        }
-    }
-
-    public void onConnectionStatusChanged(final ConnectionStatus status) {
-        mStatus = status;
-        // If this is null then we are rotating and the actions fragment takes care of its own
-        // saving
-        if (mActionFragment != null) {
-            mActionFragment.onConnectionStatusChanged(status);
-            refreshUserList();
-        }
-    }
-
     private void refreshUserList() {
         final int visibility = mStatus == ConnectionStatus.CONNECTED
                 && mFragmentType == FragmentType.CHANNEL ? View.VISIBLE : View.GONE;
-        findById(getView(), R.id.bottom_panel).setVisibility(visibility);
+        mSlideUpLayout.setVisibility(visibility);
 
         if (visibility == View.VISIBLE) {
             // TODO - change this from casting
-            final Channel channel = (Channel) mCallback.getConversation();
-            final TextView textView = findById(getView(), R.id.user_text_view);
-            textView.setText(String.format("%d users", channel.getUsers().size()));
+            final Channel channel = (Channel) mConversation;
+            mTextView.setText(String.format("%d users", channel.getUsers().size()));
+        } else if (mSlidingUpPanelLayout.isExpanded()) {
+            // Collapse Pane
+            mSlidingUpPanelLayout.collapsePane();
+            mUserListFragment.onPanelClosed();
         }
-
-        // Collapse Pane
-        mSlidingUpPanelLayout.collapsePane();
-        mUserFragment.onPanelClosed();
     }
 
     public interface Callback {
 
         public void onRemoveCurrentFragment();
-
-        public Conversation getConversation();
 
         public void disconnectFromServer();
 

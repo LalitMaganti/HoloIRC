@@ -44,9 +44,6 @@ import static com.fusionx.lightirc.util.UIUtils.findById;
 public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
-    // Constants
-    private static final String EXPAND_SAVE_STATE = "expand_save_state";
-
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
     // Callbacks
