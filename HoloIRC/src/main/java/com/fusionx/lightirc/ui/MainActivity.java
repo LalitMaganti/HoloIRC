@@ -76,7 +76,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSlidingPane.setPanelSlideListener(this);
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         mDrawerLayout.setDrawerListener(this);
 
         mRightDrawer = findById(this, R.id.right_drawer);
@@ -105,14 +104,21 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
 
-            mConversation = getService().getConversation();
+            // Service can be null if we rotate straight after entering the app
+            if (getService() != null) {
+                mConversation = getService().getConversation();
+            }
             if (mConversation != null) {
                 mConversation.getServer().getServerEventBus().register(this);
-            }
+                mCurrentFragment = (IRCFragment) getSupportFragmentManager().findFragmentById(R.id
+                        .content_frame);
 
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager().findFragmentById(R.id
-                    .content_frame);
-            if (mCurrentFragment != null) {
+                // After restoring the server, tell the NavigationDrawerFragment what the
+                // status of the current server is and the current fragment's type
+                mNavigationDrawerFragment.onConnectionStatusChanged(mConversation.getServer()
+                        .getStatus());
+                mNavigationDrawerFragment.onFragmentTypeChanged(mCurrentFragment.getType());
+
                 findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
                 supportInvalidateOptionsMenu();
             }
@@ -331,6 +337,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    public Conversation getConversation() {
+        return mConversation;
+    }
+
+    public void setConversation(final Conversation conversation) {
+        mConversation = conversation;
+        getService().setConversation(conversation);
+    }
+
+    @Override
     public Server getServer() {
         if (mConversation == null) {
             return null;
@@ -407,16 +423,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     } else {
                         onSubServerClicked(conversation);
                     }
+                    // After restoring the server, tell the NavigationDrawerFragment what the
+                    // status of the current server is
+                    mNavigationDrawerFragment.onConnectionStatusChanged(mConversation.getServer()
+                            .getStatus());
                 } else {
                     mSlidingPane.openPane();
                 }
             }
         });
-    }
-
-    public void setConversation(final Conversation conversation) {
-        mConversation = conversation;
-        getService().setConversation(conversation);
     }
 
     // Subscribe events

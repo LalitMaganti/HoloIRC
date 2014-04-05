@@ -68,6 +68,7 @@ dependencies {
     compile "com.jakewharton:butterknife:4.0.1"
 
     compile project(':libraries:relay:library')
+    compile project(':libraries:AndroidSlidingUpPanel:library')
 
     // Tests stuff
     testCompile 'junit:junit:4.10'

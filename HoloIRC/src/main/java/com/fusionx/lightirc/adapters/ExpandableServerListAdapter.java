@@ -137,7 +137,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         if (event.store == null) {
             mMessageConverter.setEventMessage(event);
         }
-        textEvent.setText((CharSequence) event.store);
+        textEvent.setText(event.store.toString());
 
         final View divider = convertView.findViewById(R.id.divider);
         divider.setVisibility(isLastChild ? View.VISIBLE : View.INVISIBLE);

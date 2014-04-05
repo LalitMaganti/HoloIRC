@@ -23,6 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Server;
@@ -55,7 +56,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 public class UserListFragment extends Fragment {
 
-    private Callbacks mCallback;
+    private Callback mCallback;
 
     private Channel mChannel;
 
@@ -88,13 +89,13 @@ public class UserListFragment extends Fragment {
                         case R.id.fragment_userlist_cab_mention:
                             mCallback.onUserMention(selectedItems);
                             mode.finish();
-                            mCallback.closeSlidingMenus();
+                            mCallback.closeDrawer();
                             return true;
                         case R.id.fragment_userlist_cab_pm: {
                             if (isNickOtherUsers(nick)) {
                                 mCallback.getServer().getServerCallBus()
                                         .sendMessageToUser(nick, "");
-                                mCallback.closeSlidingMenus();
+                                mCallback.closeDrawer();
                                 mode.finish();
                             } else {
                                 final AlertDialog.Builder build = new AlertDialog.Builder(
@@ -157,11 +158,7 @@ public class UserListFragment extends Fragment {
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
 
-        try {
-            mCallback = (Callbacks) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement Callback");
-        }
+        mCallback = FragmentUtils.getParent(this, Callback.class);
     }
 
     @Override
@@ -213,7 +210,7 @@ public class UserListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (mCallback.isUserSlidingMenuOpen()) {
+        if (mCallback.isDrawerOpen()) {
             onStartObserving();
         }
     }
@@ -222,7 +219,7 @@ public class UserListFragment extends Fragment {
     public void onPause() {
         super.onPause();
 
-        if (mCallback.isUserSlidingMenuOpen()) {
+        if (mCallback.isDrawerOpen()) {
             onStopObserving();
         }
     }
@@ -246,10 +243,13 @@ public class UserListFragment extends Fragment {
         return !mCallback.getServer().getUser().getNick().equals(nick);
     }
 
-    public void onClose() {
+    public void onPanelClosed() {
         onStopObserving();
 
-        getListView().setAdapter(null);
+        // The list view is null when we are coming into a rotation and this method is called
+        if (getListView() != null) {
+            getListView().setAdapter(null);
+        }
 
         if (mMultiChoiceFragmentListener.getMultiSelectionController() != null) {
             mMultiChoiceFragmentListener.getMultiSelectionController().finish();
@@ -292,14 +292,14 @@ public class UserListFragment extends Fragment {
         return mStickyListView;
     }
 
-    public interface Callbacks {
+    public interface Callback {
 
         public void onUserMention(final List<WorldUser> users);
 
         public Server getServer();
 
-        public void closeSlidingMenus();
+        public void closeDrawer();
 
-        public boolean isUserSlidingMenuOpen();
+        public boolean isDrawerOpen();
     }
 }

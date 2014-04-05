@@ -30,7 +30,7 @@
         android:cacheColorHint="?attr/card_server_background">
 
     <LinearLayout
-            android:id="@+id/card_server_content"
+            android:id="@+id/actions_list_layout"
             android:layout_width="0dip"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dip"

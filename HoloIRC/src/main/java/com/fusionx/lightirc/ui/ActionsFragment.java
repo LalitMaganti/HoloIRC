@@ -75,6 +75,21 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mAdapter = new ActionsAdapter(getActivity());
         mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
+
+        if (savedInstanceState != null) {
+            mAdapter.setStatus((ConnectionStatus) savedInstanceState.getSerializable("STATUS"));
+            mAdapter.setFragmentType((FragmentType) savedInstanceState.getSerializable("TYPE"));
+
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("STATUS", mAdapter.getStatus());
+        outState.putSerializable("TYPE", mAdapter.getFragmentType());
     }
 
     @Override
@@ -123,6 +138,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     public void onFragmentTypeChanged(FragmentType type) {
         mAdapter.setFragmentType(type);
+        mAdapter.notifyDataSetChanged();
     }
 
     public interface Callbacks {

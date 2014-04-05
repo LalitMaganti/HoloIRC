@@ -129,4 +129,13 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     public void setStatus(ConnectionStatus connected) {
         mStatus = connected;
     }
+
+    public ConnectionStatus getStatus() {
+        return mStatus;
+    }
+
+    public FragmentType getFragmentType() {
+        return mFragmentType;
+    }
+
 }
