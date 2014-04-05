@@ -25,11 +25,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import static butterknife.ButterKnife.findById;
+import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
-        ActionsPagerFragment.Callback, WorkerFragment.Callback {
+        NavigationDrawerFragment.Callback, WorkerFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
 
@@ -51,7 +51,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private IRCFragment mCurrentFragment;
 
-    private ActionsPagerFragment mActionsFragment;
+    private NavigationDrawerFragment mNavigationDrawerFragment;
 
     private ServerListFragment mServerListFragment;
 
@@ -89,8 +89,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mServerListFragment = new ServerListFragment();
             transaction.replace(R.id.sliding_list_frame, mServerListFragment);
 
-            mActionsFragment = new ActionsPagerFragment();
-            transaction.add(R.id.right_drawer, mActionsFragment);
+            mNavigationDrawerFragment = new NavigationDrawerFragment();
+            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
 
             mWorkerFragment = new WorkerFragment();
             transaction.add(mWorkerFragment, WORKER_FRAGMENT);
@@ -99,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         } else {
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
-            mActionsFragment = (ActionsPagerFragment) getSupportFragmentManager().findFragmentById(R
+            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R
                     .id.right_drawer);
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
@@ -239,7 +239,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
             setActionBarTitle(server.getTitle());
             setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
-            mActionsFragment.onFragmentTypeChanged(fragment.getType());
+            mNavigationDrawerFragment.onFragmentTypeChanged(fragment.getType());
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
@@ -274,7 +274,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
             setActionBarTitle(object.getId());
             setActionBarSubtitle(object.getServer().getTitle());
-            mActionsFragment.onFragmentTypeChanged(fragment.getType());
+            mNavigationDrawerFragment.onFragmentTypeChanged(fragment.getType());
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
@@ -384,7 +384,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onDrawerClosed(final View drawerView) {
-        mActionsFragment.onDrawerClosed();
+        mNavigationDrawerFragment.onDrawerClosed();
     }
 
     @Override
@@ -428,7 +428,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 setActionBarSubtitle(MiscUtils.getStatusString(this,
                         mConversation.getServer().getStatus()));
             }
-            mActionsFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
+            mNavigationDrawerFragment.onConnectionStatusChanged(mConversation.getServer().getStatus());
         }
     }
 }

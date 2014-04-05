@@ -32,6 +32,7 @@ public class IRCService extends Service implements EventPriorityHelper.Callback 
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return START_STICKY;
     }
 
@@ -51,12 +52,12 @@ public class IRCService extends Service implements EventPriorityHelper.Callback 
     }
 
     public Server getServerIfExists(final ServerConfiguration.Builder builder) {
-        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return mConnectionManager.getServerIfExists(builder.getTitle());
     }
 
     @Override
     public IBinder onBind(final Intent intent) {
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return mBinder;
     }
 

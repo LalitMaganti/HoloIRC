@@ -122,12 +122,10 @@ public final class EventPriorityHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final UserEvent event) {
-        if (!ChannelFragment.sClasses.contains(event.getClass())) {
-            final Conversation conversation = mServer.getUserChannelInterface()
-                    .getPrivateMessageUser(event.user.getNick());
+        final Conversation conversation = mServer.getUserChannelInterface()
+                .getPrivateMessageUser(event.user.getNick());
 
-            onIRCEvent(MessagePriority.HIGH, conversation, event);
-        }
+        onIRCEvent(MessagePriority.HIGH, conversation, event);
     }
 
     public interface Callback {

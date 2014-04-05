@@ -5,6 +5,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.constants.Theme;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -101,26 +102,6 @@ public class UIUtils {
         return checkedSessionPositions;
     }
 
-    // Expandable ListView stuff
-    public static boolean[] saveExpandableListViewExpandState(final ExpandableListAdapter adapter,
-            final ExpandableListView listView) {
-        int numberOfGroups = adapter.getGroupCount();
-        boolean[] groupExpandedArray = new boolean[numberOfGroups];
-        for (int i = 0; i < numberOfGroups; i++) {
-            groupExpandedArray[i] = listView.isGroupExpanded(i);
-        }
-        return groupExpandedArray;
-    }
-
-    public static void restoreExpandableListViewExpandState(boolean[] groupExpandedArray,
-            ExpandableListView listView) {
-        for (int i = 0, length = groupExpandedArray.length; i < length; i++) {
-            if (groupExpandedArray[i]) {
-                listView.expandGroup(i);
-            }
-        }
-    }
-
     public static CharacterStyle getSpanFromPriority(final MessagePriority priority) {
         if (priority == null) {
             // TODO - export this colour
@@ -142,5 +123,13 @@ public class UIUtils {
                 break;
         }
         return new ForegroundColorSpan(color);
+    }
+
+    public static <T extends View> T findById(final View view, final int id) {
+        return (T) view.findViewById(id);
+    }
+
+    public static <T extends View> T findById(final Activity activity, final int id) {
+        return (T) activity.findViewById(id);
     }
 }

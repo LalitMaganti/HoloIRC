@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
+public class NavigationDrawerFragment extends Fragment implements IgnoreListFragment
         .IgnoreListCallback, ActionsFragment.Callbacks {
 
     private ActionsFragment mActionFragment;
@@ -35,13 +35,6 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setRetainInstance(true);
-    }
-
-    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         final FrameLayout layout = new FrameLayout(getActivity());
@@ -57,7 +50,6 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
 
         if (savedInstanceState == null) {
             mActionFragment = new ActionsFragment();
-            mIgnoreListFragment = new IgnoreListFragment();
             final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             transaction.add(R.id.card_server_content, mActionFragment, "Actions").commit();
         } else {
@@ -65,6 +57,10 @@ public class ActionsPagerFragment extends Fragment implements IgnoreListFragment
                     "Actions");
             mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager().findFragmentByTag(
                     "Ignore");
+        }
+
+        if (mIgnoreListFragment == null) {
+            mIgnoreListFragment = new IgnoreListFragment();
         }
     }
 

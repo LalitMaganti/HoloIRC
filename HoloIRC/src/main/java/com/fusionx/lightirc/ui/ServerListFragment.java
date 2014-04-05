@@ -40,7 +40,7 @@ import java.util.ArrayList;
 
 import gnu.trove.set.hash.THashSet;
 
-import static butterknife.ButterKnife.findById;
+import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
@@ -80,16 +80,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         for (final ServerEventHandler handler : mEventHandlers) {
             handler.unregister();
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // Save the expand state of the ListView
-        final boolean[] expandStatus = UIUtils.saveExpandableListViewExpandState(mListAdapter,
-                mListView);
-        outState.putBooleanArray(EXPAND_SAVE_STATE, expandStatus);
     }
 
     @Override
@@ -331,10 +321,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             final PrivateMessageUser user = mServer.getUserChannelInterface()
                     .getPrivateMessageUser(event.nick);
             mListAdapter.getGroup(mServerIndex).addServerObject(user);
-            mListView.setAdapter(mListAdapter);
+            //mListView.setAdapter(mListAdapter);
+            mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
 
-            mListView.invalidateViews();
+            //mListView.invalidateViews();
         }
 
         @SuppressWarnings("unused")
@@ -342,10 +333,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             final Channel channel = mServer.getUserChannelInterface().getChannel(event
                     .channelName);
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
-            mListView.setAdapter(mListAdapter);
+            //mListView.setAdapter(mListAdapter);
+            mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
 
-            mListView.invalidateViews();
+            //mListView.invalidateViews();
         }
 
         @SuppressWarnings("unused")

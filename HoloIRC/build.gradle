@@ -55,9 +55,6 @@ apply plugin: 'android-unit-test'
 
 
 dependencies {
-    // TODO - remove this dependency
-    compile 'org.apache.commons:commons-lang3:3.0'
-
     compile 'com.android.support:support-v4:19.+'
     compile 'com.android.support:appcompat-v7:19.+'
     compile 'com.nineoldandroids:library:2.4.0'
