@@ -58,8 +58,8 @@ dependencies {
     compile 'com.android.support:support-v4:19.+'
     compile 'com.android.support:appcompat-v7:19.+'
     compile 'com.nineoldandroids:library:2.4.0'
-    compile('de.keyboardsurfer.android.widget:crouton:1.8.1') {
-        exclude group: 'com.google.android'
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.4') {
+        exclude group: 'com.google.android', module: 'support-v4'
     }
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
     compile 'com.nhaarman.listviewanimations:library:2.+'

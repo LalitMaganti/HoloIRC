@@ -93,7 +93,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         mRightDrawer = findById(this, R.id.right_drawer);
 
-        mEventBus.registerSticky(mConversationChanged);
+        // This is just registration because we'll retrieve the sticky event later
+        mEventBus.register(mConversationChanged);
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -404,16 +405,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
+        final Conversation conversation = mEventBus.getStickyEvent(OnConversationChanged.class)
+                .conversation;
 
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if (mConversation != null) {
+                if (conversation != null) {
                     // TODO - what if disconnection occurred when not attached
-                    if (mConversation.getServer().equals(mConversation)) {
-                        onServerClicked(mConversation.getServer());
+                    if (conversation.getServer().equals(conversation)) {
+                        onServerClicked(conversation.getServer());
                     } else {
-                        onSubServerClicked(mConversation);
+                        onSubServerClicked(conversation);
                     }
                 } else {
                     mSlidingPane.openPane();
