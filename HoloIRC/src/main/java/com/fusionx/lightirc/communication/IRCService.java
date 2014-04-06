@@ -6,17 +6,21 @@ import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
 import com.fusionx.relay.interfaces.Conversation;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class IRCService extends Service {
+
+    private static final int SERVICE_ID = 1;
 
     private final Handler mHandler = new Handler();
 
@@ -35,6 +39,8 @@ public class IRCService extends Service {
     }
 
     public Server connectToServer(final ServerConfiguration.Builder builder) {
+        startForeground(SERVICE_ID, getNotification());
+
         final Pair<Boolean, Server> pair = mConnectionManager.onConnectionRequested(builder
                 .build(), mHandler);
 
@@ -60,7 +66,15 @@ public class IRCService extends Service {
 
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server.getTitle());
-        mConnectionManager.onDisconnectionRequested(server.getTitle());
+        final boolean finalServer = mConnectionManager.onDisconnectionRequested(server.getTitle());
+
+        if (finalServer) {
+            stopForeground(true);
+        }
+    }
+
+    private Notification getNotification() {
+        return null;
     }
 
     public EventPriorityHelper getEventHelper(String title) {
