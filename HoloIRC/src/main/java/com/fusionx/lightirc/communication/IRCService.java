@@ -21,6 +21,9 @@ import android.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 public class IRCService extends Service {
 
     private static final int SERVICE_ID = 1;
@@ -36,7 +39,7 @@ public class IRCService extends Service {
     private ConnectionManager mConnectionManager;
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return START_STICKY;
     }
@@ -91,8 +94,8 @@ public class IRCService extends Service {
 
     public PendingIntent getMainActivityIntent() {
         final Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
     public EventPriorityHelper getEventHelper(String title) {

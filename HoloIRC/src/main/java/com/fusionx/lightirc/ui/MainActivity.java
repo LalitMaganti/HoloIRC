@@ -11,6 +11,7 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
@@ -227,6 +228,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     }
 
+    // TODO - unify the server and subserver code
     @Override
     public void onServerClicked(final Server server) {
         if (!server.equals(mConversation)) {
@@ -245,11 +247,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 server.getServerEventBus().register(this);
             }
 
-            mEventBus.postSticky(new OnConversationChanged(server, FragmentType.SERVER));
-            onChangeCurrentFragment(fragment);
-
             setActionBarTitle(server.getTitle());
             setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
+
+            mEventBus.postSticky(new OnConversationChanged(server, FragmentType.SERVER));
+            onChangeCurrentFragment(fragment);
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
@@ -262,11 +264,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             bundle.putString("title", object.getId());
 
             final IRCFragment fragment;
-            // TODO - fix this awful code
-            if (object instanceof Channel) {
+            if (object.getClass().equals(Channel.class)) {
                 fragment = new ChannelFragment();
-            } else {
+            } else if (object.getClass().equals(PrivateMessageUser.class)) {
                 fragment = new UserFragment();
+            } else {
+                throw new IllegalArgumentException();
             }
             fragment.setArguments(bundle);
 
@@ -279,11 +282,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 object.getServer().getServerEventBus().register(this);
             }
 
-            mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
-            onChangeCurrentFragment(fragment);
-
             setActionBarTitle(object.getId());
             setActionBarSubtitle(object.getServer().getTitle());
+
+            mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
+            onChangeCurrentFragment(fragment);
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
@@ -292,25 +295,33 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private void onChangeCurrentFragment(final IRCFragment fragment) {
         mCurrentFragment = fragment;
 
-        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        transaction.replace(R.id.content_frame, fragment).commit();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction();
+                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                transaction.replace(R.id.content_frame, fragment).commit();
+            }
+        }, 200);
 
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
     }
 
     private void onRemoveFragment() {
-        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        transaction.remove(mCurrentFragment).commit();
-
-        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
-
-        setActionBarTitle(getString(R.string.app_name));
-        setActionBarSubtitle(null);
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction();
+                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                transaction.remove(mCurrentFragment).commit();
+            }
+        }, 200);
 
         mCurrentFragment = null;
-        mEventBus.post(new OnConversationChanged(null, null));
+
+        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -318,6 +329,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         closeDrawer();
         supportInvalidateOptionsMenu();
         onRemoveFragment();
+
+        mEventBus.post(new OnConversationChanged(null, null));
+
+        setActionBarTitle(getString(R.string.app_name));
+        setActionBarSubtitle(null);
     }
 
     @Override
@@ -405,24 +421,23 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
-        final Conversation conversation = mEventBus.getStickyEvent(OnConversationChanged.class)
-                .conversation;
+        final OnConversationChanged event = mEventBus.getStickyEvent(OnConversationChanged.class);
+        final Conversation conversation = event != null ? event.conversation : null;
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (conversation != null) {
-                    // TODO - what if disconnection occurred when not attached
+        if (conversation != null) {
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
                     if (conversation.getServer().equals(conversation)) {
                         onServerClicked(conversation.getServer());
                     } else {
                         onSubServerClicked(conversation);
                     }
-                } else {
-                    mSlidingPane.openPane();
                 }
-            }
-        });
+            });
+        } else {
+            mSlidingPane.openPane();
+        }
     }
 
     // Subscribe events
