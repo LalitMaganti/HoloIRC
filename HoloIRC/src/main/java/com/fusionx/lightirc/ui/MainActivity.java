@@ -112,7 +112,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         AppPreferences.setUpPreferences(this);
         SharedPreferencesUtils.onInitialSetup(this);
 
-        setContentView(R.layout.new_main_activity);
+        setContentView(R.layout.main_activity);
 
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
@@ -168,7 +168,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             final Server server = getService().getServerIfExists(serverName);
             final Conversation conversation = server.getUserChannelInterface().getChannel
                     (channelName);
-            onConversationUpdated(conversation);
+            onExternalConversationUpdate(conversation);
         }
     }
 
@@ -500,10 +500,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             conversation = event != null ? event.conversation : null;
         }
 
-        onConversationUpdated(conversation);
+        onExternalConversationUpdate(conversation);
     }
 
-    private void onConversationUpdated(final Conversation conversation) {
+    private void onExternalConversationUpdate(final Conversation conversation) {
         if (conversation != null) {
             mHandler.post(new Runnable() {
                 @Override

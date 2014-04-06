@@ -24,6 +24,8 @@ import java.util.Map;
 
 import de.greenrobot.event.EventBus;
 
+import static android.support.v4.app.NotificationCompat.Builder;
+
 public class IRCService extends Service {
 
     private static final int NOTIFICATION_MENTION = 242;
@@ -52,11 +54,12 @@ public class IRCService extends Service {
                 // If we're here, the activity has not picked it up - fire off a notification
                 final NotificationManager notificationManager =
                         (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                final NotificationCompat.Builder builder = new NotificationCompat.Builder
-                        (IRCService.this).setSmallIcon(R.drawable.ic_notification)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(String.format("Mentioned in %s on %s", event.channelName,
-                                event.serverName));
+                final NotificationCompat.Builder builder = new Builder(IRCService.this);
+                builder.setSmallIcon(R.drawable.ic_notification);
+                builder.setContentTitle(getString(R.string.app_name));
+                builder.setContentText(String.format("Mentioned in %s on %s",
+                        event.channelName, event.serverName));
+                builder.setAutoCancel(true);
 
                 final Intent resultIntent = new Intent(IRCService.this, MainActivity.class);
                 resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
@@ -118,7 +121,7 @@ public class IRCService extends Service {
     }
 
     private Notification getNotification() {
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        final Builder builder = new Builder(this);
         builder.setSmallIcon(R.drawable.ic_notification);
         builder.setContentTitle(getString(R.string.app_name));
         builder.setContentText(String.format("%d servers connected",

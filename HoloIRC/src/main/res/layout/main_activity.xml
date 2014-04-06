@@ -27,7 +27,7 @@
                     android:id="@+id/content_frame_empty_textview"
                     android:gravity="center"
                     android:layout_centerInParent="true"
-                    android:text="Click a server on the right to connect :)"
+                    android:text="Welcome to HoloIRC! Click a server on the right to connect :)"
                     android:textColor="@android:color/darker_gray"
                     android:textAppearance="@android:style/TextAppearance.Large"/>
         </RelativeLayout>
