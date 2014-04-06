@@ -14,6 +14,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
@@ -402,11 +403,21 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
      * Post: the current fragment is removed - either by parting or removing the PM
      */
     @Override
-    public void onRemoveCurrentFragment() {
+    public void removeCurrentFragment() {
         if (mCurrentFragment.getType() == FragmentType.CHANNEL) {
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
         } else {
             // TODO - fix this up
+        }
+    }
+
+    @Override
+    public void onPart(final String serverName, final PartEvent event) {
+        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                && mConversation.getId().equals(event.channelName);
+
+        if (isCurrent) {
+            onRemoveFragment();
         }
     }
 

@@ -316,6 +316,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onServerDisconnected(final Server server);
 
         public IRCService getService();
+
+        public void onPart(final String serverName, final PartEvent event);
     }
 
     public class ServerEventHandler {
@@ -336,11 +338,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             final PrivateMessageUser user = mServer.getUserChannelInterface()
                     .getPrivateMessageUser(event.nick);
             mListAdapter.getGroup(mServerIndex).addServerObject(user);
-            //mListView.setAdapter(mListAdapter);
             mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
-
-            //mListView.invalidateViews();
         }
 
         @SuppressWarnings("unused")
@@ -348,11 +347,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             final Channel channel = mServer.getUserChannelInterface().getChannel(event
                     .channelName);
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
-            //mListView.setAdapter(mListAdapter);
             mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
-
-            //mListView.invalidateViews();
         }
 
         @SuppressWarnings("unused")
@@ -360,6 +356,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
+            mCallback.onPart(mServer.getTitle(), event);
         }
 
         @SuppressWarnings("unused")

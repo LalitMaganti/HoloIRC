@@ -129,7 +129,7 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
 
     @Override
     public void onRemoveCurrentFragment() {
-        mCallback.onRemoveCurrentFragment();
+        mCallback.removeCurrentFragment();
     }
 
     @Override
@@ -183,7 +183,7 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
 
     public interface Callback {
 
-        public void onRemoveCurrentFragment();
+        public void removeCurrentFragment();
 
         public void disconnectFromServer();
 
