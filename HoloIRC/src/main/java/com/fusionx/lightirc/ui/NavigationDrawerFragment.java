@@ -142,6 +142,11 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
     }
 
     @Override
+    public boolean isUserPanelOpen() {
+        return mSlidingUpPanelLayout.isExpanded();
+    }
+
+    @Override
     public void disconnectFromServer() {
         mCallback.disconnectFromServer();
     }
@@ -168,7 +173,8 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
             // TODO - change this from casting
             final Channel channel = (Channel) mConversation;
             mTextView.setText(String.format("%d users", channel.getUsers().size()));
-        } else if (mSlidingUpPanelLayout.isExpanded()) {
+        }
+        if (mSlidingUpPanelLayout.isExpanded()) {
             // Collapse Pane
             mSlidingUpPanelLayout.collapsePane();
             mUserListFragment.onPanelClosed();

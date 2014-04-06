@@ -96,11 +96,9 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         super.onViewCreated(view, savedInstanceState);
 
         EventBus.getDefault().registerSticky(mEventHandler);
-        mWorldUsers = new TreeSet<>(new IRCUserComparator(mChannel));
 
         mStickyListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mAdapter = new UserListAdapter(view.getContext(), mWorldUsers);
-        mAdapter.setInternalSet(mWorldUsers);
 
         getListView().setFastScrollEnabled(true);
     }
@@ -111,7 +109,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
-        if (mChannel != null) {
+        if (mCallback.isUserPanelOpen()) {
             onStopObserving();
         }
     }
@@ -122,7 +120,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
         // On resume, we may have missed events in the background - make sure we have the most
         // up-to-date user list
-        if (mChannel != null) {
+        if (mCallback.isUserPanelOpen()) {
             onStartObserving();
             onUpdateUserList();
         }
@@ -290,5 +288,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         public void onUserMention(final List<WorldUser> users);
 
         public void closeDrawer();
+
+        public boolean isUserPanelOpen();
     }
 }

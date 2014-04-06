@@ -37,22 +37,6 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
 
     protected abstract void attachSelectionController();
 
-    List<Integer> getCheckedPositions() {
-        List<Integer> checkedSessionPositions = new ArrayList<>();
-        if (mListView == null) {
-            return checkedSessionPositions;
-        }
-
-        SparseBooleanArray checkedPositionsBool = getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(checkedPositionsBool.keyAt(i));
-            }
-        }
-
-        return checkedSessionPositions;
-    }
-
     protected List<T> getCheckedItems() {
         final List<T> checkedSessionPositions = new ArrayList<>();
         if (mListView == null) {
@@ -98,10 +82,6 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
                 getMultiSelectionController().finish();
             }
         }
-    }
-
-    public void startActionMode() {
-        getMultiSelectionController().startActionMode();
     }
 
     @Override
