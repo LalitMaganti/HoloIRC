@@ -87,6 +87,13 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        EventBus.getDefault().unregister(mEventHandler);
+    }
+
+    @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
             final long l) {
         switch (i) {

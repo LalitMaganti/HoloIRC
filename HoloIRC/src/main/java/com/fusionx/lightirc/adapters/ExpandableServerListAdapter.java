@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.EventPriorityHelper;
+import com.fusionx.lightirc.communication.ServiceEventHelper;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.util.MessageConversionUtils;
@@ -77,7 +77,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
 
         final ServerWrapper listItem = getGroup(groupPos);
-        final EventPriorityHelper helper = mIRCService.getEventHelper(listItem.getTitle());
+        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getTitle());
 
         final TextView title = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
@@ -124,7 +124,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final ServerWrapper listItem = getGroup(groupPos);
         final Conversation conversation = getChild(groupPos, childPos);
 
-        final EventPriorityHelper helper = mIRCService.getEventHelper(listItem.getTitle());
+        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getTitle());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());

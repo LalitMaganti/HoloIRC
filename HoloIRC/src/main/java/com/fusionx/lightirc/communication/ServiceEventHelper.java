@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.communication;
 
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnMentionEvent;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.relay.Channel;
@@ -9,18 +10,27 @@ import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.MentionEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v4.app.NotificationCompat;
+
 import java.util.HashMap;
 
 import de.greenrobot.event.EventBus;
 
-public final class EventPriorityHelper {
+public final class ServiceEventHelper {
 
     private static final int EVENT_PRIORITY = 100;
+
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     private final HashMap<String, MessagePriority> mMessagePriorityMap;
 
@@ -32,7 +42,7 @@ public final class EventPriorityHelper {
 
     private MessagePriority mMessagePriority;
 
-    public EventPriorityHelper(final Server server) {
+    public ServiceEventHelper(final Server server) {
         mServer = server;
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
@@ -135,5 +145,22 @@ public final class EventPriorityHelper {
                 .getPrivateMessageUser(event.user.getNick());
 
         onIRCEvent(MessagePriority.HIGH, conversation, event);
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final MentionEvent event) {
+        final Conversation conversation = mServer.getUserChannelInterface()
+                .getChannel(event.channelName);
+
+        onIRCEvent(MessagePriority.HIGH, conversation, event);
+
+        // Forward the event UI side
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                EventBus.getDefault().post(
+                        new OnMentionEvent(mServer.getTitle(), event.channelName));
+            }
+        });
     }
 }

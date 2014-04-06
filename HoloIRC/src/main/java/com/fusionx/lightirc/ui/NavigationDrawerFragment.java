@@ -95,9 +95,9 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
             public void onClick(View v) {
                 if (mSlidingUpPanelLayout.isExpanded()) {
                     mSlidingUpPanelLayout.collapsePane();
-                    mUserListFragment.onPanelClosed();
+                    mUserListFragment.onSlideUpPanelClosed();
                 } else {
-                    mUserListFragment.onPanelOpened();
+                    mUserListFragment.onSlideUpPanelOpened();
                     mSlidingUpPanelLayout.expandPane();
                 }
             }
@@ -177,7 +177,7 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
         if (mSlidingUpPanelLayout.isExpanded()) {
             // Collapse Pane
             mSlidingUpPanelLayout.collapsePane();
-            mUserListFragment.onPanelClosed();
+            mUserListFragment.onSlideUpPanelClosed();
         }
     }
 

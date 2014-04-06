@@ -1,14 +1,15 @@
 package com.fusionx.lightirc.communication;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -21,10 +22,13 @@ import android.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import de.greenrobot.event.EventBus;
 
 public class IRCService extends Service {
+
+    private static final int NOTIFICATION_MENTION = 242;
+
+    private static final int MENTION_PRIORITY = 50;
 
     private static final int SERVICE_ID = 1;
 
@@ -34,13 +38,30 @@ public class IRCService extends Service {
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 
-    private final Map<String, EventPriorityHelper> mEventHelperMap = new HashMap<>();
+    private final Map<String, ServiceEventHelper> mEventHelperMap = new HashMap<>();
+
+    private NotificationManager mNotificationManager;
 
     private ConnectionManager mConnectionManager;
+
+    public IRCService() {
+        EventBus.getDefault().register(new Object() {
+            @SuppressWarnings("unused")
+            public void onEvent(final OnMentionEvent event) {
+                // If we're here, the activity has not picked it up - fire off a notification
+                final NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                        IRCService.this);
+                builder.setContentText(String.format("Mentioned in %s on %s", event.channelName,
+                        event.serverName));
+                mNotificationManager.notify(NOTIFICATION_MENTION, builder.build());
+            }
+        }, MENTION_PRIORITY);
+    }
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         return START_STICKY;
     }
 
@@ -52,8 +73,8 @@ public class IRCService extends Service {
         final Server server = pair.second;
 
         if (!exists) {
-            final EventPriorityHelper eventPriorityHelper = new EventPriorityHelper(server);
-            mEventHelperMap.put(server.getTitle(), eventPriorityHelper);
+            final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
+            mEventHelperMap.put(server.getTitle(), serviceEventHelper);
         }
 
         if (mConnectionManager.getServerCount() == 1) {
@@ -70,6 +91,7 @@ public class IRCService extends Service {
     @Override
     public IBinder onBind(final Intent intent) {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         return mBinder;
     }
 
@@ -98,7 +120,7 @@ public class IRCService extends Service {
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
-    public EventPriorityHelper getEventHelper(String title) {
+    public ServiceEventHelper getEventHelper(final String title) {
         return mEventHelperMap.get(title);
     }
 

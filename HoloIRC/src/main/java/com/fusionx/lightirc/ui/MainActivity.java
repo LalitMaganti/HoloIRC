@@ -4,6 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
+import com.fusionx.lightirc.event.OnMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -29,6 +30,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
@@ -46,8 +49,19 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private static final EventBus mEventBus = EventBus.getDefault();
 
-    // IRC
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
+
+    private final Object mMentionHelper = new Object() {
+
+        @SuppressWarnings("unused")
+        public void onEvent(final OnMentionEvent event) {
+            mEventBus.cancelEventDelivery(event);
+
+            final Crouton crouton = Crouton.makeText(MainActivity.this, event.channelName,
+                    Style.INFO);
+            crouton.show();
+        }
+    };
 
     // Fields
     // IRC
@@ -96,6 +110,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         // This is just registration because we'll retrieve the sticky event later
         mEventBus.register(mConversationChanged);
+        mEventBus.register(mMentionHelper, 100);
+
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -158,6 +174,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     protected void onDestroy() {
+        Crouton.clearCroutonsForActivity(this);
+
         super.onDestroy();
 
         if (mConversation != null) {
@@ -295,7 +313,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private void onChangeCurrentFragment(final IRCFragment fragment) {
         mCurrentFragment = fragment;
 
-        handler.postDelayed(new Runnable() {
+        mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 final FragmentTransaction transaction = getSupportFragmentManager()
@@ -309,16 +327,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     private void onRemoveFragment() {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final FragmentTransaction transaction = getSupportFragmentManager()
-                        .beginTransaction();
-                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                transaction.remove(mCurrentFragment).commit();
-            }
-        }, 200);
-
+        final FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.remove(mCurrentFragment).commit();
         mCurrentFragment = null;
 
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
@@ -330,7 +342,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
         onRemoveFragment();
 
-        mEventBus.post(new OnConversationChanged(null, null));
+        mEventBus.postSticky(new OnConversationChanged(null, null));
 
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
@@ -425,7 +437,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         final Conversation conversation = event != null ? event.conversation : null;
 
         if (conversation != null) {
-            handler.post(new Runnable() {
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     if (conversation.getServer().equals(conversation)) {

@@ -45,6 +45,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +55,8 @@ import java.util.TreeSet;
 import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public class UserListFragment extends Fragment implements AbsListView.MultiChoiceModeListener {
+public class UserListFragment extends Fragment implements AbsListView.MultiChoiceModeListener,
+        AdapterView.OnItemClickListener {
 
     private ActionMode mActionMode;
 
@@ -100,6 +102,9 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         mStickyListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mAdapter = new UserListAdapter(view.getContext(), mWorldUsers);
 
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().getWrappedList().setMultiChoiceModeListener(this);
+        getListView().setOnItemClickListener(this);
         getListView().setFastScrollEnabled(true);
     }
 
@@ -141,7 +146,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         }
     }
 
-    public void onPanelOpened() {
+    public void onSlideUpPanelOpened() {
         onUpdateUserList();
         onStartObserving();
     }
@@ -150,7 +155,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         return !mChannel.getServer().getUser().getNick().equals(nick);
     }
 
-    public void onPanelClosed() {
+    public void onSlideUpPanelClosed() {
         onStopObserving();
 
         // The list view is null when we are coming into a rotation and this method is called
@@ -244,30 +249,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
                 mCallback.closeDrawer();
                 return true;
             case R.id.fragment_userlist_cab_pm: {
-                if (isNickOtherUsers(nick)) {
-                    mChannel.getServer().getServerCallBus()
-                            .sendMessageToUser(nick, "");
-                    mCallback.closeDrawer();
-                    mode.finish();
-                } else {
-                    final AlertDialog.Builder build = new AlertDialog.Builder(
-                            getActivity());
-                    build.setTitle(getActivity()
-                            .getString(R.string.user_list_not_possible))
-                            .setMessage(getActivity()
-                                    .getString(R.string.user_list_pm_self_not_possible))
-                            .setPositiveButton(getActivity().getString(R.string.ok),
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(
-                                                DialogInterface dialogInterface,
-                                                int i) {
-                                            dialogInterface.dismiss();
-                                        }
-                                    }
-                            );
-                    build.show();
-                }
+                onPrivateMessageUser(nick);
                 return true;
             }
             case R.id.fragment_userlist_cab_whois:
@@ -278,9 +260,43 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         }
     }
 
+    private void onPrivateMessageUser(final String nick) {
+        if (isNickOtherUsers(nick)) {
+            mChannel.getServer().getServerCallBus().sendMessageToUser(nick, "");
+            mCallback.closeDrawer();
+            mActionMode.finish();
+        } else {
+            final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
+            build.setTitle(getActivity().getString(R.string.user_list_not_possible))
+                    .setMessage(getActivity()
+                            .getString(R.string.user_list_pm_self_not_possible))
+                    .setPositiveButton(getActivity().getString(R.string.ok),
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(
+                                        DialogInterface dialogInterface,
+                                        int i) {
+                                    dialogInterface.dismiss();
+                                }
+                            }
+                    );
+            build.show();
+        }
+    }
+
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         mActionMode = null;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final boolean checked = getListView().getCheckedItemPositions().get(position);
+        getListView().setItemChecked(position, !checked);
+
+        if (mActionMode == null) {
+            getActivity().startActionMode(this);
+        }
     }
 
     public interface Callback {
