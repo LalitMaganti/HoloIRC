@@ -3,7 +3,9 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.relay.Channel;
@@ -37,6 +39,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import de.greenrobot.event.EventBus;
 import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
@@ -45,6 +48,21 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
+
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final OnConversationChanged event) {
+            if (event.conversation != null) {
+                if (event.fragmentType == FragmentType.SERVER) {
+                    mService.getEventHelper(event.conversation.getId()).clearMessagePriority();
+                }  else {
+                    mService.getEventHelper(event.conversation.getServer().getId())
+                            .clearMessagePriority(event.conversation);
+                }
+                mListView.invalidateViews();
+            }
+        }
+    };
 
     // Callbacks
     private Callback mCallback;
@@ -70,8 +88,17 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        EventBus.getDefault().register(mEventHandler);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+
+        EventBus.getDefault().unregister(mEventHandler);
 
         for (final ServerEventHandler handler : mEventHandlers) {
             handler.unregister();
@@ -164,10 +191,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
         mCallback.onServerClicked(item.getServer());
 
-        final String title = item.getServer().getTitle();
-        mService.getEventHelper(title).clearMessagePriority();
-        mListView.invalidateViews();
-
         return true;
     }
 
@@ -186,10 +209,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         final Conversation conversation = mListAdapter.getChild(groupPosition, childPosition);
         mCallback.onSubServerClicked(conversation);
-
-        final String title = conversation.getServer().getTitle();
-        mService.getEventHelper(title).clearMessagePriority(conversation);
-        mListView.invalidateViews();
 
         return true;
     }

@@ -2,9 +2,9 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
-import com.fusionx.lightirc.event.OnMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import de.greenrobot.event.EventBus;
+import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
@@ -41,6 +42,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     public static final int SERVER_SETTINGS = 1;
 
+    private static final Configuration sConfiguration;
+
+    static {
+        sConfiguration = new Configuration.Builder().setDuration(500).build();
+    }
+
     private static final String WORKER_FRAGMENT = "WorkerFragment";
 
     private static final String ACTION_BAR_TITLE = "action_bar_title";
@@ -51,21 +58,27 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private final Object mMentionHelper = new Object() {
-
-        @SuppressWarnings("unused")
-        public void onEvent(final OnMentionEvent event) {
-            mEventBus.cancelEventDelivery(event);
-
-            final Crouton crouton = Crouton.makeText(MainActivity.this, event.channelName,
-                    Style.INFO);
-            crouton.show();
-        }
-    };
-
     // Fields
     // IRC
     private Conversation mConversation;
+
+    private final Object mMentionHelper = new Object() {
+
+        @SuppressWarnings("unused")
+        public void onEvent(final OnChannelMentionEvent event) {
+            mEventBus.cancelEventDelivery(event);
+
+            if (mConversation == null
+                    || !mConversation.getServer().getTitle().equals(event.serverName)
+                    || !mConversation.getId().equals(event.channelName)) {
+                final String message = String.format("Mentioned in %s on %s", event.channelName,
+                        event.serverName);
+                final Crouton crouton = Crouton.makeText(MainActivity.this, message, Style.INFO);
+                crouton.setConfiguration(sConfiguration);
+                crouton.show();
+            }
+        }
+    };
 
     private final Object mConversationChanged = new Object() {
         @SuppressWarnings("unused")
@@ -92,6 +105,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt());
         super.onCreate(savedInstanceState);
 
         AppPreferences.setUpPreferences(this);
@@ -107,10 +121,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mDrawerLayout.setDrawerListener(this);
 
         mRightDrawer = findById(this, R.id.right_drawer);
-
-        // This is just registration because we'll retrieve the sticky event later
-        mEventBus.register(mConversationChanged);
-        mEventBus.register(mMentionHelper, 100);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -144,6 +154,38 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             }
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        final String serverName = intent.getStringExtra("server_name");
+        final String channelName = intent.getStringExtra("channel_name");
+
+        if (serverName != null) {
+            final Server server = getService().getServerIfExists(serverName);
+            final Conversation conversation = server.getUserChannelInterface().getChannel
+                    (channelName);
+            onConversationUpdated(conversation);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // This is just registration because we'll retrieve the sticky event later
+        mEventBus.register(mConversationChanged);
+        mEventBus.register(mMentionHelper, 100);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mEventBus.unregister(mConversationChanged);
+        mEventBus.unregister(mMentionHelper);
     }
 
     @Override
@@ -433,9 +475,24 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
-        final OnConversationChanged event = mEventBus.getStickyEvent(OnConversationChanged.class);
-        final Conversation conversation = event != null ? event.conversation : null;
 
+        final String serverName = getIntent().getStringExtra("server_name");
+        final String channelName = getIntent().getStringExtra("channel_name");
+
+        final Conversation conversation;
+        if (serverName != null) {
+            final Server server = service.getServerIfExists(serverName);
+            conversation = server.getUserChannelInterface().getChannel(channelName);
+        } else {
+            final OnConversationChanged event = mEventBus.getStickyEvent(OnConversationChanged
+                    .class);
+            conversation = event != null ? event.conversation : null;
+        }
+
+        onConversationUpdated(conversation);
+    }
+
+    private void onConversationUpdated(final Conversation conversation) {
         if (conversation != null) {
             mHandler.post(new Runnable() {
                 @Override

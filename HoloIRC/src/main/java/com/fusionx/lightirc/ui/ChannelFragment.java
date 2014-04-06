@@ -30,7 +30,6 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.MentionEvent;
 import com.fusionx.relay.event.channel.NameEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
@@ -64,7 +63,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
 
     public static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
-            ImmutableList.of(NameEvent.class, MentionEvent.class);
+            ImmutableList.of(NameEvent.class);
 
     @InjectView(R.id.auto_complete_button)
     ImageButton mAutoButton;

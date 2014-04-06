@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.communication;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.OnMentionEvent;
+import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.Server;
@@ -40,28 +40,38 @@ public class IRCService extends Service {
 
     private final Map<String, ServiceEventHelper> mEventHelperMap = new HashMap<>();
 
-    private NotificationManager mNotificationManager;
-
     private ConnectionManager mConnectionManager;
-
-    public IRCService() {
-        EventBus.getDefault().register(new Object() {
-            @SuppressWarnings("unused")
-            public void onEvent(final OnMentionEvent event) {
-                // If we're here, the activity has not picked it up - fire off a notification
-                final NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                        IRCService.this);
-                builder.setContentText(String.format("Mentioned in %s on %s", event.channelName,
-                        event.serverName));
-                mNotificationManager.notify(NOTIFICATION_MENTION, builder.build());
-            }
-        }, MENTION_PRIORITY);
-    }
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        EventBus.getDefault().register(new Object() {
+            @SuppressWarnings("unused")
+            public void onEvent(final OnChannelMentionEvent event) {
+                // If we're here, the activity has not picked it up - fire off a notification
+                final NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                final NotificationCompat.Builder builder = new NotificationCompat.Builder
+                        (IRCService.this).setSmallIcon(R.drawable.ic_notification)
+                        .setContentTitle(getString(R.string.app_name))
+                        .setContentText(String.format("Mentioned in %s on %s", event.channelName,
+                                event.serverName));
+
+                final Intent resultIntent = new Intent(IRCService.this, MainActivity.class);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
+                        .FLAG_ACTIVITY_SINGLE_TOP);
+                resultIntent.putExtra("server_name", event.serverName);
+                resultIntent.putExtra("channel_name", event.channelName);
+
+                final PendingIntent resultPendingIntent = PendingIntent.getActivity(IRCService.this,
+                        NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.setContentIntent(resultPendingIntent);
+
+                notificationManager.notify(NOTIFICATION_MENTION, builder.build());
+            }
+        }, MENTION_PRIORITY);
+
         return START_STICKY;
     }
 
@@ -85,13 +95,16 @@ public class IRCService extends Service {
     }
 
     public Server getServerIfExists(final ServerConfiguration.Builder builder) {
-        return mConnectionManager.getServerIfExists(builder.getTitle());
+        return getServerIfExists(builder.getTitle());
+    }
+
+    public Server getServerIfExists(final String title) {
+        return mConnectionManager.getServerIfExists(title);
     }
 
     @Override
     public IBinder onBind(final Intent intent) {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
-        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         return mBinder;
     }
 
@@ -111,6 +124,7 @@ public class IRCService extends Service {
         builder.setContentText(String.format("%d servers connected",
                 mConnectionManager.getServerCount()));
         builder.setContentIntent(getMainActivityIntent());
+
         return builder.build();
     }
 
