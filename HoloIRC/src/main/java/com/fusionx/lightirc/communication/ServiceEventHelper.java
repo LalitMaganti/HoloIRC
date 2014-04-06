@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.communication;
 
-import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
+import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.relay.Channel;

@@ -32,30 +32,13 @@ import java.util.List;
 public class UserFragment extends IRCFragment<UserEvent> {
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        final PrivateMessageUser user = getPrivateMessageUser();
-
-        if (user.isUserQuit()) {
-            // TODO - fix this
-            //onResetUserInput();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
     public FragmentType getType() {
         return FragmentType.USER;
     }
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(getServer(), mTitle, message);
+        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
     }
 
     @Override
@@ -69,7 +52,7 @@ public class UserFragment extends IRCFragment<UserEvent> {
     }
 
     public PrivateMessageUser getPrivateMessageUser() {
-        return getServer().getUserChannelInterface().getPrivateMessageUser(mTitle);
+        return (PrivateMessageUser) mConversation;
     }
 
     // Subscription methods

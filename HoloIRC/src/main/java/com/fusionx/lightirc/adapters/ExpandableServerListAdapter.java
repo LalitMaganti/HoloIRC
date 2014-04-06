@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.ServiceEventHelper;
 import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.communication.ServiceEventHelper;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.MiscUtils;

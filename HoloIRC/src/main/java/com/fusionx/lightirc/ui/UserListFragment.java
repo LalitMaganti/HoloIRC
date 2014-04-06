@@ -64,14 +64,29 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private Channel mChannel;
 
-    private Object mEventHandler = new Object() {
+    private final Object mEventHandler = new Object() {
         @SuppressWarnings("unused")
         public void onEvent(final OnConversationChanged conversationChanged) {
-            if (conversationChanged.fragmentType == FragmentType.CHANNEL) {
-                mChannel = (Channel) conversationChanged.conversation;
+            // If it's null then remove the old conversation
+            if (conversationChanged == null || conversationChanged.fragmentType != FragmentType
+                    .CHANNEL) {
+                if (mChannel != null && mRegistered) {
+                    mChannel.getServer().getServerEventBus().unregister(this);
+                    mRegistered = false;
+                }
+                return;
             }
+
+            mChannel = (Channel) conversationChanged.conversation;
+            if (!mRegistered) {
+                mChannel.getServer().getServerEventBus().register(this);
+                mRegistered = true;
+            }
+            onUpdateUserList();
         }
     };
+
+    private boolean mRegistered;
 
     private UserListAdapter mAdapter;
 
@@ -114,8 +129,9 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
-        if (mCallback.isUserPanelOpen()) {
-            onStopObserving();
+        if (mChannel != null && mRegistered) {
+            mChannel.getServer().getServerEventBus().unregister(this);
+            mRegistered = false;
         }
     }
 
@@ -125,8 +141,12 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
         // On resume, we may have missed events in the background - make sure we have the most
         // up-to-date user list
-        if (mCallback.isUserPanelOpen()) {
-            onStartObserving();
+        if (mChannel != null) {
+            if (!mRegistered) {
+                mChannel.getServer().getServerEventBus().register(this);
+                mRegistered = true;
+            }
+
             onUpdateUserList();
         }
     }
@@ -146,24 +166,8 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         }
     }
 
-    public void onSlideUpPanelOpened() {
-        onUpdateUserList();
-        onStartObserving();
-    }
-
     boolean isNickOtherUsers(final String nick) {
         return !mChannel.getServer().getUser().getNick().equals(nick);
-    }
-
-    public void onSlideUpPanelClosed() {
-        onStopObserving();
-
-        // The list view is null when we are coming into a rotation and this method is called
-        getListView().setAdapter(null);
-
-        if (mActionMode != null) {
-            mActionMode.finish();
-        }
     }
 
     /*
@@ -174,19 +178,11 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final WorldUserEvent event) {
-        if (event.channelName.equals(mChannel.getName())) {
+        if (mChannel != null && event.channelName.equals(mChannel.getName())) {
             onUpdateUserList();
         }
     }
     // End of subscribed events
-
-    public void onStartObserving() {
-        mChannel.getServer().getServerEventBus().register(this);
-    }
-
-    public void onStopObserving() {
-        mChannel.getServer().getServerEventBus().unregister(this);
-    }
 
     public StickyListHeadersListView getListView() {
         return mStickyListView;
@@ -304,7 +300,5 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         public void onUserMention(final List<WorldUser> users);
 
         public void closeDrawer();
-
-        public boolean isUserPanelOpen();
     }
 }

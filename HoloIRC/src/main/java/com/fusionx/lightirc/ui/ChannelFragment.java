@@ -68,11 +68,13 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     @InjectView(R.id.auto_complete_button)
     ImageButton mAutoButton;
 
-    private Channel mChannel;
-
     private PopupMenu mPopupMenu;
 
     private boolean isPopupShown;
+
+    private Channel getChannel() {
+        return (Channel) mConversation;
+    }
 
     @Override
     protected View createView(final ViewGroup container, final LayoutInflater inflater) {
@@ -111,19 +113,12 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     protected List<ChannelEvent> getDisconnectedAdapterData() {
-        return getServer().getUser().getChannelSnapshot(mTitle).getBuffer();
+        return mConversation.getServer().getUser().getChannelSnapshot(mTitle).getBuffer();
     }
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseChannelMessage(getServer(), mTitle, message);
-    }
-
-    private Channel getChannel() {
-        if (mChannel == null) {
-            mChannel = getServer().getUserChannelInterface().getChannel(mTitle);
-        }
-        return mChannel;
+        UserInputParser.onParseChannelMessage(mConversation.getServer(), mTitle, message);
     }
 
     @OnClick(R.id.auto_complete_button)

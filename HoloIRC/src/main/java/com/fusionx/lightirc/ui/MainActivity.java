@@ -38,7 +38,7 @@ import de.keyboardsurfer.android.widget.crouton.Style;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
-        IRCFragment.Callback, SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
+        SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
@@ -140,19 +140,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
             mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                    .findFragmentById(R
-                            .id.right_drawer);
+                    .findFragmentById(R.id.right_drawer);
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
+            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.content_frame);
 
-            if (mConversation != null) {
-                mConversation.getServer().getServerEventBus().register(this);
-                mCurrentFragment = (IRCFragment) getSupportFragmentManager().findFragmentById(R.id
-                        .content_frame);
-
-                findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
-                supportInvalidateOptionsMenu();
+            // If the current fragment is not null then retrieve the matching convo
+            if (mCurrentFragment != null) {
+                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
             }
+
+            supportInvalidateOptionsMenu();
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -422,14 +421,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public Server getServer() {
-        if (mConversation == null) {
-            return null;
-        }
-        return mConversation.getServer();
-    }
-
-    @Override
     public void disconnectFromServer() {
         mWorkerFragment.disconnectFromServer(mConversation.getServer());
     }
@@ -515,6 +506,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     }
                 }
             });
+
+            supportInvalidateOptionsMenu();
         } else {
             mSlidingPane.openPane();
         }

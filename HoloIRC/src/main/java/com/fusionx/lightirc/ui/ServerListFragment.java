@@ -55,7 +55,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             if (event.conversation != null) {
                 if (event.fragmentType == FragmentType.SERVER) {
                     mService.getEventHelper(event.conversation.getId()).clearMessagePriority();
-                }  else {
+                } else {
                     mService.getEventHelper(event.conversation.getServer().getId())
                             .clearMessagePriority(event.conversation);
                 }
@@ -225,30 +225,15 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         if (!checked) {
             mListView.getCheckedItemPositions().delete(position);
         }
-
         final int count = mListView.getCheckedItemCount();
-        final Menu menu = mode.getMenu();
         final boolean singleItemChecked = count == 1;
-        final boolean connected = count > 0 && getFirstCheckedItem().isConnected();
 
         if (checked && singleItemChecked) {
             mSelectionType = ExpandableListView.getPackedPositionType(mListView
                     .getExpandableListPosition(position));
         }
 
-        menu.findItem(R.id.activity_server_list_popup_disconnect)
-                .setVisible(singleItemChecked && connected);
-        menu.findItem(R.id.activity_server_list_popup_edit).setVisible(singleItemChecked &&
-                !connected);
-
-        boolean deleteEnabled = !connected;
-        for (int i = 1; i < count && deleteEnabled; i++) {
-            final int pos = mListView.getCheckedItemPositions().keyAt(i);
-            final ServerWrapper listItem = (ServerWrapper) mListView
-                    .getItemAtPosition(pos);
-            deleteEnabled = !listItem.isConnected();
-        }
-        menu.findItem(R.id.activity_server_list_popup_delete).setVisible(deleteEnabled);
+        mode.invalidate();
     }
 
     @Override
@@ -259,7 +244,31 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
+        if (mSelectionType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            final int count = mListView.getCheckedItemCount();
+            final boolean singleItemChecked = count == 1;
+            final boolean connected = count > 0 && getFirstCheckedItem().isConnected();
+
+            menu.findItem(R.id.activity_server_list_popup_disconnect)
+                    .setVisible(singleItemChecked && connected);
+            menu.findItem(R.id.activity_server_list_popup_edit).setVisible(singleItemChecked &&
+                    !connected);
+
+            boolean deleteEnabled = !connected;
+            for (int i = 1; i < count && deleteEnabled; i++) {
+                final int pos = mListView.getCheckedItemPositions().keyAt(i);
+                final ServerWrapper listItem = (ServerWrapper) mListView
+                        .getItemAtPosition(pos);
+                deleteEnabled = !listItem.isConnected();
+            }
+            menu.findItem(R.id.activity_server_list_popup_delete).setVisible(deleteEnabled);
+        } else {
+            menu.findItem(R.id.activity_server_list_popup_disconnect).setVisible(false);
+            menu.findItem(R.id.activity_server_list_popup_edit).setVisible(false);
+            menu.findItem(R.id.activity_server_list_popup_delete).setVisible(false);
+        }
+
         return true;
     }
 
