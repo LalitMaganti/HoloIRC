@@ -7,7 +7,6 @@ import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
-import com.fusionx.relay.event.server.DisconnectEvent;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -47,14 +46,14 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
 
         EventBus.getDefault().register(new Object() {
             @SuppressWarnings("unused")
             public void onEvent(final OnChannelMentionEvent event) {
                 // If we're here, the activity has not picked it up - fire off a notification
-                final NotificationManager notificationManager =
-                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 final NotificationCompat.Builder builder = new Builder(IRCService.this);
                 builder.setSmallIcon(R.drawable.ic_notification);
                 builder.setContentTitle(getString(R.string.app_name));
@@ -82,6 +81,10 @@ public class IRCService extends Service {
     public Server connectToServer(final ServerConfiguration.Builder builder) {
         final Pair<Boolean, Server> pair = mConnectionManager.onConnectionRequested(builder
                 .build(), mHandler);
+
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(NOTIFICATION_MENTION);
 
         final boolean exists = pair.first;
         final Server server = pair.second;
