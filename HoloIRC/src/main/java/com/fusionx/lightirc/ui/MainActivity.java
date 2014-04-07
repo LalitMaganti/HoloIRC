@@ -405,8 +405,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void removeCurrentFragment() {
         if (mCurrentFragment.getType() == FragmentType.CHANNEL) {
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
-        } else {
-            // TODO - fix this up
+        } else if (mCurrentFragment.getType() == FragmentType.USER) {
+            mConversation.getServer().getServerCallBus().sendClosePrivateMessage(
+                    (PrivateMessageUser) mConversation);
         }
     }
 
@@ -421,7 +422,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void disconnectFromServer(final Server server) {
+    public void onPrivateMessageClosed() {
+        onRemoveFragment();
+    }
+
+    private void disconnectFromServer(final Server server) {
         mWorkerFragment.disconnectFromServer(server);
     }
 

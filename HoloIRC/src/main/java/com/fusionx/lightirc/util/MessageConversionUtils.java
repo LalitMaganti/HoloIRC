@@ -32,6 +32,7 @@ import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.event.server.WhoisEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
 import com.fusionx.relay.event.user.PrivateMessageEvent;
+import com.fusionx.relay.event.user.PrivateMessageOpenedEvent;
 import com.fusionx.relay.event.user.UserConnectEvent;
 import com.fusionx.relay.event.user.UserDisconnectEvent;
 import com.fusionx.relay.event.user.WorldPrivateActionEvent;
@@ -269,6 +270,12 @@ public class MessageConversionUtils {
         @Subscribe
         public void getDisconnectEvent(final UserDisconnectEvent event) {
             setupEvent(event, event.message);
+        }
+
+        @Subscribe
+        public void getNewPrivateMessageEvent(final PrivateMessageOpenedEvent event) {
+            final String response = mContext.getString(R.string.parser_pm_opened);
+            setupEvent(event, response);
         }
     };
 

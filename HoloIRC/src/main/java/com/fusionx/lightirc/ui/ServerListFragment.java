@@ -17,6 +17,7 @@ import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
+import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
@@ -59,8 +60,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     mService.getEventHelper(event.conversation.getServer().getId())
                             .clearMessagePriority(event.conversation);
                 }
-                mListView.invalidateViews();
             }
+            mListView.invalidateViews();
         }
     };
 
@@ -322,7 +323,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public void onPart(final String serverName, final PartEvent event);
 
-        public void disconnectFromServer(Server server);
+        public void onPrivateMessageClosed();
     }
 
     public class ServerEventHandler {
@@ -369,6 +370,14 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             if (!ChannelFragment.sClasses.contains(event.getClass())) {
                 mListView.invalidateViews();
             }
+        }
+
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final PrivateMessageClosedEvent event) {
+            mListAdapter.getGroup(mServerIndex).removeServerObject(event.privateMessageNick);
+            mListView.setAdapter(mListAdapter);
+            mListView.expandGroup(mServerIndex);
+            mCallback.onPrivateMessageClosed();
         }
 
         @SuppressWarnings("unused")

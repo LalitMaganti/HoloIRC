@@ -112,7 +112,8 @@ public final class ServiceEventHelper {
     public void onEventMainThread(final NewPrivateMessage event) {
         final PrivateMessageUser user = mServer.getUserChannelInterface().getPrivateMessageUser(
                 event.nick);
-        onIRCEvent(MessagePriority.HIGH, user, user.getBuffer().get(user.getBuffer().size() - 1));
+        final int size = user.getBuffer().size();
+        onIRCEvent(MessagePriority.HIGH, user, user.getBuffer().get(size - 1));
     }
 
     @SuppressWarnings("unused")
