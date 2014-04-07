@@ -41,7 +41,7 @@ import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 public class ServerFragment extends IRCFragment<ServerEvent> {
 
     private static final ImmutableList<? extends Class<? extends ServerEvent>> sClasses =
-            ImmutableList.of(JoinEvent.class, PartEvent.class, DisconnectEvent.class);
+            ImmutableList.of(JoinEvent.class, PartEvent.class);
 
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {

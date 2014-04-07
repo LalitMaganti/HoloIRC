@@ -250,8 +250,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             final boolean singleItemChecked = count == 1;
             final boolean connected = count > 0 && getFirstCheckedItem().isConnected();
 
-            menu.findItem(R.id.activity_server_list_popup_disconnect)
-                    .setVisible(singleItemChecked && connected);
             menu.findItem(R.id.activity_server_list_popup_edit).setVisible(singleItemChecked &&
                     !connected);
 
@@ -264,7 +262,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
             menu.findItem(R.id.activity_server_list_popup_delete).setVisible(deleteEnabled);
         } else {
-            menu.findItem(R.id.activity_server_list_popup_disconnect).setVisible(false);
             menu.findItem(R.id.activity_server_list_popup_edit).setVisible(false);
             menu.findItem(R.id.activity_server_list_popup_delete).setVisible(false);
         }
@@ -277,9 +274,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         final ServerWrapper listItem = getFirstCheckedItem();
 
         switch (item.getItemId()) {
-            case R.id.activity_server_list_popup_disconnect:
-                mCallback.disconnectFromServer(listItem.getServer());
-                break;
             case R.id.activity_server_list_popup_delete:
                 // TODO - AsyncTask this
                 final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
@@ -341,7 +335,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mServer = server;
             mServerIndex = serverIndex;
 
-            server.getServerEventBus().register(this);
+            server.getServerEventBus().register(this, 50);
         }
 
         @SuppressWarnings("unused")
@@ -397,8 +391,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 refreshServers();
 
                 unregister();
-                mCallback.onServerDisconnected(mServer);
                 mEventHandlers.remove(this);
+                mCallback.onServerDisconnected(mServer);
             } else {
                 // TODO - check what needs to be done here
                 mListView.invalidateViews();

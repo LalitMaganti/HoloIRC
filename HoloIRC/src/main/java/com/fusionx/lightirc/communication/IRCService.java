@@ -7,6 +7,7 @@ import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
+import com.fusionx.relay.event.server.DisconnectEvent;
 
 import android.app.Notification;
 import android.app.NotificationManager;

@@ -113,7 +113,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     protected List<ChannelEvent> getDisconnectedAdapterData() {
-        return mConversation.getServer().getUser().getChannelSnapshot(mTitle).getBuffer();
+        return getChannel().getBuffer();
     }
 
     @Override

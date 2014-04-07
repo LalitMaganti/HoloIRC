@@ -20,15 +20,10 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item
-            android:id="@+id/activity_server_list_popup_disconnect"
-            android:title="@string/disconnect"/>
     <item
             android:id="@+id/activity_server_list_popup_edit"
             android:title="@string/edit"/>
     <item
             android:id="@+id/activity_server_list_popup_delete"
             android:title="@string/delete"/>
-
 </menu>

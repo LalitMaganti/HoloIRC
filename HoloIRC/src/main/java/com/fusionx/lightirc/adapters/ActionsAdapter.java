@@ -133,7 +133,8 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public boolean isEnabled(int position) {
-        return !((position == 0) || (position == 1)) || isConnected();
+        return !((position == 0) || (position == 1) || mFragmentType != FragmentType.SERVER)
+                || isConnected();
     }
 
     public boolean isConnected() {

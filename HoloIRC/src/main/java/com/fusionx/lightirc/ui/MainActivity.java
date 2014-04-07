@@ -41,13 +41,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback {
 
-    public static final int SERVER_SETTINGS = 1;
-
-    private static final Configuration sConfiguration;
-
     static {
         sConfiguration = new Configuration.Builder().setDuration(500).build();
     }
+
+    public static final int SERVER_SETTINGS = 1;
+
+    private static final Configuration sConfiguration;
 
     private static final String WORKER_FRAGMENT = "WorkerFragment";
 
