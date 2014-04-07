@@ -106,13 +106,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-
-        getListView().setSelection(getListView().getCount());
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
