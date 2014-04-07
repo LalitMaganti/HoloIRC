@@ -11,7 +11,7 @@ import android.support.v7.app.ActionBarActivity;
 
 public class ChannelListActivity extends ActionBarActivity implements ServerSettingsCallbacks {
 
-    private String mFileName;
+    private ChannelListFragment mChannelListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,10 +19,17 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
 
         super.onCreate(savedInstanceState);
 
-        mFileName = getIntent().getStringExtra("filename");
+        mChannelListFragment = new ChannelListFragment();
 
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
-                new ChannelListFragment()).commit();
+                mChannelListFragment).commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        mChannelListFragment.onSaveData();
+
+        super.onBackPressed();
     }
 
     @Override

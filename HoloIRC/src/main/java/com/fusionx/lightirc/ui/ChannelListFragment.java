@@ -2,14 +2,14 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
-import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
-import com.fusionx.lightirc.misc.PreferenceConstants;
+import com.fusionx.lightirc.model.db.DatabaseContract;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
+import com.fusionx.lightirc.util.DatabaseUtils;
 import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.ContentValues;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -21,12 +21,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListAdapter;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
-
-import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_AUTOJOIN;
 
 public class ChannelListFragment extends ListFragment {
 
@@ -99,27 +95,18 @@ public class ChannelListFragment extends ListFragment {
         }
     };
 
-    private ServerSettingsCallbacks mCallbacks;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mCallbacks = (ServerSettingsCallbacks) activity;
-        } catch (ClassCastException ex) {
-            ex.printStackTrace();
-        }
-    }
+    private ContentValues mValues;
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        SharedPreferences settings = getActivity().getSharedPreferences("temp",
-                Context.MODE_PRIVATE);
-        final Set<String> set = settings
-                .getStringSet(PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>());
+
+        mValues = getActivity().getIntent().getParcelableExtra("contentValues");
+        final List<String> arrayList = DatabaseUtils.convertStringToArray(
+                mValues.getAsString(DatabaseContract.ServerTable.COLUMN_AUTOJOIN));
+
         mAdapter = new BaseCollectionAdapter<>(getActivity(), R.layout.default_listview_textview,
-                new TreeSet<>(set));
+                new TreeSet<>(arrayList));
 
         setListAdapter(mAdapter);
         setHasOptionsMenu(true);
@@ -168,12 +155,12 @@ public class ChannelListFragment extends ListFragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        getActivity().getSharedPreferences("temp",
-                Context.MODE_PRIVATE).edit().putStringSet(PREF_AUTOJOIN, mAdapter.getSetOfItems())
-                .commit();
-        super.onPause();
+    public void onSaveData() {
+        final Intent intent = new Intent();
+        mValues.put(DatabaseContract.ServerTable.COLUMN_AUTOJOIN,
+                DatabaseUtils.convertStringListToString(mAdapter.getListOfItems()));
+        intent.putExtra("contentValues", mValues);
+        getActivity().setResult(Activity.RESULT_OK, intent);
     }
 
     public abstract class ChannelDialogBuilder extends DialogBuilder {

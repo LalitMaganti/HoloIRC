@@ -176,8 +176,7 @@ public class BuilderDatabaseSource {
         values.put(COLUMN_NICK_CHANGEABLE, builder.isNickChangeable() ? 1 : 0);
 
         // Autojoin channels
-        values.put(COLUMN_AUTOJOIN,
-                convertStringListToString(builder.getAutoJoinChannels()));
+        values.put(COLUMN_AUTOJOIN, convertStringListToString(builder.getAutoJoinChannels()));
 
         // Server authorisation
         values.put(COLUMN_SERVER_USERNAME, builder.getServerUserName());

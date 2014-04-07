@@ -43,6 +43,8 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     public static final String SERVER = "server";
 
+    private static final int CHANNEL_LIST = 10;
+
     private boolean mCanSaveChanges = true;
 
     private ViewPreference mCompletePreference = null;
@@ -58,6 +60,8 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     private ContentValues mContentValues;
 
     private boolean mNewServer;
+
+    private ServerConfiguration.Builder mBuilder;
 
     private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
         if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
@@ -82,15 +86,14 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mSource = new BuilderDatabaseSource(this);
         mSource.open();
 
-        final ServerConfiguration.Builder builder;
         if (mNewServer) {
-            builder = SharedPreferencesUtils.getDefaultNewServer(this);
+            mBuilder = SharedPreferencesUtils.getDefaultNewServer(this);
             setResult(RESULT_CANCELED);
         } else {
-            builder = getIntent().getParcelableExtra(SERVER);
+            mBuilder = getIntent().getParcelableExtra(SERVER);
             setResult(RESULT_OK);
         }
-        mContentValues = mSource.getContentValuesFromBuilder(builder, !mNewServer);
+        mContentValues = mSource.getContentValuesFromBuilder(mBuilder, !mNewServer);
         // If it's a new server, we can't allow ignore list to be null - just put an empty string
         // in for now - TODO - fix this
         if (mNewServer) {
@@ -112,11 +115,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             } else {
                 mSource.updateServer(mContentValues);
             }
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
-                    Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -160,7 +158,8 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             public boolean onPreferenceClick(final Preference preference) {
                 final Intent intent = new Intent(ServerPreferenceActivity.this,
                         ChannelListActivity.class);
-                startActivity(intent);
+                intent.putExtra("contentValues", mContentValues);
+                startActivityForResult(intent, CHANNEL_LIST);
                 return false;
             }
         });
@@ -171,6 +170,17 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             mCompletePreference.setInitialText(mTitle.getTitle().toString());
         } else {
             screen.removePreference(mCompletePreference);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHANNEL_LIST) {
+                mContentValues = data.getParcelableExtra("contentValues");
+            }
         }
     }
 

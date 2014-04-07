@@ -278,7 +278,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         switch (item.getItemId()) {
             case R.id.activity_server_list_popup_disconnect:
-                mCallback.onServerDisconnected(listItem.getServer());
+                mCallback.disconnectFromServer(listItem.getServer());
                 break;
             case R.id.activity_server_list_popup_delete:
                 // TODO - AsyncTask this
@@ -327,6 +327,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public IRCService getService();
 
         public void onPart(final String serverName, final PartEvent event);
+
+        public void disconnectFromServer(Server server);
     }
 
     public class ServerEventHandler {

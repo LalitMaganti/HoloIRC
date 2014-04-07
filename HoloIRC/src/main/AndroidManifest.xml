@@ -23,6 +23,7 @@
         </activity>
         <activity
                 android:name=".ui.ChannelListActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/server_settings_auto_join_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -30,6 +31,7 @@
         </activity>
         <activity
                 android:name=".ui.SettingsActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -37,6 +39,7 @@
         </activity>
         <activity
                 android:name=".ui.ServerPreferenceActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/server_settings_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
