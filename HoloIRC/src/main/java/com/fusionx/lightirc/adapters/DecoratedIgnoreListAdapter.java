@@ -53,7 +53,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
 
     public DecoratedIgnoreListAdapter(BaseAdapter baseAdapter, OnDismissCallback callback) {
         super(baseAdapter);
-        mAnimators = new SparseArray<AnimationInfo>();
+        mAnimators = new SparseArray<>();
 
         mAnimationStartMillis = -1;
         mLastAnimatedPosition = -1;
