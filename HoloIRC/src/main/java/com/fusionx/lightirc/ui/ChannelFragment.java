@@ -159,11 +159,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     @Override
-    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
-        return inflater.inflate(R.layout.fragment_channel, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
@@ -176,11 +171,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     @Override
-    protected List<ChannelEvent> getAdapterData() {
-        return getChannel().getBuffer();
-    }
-
-    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseChannelMessage(mConversation.getServer(), mTitle, message);
     }
@@ -188,6 +178,16 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     @Override
     public FragmentType getType() {
         return FragmentType.CHANNEL;
+    }
+
+    @Override
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_channel, container, false);
+    }
+
+    @Override
+    protected List<ChannelEvent> getAdapterData() {
+        return getChannel().getBuffer();
     }
 
     private Channel getChannel() {

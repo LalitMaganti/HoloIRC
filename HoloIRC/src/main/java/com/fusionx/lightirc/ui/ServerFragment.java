@@ -50,11 +50,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
-    protected List<ServerEvent> getAdapterData() {
-        return mConversation.getServer().getBuffer();
-    }
-
-    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseServerMessage(mConversation.getServer(), message);
     }
@@ -70,5 +65,10 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
         if (!sClasses.contains(event.getClass())) {
             mMessageAdapter.add(event);
         }
+    }
+
+    @Override
+    protected List<ServerEvent> getAdapterData() {
+        return mConversation.getServer().getBuffer();
     }
 }

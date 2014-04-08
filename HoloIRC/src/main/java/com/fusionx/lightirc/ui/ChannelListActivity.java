@@ -23,6 +23,13 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
     }
 
     @Override
+    public void onBackPressed() {
+        mChannelListFragment.onSaveData();
+
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
 
@@ -32,12 +39,5 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
 
         getSupportFragmentManager().beginTransaction().replace(android.R.id.content,
                 mChannelListFragment).commit();
-    }
-
-    @Override
-    public void onBackPressed() {
-        mChannelListFragment.onSaveData();
-
-        super.onBackPressed();
     }
 }

@@ -315,6 +315,46 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main_ab, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(final Menu menu) {
+        final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
+        item.setVisible(!mSlidingPane.isOpen() && mConversation != null);
+
+        final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
+        addServer.setVisible(mSlidingPane.isOpen());
+
+        final MenuItem settings = menu.findItem(R.id.activity_main_ab_settings);
+        settings.setVisible(mSlidingPane.isOpen());
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+            case R.id.home:
+                UIUtils.toggleSlidingPane(mSlidingPane);
+                return true;
+            case R.id.activity_main_ab_actions:
+                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
+                return true;
+            case R.id.activity_main_ab_add:
+                addNewServer();
+                return true;
+            case R.id.activity_main_ab_settings:
+                openAppSettings();
+                return true;
+        }
+        return false;
+    }
+
+    @Override
     protected void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
         super.onCreate(savedInstanceState);
@@ -387,46 +427,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
             getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main_ab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(final Menu menu) {
-        final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(!mSlidingPane.isOpen() && mConversation != null);
-
-        final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
-        addServer.setVisible(mSlidingPane.isOpen());
-
-        final MenuItem settings = menu.findItem(R.id.activity_main_ab_settings);
-        settings.setVisible(mSlidingPane.isOpen());
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-            case R.id.home:
-                UIUtils.toggleSlidingPane(mSlidingPane);
-                return true;
-            case R.id.activity_main_ab_actions:
-                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
-                return true;
-            case R.id.activity_main_ab_add:
-                addNewServer();
-                return true;
-            case R.id.activity_main_ab_settings:
-                openAppSettings();
-                return true;
-        }
-        return false;
     }
 
     @Override

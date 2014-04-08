@@ -44,11 +44,6 @@ public class UserFragment extends IRCFragment<UserEvent> {
     }
 
     @Override
-    protected List<UserEvent> getAdapterData() {
-        return getPrivateMessageUser().getBuffer();
-    }
-
-    @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
     }
@@ -56,5 +51,10 @@ public class UserFragment extends IRCFragment<UserEvent> {
     @Override
     public FragmentType getType() {
         return FragmentType.USER;
+    }
+
+    @Override
+    protected List<UserEvent> getAdapterData() {
+        return getPrivateMessageUser().getBuffer();
     }
 }
