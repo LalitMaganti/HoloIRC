@@ -25,6 +25,7 @@ import com.fusionx.relay.interfaces.Conversation;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -137,7 +138,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
     }
 
-    public void refreshServers() {
+    private void refreshServers(final Runnable runnable) {
         final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
                 .LoaderCallbacks<ArrayList<ServerWrapper>>() {
             @Override
@@ -162,6 +163,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     // Expand all the groups - TODO - fix this properly
                     mListView.expandGroup(i);
                 }
+
+                // Run any code that is meant to be run after the new servers are in place
+                if (runnable != null) {
+                    final Handler handler = new Handler();
+                    handler.post(runnable);
+                }
             }
 
             @Override
@@ -170,6 +177,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         };
 
         getLoaderManager().restartLoader(21, null, callbacks);
+    }
+
+    public void refreshServers() {
+        refreshServers(null);
     }
 
     @Override
@@ -397,11 +408,14 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @SuppressWarnings("unused")
         public void onEventMainThread(final DisconnectEvent event) {
             if (event.userSent) {
-                refreshServers();
-
-                unregister();
-                mEventHandlers.remove(this);
-                mCallback.onServerDisconnected(mServer);
+                refreshServers(new Runnable() {
+                    @Override
+                    public void run() {
+                        unregister();
+                        mEventHandlers.remove(ServerEventHandler.this);
+                        mCallback.onServerDisconnected(mServer);
+                    }
+                });
             } else {
                 // TODO - check what needs to be done here
                 mListView.invalidateViews();

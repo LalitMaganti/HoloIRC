@@ -431,13 +431,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveFragment();
     }
 
-    private void disconnectFromServer(final Server server) {
-        mWorkerFragment.disconnectFromServer(server);
-    }
-
     @Override
     public void disconnectFromServer() {
-        disconnectFromServer(mConversation.getServer());
+        mWorkerFragment.disconnectFromServer(mConversation.getServer());
     }
 
     @Override
