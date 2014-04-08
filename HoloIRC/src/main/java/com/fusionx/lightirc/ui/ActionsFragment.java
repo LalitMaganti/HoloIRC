@@ -63,13 +63,6 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mListView.setOnItemClickListener(this);
-    }
-
-    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_action_listview, container, false);
@@ -84,6 +77,13 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         final ActionsAdapter adapter = new ActionsAdapter(getActivity());
         mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onActivityCreated(final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mListView.setOnItemClickListener(this);
     }
 
     @Override

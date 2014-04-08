@@ -42,30 +42,18 @@ public class NonEmptyEditTextPreference extends SummaryEditTextPreference implem
     }
 
     @Override
-    public void onTextChanged(final CharSequence s, final int start, final int before,
+    public void beforeTextChanged(final CharSequence s, final int start, final int before,
             final int count) {
     }
 
     @Override
-    public void beforeTextChanged(final CharSequence s, final int start, final int before,
+    public void onTextChanged(final CharSequence s, final int start, final int before,
             final int count) {
     }
 
     @Override
     public void afterTextChanged(final Editable s) {
         onEditTextChanged();
-    }
-
-    AlertDialog onEditTextChanged() {
-        final boolean enable = !getEditText().getText().toString().isEmpty();
-        final Dialog dlg = getDialog();
-        final AlertDialog alertDlg = (AlertDialog) dlg;
-        if (alertDlg != null) {
-            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
-            btn.setEnabled(enable);
-            getEditText().setError(enable ? null : "Must not be empty");
-        }
-        return alertDlg;
     }
 
     @Override
@@ -79,5 +67,17 @@ public class NonEmptyEditTextPreference extends SummaryEditTextPreference implem
         getEditText().removeTextChangedListener(this);
         getEditText().addTextChangedListener(this);
         onEditTextChanged();
+    }
+
+    AlertDialog onEditTextChanged() {
+        final boolean enable = !getEditText().getText().toString().isEmpty();
+        final Dialog dlg = getDialog();
+        final AlertDialog alertDlg = (AlertDialog) dlg;
+        if (alertDlg != null) {
+            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
+            btn.setEnabled(enable);
+            getEditText().setError(enable ? null : "Must not be empty");
+        }
+        return alertDlg;
     }
 }

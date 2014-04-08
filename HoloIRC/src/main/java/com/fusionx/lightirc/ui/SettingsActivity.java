@@ -20,18 +20,23 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        AppPreferences.setUpPreferences(this);
-    }
-
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBuildHeaders(final List<Header> target) {
         loadHeadersFromResource(R.xml.app_settings_headers, target);
         showAlertDialog();
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        AppPreferences.setUpPreferences(this);
     }
 
     private void showAlertDialog() {
@@ -44,10 +49,5 @@ public class SettingsActivity extends PreferenceActivity {
             final AlertDialog alert = builder.create();
             alert.show();
         }
-    }
-
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        return true;
     }
 }

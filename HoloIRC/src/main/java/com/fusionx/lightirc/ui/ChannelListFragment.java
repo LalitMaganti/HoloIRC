@@ -31,22 +31,6 @@ public class ChannelListFragment extends ListFragment {
     private MultiChoiceFragmentListener mListener = new MultiChoiceFragmentListener() {
 
         @Override
-        protected void attachSelectionController() {
-            mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                    getListView(), (ActionBarActivity) getActivity(), this, true);
-        }
-
-        @Override
-        protected ListAdapter getRealAdapter() {
-            return mAdapter;
-        }
-
-        @Override
-        protected SparseBooleanArray getCheckedItemPositions() {
-            return getListView().getCheckedItemPositions();
-        }
-
-        @Override
         public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
             final MenuInflater inflate = mode.getMenuInflater();
             inflate.inflate(R.menu.activty_server_settings_cab, menu);
@@ -93,6 +77,22 @@ public class ChannelListFragment extends ListFragment {
                 mode.getMenu().getItem(0).setVisible(selectedItemCount == 1);
             }
         }
+
+        @Override
+        protected void attachSelectionController() {
+            mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
+                    getListView(), (ActionBarActivity) getActivity(), this, true);
+        }
+
+        @Override
+        protected ListAdapter getRealAdapter() {
+            return mAdapter;
+        }
+
+        @Override
+        protected SparseBooleanArray getCheckedItemPositions() {
+            return getListView().getCheckedItemPositions();
+        }
     };
 
     private ContentValues mValues;
@@ -121,15 +121,15 @@ public class ChannelListFragment extends ListFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mListener.onSaveInstanceState(outState);
-    }
-
-    @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
         mListener.setMenuVisibility(menuVisible);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mListener.onSaveInstanceState(outState);
     }
 
     @Override

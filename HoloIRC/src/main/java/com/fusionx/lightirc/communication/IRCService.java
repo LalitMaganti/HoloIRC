@@ -78,6 +78,12 @@ public class IRCService extends Service {
         return START_STICKY;
     }
 
+    @Override
+    public IBinder onBind(final Intent intent) {
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
+        return mBinder;
+    }
+
     public Server connectToServer(final ServerConfiguration.Builder builder) {
         final Pair<Boolean, Server> pair = mConnectionManager.onConnectionRequested(builder
                 .build(), mHandler);
@@ -109,12 +115,6 @@ public class IRCService extends Service {
         return mConnectionManager.getServerIfExists(title);
     }
 
-    @Override
-    public IBinder onBind(final Intent intent) {
-        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
-        return mBinder;
-    }
-
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server.getTitle());
 
@@ -122,6 +122,16 @@ public class IRCService extends Service {
         if (finalServer) {
             stopForeground(true);
         }
+    }
+
+    public PendingIntent getMainActivityIntent() {
+        final Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(this, 0, intent, 0);
+    }
+
+    public ServiceEventHelper getEventHelper(final String title) {
+        return mEventHelperMap.get(title);
     }
 
     private Notification getNotification() {
@@ -133,16 +143,6 @@ public class IRCService extends Service {
         builder.setContentIntent(getMainActivityIntent());
 
         return builder.build();
-    }
-
-    public PendingIntent getMainActivityIntent() {
-        final Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(this, 0, intent, 0);
-    }
-
-    public ServiceEventHelper getEventHelper(final String title) {
-        return mEventHelperMap.get(title);
     }
 
     // Binder which returns this service

@@ -47,14 +47,6 @@ public class WorkerFragment extends Fragment implements LoaderManager
             private Dialog mDialog;
 
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-
-                mHandler = new Handler();
-                mDialog = new Dialog(getActivity());
-            }
-
-            @Override
             protected Void doInBackground(Void... params) {
                 final List<File> fileList = SharedPreferencesUtils.getOldServers(getActivity());
                 if (!fileList.isEmpty()) {
@@ -76,6 +68,14 @@ public class WorkerFragment extends Fragment implements LoaderManager
                     });
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                mHandler = new Handler();
+                mDialog = new Dialog(getActivity());
             }
 
             @Override

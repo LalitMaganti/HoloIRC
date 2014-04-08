@@ -31,43 +31,23 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     }
 
     @Override
-    protected void onBindDialogView(final View view) {
-        super.onBindDialogView(view);
+    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
 
-        mFirstChoice = (EditText) view.findViewById(R.id.edit_text_nick_first_choice);
-        mSecondChoice = (EditText) view.findViewById(R.id.edit_text_nick_second_choice);
-        mThirdChoice = (EditText) view.findViewById(R.id.edit_text_nick_third_choice);
+    }
 
-        retrieveNick();
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+        onEditTextChanged();
     }
 
     protected abstract void retrieveNick();
 
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-
-        if (positiveResult) {
-            final boolean persist = getOnPreferenceChangeListener().onPreferenceChange(this,
-                    getNickStorageFromText());
-            if (persist) {
-                persistNick();
-            }
-        }
-    }
-
     protected abstract void persistNick();
-
-    void onEditTextChanged() {
-        final boolean enable = !getFirstNickText().isEmpty();
-        final Dialog dlg = getDialog();
-        final AlertDialog alertDlg = (AlertDialog) dlg;
-        if (alertDlg != null) {
-            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
-            btn.setEnabled(enable);
-            mFirstChoice.setError(enable ? null : "Must not be empty");
-        }
-    }
 
     @Override
     protected void showDialog(final Bundle state) {
@@ -83,22 +63,27 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     }
 
     @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+    protected void onBindDialogView(final View view) {
+        super.onBindDialogView(view);
 
+        mFirstChoice = (EditText) view.findViewById(R.id.edit_text_nick_first_choice);
+        mSecondChoice = (EditText) view.findViewById(R.id.edit_text_nick_second_choice);
+        mThirdChoice = (EditText) view.findViewById(R.id.edit_text_nick_third_choice);
+
+        retrieveNick();
     }
 
     @Override
-    public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
+    protected void onDialogClosed(boolean positiveResult) {
+        super.onDialogClosed(positiveResult);
 
-    }
-
-    @Override
-    public void afterTextChanged(Editable editable) {
-        onEditTextChanged();
-    }
-
-    private NickStorage getNickStorageFromText() {
-        return new NickStorage(getFirstNickText(), getSecondNickText(), getThirdNickText());
+        if (positiveResult) {
+            final boolean persist = getOnPreferenceChangeListener().onPreferenceChange(this,
+                    getNickStorageFromText());
+            if (persist) {
+                persistNick();
+            }
+        }
     }
 
     protected String getFirstNickText() {
@@ -111,5 +96,20 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
 
     protected String getThirdNickText() {
         return mThirdChoice.getText().toString();
+    }
+
+    void onEditTextChanged() {
+        final boolean enable = !getFirstNickText().isEmpty();
+        final Dialog dlg = getDialog();
+        final AlertDialog alertDlg = (AlertDialog) dlg;
+        if (alertDlg != null) {
+            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
+            btn.setEnabled(enable);
+            mFirstChoice.setError(enable ? null : "Must not be empty");
+        }
+    }
+
+    private NickStorage getNickStorageFromText() {
+        return new NickStorage(getFirstNickText(), getSecondNickText(), getThirdNickText());
     }
 }

@@ -14,6 +14,15 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
     private ChannelListFragment mChannelListFragment;
 
     @Override
+    public void setupPreferences(PreferenceScreen screen, Activity activity) {
+        throw new IllegalArgumentException();
+    }
+
+    public boolean onPreferenceChange(Preference preference) {
+        throw new IllegalArgumentException();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
 
@@ -30,14 +39,5 @@ public class ChannelListActivity extends ActionBarActivity implements ServerSett
         mChannelListFragment.onSaveData();
 
         super.onBackPressed();
-    }
-
-    @Override
-    public void setupPreferences(PreferenceScreen screen, Activity activity) {
-        throw new IllegalArgumentException();
-    }
-
-    public boolean onPreferenceChange(Preference preference) {
-        throw new IllegalArgumentException();
     }
 }

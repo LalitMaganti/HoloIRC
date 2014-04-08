@@ -79,6 +79,74 @@ public class SharedPreferencesUtils {
         }
     }
 
+    public static List<File> getOldServers(final Context context) {
+        final ArrayList<File> array = new ArrayList<>();
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(context));
+
+        for (final File file : folder.listFiles()) {
+            if (!SharedPreferencesUtils.isExcludedString(file.getName())) {
+                array.add(file);
+            }
+        }
+        return array;
+    }
+
+    public static void migrateToDatabase(final List<File> array, final Context context) {
+        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
+        source.open();
+        for (final File file : array) {
+            final String prefsName = file.getName().replace(".xml", "");
+            // Get builder to transfer
+            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
+            // Also transfer over ignore list
+            final List<String> ignoreList = getIgnoreList(context, prefsName);
+            source.addServer(builder, ignoreList);
+            file.delete();
+        }
+        source.close();
+    }
+
+    public static boolean isExcludedString(final String fileName) {
+        return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
+                fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
+    }
+
+    // TODO - make these static somewhere
+    public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
+        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                (context);
+        final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
+                "holoirc");
+        final String secondNick = preferences
+                .getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
+        final String thirdNick = preferences
+                .getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
+        builder.setNickStorage(new NickStorage(firstNick, secondNick, thirdNick));
+
+        final String realName = preferences.getString(PreferenceConstants.PREF_DEFAULT_REALNAME,
+                "HoloIRCUser");
+        builder.setRealName(realName);
+
+        final boolean autoNick = preferences.getBoolean(PreferenceConstants
+                .PREF_DEFAULT_AUTO_NICK, true);
+        builder.setNickChangeable(autoNick);
+
+        builder.setServerUserName("holoirc");
+
+        return builder;
+    }
+
+    public static void onInitialSetup(final Context context) {
+        final SharedPreferences globalSettings = context.getSharedPreferences("main", MODE_PRIVATE);
+        final boolean firstRun = globalSettings.getBoolean("firstrun", true);
+
+        if (firstRun) {
+            firstTimeServerSetup(context);
+            globalSettings.edit().putBoolean("firstrun", false).commit();
+        }
+    }
+
     private static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
             final String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
@@ -134,79 +202,11 @@ public class SharedPreferencesUtils {
         return builder;
     }
 
-    public static List<File> getOldServers(final Context context) {
-        final ArrayList<File> array = new ArrayList<>();
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(context));
-
-        for (final File file : folder.listFiles()) {
-            if (!SharedPreferencesUtils.isExcludedString(file.getName())) {
-                array.add(file);
-            }
-        }
-        return array;
-    }
-
-    public static void migrateToDatabase(final List<File> array, final Context context) {
-        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
-        source.open();
-        for (final File file : array) {
-            final String prefsName = file.getName().replace(".xml", "");
-            // Get builder to transfer
-            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
-            // Also transfer over ignore list
-            final List<String> ignoreList = getIgnoreList(context, prefsName);
-            source.addServer(builder, ignoreList);
-            file.delete();
-        }
-        source.close();
-    }
-
     private static List<String> getIgnoreList(Context context, String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 MODE_PRIVATE);
         final Set<String> ignoreSet = serverSettings.getStringSet(PREF_IGNORE_LIST,
                 new HashSet<String>());
         return new ArrayList<>(ignoreSet);
-    }
-
-    public static boolean isExcludedString(final String fileName) {
-        return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
-                fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
-    }
-
-    // TODO - make these static somewhere
-    public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
-        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
-                (context);
-        final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
-                "holoirc");
-        final String secondNick = preferences
-                .getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
-        final String thirdNick = preferences
-                .getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
-        builder.setNickStorage(new NickStorage(firstNick, secondNick, thirdNick));
-
-        final String realName = preferences.getString(PreferenceConstants.PREF_DEFAULT_REALNAME,
-                "HoloIRCUser");
-        builder.setRealName(realName);
-
-        final boolean autoNick = preferences.getBoolean(PreferenceConstants
-                .PREF_DEFAULT_AUTO_NICK, true);
-        builder.setNickChangeable(autoNick);
-
-        builder.setServerUserName("holoirc");
-
-        return builder;
-    }
-
-    public static void onInitialSetup(final Context context) {
-        final SharedPreferences globalSettings = context.getSharedPreferences("main", MODE_PRIVATE);
-        final boolean firstRun = globalSettings.getBoolean("firstrun", true);
-
-        if (firstRun) {
-            firstTimeServerSetup(context);
-            globalSettings.edit().putBoolean("firstrun", false).commit();
-        }
     }
 }

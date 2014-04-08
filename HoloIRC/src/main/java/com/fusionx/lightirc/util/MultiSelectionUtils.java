@@ -104,19 +104,6 @@ public class MultiSelectionUtils {
             return controller;
         }
 
-        private void readInstanceState(Bundle savedInstanceState) {
-            mTempIdsToCheckOnRestore = null;
-            if (savedInstanceState != null) {
-                long[] checkedIds = savedInstanceState.getLongArray(getStateKey());
-                if (checkedIds != null && checkedIds.length > 0) {
-                    mTempIdsToCheckOnRestore = new HashSet<>();
-                    for (long id : checkedIds) {
-                        mTempIdsToCheckOnRestore.add(id);
-                    }
-                }
-            }
-        }
-
         public void tryRestoreInstanceState(Bundle savedInstanceState) {
             readInstanceState(savedInstanceState);
             tryRestoreInstanceState();
@@ -162,10 +149,6 @@ public class MultiSelectionUtils {
             }
 
             return false;
-        }
-
-        private String getStateKey() {
-            return MultiSelectionUtils.class.getSimpleName() + "_" + mListView.getId();
         }
 
         @Override
@@ -259,12 +242,28 @@ public class MultiSelectionUtils {
             return mActionMode != null;
         }
 
-
         public void startActionMode() {
             if (mActionMode != null) {
                 return;
             }
             mActionMode = mActivity.startSupportActionMode(Controller.this);
+        }
+
+        private void readInstanceState(Bundle savedInstanceState) {
+            mTempIdsToCheckOnRestore = null;
+            if (savedInstanceState != null) {
+                long[] checkedIds = savedInstanceState.getLongArray(getStateKey());
+                if (checkedIds != null && checkedIds.length > 0) {
+                    mTempIdsToCheckOnRestore = new HashSet<>();
+                    for (long id : checkedIds) {
+                        mTempIdsToCheckOnRestore.add(id);
+                    }
+                }
+            }
+        }
+
+        private String getStateKey() {
+            return MultiSelectionUtils.class.getSimpleName() + "_" + mListView.getId();
         }
     }
 }

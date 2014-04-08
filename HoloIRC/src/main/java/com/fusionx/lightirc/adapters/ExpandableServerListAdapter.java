@@ -48,8 +48,28 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
+    public int getGroupCount() {
+        return mServerListItems.size();
+    }
+
+    @Override
+    public int getChildrenCount(final int groupPos) {
+        return mServerListItems.get(groupPos).getSubServerSize();
+    }
+
+    @Override
+    public ServerWrapper getGroup(final int groupPos) {
+        return mServerListItems.get(groupPos);
+    }
+
+    @Override
     public Conversation getChild(final int groupPos, final int childPos) {
         return mServerListItems.get(groupPos).getSubServer(childPos);
+    }
+
+    @Override
+    public long getGroupId(final int groupPos) {
+        return groupPos;
     }
 
     @Override
@@ -60,11 +80,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean hasStableIds() {
         return true;
-    }
-
-    @Override
-    public int getChildrenCount(final int groupPos) {
-        return mServerListItems.get(groupPos).getSubServerSize();
     }
 
     // TODO - ViewHolder pattern
@@ -144,21 +159,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
-    }
-
-    @Override
-    public ServerWrapper getGroup(final int groupPos) {
-        return mServerListItems.get(groupPos);
-    }
-
-    @Override
-    public int getGroupCount() {
-        return mServerListItems.size();
-    }
-
-    @Override
-    public long getGroupId(final int groupPos) {
-        return groupPos;
     }
 
     public final class ExpandListener implements View.OnClickListener {

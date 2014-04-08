@@ -7,12 +7,14 @@ import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.connection.ConnectionManager;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
@@ -55,17 +57,6 @@ public final class ServiceEventHelper {
         server.getServerEventBus().register(this, EVENT_PRIORITY);
     }
 
-    public void setSubMessagePriority(final String title, final MessagePriority priority) {
-        final MessagePriority oldPriority = mMessagePriorityMap.get(title);
-        if (oldPriority == null || oldPriority.compareTo(priority) < 0) {
-            mMessagePriorityMap.put(title, priority);
-        }
-    }
-
-    public void setSubEvent(final String title, final Event event) {
-        mEventMap.put(title, event);
-    }
-
     public void clearMessagePriority() {
         mMessagePriority = null;
     }
@@ -86,25 +77,9 @@ public final class ServiceEventHelper {
         return mMessagePriority;
     }
 
-    public void setMessagePriority(final MessagePriority priority) {
+    private void setMessagePriority(final MessagePriority priority) {
         if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
             mMessagePriority = priority;
-        }
-    }
-
-    public void onIRCEvent(final MessagePriority priority, final Conversation conversation,
-            final Event event) {
-        if (conversation.equals(mConversation)) {
-            if (!conversation.equals(conversation.getServer())) {
-                setSubEvent(conversation.getId(), event);
-            }
-        } else {
-            if (conversation.equals(conversation.getServer())) {
-                setMessagePriority(priority);
-            } else {
-                setSubMessagePriority(conversation.getId(), priority);
-                setSubEvent(conversation.getId(), event);
-            }
         }
     }
 
@@ -163,5 +138,40 @@ public final class ServiceEventHelper {
                 .getPrivateMessageUser(event.user.getNick());
 
         onIRCEvent(MessagePriority.HIGH, conversation, event);
+    }
+
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final DisconnectEvent disconnectEvent) {
+        if (!disconnectEvent.userSent && !disconnectEvent.retryPending) {
+            final ConnectionManager connectionMan = ConnectionManager.getConnectionManager(null);
+            connectionMan.onFinalUnexpectedDisconnect(mServer.getTitle());
+        }
+    }
+
+    private void setSubMessagePriority(final String title, final MessagePriority priority) {
+        final MessagePriority oldPriority = mMessagePriorityMap.get(title);
+        if (oldPriority == null || oldPriority.compareTo(priority) < 0) {
+            mMessagePriorityMap.put(title, priority);
+        }
+    }
+
+    private void setSubEvent(final String title, final Event event) {
+        mEventMap.put(title, event);
+    }
+
+    private void onIRCEvent(final MessagePriority priority, final Conversation conversation,
+            final Event event) {
+        if (conversation.equals(mConversation)) {
+            if (!conversation.equals(conversation.getServer())) {
+                setSubEvent(conversation.getId(), event);
+            }
+        } else {
+            if (conversation.equals(conversation.getServer())) {
+                setMessagePriority(priority);
+            } else {
+                setSubMessagePriority(conversation.getId(), priority);
+                setSubEvent(conversation.getId(), event);
+            }
+        }
     }
 }

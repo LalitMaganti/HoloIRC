@@ -56,29 +56,6 @@ public class NumberPickerPreference extends DialogPreference {
         setDialogIcon(null);
     }
 
-    @Override
-    protected void onSetInitialValue(boolean restore, Object defaultValue) {
-        setValue(restore ? getPersistedInt(DEFAULT_VALUE) : (Integer) defaultValue);
-    }
-
-    @Override
-    protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInt(index, DEFAULT_VALUE);
-    }
-
-    @Override
-    protected void onBindDialogView(View view) {
-        super.onBindDialogView(view);
-
-        TextView dialogMessageText = (TextView) view.findViewById(R.id.text_dialog_message);
-        dialogMessageText.setText(getDialogMessage());
-
-        mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
-        mNumberPicker.setMinValue(mMinValue);
-        mNumberPicker.setMaxValue(mMaxValue);
-        mNumberPicker.setValue(mValue);
-    }
-
     public int getMinValue() {
         return mMinValue;
     }
@@ -109,6 +86,29 @@ public class NumberPickerPreference extends DialogPreference {
             persistInt(value);
             notifyChanged();
         }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInt(index, DEFAULT_VALUE);
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restore, Object defaultValue) {
+        setValue(restore ? getPersistedInt(DEFAULT_VALUE) : (Integer) defaultValue);
+    }
+
+    @Override
+    protected void onBindDialogView(View view) {
+        super.onBindDialogView(view);
+
+        TextView dialogMessageText = (TextView) view.findViewById(R.id.text_dialog_message);
+        dialogMessageText.setText(getDialogMessage());
+
+        mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+        mNumberPicker.setMinValue(mMinValue);
+        mNumberPicker.setMaxValue(mMaxValue);
+        mNumberPicker.setValue(mValue);
     }
 
     @Override

@@ -91,10 +91,6 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         return (DecoratedIgnoreListAdapter) super.getListAdapter();
     }
 
-    private BaseCollectionAdapter<String> getIgnoreAdapter() {
-        return (BaseCollectionAdapter) getListAdapter().getDecoratedBaseAdapter();
-    }
-
     @Override
     public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
         for (final int position : reverseSortedPositions) {
@@ -170,6 +166,10 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         if (mActionMode != null) {
             mActionMode.finish();
         }
+    }
+
+    private BaseCollectionAdapter<String> getIgnoreAdapter() {
+        return (BaseCollectionAdapter) getListAdapter().getDecoratedBaseAdapter();
     }
 
     public interface IgnoreListCallback {

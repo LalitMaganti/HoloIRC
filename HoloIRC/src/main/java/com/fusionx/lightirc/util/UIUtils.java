@@ -29,11 +29,6 @@ public class UIUtils {
 
     private static Typeface mRobotoThinTypeface = null;
 
-    private static boolean isTablet(final Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration
-                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
     public static boolean isLandscape(final Context context) {
         return context.getResources().getConfiguration().orientation == Configuration
                 .ORIENTATION_LANDSCAPE;
@@ -50,14 +45,6 @@ public class UIUtils {
     public static void setRobotoLight(final Context context, final TextView textView) {
         final Typeface font = getRobotoLight(context);
         textView.setTypeface(font);
-    }
-
-    private static Typeface getRobotoThin(final Context context) {
-        if (mRobotoLightTypeface == null) {
-            mRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
-                    "Roboto-Thin.ttf");
-        }
-        return mRobotoThinTypeface;
     }
 
     public static void setRobotoThin(final Context context, final TextView textView) {
@@ -139,5 +126,18 @@ public class UIUtils {
         final TypedValue typedvalueattr = new TypedValue();
         context.getTheme().resolveAttribute(attrResource, typedvalueattr, true);
         return typedvalueattr.resourceId;
+    }
+
+    private static boolean isTablet(final Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration
+                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    private static Typeface getRobotoThin(final Context context) {
+        if (mRobotoLightTypeface == null) {
+            mRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
+                    "Roboto-Thin.ttf");
+        }
+        return mRobotoThinTypeface;
     }
 }

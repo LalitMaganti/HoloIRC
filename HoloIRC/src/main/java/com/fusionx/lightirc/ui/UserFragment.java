@@ -31,21 +31,6 @@ import java.util.List;
 
 public class UserFragment extends IRCFragment<UserEvent> {
 
-    @Override
-    public FragmentType getType() {
-        return FragmentType.USER;
-    }
-
-    @Override
-    public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
-    }
-
-    @Override
-    protected List<UserEvent> getAdapterData() {
-        return getPrivateMessageUser().getBuffer();
-    }
-
     public PrivateMessageUser getPrivateMessageUser() {
         return (PrivateMessageUser) mConversation;
     }
@@ -56,5 +41,20 @@ public class UserFragment extends IRCFragment<UserEvent> {
         if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
             mMessageAdapter.add(event);
         }
+    }
+
+    @Override
+    protected List<UserEvent> getAdapterData() {
+        return getPrivateMessageUser().getBuffer();
+    }
+
+    @Override
+    public void onSendMessage(final String message) {
+        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
+    }
+
+    @Override
+    public FragmentType getType() {
+        return FragmentType.USER;
     }
 }

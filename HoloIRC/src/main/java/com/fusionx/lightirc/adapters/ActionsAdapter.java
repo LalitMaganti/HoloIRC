@@ -76,6 +76,46 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     }
 
     @Override
+    public long getHeaderId(int i) {
+        return i < mServerItemCount ? 0 : 1;
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return !((position == 0) || (position == 1) || mFragmentType != FragmentType.SERVER)
+                || isConnected();
+    }
+
+    @Override
+    public int getCount() {
+        if (mFragmentType == FragmentType.SERVER) {
+            return mServerItemCount;
+        } else if (mFragmentType == FragmentType.CHANNEL) {
+            return mServerItemCount + mChannelArray.length;
+        } else {
+            return mServerItemCount + mUserArray.length;
+        }
+    }
+
+    @Override
+    public String getItem(int position) {
+        if (position < mServerItemCount) {
+            return super.getItem(position);
+        } else if (mFragmentType == FragmentType.CHANNEL) {
+            return mChannelArray[getCount() - position - 1];
+        } else if (mFragmentType == FragmentType.USER) {
+            return mUserArray[getCount() - position - 1];
+        } else {
+            return "";
+        }
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView row = (TextView) convertView;
         if (row == null) {
@@ -95,46 +135,6 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         }
 
         return row;
-    }
-
-    @Override
-    public long getHeaderId(int i) {
-        return i < mServerItemCount ? 0 : 1;
-    }
-
-    @Override
-    public boolean areAllItemsEnabled() {
-        return false;
-    }
-
-    @Override
-    public String getItem(int position) {
-        if (position < mServerItemCount) {
-            return super.getItem(position);
-        } else if (mFragmentType == FragmentType.CHANNEL) {
-            return mChannelArray[getCount() - position - 1];
-        } else if (mFragmentType == FragmentType.USER) {
-            return mUserArray[getCount() - position - 1];
-        } else {
-            return "";
-        }
-    }
-
-    @Override
-    public int getCount() {
-        if (mFragmentType == FragmentType.SERVER) {
-            return mServerItemCount;
-        } else if (mFragmentType == FragmentType.CHANNEL) {
-            return mServerItemCount + mChannelArray.length;
-        } else {
-            return mServerItemCount + mUserArray.length;
-        }
-    }
-
-    @Override
-    public boolean isEnabled(int position) {
-        return !((position == 0) || (position == 1) || mFragmentType != FragmentType.SERVER)
-                || isConnected();
     }
 
     public boolean isConnected() {

@@ -124,18 +124,6 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-
-        // On a pause, it could lead to a stop in which case we don't actually know what's going
-        // on in the background - stop observation and restart when we return
-        if (mChannel != null && mRegistered) {
-            mChannel.getServer().getServerEventBus().unregister(this);
-            mRegistered = false;
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -148,6 +136,18 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
             }
 
             onUpdateUserList();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // On a pause, it could lead to a stop in which case we don't actually know what's going
+        // on in the background - stop observation and restart when we return
+        if (mChannel != null && mRegistered) {
+            mChannel.getServer().getServerEventBus().unregister(this);
+            mRegistered = false;
         }
     }
 
@@ -166,10 +166,6 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         }
     }
 
-    boolean isNickOtherUsers(final String nick) {
-        return !mChannel.getServer().getUser().getNick().equals(nick);
-    }
-
     /*
      * Subscribed events
      *
@@ -182,11 +178,11 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
             onUpdateUserList();
         }
     }
-    // End of subscribed events
 
     public StickyListHeadersListView getListView() {
         return mStickyListView;
     }
+    // End of subscribed events
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
@@ -202,22 +198,6 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
             mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
             mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
         }
-    }
-
-    protected List<WorldUser> getCheckedItems() {
-        final List<WorldUser> checkedSessionPositions = new ArrayList<>();
-        if (mStickyListView == null) {
-            return checkedSessionPositions;
-        }
-
-        final SparseBooleanArray checkedPositionsBool = mStickyListView.getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(mAdapter.getItem(checkedPositionsBool.keyAt(i)));
-            }
-        }
-
-        return checkedSessionPositions;
     }
 
     @Override
@@ -256,6 +236,41 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         }
     }
 
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mActionMode = null;
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        final boolean checked = getListView().getCheckedItemPositions().get(position);
+        getListView().setItemChecked(position, !checked);
+
+        if (mActionMode == null) {
+            getActivity().startActionMode(this);
+        }
+    }
+
+    protected List<WorldUser> getCheckedItems() {
+        final List<WorldUser> checkedSessionPositions = new ArrayList<>();
+        if (mStickyListView == null) {
+            return checkedSessionPositions;
+        }
+
+        final SparseBooleanArray checkedPositionsBool = mStickyListView.getCheckedItemPositions();
+        for (int i = 0; i < checkedPositionsBool.size(); i++) {
+            if (checkedPositionsBool.valueAt(i)) {
+                checkedSessionPositions.add(mAdapter.getItem(checkedPositionsBool.keyAt(i)));
+            }
+        }
+
+        return checkedSessionPositions;
+    }
+
+    boolean isNickOtherUsers(final String nick) {
+        return !mChannel.getServer().getUser().getNick().equals(nick);
+    }
+
     private void onPrivateMessageUser(final String nick) {
         if (isNickOtherUsers(nick)) {
             mChannel.getServer().getServerCallBus().sendMessageToUser(nick, "");
@@ -277,21 +292,6 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
                             }
                     );
             build.show();
-        }
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mActionMode = null;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final boolean checked = getListView().getCheckedItemPositions().get(position);
-        getListView().setItemChecked(position, !checked);
-
-        if (mActionMode == null) {
-            getActivity().startActionMode(this);
         }
     }
 

@@ -97,17 +97,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        EventBus.getDefault().unregister(mEventHandler);
-
-        for (final ServerEventHandler handler : mEventHandlers) {
-            handler.unregister();
-        }
-    }
-
-    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.expandable_list_fragment, container, false);
@@ -135,6 +124,17 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             if (service != null) {
                 onServiceConnected(service);
             }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        EventBus.getDefault().unregister(mEventHandler);
+
+        for (final ServerEventHandler handler : mEventHandlers) {
+            handler.unregister();
         }
     }
 
@@ -266,6 +266,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mActionModeStarted = false;
     }
 
+    public void onServiceConnected(final IRCService service) {
+        mService = service;
+
+        refreshServers();
+    }
+
     private ServerWrapper getFirstCheckedItem() {
         if (mListView.getCheckedItemCount() == 0) {
             return null;
@@ -274,13 +280,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         final int position = mListView.getCheckedItemPositions().keyAt(0);
         return (ServerWrapper) mListView.getItemAtPosition(position);
     }
-
-    public void onServiceConnected(final IRCService service) {
-        mService = service;
-
-        refreshServers();
-    }
-
 
     private void refreshServers(final Runnable runnable) {
         final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager

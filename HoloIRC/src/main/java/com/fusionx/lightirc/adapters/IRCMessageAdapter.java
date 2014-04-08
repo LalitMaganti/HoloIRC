@@ -48,12 +48,6 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         return getEvent(position);
     }
 
-    private Event getEvent(final int position) {
-        synchronized (mLock) {
-            return mObjects.get(position);
-        }
-    }
-
     @Override
     public long getItemId(int position) {
         return position;
@@ -70,6 +64,32 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
         Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
         return view;
+    }
+
+    public void add(final T event) {
+        synchronized (mLock) {
+            mObjects.add(event);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setData(final List<T> list) {
+        synchronized (mLock) {
+            mObjects = list;
+        }
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        synchronized (mLock) {
+            mObjects.clear();
+        }
+    }
+
+    private Event getEvent(final int position) {
+        synchronized (mLock) {
+            return mObjects.get(position);
+        }
     }
 
     private View initView(final ViewGroup parent) {
@@ -100,26 +120,6 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
             holder.timestamp.setText(event.timestamp.format("%H:%M"));
         } else {
             holder.timestamp.setVisibility(View.GONE);
-        }
-    }
-
-    public void add(final T event) {
-        synchronized (mLock) {
-            mObjects.add(event);
-        }
-        notifyDataSetChanged();
-    }
-
-    public void setData(final List<T> list) {
-        synchronized (mLock) {
-            mObjects = list;
-        }
-        notifyDataSetChanged();
-    }
-
-    public void clear() {
-        synchronized (mLock) {
-            mObjects.clear();
         }
     }
 

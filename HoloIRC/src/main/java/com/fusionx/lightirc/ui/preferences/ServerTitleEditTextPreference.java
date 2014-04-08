@@ -15,6 +15,11 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
         super(context, attributes);
     }
 
+    // Getters and setters
+    public void setListOfExistingServers(ArrayList<String> listOfExistingServers) {
+        mListOfExistingServers = listOfExistingServers;
+    }
+
     @Override
     protected AlertDialog onEditTextChanged() {
         AlertDialog dialog = super.onEditTextChanged();
@@ -34,10 +39,5 @@ public class ServerTitleEditTextPreference extends NonEmptyEditTextPreference {
             }
         }
         return dialog;
-    }
-
-    // Getters and setters
-    public void setListOfExistingServers(ArrayList<String> listOfExistingServers) {
-        mListOfExistingServers = listOfExistingServers;
     }
 }

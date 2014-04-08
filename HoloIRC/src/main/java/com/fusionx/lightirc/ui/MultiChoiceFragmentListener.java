@@ -35,25 +35,6 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
         }
     }
 
-    protected abstract void attachSelectionController();
-
-    protected List<T> getCheckedItems() {
-        final List<T> checkedSessionPositions = new ArrayList<>();
-        if (mListView == null) {
-            return checkedSessionPositions;
-        }
-
-        final SparseBooleanArray checkedPositionsBool = getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add((T) getRealAdapter().getItem(checkedPositionsBool
-                        .keyAt(i)));
-            }
-        }
-
-        return checkedSessionPositions;
-    }
-
     public void onDestroyView() {
         finish();
     }
@@ -91,6 +72,25 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
 
     @Override
     public void onDestroyActionMode(ActionMode arg0) {
+    }
+
+    protected abstract void attachSelectionController();
+
+    protected List<T> getCheckedItems() {
+        final List<T> checkedSessionPositions = new ArrayList<>();
+        if (mListView == null) {
+            return checkedSessionPositions;
+        }
+
+        final SparseBooleanArray checkedPositionsBool = getCheckedItemPositions();
+        for (int i = 0; i < checkedPositionsBool.size(); i++) {
+            if (checkedPositionsBool.valueAt(i)) {
+                checkedSessionPositions.add((T) getRealAdapter().getItem(checkedPositionsBool
+                        .keyAt(i)));
+            }
+        }
+
+        return checkedSessionPositions;
     }
 
     protected abstract ListAdapter getRealAdapter();

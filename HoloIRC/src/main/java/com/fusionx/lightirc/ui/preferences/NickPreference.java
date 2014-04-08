@@ -14,6 +14,14 @@ public class NickPreference extends AbstractNickPreference {
         super(context, attrs);
     }
 
+    public void setNickChoices(final String first, final String second, final String third) {
+        final SharedPreferences.Editor editor = getEditor();
+        editor.putString(PREF_NICK, first);
+        editor.putString(PREF_SECOND_NICK, second);
+        editor.putString(PREF_THIRD_NICK, third);
+        editor.commit();
+    }
+
     @Override
     protected void retrieveNick() {
         final SharedPreferences sharedPreferences = getSharedPreferences();
@@ -28,14 +36,6 @@ public class NickPreference extends AbstractNickPreference {
         editor.putString(PREF_NICK, getFirstNickText());
         editor.putString(PREF_SECOND_NICK, getSecondNickText());
         editor.putString(PREF_THIRD_NICK, getThirdNickText());
-        editor.commit();
-    }
-
-    public void setNickChoices(final String first, final String second, final String third) {
-        final SharedPreferences.Editor editor = getEditor();
-        editor.putString(PREF_NICK, first);
-        editor.putString(PREF_SECOND_NICK, second);
-        editor.putString(PREF_THIRD_NICK, third);
         editor.commit();
     }
 }

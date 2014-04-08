@@ -65,6 +65,12 @@ public class AppPreferences implements EventPreferences {
         return !hideUserMessages;
     }
 
+    // We always want to display the messages that the app user sends
+    @Override
+    public boolean isSelfEventBroadcast() {
+        return true;
+    }
+
     @Override
     public boolean isMOTDShown() {
         return motdAllowed;
@@ -77,12 +83,6 @@ public class AppPreferences implements EventPreferences {
 
     @Override
     public boolean shouldNickBeColourful() {
-        return true;
-    }
-
-    // We always want to display the messages that the app user sends
-    @Override
-    public boolean isSelfEventBroadcast() {
         return true;
     }
 }

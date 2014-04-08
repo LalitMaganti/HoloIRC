@@ -131,11 +131,6 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
     }
 
     @Override
-    public void onMentionMultipleUsers(final List<WorldUser> users) {
-        mCallback.onMentionMultipleUsers(users);
-    }
-
-    @Override
     public void closeDrawer() {
         mCallback.closeDrawer();
     }
@@ -152,6 +147,11 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
                 R.anim.slide_in_left, R.anim.slide_out_right);
         transaction.addToBackStack(null);
         transaction.replace(R.id.actions_list_layout, mIgnoreListFragment, "Ignore").commit();
+    }
+
+    @Override
+    public void onMentionMultipleUsers(final List<WorldUser> users) {
+        mCallback.onMentionMultipleUsers(users);
     }
 
     public void onDrawerClosed() {

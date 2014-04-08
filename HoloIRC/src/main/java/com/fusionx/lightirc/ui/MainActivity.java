@@ -108,194 +108,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private View mRightDrawer;
 
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
-        super.onCreate(savedInstanceState);
-
-        AppPreferences.setUpPreferences(this);
-        SharedPreferencesUtils.onInitialSetup(this);
-
-        setContentView(R.layout.main_activity);
-
-        mSlidingPane = findById(this, R.id.sliding_pane_layout);
-        mSlidingPane.setParallaxDistance(100);
-        mSlidingPane.setPanelSlideListener(this);
-        if (AppPreferences.theme == Theme.DARK) {
-            // TODO - fix this hack
-            mSlidingPane.setShadowDrawable(null);
-        }
-
-        mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
-
-        mRightDrawer = findById(this, R.id.right_drawer);
-
-        if (savedInstanceState == null) {
-            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            mServerListFragment = new ServerListFragment();
-            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
-
-            mNavigationDrawerFragment = new NavigationDrawerFragment();
-            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
-
-            mWorkerFragment = new WorkerFragment();
-            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
-
-            transaction.commit();
-        } else {
-            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
-                    R.id.sliding_list_frame);
-            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.right_drawer);
-            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
-                    .findFragmentByTag(WORKER_FRAGMENT);
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.content_frame);
-
-            // If the current fragment is not null then retrieve the matching convo
-            if (mCurrentFragment != null) {
-                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
-            }
-
-            supportInvalidateOptionsMenu();
-        }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        final String serverName = intent.getStringExtra("server_name");
-        final String channelName = intent.getStringExtra("channel_name");
-
-        if (serverName != null) {
-            final Server server = getService().getServerIfExists(serverName);
-            final Conversation conversation = server.getUserChannelInterface().getChannel
-                    (channelName);
-            onExternalConversationUpdate(conversation);
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        // This is just registration because we'll retrieve the sticky event later
-        mEventBus.register(mConversationChanged);
-        mEventBus.register(mMentionHelper, 100);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        mEventBus.unregister(mConversationChanged);
-        mEventBus.unregister(mMentionHelper);
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        // Save the action bar title & sub-title
-        if (outState != null) {
-            outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
-            // It's null if there's no fragment currently displayed
-            if (getSupportActionBar().getSubtitle() != null) {
-                outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle()
-                        .toString());
-            }
-        }
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        // Restore the action bar title & sub-title
-        if (savedInstanceState != null) {
-            getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
-            getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        Crouton.clearCroutonsForActivity(this);
-
-        super.onDestroy();
-
-        if (mConversation != null) {
-            mConversation.getServer().getServerEventBus().unregister(this);
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main_ab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(final Menu menu) {
-        final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(!mSlidingPane.isOpen() && mConversation != null);
-
-        final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
-        addServer.setVisible(mSlidingPane.isOpen());
-
-        final MenuItem settings = menu.findItem(R.id.activity_main_ab_settings);
-        settings.setVisible(mSlidingPane.isOpen());
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-            case R.id.home:
-                UIUtils.toggleSlidingPane(mSlidingPane);
-                return true;
-            case R.id.activity_main_ab_actions:
-                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
-                return true;
-            case R.id.activity_main_ab_add:
-                addNewServer();
-                return true;
-            case R.id.activity_main_ab_settings:
-                openAppSettings();
-                return true;
-        }
-        return false;
-    }
-
-    private void openAppSettings() {
-        final Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
-    }
-
-    private void addNewServer() {
-        final Intent intent = new Intent(this, ServerPreferenceActivity.class);
-        intent.putExtra("new", true);
-        intent.putExtra("file", "server");
-        startActivityForResult(intent, SERVER_SETTINGS);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (RESULT_OK == resultCode) {
-            if (requestCode == SERVER_SETTINGS) {
-                mServerListFragment.refreshServers();
-            }
-        }
-    }
-
     // TODO - unify the server and subserver code
     @Override
     public void onServerClicked(final Server server) {
@@ -360,32 +172,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
     }
 
-    private void onChangeCurrentFragment(final IRCFragment fragment) {
-        mCurrentFragment = fragment;
-
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final FragmentTransaction transaction = getSupportFragmentManager()
-                        .beginTransaction();
-                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                transaction.replace(R.id.content_frame, fragment).commit();
-            }
-        }, 200);
-
-        findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
-    }
-
-    private void onRemoveFragment() {
-        final FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction();
-        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-        transaction.remove(mCurrentFragment).commit();
-        mCurrentFragment = null;
-
-        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
-    }
-
     @Override
     public void onServerDisconnected(final Server server) {
         closeDrawer();
@@ -403,6 +189,21 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         return mWorkerFragment.getService();
     }
 
+    @Override
+    public void onPart(final String serverName, final PartEvent event) {
+        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                && mConversation.getId().equals(event.channelName);
+
+        if (isCurrent) {
+            onRemoveFragment();
+        }
+    }
+
+    @Override
+    public void onPrivateMessageClosed() {
+        onRemoveFragment();
+    }
+
     /**
      * Removes the current displayed fragment
      *
@@ -417,21 +218,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mConversation.getServer().getServerCallBus().sendClosePrivateMessage(
                     (PrivateMessageUser) mConversation);
         }
-    }
-
-    @Override
-    public void onPart(final String serverName, final PartEvent event) {
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                && mConversation.getId().equals(event.channelName);
-
-        if (isCurrent) {
-            onRemoveFragment();
-        }
-    }
-
-    @Override
-    public void onPrivateMessageClosed() {
-        onRemoveFragment();
     }
 
     @Override
@@ -459,6 +245,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    public void onPanelSlide(final View view, final float v) {
+        // Empty
+    }
+
+    @Override
     public void onPanelOpened(final View view) {
         supportInvalidateOptionsMenu();
         // TODO - write the opposing code in onPanelClosed so this is done
@@ -470,11 +261,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onPanelClosed(final View view) {
         supportInvalidateOptionsMenu();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public void onPanelSlide(final View view, final float v) {
-        // Empty
     }
 
     @Override
@@ -514,6 +300,234 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onExternalConversationUpdate(conversation);
     }
 
+    // Subscribe events
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final StatusChangeEvent event) {
+        // Null happens when the disconnect handler is called first & the fragment has already been
+        // removed by the disconnect handler
+        if (mCurrentFragment != null) {
+            final ConnectionStatus status = mConversation.getServer().getStatus();
+            if (mCurrentFragment.getType() == FragmentType.SERVER) {
+                setActionBarSubtitle(MiscUtils.getStatusString(this, status));
+            }
+            mEventBus.postSticky(new OnCurrentServerStatusChanged(status));
+        }
+    }
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt());
+        super.onCreate(savedInstanceState);
+
+        AppPreferences.setUpPreferences(this);
+        SharedPreferencesUtils.onInitialSetup(this);
+
+        setContentView(R.layout.main_activity);
+
+        mSlidingPane = findById(this, R.id.sliding_pane_layout);
+        mSlidingPane.setParallaxDistance(100);
+        mSlidingPane.setPanelSlideListener(this);
+        if (AppPreferences.theme == Theme.DARK) {
+            // TODO - fix this hack
+            mSlidingPane.setShadowDrawable(null);
+        }
+
+        mDrawerLayout = findById(this, R.id.drawer_layout);
+        mDrawerLayout.setDrawerListener(this);
+
+        mRightDrawer = findById(this, R.id.right_drawer);
+
+        if (savedInstanceState == null) {
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            mServerListFragment = new ServerListFragment();
+            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
+
+            mNavigationDrawerFragment = new NavigationDrawerFragment();
+            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
+
+            mWorkerFragment = new WorkerFragment();
+            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
+
+            transaction.commit();
+        } else {
+            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
+                    R.id.sliding_list_frame);
+            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.right_drawer);
+            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
+                    .findFragmentByTag(WORKER_FRAGMENT);
+            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.content_frame);
+
+            // If the current fragment is not null then retrieve the matching convo
+            if (mCurrentFragment != null) {
+                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
+            }
+
+            supportInvalidateOptionsMenu();
+        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        mEventBus.unregister(mConversationChanged);
+        mEventBus.unregister(mMentionHelper);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore the action bar title & sub-title
+        if (savedInstanceState != null) {
+            getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
+            getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main_ab, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(final Menu menu) {
+        final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
+        item.setVisible(!mSlidingPane.isOpen() && mConversation != null);
+
+        final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
+        addServer.setVisible(mSlidingPane.isOpen());
+
+        final MenuItem settings = menu.findItem(R.id.activity_main_ab_settings);
+        settings.setVisible(mSlidingPane.isOpen());
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+            case R.id.home:
+                UIUtils.toggleSlidingPane(mSlidingPane);
+                return true;
+            case R.id.activity_main_ab_actions:
+                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
+                return true;
+            case R.id.activity_main_ab_add:
+                addNewServer();
+                return true;
+            case R.id.activity_main_ab_settings:
+                openAppSettings();
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (RESULT_OK == resultCode) {
+            if (requestCode == SERVER_SETTINGS) {
+                mServerListFragment.refreshServers();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        Crouton.clearCroutonsForActivity(this);
+
+        super.onDestroy();
+
+        if (mConversation != null) {
+            mConversation.getServer().getServerEventBus().unregister(this);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        final String serverName = intent.getStringExtra("server_name");
+        final String channelName = intent.getStringExtra("channel_name");
+
+        if (serverName != null) {
+            final Server server = getService().getServerIfExists(serverName);
+            final Conversation conversation = server.getUserChannelInterface().getChannel
+                    (channelName);
+            onExternalConversationUpdate(conversation);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the action bar title & sub-title
+        if (outState != null) {
+            outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
+            // It's null if there's no fragment currently displayed
+            if (getSupportActionBar().getSubtitle() != null) {
+                outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle()
+                        .toString());
+            }
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // This is just registration because we'll retrieve the sticky event later
+        mEventBus.register(mConversationChanged);
+        mEventBus.register(mMentionHelper, 100);
+    }
+
+    private void openAppSettings() {
+        final Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void addNewServer() {
+        final Intent intent = new Intent(this, ServerPreferenceActivity.class);
+        intent.putExtra("new", true);
+        intent.putExtra("file", "server");
+        startActivityForResult(intent, SERVER_SETTINGS);
+    }
+
+    private void onChangeCurrentFragment(final IRCFragment fragment) {
+        mCurrentFragment = fragment;
+
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                final FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction();
+                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+                transaction.replace(R.id.content_frame, fragment).commit();
+            }
+        }, 200);
+
+        findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
+    }
+
+    private void onRemoveFragment() {
+        final FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.remove(mCurrentFragment).commit();
+        mCurrentFragment = null;
+
+        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
+    }
+
     private void onExternalConversationUpdate(final Conversation conversation) {
         if (conversation != null) {
             mHandler.post(new Runnable() {
@@ -530,20 +544,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             supportInvalidateOptionsMenu();
         } else {
             mSlidingPane.openPane();
-        }
-    }
-
-    // Subscribe events
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final StatusChangeEvent event) {
-        // Null happens when the disconnect handler is called first & the fragment has already been
-        // removed by the disconnect handler
-        if (mCurrentFragment != null) {
-            final ConnectionStatus status = mConversation.getServer().getStatus();
-            if (mCurrentFragment.getType() == FragmentType.SERVER) {
-                setActionBarSubtitle(MiscUtils.getStatusString(this, status));
-            }
-            mEventBus.postSticky(new OnCurrentServerStatusChanged(status));
         }
     }
 }

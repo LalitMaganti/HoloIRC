@@ -74,71 +74,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
-        super.onCreate(savedInstanceState);
-
-        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
-        mCanSaveChanges = !mNewServer;
-
-        mSource = new BuilderDatabaseSource(this);
-        mSource.open();
-
-        if (mNewServer) {
-            mBuilder = SharedPreferencesUtils.getDefaultNewServer(this);
-            setResult(RESULT_CANCELED);
-        } else {
-            mBuilder = getIntent().getParcelableExtra(SERVER);
-            setResult(RESULT_OK);
-        }
-        mContentValues = mSource.getContentValuesFromBuilder(mBuilder, !mNewServer);
-        // If it's a new server, we can't allow ignore list to be null - just put an empty string
-        // in for now - TODO - fix this
-        if (mNewServer) {
-            mContentValues.put(COLUMN_IGNORE_LIST, "");
-        }
-
-        final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
-                fragment).commit();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        if (mCanSaveChanges) {
-            if (mNewServer) {
-                mSource.addServer(mContentValues);
-            } else {
-                mSource.updateServer(mContentValues);
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // In onPause we added the new server if it was new so don't add it again
-        if (mCanSaveChanges) {
-            mNewServer = false;
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
-                "tempUselessFile.xml");
-        if (folder.exists()) {
-            folder.delete();
-        }
-        mSource.close();
-    }
-
-    @Override
     public void setupPreferences(final PreferenceScreen screen, final Activity activity) {
         mScreen = screen;
 
@@ -172,17 +107,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (resultCode == RESULT_OK) {
-            if (requestCode == CHANNEL_LIST) {
-                mContentValues = data.getParcelableExtra("contentValues");
-            }
-        }
-    }
-
-    @Override
     public boolean onPreferenceChange(final Preference preference) {
         if (!mCanSaveChanges) {
             if (preference == mTitle && StringUtils.isEmpty(mUrl.getText())) {
@@ -198,6 +122,88 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             }
         }
         return true;
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt());
+        super.onCreate(savedInstanceState);
+
+        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
+        mCanSaveChanges = !mNewServer;
+
+        mSource = new BuilderDatabaseSource(this);
+        mSource.open();
+
+        if (mNewServer) {
+            mBuilder = SharedPreferencesUtils.getDefaultNewServer(this);
+            setResult(RESULT_CANCELED);
+        } else {
+            mBuilder = getIntent().getParcelableExtra(SERVER);
+            setResult(RESULT_OK);
+        }
+        mContentValues = mSource.getContentValuesFromBuilder(mBuilder, !mNewServer);
+        // If it's a new server, we can't allow ignore list to be null - just put an empty string
+        // in for now - TODO - fix this
+        if (mNewServer) {
+            mContentValues.put(COLUMN_IGNORE_LIST, "");
+        }
+
+        final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                fragment).commit();
+    }
+
+    @Override
+    protected boolean isValidFragment(final String fragmentName) {
+        // TODO - this is a hack - fixit
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
+                "tempUselessFile.xml");
+        if (folder.exists()) {
+            folder.delete();
+        }
+        mSource.close();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHANNEL_LIST) {
+                mContentValues = data.getParcelableExtra("contentValues");
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // In onPause we added the new server if it was new so don't add it again
+        if (mCanSaveChanges) {
+            mNewServer = false;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mCanSaveChanges) {
+            if (mNewServer) {
+                mSource.addServer(mContentValues);
+            } else {
+                mSource.updateServer(mContentValues);
+            }
+        }
     }
 
     private void setPreferenceOnChangeListeners(final PreferenceScreen preferenceScreen) {
@@ -258,11 +264,5 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                 p.setOnPreferenceChangeListener(listener);
             }
         }
-    }
-
-    @Override
-    protected boolean isValidFragment(final String fragmentName) {
-        // TODO - this is a hack - fixit
-        return true;
     }
 }

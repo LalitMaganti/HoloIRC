@@ -72,27 +72,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     private boolean isPopupShown;
 
-    private Channel getChannel() {
-        return (Channel) mConversation;
-    }
-
-    @Override
-    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
-        return inflater.inflate(R.layout.fragment_channel, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
-        mMessageBox.addTextChangedListener(this);
-
-        if (savedInstanceState == null) {
-            getListView().setSelection(mMessageAdapter.getCount() - 1);
-        }
-    }
-
     public void onMentionMultipleUsers(final List<WorldUser> users) {
         final StringBuilder builder = new StringBuilder();
         final String text = String.valueOf(mMessageBox.getText());
@@ -103,21 +82,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
         mMessageBox.clearComposingText();
         mMessageBox.append(builder.toString());
-    }
-
-    @Override
-    public FragmentType getType() {
-        return FragmentType.CHANNEL;
-    }
-
-    @Override
-    protected List<ChannelEvent> getAdapterData() {
-        return getChannel().getBuffer();
-    }
-
-    @Override
-    public void onSendMessage(final String message) {
-        UserInputParser.onParseChannelMessage(mConversation.getServer(), mTitle, message);
     }
 
     @OnClick(R.id.auto_complete_button)
@@ -183,15 +147,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         mAutoButton.setEnabled(Utils.isNotEmpty(s));
     }
 
-    private void changeLastWord(final String newWord) {
-        final String message = mMessageBox.getText().toString();
-        final List<String> list = IRCUtils.splitRawLine(message, false);
-        list.set(list.size() - 1, newWord);
-        mMessageBox.setText("");
-        mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
-    }
-
-
     // Subscription methods
     @Subscribe
     public void onEventMainThread(final ChannelEvent event) {
@@ -201,5 +156,49 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
             }
             mMessageAdapter.add(event);
         }
+    }
+
+    @Override
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_channel, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
+        mMessageBox.addTextChangedListener(this);
+
+        if (savedInstanceState == null) {
+            getListView().setSelection(mMessageAdapter.getCount() - 1);
+        }
+    }
+
+    @Override
+    protected List<ChannelEvent> getAdapterData() {
+        return getChannel().getBuffer();
+    }
+
+    @Override
+    public void onSendMessage(final String message) {
+        UserInputParser.onParseChannelMessage(mConversation.getServer(), mTitle, message);
+    }
+
+    @Override
+    public FragmentType getType() {
+        return FragmentType.CHANNEL;
+    }
+
+    private Channel getChannel() {
+        return (Channel) mConversation;
+    }
+
+    private void changeLastWord(final String newWord) {
+        final String message = mMessageBox.getText().toString();
+        final List<String> list = IRCUtils.splitRawLine(message, false);
+        list.set(list.size() - 1, newWord);
+        mMessageBox.setText("");
+        mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
     }
 }

@@ -186,19 +186,6 @@ public class MultiSelectListPreference extends DialogPreference {
         mNewValues.addAll(mValues);
     }
 
-    private boolean[] getSelectedItems() {
-        final CharSequence[] entries = mEntryValues;
-        final int entryCount = entries.length;
-        final Set<String> values = mValues;
-        boolean[] result = new boolean[entryCount];
-
-        for (int i = 0; i < entryCount; i++) {
-            result[i] = values.contains(entries[i].toString());
-        }
-
-        return result;
-    }
-
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
@@ -210,6 +197,19 @@ public class MultiSelectListPreference extends DialogPreference {
             }
         }
         mPreferenceChanged = false;
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final Parcelable superState = super.onSaveInstanceState();
+        if (isPersistent()) {
+            // No need to save instance state
+            return superState;
+        }
+
+        final SavedState myState = new SavedState(superState);
+        myState.values = getValues();
+        return myState;
     }
 
     @Override
@@ -228,19 +228,6 @@ public class MultiSelectListPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValues(restoreValue ? getPersistedStringSet(mValues) : (Set<String>) defaultValue);
-    }
-
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        final Parcelable superState = super.onSaveInstanceState();
-        if (isPersistent()) {
-            // No need to save instance state
-            return superState;
-        }
-
-        final SavedState myState = new SavedState(superState);
-        myState.values = getValues();
-        return myState;
     }
 
     protected Set<String> getPersistedStringSet(Set<String> defaultReturnValue) {
@@ -263,6 +250,19 @@ public class MultiSelectListPreference extends DialogPreference {
             return true;
         }
         return false;
+    }
+
+    private boolean[] getSelectedItems() {
+        final CharSequence[] entries = mEntryValues;
+        final int entryCount = entries.length;
+        final Set<String> values = mValues;
+        boolean[] result = new boolean[entryCount];
+
+        for (int i = 0; i < entryCount; i++) {
+            result[i] = values.contains(entries[i].toString());
+        }
+
+        return result;
     }
 
     private static class SavedState extends BaseSavedState {

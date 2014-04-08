@@ -25,7 +25,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
 import com.nhaarman.listviewanimations.swinginadapters.AnimationAdapter;
@@ -66,10 +65,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
         return createView(container, inflate);
-    }
-
-    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
-        return inflater.inflate(R.layout.fragment_irc, container, false);
     }
 
     @Override
@@ -130,15 +125,19 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
     }
 
-    protected abstract List<T> getAdapterData();
-
-    // Abstract methods
-    protected abstract void onSendMessage(final String message);
-
     public abstract FragmentType getType();
 
     // Getters and setters
     public String getTitle() {
         return mTitle;
     }
+
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_irc, container, false);
+    }
+
+    protected abstract List<T> getAdapterData();
+
+    // Abstract methods
+    protected abstract void onSendMessage(final String message);
 }
