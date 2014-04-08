@@ -82,7 +82,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final TextView title = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
         if (helper != null) {
-            builder.setSpan(UIUtils.getSpanFromPriority(helper.getMessagePriority()), 0,
+            builder.setSpan(UIUtils.getSpanFromPriority(mContext, helper.getMessagePriority()), 0,
                     listItem.getTitle().length(), 0);
         }
 
@@ -128,8 +128,8 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
-        builder.setSpan(UIUtils.getSpanFromPriority(helper.getSubMessagePriority(conversation
-                .getId())), 0, conversation.getId().length(), 0);
+        builder.setSpan(UIUtils.getSpanFromPriority(mContext, helper.getSubMessagePriority
+                (conversation.getId())), 0, conversation.getId().length(), 0);
         textView.setText(builder);
 
         final Event event = helper.getSubEvent(conversation.getId());

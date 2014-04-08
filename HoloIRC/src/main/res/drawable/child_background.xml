@@ -4,5 +4,5 @@
     <item android:drawable="@drawable/item_focused" android:state_focused="true"/>
     <item android:drawable="@drawable/item_checked" android:state_checked="true"/>
     <item android:drawable="@drawable/item_activated" android:state_activated="true"/>
-    <item android:drawable="@color/very_light_grey"/>
+    <item android:drawable="@android:color/transparent"/>
 </selector>

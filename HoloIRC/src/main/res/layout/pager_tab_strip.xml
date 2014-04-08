@@ -3,5 +3,5 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/activity_irc_tabs"
         android:layout_width="match_parent"
-        android:background="@color/sliding_menu_background"
+        android:background="@color/medium_grey"
         android:layout_height="48dip"/>

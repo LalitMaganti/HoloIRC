@@ -14,6 +14,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
@@ -117,6 +118,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
         mSlidingPane.setPanelSlideListener(this);
+        if (AppPreferences.theme == Theme.DARK) {
+            // TODO - fix this hack
+            mSlidingPane.setShadowDrawable(null);
+        }
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(this);

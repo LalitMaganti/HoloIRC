@@ -1,41 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-HoloIRC - an IRC client for Android
-
-Copyright 2013 Lalit Maganti
-
-This file is part of HoloIRC.
-
-HoloIRC is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-HoloIRC is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
--->
 <resources>
 
     <style name="Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="card_server_background">@color/server_card_background_light</item>
         <item name="default_text_colour">@android:color/black</item>
+        <item name="default_inverted_text_colour">@android:color/white</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_light</item>
         <item name="activatableItemBackground">@drawable/activatable_item_background</item>
         <item name="expand_close_menu_drawable">@drawable/expander_close_holo_light</item>
         <item name="expand_open_menu_drawable">@drawable/expander_open_holo_light</item>
+
+        <item name="main_background">@android:color/white</item>
+        <item name="expandable_list_background">@color/very_light_grey</item>
+        <item name="expandable_list_text">@color/dark_gray</item>
     </style>
 
     <style name="Dark" parent="@style/Theme.AppCompat">
-        <item name="card_server_background">@color/server_card_background_dark</item>
         <item name="default_text_colour">@android:color/white</item>
+        <item name="default_inverted_text_colour">@android:color/black</item>
         <item name="overflow_menu_drawable">@drawable/ic_menu_moreoverflow_normal_holo_dark</item>
         <item name="activatableItemBackground">@drawable/activatable_item_background</item>
         <item name="expand_close_menu_drawable">@drawable/expander_close_holo_dark</item>
         <item name="expand_open_menu_drawable">@drawable/expander_open_holo_dark</item>
+
+        <item name="main_background">@android:color/transparent</item>
+        <item name="expandable_list_background">@android:color/transparent</item>
+        <item name="expandable_list_text">@android:color/white</item>
     </style>
 </resources>

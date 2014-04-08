@@ -27,10 +27,9 @@
             android:id="@+id/group_content"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/card_server_overflow">
+            android:layout_height="wrap_content">
         <TextView
-                android:textColor="#cc222222"
+                android:textColor="?attr/expandable_list_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/child_title"
@@ -38,7 +37,7 @@
                 android:paddingTop="@dimen/margin_medium"
                 android:text="Text"/>
         <TextView
-                android:textColor="#cc222222"
+                android:textColor="?attr/expandable_list_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"

@@ -15,6 +15,7 @@ import android.support.v4.widget.SlidingPaneLayout;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.TextView;
@@ -100,10 +101,13 @@ public class UIUtils {
         return checkedSessionPositions;
     }
 
-    public static CharacterStyle getSpanFromPriority(final MessagePriority priority) {
+    public static CharacterStyle getSpanFromPriority(final Context context, final MessagePriority
+            priority) {
         if (priority == null) {
-            // TODO - export this colour
-            return new ForegroundColorSpan(Color.parseColor("#CC222222"));
+            final TypedValue typedvalueattr = new TypedValue();
+            context.getTheme().resolveAttribute(R.attr.expandable_list_text, typedvalueattr, true);
+            return new ForegroundColorSpan(context.getResources().getColor(typedvalueattr
+                    .resourceId));
         }
         final int color;
         switch (priority) {
@@ -117,7 +121,7 @@ public class UIUtils {
                 color = Color.parseColor("#CC0000");
                 break;
             default:
-                color = Color.parseColor("#CC222222");
+                color = 0;
                 break;
         }
         return new ForegroundColorSpan(color);

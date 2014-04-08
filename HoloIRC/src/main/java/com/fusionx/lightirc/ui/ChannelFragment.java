@@ -71,7 +71,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     private PopupMenu mPopupMenu;
 
     private boolean isPopupShown;
-
+    
     private Channel getChannel() {
         return (Channel) mConversation;
     }
