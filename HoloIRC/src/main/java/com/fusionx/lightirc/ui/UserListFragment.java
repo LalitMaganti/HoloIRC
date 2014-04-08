@@ -64,6 +64,8 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private Channel mChannel;
 
+    private boolean mRegistered;
+
     private final Object mEventHandler = new Object() {
         @SuppressWarnings("unused")
         public void onEvent(final OnConversationChanged conversationChanged) {
@@ -85,8 +87,6 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
             onUpdateUserList();
         }
     };
-
-    private boolean mRegistered;
 
     private UserListAdapter mAdapter;
 
@@ -240,7 +240,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         final String nick = selectedItems.get(0).getNick();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
-                mCallback.onUserMention(selectedItems);
+                mCallback.onMentionMultipleUsers(selectedItems);
                 mode.finish();
                 mCallback.closeDrawer();
                 return true;
@@ -297,7 +297,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     public interface Callback {
 
-        public void onUserMention(final List<WorldUser> users);
+        public void onMentionMultipleUsers(final List<WorldUser> users);
 
         public void closeDrawer();
     }

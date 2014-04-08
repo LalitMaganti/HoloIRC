@@ -13,7 +13,6 @@ import com.fusionx.relay.interfaces.Conversation;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -102,12 +101,9 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             divider.setVisibility(isExpanded ? View.INVISIBLE : View.VISIBLE);
             expandButton.setTag(!isExpanded);
 
-            final TypedValue typedvalueattr = new TypedValue();
-            mContext.getTheme().resolveAttribute(isExpanded ? R.attr.expand_close_menu_drawable
-                    : R.attr.expand_open_menu_drawable, typedvalueattr, true);
-            expandButton.setImageDrawable(mContext.getResources().getDrawable(typedvalueattr
-                    .resourceId));
-
+            final int drawableId = UIUtils.getResourceId(mContext, isExpanded
+                    ? R.attr.expand_close_menu_drawable : R.attr.expand_open_menu_drawable);
+            expandButton.setImageDrawable(mContext.getResources().getDrawable(drawableId));
             expandButton.setOnClickListener(new ExpandListener(groupPos));
         }
         return convertView;
@@ -176,21 +172,18 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         @Override
         public void onClick(final View v) {
             final boolean collapsed = (boolean) v.getTag();
-            final TypedValue typedvalueattr = new TypedValue();
+            final int drawableId;
 
             if (collapsed) {
-                mContext.getTheme().resolveAttribute(R.attr
-                        .expand_close_menu_drawable, typedvalueattr, true);
+                drawableId = UIUtils.getResourceId(mContext, R.attr.expand_close_menu_drawable);
                 mListView.expandGroup(mGroupPos);
             } else {
-                mContext.getTheme().resolveAttribute(R.attr
-                        .expand_open_menu_drawable, typedvalueattr, true);
+                drawableId = UIUtils.getResourceId(mContext, R.attr.expand_open_menu_drawable);
                 mListView.collapseGroup(mGroupPos);
             }
 
             final ImageView imageView = (ImageView) v;
-            imageView.setImageDrawable(mContext.getResources().getDrawable(typedvalueattr
-                    .resourceId));
+            imageView.setImageDrawable(mContext.getResources().getDrawable(drawableId));
             v.setTag(!collapsed);
         }
     }

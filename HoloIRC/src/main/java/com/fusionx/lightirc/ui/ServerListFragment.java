@@ -138,47 +138,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
     }
 
-    private void refreshServers(final Runnable runnable) {
-        final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
-                .LoaderCallbacks<ArrayList<ServerWrapper>>() {
-            @Override
-            public Loader<ArrayList<ServerWrapper>> onCreateLoader(int id, Bundle args) {
-                return new ServerWrapperLoader(getActivity(), mService);
-            }
-
-            @Override
-            public void onLoadFinished(final Loader<ArrayList<ServerWrapper>> loader,
-                    final ArrayList<ServerWrapper> listItems) {
-                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
-                        mListView, mService);
-                mListView.setAdapter(mListAdapter);
-                for (final ServerEventHandler handler : mEventHandlers) {
-                    handler.unregister();
-                }
-                for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
-                    ServerWrapper wrapper = listItems.get(i);
-                    if (wrapper.getServer() != null) {
-                        mEventHandlers.add(new ServerEventHandler(wrapper.getServer(), i));
-                    }
-                    // Expand all the groups - TODO - fix this properly
-                    mListView.expandGroup(i);
-                }
-
-                // Run any code that is meant to be run after the new servers are in place
-                if (runnable != null) {
-                    final Handler handler = new Handler();
-                    handler.post(runnable);
-                }
-            }
-
-            @Override
-            public void onLoaderReset(Loader<ArrayList<ServerWrapper>> loader) {
-            }
-        };
-
-        getLoaderManager().restartLoader(21, null, callbacks);
-    }
-
     public void refreshServers() {
         refreshServers(null);
     }
@@ -320,6 +279,48 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mService = service;
 
         refreshServers();
+    }
+
+
+    private void refreshServers(final Runnable runnable) {
+        final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
+                .LoaderCallbacks<ArrayList<ServerWrapper>>() {
+            @Override
+            public Loader<ArrayList<ServerWrapper>> onCreateLoader(int id, Bundle args) {
+                return new ServerWrapperLoader(getActivity(), mService);
+            }
+
+            @Override
+            public void onLoadFinished(final Loader<ArrayList<ServerWrapper>> loader,
+                    final ArrayList<ServerWrapper> listItems) {
+                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
+                        mListView, mService);
+                mListView.setAdapter(mListAdapter);
+                for (final ServerEventHandler handler : mEventHandlers) {
+                    handler.unregister();
+                }
+                for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
+                    ServerWrapper wrapper = listItems.get(i);
+                    if (wrapper.getServer() != null) {
+                        mEventHandlers.add(new ServerEventHandler(wrapper.getServer(), i));
+                    }
+                    // Expand all the groups - TODO - fix this properly
+                    mListView.expandGroup(i);
+                }
+
+                // Run any code that is meant to be run after the new servers are in place
+                if (runnable != null) {
+                    final Handler handler = new Handler();
+                    handler.post(runnable);
+                }
+            }
+
+            @Override
+            public void onLoaderReset(Loader<ArrayList<ServerWrapper>> loader) {
+            }
+        };
+
+        getLoaderManager().restartLoader(21, null, callbacks);
     }
 
     public interface Callback {

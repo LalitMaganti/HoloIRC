@@ -134,4 +134,10 @@ public class UIUtils {
     public static <T extends View> T findById(final Activity activity, final int id) {
         return (T) activity.findViewById(id);
     }
+
+    public static int getResourceId(final Context context, final int attrResource) {
+        final TypedValue typedvalueattr = new TypedValue();
+        context.getTheme().resolveAttribute(attrResource, typedvalueattr, true);
+        return typedvalueattr.resourceId;
+    }
 }

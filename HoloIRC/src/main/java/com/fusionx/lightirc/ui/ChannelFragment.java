@@ -71,7 +71,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     private PopupMenu mPopupMenu;
 
     private boolean isPopupShown;
-    
+
     private Channel getChannel() {
         return (Channel) mConversation;
     }
@@ -87,9 +87,13 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
         mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
+
+        if (savedInstanceState == null) {
+            getListView().setSelection(mMessageAdapter.getCount() - 1);
+        }
     }
 
-    public void onUserMention(final List<WorldUser> users) {
+    public void onMentionMultipleUsers(final List<WorldUser> users) {
         final StringBuilder builder = new StringBuilder();
         final String text = String.valueOf(mMessageBox.getText());
         for (final WorldUser userNick : users) {
@@ -108,11 +112,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     protected List<ChannelEvent> getAdapterData() {
-        return getChannel().getBuffer();
-    }
-
-    @Override
-    protected List<ChannelEvent> getDisconnectedAdapterData() {
         return getChannel().getBuffer();
     }
 

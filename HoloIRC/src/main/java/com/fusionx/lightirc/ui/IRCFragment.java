@@ -127,16 +127,10 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     }
 
     public void onResetBuffer() {
-        if (mConversation.getServer().getStatus() == ConnectionStatus.CONNECTED) {
-            mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
-        } else {
-            mMessageAdapter.setData(new ArrayList<>(getDisconnectedAdapterData()));
-        }
+        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
     }
 
     protected abstract List<T> getAdapterData();
-
-    protected abstract List<T> getDisconnectedAdapterData();
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);

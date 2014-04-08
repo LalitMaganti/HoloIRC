@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
@@ -24,7 +23,6 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;

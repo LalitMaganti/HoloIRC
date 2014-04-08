@@ -24,7 +24,6 @@ package com.fusionx.lightirc.ui;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
@@ -58,11 +57,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     @Override
     protected List<ServerEvent> getAdapterData() {
         return mConversation.getServer().getBuffer();
-    }
-
-    @Override
-    protected List<ServerEvent> getDisconnectedAdapterData() {
-        return getAdapterData();
     }
 
     @Override

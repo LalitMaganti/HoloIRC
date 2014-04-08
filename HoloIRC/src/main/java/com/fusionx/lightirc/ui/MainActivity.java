@@ -14,6 +14,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
@@ -30,6 +31,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Configuration;
@@ -439,6 +442,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void closeDrawer() {
         mDrawerLayout.closeDrawers();
+    }
+
+    // TODO - fix this hack
+    @Override
+    public void onMentionMultipleUsers(List<WorldUser> users) {
+        ((ChannelFragment) mCurrentFragment).onMentionMultipleUsers(users);
     }
 
     public void setActionBarTitle(final String title) {

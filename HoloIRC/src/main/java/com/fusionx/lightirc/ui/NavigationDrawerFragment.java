@@ -131,7 +131,8 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
     }
 
     @Override
-    public void onUserMention(final List<WorldUser> users) {
+    public void onMentionMultipleUsers(final List<WorldUser> users) {
+        mCallback.onMentionMultipleUsers(users);
     }
 
     @Override
@@ -180,5 +181,7 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
         public void disconnectFromServer();
 
         public void closeDrawer();
+
+        public void onMentionMultipleUsers(List<WorldUser> users);
     }
 }

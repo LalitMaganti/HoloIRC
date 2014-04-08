@@ -46,11 +46,6 @@ public class UserFragment extends IRCFragment<UserEvent> {
         return getPrivateMessageUser().getBuffer();
     }
 
-    @Override
-    protected List<UserEvent> getDisconnectedAdapterData() {
-        return getAdapterData();
-    }
-
     public PrivateMessageUser getPrivateMessageUser() {
         return (PrivateMessageUser) mConversation;
     }
