@@ -48,7 +48,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mDatabaseSource = new BuilderDatabaseSource(getActivity().getApplicationContext());
+        mDatabaseSource = new BuilderDatabaseSource(getActivity());
         mDatabaseSource.open();
     }
 
@@ -84,6 +84,13 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         getListView().setOnItemClickListener(this);
 
         getListView().startActionMode(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        EventBus.getDefault().unregister(mEventHandler);
     }
 
     @Override
@@ -152,6 +159,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
                 IgnoreListCallback.class);
         final List<String> list = getIgnoreAdapter().getListOfItems();
         mDatabaseSource.updateIgnoreList(mConversation.getServer().getTitle(), list);
+        mConversation.getServer().updateIgnoreList(list);
 
         callback.switchToIRCActionFragment();
     }

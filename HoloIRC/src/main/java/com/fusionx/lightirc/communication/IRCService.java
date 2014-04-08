@@ -20,6 +20,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
@@ -84,9 +85,10 @@ public class IRCService extends Service {
         return mBinder;
     }
 
-    public Server connectToServer(final ServerConfiguration.Builder builder) {
+    public Server connectToServer(final ServerConfiguration.Builder builder,
+            final List<String> ignoreList) {
         final Pair<Boolean, Server> pair = mConnectionManager.onConnectionRequested(builder
-                .build(), mHandler);
+                .build(), ignoreList, mHandler);
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

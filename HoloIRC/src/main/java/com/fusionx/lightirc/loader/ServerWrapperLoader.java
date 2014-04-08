@@ -3,11 +3,13 @@ package com.fusionx.lightirc.loader;
 import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>> {
 
@@ -26,7 +28,10 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>
 
         source.open();
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
-            listItems.add(new ServerWrapper(builder, mService.getServerIfExists(builder)));
+            final Server server = mService.getServerIfExists(builder);
+            final List<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
+            final ServerWrapper wrapper = new ServerWrapper(builder, ignoreList, server);
+            listItems.add(wrapper);
         }
         source.close();
 
