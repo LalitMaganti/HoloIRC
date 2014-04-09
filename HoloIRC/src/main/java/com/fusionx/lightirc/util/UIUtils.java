@@ -73,12 +73,12 @@ public class UIUtils {
     }
 
     public static List<Integer> getCheckedPositions(final AbsListView listView) {
-        List<Integer> checkedSessionPositions = new ArrayList<>();
+        final List<Integer> checkedSessionPositions = new ArrayList<>();
         if (listView == null) {
             return checkedSessionPositions;
         }
 
-        SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
+        final SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
         for (int i = 0; i < checkedPositionsBool.size(); i++) {
             if (checkedPositionsBool.valueAt(i)) {
                 checkedSessionPositions.add(checkedPositionsBool.keyAt(i));

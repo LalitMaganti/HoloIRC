@@ -167,5 +167,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="ignore_list">Ignore List</string>
     <string name="items_checked">items checked</string>
     <string name="actions">Actions</string>
+    <string name="done">Done</string>
 
 </resources>

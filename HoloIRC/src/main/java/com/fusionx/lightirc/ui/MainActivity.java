@@ -7,6 +7,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.ui.widget.ProgramableSlidingPaneLayout;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
@@ -102,7 +103,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private ServerListFragment mServerListFragment;
 
     // Views
-    private SlidingPaneLayout mSlidingPane;
+    private ProgramableSlidingPaneLayout mSlidingPane;
 
     private DrawerLayout mDrawerLayout;
 
@@ -230,6 +231,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mDrawerLayout.closeDrawers();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!mNavigationDrawerFragment.onBackPressed()) {
+            if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
+                mDrawerLayout.closeDrawer(mRightDrawer);
+                return;
+            }
+            super.onBackPressed();
+        }
+    }
+
     // TODO - fix this hack
     @Override
     public void onMentionMultipleUsers(List<WorldUser> users) {
@@ -269,11 +281,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onDrawerOpened(final View drawerView) {
+        mSlidingPane.setSlideable(false);
     }
 
     @Override
     public void onDrawerClosed(final View drawerView) {
         mNavigationDrawerFragment.onDrawerClosed();
+        mSlidingPane.setSlideable(true);
     }
 
     @Override
@@ -374,6 +388,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout.setFocusableInTouchMode(false);
 
         mRightDrawer = findById(this, R.id.right_drawer);
 

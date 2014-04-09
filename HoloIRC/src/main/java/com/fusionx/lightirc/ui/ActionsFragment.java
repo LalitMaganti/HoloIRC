@@ -27,6 +27,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -39,6 +40,8 @@ import android.widget.AdapterView;
 
 import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
+import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
 
@@ -65,7 +68,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_action_listview, container, false);
+        return inflater.inflate(R.layout.default_stickylist_view, container, false);
     }
 
     @Override
@@ -75,7 +78,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         EventBus.getDefault().registerSticky(mEventHandler);
 
         final ActionsAdapter adapter = new ActionsAdapter(getActivity());
-        mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
+        mListView = findById(view, android.R.id.list);
         mListView.setAdapter(adapter);
     }
 

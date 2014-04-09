@@ -10,11 +10,15 @@ import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.interfaces.Conversation;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -25,8 +29,8 @@ import de.greenrobot.event.EventBus;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
-public class NavigationDrawerFragment extends Fragment implements IgnoreListFragment
-        .IgnoreListCallback, ActionsFragment.Callbacks, UserListFragment.Callback {
+public class NavigationDrawerFragment extends Fragment implements
+        ActionsFragment.Callbacks, UserListFragment.Callback {
 
     private ConnectionStatus mStatus;
 
@@ -61,6 +65,8 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
 
     private UserListFragment mUserListFragment;
 
+    private boolean mIsIgnoreListDisplayed = false;
+
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
@@ -70,6 +76,12 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
         } catch (final ClassCastException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -120,9 +132,13 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
         }
     }
 
-    @Override
     public void switchToIRCActionFragment() {
         getChildFragmentManager().popBackStackImmediate();
+        mIsIgnoreListDisplayed = false;
+
+        revertActionBarToNormal();
+        refreshUserList();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -147,6 +163,11 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
                 R.anim.slide_in_left, R.anim.slide_out_right);
         transaction.addToBackStack(null);
         transaction.replace(R.id.actions_list_layout, mIgnoreListFragment, "Ignore").commit();
+        mIsIgnoreListDisplayed = true;
+
+        updateActionBarForIgnoreList();
+        refreshUserList();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override
@@ -155,12 +176,85 @@ public class NavigationDrawerFragment extends Fragment implements IgnoreListFrag
     }
 
     public void onDrawerClosed() {
-        mIgnoreListFragment.finishActionMode();
+        if (mIsIgnoreListDisplayed) {
+            mIgnoreListFragment.saveIgnoreList();
+            switchToIRCActionFragment();
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.navigation_drawer_action_bar, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(final Menu menu) {
+        final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
+        item.setVisible(item.isVisible() && !mIsIgnoreListDisplayed);
+
+        final MenuItem add = menu.findItem(R.id.ignore_list_cab_add);
+        add.setVisible(mIsIgnoreListDisplayed);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.ignore_list_cab_add:
+                mIgnoreListFragment.addIgnoredUser();
+                return true;
+        }
+        return false;
+    }
+
+    public boolean onBackPressed() {
+        if (mIsIgnoreListDisplayed) {
+            mIgnoreListFragment.saveIgnoreList();
+            switchToIRCActionFragment();
+            return true;
+        } else if (mSlidingUpPanelLayout.isExpanded()) {
+            mSlidingUpPanelLayout.collapsePane();
+            return true;
+        }
+        return false;
+    }
+
+    private void updateActionBarForIgnoreList() {
+        final LayoutInflater inflater = (LayoutInflater) getActivity().getActionBar()
+                .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+        final View customActionBarView = inflater.inflate(
+                R.layout.actionbar_custom_view_done, null);
+        findById(customActionBarView, R.id.actionbar_done).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mIgnoreListFragment.saveIgnoreList();
+                        switchToIRCActionFragment();
+                    }
+                }
+        );
+        final ActionBar actionBar = getActivity().getActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
+                ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
+                        | ActionBar.DISPLAY_SHOW_TITLE
+        );
+        actionBar.setCustomView(customActionBarView);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+    }
+
+    private void revertActionBarToNormal() {
+        final ActionBar actionBar = getActivity().getActionBar();
+        actionBar.setDisplayOptions(
+                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE,
+                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE |
+                        ActionBar.DISPLAY_SHOW_CUSTOM
+        );
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void refreshUserList() {
-        final int visibility = mStatus == ConnectionStatus.CONNECTED
-                && mFragmentType == FragmentType.CHANNEL ? View.VISIBLE : View.GONE;
+        final int visibility = mStatus == ConnectionStatus.CONNECTED &&
+                mFragmentType == FragmentType.CHANNEL && !mIsIgnoreListDisplayed ?
+                View.VISIBLE : View.GONE;
         mSlideUpLayout.setVisibility(visibility);
 
         if (visibility == View.VISIBLE) {
