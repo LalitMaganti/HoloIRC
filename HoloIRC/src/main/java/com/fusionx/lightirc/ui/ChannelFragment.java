@@ -164,10 +164,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
         mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
-
-        if (savedInstanceState == null) {
-            getListView().setSelection(mMessageAdapter.getCount() - 1);
-        }
     }
 
     @Override

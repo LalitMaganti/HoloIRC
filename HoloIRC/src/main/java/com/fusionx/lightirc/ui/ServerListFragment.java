@@ -16,6 +16,7 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
+import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
@@ -145,11 +146,15 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     @Override
     public boolean onGroupClick(final ExpandableListView parent, final View v,
             final int groupPosition, final long id) {
+        return onServerClick(groupPosition);
+    }
+
+    private boolean onServerClick(final int groupPosition) {
         if (mActionModeStarted && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_GROUP) {
-            int flatPosition = parent.getFlatListPosition(ExpandableListView
+            int flatPosition = mListView.getFlatListPosition(ExpandableListView
                     .getPackedPositionForGroup(groupPosition));
-            parent.setItemChecked(flatPosition, !parent.isItemChecked(flatPosition));
+            mListView.setItemChecked(flatPosition, !mListView.isItemChecked(flatPosition));
             return true;
         } else if (mActionModeStarted) {
             return true;
@@ -334,6 +339,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public void onPart(final String serverName, final PartEvent event);
 
+        public boolean onKick(final String serverName, final KickEvent event);
+
         public void onPrivateMessageClosed();
     }
 
@@ -374,6 +381,18 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
             mCallback.onPart(mServer.getTitle(), event);
+        }
+
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final KickEvent event) throws InterruptedException {
+            mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
+            mListView.setAdapter(mListAdapter);
+            mListView.expandGroup(mServerIndex);
+
+            final boolean switchToServer = mCallback.onKick(mServer.getTitle(), event);
+            if (switchToServer) {
+                onServerClick(mServerIndex);
+            }
         }
 
         @SuppressWarnings("unused")

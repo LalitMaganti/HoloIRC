@@ -82,13 +82,12 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         mTitle = getArguments().getString("title");
 
         mMessageAdapter = new IRCMessageAdapter<>(getActivity());
-        final AnimationAdapter adapter = new AlphaInAnimationAdapter(mMessageAdapter);
-        adapter.setAbsListView(getListView());
-        setListAdapter(adapter);
+        setListAdapter(mMessageAdapter);
 
-        if (savedInstanceState != null) {
-            adapter.setShouldAnimateFromPosition(savedInstanceState.getInt("NUMBEROFITEMS"));
+        if (savedInstanceState == null) {
+            getListView().setSelection(mMessageAdapter.getCount() - 1);
         }
+
         onResetBuffer();
         mConversation.getServer().getServerEventBus().register(this);
     }
@@ -98,13 +97,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         super.onDestroyView();
 
         ButterKnife.reset(this);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt("NUMBEROFITEMS", mMessageAdapter.getCount());
     }
 
     @Override

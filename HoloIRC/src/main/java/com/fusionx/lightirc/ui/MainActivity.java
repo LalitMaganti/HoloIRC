@@ -17,6 +17,7 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.Theme;
+import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
@@ -198,6 +199,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (isCurrent) {
             onRemoveFragment();
         }
+    }
+
+    @Override
+    public boolean onKick(final String serverName, final KickEvent event) {
+        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                && mConversation.getId().equals(event.channelName);
+
+        if (isCurrent) {
+            onRemoveFragment();
+        }
+        return isCurrent;
     }
 
     @Override
@@ -527,10 +539,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                         .beginTransaction();
                 transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                 transaction.replace(R.id.content_frame, fragment).commit();
+
+                findById(MainActivity.this, R.id.content_frame_empty_textview)
+                        .setVisibility(View.GONE);
             }
         }, 200);
-
-        findById(this, R.id.content_frame_empty_textview).setVisibility(View.GONE);
     }
 
     private void onRemoveFragment() {
