@@ -68,13 +68,17 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         @SuppressWarnings("unused")
         public void onEvent(final OnConversationChanged conversationChanged) {
             // If it's null then remove the old conversation
-            if (conversationChanged == null || conversationChanged.fragmentType != FragmentType
-                    .CHANNEL) {
+            if (conversationChanged.conversation == null
+                    || conversationChanged.fragmentType != FragmentType.CHANNEL) {
+                if (mChannel != null) {
+                    mChannel.getServer().getServerEventBus().unregister(UserListFragment.this);
+                }
                 mChannel = null;
                 return;
             }
 
             mChannel = (Channel) conversationChanged.conversation;
+            mChannel.getServer().getServerEventBus().register(UserListFragment.this);
             onUpdateUserList();
         }
     };
@@ -116,14 +120,9 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public void onResume() {
         super.onResume();
 
-        EventBus.getDefault().registerSticky(mEventHandler);
-
         // On resume, we may have missed events in the background - make sure we have the most
-        // up-to-date user list
-        if (mChannel != null) {
-            mChannel.getServer().getServerEventBus().register(this);
-            onUpdateUserList();
-        }
+        // up-to-date user list - register the event handler sticky so we can get the latest info
+        EventBus.getDefault().registerSticky(mEventHandler);
     }
 
     @Override
