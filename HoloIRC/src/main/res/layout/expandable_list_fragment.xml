@@ -8,4 +8,6 @@
         android:dividerHeight="0dp"
         android:background="?attr/expandable_list_background"
         android:cacheColorHint="@android:color/transparent"
-        android:id="@+id/server_list"/>
+        android:id="@+id/server_list"
+        android:clipToPadding="false"
+        android:scrollbarStyle="outsideOverlay"/>

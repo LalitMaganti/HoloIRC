@@ -42,10 +42,11 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     private final Object mEventHandler = new Object() {
         @SuppressWarnings("unused")
         public void onEvent(final OnConversationChanged conversationChanged) {
-            if (mFragmentType != conversationChanged.fragmentType) {
-                mFragmentType = conversationChanged.fragmentType;
-                notifyDataSetChanged();
+            mFragmentType = conversationChanged.fragmentType;
+            if (conversationChanged.conversation != null) {
+                mStatus = conversationChanged.conversation.getServer().getStatus();
             }
+            notifyDataSetChanged();
         }
 
         @SuppressWarnings("unused")
