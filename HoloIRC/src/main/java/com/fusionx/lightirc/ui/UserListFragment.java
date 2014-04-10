@@ -76,6 +76,9 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
                 mChannel = null;
                 return;
             }
+            if (mChannel != null) {
+                mChannel.getServer().getServerEventBus().unregister(UserListFragment.this);
+            }
 
             mChannel = (Channel) conversationChanged.conversation;
             mChannel.getServer().getServerEventBus().register(UserListFragment.this);
