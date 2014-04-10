@@ -64,26 +64,17 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private Channel mChannel;
 
-    private boolean mRegistered;
-
     private final Object mEventHandler = new Object() {
         @SuppressWarnings("unused")
         public void onEvent(final OnConversationChanged conversationChanged) {
             // If it's null then remove the old conversation
             if (conversationChanged == null || conversationChanged.fragmentType != FragmentType
                     .CHANNEL) {
-                if (mChannel != null && mRegistered) {
-                    mChannel.getServer().getServerEventBus().unregister(this);
-                    mRegistered = false;
-                }
+                mChannel = null;
                 return;
             }
 
             mChannel = (Channel) conversationChanged.conversation;
-            if (!mRegistered) {
-                mChannel.getServer().getServerEventBus().register(this);
-                mRegistered = true;
-            }
             onUpdateUserList();
         }
     };
@@ -112,8 +103,6 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        EventBus.getDefault().registerSticky(mEventHandler);
-
         mStickyListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
         mAdapter = new UserListAdapter(view.getContext(), mWorldUsers);
 
@@ -127,14 +116,12 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public void onResume() {
         super.onResume();
 
+        EventBus.getDefault().registerSticky(mEventHandler);
+
         // On resume, we may have missed events in the background - make sure we have the most
         // up-to-date user list
         if (mChannel != null) {
-            if (!mRegistered) {
-                mChannel.getServer().getServerEventBus().register(this);
-                mRegistered = true;
-            }
-
+            mChannel.getServer().getServerEventBus().register(this);
             onUpdateUserList();
         }
     }
@@ -143,11 +130,12 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public void onPause() {
         super.onPause();
 
+        EventBus.getDefault().unregister(mEventHandler);
+
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
-        if (mChannel != null && mRegistered) {
+        if (mChannel != null) {
             mChannel.getServer().getServerEventBus().unregister(this);
-            mRegistered = false;
         }
     }
 
