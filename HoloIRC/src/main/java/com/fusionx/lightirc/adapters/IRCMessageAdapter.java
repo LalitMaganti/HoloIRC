@@ -96,10 +96,10 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         final View view = mInflater.inflate(R.layout.irc_listview_textview, parent, false);
 
         final TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
-        timestamp.setTypeface(UIUtils.getRobotoLight(mContext));
+        UIUtils.setRobotoLight(mContext, timestamp);
 
         final TextView message = (TextView) view.findViewById(R.id.message);
-        message.setTypeface(UIUtils.getRobotoLight(mContext));
+        UIUtils.setRobotoLight(mContext, message);
 
         final ViewHolder holder = new ViewHolder(timestamp, message);
         view.setTag(holder);

@@ -31,17 +31,18 @@
     </string-array>
 
     <string-array name="server_actions">
-        <item>Join new channel</item>
-        <item>Change nick</item>
-        <item>Disconnect</item>
-        <item>Ignore List</item>
+        <item>@string/action_join_channel</item>
+        <item>@string/action_change_nick</item>
+        <item>@string/action_ignore_list</item>
+        <item>@string/action_disconnect</item>
+        <item>@string/action_reconnect</item>
     </string-array>
 
     <string-array name="channel_actions">
-        <item>Part channel</item>
+        <item>@string/action_part_channel</item>
     </string-array>
 
     <string-array name="user_actions">
-        <item>Close PM</item>
+        <item>@string/action_close_pm</item>
     </string-array>
 </resources>

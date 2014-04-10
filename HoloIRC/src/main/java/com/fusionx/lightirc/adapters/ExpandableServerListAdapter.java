@@ -116,7 +116,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             divider.setVisibility(isExpanded ? View.INVISIBLE : View.VISIBLE);
             expandButton.setTag(!isExpanded);
 
-            final int drawableId = UIUtils.getResourceId(mContext, isExpanded
+            final int drawableId = UIUtils.resolveResourceIdFromAttr(mContext, isExpanded
                     ? R.attr.expand_close_menu_drawable : R.attr.expand_open_menu_drawable);
             expandButton.setImageDrawable(mContext.getResources().getDrawable(drawableId));
             expandButton.setOnClickListener(new ExpandListener(groupPos));
@@ -175,10 +175,12 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             final int drawableId;
 
             if (collapsed) {
-                drawableId = UIUtils.getResourceId(mContext, R.attr.expand_close_menu_drawable);
+                drawableId = UIUtils.resolveResourceIdFromAttr(mContext,
+                        R.attr.expand_close_menu_drawable);
                 mListView.expandGroup(mGroupPos);
             } else {
-                drawableId = UIUtils.getResourceId(mContext, R.attr.expand_open_menu_drawable);
+                drawableId = UIUtils.resolveResourceIdFromAttr(mContext,
+                        R.attr.expand_open_menu_drawable);
                 mListView.collapseGroup(mGroupPos);
             }
 

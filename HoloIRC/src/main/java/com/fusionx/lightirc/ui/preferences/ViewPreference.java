@@ -31,7 +31,7 @@ public class ViewPreference extends Preference {
         if (convertView == null) {
             mTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
                     .must_be_complete_textview, null);
-            mTextView.setTypeface(UIUtils.getRobotoLight(getContext()));
+            UIUtils.setRobotoLight(getContext(), mTextView);
             mTextView.setText(mText);
             return mTextView;
         }

@@ -35,7 +35,7 @@ public class WorkerFragment extends Fragment implements LoaderManager
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         setRetainInstance(true);
@@ -110,6 +110,10 @@ public class WorkerFragment extends Fragment implements LoaderManager
 
     public void disconnectFromServer(final Server server) {
         mService.requestDisconnectionFromServer(server);
+    }
+
+    public void reconnectToServer(final Server server) {
+        mService.requestReconnectionToServer(server);
     }
 
     public interface Callback {

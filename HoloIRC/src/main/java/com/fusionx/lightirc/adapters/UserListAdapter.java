@@ -53,12 +53,10 @@ public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        final TextView view;
-        if (convertView == null) {
+        TextView view = (TextView) convertView;
+        if (view == null) {
             view = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
-            view.setTypeface(UIUtils.getRobotoLight(getContext()));
-        } else {
-            view = (TextView) convertView;
+            UIUtils.setRobotoLight(getContext(), view);
         }
         view.setText(getItem(position).getSpannedNick(mChannel));
         return view;
@@ -66,10 +64,8 @@ public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
 
     @Override
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        final TextView view;
-        if (convertView != null) {
-            view = (TextView) convertView;
-        } else {
+        TextView view = (TextView) convertView;
+        if (convertView == null) {
             view = (TextView) mInflater.inflate(R.layout.sliding_menu_header, viewGroup, false);
         }
 

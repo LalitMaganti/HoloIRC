@@ -260,6 +260,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         ((ChannelFragment) mCurrentFragment).onMentionMultipleUsers(users);
     }
 
+    @Override
+    public void reconnectToServer() {
+        mWorkerFragment.reconnectToServer(mConversation.getServer());
+    }
+
     public void setActionBarTitle(final String title) {
         getSupportActionBar().setTitle(title);
     }

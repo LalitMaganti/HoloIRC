@@ -142,7 +142,7 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void onRemoveCurrentFragment() {
+    public void removeCurrentFragment() {
         mCallback.removeCurrentFragment();
     }
 
@@ -168,6 +168,11 @@ public class NavigationDrawerFragment extends Fragment implements
         updateActionBarForIgnoreList();
         refreshUserList();
         getActivity().supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void reconnectToServer() {
+         mCallback.reconnectToServer();
     }
 
     @Override
@@ -277,5 +282,7 @@ public class NavigationDrawerFragment extends Fragment implements
         public void closeDrawer();
 
         public void onMentionMultipleUsers(List<WorldUser> users);
+
+        public void reconnectToServer();
     }
 }

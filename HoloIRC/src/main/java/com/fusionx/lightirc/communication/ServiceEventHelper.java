@@ -140,14 +140,6 @@ public final class ServiceEventHelper {
         onIRCEvent(MessagePriority.HIGH, conversation, event);
     }
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final DisconnectEvent disconnectEvent) {
-        if (!disconnectEvent.userSent && !disconnectEvent.retryPending) {
-            final ConnectionManager connectionMan = ConnectionManager.getConnectionManager(null);
-            connectionMan.onFinalUnexpectedDisconnect(mServer.getTitle());
-        }
-    }
-
     private void setSubMessagePriority(final String title, final MessagePriority priority) {
         final MessagePriority oldPriority = mMessagePriorityMap.get(title);
         if (oldPriority == null || oldPriority.compareTo(priority) < 0) {

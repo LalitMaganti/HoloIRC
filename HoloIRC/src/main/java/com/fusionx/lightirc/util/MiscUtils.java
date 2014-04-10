@@ -58,6 +58,8 @@ public class MiscUtils {
         switch (connectionStatus) {
             case CONNECTED:
                 return context.getString(R.string.status_connected);
+            case RECONNECTING:
+                return context.getString(R.string.reconnecting);
             case CONNECTING:
                 return context.getString(R.string.status_connecting);
             case DISCONNECTED:

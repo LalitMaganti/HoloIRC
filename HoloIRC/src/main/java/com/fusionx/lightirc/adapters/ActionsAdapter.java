@@ -21,6 +21,9 @@ import java.util.Arrays;
 import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
+import static com.fusionx.lightirc.util.UIUtils.resolveResourceIdFromAttr;
+
+// TODO - rewrite this horribly written class
 public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHeadersAdapter {
 
     private final LayoutInflater mInflater;
@@ -35,6 +38,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     private FragmentType mFragmentType = FragmentType.SERVER;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final Object mEventHandler = new Object() {
         @SuppressWarnings("unused")
         public void onEvent(final OnConversationChanged conversationChanged) {
@@ -63,12 +67,14 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     }
 
     @Override
-    public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        final TextView otherHeader = (TextView) (convertView == null ? mInflater.inflate(R.layout
-                .sliding_menu_header, viewGroup, false) : convertView);
+    public View getHeaderView(final int i, final View convertView, final ViewGroup viewGroup) {
+        final TextView otherHeader = (TextView) (convertView == null
+                ? mInflater.inflate(R.layout.sliding_menu_header, viewGroup, false)
+                : convertView);
+
         if (i == 0 && convertView == null) {
             otherHeader.setText(getContext().getString(R.string.server));
-        } else if (i == mServerItemCount) {
+        } else if (i == getRealServerCount()) {
             otherHeader.setText(mFragmentType == FragmentType.CHANNEL ? getContext()
                     .getString(R.string.channel) : getContext().getString(R.string.user));
         }
@@ -77,7 +83,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public long getHeaderId(int i) {
-        return i < mServerItemCount ? 0 : 1;
+        return i < getRealServerCount() ? 0 : 1;
     }
 
     @Override
@@ -86,30 +92,29 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     }
 
     @Override
-    public boolean isEnabled(int position) {
-        return !((position == 0) || (position == 1) || mFragmentType != FragmentType.SERVER)
-                || isConnected();
+    public boolean isEnabled(final int position) {
+        return position != 0 && position != 1 && position < getRealServerCount() || isConnected();
     }
 
     @Override
     public int getCount() {
         if (mFragmentType == FragmentType.SERVER) {
-            return mServerItemCount;
+            return getRealServerCount();
         } else if (mFragmentType == FragmentType.CHANNEL) {
-            return mServerItemCount + mChannelArray.length;
+            return getRealServerCount() + mChannelArray.length;
         } else {
-            return mServerItemCount + mUserArray.length;
+            return getRealServerCount() + mUserArray.length;
         }
     }
 
     @Override
     public String getItem(int position) {
-        if (position < mServerItemCount) {
+        if (position < getRealServerCount()) {
             return super.getItem(position);
         } else if (mFragmentType == FragmentType.CHANNEL) {
-            return mChannelArray[getCount() - position - 1];
+            return mChannelArray[getCount() - 1 - position];
         } else if (mFragmentType == FragmentType.USER) {
-            return mUserArray[getCount() - position - 1];
+            return mUserArray[getCount() - 1 - position];
         } else {
             return "";
         }
@@ -122,8 +127,10 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             row = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
             UIUtils.setRobotoLight(getContext(), row);
         }
-        if (position == 2) {
-            row.setText(isConnected() ? "Disconnect" : "Close");
+
+        if (position == 3) {
+            row.setText(isConnected() ? getItem(position) : getContext().getString(R.string
+                    .action_close_server));
         } else {
             row.setText(getItem(position));
         }
@@ -131,7 +138,9 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         if (!isEnabled(position)) {
             row.setTextColor(Color.GRAY);
         } else {
-            row.setTextColor(getContext().getResources().getColor(android.R.color.black));
+            final int resId = resolveResourceIdFromAttr(getContext(), R.attr.default_text_colour);
+            final int colour = UIUtils.getColourFromResource(getContext(), resId);
+            row.setTextColor(colour);
         }
 
         return row;
@@ -139,5 +148,13 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     public boolean isConnected() {
         return mStatus == ConnectionStatus.CONNECTED;
+    }
+
+    public boolean isDisconnected() {
+        return mStatus == ConnectionStatus.DISCONNECTED;
+    }
+
+    private int getRealServerCount() {
+        return mServerItemCount - (isDisconnected() ? 0 : 1);
     }
 }

@@ -154,8 +154,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="nick_second_choice">Second choice nick name</string>
     <string name="nick_third_choice">Third choice nick name</string>
 
-    <string name="action_part_channel">Part channel</string>
-    <string name="action_close_pm">Close PM</string>
     <string name="pref_highlight_whole_line_title">Nick line colours</string>
     <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
         with a nick
@@ -168,5 +166,17 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="items_checked">items checked</string>
     <string name="actions">Actions</string>
     <string name="done">Done</string>
+    <string name="reconnecting">Reconnecting</string>
+
+    <!-- Actions -->
+    <string name="action_join_channel">Join new channel</string>
+    <string name="action_change_nick">Change nick</string>
+    <string name="action_ignore_list">Ignore List</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="action_close_server">Close</string>
+    <string name="action_reconnect">Reconnect</string>
+
+    <string name="action_part_channel">Part channel</string>
+    <string name="action_close_pm">Close PM</string>
 
 </resources>

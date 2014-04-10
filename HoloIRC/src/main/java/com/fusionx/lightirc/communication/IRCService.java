@@ -85,9 +85,9 @@ public class IRCService extends Service {
         return mBinder;
     }
 
-    public Server connectToServer(final ServerConfiguration.Builder builder,
+    public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
             final List<String> ignoreList) {
-        final Pair<Boolean, Server> pair = mConnectionManager.onConnectionRequested(builder
+        final Pair<Boolean, Server> pair = mConnectionManager.requestConnection(builder
                 .build(), ignoreList, mHandler);
 
         final NotificationManager notificationManager =
@@ -120,10 +120,15 @@ public class IRCService extends Service {
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server.getTitle());
 
-        final boolean finalServer = mConnectionManager.onDisconnectionRequested(server.getTitle());
+        final boolean finalServer = mConnectionManager.requestDisconnectionAndRemoval(
+                server.getTitle());
         if (finalServer) {
             stopForeground(true);
         }
+    }
+
+    public void requestReconnectionToServer(final Server server) {
+        mConnectionManager.requestReconnection(server);
     }
 
     public PendingIntent getMainActivityIntent() {

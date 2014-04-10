@@ -25,21 +25,34 @@ import java.util.List;
 
 public class UIUtils {
 
-    private static Typeface mRobotoLightTypeface = null;
+    private static Typeface sRobotoLightTypeface = null;
 
-    private static Typeface mRobotoThinTypeface = null;
+    private static Typeface sRobotoThinTypeface = null;
 
     public static boolean isLandscape(final Context context) {
         return context.getResources().getConfiguration().orientation == Configuration
                 .ORIENTATION_LANDSCAPE;
     }
 
-    public static Typeface getRobotoLight(final Context context) {
-        if (mRobotoLightTypeface == null) {
-            mRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(),
+    private static boolean isTablet(final Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration
+                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    private static Typeface getRobotoLight(final Context context) {
+        if (sRobotoLightTypeface == null) {
+            sRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(),
                     "Roboto-Light.ttf");
         }
-        return mRobotoLightTypeface;
+        return sRobotoLightTypeface;
+    }
+
+    private static Typeface getRobotoThin(final Context context) {
+        if (sRobotoLightTypeface == null) {
+            sRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
+                    "Roboto-Thin.ttf");
+        }
+        return sRobotoThinTypeface;
     }
 
     public static void setRobotoLight(final Context context, final TextView textView) {
@@ -122,22 +135,13 @@ public class UIUtils {
         return (T) activity.findViewById(id);
     }
 
-    public static int getResourceId(final Context context, final int attrResource) {
+    public static int resolveResourceIdFromAttr(final Context context, final int attrResource) {
         final TypedValue typedvalueattr = new TypedValue();
         context.getTheme().resolveAttribute(attrResource, typedvalueattr, true);
         return typedvalueattr.resourceId;
     }
 
-    private static boolean isTablet(final Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration
-                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    private static Typeface getRobotoThin(final Context context) {
-        if (mRobotoLightTypeface == null) {
-            mRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
-                    "Roboto-Thin.ttf");
-        }
-        return mRobotoThinTypeface;
+    public static int getColourFromResource(final Context context, final int resourceId) {
+        return context.getResources().getColor(resourceId);
     }
 }

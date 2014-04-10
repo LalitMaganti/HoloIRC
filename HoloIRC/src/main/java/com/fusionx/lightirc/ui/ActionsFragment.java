@@ -27,7 +27,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -58,6 +57,8 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     private StickyListHeadersListView mListView;
 
+    private ActionsAdapter mAdapter;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -77,14 +78,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         EventBus.getDefault().registerSticky(mEventHandler);
 
-        final ActionsAdapter adapter = new ActionsAdapter(getActivity());
+        mAdapter = new ActionsAdapter(getActivity());
         mListView = findById(view, android.R.id.list);
-        mListView.setAdapter(adapter);
-    }
-
-    @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+        mListView.setAdapter(mAdapter);
 
         mListView.setOnItemClickListener(this);
     }
@@ -99,23 +95,26 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
             final long l) {
-        switch (i) {
-            case 0:
-                showChannelDialog();
-                break;
-            case 1:
-                showNickDialog();
-                break;
-            case 2:
-                mCallbacks.disconnectFromServer();
-                return;
-            case 3:
-                mCallbacks.switchToIgnoreFragment();
-                return;
-            case 4:
-                mCallbacks.onRemoveCurrentFragment();
-                break;
+        final String action = mAdapter.getItem(i);
+
+        if (action.equals(getString(R.string.action_join_channel))) {
+            showChannelDialog();
+        } else if (action.equals(getString(R.string.action_change_nick))) {
+            showNickDialog();
+        } else if (action.equals(getString(R.string.action_ignore_list))) {
+            mCallbacks.switchToIgnoreFragment();
+        } else if (action.equals(getString(R.string.action_disconnect))) {
+            mCallbacks.disconnectFromServer();
+        } else if (action.equals(getString(R.string.action_close_server))) {
+            mCallbacks.disconnectFromServer();
+        } else if (action.equals(getString(R.string.action_reconnect))) {
+            mCallbacks.reconnectToServer();
+        } else if (action.equals(getString(R.string.action_part_channel))) {
+            mCallbacks.removeCurrentFragment();
+        } else if (action.equals(getString(R.string.action_close_pm))) {
+            mCallbacks.removeCurrentFragment();
         }
+
         mCallbacks.closeDrawer();
     }
 
@@ -137,13 +136,15 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     public interface Callbacks {
 
-        public void onRemoveCurrentFragment();
+        public void removeCurrentFragment();
 
         public void closeDrawer();
 
         public void disconnectFromServer();
 
         public void switchToIgnoreFragment();
+
+        public void reconnectToServer();
     }
 
     public class ChannelDialogBuilder extends DialogBuilder {
