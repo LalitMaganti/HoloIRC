@@ -129,6 +129,8 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         }
 
         if (position == 3) {
+            // TODO - improve UX by making this more precise to the specific status of the
+            // connection
             row.setText(isConnected() ? getItem(position) : getContext().getString(R.string
                     .action_close_server));
         } else {

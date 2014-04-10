@@ -435,6 +435,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             // If the current fragment is not null then retrieve the matching convo
             if (mCurrentFragment != null) {
                 mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
+
+                findById(MainActivity.this, R.id.content_frame_empty_textview)
+                        .setVisibility(View.GONE);
             }
 
             supportInvalidateOptionsMenu();
