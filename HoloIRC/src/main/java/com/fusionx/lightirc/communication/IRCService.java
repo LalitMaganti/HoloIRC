@@ -102,9 +102,7 @@ public class IRCService extends Service {
             mEventHelperMap.put(server.getTitle(), serviceEventHelper);
         }
 
-        if (mConnectionManager.getServerCount() == 1) {
-            startForeground(SERVICE_ID, getNotification());
-        }
+        startForeground(SERVICE_ID, getNotification());
 
         return server;
     }

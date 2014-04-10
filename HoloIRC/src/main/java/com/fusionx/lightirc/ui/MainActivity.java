@@ -125,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSlidingPane.setPanelSlideListener(this);
         if (AppPreferences.theme == Theme.DARK) {
             // TODO - fix this hack
-            mSlidingPane.setShadowDrawable(null);
+            mSlidingPane.setSliderFadeColor(0);
         }
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
