@@ -63,8 +63,6 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private Callback mCallback;
 
-    private UserListFragment mUserListFragment;
-
     private boolean mIsIgnoreListDisplayed = false;
 
     @Override
@@ -114,15 +112,13 @@ public class NavigationDrawerFragment extends Fragment implements
         });
 
         if (savedInstanceState == null) {
-            mUserListFragment = new UserListFragment();
+            final UserListFragment userListFragment = new UserListFragment();
 
             final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             transaction.add(R.id.actions_list_layout, new ActionsFragment(), "Actions");
-            transaction.replace(R.id.user_list_frame_layout, mUserListFragment);
+            transaction.replace(R.id.user_list_frame_layout, userListFragment);
             transaction.commit();
         } else {
-            mUserListFragment = (UserListFragment) getChildFragmentManager().findFragmentById(R.id
-                    .user_list_frame_layout);
             mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager().findFragmentByTag(
                     "Ignore");
         }

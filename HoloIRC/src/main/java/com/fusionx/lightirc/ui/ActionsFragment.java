@@ -103,6 +103,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
             showNickDialog();
         } else if (action.equals(getString(R.string.action_ignore_list))) {
             mCallbacks.switchToIgnoreFragment();
+            return;
         } else if (action.equals(getString(R.string.action_disconnect))) {
             mCallbacks.disconnectFromServer();
         } else if (action.equals(getString(R.string.action_close_server))) {
