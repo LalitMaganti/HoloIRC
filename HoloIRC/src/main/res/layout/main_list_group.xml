@@ -50,7 +50,7 @@
 
     <View
             android:id="@+id/divider"
-            android:background="#e2e2e2"
+            android:background="?attr/action_divider_colour"
             android:layout_width="fill_parent"
             android:layout_height="1.2dp"
             android:layout_below="@+id/group_content"/>
