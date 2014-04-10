@@ -84,12 +84,12 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         mMessageAdapter = new IRCMessageAdapter<>(getActivity());
         setListAdapter(mMessageAdapter);
 
+        onResetBuffer();
+        mConversation.getServer().getServerEventBus().register(this);
+
         if (savedInstanceState == null) {
             getListView().setSelection(mMessageAdapter.getCount() - 1);
         }
-
-        onResetBuffer();
-        mConversation.getServer().getServerEventBus().register(this);
     }
 
     @Override
