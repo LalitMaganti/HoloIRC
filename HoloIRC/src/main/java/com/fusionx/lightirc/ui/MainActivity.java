@@ -22,6 +22,7 @@ import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,6 +43,7 @@ import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
+import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
@@ -109,66 +111,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private DrawerLayout mDrawerLayout;
 
     private View mRightDrawer;
-
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
-        super.onCreate(savedInstanceState);
-
-        AppPreferences.setUpPreferences(this);
-        SharedPreferencesUtils.onInitialSetup(this);
-
-        setContentView(R.layout.main_activity);
-
-        mSlidingPane = findById(this, R.id.sliding_pane_layout);
-        mSlidingPane.setParallaxDistance(100);
-        mSlidingPane.setPanelSlideListener(this);
-        if (AppPreferences.theme == Theme.DARK) {
-            // TODO - fix this hack
-            mSlidingPane.setSliderFadeColor(0);
-        }
-
-        mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
-        mDrawerLayout.setFocusableInTouchMode(false);
-
-        mRightDrawer = findById(this, R.id.right_drawer);
-
-        if (savedInstanceState == null) {
-            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            mServerListFragment = new ServerListFragment();
-            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
-
-            mNavigationDrawerFragment = new NavigationDrawerFragment();
-            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
-
-            mWorkerFragment = new WorkerFragment();
-            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
-
-            transaction.commit();
-        } else {
-            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
-                    R.id.sliding_list_frame);
-            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.right_drawer);
-            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
-                    .findFragmentByTag(WORKER_FRAGMENT);
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.content_frame);
-
-            // If the current fragment is not null then retrieve the matching convo
-            if (mCurrentFragment != null) {
-                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
-
-                findById(MainActivity.this, R.id.content_frame_empty_textview)
-                        .setVisibility(View.GONE);
-            }
-
-            supportInvalidateOptionsMenu();
-        }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
 
     // TODO - unify the server and subserver code
     @Override
@@ -383,7 +325,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         final String channelName = getIntent().getStringExtra("channel_name");
 
         final Conversation conversation;
-        if (serverName != null) {
+        // If we are launching from recents then we are definitely not coming from the
+        // notification - ignore what's in the intent
+        if (serverName != null && !isAppFromRecentApps(getIntent().getFlags())) {
+            // Try to remove the extras from the intent - this probably won't work though if the
+            // activity finishes which is why we have the recents check
+            getIntent().removeExtra("server_name");
+            getIntent().removeExtra("channel_name");
+
             final Server server = service.getServerIfExists(serverName);
             conversation = server.getUserChannelInterface().getChannel(channelName);
         } else {
@@ -450,6 +399,66 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt());
+        super.onCreate(savedInstanceState);
+
+        AppPreferences.setUpPreferences(this);
+        SharedPreferencesUtils.onInitialSetup(this);
+
+        setContentView(R.layout.main_activity);
+
+        mSlidingPane = findById(this, R.id.sliding_pane_layout);
+        mSlidingPane.setParallaxDistance(100);
+        mSlidingPane.setPanelSlideListener(this);
+        if (AppPreferences.theme == Theme.DARK) {
+            // TODO - fix this hack
+            mSlidingPane.setSliderFadeColor(0);
+        }
+
+        mDrawerLayout = findById(this, R.id.drawer_layout);
+        mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout.setFocusableInTouchMode(false);
+
+        mRightDrawer = findById(this, R.id.right_drawer);
+
+        if (savedInstanceState == null) {
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            mServerListFragment = new ServerListFragment();
+            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
+
+            mNavigationDrawerFragment = new NavigationDrawerFragment();
+            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
+
+            mWorkerFragment = new WorkerFragment();
+            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
+
+            transaction.commit();
+        } else {
+            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
+                    R.id.sliding_list_frame);
+            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.right_drawer);
+            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
+                    .findFragmentByTag(WORKER_FRAGMENT);
+            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.content_frame);
+
+            // If the current fragment is not null then retrieve the matching convo
+            if (mCurrentFragment != null) {
+                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
+
+                findById(MainActivity.this, R.id.content_frame_empty_textview)
+                        .setVisibility(View.GONE);
+            }
+
+            supportInvalidateOptionsMenu();
+        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
 
@@ -493,11 +502,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
 
         final String serverName = intent.getStringExtra("server_name");
         final String channelName = intent.getStringExtra("channel_name");
 
         if (serverName != null) {
+            // Try to remove the extras from the intent - this probably won't work though if the
+            // activity finishes which is why we have the recents check
+            getIntent().removeExtra("server_name");
+            getIntent().removeExtra("channel_name");
+
             final Server server = getService().getServerIfExists(serverName);
             final Conversation conversation = server.getUserChannelInterface().getChannel
                     (channelName);

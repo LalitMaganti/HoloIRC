@@ -7,6 +7,7 @@ import com.fusionx.relay.constants.Theme;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -143,5 +144,9 @@ public class UIUtils {
 
     public static int getColourFromResource(final Context context, final int resourceId) {
         return context.getResources().getColor(resourceId);
+    }
+
+    public static boolean isAppFromRecentApps(final int flags) {
+        return (flags & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0;
     }
 }
