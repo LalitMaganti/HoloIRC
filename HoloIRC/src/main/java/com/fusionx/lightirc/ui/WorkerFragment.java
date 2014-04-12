@@ -6,16 +6,13 @@ import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Server;
 
 import android.app.Activity;
-import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-
-import java.io.File;
-import java.util.List;
 
 /**
  * Class where all the IRC work is carried out
@@ -44,22 +41,18 @@ public class WorkerFragment extends Fragment implements LoaderManager
 
             private Handler mHandler;
 
-            private Dialog mDialog;
+            private ProgressDialog mDialog;
 
             @Override
-            protected Void doInBackground(Void... params) {
-                final List<File> fileList = SharedPreferencesUtils.getOldServers(getActivity());
-                if (!fileList.isEmpty()) {
+            protected Void doInBackground(final Void... params) {
+                if (SharedPreferencesUtils.isInitialDatabaseRun(getActivity())) {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mDialog.setCancelable(false);
-                            mDialog.setCanceledOnTouchOutside(false);
-                            mDialog.setTitle("Please wait...");
                             mDialog.show();
                         }
                     });
-                    SharedPreferencesUtils.migrateToDatabase(fileList, getActivity());
+                    SharedPreferencesUtils.onInitialSetup(getActivity());
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -75,7 +68,9 @@ public class WorkerFragment extends Fragment implements LoaderManager
                 super.onPreExecute();
 
                 mHandler = new Handler();
-                mDialog = new Dialog(getActivity());
+                mDialog = ProgressDialog.show(getActivity(), "Please wait",
+                        "Updating data to new format", true, false);
+                mDialog.setCanceledOnTouchOutside(false);
             }
 
             @Override

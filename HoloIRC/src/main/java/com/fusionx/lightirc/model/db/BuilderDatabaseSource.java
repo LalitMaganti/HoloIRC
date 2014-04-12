@@ -46,8 +46,9 @@ public class BuilderDatabaseSource {
         mServerDatabase = new ServerDatabase(context);
     }
 
-    public void open() throws SQLException {
+    public BuilderDatabaseSource open() throws SQLException {
         mDatabase = mServerDatabase.getWritableDatabase();
+        return this;
     }
 
     public void close() {
@@ -73,61 +74,66 @@ public class BuilderDatabaseSource {
 
     public List<ServerConfiguration.Builder> getAllBuilders() {
         final List<ServerConfiguration.Builder> builders = new ArrayList<>();
-        // Select All Query
         final String selectQuery = "SELECT * FROM " + TABLE_NAME;
 
         final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
-
-                builder.setId(getIntByName(cursor, _ID));
-
-                // Server connection
-                builder.setTitle(getStringByName(cursor, COLUMN_TITLE));
-                builder.setUrl(getStringByName(cursor, COLUMN_URL));
-                builder.setPort(getIntByName(cursor, COLUMN_PORT));
-
-                // SSL
-                builder.setSsl(getIntByName(cursor, COLUMN_SSL) > 0);
-                builder.setSslAcceptAllCertificates(getIntByName(cursor,
-                        COLUMN_SSL_ACCEPT_ALL) > 0);
-
-                // User settings
-                final String firstChoice = getStringByName(cursor, COLUMN_NICK_ONE);
-                final String secondChoice = getStringByName(cursor, COLUMN_NICK_TWO);
-                final String thirdChoice = getStringByName(cursor, COLUMN_NICK_THREE);
-                final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice,
-                        thirdChoice);
-                builder.setNickStorage(nickStorage);
-                builder.setRealName(getStringByName(cursor, COLUMN_REAL_NAME));
-                builder.setNickChangeable(getIntByName(cursor, COLUMN_NICK_CHANGEABLE) > 0);
-
-                // Autojoin channels
-                final List<String> channels = convertStringToArray(getStringByName(cursor,
-                        COLUMN_AUTOJOIN));
-                builder.getAutoJoinChannels().addAll(channels);
-
-                // Server authorisation
-                builder.setServerUserName(getStringByName(cursor, COLUMN_SERVER_USERNAME));
-                builder.setServerPassword(getStringByName(cursor, COLUMN_SERVER_PASSWORD));
-
-                // SASL authorisation
-                builder.setSaslUsername(getStringByName(cursor, COLUMN_SASL_USERNAME));
-                builder.setSaslPassword(getStringByName(cursor, COLUMN_SASL_PASSWORD));
-
-                // NickServ authorisation
-                builder.setNickservPassword(getStringByName(cursor, COLUMN_NICK_SERV_PASSWORD));
-
-                // Adding contact to list
+                final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
                 builders.add(builder);
             } while (cursor.moveToNext());
         }
-
-        // return contact list
         return builders;
+    }
+
+    private static ServerConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
+        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+
+        builder.setId(getIntByName(cursor, _ID));
+
+        // Server connection
+        builder.setTitle(getStringByName(cursor, COLUMN_TITLE));
+        builder.setUrl(getStringByName(cursor, COLUMN_URL));
+        builder.setPort(getIntByName(cursor, COLUMN_PORT));
+
+        // SSL
+        builder.setSsl(getIntByName(cursor, COLUMN_SSL) > 0);
+        builder.setSslAcceptAllCertificates(getIntByName(cursor,
+                COLUMN_SSL_ACCEPT_ALL) > 0);
+
+        // User settings
+        final String firstChoice = getStringByName(cursor, COLUMN_NICK_ONE);
+        final String secondChoice = getStringByName(cursor, COLUMN_NICK_TWO);
+        final String thirdChoice = getStringByName(cursor, COLUMN_NICK_THREE);
+        final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice,
+                thirdChoice);
+        builder.setNickStorage(nickStorage);
+        builder.setRealName(getStringByName(cursor, COLUMN_REAL_NAME));
+        builder.setNickChangeable(getIntByName(cursor, COLUMN_NICK_CHANGEABLE) > 0);
+
+        // Autojoin channels
+        final List<String> channels = convertStringToArray(getStringByName(cursor,
+                COLUMN_AUTOJOIN));
+        builder.getAutoJoinChannels().addAll(channels);
+
+        // Server authorisation
+        builder.setServerUserName(getStringByName(cursor, COLUMN_SERVER_USERNAME));
+        builder.setServerPassword(getStringByName(cursor, COLUMN_SERVER_PASSWORD));
+
+        // SASL authorisation
+        builder.setSaslUsername(getStringByName(cursor, COLUMN_SASL_USERNAME));
+        builder.setSaslPassword(getStringByName(cursor, COLUMN_SASL_PASSWORD));
+
+        // NickServ authorisation
+        builder.setNickservPassword(getStringByName(cursor, COLUMN_NICK_SERV_PASSWORD));
+
+        return builder;
+    }
+
+    public ServerConfiguration.Builder getBuilderByName(final String serverName) {
+        final Cursor cursor = mDatabase.query(TABLE_NAME, null,
+                String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
+        return cursor.moveToFirst() ? getBuilderFromCursor(cursor) : null;
     }
 
     public List<String> getIgnoreListByName(final String serverName) {

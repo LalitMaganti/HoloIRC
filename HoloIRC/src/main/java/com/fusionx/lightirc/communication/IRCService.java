@@ -118,10 +118,12 @@ public class IRCService extends Service {
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server.getTitle());
 
-        final boolean finalServer = mConnectionManager.requestDisconnectionAndRemoval(
-                server.getTitle());
+        final boolean finalServer = mConnectionManager
+                .requestDisconnectionAndRemoval(server.getTitle());
         if (finalServer) {
             stopForeground(true);
+        } else {
+            startForeground(SERVICE_ID, getNotification());
         }
     }
 

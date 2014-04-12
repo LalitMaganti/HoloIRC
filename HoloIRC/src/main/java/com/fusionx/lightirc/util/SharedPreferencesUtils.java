@@ -28,13 +28,9 @@ import com.fusionx.relay.misc.NickStorage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.preference.PreferenceManager;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,36 +43,6 @@ public class SharedPreferencesUtils {
 
     public static String getSharedPreferencesPath(final Context context) {
         return context.getFilesDir().getAbsolutePath().replace("files", "shared_prefs/");
-    }
-
-    public static void firstTimeServerSetup(final Context context) {
-        final AssetManager assetManager = context.getAssets();
-        final String[] files;
-        try {
-            files = assetManager.list("");
-            for (String filename : files) {
-                if (filename.endsWith(".xml")) {
-                    final InputStream in = assetManager.open(filename);
-                    final File outFile = new File(getSharedPreferencesPath(context));
-                    if (outFile.exists() || outFile.mkdir()) {
-                        final File file = new File(getSharedPreferencesPath(context), filename);
-                        final FileOutputStream out = new FileOutputStream(file);
-
-                        byte[] buffer = new byte[2048];
-                        int read;
-                        while ((read = in.read(buffer)) != -1) {
-                            out.write(buffer, 0, read);
-                        }
-
-                        in.close();
-                        out.flush();
-                        out.close();
-                    }
-                }
-            }
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static List<File> getOldServers(final Context context) {
@@ -137,14 +103,50 @@ public class SharedPreferencesUtils {
         return builder;
     }
 
+    public static boolean isInitialDatabaseRun(final Context context) {
+        final SharedPreferences globalSettings = context.getSharedPreferences("main", MODE_PRIVATE);
+        return globalSettings.getBoolean("firstDbRun", true);
+    }
+
     public static void onInitialSetup(final Context context) {
         final SharedPreferences globalSettings = context.getSharedPreferences("main", MODE_PRIVATE);
         final boolean firstRun = globalSettings.getBoolean("firstrun", true);
+        final boolean firstDbRun = globalSettings.getBoolean("firstDbRun", true);
 
         if (firstRun) {
             firstTimeServerSetup(context);
             globalSettings.edit().putBoolean("firstrun", false).commit();
+            globalSettings.edit().putBoolean("firstDbRun", false).commit();
+        } else if (firstDbRun) {
+            final List<File> fileList = SharedPreferencesUtils.getOldServers(context);
+            migrateToDatabase(fileList, context);
+            firstDbSetup(context);
+            globalSettings.edit().putBoolean("firstDbRun", false).commit();
         }
+    }
+
+    private static void firstTimeServerSetup(final Context context) {
+        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
+        source.open();
+
+        final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
+        for (final ServerConfiguration.Builder builder : builders) {
+            source.addServer(builder, new ArrayList<String>());
+        }
+        source.close();
+    }
+
+    private static void firstDbSetup(final Context context) {
+        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
+        source.open();
+
+        final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
+        for (final ServerConfiguration.Builder builder : builders) {
+            if (source.getBuilderByName(builder.getTitle()) == null) {
+                source.addServer(builder, new ArrayList<String>());
+            }
+        }
+        source.close();
     }
 
     private static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,

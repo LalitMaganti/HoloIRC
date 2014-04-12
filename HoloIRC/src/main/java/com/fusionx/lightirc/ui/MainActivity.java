@@ -404,7 +404,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         super.onCreate(savedInstanceState);
 
         AppPreferences.setUpPreferences(this);
-        SharedPreferencesUtils.onInitialSetup(this);
 
         setContentView(R.layout.main_activity);
 
