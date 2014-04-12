@@ -8,9 +8,11 @@ import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
+import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
@@ -25,6 +27,7 @@ import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -41,11 +44,13 @@ import android.widget.ExpandableListView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
+import static com.fusionx.lightirc.util.UIUtils.getCheckedPositions;
 
 public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
@@ -252,12 +257,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         switch (item.getItemId()) {
             case R.id.activity_server_list_popup_delete:
-                // TODO - AsyncTask this
-                final BuilderDatabaseSource source = new BuilderDatabaseSource(getActivity());
-                source.open();
-                source.removeServer(listItem.getBuilder().getId());
-                source.close();
-                refreshServers();
+                onDeleteServer(getCheckedPositions(mListView));
                 break;
             case R.id.activity_server_list_popup_edit:
                 onEditServer(listItem);
@@ -265,6 +265,34 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         mode.finish();
         return true;
+    }
+
+    private void onDeleteServer(final List<Integer> checkedPositions) {
+        final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+
+            private BuilderDatabaseSource source;
+            @Override
+            protected void onPreExecute() {
+                source = new BuilderDatabaseSource(getActivity());
+                source.open();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                for (final int group : checkedPositions) {
+                    final ServerWrapper listItem = mListAdapter.getGroup(group);
+                    source.removeServer(listItem.getBuilder().getId());
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                source.close();
+                refreshServers();
+            }
+        };
+        asyncTask.execute();
     }
 
     @Override
