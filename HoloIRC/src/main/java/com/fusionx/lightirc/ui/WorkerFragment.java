@@ -68,8 +68,11 @@ public class WorkerFragment extends Fragment implements LoaderManager
                 super.onPreExecute();
 
                 mHandler = new Handler();
-                mDialog = ProgressDialog.show(getActivity(), "Please wait",
-                        "Updating data to new format", true, false);
+                mDialog = new ProgressDialog(getActivity());
+                mDialog.setTitle("Please wait");
+                mDialog.setMessage("Updating data to new format");
+                mDialog.setIndeterminate(true);
+                mDialog.setCancelable(false);
                 mDialog.setCanceledOnTouchOutside(false);
             }
 
