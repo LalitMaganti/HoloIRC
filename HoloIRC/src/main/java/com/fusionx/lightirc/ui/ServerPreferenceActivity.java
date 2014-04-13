@@ -89,6 +89,10 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             public boolean onPreferenceClick(final Preference preference) {
                 final Intent intent = new Intent(ServerPreferenceActivity.this,
                         ChannelListActivity.class);
+                if (mNewServer) {
+                    mSource.addServer(mContentValues);
+                    mNewServer = false;
+                }
                 intent.putExtra("contentValues", mContentValues);
                 startActivityForResult(intent, CHANNEL_LIST);
                 return false;
@@ -189,6 +193,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         if (mCanSaveChanges) {
             if (mNewServer) {
                 mSource.addServer(mContentValues);
+                mNewServer = false;
             } else {
                 mSource.updateServer(mContentValues);
             }
