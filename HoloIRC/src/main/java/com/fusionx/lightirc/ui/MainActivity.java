@@ -9,7 +9,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
@@ -22,7 +22,6 @@ import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,9 +37,7 @@ import android.view.View;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
@@ -49,13 +46,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback {
 
-    static {
-        sConfiguration = new Configuration.Builder().setDuration(500).build();
-    }
-
     public static final int SERVER_SETTINGS = 1;
-
-    private static final Configuration sConfiguration;
 
     private static final String WORKER_FRAGMENT = "WorkerFragment";
 
@@ -71,20 +62,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     // IRC
     private Conversation mConversation;
 
+    // Mention helper
     private final Object mMentionHelper = new Object() {
 
         @SuppressWarnings("unused")
         public void onEvent(final OnChannelMentionEvent event) {
+            // Don't pass this event onto any other subscribers - we have handed it
             mEventBus.cancelEventDelivery(event);
 
             if (mConversation == null
                     || !mConversation.getServer().getTitle().equals(event.serverName)
                     || !mConversation.getId().equals(event.channelName)) {
-                final String message = String.format("Mentioned in %s on %s", event.channelName,
-                        event.serverName);
-                final Crouton crouton = Crouton.makeText(MainActivity.this, message, Style.INFO);
-                crouton.setConfiguration(sConfiguration);
-                crouton.show();
+                NotificationUtils.notifyInApp(MainActivity.this, event);
             }
         }
     };

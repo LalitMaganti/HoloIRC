@@ -31,9 +31,9 @@ public class AppPreferences implements EventPreferences {
 
     private static Set<String> defaultNotificationSettings;
 
-    private static Set<String> inAppNotification;
+    public static Set<String> inAppNotification;
 
-    private static Set<String> outOfAppNotification;
+    public static Set<String> outOfAppNotification;
 
     public static void setUpPreferences(final Context context) {
         if (defaultNotificationSettings == null) {
@@ -54,7 +54,7 @@ public class AppPreferences implements EventPreferences {
         quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
         numberOfReconnectEvents = preferences.getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
         inAppNotification = preferences.getStringSet(PreferenceConstants.PREF_IN_APP_NOTIFICATION,
-                new HashSet<String>());
+                defaultNotificationSettings);
         outOfAppNotification = preferences.getStringSet(PreferenceConstants
                 .PREF_OUT_OF_APP_NOTIFICATION, defaultNotificationSettings);
     }
