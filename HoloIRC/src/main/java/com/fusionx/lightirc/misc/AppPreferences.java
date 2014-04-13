@@ -1,11 +1,15 @@
 package com.fusionx.lightirc.misc;
 
+import com.fusionx.lightirc.R;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class AppPreferences implements EventPreferences {
 
@@ -25,7 +29,18 @@ public class AppPreferences implements EventPreferences {
 
     public static Theme theme;
 
+    private static Set<String> defaultNotificationSettings;
+
+    private static Set<String> inAppNotification;
+
+    private static Set<String> outOfAppNotification;
+
     public static void setUpPreferences(final Context context) {
+        if (defaultNotificationSettings == null) {
+            defaultNotificationSettings = new HashSet<>();
+            defaultNotificationSettings.add(context.getString(R.string.notification_value_visual));
+        }
+
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
         final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
@@ -38,6 +53,10 @@ public class AppPreferences implements EventPreferences {
         partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
         quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
         numberOfReconnectEvents = preferences.getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
+        inAppNotification = preferences.getStringSet(PreferenceConstants.PREF_IN_APP_NOTIFICATION,
+                new HashSet<String>());
+        outOfAppNotification = preferences.getStringSet(PreferenceConstants
+                .PREF_OUT_OF_APP_NOTIFICATION, defaultNotificationSettings);
     }
 
     @Override

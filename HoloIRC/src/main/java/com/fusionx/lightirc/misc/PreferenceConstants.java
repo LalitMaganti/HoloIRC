@@ -97,4 +97,9 @@ public class PreferenceConstants {
     public final static String PREF_APP_VERSION = "pref_app_version";
 
     public final static String PREF_SOURCE = "pref_source";
+
+    // Notification settings
+    public static final String PREF_IN_APP_NOTIFICATION = "pref_notify_in_app";
+
+    public static final String PREF_OUT_OF_APP_NOTIFICATION = "pref_notify_out_app";
 }

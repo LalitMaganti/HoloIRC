@@ -28,13 +28,13 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     @Override
-    protected boolean isValidFragment(String fragmentName) {
+    protected boolean isValidFragment(final String fragmentName) {
         return true;
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
 
         AppPreferences.setUpPreferences(this);
     }
