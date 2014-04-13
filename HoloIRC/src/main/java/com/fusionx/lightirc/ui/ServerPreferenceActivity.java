@@ -59,8 +59,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private boolean mNewServer;
 
-    private ServerConfiguration.Builder mBuilder;
-
     private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
         if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
             final PreferenceGroup pGroup = (PreferenceGroup) p;
@@ -135,14 +133,15 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mSource = new BuilderDatabaseSource(this);
         mSource.open();
 
+        ServerConfiguration.Builder builder;
         if (mNewServer) {
-            mBuilder = SharedPreferencesUtils.getDefaultNewServer(this);
+            builder = SharedPreferencesUtils.getDefaultNewServer(this);
             setResult(RESULT_CANCELED);
         } else {
-            mBuilder = getIntent().getParcelableExtra(SERVER);
+            builder = getIntent().getParcelableExtra(SERVER);
             setResult(RESULT_OK);
         }
-        mContentValues = mSource.getContentValuesFromBuilder(mBuilder, !mNewServer);
+        mContentValues = mSource.getContentValuesFromBuilder(builder, !mNewServer);
         // If it's a new server, we can't allow ignore list to be null - just put an empty string
         // in for now - TODO - fix this
         if (mNewServer) {
@@ -184,16 +183,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        // In onPause we added the new server if it was new so don't add it again
-        if (mCanSaveChanges) {
-            mNewServer = false;
-        }
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
 
@@ -203,6 +192,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             } else {
                 mSource.updateServer(mContentValues);
             }
+            mNewServer = false;
         }
     }
 
