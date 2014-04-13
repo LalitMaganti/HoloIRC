@@ -30,6 +30,15 @@ import static android.support.v4.app.NotificationCompat.Builder;
 
 public class IRCService extends Service {
 
+    private boolean mRegistered = false;
+
+    private final Object mMentionHelper = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnChannelMentionEvent event) {
+            NotificationUtils.notifyOutOfApp(IRCService.this, event);
+        }
+    };
+
     private static final int MENTION_PRIORITY = 50;
 
     private static final int SERVICE_ID = 1;
@@ -48,12 +57,10 @@ public class IRCService extends Service {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
 
-        EventBus.getDefault().register(new Object() {
-            @SuppressWarnings("unused")
-            public void onEvent(final OnChannelMentionEvent event) {
-                NotificationUtils.notifyOutOfApp(IRCService.this, event);
-            }
-        }, MENTION_PRIORITY);
+        if (!mRegistered) {
+            EventBus.getDefault().register(mMentionHelper, MENTION_PRIORITY);
+            mRegistered = true;
+        }
 
         return START_STICKY;
     }

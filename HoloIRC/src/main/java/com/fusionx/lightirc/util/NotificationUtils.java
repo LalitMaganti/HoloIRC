@@ -75,13 +75,12 @@ public class NotificationUtils {
             builder.setAutoCancel(true);
 
             if (outApp.contains(context.getString(R.string.notification_value_audio))) {
-                builder.setDefaults(Notification.DEFAULT_SOUND);
+                final Uri notification = RingtoneManager.getDefaultUri(TYPE_NOTIFICATION);
+                builder.setSound(notification);
             }
-
             if (outApp.contains(context.getString(R.string.notification_value_vibrate))) {
-                builder.setDefaults(Notification.DEFAULT_VIBRATE);
+                builder.setVibrate(new long[] {0, 500});
             }
-
             if (outApp.contains(context.getString(R.string.notification_value_lights))) {
                 builder.setDefaults(Notification.DEFAULT_LIGHTS);
             }

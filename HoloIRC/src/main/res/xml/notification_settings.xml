@@ -14,7 +14,8 @@
                 android:summary="Methods to notify you by"
                 android:entries="@array/notification_in_entries"
                 android:entryValues="@array/notification_in_values"
-                android:defaultValue="@array/empty_array"/>
+                android:defaultValue="@array/empty_array"
+                android:dependency="pref_notify_in_app"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Out of App Notifications">
         <CheckBoxPreference
@@ -29,6 +30,7 @@
                 android:summary="Methods to notify you by"
                 android:entries="@array/notification_out_entries"
                 android:entryValues="@array/notification_out_values"
-                android:defaultValue="@array/empty_array"/>
+                android:defaultValue="@array/empty_array"
+                android:dependency="pref_notify_out_app"/>
     </PreferenceCategory>
 </PreferenceScreen>
