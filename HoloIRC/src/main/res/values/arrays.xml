@@ -49,11 +49,13 @@
     <string-array name="notification_entries">
         <item>@string/notification_entry_visual</item>
         <item>@string/notification_entry_audio</item>
+        <item>@string/notification_entry_vibrate</item>
     </string-array>
 
     <string-array name="notification_values">
         <item>@string/notification_value_visual</item>
         <item>@string/notification_value_audio</item>
+        <item>@string/notification_value_vibrate</item>
     </string-array>
 
     <string-array name="notification_default">
