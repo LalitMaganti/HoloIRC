@@ -25,10 +25,9 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
-import com.nhaarman.listviewanimations.swinginadapters.AnimationAdapter;
-import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,8 +44,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
 import de.greenrobot.event.EventBus;
 
 public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
@@ -54,7 +51,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
 
     Conversation mConversation;
 
-    @InjectView(R.id.fragment_irc_message_box)
     EditText mMessageBox;
 
     String mTitle;
@@ -75,10 +71,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
                 (OnConversationChanged.class);
         mConversation = event.conversation;
 
-        // Sets up the views
-        ButterKnife.inject(this, view);
-
+        mMessageBox = UIUtils.findById(view, R.id.fragment_irc_message_box);
         mMessageBox.setOnEditorActionListener(this);
+
         mTitle = getArguments().getString("title");
 
         mMessageAdapter = new IRCMessageAdapter<>(getActivity());
@@ -90,13 +85,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         if (savedInstanceState == null) {
             getListView().setSelection(mMessageAdapter.getCount() - 1);
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        ButterKnife.reset(this);
     }
 
     @Override

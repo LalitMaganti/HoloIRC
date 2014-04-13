@@ -64,9 +64,6 @@ dependencies {
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
     compile 'com.nhaarman.listviewanimations:library:2.+'
 
-    // TODO - remove this
-    compile "com.jakewharton:butterknife:4.0.1"
-
     compile project(':libraries:relay:library')
     compile project(':libraries:AndroidSlidingUpPanel:library')
 
