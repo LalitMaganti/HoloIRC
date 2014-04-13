@@ -45,4 +45,28 @@
     <string-array name="user_actions">
         <item>@string/action_close_pm</item>
     </string-array>
+
+    <string-array name="notification_in_entries">
+        <item>@string/notification_entry_audio</item>
+        <item>@string/notification_entry_vibrate</item>
+    </string-array>
+
+    <string-array name="notification_in_values">
+        <item>@string/notification_value_audio</item>
+        <item>@string/notification_value_vibrate</item>
+    </string-array>
+
+    <string-array name="notification_out_entries">
+        <item>@string/notification_entry_audio</item>
+        <item>@string/notification_entry_vibrate</item>
+        <item>@string/notification_entry_lights</item>
+    </string-array>
+
+    <string-array name="notification_out_values">
+        <item>@string/notification_value_audio</item>
+        <item>@string/notification_value_vibrate</item>
+        <item>@string/notification_value_lights</item>
+    </string-array>
+
+    <string-array name="empty_array"/>
 </resources>

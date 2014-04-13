@@ -179,4 +179,12 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="action_part_channel">Part channel</string>
     <string name="action_close_pm">Close PM</string>
 
+    <!-- Notification settings -->
+    <string name="notification_entry_audio">Audio</string>
+    <string name="notification_entry_vibrate">Vibrate</string>
+    <string name="notification_entry_lights">Lights</string>
+    <string name="notification_value_audio">audio</string>
+    <string name="notification_value_vibrate">vibrate</string>
+    <string name="notification_value_lights">lights</string>
+
 </resources>

@@ -4,6 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
@@ -29,7 +30,14 @@ import static android.support.v4.app.NotificationCompat.Builder;
 
 public class IRCService extends Service {
 
-    private static final int NOTIFICATION_MENTION = 242;
+    private boolean mRegistered = false;
+
+    private final Object mMentionHelper = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnChannelMentionEvent event) {
+            NotificationUtils.notifyOutOfApp(IRCService.this, event);
+        }
+    };
 
     private static final int MENTION_PRIORITY = 50;
 
@@ -47,34 +55,12 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        final NotificationManager notificationManager =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
 
-        EventBus.getDefault().register(new Object() {
-            @SuppressWarnings("unused")
-            public void onEvent(final OnChannelMentionEvent event) {
-                // If we're here, the activity has not picked it up - fire off a notification
-                final NotificationCompat.Builder builder = new Builder(IRCService.this);
-                builder.setSmallIcon(R.drawable.ic_notification);
-                builder.setContentTitle(getString(R.string.app_name));
-                builder.setContentText(String.format("Mentioned in %s on %s",
-                        event.channelName, event.serverName));
-                builder.setAutoCancel(true);
-
-                final Intent resultIntent = new Intent(IRCService.this, MainActivity.class);
-                resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
-                        .FLAG_ACTIVITY_SINGLE_TOP);
-                resultIntent.putExtra("server_name", event.serverName);
-                resultIntent.putExtra("channel_name", event.channelName);
-
-                final PendingIntent resultPendingIntent = PendingIntent.getActivity(IRCService.this,
-                        NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.setContentIntent(resultPendingIntent);
-
-                notificationManager.notify(NOTIFICATION_MENTION, builder.build());
-            }
-        }, MENTION_PRIORITY);
+        if (!mRegistered) {
+            EventBus.getDefault().register(mMentionHelper, MENTION_PRIORITY);
+            mRegistered = true;
+        }
 
         return START_STICKY;
     }
@@ -92,7 +78,7 @@ public class IRCService extends Service {
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_MENTION);
+        notificationManager.cancel(NotificationUtils.NOTIFICATION_MENTION);
 
         final boolean exists = pair.first;
         final Server server = pair.second;

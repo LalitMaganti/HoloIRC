@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class AppPreferences implements EventPreferences {
 
     public static boolean highlightLine = true;
@@ -25,6 +28,14 @@ public class AppPreferences implements EventPreferences {
 
     public static Theme theme;
 
+    public static boolean inAppNotification;
+
+    public static Set<String> inAppNotificationSettings;
+
+    public static boolean outOfAppNotification;
+
+    public static Set<String> outOfAppNotificationSettings;
+
     public static void setUpPreferences(final Context context) {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
@@ -38,6 +49,14 @@ public class AppPreferences implements EventPreferences {
         partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
         quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
         numberOfReconnectEvents = preferences.getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
+        inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
+                .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
+        inAppNotification = preferences.getBoolean(PreferenceConstants
+                .PREF_IN_APP_NOTIFICATION, true);
+        outOfAppNotificationSettings = preferences.getStringSet(PreferenceConstants
+                .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
+        outOfAppNotification = preferences.getBoolean(PreferenceConstants
+                .PREF_OUT_OF_APP_NOTIFICATION, true);
     }
 
     @Override
