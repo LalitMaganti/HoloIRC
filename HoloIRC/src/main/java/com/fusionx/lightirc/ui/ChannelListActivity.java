@@ -9,18 +9,9 @@ import android.preference.Preference;
 import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBarActivity;
 
-public class ChannelListActivity extends ActionBarActivity implements ServerSettingsCallbacks {
+public class ChannelListActivity extends ActionBarActivity {
 
     private ChannelListFragment mChannelListFragment;
-
-    @Override
-    public void setupPreferences(PreferenceScreen screen, Activity activity) {
-        throw new IllegalArgumentException();
-    }
-
-    public boolean onPreferenceChange(Preference preference) {
-        throw new IllegalArgumentException();
-    }
 
     @Override
     public void onBackPressed() {
