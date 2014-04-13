@@ -2,8 +2,6 @@ package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
 
-import net.simonvt.numberpicker.NumberPicker;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
@@ -11,10 +9,12 @@ import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 
 /**
- * A {@link DialogPreference} that provides a user with the means to select an integer from a {@link
+ * A {@link DialogPreference} that provides a user with the means to select an integer from a
+ * {@link
  * NumberPicker}, and persist it.
  *
  * @author lukehorvat
@@ -35,10 +35,6 @@ public class NumberPickerPreference extends DialogPreference {
 
     private NumberPicker mNumberPicker;
 
-    public NumberPickerPreference(Context context) {
-        this(context, null);
-    }
-
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -58,29 +54,6 @@ public class NumberPickerPreference extends DialogPreference {
         setPositiveButtonText(android.R.string.ok);
         setNegativeButtonText(android.R.string.cancel);
         setDialogIcon(null);
-    }
-
-    @Override
-    protected void onSetInitialValue(boolean restore, Object defaultValue) {
-        setValue(restore ? getPersistedInt(DEFAULT_VALUE) : (Integer) defaultValue);
-    }
-
-    @Override
-    protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInt(index, DEFAULT_VALUE);
-    }
-
-    @Override
-    protected void onBindDialogView(View view) {
-        super.onBindDialogView(view);
-
-        TextView dialogMessageText = (TextView) view.findViewById(R.id.text_dialog_message);
-        dialogMessageText.setText(getDialogMessage());
-
-        mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
-        mNumberPicker.setMinValue(mMinValue);
-        mNumberPicker.setMaxValue(mMaxValue);
-        mNumberPicker.setValue(mValue);
     }
 
     public int getMinValue() {
@@ -113,6 +86,29 @@ public class NumberPickerPreference extends DialogPreference {
             persistInt(value);
             notifyChanged();
         }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInt(index, DEFAULT_VALUE);
+    }
+
+    @Override
+    protected void onSetInitialValue(boolean restore, Object defaultValue) {
+        setValue(restore ? getPersistedInt(DEFAULT_VALUE) : (Integer) defaultValue);
+    }
+
+    @Override
+    protected void onBindDialogView(View view) {
+        super.onBindDialogView(view);
+
+        TextView dialogMessageText = (TextView) view.findViewById(R.id.text_dialog_message);
+        dialogMessageText.setText(getDialogMessage());
+
+        mNumberPicker = (NumberPicker) view.findViewById(R.id.number_picker);
+        mNumberPicker.setMinValue(mMinValue);
+        mNumberPicker.setMaxValue(mMaxValue);
+        mNumberPicker.setValue(mValue);
     }
 
     @Override
@@ -156,6 +152,20 @@ public class NumberPickerPreference extends DialogPreference {
 
     private static class SavedState extends BaseSavedState {
 
+        @SuppressWarnings("unused")
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable
+                .Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+
         int minValue;
 
         int maxValue;
@@ -182,20 +192,6 @@ public class NumberPickerPreference extends DialogPreference {
             dest.writeInt(maxValue);
             dest.writeInt(value);
         }
-
-        @SuppressWarnings("unused")
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable
-                .Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 }
 

@@ -21,90 +21,54 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerStatus;
+import com.google.common.collect.ImmutableList;
+
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 
 import java.util.List;
 
+import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
+
 public class ServerFragment extends IRCFragment<ServerEvent> {
 
-    private Callbacks mCallback;
+    private static final ImmutableList<? extends Class<? extends ServerEvent>> sClasses =
+            ImmutableList.of(JoinEvent.class, PartEvent.class);
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, Callbacks.class);
-        }
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
-                .SOFT_INPUT_STATE_HIDDEN);
-
-        mMessageBox.setEnabled(mCallback.isConnectedToServer());
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        if (getServer().getStatus() != ServerStatus.CONNECTED) {
-            onDisableUserInput();
-        }
+        getActivity().getWindow().setSoftInputMode(SOFT_INPUT_STATE_HIDDEN);
     }
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseServerMessage(getServer(), message);
-    }
-
-    public void onConnected() {
-        mMessageBox.setEnabled(true);
-    }
-
-    public Server getServer() {
-        return mCallback.getServer();
-    }
-
-    @Override
-    protected List<ServerEvent> getAdapterData() {
-        return getServer().getBuffer();
+        UserInputParser.onParseServerMessage(mConversation.getServer(), message);
     }
 
     @Override
     public FragmentType getType() {
-        return FragmentType.Server;
+        return FragmentType.SERVER;
     }
 
     // Subscription methods
     @Subscribe
-    public void onServerEvent(final ServerEvent event) {
-        if (!(event instanceof JoinEvent) && !(event instanceof PartEvent)) {
+    public void onEventMainThread(final ServerEvent event) {
+        if (!sClasses.contains(event.getClass())) {
             mMessageAdapter.add(event);
         }
     }
 
-    public interface Callbacks {
-
-        public Server getServer();
-
-        public boolean isConnectedToServer();
+    @Override
+    protected List<ServerEvent> getAdapterData() {
+        return mConversation.getServer().getBuffer();
     }
 }

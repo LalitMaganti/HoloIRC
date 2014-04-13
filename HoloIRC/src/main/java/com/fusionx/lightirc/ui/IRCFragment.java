@@ -23,11 +23,12 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.relay.Server;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.event.Event;
-import com.haarman.listviewanimations.swinginadapters.AnimationAdapter;
-import com.haarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
+import com.fusionx.relay.interfaces.Conversation;
+import com.nhaarman.listviewanimations.swinginadapters.AnimationAdapter;
+import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,61 +45,58 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
+
 public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
         .OnEditorActionListener {
 
-    String mTitle;
+    Conversation mConversation;
 
+    @InjectView(R.id.fragment_irc_message_box)
     EditText mMessageBox;
+
+    String mTitle;
 
     IRCMessageAdapter<T> mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        final View view = inflate.inflate(R.layout.fragment_irc, container, false);
-
-        // This is done here rather than in onViewCreated as a NoSaveStateFramelayout will be
-        // inserted by the support library
-        mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
-        mMessageBox.setOnEditorActionListener(this);
-        mTitle = getArguments().getString("title");
-
-        return view;
+        return createView(container, inflate);
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mMessageAdapter = new IRCMessageAdapter<>(getActivity());
-        final AnimationAdapter adapter = new AlphaInAnimationAdapter(mMessageAdapter);
-        adapter.setAbsListView(getListView());
-        setListAdapter(adapter);
+        final OnConversationChanged event = EventBus.getDefault().getStickyEvent
+                (OnConversationChanged.class);
+        mConversation = event.conversation;
 
-        if (savedInstanceState != null) {
-            adapter.setShouldAnimateFromPosition(savedInstanceState.getInt("NUMBEROFITEMS"));
+        // Sets up the views
+        ButterKnife.inject(this, view);
+
+        mMessageBox.setOnEditorActionListener(this);
+        mTitle = getArguments().getString("title");
+
+        mMessageAdapter = new IRCMessageAdapter<>(getActivity());
+        setListAdapter(mMessageAdapter);
+
+        onResetBuffer();
+        mConversation.getServer().getServerEventBus().register(this);
+
+        if (savedInstanceState == null) {
+            getListView().setSelection(mMessageAdapter.getCount() - 1);
         }
-        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
-        getServer().getServerEventBus().register(this);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        getServer().getServerEventBus().unregister(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getListView().setSelection(getListView().getCount());
-    }
-
-    public final void onDisableUserInput() {
-        mMessageBox.setEnabled(false);
+        ButterKnife.reset(this);
     }
 
     @Override
@@ -111,24 +109,13 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
             mMessageBox.setText("");
             onSendMessage(message);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putInt("NUMBEROFITEMS", mMessageAdapter.getCount());
+    public void onResetBuffer() {
+        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
     }
-
-    protected abstract Server getServer();
-
-    protected abstract List<T> getAdapterData();
-
-    // Abstract methods
-    protected abstract void onSendMessage(final String message);
 
     public abstract FragmentType getType();
 
@@ -136,4 +123,13 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public String getTitle() {
         return mTitle;
     }
+
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_irc, container, false);
+    }
+
+    protected abstract List<T> getAdapterData();
+
+    // Abstract methods
+    protected abstract void onSendMessage(final String message);
 }

@@ -17,7 +17,6 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
 
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -41,13 +40,13 @@ import java.util.Set;
  */
 public class MultiSelectListPreference extends DialogPreference {
 
-    private CharSequence[] mEntries;
-
-    private CharSequence[] mEntryValues;
-
     private final Set<String> mValues = new HashSet<String>();
 
     private final Set<String> mNewValues = new HashSet<String>();
+
+    private CharSequence[] mEntries;
+
+    private CharSequence[] mEntryValues;
 
     private boolean mPreferenceChanged;
 
@@ -167,7 +166,8 @@ public class MultiSelectListPreference extends DialogPreference {
         if (mEntries == null || mEntryValues == null) {
             throw new IllegalStateException(
                     "MultiSelectListPreference requires an entries array and " +
-                            "an entryValues array.");
+                            "an entryValues array."
+            );
         }
 
         boolean[] checkedItems = getSelectedItems();
@@ -180,22 +180,10 @@ public class MultiSelectListPreference extends DialogPreference {
                             mPreferenceChanged |= mNewValues.remove(mEntryValues[which].toString());
                         }
                     }
-                });
+                }
+        );
         mNewValues.clear();
         mNewValues.addAll(mValues);
-    }
-
-    private boolean[] getSelectedItems() {
-        final CharSequence[] entries = mEntryValues;
-        final int entryCount = entries.length;
-        final Set<String> values = mValues;
-        boolean[] result = new boolean[entryCount];
-
-        for (int i = 0; i < entryCount; i++) {
-            result[i] = values.contains(entries[i].toString());
-        }
-
-        return result;
     }
 
     @Override
@@ -209,6 +197,19 @@ public class MultiSelectListPreference extends DialogPreference {
             }
         }
         mPreferenceChanged = false;
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final Parcelable superState = super.onSaveInstanceState();
+        if (isPersistent()) {
+            // No need to save instance state
+            return superState;
+        }
+
+        final SavedState myState = new SavedState(superState);
+        myState.values = getValues();
+        return myState;
     }
 
     @Override
@@ -229,26 +230,12 @@ public class MultiSelectListPreference extends DialogPreference {
         setValues(restoreValue ? getPersistedStringSet(mValues) : (Set<String>) defaultValue);
     }
 
-    @Override
-    protected Parcelable onSaveInstanceState() {
-        final Parcelable superState = super.onSaveInstanceState();
-        if (isPersistent()) {
-            // No need to save instance state
-            return superState;
-        }
-
-        final SavedState myState = new SavedState(superState);
-        myState.values = getValues();
-        return myState;
-    }
-
     protected Set<String> getPersistedStringSet(Set<String> defaultReturnValue) {
         if (!shouldPersist()) {
             return defaultReturnValue;
         }
 
-        return SharedPreferencesUtils.getStringSet(getSharedPreferences(), getKey(),
-                defaultReturnValue);
+        return getSharedPreferences().getStringSet(getKey(), defaultReturnValue);
     }
 
     protected boolean persistStringSet(Set<String> values) {
@@ -259,10 +246,23 @@ public class MultiSelectListPreference extends DialogPreference {
                 return true;
             }
 
-            SharedPreferencesUtils.putStringSet(getSharedPreferences(), getKey(), values);
+            getSharedPreferences().edit().putStringSet(getKey(), values).commit();
             return true;
         }
         return false;
+    }
+
+    private boolean[] getSelectedItems() {
+        final CharSequence[] entries = mEntryValues;
+        final int entryCount = entries.length;
+        final Set<String> values = mValues;
+        boolean[] result = new boolean[entryCount];
+
+        for (int i = 0; i < entryCount; i++) {
+            result[i] = values.contains(entries[i].toString());
+        }
+
+        return result;
     }
 
     private static class SavedState extends BaseSavedState {

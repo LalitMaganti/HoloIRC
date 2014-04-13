@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:textSize="14sp"
             android:paddingRight="6dip"
-            android:textColor="?server_card_text"
+            android:textColor="?default_text_colour"
             android:text="Testing"
             android:textIsSelectable="true"/>
 
@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textColor="?server_card_text"
+            android:textColor="?default_text_colour"
             android:text="Testing"
             android:textIsSelectable="true"
             android:layout_toRightOf="@+id/timestamp"/>

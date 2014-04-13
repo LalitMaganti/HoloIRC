@@ -31,14 +31,14 @@ public class ViewPreference extends Preference {
         if (convertView == null) {
             mTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
                     .must_be_complete_textview, null);
-            mTextView.setTypeface(UIUtils.getRobotoLight(getContext()));
+            UIUtils.setRobotoLight(getContext(), mTextView);
             mTextView.setText(mText);
             return mTextView;
         }
         return convertView;
     }
 
-    public void setInitialText(CharSequence text) {
+    public void setInitialText(final CharSequence text) {
         mText = String.format(getContext().getString(R.string.server_settings_non_empty), text);
         if (mTextView != null) {
             mTextView.setText(mText);

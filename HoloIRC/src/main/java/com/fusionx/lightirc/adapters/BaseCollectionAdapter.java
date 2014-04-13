@@ -71,7 +71,8 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     private int mResource;
 
     /**
-     * The resource indicating what views to inflate to display the content of this array adapter in
+     * The resource indicating what views to inflate to display the content of this array adapter
+     * in
      * a drop down widget.
      */
     private int mDropDownResource;
@@ -214,8 +215,17 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        return createViewFromResource(position, convertView, parent, mDropDownResource);
+    }
+
+    /**
      * Control whether methods that change the list ({@link #add}, {@link #remove}, {@link #clear})
-     * automatically call {@link #notifyDataSetChanged}.  If set to false, caller must manually call
+     * automatically call {@link #notifyDataSetChanged}.  If set to false, caller must manually
+     * call
      * notifyDataSetChanged() to have the changes reflected in the attached view.
      *
      * The default is true, and calling notifyDataSetChanged() resets the flag to true.
@@ -225,15 +235,6 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      */
     public void setNotifyOnChange(boolean notifyOnChange) {
         mNotifyOnChange = notifyOnChange;
-    }
-
-    private void init(Context context, int resource, int textViewResourceId,
-            Collection<T> objects) {
-        mContext = context;
-        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mResource = mDropDownResource = resource;
-        mObjects = objects;
-        mFieldId = textViewResourceId;
     }
 
     /**
@@ -276,6 +277,37 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         return createViewFromResource(position, convertView, parent, mResource);
     }
 
+    /**
+     * <p>Sets the layout resource to create the drop down views.</p>
+     *
+     * @param resource the layout resource defining the drop down views
+     * @see #getDropDownView(int, android.view.View, android.view.ViewGroup)
+     */
+    public void setDropDownViewResource(int resource) {
+        this.mDropDownResource = resource;
+    }
+
+    public List<T> getListOfItems() {
+        synchronized (mLock) {
+            return new ArrayList<>(mObjects);
+        }
+    }
+
+    public Set<T> getSetOfItems() {
+        synchronized (mLock) {
+            return new HashSet<>(mObjects);
+        }
+    }
+
+    private void init(Context context, int resource, int textViewResourceId,
+            Collection<T> objects) {
+        mContext = context;
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mResource = mDropDownResource = resource;
+        mObjects = objects;
+        mFieldId = textViewResourceId;
+    }
+
     private View createViewFromResource(int position, View convertView, ViewGroup parent,
             int resource) {
         View view;
@@ -309,36 +341,6 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         }
 
         return view;
-    }
-
-    /**
-     * <p>Sets the layout resource to create the drop down views.</p>
-     *
-     * @param resource the layout resource defining the drop down views
-     * @see #getDropDownView(int, android.view.View, android.view.ViewGroup)
-     */
-    public void setDropDownViewResource(int resource) {
-        this.mDropDownResource = resource;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return createViewFromResource(position, convertView, parent, mDropDownResource);
-    }
-
-    public List<T> getListOfItems() {
-        synchronized (mLock) {
-            return new ArrayList<>(mObjects);
-        }
-    }
-
-    public Set<T> getSetOfItems() {
-        synchronized (mLock) {
-            return new HashSet<>(mObjects);
-        }
     }
 }
 

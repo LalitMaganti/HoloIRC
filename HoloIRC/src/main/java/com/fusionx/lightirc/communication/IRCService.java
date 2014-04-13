@@ -1,242 +1,159 @@
-/*
-    HoloIRC - an IRC client for Android
-
-    Copyright 2013 Lalit Maganti
-
-    This file is part of HoloIRC.
-
-    HoloIRC is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HoloIRC is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.fusionx.lightirc.communication;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.ui.ServerListActivity;
-import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
-import com.fusionx.relay.event.channel.MentionEvent;
-import com.squareup.otto.Subscribe;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Pair;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.greenrobot.event.EventBus;
+
+import static android.support.v4.app.NotificationCompat.Builder;
 
 public class IRCService extends Service {
 
-    public static final String MENTIONACTIVITY = "MENTIONACTIVITY";
+    private static final int NOTIFICATION_MENTION = 242;
 
-    private final IRCBinder mBinder = new IRCBinder();
+    private static final int MENTION_PRIORITY = 50;
 
-    private final Handler mAdapterHandler = new Handler(Looper.getMainLooper());
+    private static final int SERVICE_ID = 1;
+
+    private final Handler mHandler = new Handler();
+
+    private final NewIRCBinder mBinder = new NewIRCBinder();
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 
-    private final HashMap<String, MentionHelper> mMentionHelperHashMap = new HashMap<>();
+    private final Map<String, ServiceEventHelper> mEventHelperMap = new HashMap<>();
 
-    private ConnectionManager mConnectionManager = null;
-
-    private String mNoMention;
-
-    public Server connectToServer(final ServerConfiguration configuration) {
-        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
-
-        final Pair<Boolean, Server> serverPair = mConnectionManager.onConnectionRequested
-                (configuration, mAdapterHandler);
-        // The second element is the server itself
-        final Server server = serverPair.second;
-
-        // The first element is true if the server exists
-        if (!serverPair.first) {
-            final MentionHelper helper = new MentionHelper(configuration);
-            mMentionHelperHashMap.put(configuration.getTitle(), helper);
-            server.getServerEventBus().register(helper);
-        }
-
-        updateServiceNotification();
-
-        return server;
-    }
-
-    private void updateServiceNotification() {
-        final String text = String.format(getResources().getQuantityString(R.plurals
-                .server_connection, mConnectionManager.getServerCount()),
-                mConnectionManager.getServerCount());
-        final Intent intent = new Intent(this, ServerListActivity.class);
-        final Intent intent2 = new Intent(this, IRCService.class);
-        intent2.putExtra("stop", true);
-        final PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        final PendingIntent pIntent2 = PendingIntent.getService(this, 0, intent2, 0);
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.app_name)).setContentText(text).setTicker(text)
-                        // TODO - change to a proper icon
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pIntent);
-
-        final Notification notification = builder.addAction(android.R.drawable
-                .ic_menu_close_clear_cancel, getString(R.string.service_disconnect_all),
-                pIntent2).build();
-
-        // Just a random number
-        // TODO - maybe static int this?
-        startForeground(1337, notification);
-    }
-
-    public void disconnectAll() {
-        // Needed due to the fact that the connection manager can be null if the service was
-        // restarted or if the theme is being changed
-        if (mConnectionManager != null) {
-            synchronized (mBinder) {
-                for (final String title : mMentionHelperHashMap.keySet()) {
-                    final Server server = mConnectionManager.getServerIfExists(title);
-                    server.getServerEventBus().unregister(mMentionHelperHashMap.get(title));
-                }
-                mMentionHelperHashMap.clear();
-                mConnectionManager.disconnectAll();
-            }
-        }
-        stopForeground(true);
-
-        final NotificationManager mNotificationManager = (NotificationManager) getSystemService
-                (Context.NOTIFICATION_SERVICE);
-        mNotificationManager.cancelAll();
-    }
-
-    public void disconnect(final Server server) {
-        synchronized (mBinder) {
-            final String serverName = server.getConfiguration().getTitle();
-            server.getServerEventBus().unregister(mMentionHelperHashMap.get(serverName));
-            mMentionHelperHashMap.remove(serverName);
-
-            if (mConnectionManager.onDisconnectionRequested(serverName)) {
-                stopForeground(true);
-            } else {
-                updateServiceNotification();
-                final NotificationManager mNotificationManager = (NotificationManager)
-                        getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.cancel(345);
-            }
-        }
-    }
-
-    public void onFinalUnexpectedDisconnect(final Server server) {
-        synchronized (mBinder) {
-            final String serverName = server.getConfiguration().getTitle();
-            server.getServerEventBus().unregister(mMentionHelperHashMap.get(serverName));
-            mMentionHelperHashMap.remove(serverName);
-
-            if (mConnectionManager.onFinalUnexpectedDisconnect(serverName)) {
-                stopForeground(true);
-            } else {
-                updateServiceNotification();
-                final NotificationManager mNotificationManager = (NotificationManager)
-                        getSystemService(Context.NOTIFICATION_SERVICE);
-                mNotificationManager.cancel(345);
-            }
-        }
-    }
+    private ConnectionManager mConnectionManager;
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        // This check is needed because a null intent will be sent when the service is killed by
-        // the system and is restarted
-        if (intent != null) {
-            if (intent.getBooleanExtra("stop", false)) {
-                disconnectAll();
-                return 0;
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
+
+        EventBus.getDefault().register(new Object() {
+            @SuppressWarnings("unused")
+            public void onEvent(final OnChannelMentionEvent event) {
+                // If we're here, the activity has not picked it up - fire off a notification
+                final NotificationCompat.Builder builder = new Builder(IRCService.this);
+                builder.setSmallIcon(R.drawable.ic_notification);
+                builder.setContentTitle(getString(R.string.app_name));
+                builder.setContentText(String.format("Mentioned in %s on %s",
+                        event.channelName, event.serverName));
+                builder.setAutoCancel(true);
+
+                final Intent resultIntent = new Intent(IRCService.this, MainActivity.class);
+                resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
+                        .FLAG_ACTIVITY_SINGLE_TOP);
+                resultIntent.putExtra("server_name", event.serverName);
+                resultIntent.putExtra("channel_name", event.channelName);
+
+                final PendingIntent resultPendingIntent = PendingIntent.getActivity(IRCService.this,
+                        NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                builder.setContentIntent(resultPendingIntent);
+
+                notificationManager.notify(NOTIFICATION_MENTION, builder.build());
             }
-        }
+        }, MENTION_PRIORITY);
+
         return START_STICKY;
     }
 
     @Override
     public IBinder onBind(final Intent intent) {
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return mBinder;
     }
 
-    @Override
-    public boolean onUnbind(final Intent intent) {
-        return true;
+    public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
+            final List<String> ignoreList) {
+        final Pair<Boolean, Server> pair = mConnectionManager.requestConnection(builder
+                .build(), ignoreList, mHandler);
+
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(NOTIFICATION_MENTION);
+
+        final boolean exists = pair.first;
+        final Server server = pair.second;
+
+        if (!exists) {
+            final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
+            mEventHelperMap.put(server.getTitle(), serviceEventHelper);
+        }
+
+        startForeground(SERVICE_ID, getNotification());
+
+        return server;
+    }
+
+    public Server getServerIfExists(final ServerConfiguration.Builder builder) {
+        return getServerIfExists(builder.getTitle());
     }
 
     public Server getServerIfExists(final String title) {
-        if (mConnectionManager != null) {
-            return mConnectionManager.getServerIfExists(title);
+        return mConnectionManager.getServerIfExists(title);
+    }
+
+    public void requestDisconnectionFromServer(final Server server) {
+        mEventHelperMap.remove(server.getTitle());
+
+        final boolean finalServer = mConnectionManager
+                .requestDisconnectionAndRemoval(server.getTitle());
+        if (finalServer) {
+            stopForeground(true);
         } else {
-            return null;
+            startForeground(SERVICE_ID, getNotification());
         }
     }
 
-    public void setNoMention(String noMention) {
-        mNoMention = noMention;
+    public void requestReconnectionToServer(final Server server) {
+        mConnectionManager.requestReconnection(server);
     }
 
-    public class MentionHelper {
+    public PendingIntent getMainActivityIntent() {
+        final Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(this, 0, intent, 0);
+    }
 
-        private final ServerConfiguration mConfiguration;
+    public ServiceEventHelper getEventHelper(final String title) {
+        return mEventHelperMap.get(title);
+    }
 
-        private MentionHelper(final ServerConfiguration configuration) {
-            mConfiguration = configuration;
-        }
+    private Notification getNotification() {
+        final Builder builder = new Builder(this);
+        builder.setSmallIcon(R.drawable.ic_notification);
+        builder.setContentTitle(getString(R.string.app_name));
+        builder.setContentText(String.format("%d servers connected",
+                mConnectionManager.getServerCount()));
+        builder.setContentIntent(getMainActivityIntent());
 
-        // Subscribe events
-        @Subscribe
-        public void onMention(final MentionEvent event) {
-            if (!mConfiguration.getTitle().equals(mNoMention)) {
-                final NotificationManager mNotificationManager = (NotificationManager)
-                        getSystemService(Context.NOTIFICATION_SERVICE);
-                final Intent intent = new Intent(IRCService.this, UIUtils.getIRCActivity(IRCService
-                        .this));
-                intent.putExtra("serverTitle", mConfiguration.getTitle());
-                intent.putExtra("serverConfig", mConfiguration);
-                intent.putExtra("mention", event.channelName);
-                final TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(IRCService.this);
-                taskStackBuilder.addParentStack(UIUtils.getIRCActivity(IRCService.this));
-                taskStackBuilder.addNextIntent(intent);
-                final PendingIntent pIntent = taskStackBuilder.getPendingIntent(0,
-                        PendingIntent.FLAG_UPDATE_CURRENT);
-                final Notification notification = new NotificationCompat.Builder(IRCService.this)
-                        .setContentTitle(getString(R.string.app_name))
-                        .setContentText(getString(R.string.service_you_mentioned) + " " + event
-                                .channelName)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setAutoCancel(true)
-                        .setTicker(getString(R.string.service_you_mentioned) + " " + event
-                                .channelName)
-                        .setContentIntent(pIntent).build();
-                mNotificationManager.notify(345, notification);
-            }
-        }
-        // Subscribe events end
+        return builder.build();
     }
 
     // Binder which returns this service
-    public class IRCBinder extends Binder {
+    public class NewIRCBinder extends Binder {
 
         public IRCService getService() {
             return IRCService.this;

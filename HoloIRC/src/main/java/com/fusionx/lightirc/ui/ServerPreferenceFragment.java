@@ -32,7 +32,7 @@ public class ServerPreferenceFragment extends PreferenceFragment {
         setHasOptionsMenu(true);
 
         getPreferenceManager().setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
-        getPreferenceManager().setSharedPreferencesName(mCallback.getFileName());
+        getPreferenceManager().setSharedPreferencesName("tempUselessFile");
 
         addPreferencesFromResource(R.xml.activty_server_settings_prefs);
 

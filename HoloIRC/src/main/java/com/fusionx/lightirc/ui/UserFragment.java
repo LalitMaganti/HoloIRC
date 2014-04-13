@@ -21,80 +21,40 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.PrivateMessageUser;
-import com.fusionx.relay.Server;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
-
-import android.app.Activity;
 
 import java.util.List;
 
 public class UserFragment extends IRCFragment<UserEvent> {
 
-    private Callbacks mCallbacks;
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (mCallbacks == null) {
-            mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        final PrivateMessageUser user = getPrivateMessageUser();
-
-        if (user.isUserQuit()) {
-            onDisableUserInput();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public FragmentType getType() {
-        return FragmentType.User;
-    }
-
-    @Override
-    public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(mCallbacks.getServer(), mTitle, message);
-    }
-
-    public Server getServer() {
-        return mCallbacks.getServer();
-    }
-
-    @Override
-    protected List<UserEvent> getAdapterData() {
-        return getPrivateMessageUser().getBuffer();
-    }
-
     public PrivateMessageUser getPrivateMessageUser() {
-        return getServer().getUserChannelInterface().getPrivateMessageUserIfExists(mTitle);
+        return (PrivateMessageUser) mConversation;
     }
 
     // Subscription methods
     @Subscribe
-    public void onPrivateEvent(final UserEvent event) {
+    public void onEventMainThread(final UserEvent event) {
         if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
             mMessageAdapter.add(event);
         }
     }
 
-    public interface Callbacks {
+    @Override
+    public void onSendMessage(final String message) {
+        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
+    }
 
-        public Server getServer();
+    @Override
+    public FragmentType getType() {
+        return FragmentType.USER;
+    }
+
+    @Override
+    protected List<UserEvent> getAdapterData() {
+        return getPrivateMessageUser().getBuffer();
     }
 }

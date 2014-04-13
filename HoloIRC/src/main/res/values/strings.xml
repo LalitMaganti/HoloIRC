@@ -79,6 +79,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     </string>
     <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
     <string name="parser_message" translatable="false">%1$s: %2$s</string>
+    <string name="parser_connected_generic">Connected to server</string>
     <string name="parser_connected">Connected to %1$s</string>
     <string name="parser_joined_channel">%1$s joined the channel</string>
     <string name="parser_quit_server">%1$s quit the server</string>
@@ -95,6 +96,8 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
     <string name="parser_slap_message">slaps %1$s with a trout</string>
     <string name="parser_action"><![CDATA[<bold>* %1$s %2$s</bold>]]></string>
+    <string name="parser_connecting">Connecting to server</string>
+    <string name="parser_pm_opened">Private message opened</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -151,13 +154,29 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="nick_second_choice">Second choice nick name</string>
     <string name="nick_third_choice">Third choice nick name</string>
 
-    <string name="action_part_channel">Part channel</string>
-    <string name="action_close_pm">Close PM</string>
     <string name="pref_highlight_whole_line_title">Nick line colours</string>
     <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
         with a nick
     </string>
     <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="notification_settings_title">Notification Settings</string>
+    <string name="ignore_nick_title">Nick to ignore</string>
+    <string name="ignore_nick_description">Nickname of the user to be ignored</string>
+    <string name="ignore_list">Ignore List</string>
+    <string name="items_checked">items checked</string>
+    <string name="actions">Actions</string>
+    <string name="done">Done</string>
+    <string name="reconnecting">Reconnecting</string>
+
+    <!-- Actions -->
+    <string name="action_join_channel">Join new channel</string>
+    <string name="action_change_nick">Change nick</string>
+    <string name="action_ignore_list">Ignore List</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="action_close_server">Close</string>
+    <string name="action_reconnect">Reconnect</string>
+
+    <string name="action_part_channel">Part channel</string>
+    <string name="action_close_pm">Close PM</string>
 
 </resources>

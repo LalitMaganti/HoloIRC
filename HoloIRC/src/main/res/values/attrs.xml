@@ -20,9 +20,17 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <resources>
-    <attr name="card_server_background" format="reference|color"/>
-    <attr name="server_card_text" format="reference|color"/>
+    <attr name="holo_background" format="reference"/>
+    <attr name="default_text_colour" format="reference|color"/>
+    <attr name="default_inverted_text_colour" format="reference|color"/>
     <attr name="overflow_menu_drawable" format="reference"/>
+    <attr name="expand_close_menu_drawable" format="reference"/>
+    <attr name="expand_open_menu_drawable" format="reference"/>
+    <attr name="action_divider_colour" format="reference|color"/>
+
+    <attr name="main_background" format="reference|color"/>
+    <attr name="expandable_list_background" format="reference|color"/>
+    <attr name="expandable_list_text" format="reference|color"/>
 
     <!-- Don't touch this -->
     <attr name="numberPickerStyle" format="reference"/>
@@ -43,28 +51,5 @@
     <declare-styleable name="MultiSelectListPreference">
         <attr name="entries" format="reference"/>
         <attr name="entryValues" format="reference"/>
-    </declare-styleable>
-
-    <declare-styleable name="NumberPicker">
-        <!-- @hide Color for the solid color background if such for optimized rendering. -->
-        <attr name="solidColor" format="color|reference"/>
-        <!-- @hide The divider for making the selection area. -->
-        <attr name="selectionDivider" format="reference"/>
-        <!-- @hide The height of the selection divider. -->
-        <attr name="selectionDividerHeight" format="dimension"/>
-        <!-- @hide The distance between the two selection dividers. -->
-        <attr name="selectionDividersDistance" format="dimension"/>
-        <!-- @hide The min height of the NumberPicker. -->
-        <attr name="internalMinHeight" format="dimension"/>
-        <!-- @hide The max height of the NumberPicker. -->
-        <attr name="internalMaxHeight" format="dimension"/>
-        <!-- @hide The min width of the NumberPicker. -->
-        <attr name="internalMinWidth" format="dimension"/>
-        <!-- @hide The max width of the NumberPicker. -->
-        <attr name="internalMaxWidth" format="dimension"/>
-        <!-- @hide The layout of the number picker. -->
-        <attr name="internalLayout" format="reference"/>
-        <!-- @hide The drawable for pressed virtual (increment/decrement) buttons. -->
-        <attr name="virtualButtonPressedDrawable" format="reference"/>
     </declare-styleable>
 </resources>

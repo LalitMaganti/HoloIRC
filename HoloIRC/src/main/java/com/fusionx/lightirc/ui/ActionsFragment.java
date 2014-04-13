@@ -23,12 +23,11 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
-import com.fusionx.lightirc.constants.FragmentType;
-import com.fusionx.lightirc.ui.dialogbuilder.ChannelNamePromptDialogBuilder;
-import com.fusionx.lightirc.ui.dialogbuilder.NickPromptDialogBuilder;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
+import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Server;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -38,14 +37,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
-public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener,
-        SlidingMenu.OnOpenListener {
+import static com.fusionx.lightirc.util.UIUtils.findById;
+
+public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
+
+    private Conversation mConversation;
+
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+        }
+    };
 
     private Callbacks mCallbacks;
-
-    private FragmentType mFragmentType;
 
     private StickyListHeadersListView mListView;
 
@@ -59,111 +67,97 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     @Override
-    public void onActivityCreated(final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mListView.setOnItemClickListener(this);
-    }
-
-    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_action_listview, container, false);
+        return inflater.inflate(R.layout.default_stickylist_view, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        EventBus.getDefault().registerSticky(mEventHandler);
+
         mAdapter = new ActionsAdapter(getActivity());
-        mListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
+        mListView = findById(view, android.R.id.list);
         mListView.setAdapter(mAdapter);
-        if (mFragmentType != null) {
-            mAdapter.setFragmentType(mFragmentType);
-            mFragmentType = null;
-        }
-        onOpen();
+
+        mListView.setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        EventBus.getDefault().unregister(mEventHandler);
     }
 
     @Override
     public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
             final long l) {
-        switch (i) {
-            case 0:
-                channelNameDialog();
-                break;
-            case 1:
-                nickChangeDialog();
-                break;
-            case 2:
-                mCallbacks.disconnectFromServer();
-                return;
-            case 3:
-                ActionsPagerFragment fragment = (ActionsPagerFragment) getParentFragment();
-                fragment.switchToIgnoreFragment();
-                return;
-            case 4:
-                mCallbacks.closeOrPartCurrentTab();
-                break;
+        final String action = mAdapter.getItem(i);
+
+        if (action.equals(getString(R.string.action_join_channel))) {
+            showChannelDialog();
+        } else if (action.equals(getString(R.string.action_change_nick))) {
+            showNickDialog();
+        } else if (action.equals(getString(R.string.action_ignore_list))) {
+            mCallbacks.switchToIgnoreFragment();
+            return;
+        } else if (action.equals(getString(R.string.action_disconnect))) {
+            mCallbacks.disconnectFromServer();
+        } else if (action.equals(getString(R.string.action_close_server))) {
+            mCallbacks.disconnectFromServer();
+        } else if (action.equals(getString(R.string.action_reconnect))) {
+            mCallbacks.reconnectToServer();
+        } else if (action.equals(getString(R.string.action_part_channel))) {
+            mCallbacks.removeCurrentFragment();
+        } else if (action.equals(getString(R.string.action_close_pm))) {
+            mCallbacks.removeCurrentFragment();
         }
-        mCallbacks.closeAllSlidingMenus();
+
+        mCallbacks.closeDrawer();
     }
 
-    private void nickChangeDialog() {
-        final NickPromptDialogBuilder nickDialog = new NickPromptDialogBuilder(getActivity(),
-                mCallbacks.getNick()) {
+    private void showNickDialog() {
+        final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
+                mConversation.getServer().getUser().getNick()) {
             @Override
             public void onOkClicked(final String input) {
-                mCallbacks.getServer().getServerCallBus().sendNickChange(input);
+                mConversation.getServer().getServerCallBus().sendNickChange(input);
             }
         };
         nickDialog.show();
     }
 
-    private void channelNameDialog() {
-        final ChannelNamePromptDialogBuilder builder = new ChannelNamePromptDialogBuilder
-                (getActivity()) {
-            @Override
-            public void onOkClicked(final String input) {
-                mCallbacks.getServer().getServerCallBus().sendJoin(input);
-            }
-        };
+    private void showChannelDialog() {
+        final ChannelDialogBuilder builder = new ChannelDialogBuilder();
         builder.show();
-    }
-
-    @Override
-    public void onOpen() {
-        if (mCallbacks.isConnectedToServer() != mAdapter.isConnected()) {
-            mAdapter.setConnected(mCallbacks.isConnectedToServer());
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    public void updateConnectionStatus(final boolean isConnected) {
-        mAdapter.setConnected(isConnected);
-        mAdapter.notifyDataSetChanged();
-    }
-
-    public void onTabChanged(final FragmentType selectedType) {
-        if (mAdapter == null) {
-            mFragmentType = selectedType;
-        } else {
-            mAdapter.setFragmentType(selectedType);
-        }
     }
 
     public interface Callbacks {
 
-        public String getNick();
+        public void removeCurrentFragment();
 
-        public void closeOrPartCurrentTab();
-
-        public boolean isConnectedToServer();
-
-        public Server getServer();
-
-        public void closeAllSlidingMenus();
+        public void closeDrawer();
 
         public void disconnectFromServer();
+
+        public void switchToIgnoreFragment();
+
+        public void reconnectToServer();
+    }
+
+    public class ChannelDialogBuilder extends DialogBuilder {
+
+        public ChannelDialogBuilder() {
+            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
+                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
+        }
+
+        @Override
+        public void onOkClicked(final String input) {
+            mConversation.getServer().getServerCallBus().sendJoin(input);
+        }
     }
 }
