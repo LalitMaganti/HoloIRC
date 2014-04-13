@@ -45,4 +45,18 @@
     <string-array name="user_actions">
         <item>@string/action_close_pm</item>
     </string-array>
+
+    <string-array name="notification_entries">
+        <item>@string/notification_entry_visual</item>
+        <item>@string/notification_entry_audio</item>
+    </string-array>
+
+    <string-array name="notification_values">
+        <item>@string/notification_value_visual</item>
+        <item>@string/notification_value_audio</item>
+    </string-array>
+
+    <string-array name="notification_default">
+        <item>@string/notification_value_visual</item>
+    </string-array>
 </resources>
