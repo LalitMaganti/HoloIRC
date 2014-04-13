@@ -56,8 +56,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import butterknife.InjectView;
-import butterknife.OnClick;
+import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
@@ -65,12 +64,11 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     public static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
             ImmutableList.of(NameEvent.class);
 
-    @InjectView(R.id.auto_complete_button)
-    ImageButton mAutoButton;
+    private ImageButton mAutoButton;
 
     private PopupMenu mPopupMenu;
 
-    private boolean isPopupShown;
+    private boolean mIsPopupShown;
 
     public void onMentionMultipleUsers(final List<WorldUser> users) {
         final StringBuilder builder = new StringBuilder();
@@ -84,45 +82,9 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         mMessageBox.append(builder.toString());
     }
 
-    @OnClick(R.id.auto_complete_button)
-    public void onAutoCompleteClick(final ImageButton autoComplete) {
-        if (isPopupShown) {
-            mPopupMenu.dismiss();
-        } else {
-            // TODO - this needs to be synchronized properly
-            final Collection<WorldUser> users = getChannel().getUsers();
-            final List<WorldUser> sortedList = new ArrayList<>(users.size());
-            final String message = mMessageBox.getText().toString();
-            final String finalWord = Iterables.getLast(IRCUtils.splitRawLine(message, false));
-            for (final WorldUser user : users) {
-                if (StringUtils.startsWithIgnoreCase(user.getNick(), finalWord)) {
-                    sortedList.add(user);
-                }
-            }
-
-            if (sortedList.size() == 1) {
-                changeLastWord(Iterables.getLast(sortedList).getNick());
-            } else if (sortedList.size() > 1) {
-                if (mPopupMenu == null) {
-                    mPopupMenu = new PopupMenu(getActivity(), autoComplete);
-                    mPopupMenu.setOnDismissListener(this);
-                    mPopupMenu.setOnMenuItemClickListener(this);
-                }
-                final Menu innerMenu = mPopupMenu.getMenu();
-                innerMenu.clear();
-
-                Collections.sort(sortedList, new IRCUserComparator(getChannel()));
-                for (final WorldUser user : sortedList) {
-                    innerMenu.add(user.getNick());
-                }
-                mPopupMenu.show();
-            }
-        }
-    }
-
     @Override
     public void onDismiss(final PopupMenu popupMenu) {
-        isPopupShown = false;
+        mIsPopupShown = false;
     }
 
     @Override
@@ -130,7 +92,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         final String nick = menuItem.getTitle().toString();
         changeLastWord(nick);
 
-        isPopupShown = false;
+        mIsPopupShown = false;
         return true;
     }
 
@@ -162,6 +124,46 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mAutoButton = findById(view, R.id.auto_complete_button);
+        mAutoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsPopupShown) {
+                    mPopupMenu.dismiss();
+                } else {
+                    // TODO - this needs to be synchronized properly
+                    final Collection<WorldUser> users = getChannel().getUsers();
+                    final List<WorldUser> sortedList = new ArrayList<>(users.size());
+                    final String message = mMessageBox.getText().toString();
+                    final String finalWord = Iterables
+                            .getLast(IRCUtils.splitRawLine(message, false));
+                    for (final WorldUser user : users) {
+                        if (StringUtils.startsWithIgnoreCase(user.getNick(), finalWord)) {
+                            sortedList.add(user);
+                        }
+                    }
+
+                    if (sortedList.size() == 1) {
+                        changeLastWord(Iterables.getLast(sortedList).getNick());
+                    } else if (sortedList.size() > 1) {
+                        if (mPopupMenu == null) {
+                            mPopupMenu = new PopupMenu(getActivity(), mAutoButton);
+                            mPopupMenu.setOnDismissListener(ChannelFragment.this);
+                            mPopupMenu.setOnMenuItemClickListener(ChannelFragment.this);
+                        }
+                        final Menu innerMenu = mPopupMenu.getMenu();
+                        innerMenu.clear();
+
+                        Collections.sort(sortedList, new IRCUserComparator(getChannel()));
+                        for (final WorldUser user : sortedList) {
+                            innerMenu.add(user.getNick());
+                        }
+                        mPopupMenu.show();
+                    }
+                }
+            }
+        });
 
         mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
