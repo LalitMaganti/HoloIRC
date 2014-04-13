@@ -1,20 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Nickname notifications">
-        <MultiSelectListPreference
+    <PreferenceCategory android:title="In-App Notifications">
+        <CheckBoxPreference
                 android:key="pref_notify_in_app"
                 android:title="Notify in-app"
                 android:summary="Notify when your nickname is mentioned when you are in the app"
-                android:entries="@array/notification_entries"
-                android:entryValues="@array/notification_values"
-                android:defaultValue="@array/notification_default"/>
+                android:defaultValue="true"/>
+
         <MultiSelectListPreference
+                android:key="pref_notify_in_app_settings"
+                android:title="In-app settings"
+                android:summary="Methods to notify you by"
+                android:entries="@array/notification_in_entries"
+                android:entryValues="@array/notification_in_values"
+                android:defaultValue="@array/empty_array"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Out of App Notifications">
+        <CheckBoxPreference
                 android:key="pref_notify_out_app"
                 android:title="Notify out of app"
                 android:summary="Notify when your nickname is mentioned when you are not in the app"
-                android:entries="@array/notification_entries"
-                android:entryValues="@array/notification_values"
-                android:defaultValue="@array/notification_default"/>
+                android:defaultValue="true"/>
+
+        <MultiSelectListPreference
+                android:key="pref_notify_out_app_settings"
+                android:title="Out of app settings"
+                android:summary="Methods to notify you by"
+                android:entries="@array/notification_out_entries"
+                android:entryValues="@array/notification_out_values"
+                android:defaultValue="@array/empty_array"/>
     </PreferenceCategory>
 </PreferenceScreen>
