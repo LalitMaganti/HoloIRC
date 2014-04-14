@@ -300,6 +300,10 @@ public class MessageConversionUtils {
     }
 
     public void setEventMessage(final Event event) {
+        // Set store to some value so we don't crash if the event is not picked up
+        event.store = "";
+
+        // Actually fix the values
         mConverter.post(event);
     }
 
