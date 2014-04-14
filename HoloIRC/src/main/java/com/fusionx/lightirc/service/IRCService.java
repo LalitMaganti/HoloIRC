@@ -51,7 +51,7 @@ public class IRCService extends Service {
 
     private final Map<Server, ServiceEventHelper> mEventHelperMap = new THashMap<>();
 
-    private final Map<String, LoggingHelper> mLoggingHelperMap = new THashMap<>();
+    private final Map<Server, LoggingHelper> mLoggingHelperMap = new THashMap<>();
 
     private ConnectionManager mConnectionManager;
 

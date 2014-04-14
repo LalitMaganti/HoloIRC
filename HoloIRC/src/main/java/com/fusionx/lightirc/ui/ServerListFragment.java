@@ -2,12 +2,12 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
-import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -60,10 +60,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onEventMainThread(final OnConversationChanged event) {
             if (event.conversation != null) {
                 if (event.fragmentType == FragmentType.SERVER) {
-                    mService.getEventHelper(event.conversation.getId()).clearMessagePriority();
+                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority();
                 } else {
-                    mService.getEventHelper(event.conversation.getServer().getId())
-                            .clearMessagePriority(event.conversation);
+                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority
+                            (event.conversation);
                 }
             }
             mListView.invalidateViews();
@@ -150,28 +150,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public boolean onGroupClick(final ExpandableListView parent, final View v,
             final int groupPosition, final long id) {
         return onServerClick(groupPosition);
-    }
-
-    private boolean onServerClick(final int groupPosition) {
-        if (mActionModeStarted && mSelectionType == ExpandableListView
-                .PACKED_POSITION_TYPE_GROUP) {
-            int flatPosition = mListView.getFlatListPosition(ExpandableListView
-                    .getPackedPositionForGroup(groupPosition));
-            mListView.setItemChecked(flatPosition, !mListView.isItemChecked(flatPosition));
-            return true;
-        } else if (mActionModeStarted) {
-            return true;
-        }
-
-        final ServerWrapper item = mListAdapter.getGroup(groupPosition);
-        if (item.getServer() == null) {
-            item.setServer(mService.requestConnectionToServer(item.getBuilder(),
-                    item.getIgnoreList()));
-            mEventHandlers.add(new ServerEventHandler(item.getServer(), groupPosition));
-        }
-        mCallback.onServerClicked(item.getServer());
-
-        return true;
     }
 
     @Override
@@ -265,10 +243,44 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mActionModeStarted = false;
+    }
+
+    public void onServiceConnected(final IRCService service) {
+        mService = service;
+
+        refreshServers();
+    }
+
+    private boolean onServerClick(final int groupPosition) {
+        if (mActionModeStarted && mSelectionType == ExpandableListView
+                .PACKED_POSITION_TYPE_GROUP) {
+            int flatPosition = mListView.getFlatListPosition(ExpandableListView
+                    .getPackedPositionForGroup(groupPosition));
+            mListView.setItemChecked(flatPosition, !mListView.isItemChecked(flatPosition));
+            return true;
+        } else if (mActionModeStarted) {
+            return true;
+        }
+
+        final ServerWrapper item = mListAdapter.getGroup(groupPosition);
+        if (item.getServer() == null) {
+            item.setServer(mService.requestConnectionToServer(item.getBuilder(),
+                    item.getIgnoreList()));
+            mEventHandlers.add(new ServerEventHandler(item.getServer(), groupPosition));
+        }
+        mCallback.onServerClicked(item.getServer());
+
+        return true;
+    }
+
     private void onDeleteServer(final List<Integer> checkedPositions) {
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
             private BuilderDatabaseSource source;
+
             @Override
             protected void onPreExecute() {
                 source = new BuilderDatabaseSource(getActivity());
@@ -291,17 +303,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
         };
         asyncTask.execute();
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mActionModeStarted = false;
-    }
-
-    public void onServiceConnected(final IRCService service) {
-        mService = service;
-
-        refreshServers();
     }
 
     private ServerWrapper getFirstCheckedItem() {
