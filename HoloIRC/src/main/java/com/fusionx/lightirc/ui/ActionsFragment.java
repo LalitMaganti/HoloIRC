@@ -55,8 +55,6 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     private Callbacks mCallbacks;
 
-    private StickyListHeadersListView mListView;
-
     private ActionsAdapter mAdapter;
 
     @Override
@@ -79,10 +77,10 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         EventBus.getDefault().registerSticky(mEventHandler);
 
         mAdapter = new ActionsAdapter(getActivity());
-        mListView = findById(view, android.R.id.list);
-        mListView.setAdapter(mAdapter);
+        final StickyListHeadersListView listView = findById(view, android.R.id.list);
+        listView.setAdapter(mAdapter);
 
-        mListView.setOnItemClickListener(this);
+        listView.setOnItemClickListener(this);
     }
 
     @Override
