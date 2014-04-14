@@ -1,13 +1,16 @@
 package com.fusionx.lightirc.event;
 
+import com.fusionx.relay.Channel;
+import com.fusionx.relay.Server;
+
 public class OnChannelMentionEvent {
 
-    public final String serverName;
+    public final Server server;
 
-    public final String channelName;
+    public final Channel channel;
 
-    public OnChannelMentionEvent(String serverName, String channelName) {
-        this.serverName = serverName;
-        this.channelName = channelName;
+    public OnChannelMentionEvent(final Server server, final Channel channel) {
+        this.server = server;
+        this.channel = channel;
     }
 }

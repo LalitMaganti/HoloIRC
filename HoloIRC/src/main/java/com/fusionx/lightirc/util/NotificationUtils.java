@@ -40,8 +40,8 @@ public class NotificationUtils {
         final Set<String> inApp = AppPreferences.inAppNotificationSettings;
 
         if (AppPreferences.inAppNotification) {
-            final String message = String.format("Mentioned in %s on %s", event.channelName,
-                    event.serverName);
+            final String message = String.format("Mentioned in %s on %s", event.channel.getId(),
+                    event.channel.getId());
             final Crouton crouton = Crouton.makeText(activity, message, Style.INFO);
             crouton.setConfiguration(sConfiguration);
             crouton.show();
@@ -71,7 +71,7 @@ public class NotificationUtils {
             builder.setSmallIcon(R.drawable.ic_notification);
             builder.setContentTitle(context.getString(R.string.app_name));
             builder.setContentText(String.format("Mentioned in %s on %s",
-                    event.channelName, event.serverName));
+                    event.channel.getId(), event.server.getId()));
             builder.setAutoCancel(true);
 
             if (outApp.contains(context.getString(R.string.notification_value_audio))) {
@@ -88,8 +88,8 @@ public class NotificationUtils {
             final Intent resultIntent = new Intent(context, MainActivity.class);
             resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
                     .FLAG_ACTIVITY_SINGLE_TOP);
-            resultIntent.putExtra("server_name", event.serverName);
-            resultIntent.putExtra("channel_name", event.channelName);
+            resultIntent.putExtra("server_name", event.server.getTitle());
+            resultIntent.putExtra("channel_name", event.channel.getName());
 
             final PendingIntent resultPendingIntent = PendingIntent.getActivity(context,
                     NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);

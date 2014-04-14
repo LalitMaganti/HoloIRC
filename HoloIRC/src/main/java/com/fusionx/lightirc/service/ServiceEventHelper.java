@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.communication;
+package com.fusionx.lightirc.service;
 
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -7,14 +7,12 @@ import com.fusionx.lightirc.ui.ChannelFragment;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.connection.ConnectionManager;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
-import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
@@ -32,9 +30,9 @@ public final class ServiceEventHelper {
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private final HashMap<String, MessagePriority> mMessagePriorityMap;
+    private final HashMap<Conversation, MessagePriority> mMessagePriorityMap;
 
-    private final HashMap<String, Event> mEventMap;
+    private final HashMap<Conversation, Event> mEventMap;
 
     private final Server mServer;
 
@@ -62,14 +60,14 @@ public final class ServiceEventHelper {
     }
 
     public void clearMessagePriority(Conversation conversation) {
-        mMessagePriorityMap.remove(conversation.getId());
+        mMessagePriorityMap.remove(conversation);
     }
 
-    public MessagePriority getSubMessagePriority(final String title) {
+    public MessagePriority getSubMessagePriority(final Conversation title) {
         return mMessagePriorityMap.get(title);
     }
 
-    public Event getSubEvent(final String id) {
+    public Event getSubEvent(final Conversation id) {
         return mEventMap.get(id);
     }
 
@@ -116,8 +114,8 @@ public final class ServiceEventHelper {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            EventBus.getDefault().post(new OnChannelMentionEvent(mServer.getTitle(),
-                                    event.channelName));
+                            EventBus.getDefault().post(new OnChannelMentionEvent(mServer,
+                                    (Channel) conversation));
                         }
                     });
                 } else if (event.getClass().equals(WorldMessageEvent.class)
@@ -140,14 +138,14 @@ public final class ServiceEventHelper {
         onIRCEvent(MessagePriority.HIGH, conversation, event);
     }
 
-    private void setSubMessagePriority(final String title, final MessagePriority priority) {
-        final MessagePriority oldPriority = mMessagePriorityMap.get(title);
+    private void setSubMessagePriority(final Conversation conversation, final MessagePriority priority) {
+        final MessagePriority oldPriority = mMessagePriorityMap.get(conversation);
         if (oldPriority == null || oldPriority.compareTo(priority) < 0) {
-            mMessagePriorityMap.put(title, priority);
+            mMessagePriorityMap.put(conversation, priority);
         }
     }
 
-    private void setSubEvent(final String title, final Event event) {
+    private void setSubEvent(final Conversation title, final Event event) {
         mEventMap.put(title, event);
     }
 
@@ -155,14 +153,14 @@ public final class ServiceEventHelper {
             final Event event) {
         if (conversation.equals(mConversation)) {
             if (!conversation.equals(conversation.getServer())) {
-                setSubEvent(conversation.getId(), event);
+                setSubEvent(conversation, event);
             }
         } else {
             if (conversation.equals(conversation.getServer())) {
                 setMessagePriority(priority);
             } else {
-                setSubMessagePriority(conversation.getId(), priority);
-                setSubEvent(conversation.getId(), event);
+                setSubMessagePriority(conversation, priority);
+                setSubEvent(conversation, event);
             }
         }
     }

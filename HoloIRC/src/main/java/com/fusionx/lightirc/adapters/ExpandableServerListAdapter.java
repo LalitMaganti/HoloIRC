@@ -1,8 +1,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.communication.ServiceEventHelper;
+import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.service.ServiceEventHelper;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -91,7 +91,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
 
         final ServerWrapper listItem = getGroup(groupPos);
-        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getTitle());
+        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getServer());
 
         final TextView title = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
@@ -135,15 +135,15 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final ServerWrapper listItem = getGroup(groupPos);
         final Conversation conversation = getChild(groupPos, childPos);
 
-        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getTitle());
+        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getServer());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
         builder.setSpan(UIUtils.getSpanFromPriority(mContext, helper.getSubMessagePriority
-                (conversation.getId())), 0, conversation.getId().length(), 0);
+                (conversation)), 0, conversation.getId().length(), 0);
         textView.setText(builder);
 
-        final Event event = helper.getSubEvent(conversation.getId());
+        final Event event = helper.getSubEvent(conversation);
         final TextView textEvent = (TextView) convertView.findViewById(R.id.child_event);
         if (event.store == null) {
             mMessageConverter.setEventMessage(event);

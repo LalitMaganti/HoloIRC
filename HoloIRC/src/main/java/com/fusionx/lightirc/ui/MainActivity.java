@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
@@ -70,9 +70,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             // Don't pass this event onto any other subscribers - we have handed it
             mEventBus.cancelEventDelivery(event);
 
-            if (mConversation == null
-                    || !mConversation.getServer().getTitle().equals(event.serverName)
-                    || !mConversation.getId().equals(event.channelName)) {
+            if (!event.channel.equals(mConversation)) {
                 NotificationUtils.notifyInApp(MainActivity.this, event);
             }
         }

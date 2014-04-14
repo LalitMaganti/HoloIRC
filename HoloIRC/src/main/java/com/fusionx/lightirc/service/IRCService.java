@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.communication;
+package com.fusionx.lightirc.service;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
+import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 
@@ -48,7 +49,9 @@ public class IRCService extends Service {
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 
-    private final Map<String, ServiceEventHelper> mEventHelperMap = new HashMap<>();
+    private final Map<Server, ServiceEventHelper> mEventHelperMap = new THashMap<>();
+
+    private final Map<String, LoggingHelper> mLoggingHelperMap = new THashMap<>();
 
     private ConnectionManager mConnectionManager;
 
@@ -84,7 +87,7 @@ public class IRCService extends Service {
 
         if (!exists) {
             final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
-            mEventHelperMap.put(server.getTitle(), serviceEventHelper);
+            mEventHelperMap.put(server, serviceEventHelper);
         }
 
         startForeground(SERVICE_ID, getNotification());
@@ -101,7 +104,7 @@ public class IRCService extends Service {
     }
 
     public void requestDisconnectionFromServer(final Server server) {
-        mEventHelperMap.remove(server.getTitle());
+        mEventHelperMap.remove(server);
 
         final boolean finalServer = mConnectionManager
                 .requestDisconnectionAndRemoval(server.getTitle());
@@ -122,8 +125,8 @@ public class IRCService extends Service {
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
-    public ServiceEventHelper getEventHelper(final String title) {
-        return mEventHelperMap.get(title);
+    public ServiceEventHelper getEventHelper(final Server server) {
+        return mEventHelperMap.get(server);
     }
 
     public void disconnectAll() {

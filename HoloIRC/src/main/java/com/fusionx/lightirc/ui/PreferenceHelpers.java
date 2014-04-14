@@ -1,15 +1,13 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.app.AlertDialog;
