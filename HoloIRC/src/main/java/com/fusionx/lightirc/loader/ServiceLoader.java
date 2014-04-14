@@ -14,7 +14,7 @@ public class ServiceLoader extends Loader<IRCService> {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder binder) {
-            final IRCService service = ((IRCService.NewIRCBinder) binder).getService();
+            final IRCService service = ((IRCService.IRCBinder) binder).getService();
             deliverResult(service);
         }
 
