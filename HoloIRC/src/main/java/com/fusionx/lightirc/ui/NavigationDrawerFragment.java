@@ -43,13 +43,16 @@ public class NavigationDrawerFragment extends Fragment implements
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
             mFragmentType = conversationChanged.fragmentType;
-            refreshUserList();
+            if (conversationChanged.conversation != null) {
+                mStatus = conversationChanged.conversation.getServer().getStatus();
+            }
+            updateUserListVisibility();
         }
 
         @SuppressWarnings("unused")
         public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
             mStatus = statusChanged.status;
-            refreshUserList();
+            updateUserListVisibility();
         }
     };
 
@@ -133,7 +136,7 @@ public class NavigationDrawerFragment extends Fragment implements
         mIsIgnoreListDisplayed = false;
 
         revertActionBarToNormal();
-        refreshUserList();
+        updateUserListVisibility();
         getActivity().supportInvalidateOptionsMenu();
     }
 
@@ -162,7 +165,7 @@ public class NavigationDrawerFragment extends Fragment implements
         mIsIgnoreListDisplayed = true;
 
         updateActionBarForIgnoreList();
-        refreshUserList();
+        updateUserListVisibility();
         getActivity().supportInvalidateOptionsMenu();
     }
 
@@ -252,7 +255,8 @@ public class NavigationDrawerFragment extends Fragment implements
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    private void refreshUserList() {
+    @Override
+    public void updateUserListVisibility() {
         final int visibility = mStatus == ConnectionStatus.CONNECTED &&
                 mFragmentType == FragmentType.CHANNEL && !mIsIgnoreListDisplayed ?
                 View.VISIBLE : View.GONE;
@@ -262,10 +266,11 @@ public class NavigationDrawerFragment extends Fragment implements
             // TODO - change this from casting
             final Channel channel = (Channel) mConversation;
             mTextView.setText(String.format("%d users", channel.getUsers().size()));
-        }
-        if (mSlidingUpPanelLayout.isExpanded()) {
-            // Collapse Pane
-            mSlidingUpPanelLayout.collapsePane();
+        } else {
+            if (mSlidingUpPanelLayout.isExpanded()) {
+                // Collapse Pane
+                mSlidingUpPanelLayout.collapsePane();
+            }
         }
     }
 

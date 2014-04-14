@@ -28,6 +28,7 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.NameEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
 
@@ -141,6 +142,8 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     }
 
     public void onUpdateUserList() {
+        mCallback.updateUserListVisibility();
+
         final Collection<WorldUser> userList = mChannel.getUsers();
 
         getListView().setAdapter(null);
@@ -163,15 +166,23 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final WorldUserEvent event) {
-        if (mChannel != null && event.channelName.equals(mChannel.getName())) {
+        if (mChannel != null && event.channelName.equals(mChannel.getName())
+                && event.isUserListChangeEvent()) {
             onUpdateUserList();
         }
     }
 
+    @SuppressWarnings("unused")
+    public void onEventMainThread(final NameEvent event) {
+        if (mChannel != null && event.channelName.equals(mChannel.getName())) {
+            onUpdateUserList();
+        }
+    }
+    // End of subscribed events
+
     public StickyListHeadersListView getListView() {
         return mStickyListView;
     }
-    // End of subscribed events
 
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
@@ -287,6 +298,8 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public interface Callback {
 
         public void onMentionMultipleUsers(final List<WorldUser> users);
+
+        public void updateUserListVisibility();
 
         public void closeDrawer();
     }
