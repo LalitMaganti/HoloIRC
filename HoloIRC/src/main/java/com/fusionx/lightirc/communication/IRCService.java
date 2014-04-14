@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
 
 import java.util.HashMap;
@@ -45,7 +44,7 @@ public class IRCService extends Service {
 
     private final Handler mHandler = new Handler();
 
-    private final NewIRCBinder mBinder = new NewIRCBinder();
+    private final IRCBinder mBinder = new IRCBinder();
 
     private final AppPreferences mAppPreferences = new AppPreferences();
 
@@ -127,6 +126,10 @@ public class IRCService extends Service {
         return mEventHelperMap.get(title);
     }
 
+    public void disconnectAll() {
+        mConnectionManager.requestDisconnectAll();
+    }
+
     private Notification getNotification() {
         final Builder builder = new Builder(this);
         builder.setSmallIcon(R.drawable.ic_notification);
@@ -139,7 +142,7 @@ public class IRCService extends Service {
     }
 
     // Binder which returns this service
-    public class NewIRCBinder extends Binder {
+    public class IRCBinder extends Binder {
 
         public IRCService getService() {
             return IRCService.this;
