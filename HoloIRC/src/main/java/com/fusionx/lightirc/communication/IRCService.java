@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
 
 import java.util.HashMap;
@@ -141,6 +142,7 @@ public class IRCService extends Service {
     }
 
     public void disconnectAll() {
+        mEventHelperMap.clear();
         mConnectionManager.requestDisconnectAll();
     }
 
