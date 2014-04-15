@@ -11,15 +11,14 @@ import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.KickEvent;
+import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
-import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
@@ -441,10 +440,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @SuppressWarnings("unused")
         public void onEventMainThread(final UserEvent event) {
             mListView.invalidateViews();
-        }
-
-        @SuppressWarnings("unused")
-        public void onEventMainThread(final ServerEvent event) {
         }
 
         @SuppressWarnings("unused")

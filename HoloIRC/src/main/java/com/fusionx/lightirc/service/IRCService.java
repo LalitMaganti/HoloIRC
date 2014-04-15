@@ -3,6 +3,7 @@ package com.fusionx.lightirc.service;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.relay.Server;
@@ -17,7 +18,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
 
 import java.util.HashMap;
@@ -31,7 +31,9 @@ import static android.support.v4.app.NotificationCompat.Builder;
 
 public class IRCService extends Service {
 
-    private boolean mRegistered = false;
+    private static final int MENTION_PRIORITY = 50;
+
+    private static final int SERVICE_ID = 1;
 
     private final Object mMentionHelper = new Object() {
         @SuppressWarnings("unused")
@@ -39,10 +41,6 @@ public class IRCService extends Service {
             NotificationUtils.notifyOutOfApp(IRCService.this, event);
         }
     };
-
-    private static final int MENTION_PRIORITY = 50;
-
-    private static final int SERVICE_ID = 1;
 
     private final Handler mHandler = new Handler();
 
@@ -53,6 +51,10 @@ public class IRCService extends Service {
     private final Map<Server, ServiceEventHelper> mEventHelperMap = new THashMap<>();
 
     private final Map<Server, LoggingHelper> mLoggingHelperMap = new THashMap<>();
+
+    private final Map<Server, EventCache> mEventCache = new HashMap<>();
+
+    private boolean mRegistered = false;
 
     private ConnectionManager mConnectionManager;
 
@@ -89,6 +91,7 @@ public class IRCService extends Service {
         if (!exists) {
             final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
             mEventHelperMap.put(server, serviceEventHelper);
+            mEventCache.put(server, new EventCache());
         }
 
         startForeground(SERVICE_ID, getNotification());
@@ -106,6 +109,7 @@ public class IRCService extends Service {
 
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server);
+        mEventCache.remove(server);
 
         final boolean finalServer = mConnectionManager
                 .requestDisconnectionAndRemoval(server.getTitle());
@@ -132,7 +136,12 @@ public class IRCService extends Service {
 
     public void disconnectAll() {
         mEventHelperMap.clear();
+        mEventCache.clear();
         mConnectionManager.requestDisconnectAll();
+    }
+
+    public EventCache getEventCache(Server server) {
+        return mEventCache.get(server);
     }
 
     private Notification getNotification() {

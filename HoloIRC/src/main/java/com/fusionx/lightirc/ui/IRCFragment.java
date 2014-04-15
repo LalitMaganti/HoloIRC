@@ -24,7 +24,9 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
@@ -67,6 +69,8 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        final Callback callback = FragmentUtils.getParent(this, Callback.class);
+
         final OnConversationChanged event = EventBus.getDefault().getStickyEvent
                 (OnConversationChanged.class);
         mConversation = event.conversation;
@@ -76,7 +80,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
 
         mTitle = getArguments().getString("title");
 
-        mMessageAdapter = new IRCMessageAdapter<>(getActivity());
+        mMessageAdapter = new IRCMessageAdapter<>(getActivity(), callback.getEventCache());
         setListAdapter(mMessageAdapter);
 
         onResetBuffer();
@@ -120,4 +124,9 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);
+
+    public interface Callback {
+
+        public EventCache getEventCache();
+    }
 }

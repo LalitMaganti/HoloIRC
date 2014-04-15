@@ -1,12 +1,13 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
@@ -44,7 +45,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
-        NavigationDrawerFragment.Callback, WorkerFragment.Callback {
+        NavigationDrawerFragment.Callback, WorkerFragment.Callback, IRCFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
 
@@ -383,6 +384,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public EventCache getEventCache() {
+        return getService().getEventCache(mConversation.getServer());
     }
 
     @Override

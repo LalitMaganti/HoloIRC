@@ -1,7 +1,10 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
@@ -17,6 +20,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
     private final Object mLock = new Object();
@@ -29,11 +34,20 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
     private List<T> mObjects;
 
-    public IRCMessageAdapter(Context context) {
+    private EventCache mEventCache;
+
+    public IRCMessageAdapter(final Context context, final EventCache cache) {
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
         mConverter = MessageConversionUtils.getConverter(mContext);
+        mEventCache = cache;
+        EventBus.getDefault().register(new Object() {
+            @SuppressWarnings("unused")
+            public void onEvent(final OnPreferencesChangedEvent event) {
+                notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -108,10 +122,12 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
     }
 
     private void setUpMessage(final ViewHolder holder, final Event event) {
-        if (event.store == null) {
-            mConverter.setEventMessage(event);
+        EventDecorator decorator = mEventCache.get(event);
+        if (decorator == null) {
+            decorator = mConverter.getEventDecorator(event);
+            mEventCache.put(event, decorator);
         }
-        holder.message.setText((CharSequence) event.store);
+        holder.message.setText(decorator.getMessage());
     }
 
     private void addTimestampIfRequired(ViewHolder holder, final Event event) {

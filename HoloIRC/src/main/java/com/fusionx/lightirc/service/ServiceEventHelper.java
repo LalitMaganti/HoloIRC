@@ -8,7 +8,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;

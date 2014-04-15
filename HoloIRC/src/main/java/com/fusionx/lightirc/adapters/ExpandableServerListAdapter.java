@@ -1,6 +1,8 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventHelper;
 import com.fusionx.lightirc.model.ServerWrapper;
@@ -136,6 +138,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final Conversation conversation = getChild(groupPos, childPos);
 
         final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getServer());
+        final EventCache cache = mIRCService.getEventCache(listItem.getServer());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
@@ -145,10 +148,13 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
         final Event event = helper.getSubEvent(conversation);
         final TextView textEvent = (TextView) convertView.findViewById(R.id.child_event);
-        if (event.store == null) {
-            mMessageConverter.setEventMessage(event);
+
+        EventDecorator decorator = cache.get(event);
+        if (decorator == null) {
+            decorator = mMessageConverter.getEventDecorator(event);
+            cache.put(event, decorator);
         }
-        textEvent.setText(event.store.toString());
+        textEvent.setText(decorator.getMessage());
 
         final View divider = convertView.findViewById(R.id.divider);
         divider.setVisibility(isLastChild ? View.VISIBLE : View.INVISIBLE);

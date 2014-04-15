@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.misc;
 
+import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 
@@ -9,6 +10,10 @@ import android.preference.PreferenceManager;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import de.greenrobot.event.EventBus;
+
+import static android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 public class AppPreferences implements EventPreferences {
 
@@ -36,19 +41,41 @@ public class AppPreferences implements EventPreferences {
 
     public static Set<String> outOfAppNotificationSettings;
 
+    private static boolean isPrefsSetup = false;
+
     public static void setUpPreferences(final Context context) {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
-                (context);
+        if (!isPrefsSetup) {
+            isPrefsSetup = true;
+            final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
+                    (context);
+            preferences.registerOnSharedPreferenceChangeListener(
+                    new OnSharedPreferenceChangeListener() {
+                        @Override
+                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
+                                final String key) {
+                            setPreferences(sharedPreferences);
+                            EventBus.getDefault().post(new OnPreferencesChangedEvent());
+                        }
+                    }
+            );
+            setPreferences(preferences);
+        }
+    }
+
+    public static void setPreferences(final SharedPreferences preferences) {
         final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
                 .FRAGMENT_SETTINGS_THEME, "1"));
         theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
-        highlightLine = preferences.getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
+        highlightLine = preferences
+                .getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
         timestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
         motdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
-        hideUserMessages = preferences.getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
+        hideUserMessages = preferences
+                .getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
         partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
         quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
-        numberOfReconnectEvents = preferences.getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
+        numberOfReconnectEvents = preferences
+                .getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
         inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
                 .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
         inAppNotification = preferences.getBoolean(PreferenceConstants

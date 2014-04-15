@@ -32,13 +32,6 @@ public class SettingsActivity extends PreferenceActivity {
         return true;
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        AppPreferences.setUpPreferences(this);
-    }
-
     private void showAlertDialog() {
         if (getIntent().getIntExtra("connectedServers", 0) != 0) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);

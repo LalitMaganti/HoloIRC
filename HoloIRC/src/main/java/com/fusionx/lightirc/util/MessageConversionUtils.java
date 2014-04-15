@@ -1,6 +1,8 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
@@ -54,6 +56,8 @@ public class MessageConversionUtils {
     private final Context mContext;
 
     private final Bus mConverter;
+
+    private EventDecorator mMessage;
 
     private final Object mParser = new Object() {
 
@@ -299,12 +303,16 @@ public class MessageConversionUtils {
         return sConverter;
     }
 
-    public void setEventMessage(final Event event) {
-        // Set store to some value so we don't crash if the event is not picked up
-        event.store = "";
+    public EventDecorator getEventDecorator(final Event event) {
+        mMessage = null;
 
         // Actually fix the values
         mConverter.post(event);
+
+        if (mMessage == null) {
+            mMessage = new EventDecorator("");
+        }
+        return mMessage;
     }
 
     private String appendReasonIfNeeded(final String response, final String reason) {
@@ -313,6 +321,6 @@ public class MessageConversionUtils {
     }
 
     private void setupEvent(final Event event, final String message) {
-        event.store = ColourParserUtils.onParseMarkup(message);
+        mMessage = new EventDecorator(ColourParserUtils.onParseMarkup(message));
     }
 }
