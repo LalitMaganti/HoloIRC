@@ -26,6 +26,8 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.NickStorage;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -64,9 +66,13 @@ public class SharedPreferencesUtils {
             final String prefsName = file.getName().replace(".xml", "");
             // Get builder to transfer
             final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
-            // Also transfer over ignore list
-            final List<String> ignoreList = getIgnoreList(context, prefsName);
-            source.addServer(builder, ignoreList);
+            // Only transfer if the builder is not broken
+            if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
+                    .isNotEmpty(builder.getUrl())) {
+                // Also transfer over ignore list
+                final List<String> ignoreList = getIgnoreList(context, prefsName);
+                source.addServer(builder, ignoreList);
+            }
             file.delete();
         }
         source.close();
