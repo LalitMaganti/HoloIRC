@@ -6,14 +6,13 @@ import com.fusionx.relay.interfaces.EventPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import de.greenrobot.event.EventBus;
 
-import static android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class AppPreferences implements EventPreferences {
 
@@ -41,23 +40,20 @@ public class AppPreferences implements EventPreferences {
 
     public static Set<String> outOfAppNotificationSettings;
 
-    private static boolean isPrefsSetup = false;
+    private static SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
 
     public static void setUpPreferences(final Context context) {
-        if (!isPrefsSetup) {
-            isPrefsSetup = true;
-            final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
-                    (context);
-            preferences.registerOnSharedPreferenceChangeListener(
-                    new OnSharedPreferenceChangeListener() {
-                        @Override
-                        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
-                                final String key) {
-                            setPreferences(sharedPreferences);
-                            EventBus.getDefault().post(new OnPreferencesChangedEvent());
-                        }
-                    }
-            );
+        if (sPrefsChangeListener == null) {
+            sPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(final SharedPreferences
+                        sharedPreferences, final String key) {
+                    setPreferences(sharedPreferences);
+                    EventBus.getDefault().post(new OnPreferencesChangedEvent());
+                }
+            };
+            final SharedPreferences preferences = getDefaultSharedPreferences(context);
+            preferences.registerOnSharedPreferenceChangeListener(sPrefsChangeListener);
             setPreferences(preferences);
         }
     }
