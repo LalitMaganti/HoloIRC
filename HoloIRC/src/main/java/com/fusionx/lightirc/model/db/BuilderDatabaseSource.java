@@ -3,6 +3,8 @@ package com.fusionx.lightirc.model.db;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.NickStorage;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -65,11 +67,13 @@ public class BuilderDatabaseSource {
             final List<String> ignoreList) {
         final ContentValues values = getContentValuesFromBuilder(builder, false);
 
-        values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
-                convertStringListToString(ignoreList));
+        if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils.isNotEmpty(builder.getUrl())) {
+            values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
+                    convertStringListToString(ignoreList));
 
-        final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
-        builder.setId(id);
+            final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
+            builder.setId(id);
+        }
     }
 
     public List<ServerConfiguration.Builder> getAllBuilders() {
