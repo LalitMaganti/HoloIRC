@@ -77,12 +77,8 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
 
-        if (positiveResult) {
-            final boolean persist = getOnPreferenceChangeListener().onPreferenceChange(this,
-                    getNickStorageFromText());
-            if (persist) {
-                persistNick();
-            }
+        if (positiveResult && callChangeListener(getNickStorageFromText())) {
+            persistNick();
         }
     }
 
