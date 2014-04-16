@@ -102,11 +102,6 @@ public class AppPreferences implements EventPreferences {
         return theme;
     }
 
-    @Override
-    public boolean shouldLogUserListChanges() {
-        return !hideUserMessages;
-    }
-
     // We always want to display the messages that the app user sends
     @Override
     public boolean isSelfEventBroadcast() {

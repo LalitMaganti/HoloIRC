@@ -1,10 +1,10 @@
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.model.EventDecorator;
+import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
@@ -15,14 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-
-public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
+public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements Filterable {
 
     private final Object mLock = new Object();
 
@@ -32,22 +32,21 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
     private final MessageConversionUtils mConverter;
 
+    private boolean mShouldFilter;
+
+    private Filter mFilter;
+
     private List<T> mObjects;
 
     private EventCache mEventCache;
 
-    public IRCMessageAdapter(final Context context, final EventCache cache) {
+    public IRCMessageAdapter(final Context context, final EventCache cache, final boolean filter) {
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
         mConverter = MessageConversionUtils.getConverter(mContext);
         mEventCache = cache;
-        EventBus.getDefault().register(new Object() {
-            @SuppressWarnings("unused")
-            public void onEvent(final OnPreferencesChangedEvent event) {
-                notifyDataSetChanged();
-            }
-        });
+        mShouldFilter = filter;
     }
 
     @Override
@@ -81,23 +80,30 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
     }
 
     public void add(final T event) {
-        synchronized (mLock) {
-            mObjects.add(event);
+        if (!mShouldFilter || EventUtils.shouldDisplayEvent(event)) {
+            synchronized (mLock) {
+                mObjects.add(event);
+            }
+            notifyDataSetChanged();
         }
-        notifyDataSetChanged();
     }
 
     public void setData(final List<T> list) {
         synchronized (mLock) {
-            mObjects = list;
+            mObjects = new ArrayList<>(list);
         }
         notifyDataSetChanged();
+        if (mShouldFilter) {
+            getFilter().filter(null);
+        }
     }
 
-    public void clear() {
-        synchronized (mLock) {
-            mObjects.clear();
+    @Override
+    public Filter getFilter() {
+        if (mFilter == null) {
+            mFilter = new IRCFilter();
         }
+        return mFilter;
     }
 
     private Event getEvent(final int position) {
@@ -148,6 +154,33 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         private ViewHolder(final TextView timestamp, final TextView message) {
             this.timestamp = timestamp;
             this.message = message;
+        }
+    }
+
+    private class IRCFilter extends Filter {
+
+        @Override
+        protected FilterResults performFiltering(final CharSequence constraint) {
+            final ArrayList<T> resultList = new ArrayList<>();
+            synchronized (mLock) {
+                for (final T object : mObjects) {
+                    if (EventUtils.shouldDisplayEvent(object)) {
+                        resultList.add(object);
+                    }
+                }
+            }
+
+            final FilterResults results = new FilterResults();
+            results.values = resultList;
+            results.count = resultList.size();
+            return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(final CharSequence constraint, final FilterResults results) {
+            mObjects = (List<T>) results.values;
+            notifyDataSetChanged();
         }
     }
 }

@@ -24,6 +24,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
@@ -59,6 +60,12 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
 
     IRCMessageAdapter<T> mMessageAdapter;
 
+    private Object mEventListener = new Object() {
+        public void onEvent(final OnPreferencesChangedEvent event) {
+            onResetBuffer();
+        }
+    };
+
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
@@ -69,8 +76,6 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final Callback callback = FragmentUtils.getParent(this, Callback.class);
-
         final OnConversationChanged event = EventBus.getDefault().getStickyEvent
                 (OnConversationChanged.class);
         mConversation = event.conversation;
@@ -80,8 +85,10 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
 
         mTitle = getArguments().getString("title");
 
-        mMessageAdapter = new IRCMessageAdapter<>(getActivity(), callback.getEventCache());
+        mMessageAdapter = getNewAdapter();
         setListAdapter(mMessageAdapter);
+
+        EventBus.getDefault().register(mEventListener);
 
         onResetBuffer();
         mConversation.getServer().getServerEventBus().register(this);
@@ -89,6 +96,13 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
         if (savedInstanceState == null) {
             getListView().setSelection(mMessageAdapter.getCount() - 1);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        EventBus.getDefault().unregister(mEventListener);
     }
 
     @Override
@@ -106,7 +120,7 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     }
 
     public void onResetBuffer() {
-        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
+        mMessageAdapter.setData(getAdapterData());
     }
 
     public abstract FragmentType getType();
@@ -114,6 +128,11 @@ public abstract class IRCFragment<T extends Event> extends ListFragment implemen
     // Getters and setters
     public String getTitle() {
         return mTitle;
+    }
+
+    protected IRCMessageAdapter<T> getNewAdapter() {
+        final Callback callback = FragmentUtils.getParent(this, Callback.class);
+        return new IRCMessageAdapter<>(getActivity(), callback.getEventCache(), true);
     }
 
     protected View createView(final ViewGroup container, final LayoutInflater inflater) {

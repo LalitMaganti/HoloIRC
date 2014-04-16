@@ -21,11 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.google.common.collect.ImmutableList;
-
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.event.server.JoinEvent;
-import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
@@ -38,9 +34,6 @@ import java.util.List;
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 
 public class ServerFragment extends IRCFragment<ServerEvent> {
-
-    private static final ImmutableList<? extends Class<? extends ServerEvent>> sClasses =
-            ImmutableList.of(JoinEvent.class, PartEvent.class);
 
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
@@ -62,9 +55,7 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     // Subscription methods
     @Subscribe
     public void onEventMainThread(final ServerEvent event) {
-        if (!sClasses.contains(event.getClass())) {
-            mMessageAdapter.add(event);
-        }
+        mMessageAdapter.add(event);
     }
 
     @Override
