@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ActionEvent;
@@ -56,8 +55,6 @@ public class MessageConversionUtils {
     private final Context mContext;
 
     private final Bus mConverter;
-
-    private EventDecorator mMessage;
 
     private final Object mParser = new Object() {
 
@@ -289,6 +286,8 @@ public class MessageConversionUtils {
             setupEvent(event, String.format(response, event.nick, event.message));
         }
     };
+
+    private EventDecorator mMessage;
 
     private MessageConversionUtils(final Context context) {
         mContext = context.getApplicationContext();

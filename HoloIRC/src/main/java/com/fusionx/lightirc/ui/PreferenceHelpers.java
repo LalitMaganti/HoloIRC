@@ -1,10 +1,10 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.PreferenceConstants;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.ConnectionStatus;
@@ -101,7 +101,17 @@ class PreferenceHelpers {
             return true;
         }
 
-        private final ServiceConnection mConnection = new ServiceConnection() {
+        // TODO - this is a hack - fix it
+        private void fixCurrentBusSettings() {
+            final OnConversationChanged event = EventBus.getDefault().getStickyEvent
+                    (OnConversationChanged.class);
+            if (event.conversation != null) {
+                EventBus.getDefault().postSticky(new OnConversationChanged
+                        (null, null));
+                EventBus.getDefault().postSticky(new OnCurrentServerStatusChanged
+                        (ConnectionStatus.DISCONNECTED));
+            }
+        }        private final ServiceConnection mConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
                 final IRCService service = ((IRCService.IRCBinder) binder).getService();
@@ -121,16 +131,6 @@ class PreferenceHelpers {
             }
         };
 
-        // TODO - this is a hack - fix it
-        private void fixCurrentBusSettings() {
-            final OnConversationChanged event = EventBus.getDefault().getStickyEvent
-                    (OnConversationChanged.class);
-            if (event.conversation != null) {
-                EventBus.getDefault().postSticky(new OnConversationChanged
-                        (null, null));
-                EventBus.getDefault().postSticky(new OnCurrentServerStatusChanged
-                        (ConnectionStatus.DISCONNECTED));
-            }
-        }
+
     }
 }

@@ -35,27 +35,6 @@ public class UIUtils {
                 .ORIENTATION_LANDSCAPE;
     }
 
-    private static boolean isTablet(final Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration
-                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    private static Typeface getRobotoLight(final Context context) {
-        if (sRobotoLightTypeface == null) {
-            sRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(),
-                    "Roboto-Light.ttf");
-        }
-        return sRobotoLightTypeface;
-    }
-
-    private static Typeface getRobotoThin(final Context context) {
-        if (sRobotoLightTypeface == null) {
-            sRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
-                    "Roboto-Thin.ttf");
-        }
-        return sRobotoThinTypeface;
-    }
-
     public static void setRobotoLight(final Context context, final TextView textView) {
         final Typeface font = getRobotoLight(context);
         textView.setTypeface(font);
@@ -148,5 +127,26 @@ public class UIUtils {
 
     public static boolean isAppFromRecentApps(final int flags) {
         return (flags & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0;
+    }
+
+    private static boolean isTablet(final Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration
+                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    private static Typeface getRobotoLight(final Context context) {
+        if (sRobotoLightTypeface == null) {
+            sRobotoLightTypeface = Typeface.createFromAsset(context.getAssets(),
+                    "Roboto-Light.ttf");
+        }
+        return sRobotoLightTypeface;
+    }
+
+    private static Typeface getRobotoThin(final Context context) {
+        if (sRobotoLightTypeface == null) {
+            sRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
+                    "Roboto-Thin.ttf");
+        }
+        return sRobotoThinTypeface;
     }
 }

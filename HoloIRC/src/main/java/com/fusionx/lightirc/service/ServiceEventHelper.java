@@ -8,12 +8,12 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.WorldActionEvent;
 import com.fusionx.relay.event.channel.WorldMessageEvent;
 import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.event.server.JoinEvent;
+import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
@@ -138,7 +138,8 @@ public final class ServiceEventHelper {
         onIRCEvent(MessagePriority.HIGH, conversation, event);
     }
 
-    private void setSubMessagePriority(final Conversation conversation, final MessagePriority priority) {
+    private void setSubMessagePriority(final Conversation conversation,
+            final MessagePriority priority) {
         final MessagePriority oldPriority = mMessagePriorityMap.get(conversation);
         if (oldPriority == null || oldPriority.compareTo(priority) < 0) {
             mMessagePriorityMap.put(conversation, priority);

@@ -79,7 +79,7 @@ public class NotificationUtils {
                 builder.setSound(notification);
             }
             if (outApp.contains(context.getString(R.string.notification_value_vibrate))) {
-                builder.setVibrate(new long[] {0, 500});
+                builder.setVibrate(new long[]{0, 500});
             }
             if (outApp.contains(context.getString(R.string.notification_value_lights))) {
                 builder.setDefaults(Notification.DEFAULT_LIGHTS);

@@ -105,5 +105,6 @@ public class PreferenceConstants {
 
     public static final String PREF_OUT_OF_APP_NOTIFICATION = "pref_notify_out_app";
 
-    public static final String PREF_OUT_OF_APP_NOTIFICATION_SETTINGS = "pref_notify_out_app_settings";
+    public static final String PREF_OUT_OF_APP_NOTIFICATION_SETTINGS
+            = "pref_notify_out_app_settings";
 }

@@ -48,48 +48,6 @@ public class BuilderDatabaseSource {
         mServerDatabase = new ServerDatabase(context);
     }
 
-    public BuilderDatabaseSource open() throws SQLException {
-        mDatabase = mServerDatabase.getWritableDatabase();
-        return this;
-    }
-
-    public void close() {
-        mServerDatabase.close();
-        mDatabase = null;
-    }
-
-    public void addServer(final ContentValues values) {
-        final long id = mDatabase.insert(TABLE_NAME, null, values);
-        values.put(_ID, (int) id);
-    }
-
-    public void addServer(final ServerConfiguration.Builder builder,
-            final List<String> ignoreList) {
-        final ContentValues values = getContentValuesFromBuilder(builder, false);
-
-        if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils.isNotEmpty(builder.getUrl())) {
-            values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
-                    convertStringListToString(ignoreList));
-
-            final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
-            builder.setId(id);
-        }
-    }
-
-    public List<ServerConfiguration.Builder> getAllBuilders() {
-        final List<ServerConfiguration.Builder> builders = new ArrayList<>();
-        final String selectQuery = "SELECT * FROM " + TABLE_NAME;
-
-        final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
-                builders.add(builder);
-            } while (cursor.moveToNext());
-        }
-        return builders;
-    }
-
     private static ServerConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
 
@@ -132,6 +90,49 @@ public class BuilderDatabaseSource {
         builder.setNickservPassword(getStringByName(cursor, COLUMN_NICK_SERV_PASSWORD));
 
         return builder;
+    }
+
+    public BuilderDatabaseSource open() throws SQLException {
+        mDatabase = mServerDatabase.getWritableDatabase();
+        return this;
+    }
+
+    public void close() {
+        mServerDatabase.close();
+        mDatabase = null;
+    }
+
+    public void addServer(final ContentValues values) {
+        final long id = mDatabase.insert(TABLE_NAME, null, values);
+        values.put(_ID, (int) id);
+    }
+
+    public void addServer(final ServerConfiguration.Builder builder,
+            final List<String> ignoreList) {
+        final ContentValues values = getContentValuesFromBuilder(builder, false);
+
+        if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
+                .isNotEmpty(builder.getUrl())) {
+            values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
+                    convertStringListToString(ignoreList));
+
+            final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
+            builder.setId(id);
+        }
+    }
+
+    public List<ServerConfiguration.Builder> getAllBuilders() {
+        final List<ServerConfiguration.Builder> builders = new ArrayList<>();
+        final String selectQuery = "SELECT * FROM " + TABLE_NAME;
+
+        final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
+                builders.add(builder);
+            } while (cursor.moveToNext());
+        }
+        return builders;
     }
 
     public ServerConfiguration.Builder getBuilderByName(final String serverName) {

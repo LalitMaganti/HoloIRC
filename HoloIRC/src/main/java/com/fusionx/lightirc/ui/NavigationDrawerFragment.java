@@ -171,7 +171,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void reconnectToServer() {
-         mCallback.reconnectToServer();
+        mCallback.reconnectToServer();
     }
 
     @Override
@@ -222,6 +222,25 @@ public class NavigationDrawerFragment extends Fragment implements
         return false;
     }
 
+    @Override
+    public void updateUserListVisibility() {
+        final int visibility = mStatus == ConnectionStatus.CONNECTED &&
+                mFragmentType == FragmentType.CHANNEL && !mIsIgnoreListDisplayed ?
+                View.VISIBLE : View.GONE;
+        mSlideUpLayout.setVisibility(visibility);
+
+        if (visibility == View.VISIBLE) {
+            // TODO - change this from casting
+            final Channel channel = (Channel) mConversation;
+            mTextView.setText(String.format("%d users", channel.getUsers().size()));
+        } else {
+            if (mSlidingUpPanelLayout.isExpanded()) {
+                // Collapse Pane
+                mSlidingUpPanelLayout.collapsePane();
+            }
+        }
+    }
+
     private void updateActionBarForIgnoreList() {
         final LayoutInflater inflater = (LayoutInflater) getActivity().getActionBar()
                 .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
@@ -253,25 +272,6 @@ public class NavigationDrawerFragment extends Fragment implements
                         ActionBar.DISPLAY_SHOW_CUSTOM
         );
         actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public void updateUserListVisibility() {
-        final int visibility = mStatus == ConnectionStatus.CONNECTED &&
-                mFragmentType == FragmentType.CHANNEL && !mIsIgnoreListDisplayed ?
-                View.VISIBLE : View.GONE;
-        mSlideUpLayout.setVisibility(visibility);
-
-        if (visibility == View.VISIBLE) {
-            // TODO - change this from casting
-            final Channel channel = (Channel) mConversation;
-            mTextView.setText(String.format("%d users", channel.getUsers().size()));
-        } else {
-            if (mSlidingUpPanelLayout.isExpanded()) {
-                // Collapse Pane
-                mSlidingUpPanelLayout.collapsePane();
-            }
-        }
     }
 
     public interface Callback {
