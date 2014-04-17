@@ -81,7 +81,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     private ExpandableServerListAdapter mListAdapter;
 
     // Action mode
-    private boolean mActionModeStarted;
+    private ActionMode mActionMode;
 
     private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
@@ -151,16 +151,22 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return onServerClick(groupPosition);
     }
 
+    public void onPanelClosed() {
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
+    }
+
     @Override
     public boolean onChildClick(final ExpandableListView parent, final View v,
             final int groupPosition, final int childPosition, final long id) {
-        if (mActionModeStarted && mSelectionType == ExpandableListView
+        if (mActionMode != null && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_CHILD) {
             int flatPosition = parent.getFlatListPosition(ExpandableListView
                     .getPackedPositionForChild(groupPosition, childPosition));
             parent.setItemChecked(flatPosition, !parent.isItemChecked(flatPosition));
             return true;
-        } else if (mActionModeStarted) {
+        } else if (mActionMode != null) {
             return true;
         }
 
@@ -194,9 +200,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
         mode.getMenuInflater().inflate(R.menu.activity_server_list_popup, menu);
-        mActionModeStarted = true;
+        mActionMode = mode;
         return true;
     }
 
@@ -242,11 +248,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mActionModeStarted = false;
-    }
-
     public void onServiceConnected(final IRCService service) {
         mService = service;
 
@@ -254,13 +255,13 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     private boolean onServerClick(final int groupPosition) {
-        if (mActionModeStarted && mSelectionType == ExpandableListView
+        if (mActionMode != null && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_GROUP) {
             int flatPosition = mListView.getFlatListPosition(ExpandableListView
                     .getPackedPositionForGroup(groupPosition));
             mListView.setItemChecked(flatPosition, !mListView.isItemChecked(flatPosition));
             return true;
-        } else if (mActionModeStarted) {
+        } else if (mActionMode != null) {
             return true;
         }
 
@@ -302,6 +303,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
         };
         asyncTask.execute();
+    }
+
+    @Override
+    public void onDestroyActionMode(final ActionMode mode) {
+        mActionMode = null;
     }
 
     private ServerWrapper getFirstCheckedItem() {
