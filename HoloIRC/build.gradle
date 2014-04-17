@@ -63,6 +63,7 @@ dependencies {
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
     compile 'com.nhaarman.listviewanimations:library:2.+'
 
+    compile project(':libraries:Bus:library')
     compile project(':libraries:relay:library')
     compile project(':libraries:AndroidSlidingUpPanel:library')
 

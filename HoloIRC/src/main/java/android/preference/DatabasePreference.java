@@ -32,8 +32,19 @@ public class DatabasePreference extends Preference {
         }
     }
 
-    public DatabasePreference(Context context, AttributeSet attrs) {
-        this(context, attrs, com.android.internal.R.attr.preferenceStyle);
+    public DatabasePreference(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+
+        final TypedArray a = context.obtainStyledAttributes(attrs,
+                R.styleable.DatabasePreference, 0, 0);
+        final String classString = a.getString(R.styleable.DatabasePreference_preference);
+        a.recycle();
+
+        try {
+            mPreference = (Preference) Class.forName(classString).newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public Intent getIntent() {
