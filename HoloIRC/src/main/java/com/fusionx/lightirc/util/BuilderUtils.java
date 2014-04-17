@@ -18,7 +18,12 @@ public class BuilderUtils {
         snoonet.setTitle("Snoonet").setUrl("irc.snoonet.org").setPort(6667).setSsl(false);
         snoonet.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
         snoonet.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
+        
+        final ServerConfiguration.Builder tmwirc = new ServerConfiguration.Builder();
+        tmwirc.setTitle("Techman's World IRC").setUrl("irc.techmansworld.com").setPort(6667).setSsl(false);
+        tmwirc.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
+        tmwirc.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
-        return Arrays.asList(freenode, snoonet);
+        return Arrays.asList(freenode, snoonet, tmwirc);
     }
 }
