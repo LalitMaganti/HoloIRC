@@ -120,7 +120,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onSubServerClicked(final Conversation object) {
-        changeCurrentConversation(object, false);
+        changeCurrentConversation(object, true);
     }
 
     @Override
@@ -243,6 +243,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onPanelClosed(final View view) {
         supportInvalidateOptionsMenu();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mServerListFragment.onPanelClosed();
     }
 
     @Override

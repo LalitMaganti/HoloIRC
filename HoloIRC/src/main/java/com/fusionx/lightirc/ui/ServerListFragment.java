@@ -8,11 +8,9 @@ import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.event.NewPrivateMessage;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
@@ -84,7 +82,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     private ExpandableServerListAdapter mListAdapter;
 
     // Action mode
-    private boolean mActionModeStarted;
+    private ActionMode mActionMode;
 
     private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
@@ -154,14 +152,20 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return onServerClick(groupPosition);
     }
 
+    public void onPanelClosed() {
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
+    }
+
     private boolean onServerClick(final int groupPosition) {
-        if (mActionModeStarted && mSelectionType == ExpandableListView
+        if (mActionMode != null && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_GROUP) {
             int flatPosition = mListView.getFlatListPosition(ExpandableListView
                     .getPackedPositionForGroup(groupPosition));
             mListView.setItemChecked(flatPosition, !mListView.isItemChecked(flatPosition));
             return true;
-        } else if (mActionModeStarted) {
+        } else if (mActionMode != null) {
             return true;
         }
 
@@ -179,13 +183,13 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     @Override
     public boolean onChildClick(final ExpandableListView parent, final View v,
             final int groupPosition, final int childPosition, final long id) {
-        if (mActionModeStarted && mSelectionType == ExpandableListView
+        if (mActionMode != null && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_CHILD) {
             int flatPosition = parent.getFlatListPosition(ExpandableListView
                     .getPackedPositionForChild(groupPosition, childPosition));
             parent.setItemChecked(flatPosition, !parent.isItemChecked(flatPosition));
             return true;
-        } else if (mActionModeStarted) {
+        } else if (mActionMode != null) {
             return true;
         }
 
@@ -219,9 +223,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
         mode.getMenuInflater().inflate(R.menu.activity_server_list_popup, menu);
-        mActionModeStarted = true;
+        mActionMode = mode;
         return true;
     }
 
@@ -296,8 +300,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mActionModeStarted = false;
+    public void onDestroyActionMode(final ActionMode mode) {
+        mActionMode = null;
     }
 
     public void onServiceConnected(final IRCService service) {
