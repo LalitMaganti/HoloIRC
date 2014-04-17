@@ -103,65 +103,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     // TODO - unify the server and subserver code
     @Override
     public void onServerClicked(final Server server) {
-        if (!server.equals(mConversation)) {
-            final Bundle bundle = new Bundle();
-            bundle.putString("title", server.getTitle());
-
-            final IRCFragment fragment = new ServerFragment();
-            fragment.setArguments(bundle);
-
-            if (mConversation != null) {
-                if (mConversation.getServer() != server) {
-                    mConversation.getServer().getServerEventBus().unregister(this);
-                    server.getServerEventBus().register(this);
-                }
-            } else {
-                server.getServerEventBus().register(this);
-            }
-
-            setActionBarTitle(server.getTitle());
-            setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
-
-            mEventBus.postSticky(new OnConversationChanged(server, FragmentType.SERVER));
-            onChangeCurrentFragment(fragment);
-        }
-        mSlidingPane.closePane();
-        supportInvalidateOptionsMenu();
+        changeCurrentConversation(server, true);
     }
 
     @Override
     public void onSubServerClicked(final Conversation object) {
-        if (!object.equals(mConversation)) {
-            final Bundle bundle = new Bundle();
-            bundle.putString("title", object.getId());
-
-            final IRCFragment fragment;
-            if (object.getClass().equals(Channel.class)) {
-                fragment = new ChannelFragment();
-            } else if (object.getClass().equals(PrivateMessageUser.class)) {
-                fragment = new UserFragment();
-            } else {
-                throw new IllegalArgumentException();
-            }
-            fragment.setArguments(bundle);
-
-            if (mConversation != null) {
-                if (mConversation.getServer() != object.getServer()) {
-                    mConversation.getServer().getServerEventBus().unregister(this);
-                    object.getServer().getServerEventBus().register(this);
-                }
-            } else {
-                object.getServer().getServerEventBus().register(this);
-            }
-
-            setActionBarTitle(object.getId());
-            setActionBarSubtitle(object.getServer().getTitle());
-
-            mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
-            onChangeCurrentFragment(fragment);
-        }
-        mSlidingPane.closePane();
-        supportInvalidateOptionsMenu();
+        changeCurrentConversation(object, false);
     }
 
     @Override
@@ -536,6 +483,67 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mEventBus.register(mMentionHelper, 100);
     }
 
+    private void changeCurrentConversation(final Server server, final boolean delayChange) {
+        if (!server.equals(mConversation)) {
+            final Bundle bundle = new Bundle();
+            bundle.putString("title", server.getTitle());
+
+            final IRCFragment fragment = new ServerFragment();
+            fragment.setArguments(bundle);
+
+            if (mConversation != null) {
+                if (mConversation.getServer() != server) {
+                    mConversation.getServer().getServerEventBus().unregister(this);
+                    server.getServerEventBus().register(this);
+                }
+            } else {
+                server.getServerEventBus().register(this);
+            }
+
+            setActionBarTitle(server.getTitle());
+            setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
+
+            mEventBus.postSticky(new OnConversationChanged(server, FragmentType.SERVER));
+            onChangeCurrentFragment(fragment, delayChange);
+        }
+        mSlidingPane.closePane();
+        supportInvalidateOptionsMenu();
+    }
+
+    private void changeCurrentConversation(final Conversation object, boolean delayChange) {
+        if (!object.equals(mConversation)) {
+            final Bundle bundle = new Bundle();
+            bundle.putString("title", object.getId());
+
+            final IRCFragment fragment;
+            if (object.getClass().equals(Channel.class)) {
+                fragment = new ChannelFragment();
+            } else if (object.getClass().equals(PrivateMessageUser.class)) {
+                fragment = new UserFragment();
+            } else {
+                throw new IllegalArgumentException();
+            }
+            fragment.setArguments(bundle);
+
+            if (mConversation != null) {
+                if (mConversation.getServer() != object.getServer()) {
+                    mConversation.getServer().getServerEventBus().unregister(this);
+                    object.getServer().getServerEventBus().register(this);
+                }
+            } else {
+                object.getServer().getServerEventBus().register(this);
+            }
+
+            setActionBarTitle(object.getId());
+            setActionBarSubtitle(object.getServer().getTitle());
+
+            mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
+            onChangeCurrentFragment(fragment, delayChange);
+        }
+        mSlidingPane.closePane();
+        supportInvalidateOptionsMenu();
+    }
+
     private void openAppSettings() {
         final Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
@@ -548,10 +556,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         startActivityForResult(intent, SERVER_SETTINGS);
     }
 
-    private void onChangeCurrentFragment(final IRCFragment fragment) {
+    private void onChangeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
-        mHandler.postDelayed(new Runnable() {
+        final Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 final FragmentTransaction transaction = getSupportFragmentManager()
@@ -562,7 +570,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 findById(MainActivity.this, R.id.content_frame_empty_textview)
                         .setVisibility(View.GONE);
             }
-        }, 300);
+        };
+
+        if (delayChange) {
+            mHandler.postDelayed(runnable, 300);
+        } else {
+            mHandler.post(runnable);
+        }
     }
 
     private void onRemoveFragment() {
@@ -581,9 +595,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 @Override
                 public void run() {
                     if (conversation.getServer().equals(conversation)) {
-                        onServerClicked(conversation.getServer());
+                        changeCurrentConversation(conversation.getServer(), false);
                     } else {
-                        onSubServerClicked(conversation);
+                        changeCurrentConversation(conversation, false);
                     }
                 }
             });
