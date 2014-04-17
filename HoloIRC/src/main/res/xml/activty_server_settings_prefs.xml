@@ -37,6 +37,7 @@
                 android:defaultValue=""
                 android:singleLine="true"
                 android:lines="1"
+                android:inputType="textNoSuggestions"
                 android:title="@string/server_settings_url_title"/>
         <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
                 android:key="pref_port"
