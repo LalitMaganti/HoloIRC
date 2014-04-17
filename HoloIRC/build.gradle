@@ -57,7 +57,6 @@ apply plugin: 'android-unit-test'
 dependencies {
     compile 'com.android.support:support-v4:19.+'
     compile 'com.android.support:appcompat-v7:19.+'
-    compile 'com.nineoldandroids:library:2.4.0'
     compile('de.keyboardsurfer.android.widget:crouton:1.8.4') {
         exclude group: 'com.google.android', module: 'support-v4'
     }

@@ -1,1 +1,2 @@
-include ':HoloIRC', 'libraries:relay:library', 'libraries:AndroidSlidingUpPanel:library'
+include ':HoloIRC', 'libraries:Bus', 'libraries:relay:library',
+        'libraries:AndroidSlidingUpPanel:library'
