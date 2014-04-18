@@ -342,7 +342,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
+        setTheme(UIUtils.getThemeInt(this));
         super.onCreate(savedInstanceState);
 
         AppPreferences.getAppPreferences(this);

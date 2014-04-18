@@ -15,7 +15,7 @@ public class SettingsActivity extends PreferenceActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
+        setTheme(UIUtils.getThemeInt(this));
         super.onCreate(savedInstanceState);
     }
 

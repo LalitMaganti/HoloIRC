@@ -45,8 +45,9 @@ public class UIUtils {
         textView.setTypeface(font);
     }
 
-    public static int getThemeInt() {
-        return AppPreferences.getTheme() != Theme.DARK ? R.style.Light : R.style.Dark;
+    public static int getThemeInt(final Context context) {
+        return AppPreferences.getAppPreferences(context).getTheme() != Theme.DARK ? R.style.Light
+                : R.style.Dark;
     }
 
     public static void toggleSlidingPane(final SlidingPaneLayout slidingPaneLayout) {

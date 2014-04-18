@@ -18,7 +18,7 @@ public class ChannelListActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
+        setTheme(UIUtils.getThemeInt(this));
 
         super.onCreate(savedInstanceState);
 
