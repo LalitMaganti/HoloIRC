@@ -414,14 +414,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restore the action bar title & sub-title
-        if (savedInstanceState != null) {
-            getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
-            getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
-        }
+        getSupportActionBar().setTitle(savedInstanceState.getString(ACTION_BAR_TITLE));
+        getSupportActionBar().setSubtitle(savedInstanceState.getString(ACTION_BAR_SUBTITLE));
     }
 
     @Override
