@@ -215,9 +215,6 @@ public class NavigationDrawerFragment extends Fragment implements
             mIgnoreListFragment.saveIgnoreList();
             switchToIRCActionFragment();
             return true;
-        } else if (mSlidingUpPanelLayout.isExpanded()) {
-            mSlidingUpPanelLayout.collapsePane();
-            return true;
         }
         return false;
     }

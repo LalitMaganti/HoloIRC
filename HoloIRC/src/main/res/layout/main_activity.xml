@@ -13,8 +13,9 @@
 
     <android.support.v4.widget.DrawerLayout
             android:id="@+id/drawer_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="400dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
         <RelativeLayout
                 android:id="@+id/content_frame"
@@ -39,6 +40,5 @@
                 android:layout_gravity="end"
                 android:divider="@android:color/transparent"
                 android:background="?attr/main_background"/>
-
     </android.support.v4.widget.DrawerLayout>
 </com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout>
