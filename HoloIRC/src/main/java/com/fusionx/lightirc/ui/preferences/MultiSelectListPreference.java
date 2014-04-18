@@ -74,7 +74,7 @@ public class MultiSelectListPreference extends DialogPreference {
      * @param entries The entries.
      * @see #setEntryValues(CharSequence[])
      */
-    public void setEntries(CharSequence[] entries) {
+    void setEntries(CharSequence[] entries) {
         mEntries = entries;
     }
 
@@ -102,7 +102,7 @@ public class MultiSelectListPreference extends DialogPreference {
      *
      * @param entryValues The array to be used as values to save for the preference.
      */
-    public void setEntryValues(CharSequence[] entryValues) {
+    void setEntryValues(CharSequence[] entryValues) {
         mEntryValues = entryValues;
     }
 
@@ -126,7 +126,7 @@ public class MultiSelectListPreference extends DialogPreference {
     /**
      * Retrieves the current value of the key.
      */
-    public Set<String> getValues() {
+    Set<String> getValues() {
         return mValues;
     }
 
@@ -135,7 +135,7 @@ public class MultiSelectListPreference extends DialogPreference {
      *
      * @param values The values to set for the key.
      */
-    public void setValues(Set<String> values) {
+    void setValues(Set<String> values) {
         mValues.clear();
         mValues.addAll(values);
 
@@ -230,7 +230,7 @@ public class MultiSelectListPreference extends DialogPreference {
         setValues(restoreValue ? getPersistedStringSet(mValues) : (Set<String>) defaultValue);
     }
 
-    protected Set<String> getPersistedStringSet(Set<String> defaultReturnValue) {
+    Set<String> getPersistedStringSet(Set<String> defaultReturnValue) {
         if (!shouldPersist()) {
             return defaultReturnValue;
         }
@@ -238,7 +238,7 @@ public class MultiSelectListPreference extends DialogPreference {
         return getSharedPreferences().getStringSet(getKey(), defaultReturnValue);
     }
 
-    protected boolean persistStringSet(Set<String> values) {
+    boolean persistStringSet(Set<String> values) {
         if (shouldPersist()) {
             // Shouldn't store null
             if (values.equals(getPersistedStringSet(null))) {

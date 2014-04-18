@@ -48,7 +48,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
+abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
         .OnEditorActionListener {
 
     Conversation mConversation;

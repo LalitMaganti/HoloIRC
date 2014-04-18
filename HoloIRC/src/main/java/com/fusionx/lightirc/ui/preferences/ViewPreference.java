@@ -30,7 +30,7 @@ public class ViewPreference extends Preference {
     public View getView(final View convertView, final ViewGroup parent) {
         if (convertView == null) {
             mTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
-                    .must_be_complete_textview, null);
+                    .must_be_complete_textview, parent);
             UIUtils.setRobotoLight(getContext(), mTextView);
             mTextView.setText(mText);
             return mTextView;

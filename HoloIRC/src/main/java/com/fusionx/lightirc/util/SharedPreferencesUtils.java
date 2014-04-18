@@ -47,7 +47,7 @@ public class SharedPreferencesUtils {
         return context.getFilesDir().getAbsolutePath().replace("files", "shared_prefs/");
     }
 
-    public static List<File> getOldServers(final Context context) {
+    private static List<File> getOldServers(final Context context) {
         final ArrayList<File> array = new ArrayList<>();
         final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(context));
 
@@ -59,7 +59,7 @@ public class SharedPreferencesUtils {
         return array;
     }
 
-    public static void migrateToDatabase(final List<File> array, final Context context) {
+    private static void migrateToDatabase(final List<File> array, final Context context) {
         final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
         source.open();
         for (final File file : array) {
@@ -78,7 +78,7 @@ public class SharedPreferencesUtils {
         source.close();
     }
 
-    public static boolean isExcludedString(final String fileName) {
+    private static boolean isExcludedString(final String fileName) {
         return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
                 fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
     }

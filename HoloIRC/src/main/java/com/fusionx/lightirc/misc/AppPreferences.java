@@ -16,19 +16,19 @@ import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class AppPreferences implements EventPreferences {
 
-    public static boolean highlightLine = true;
+    private static boolean highlightLine = true;
 
     public static boolean timestamp = false;
 
-    public static boolean motdAllowed = true;
+    private static boolean motdAllowed = true;
 
     public static boolean hideUserMessages = false;
 
-    public static String partReason = "";
+    private static String partReason = "";
 
-    public static String quitReason = "";
+    private static String quitReason = "";
 
-    public static int numberOfReconnectEvents = 3;
+    private static int numberOfReconnectEvents = 3;
 
     public static Theme theme;
 

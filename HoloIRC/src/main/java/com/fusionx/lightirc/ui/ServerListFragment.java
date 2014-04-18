@@ -49,7 +49,7 @@ import gnu.trove.set.hash.THashSet;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.getCheckedPositions;
 
-public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
+class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
@@ -176,7 +176,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
-    public void onEditServer(final ServerWrapper builder) {
+    void onEditServer(final ServerWrapper builder) {
         final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
         intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
         intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());

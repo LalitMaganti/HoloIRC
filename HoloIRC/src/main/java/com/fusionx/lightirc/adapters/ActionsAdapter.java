@@ -149,11 +149,11 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         return row;
     }
 
-    public boolean isConnected() {
+    boolean isConnected() {
         return mStatus == ConnectionStatus.CONNECTED;
     }
 
-    public boolean isDisconnected() {
+    boolean isDisconnected() {
         return mStatus == ConnectionStatus.DISCONNECTED;
     }
 

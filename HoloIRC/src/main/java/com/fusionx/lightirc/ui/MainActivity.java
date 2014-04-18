@@ -206,11 +206,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mWorkerFragment.reconnectToServer(mConversation.getServer());
     }
 
-    public void setActionBarTitle(final String title) {
+    void setActionBarTitle(final String title) {
         getSupportActionBar().setTitle(title);
     }
 
-    public void setActionBarSubtitle(final String subtitle) {
+    void setActionBarSubtitle(final String subtitle) {
         getSupportActionBar().setSubtitle(subtitle);
     }
 

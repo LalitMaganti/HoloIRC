@@ -3,11 +3,11 @@ package com.fusionx.lightirc.loader;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
-public abstract class AbstractLoader<T> extends AsyncTaskLoader<T> {
+abstract class AbstractLoader<T> extends AsyncTaskLoader<T> {
 
-    protected T mItem;
+    private T mItem;
 
-    public AbstractLoader(Context context) {
+    AbstractLoader(Context context) {
         super(context);
     }
 

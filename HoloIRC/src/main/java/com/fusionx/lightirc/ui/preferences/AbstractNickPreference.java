@@ -82,15 +82,15 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
         }
     }
 
-    protected String getFirstNickText() {
+    String getFirstNickText() {
         return mFirstChoice.getText().toString();
     }
 
-    protected String getSecondNickText() {
+    String getSecondNickText() {
         return mSecondChoice.getText().toString();
     }
 
-    protected String getThirdNickText() {
+    String getThirdNickText() {
         return mThirdChoice.getText().toString();
     }
 

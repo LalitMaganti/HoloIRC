@@ -6,7 +6,7 @@ import com.fusionx.relay.misc.NickStorage;
 import java.util.Arrays;
 import java.util.List;
 
-public class BuilderUtils {
+class BuilderUtils {
 
     public static List<ServerConfiguration.Builder> getFirstTimeBuilderList() {
         final ServerConfiguration.Builder freenode = new ServerConfiguration.Builder();

@@ -67,7 +67,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         final ListView listView = findById(view, android.R.id.list);
 
         final TextView otherHeader = (TextView) inflater
-                .inflate(R.layout.sliding_menu_header, null, false);
+                .inflate(R.layout.sliding_menu_header, container, false);
         otherHeader.setText("Ignore List");
         listView.addHeaderView(otherHeader);
 

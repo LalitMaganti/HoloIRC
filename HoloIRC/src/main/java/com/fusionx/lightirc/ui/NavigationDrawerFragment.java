@@ -131,7 +131,7 @@ public class NavigationDrawerFragment extends Fragment implements
         }
     }
 
-    public void switchToIRCActionFragment() {
+    void switchToIRCActionFragment() {
         getChildFragmentManager().popBackStackImmediate();
         mIsIgnoreListDisplayed = false;
 

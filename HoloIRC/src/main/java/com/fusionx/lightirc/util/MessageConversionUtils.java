@@ -50,7 +50,7 @@ import android.util.Log;
 
 public class MessageConversionUtils {
 
-    public static MessageConversionUtils sConverter;
+    private static MessageConversionUtils sConverter;
 
     private final Context mContext;
 
