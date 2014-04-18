@@ -4,7 +4,7 @@ public class EventDecorator {
 
     private final CharSequence mMessage;
 
-    public EventDecorator(CharSequence message) {
+    public EventDecorator(final CharSequence message) {
         mMessage = message;
     }
 

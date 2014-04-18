@@ -114,7 +114,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     public void onEventMainThread(final ChannelEvent event) {
         if (event.channelName.equals(mTitle) && !(sClasses.contains(event.getClass()))) {
             if (WorldUserEvent.sUserListChangeEvents.contains(event.getClass())
-                    && AppPreferences.hideUserMessages) {
+                    && AppPreferences.getAppPreferences(getActivity()).isHideUserMessages()) {
                 return;
             }
             mMessageAdapter.add(event);

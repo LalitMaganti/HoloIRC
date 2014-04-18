@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Logging">
+        <Preference
+                android:key="pref_logging_directory"
+                android:title="Choose logging directory"
+                android:summary="Choose the directory to store logs in"/>
+        <Preference
+                android:key="pref_logging_timestamp"
+                android:title="Choose logging directory"
+                android:summary="Choose the directory to store logs in"/>
+    </PreferenceCategory>
+</PreferenceScreen>

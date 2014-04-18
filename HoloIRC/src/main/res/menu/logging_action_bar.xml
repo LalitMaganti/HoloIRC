@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/myswitch"
+            android:title=""
+            android:showAsAction="always"
+            android:actionLayout="@layout/logging_action_bar"/>
+</menu>

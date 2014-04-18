@@ -80,7 +80,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     }
 
     public void add(final T event) {
-        if (!mShouldFilter || EventUtils.shouldDisplayEvent(event)) {
+        if (!mShouldFilter || EventUtils.shouldDisplayEvent(mContext, event)) {
             synchronized (mLock) {
                 mObjects.add(event);
             }
@@ -137,7 +137,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     }
 
     private void addTimestampIfRequired(ViewHolder holder, final Event event) {
-        if (AppPreferences.timestamp) {
+        if (AppPreferences.getAppPreferences(mContext).isTimestamp()) {
             holder.timestamp.setVisibility(View.VISIBLE);
             holder.timestamp.setText(event.timestamp.format("%H:%M"));
         } else {
@@ -164,7 +164,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
             final ArrayList<T> resultList = new ArrayList<>();
             synchronized (mLock) {
                 for (final T object : mObjects) {
-                    if (EventUtils.shouldDisplayEvent(object)) {
+                    if (EventUtils.shouldDisplayEvent(mContext, object)) {
                         resultList.add(object);
                     }
                 }

@@ -345,14 +345,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setTheme(UIUtils.getThemeInt());
         super.onCreate(savedInstanceState);
 
-        AppPreferences.setUpPreferences(this);
+        AppPreferences.getAppPreferences(this);
 
         setContentView(R.layout.main_activity);
 
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
         mSlidingPane.setPanelSlideListener(this);
-        if (AppPreferences.theme == Theme.DARK) {
+        if (AppPreferences.getAppPreferences(this).getTheme() == Theme.DARK) {
             // TODO - fix this hack
             mSlidingPane.setSliderFadeColor(0);
         }

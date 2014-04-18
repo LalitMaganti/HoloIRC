@@ -18,6 +18,10 @@
             android:title="@string/notification_settings_title"
             android:summary="@string/notification_settings_summary"/>
     <header
+            android:fragment="com.fusionx.lightirc.ui.LoggingPreferenceFragment"
+            android:title="@string/logging_settings_title"
+            android:summary="@string/logging_settings_summary"/>
+    <header
             android:fragment="com.fusionx.lightirc.ui.AboutPreferenceFragment"
             android:title="@string/about"
             android:summary="@string/settings_about_fragment_summary"/>
