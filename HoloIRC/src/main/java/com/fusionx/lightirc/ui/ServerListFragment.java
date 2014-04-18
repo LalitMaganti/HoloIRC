@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +113,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         mListView = findById(view, R.id.server_list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        mListView.setEmptyView(findById(view, android.R.id.empty));
 
         mListView.setMultiChoiceModeListener(this);
 
@@ -333,6 +335,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
                         mListView, mService);
                 mListView.setAdapter(mListAdapter);
+
+                final TextView textView = findById(getView(), R.id.empty_text_view);
+                textView.setText("No servers found :(\nClick + to add one");
+
+                findById(getView(), R.id.progress_bar_empty).setVisibility(View.GONE);
+
                 for (final ServerEventHandler handler : mEventHandlers) {
                     handler.unregister();
                 }

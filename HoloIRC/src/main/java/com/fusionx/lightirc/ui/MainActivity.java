@@ -315,7 +315,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(!mSlidingPane.isOpen() && mConversation != null);
+        item.setVisible((!mSlidingPane.isSlideable() || !mSlidingPane.isOpen())
+                && mConversation != null);
 
         final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());
@@ -402,7 +403,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
             supportInvalidateOptionsMenu();
         }
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (mSlidingPane.isSlideable()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
