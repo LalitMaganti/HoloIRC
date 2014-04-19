@@ -5,6 +5,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
@@ -99,7 +100,8 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final ChannelEvent event) {
-        if (!EventUtils.shouldStoreEvent(event)) {
+        if (!EventUtils.shouldStoreEvent(event)
+                || mConversation.getServer().getStatus() == ConnectionStatus.DISCONNECTED) {
             return;
         }
 
@@ -133,6 +135,10 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final UserEvent event) {
+        if (mConversation.getServer().getStatus() == ConnectionStatus.DISCONNECTED) {
+            return;
+        }
+
         final Conversation conversation = mServer.getUserChannelInterface()
                 .getPrivateMessageUser(event.user.getNick());
 

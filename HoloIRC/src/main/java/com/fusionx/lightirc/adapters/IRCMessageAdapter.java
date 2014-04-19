@@ -80,12 +80,14 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     }
 
     public void add(final T event) {
-        if (!mShouldFilter || EventUtils.shouldStoreEvent(event)) {
-            synchronized (mLock) {
-                mObjects.add(event);
-            }
-            notifyDataSetChanged();
+        if (mShouldFilter && !EventUtils.shouldStoreEvent(event)) {
+            return;
         }
+
+        synchronized (mLock) {
+            mObjects.add(event);
+        }
+        notifyDataSetChanged();
     }
 
     public void setData(final List<T> list) {

@@ -106,8 +106,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     // Subscription methods
     @Subscribe
     public void onEventMainThread(final ChannelEvent event) {
-        if (event.channelName.equals(mTitle) || !EventUtils.shouldStoreEvent(
-                event)) {
+        if (!event.channelName.equals(mTitle)) {
             return;
         }
 

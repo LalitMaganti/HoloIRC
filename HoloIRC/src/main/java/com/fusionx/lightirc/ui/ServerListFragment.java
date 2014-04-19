@@ -10,6 +10,7 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
@@ -439,7 +440,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final ChannelEvent event) {
-            if (EventUtils.shouldStoreEvent(event)) {
+            if (EventUtils.shouldStoreEvent(event)
+                    && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
             }
         }
@@ -454,7 +456,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final UserEvent event) {
-            mListView.invalidateViews();
+            if (mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
+                mListView.invalidateViews();
+            }
         }
 
         @SuppressWarnings("unused")

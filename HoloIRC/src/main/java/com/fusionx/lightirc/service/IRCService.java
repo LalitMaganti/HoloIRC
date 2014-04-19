@@ -34,6 +34,7 @@ import de.greenrobot.event.EventBus;
 import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;
+import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
 
 public class IRCService extends Service {
 
@@ -148,7 +149,7 @@ public class IRCService extends Service {
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(NotificationUtils.NOTIFICATION_MENTION);
+        notificationManager.cancel(NOTIFICATION_MENTION);
 
         final boolean finalServer = mConnectionManager.requestDisconnectionAndRemoval(server
                 .getTitle());
