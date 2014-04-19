@@ -3,9 +3,7 @@ package com.fusionx.lightirc.service;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
@@ -56,6 +54,10 @@ public final class ServiceEventHelper {
         server.getServerEventBus().register(this, EVENT_PRIORITY);
     }
 
+    public void unregister() {
+        mServer.getServerEventBus().unregister(this);
+    }
+
     public void clearMessagePriority() {
         mMessagePriority = null;
     }
@@ -100,11 +102,6 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final ChannelEvent event) {
-        if (!EventUtils.shouldStoreEvent(event)
-                || mConversation.getServer().getStatus() == ConnectionStatus.DISCONNECTED) {
-            return;
-        }
-
         final Conversation conversation = mServer.getUserChannelInterface().getChannel(event
                 .channelName);
         // TODO - fix this horrible code
@@ -135,10 +132,6 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final UserEvent event) {
-        if (mConversation.getServer().getStatus() == ConnectionStatus.DISCONNECTED) {
-            return;
-        }
-
         final Conversation conversation = mServer.getUserChannelInterface()
                 .getPrivateMessageUser(event.user.getNick());
 

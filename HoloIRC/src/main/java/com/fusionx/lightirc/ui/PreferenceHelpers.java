@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.PreferenceConstants;
@@ -10,10 +9,8 @@ import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.ConnectionStatus;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
@@ -86,7 +83,7 @@ class PreferenceHelpers {
 
         @Override
         public boolean onPreferenceChange(final Preference preference, final Object o) {
-            final AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+            /*final AlertDialog.Builder build = new AlertDialog.Builder(mContext);
             build.setMessage(mContext.getString(R.string.appearance_settings_requires_restart))
                     .setPositiveButton(mContext.getString(R.string.restart),
                             new DialogInterface.OnClickListener() {
@@ -97,7 +94,7 @@ class PreferenceHelpers {
                                 }
                             }
                     );
-            build.show();
+            build.show();*/
             return true;
         }
 
@@ -111,7 +108,9 @@ class PreferenceHelpers {
                 EventBus.getDefault().postSticky(new OnCurrentServerStatusChanged
                         (ConnectionStatus.DISCONNECTED));
             }
-        }        private final ServiceConnection mConnection = new ServiceConnection() {
+        }
+
+        private final ServiceConnection mConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
                 final IRCService service = ((IRCService.IRCBinder) binder).getService();

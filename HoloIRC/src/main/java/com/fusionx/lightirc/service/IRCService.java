@@ -147,15 +147,15 @@ public class IRCService extends Service {
         return mConnectionManager.getServerIfExists(title);
     }
 
-    public void requestDisconnectionFromServer(final Server server) {
+    public void requestConnectionStoppage(final Server server) {
+        mEventHelperMap.get(server).unregister();
         mEventHelperMap.remove(server);
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_MENTION);
 
-        final boolean finalServer = mConnectionManager.requestDisconnectionAndRemoval(server
-                .getTitle());
+        final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(server.getTitle());
         if (finalServer) {
             stopForeground(true);
         } else {
@@ -177,17 +177,11 @@ public class IRCService extends Service {
         return mEventHelperMap.get(server);
     }
 
-    public void disconnectAll() {
-        mEventHelperMap.clear();
-        mEventCache.clear();
-        mConnectionManager.requestDisconnectAll();
-    }
-
     public EventCache getEventCache(Server server) {
         return mEventCache.get(server);
     }
 
-    public void startWatchingExternalStorage() {
+    private void startWatchingExternalStorage() {
         final IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
         filter.addAction(Intent.ACTION_MEDIA_REMOVED);
@@ -195,7 +189,7 @@ public class IRCService extends Service {
         updateExternalStorageState();
     }
 
-    public void stopWatchingExternalStorage() {
+    private void stopWatchingExternalStorage() {
         unregisterReceiver(mExternalStorageReceiver);
     }
 

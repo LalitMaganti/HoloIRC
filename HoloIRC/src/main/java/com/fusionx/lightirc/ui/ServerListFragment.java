@@ -21,6 +21,7 @@ import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
+import com.fusionx.relay.event.server.StopEvent;
 import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
@@ -468,19 +469,19 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final DisconnectEvent event) {
-            if (event.userSent) {
-                refreshServers(new Runnable() {
-                    @Override
-                    public void run() {
-                        unregister();
-                        mEventHandlers.remove(ServerEventHandler.this);
-                        mCallback.onServerDisconnected(mServer);
-                    }
-                });
-            } else {
-                // TODO - check what needs to be done here
-                mListView.invalidateViews();
-            }
+            mListView.invalidateViews();
+        }
+
+        @SuppressWarnings("unused")
+        public void onEventMainThread(final StopEvent event) {
+            refreshServers(new Runnable() {
+                @Override
+                public void run() {
+                    unregister();
+                    mEventHandlers.remove(ServerEventHandler.this);
+                    mCallback.onServerDisconnected(mServer);
+                }
+            });
         }
 
         public void unregister() {

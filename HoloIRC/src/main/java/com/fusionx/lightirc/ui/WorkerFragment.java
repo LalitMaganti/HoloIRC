@@ -107,7 +107,7 @@ public class WorkerFragment extends Fragment implements LoaderManager
     }
 
     public void disconnectFromServer(final Server server) {
-        mService.requestDisconnectionFromServer(server);
+        mService.requestConnectionStoppage(server);
     }
 
     public void reconnectToServer(final Server server) {
