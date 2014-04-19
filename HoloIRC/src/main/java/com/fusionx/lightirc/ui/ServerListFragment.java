@@ -50,7 +50,7 @@ import gnu.trove.set.hash.THashSet;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.getCheckedPositions;
 
-class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
+public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
