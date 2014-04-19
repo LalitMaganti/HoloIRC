@@ -114,7 +114,6 @@ class PreferenceHelpers {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
                 final IRCService service = ((IRCService.IRCBinder) binder).getService();
-                service.disconnectAll();
 
                 fixCurrentBusSettings();
 
