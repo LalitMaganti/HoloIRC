@@ -21,17 +21,14 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.NameEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.util.IRCUtils;
@@ -60,9 +57,6 @@ import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
         .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
-
-    public static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
-            ImmutableList.of(NameEvent.class);
 
     private ImageButton mAutoButton;
 
@@ -112,13 +106,12 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     // Subscription methods
     @Subscribe
     public void onEventMainThread(final ChannelEvent event) {
-        if (event.channelName.equals(mTitle) && !(sClasses.contains(event.getClass()))) {
-            if (WorldUserEvent.sUserListChangeEvents.contains(event.getClass())
-                    && AppPreferences.hideUserMessages) {
-                return;
-            }
-            mMessageAdapter.add(event);
+        if (event.channelName.equals(mTitle) || !EventUtils.shouldStoreEvent(
+                event)) {
+            return;
         }
+
+        mMessageAdapter.add(event);
     }
 
     @Override

@@ -158,8 +158,8 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
         with a nick
     </string>
-    <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="ignore_nick_title">Nick to ignore</string>
     <string name="ignore_nick_description">Nickname of the user to be ignored</string>
     <string name="ignore_list">Ignore List</string>
@@ -186,5 +186,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_value_audio">audio</string>
     <string name="notification_value_vibrate">vibrate</string>
     <string name="notification_value_lights">lights</string>
+
+    <!-- Logging settings -->
+    <string name="logging_settings_summary">Logging Settings</string>
+    <string name="logging_settings_title">Control logging settings</string>
 
 </resources>

@@ -3,7 +3,7 @@ package com.fusionx.lightirc.service;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.lightirc.ui.ChannelFragment;
+import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -99,34 +99,35 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final ChannelEvent event) {
-        if (!ChannelFragment.sClasses.contains(event.getClass())) {
-            final Conversation conversation = mServer.getUserChannelInterface()
-                    .getChannel(event.channelName);
+        if (!EventUtils.shouldStoreEvent(event)) {
+            return;
+        }
 
-            // TODO - fix this horrible code
-            if (event instanceof WorldUserEvent) {
-                final WorldUserEvent userEvent = (WorldUserEvent) event;
+        final Conversation conversation = mServer.getUserChannelInterface().getChannel(event
+                .channelName);
+        // TODO - fix this horrible code
+        if (event instanceof WorldUserEvent) {
+            final WorldUserEvent userEvent = (WorldUserEvent) event;
 
-                if (userEvent.userMentioned) {
-                    onIRCEvent(MessagePriority.HIGH, conversation, event);
+            if (userEvent.userMentioned) {
+                onIRCEvent(MessagePriority.HIGH, conversation, event);
 
-                    // Forward the event UI side
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            EventBus.getDefault().post(new OnChannelMentionEvent(mServer,
-                                    (Channel) conversation));
-                        }
-                    });
-                } else if (event.getClass().equals(WorldMessageEvent.class)
-                        || event.getClass().equals(WorldActionEvent.class)) {
-                    onIRCEvent(MessagePriority.MEDIUM, conversation, event);
-                } else {
-                    onIRCEvent(MessagePriority.LOW, conversation, event);
-                }
+                // Forward the event UI side
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        EventBus.getDefault().post(new OnChannelMentionEvent(mServer,
+                                (Channel) conversation));
+                    }
+                });
+            } else if (event.getClass().equals(WorldMessageEvent.class)
+                    || event.getClass().equals(WorldActionEvent.class)) {
+                onIRCEvent(MessagePriority.MEDIUM, conversation, event);
             } else {
                 onIRCEvent(MessagePriority.LOW, conversation, event);
             }
+        } else {
+            onIRCEvent(MessagePriority.LOW, conversation, event);
         }
     }
 

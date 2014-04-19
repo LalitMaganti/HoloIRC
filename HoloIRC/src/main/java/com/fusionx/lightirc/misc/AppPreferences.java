@@ -3,9 +3,11 @@ package com.fusionx.lightirc.misc;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
+import com.fusionx.relay.logging.LoggingPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,51 +16,71 @@ import de.greenrobot.event.EventBus;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
-public class AppPreferences implements EventPreferences {
+public class AppPreferences implements EventPreferences, LoggingPreferences {
 
-    private static boolean highlightLine = true;
+    private static AppPreferences mAppPreferences;
 
-    public static boolean timestamp = false;
+    private final Context mContext;
 
-    private static boolean motdAllowed = true;
+    private boolean timestamp = false;
 
-    public static boolean hideUserMessages = false;
+    private boolean hideUserMessages = false;
 
-    private static String partReason = "";
+    private Theme theme;
 
-    private static String quitReason = "";
+    private boolean inAppNotification;
 
-    private static int numberOfReconnectEvents = 3;
+    private Set<String> inAppNotificationSettings;
 
-    public static Theme theme;
+    private boolean outOfAppNotification;
 
-    public static boolean inAppNotification;
+    private Set<String> outOfAppNotificationSettings;
 
-    public static Set<String> inAppNotificationSettings;
+    private boolean highlightLine = true;
 
-    public static boolean outOfAppNotification;
+    private boolean motdAllowed = true;
 
-    public static Set<String> outOfAppNotificationSettings;
+    private String partReason = "";
 
-    private static SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
+    private String quitReason = "";
 
-    public static void setUpPreferences(final Context context) {
-        if (sPrefsChangeListener == null) {
-            sPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-                @Override
-                public void onSharedPreferenceChanged(final SharedPreferences
-                        sharedPreferences, final String key) {
-                    setPreferences(sharedPreferences);
-                    EventBus.getDefault().post(new OnPreferencesChangedEvent());
-                }
-            };
-            final SharedPreferences preferences = getDefaultSharedPreferences(context);
-            preferences.registerOnSharedPreferenceChangeListener(sPrefsChangeListener);
-            setPreferences(preferences);
+    private int numberOfReconnectEvents = 3;
+
+    private SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
+
+    // Logging
+    private boolean mLoggingEnabled;
+
+    private String mLoggingDirectory;
+
+    private boolean mLoggingTimeStamp;
+
+    public AppPreferences(final Context context) {
+        mContext = context.getApplicationContext();
+        sPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(final SharedPreferences
+                    sharedPreferences, final String key) {
+                setPreferences(sharedPreferences);
+                EventBus.getDefault().post(new OnPreferencesChangedEvent());
+            }
+        };
+        final SharedPreferences preferences = getDefaultSharedPreferences(context);
+        preferences.registerOnSharedPreferenceChangeListener(sPrefsChangeListener);
+        setPreferences(preferences);
+    }
+
+    public static void setupAppPreferences(final Context context) {
+        if (mAppPreferences == null) {
+            mAppPreferences = new AppPreferences(context);
         }
     }
 
-    public static void setPreferences(final SharedPreferences preferences) {
+    public static AppPreferences getAppPreferences() {
+        return mAppPreferences;
+    }
+
+    public void setPreferences(final SharedPreferences preferences) {
         final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
                 .FRAGMENT_SETTINGS_THEME, "1"));
         theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
@@ -80,6 +102,45 @@ public class AppPreferences implements EventPreferences {
                 .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
         outOfAppNotification = preferences.getBoolean(PreferenceConstants
                 .PREF_OUT_OF_APP_NOTIFICATION, true);
+
+        // Logging
+        mLoggingEnabled = preferences.getBoolean(PreferenceConstants.PREF_LOGGING, false);
+        mLoggingDirectory = preferences.getString(PreferenceConstants.PREF_LOGGING_DIRECTORY,
+                "/IRCLogs");
+        mLoggingTimeStamp = preferences.getBoolean(PreferenceConstants.PREF_LOGGING_TIMESTAMP,
+                true);
+    }
+
+    public boolean isLoggingEnabled() {
+        return mLoggingEnabled;
+    }
+
+    public String getLoggingRelativePath() {
+        return mLoggingDirectory;
+    }
+
+    public boolean isTimestamp() {
+        return timestamp;
+    }
+
+    public boolean isHideUserMessages() {
+        return hideUserMessages;
+    }
+
+    public boolean isInAppNotification() {
+        return inAppNotification;
+    }
+
+    public Set<String> getInAppNotificationSettings() {
+        return inAppNotificationSettings;
+    }
+
+    public boolean isOutOfAppNotification() {
+        return outOfAppNotification;
+    }
+
+    public Set<String> getOutOfAppNotificationSettings() {
+        return outOfAppNotificationSettings;
     }
 
     @Override
@@ -121,5 +182,19 @@ public class AppPreferences implements EventPreferences {
     @Override
     public boolean shouldNickBeColourful() {
         return true;
+    }
+
+    @Override
+    public boolean shouldLogTimestamps() {
+        return mLoggingTimeStamp;
+    }
+
+    @Override
+    public String getLoggingPath() {
+        return Environment.getExternalStorageDirectory() + "/" + mLoggingDirectory;
+    }
+
+    public String getRelativeLoggingPath() {
+        return mLoggingDirectory;
     }
 }

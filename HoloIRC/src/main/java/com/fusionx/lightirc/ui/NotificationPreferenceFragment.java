@@ -14,5 +14,6 @@ public class NotificationPreferenceFragment extends PreferenceFragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.notification_settings);
+        setHasOptionsMenu(true);
     }
 }

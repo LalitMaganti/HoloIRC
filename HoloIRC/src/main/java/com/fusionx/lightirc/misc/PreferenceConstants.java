@@ -105,6 +105,13 @@ public class PreferenceConstants {
 
     public static final String PREF_OUT_OF_APP_NOTIFICATION = "pref_notify_out_app";
 
-    public static final String PREF_OUT_OF_APP_NOTIFICATION_SETTINGS
-            = "pref_notify_out_app_settings";
+    public static final String PREF_OUT_OF_APP_NOTIFICATION_SETTINGS =
+            "pref_notify_out_app_settings";
+
+    // Logging settings
+    public static final String PREF_LOGGING = "pref_logging";
+
+    public static final String PREF_LOGGING_DIRECTORY = "pref_logging_directory";
+
+    public static final String PREF_LOGGING_TIMESTAMP = "pref_logging_timestamp";
 }

@@ -8,6 +8,7 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -438,7 +439,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final ChannelEvent event) {
-            if (!ChannelFragment.sClasses.contains(event.getClass())) {
+            if (EventUtils.shouldStoreEvent(event)) {
                 mListView.invalidateViews();
             }
         }

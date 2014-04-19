@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="Logging">
+        <Preference
+                android:key="pref_logging_directory"
+                android:title="Logging directory"
+                android:summary="Logs are stored in a folder called IRCLogs on you primary
+                external storage\nUnfortunately at the moment there's no way to change this :("/>
+        <CheckBoxPreference
+                android:key="pref_logging_timestamp"
+                android:title="Logging timestamp"
+                android:summary="Whether each line should have the time it happened on it"
+                android:defaultValue="true"/>
+    </PreferenceCategory>
+</PreferenceScreen>
