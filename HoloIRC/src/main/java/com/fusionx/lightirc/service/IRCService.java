@@ -88,7 +88,7 @@ public class IRCService extends Service {
 
     private void onFirstStart() {
         if (mFirstStart) {
-            mAppPreferences = AppPreferences.getAppPreferences(this);
+            mAppPreferences = AppPreferences.getAppPreferences();
             mLoggingManager = new LoggingManagerImpl(this, mAppPreferences);
             startWatchingExternalStorage();
             EventBus.getDefault().register(mEventHelper, SERVICE_PRIORITY);

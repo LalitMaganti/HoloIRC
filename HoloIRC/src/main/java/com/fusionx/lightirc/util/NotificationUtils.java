@@ -37,10 +37,10 @@ public class NotificationUtils {
     }
 
     public static void notifyInApp(final Activity activity, final OnChannelMentionEvent event) {
-        final Set<String> inApp = AppPreferences.getAppPreferences(activity)
+        final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
-        if (AppPreferences.getAppPreferences(activity).isInAppNotification()) {
+        if (AppPreferences.getAppPreferences().isInAppNotification()) {
             final String message = String.format("Mentioned in %s on %s", event.channel.getId(),
                     event.channel.getId());
             final Crouton crouton = Crouton.makeText(activity, message, Style.INFO);
@@ -61,10 +61,10 @@ public class NotificationUtils {
     }
 
     public static void notifyOutOfApp(final Context context, final OnChannelMentionEvent event) {
-        final Set<String> outApp = AppPreferences.getAppPreferences(context)
+        final Set<String> outApp = AppPreferences.getAppPreferences()
                 .getOutOfAppNotificationSettings();
 
-        if (AppPreferences.getAppPreferences(context).isOutOfAppNotification()) {
+        if (AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             final NotificationManager notificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 

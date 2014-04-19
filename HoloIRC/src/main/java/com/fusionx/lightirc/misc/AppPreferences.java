@@ -70,10 +70,13 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         setPreferences(preferences);
     }
 
-    public static AppPreferences getAppPreferences(final Context context) {
+    public static void setupAppPreferences(final Context context) {
         if (mAppPreferences == null) {
             mAppPreferences = new AppPreferences(context);
         }
+    }
+
+    public static AppPreferences getAppPreferences() {
         return mAppPreferences;
     }
 

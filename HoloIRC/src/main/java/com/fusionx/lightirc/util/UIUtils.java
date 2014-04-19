@@ -46,7 +46,7 @@ public class UIUtils {
     }
 
     public static int getThemeInt(final Context context) {
-        return AppPreferences.getAppPreferences(context).getTheme() != Theme.DARK ? R.style.Light
+        return AppPreferences.getAppPreferences().getTheme() != Theme.DARK ? R.style.Light
                 : R.style.Dark;
     }
 

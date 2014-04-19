@@ -34,6 +34,6 @@ public class LoggingManagerImpl extends LoggingManager {
 
     @Override
     protected boolean shouldLogEvent(final Event event) {
-        return EventUtils.shouldDisplayEvent(mIRCService, event);
+        return EventUtils.shouldStoreEvent(event);
     }
 }
