@@ -9,13 +9,13 @@ import com.fusionx.relay.event.Event;
 import com.fusionx.relay.logging.LoggingManager;
 import com.fusionx.relay.logging.LoggingPreferences;
 
-public class LoggingManagerImpl extends LoggingManager {
+public class IRCLoggingManager extends LoggingManager {
 
     private final MessageConversionUtils mConverter;
 
     private final IRCService mIRCService;
 
-    public LoggingManagerImpl(final IRCService service, final LoggingPreferences preferences) {
+    public IRCLoggingManager(final IRCService service, final LoggingPreferences preferences) {
         super(preferences);
 
         mIRCService = service;

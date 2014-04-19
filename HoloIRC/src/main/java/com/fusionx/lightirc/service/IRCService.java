@@ -3,7 +3,7 @@ package com.fusionx.lightirc.service;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
-import com.fusionx.lightirc.logging.LoggingManagerImpl;
+import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
@@ -70,7 +70,7 @@ public class IRCService extends Service {
 
     private boolean mExternalStorageWriteable = false;
 
-    private LoggingManagerImpl mLoggingManager;
+    private IRCLoggingManager mLoggingManager;
 
     private AppPreferences mAppPreferences;
 
@@ -89,7 +89,7 @@ public class IRCService extends Service {
     private void onFirstStart() {
         if (mFirstStart) {
             mAppPreferences = AppPreferences.getAppPreferences();
-            mLoggingManager = new LoggingManagerImpl(this, mAppPreferences);
+            mLoggingManager = new IRCLoggingManager(this, mAppPreferences);
             startWatchingExternalStorage();
             EventBus.getDefault().register(mEventHelper, SERVICE_PRIORITY);
 
@@ -150,8 +150,8 @@ public class IRCService extends Service {
         mEventCache.remove(server);
         mLoggingManager.removeServerFromManager(server);
 
-        final boolean finalServer = mConnectionManager
-                .requestDisconnectionAndRemoval(server.getTitle());
+        final boolean finalServer = mConnectionManager.requestDisconnectionAndRemoval(server
+                .getTitle());
         if (finalServer) {
             stopForeground(true);
         } else {
