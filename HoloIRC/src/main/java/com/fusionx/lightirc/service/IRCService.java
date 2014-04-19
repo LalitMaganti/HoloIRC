@@ -118,10 +118,6 @@ public class IRCService extends Service {
         final Pair<Boolean, Server> pair = mConnectionManager.requestConnection(builder
                 .build(), ignoreList, mHandler);
 
-        final NotificationManager notificationManager =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(NotificationUtils.NOTIFICATION_MENTION);
-
         final boolean exists = pair.first;
         final Server server = pair.second;
 
@@ -149,6 +145,10 @@ public class IRCService extends Service {
         mEventHelperMap.remove(server);
         mEventCache.remove(server);
         mLoggingManager.removeServerFromManager(server);
+
+        final NotificationManager notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(NotificationUtils.NOTIFICATION_MENTION);
 
         final boolean finalServer = mConnectionManager.requestDisconnectionAndRemoval(server
                 .getTitle());
