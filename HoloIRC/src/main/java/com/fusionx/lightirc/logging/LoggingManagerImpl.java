@@ -2,6 +2,7 @@ package com.fusionx.lightirc.logging;
 
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
@@ -29,5 +30,10 @@ public class LoggingManagerImpl extends LoggingManager {
             mIRCService.getEventCache(server).put(event, decorator);
         }
         return decorator.getMessage();
+    }
+
+    @Override
+    protected boolean shouldLogEvent(final Event event) {
+        return EventUtils.shouldDisplayEvent(mIRCService, event);
     }
 }
