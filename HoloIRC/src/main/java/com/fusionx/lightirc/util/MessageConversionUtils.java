@@ -43,6 +43,7 @@ import com.fusionx.relay.util.ColourParserUtils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.DeadEvent;
 import com.squareup.otto.Subscribe;
+import com.squareup.otto.ThreadEnforcer;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -291,7 +292,7 @@ public class MessageConversionUtils {
 
     private MessageConversionUtils(final Context context) {
         mContext = context.getApplicationContext();
-        mConverter = new Bus();
+        mConverter = new Bus(ThreadEnforcer.ANY);
         mConverter.register(mParser);
     }
 

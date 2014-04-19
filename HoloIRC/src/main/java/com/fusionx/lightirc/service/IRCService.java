@@ -80,8 +80,13 @@ public class IRCService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        onFirstStart();
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
 
+        return START_STICKY;
+    }
+
+    private void onFirstStart() {
         if (mFirstStart) {
             mAppPreferences = AppPreferences.getAppPreferences(this);
             mLoggingManager = new LoggingManagerImpl(this, mAppPreferences);
@@ -90,8 +95,6 @@ public class IRCService extends Service {
 
             mFirstStart = false;
         }
-
-        return START_STICKY;
     }
 
     @Override
@@ -105,6 +108,7 @@ public class IRCService extends Service {
 
     @Override
     public IBinder onBind(final Intent intent) {
+        onFirstStart();
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return mBinder;
     }
@@ -125,6 +129,7 @@ public class IRCService extends Service {
             final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
             mEventHelperMap.put(server, serviceEventHelper);
             mEventCache.put(server, new EventCache());
+            mLoggingManager.addServerToManager(server);
         }
 
         startForeground(SERVICE_ID, getNotification());
@@ -143,6 +148,7 @@ public class IRCService extends Service {
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server);
         mEventCache.remove(server);
+        mLoggingManager.removeServerFromManager(server);
 
         final boolean finalServer = mConnectionManager
                 .requestDisconnectionAndRemoval(server.getTitle());

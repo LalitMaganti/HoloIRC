@@ -1,13 +1,13 @@
 package com.fusionx.lightirc.misc;
 
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
-import com.fusionx.lightirc.util.StorageUtils;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 import com.fusionx.relay.logging.LoggingPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -112,7 +112,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return mLoggingEnabled;
     }
 
-    public String getLoggingDirectory() {
+    public String getLoggingRelativePath() {
         return mLoggingDirectory;
     }
 
@@ -188,7 +188,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     @Override
     public String getLoggingPath() {
-        return StorageUtils.getLoggingDir(mContext).getAbsolutePath();
+        return Environment.getExternalStorageDirectory() + "/" + mLoggingDirectory;
     }
 
     public String getRelativeLoggingPath() {
