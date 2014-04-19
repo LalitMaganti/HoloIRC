@@ -118,6 +118,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveFragment();
 
         mEventBus.postSticky(new OnConversationChanged(null, null));
+        getService().removeLoggingHandler(server);
 
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);

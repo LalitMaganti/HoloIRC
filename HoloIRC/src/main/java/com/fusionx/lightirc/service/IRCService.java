@@ -87,6 +87,10 @@ public class IRCService extends Service {
         return START_STICKY;
     }
 
+    public void removeLoggingHandler(Server server) {
+        mLoggingManager.removeServerFromManager(server);
+    }
+
     private void onFirstStart() {
         if (mFirstStart) {
             mAppPreferences = AppPreferences.getAppPreferences();
@@ -145,7 +149,6 @@ public class IRCService extends Service {
     public void requestDisconnectionFromServer(final Server server) {
         mEventHelperMap.remove(server);
         mEventCache.remove(server);
-        mLoggingManager.removeServerFromManager(server);
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
