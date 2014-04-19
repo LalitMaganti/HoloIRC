@@ -64,7 +64,6 @@ dependencies {
     compile 'com.nhaarman.listviewanimations:library:2.+'
     compile 'net.rdrei.android.dirchooser:library:2.1-SNAPSHOT@aar'
 
-    compile project(':libraries:Bus:library')
     compile project(':libraries:relay:library')
     compile project(':libraries:AndroidSlidingUpPanel:library')
 

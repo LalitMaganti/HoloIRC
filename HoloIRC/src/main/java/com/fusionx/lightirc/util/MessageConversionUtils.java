@@ -3,6 +3,7 @@ package com.fusionx.lightirc.util;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.relay.event.Event;
+import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.channel.ActionEvent;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
@@ -174,7 +175,9 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void getMessage(final WorldMessageEvent event) {
-            final String response = mContext.getString(R.string.parser_message);
+            final String response = mContext.getString(event.userMentioned
+                    ? R.string.parser_bold_message
+                    : R.string.parser_message);
             setupEvent(event, String.format(response, event.nick, event.message));
         }
 
@@ -198,7 +201,7 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void getNoticeMessage(final ChannelNoticeEvent event) {
-            final String response = mContext.getString(R.string.parser_notice);
+            final String response = mContext.getString(R.string.parser_bold_message);
             setupEvent(event, String.format(response, event.originNick, event.notice));
         }
 
@@ -249,7 +252,7 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void getPrivateNoticeMessage(final PrivateNoticeEvent event) {
-            final String response = mContext.getString(R.string.parser_notice);
+            final String response = mContext.getString(R.string.parser_bold_message);
             setupEvent(event, String.format(response, event.sendingNick, event.message));
         }
 
@@ -273,6 +276,12 @@ public class MessageConversionUtils {
         @Subscribe
         public void getDisconnectEvent(final UserDisconnectEvent event) {
             setupEvent(event, event.message);
+        }
+
+        @Subscribe
+        public void getReconnectEvent(final ReconnectEvent event) {
+            final String response = mContext.getString(R.string.parser_reconnect);
+            setupEvent(event, response);
         }
 
         @Subscribe

@@ -74,7 +74,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->
-    <string name="parser_notice" translatable="false">
+    <string name="parser_bold_message" translatable="false">
         <![CDATA[<bold>%1$s: %2$s</bold>]]>
     </string>
     <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
@@ -98,6 +98,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_action"><![CDATA[<bold>* %1$s %2$s</bold>]]></string>
     <string name="parser_connecting">Connecting to server</string>
     <string name="parser_pm_opened">Private message opened</string>
+    <string name="parser_reconnect">Trying to reconnect to the server…</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
