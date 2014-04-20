@@ -136,6 +136,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         if (isCurrent) {
             onRemoveFragment();
+            mEventBus.postSticky(new OnConversationChanged(null, null));
         }
     }
 
@@ -146,6 +147,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         if (isCurrent) {
             onRemoveFragment();
+            mEventBus.postSticky(new OnConversationChanged(null, null));
         }
         return isCurrent;
     }
@@ -153,6 +155,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onPrivateMessageClosed() {
         onRemoveFragment();
+        mEventBus.postSticky(new OnConversationChanged(null, null));
     }
 
     /**
