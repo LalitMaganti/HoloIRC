@@ -115,9 +115,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onServerStopCompleteted(final Server server) {
         closeDrawer();
         supportInvalidateOptionsMenu();
-        onRemoveFragment();
 
-        mEventBus.postSticky(new OnConversationChanged(null, null));
+        if (mCurrentFragment != null) {
+            onRemoveFragment();
+            mEventBus.postSticky(new OnConversationChanged(null, null));
+        }
         getService().removeLoggingHandlerAndEventCache(server);
 
         setActionBarTitle(getString(R.string.app_name));
@@ -131,31 +133,38 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onPart(final String serverName, final PartEvent event) {
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                && mConversation.getId().equals(event.channelName);
+        if (mConversation != null) {
+            final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                    && mConversation.getId().equals(event.channelName);
 
-        if (isCurrent) {
-            onRemoveFragment();
-            mEventBus.postSticky(new OnConversationChanged(null, null));
+            if (isCurrent) {
+                onRemoveFragment();
+                mEventBus.postSticky(new OnConversationChanged(null, null));
+            }
         }
     }
 
     @Override
     public boolean onKick(final String serverName, final KickEvent event) {
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                && mConversation.getId().equals(event.channelName);
+        if (mConversation != null) {
+            final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                    && mConversation.getId().equals(event.channelName);
 
-        if (isCurrent) {
-            onRemoveFragment();
-            mEventBus.postSticky(new OnConversationChanged(null, null));
+            if (isCurrent) {
+                onRemoveFragment();
+                mEventBus.postSticky(new OnConversationChanged(null, null));
+            }
+            return isCurrent;
         }
-        return isCurrent;
+        return false;
     }
 
     @Override
     public void onPrivateMessageClosed() {
-        onRemoveFragment();
-        mEventBus.postSticky(new OnConversationChanged(null, null));
+        if (mCurrentFragment != null) {
+            onRemoveFragment();
+            mEventBus.postSticky(new OnConversationChanged(null, null));
+        }
     }
 
     /**
