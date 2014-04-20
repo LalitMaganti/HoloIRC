@@ -377,7 +377,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public void onSubServerClicked(final Conversation object);
 
-        public void onServerDisconnected(final Server server);
+        public void onServerStopCompleteted(final Server server);
 
         public IRCService getService();
 
@@ -479,7 +479,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 public void run() {
                     unregister();
                     mEventHandlers.remove(ServerEventHandler.this);
-                    mCallback.onServerDisconnected(mServer);
+                    mCallback.onServerStopCompleteted(mServer);
                 }
             });
         }

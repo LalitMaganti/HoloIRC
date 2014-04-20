@@ -112,7 +112,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onServerDisconnected(final Server server) {
+    public void onServerStopCompleteted(final Server server) {
         closeDrawer();
         supportInvalidateOptionsMenu();
         onRemoveFragment();
@@ -391,8 +391,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             if (mCurrentFragment != null) {
                 mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
 
-                findById(MainActivity.this, R.id.content_frame_empty_textview)
-                        .setVisibility(View.GONE);
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
+                        (View.GONE);
             }
 
             supportInvalidateOptionsMenu();

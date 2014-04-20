@@ -16,6 +16,8 @@ import com.fusionx.relay.event.server.StatusChangeEvent;
 
 import android.content.Context;
 
+import java.util.List;
+
 public class EventUtils {
 
     private static final ImmutableList<? extends Class<? extends ServerEvent>>
@@ -39,5 +41,15 @@ public class EventUtils {
             return !sChannelIgnoreClasses.contains(channelEvent.getClass());
         }
         return true;
+    }
+
+    public static <T extends Event> T getLastStorableEvent(final List<T> eventList) {
+        for (int i = eventList.size() - 1; i >= 0; i--) {
+            final T event = eventList.get(i);
+            if (shouldStoreEvent(event)) {
+                return event;
+            }
+        }
+        return eventList.get(eventList.size() - 1);
     }
 }

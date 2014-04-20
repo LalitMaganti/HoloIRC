@@ -23,6 +23,9 @@ import java.util.HashMap;
 
 import de.greenrobot.event.EventBus;
 
+import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
+import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;
+
 public final class ServiceEventHelper {
 
     private static final int EVENT_PRIORITY = 100;
@@ -88,54 +91,50 @@ public final class ServiceEventHelper {
     public void onEventMainThread(final NewPrivateMessage event) {
         final PrivateMessageUser user = mServer.getUserChannelInterface().getPrivateMessageUser(
                 event.nick);
-        final int size = user.getBuffer().size();
-        onIRCEvent(MessagePriority.HIGH, user, user.getBuffer().get(size - 1));
+        onIRCEvent(MessagePriority.HIGH, user, getLastStorableEvent(user.getBuffer()));
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final JoinEvent event) {
-        final Channel channel = mServer.getUserChannelInterface().getChannel(event
-                .channelName);
-        onIRCEvent(MessagePriority.LOW, channel, channel.getBuffer().get(channel.getBuffer()
-                .size() - 1));
+        final Channel channel = mServer.getUserChannelInterface().getChannel(event.channelName);
+        onIRCEvent(MessagePriority.LOW, channel, getLastStorableEvent(channel.getBuffer()));
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final ChannelEvent event) {
-        final Conversation conversation = mServer.getUserChannelInterface().getChannel(event
-                .channelName);
-        // TODO - fix this horrible code
-        if (event instanceof WorldUserEvent) {
-            final WorldUserEvent userEvent = (WorldUserEvent) event;
+        final Conversation conversation =
+                mServer.getUserChannelInterface().getChannel(event.channelName);
+        if (shouldStoreEvent(event)) {
+            // TODO - fix this horrible code
+            if (event instanceof WorldUserEvent) {
+                final WorldUserEvent userEvent = (WorldUserEvent) event;
 
-            if (userEvent.userMentioned) {
-                onIRCEvent(MessagePriority.HIGH, conversation, event);
+                if (userEvent.userMentioned) {
+                    onIRCEvent(MessagePriority.HIGH, conversation, event);
 
-                // Forward the event UI side
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        EventBus.getDefault().post(new OnChannelMentionEvent(mServer,
-                                (Channel) conversation));
-                    }
-                });
-            } else if (event.getClass().equals(WorldMessageEvent.class)
-                    || event.getClass().equals(WorldActionEvent.class)) {
-                onIRCEvent(MessagePriority.MEDIUM, conversation, event);
+                    // Forward the event UI side
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            EventBus.getDefault().post(new OnChannelMentionEvent(mServer,
+                                    (Channel) conversation));
+                        }
+                    });
+                } else if (event.getClass().equals(WorldMessageEvent.class)
+                        || event.getClass().equals(WorldActionEvent.class)) {
+                    onIRCEvent(MessagePriority.MEDIUM, conversation, event);
+                } else {
+                    onIRCEvent(MessagePriority.LOW, conversation, event);
+                }
             } else {
                 onIRCEvent(MessagePriority.LOW, conversation, event);
             }
-        } else {
-            onIRCEvent(MessagePriority.LOW, conversation, event);
         }
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final UserEvent event) {
-        final Conversation conversation = mServer.getUserChannelInterface()
-                .getPrivateMessageUser(event.user.getNick());
-
-        onIRCEvent(MessagePriority.HIGH, conversation, event);
+        onIRCEvent(MessagePriority.HIGH, event.user, event);
     }
 
     private void setSubMessagePriority(final Conversation conversation,
