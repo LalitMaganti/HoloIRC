@@ -36,10 +36,6 @@ android {
         release
     }
 
-    sourceSets {
-        instrumentTest.setRoot('src/test')
-    }
-
     buildTypes {
         debug {
             packageNameSuffix '.debug'

@@ -24,7 +24,7 @@ import android.widget.ListAdapter;
 import java.util.List;
 import java.util.TreeSet;
 
-class ChannelListFragment extends ListFragment {
+public class ChannelListFragment extends ListFragment {
 
     private BaseCollectionAdapter<String> mAdapter;
 
