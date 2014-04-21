@@ -14,8 +14,6 @@ import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 
-import android.content.Context;
-
 import java.util.List;
 
 public class EventUtils {

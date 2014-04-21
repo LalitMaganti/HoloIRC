@@ -28,7 +28,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -39,7 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

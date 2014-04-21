@@ -29,7 +29,6 @@ import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
@@ -47,8 +46,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 

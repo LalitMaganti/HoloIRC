@@ -4,7 +4,6 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
@@ -22,8 +21,6 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.util.HashMap;
-
-import de.greenrobot.event.EventBus;
 
 import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
 import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;

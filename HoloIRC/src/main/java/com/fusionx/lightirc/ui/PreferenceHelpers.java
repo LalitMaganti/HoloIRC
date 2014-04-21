@@ -19,8 +19,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 
-import de.greenrobot.event.EventBus;
-
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 class PreferenceHelpers {

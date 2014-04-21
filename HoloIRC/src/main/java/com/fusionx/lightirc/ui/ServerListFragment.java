@@ -10,7 +10,6 @@ import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
@@ -49,7 +48,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

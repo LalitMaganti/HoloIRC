@@ -8,8 +8,6 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.connection.ConnectionManager;
@@ -32,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.greenrobot.event.EventBus;
 import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;

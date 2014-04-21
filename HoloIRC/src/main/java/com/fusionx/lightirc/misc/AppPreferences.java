@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.misc;
 
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 import com.fusionx.relay.logging.LoggingPreferences;
@@ -12,8 +11,6 @@ import android.os.Environment;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import de.greenrobot.event.EventBus;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
