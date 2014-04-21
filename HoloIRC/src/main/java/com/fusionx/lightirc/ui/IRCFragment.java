@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -28,6 +29,7 @@ import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.interfaces.Conversation;
@@ -48,6 +50,8 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
+
 abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
         .OnEditorActionListener {
 
@@ -60,6 +64,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     IRCMessageAdapter<T> mMessageAdapter;
 
     private Object mEventListener = new Object() {
+        @Subscribe
         public void onEvent(final OnPreferencesChangedEvent event) {
             onResetBuffer();
         }
@@ -75,8 +80,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final OnConversationChanged event = EventBus.getDefault().getStickyEvent
-                (OnConversationChanged.class);
+        final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
 
         mMessageBox = UIUtils.findById(view, R.id.fragment_irc_message_box);
@@ -87,7 +91,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         mMessageAdapter = getNewAdapter();
         setListAdapter(mMessageAdapter);
 
-        EventBus.getDefault().register(mEventListener);
+        getBus().register(mEventListener);
 
         onResetBuffer();
         mConversation.getServer().getServerEventBus().register(this);
@@ -101,7 +105,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     public void onDestroyView() {
         super.onDestroyView();
 
-        EventBus.getDefault().unregister(mEventListener);
+        getBus().unregister(mEventListener);
     }
 
     @Override

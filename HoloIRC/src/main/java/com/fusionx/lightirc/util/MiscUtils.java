@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.util;
 
+import com.fusionx.bus.Bus;
 import com.fusionx.lightirc.R;
 import com.fusionx.relay.ConnectionStatus;
 
@@ -34,6 +35,8 @@ import android.content.pm.PackageManager;
  * @author Lalit Maganti
  */
 public class MiscUtils {
+
+    private static Bus sBus;
 
     /**
      * Static utility methods only - can't instantiate this class
@@ -67,5 +70,12 @@ public class MiscUtils {
             default:
                 return null;
         }
+    }
+
+    public static Bus getBus() {
+        if (sBus == null) {
+            sBus = new Bus();
+        }
+        return sBus;
     }
 }

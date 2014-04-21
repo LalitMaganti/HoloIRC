@@ -21,6 +21,8 @@ import android.preference.PreferenceScreen;
 
 import de.greenrobot.event.EventBus;
 
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
+
 class PreferenceHelpers {
 
     public static void setupNumberPicker(final PreferenceScreen screen) {
@@ -100,13 +102,12 @@ class PreferenceHelpers {
 
         // TODO - this is a hack - fix it
         private void fixCurrentBusSettings() {
-            final OnConversationChanged event = EventBus.getDefault().getStickyEvent
-                    (OnConversationChanged.class);
+            final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged
+                    .class);
             if (event.conversation != null) {
-                EventBus.getDefault().postSticky(new OnConversationChanged
-                        (null, null));
-                EventBus.getDefault().postSticky(new OnCurrentServerStatusChanged
-                        (ConnectionStatus.DISCONNECTED));
+                getBus().postSticky(new OnConversationChanged(null, null));
+                getBus().postSticky(new OnCurrentServerStatusChanged(ConnectionStatus
+                        .DISCONNECTED));
             }
         }
 

@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.service;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
@@ -7,6 +8,7 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
@@ -34,7 +36,9 @@ import de.greenrobot.event.EventBus;
 import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
+import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
 
@@ -50,13 +54,13 @@ public class IRCService extends Service {
     };
 
     private final Object mEventHelper = new Object() {
-        @SuppressWarnings("unused")
-        public void onEvent(final OnChannelMentionEvent event) {
-            NotificationUtils.notifyOutOfApp(IRCService.this, event);
+        @Subscribe
+        public void onMentioned(final OnChannelMentionEvent event) {
+            notifyOutOfApp(IRCService.this, event);
         }
 
-        @SuppressWarnings("unused")
-        public void onEvent(final OnPreferencesChangedEvent event) {
+        @Subscribe
+        public void onPrefsChanged(final OnPreferencesChangedEvent event) {
             updateLoggingState();
         }
     };
@@ -98,7 +102,7 @@ public class IRCService extends Service {
             mAppPreferences = AppPreferences.getAppPreferences();
             mLoggingManager = new IRCLoggingManager(this, mAppPreferences);
             startWatchingExternalStorage();
-            EventBus.getDefault().register(mEventHelper, SERVICE_PRIORITY);
+            getBus().register(mEventHelper, SERVICE_PRIORITY);
 
             mFirstStart = false;
         }
@@ -110,7 +114,7 @@ public class IRCService extends Service {
 
         // Unregister observer status
         stopWatchingExternalStorage();
-        EventBus.getDefault().unregister(mEventHelper);
+        getBus().unregister(mEventHelper);
     }
 
     @Override

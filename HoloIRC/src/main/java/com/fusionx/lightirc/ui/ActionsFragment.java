@@ -21,12 +21,14 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ActionsAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -40,6 +42,7 @@ import android.widget.AdapterView;
 import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
@@ -47,7 +50,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     private Conversation mConversation;
 
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
         }
@@ -74,7 +77,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        EventBus.getDefault().registerSticky(mEventHandler);
+        getBus().registerSticky(mEventHandler);
 
         mAdapter = new ActionsAdapter(getActivity());
         final StickyListHeadersListView listView = findById(view, android.R.id.list);
@@ -87,7 +90,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public void onDestroyView() {
         super.onDestroyView();
 
-        EventBus.getDefault().unregister(mEventHandler);
+        getBus().unregister(mEventHandler);
     }
 
     @Override

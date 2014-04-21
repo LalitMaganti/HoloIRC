@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Bus;
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -37,9 +39,9 @@ import android.view.View;
 
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
@@ -55,7 +57,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
 
-    private static final EventBus mEventBus = EventBus.getDefault();
+    private static final Bus mEventBus = getBus();
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -65,21 +67,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     // Mention helper
     private final Object mMentionHelper = new Object() {
-
-        @SuppressWarnings("unused")
-        public void onEvent(final OnChannelMentionEvent event) {
-            // Don't pass this event onto any other subscribers - we have handed it
-            mEventBus.cancelEventDelivery(event);
-
+        @Subscribe(cancellable = true)
+        public boolean onMentioned(final OnChannelMentionEvent event) {
             if (!event.channel.equals(mConversation)) {
                 NotificationUtils.notifyInApp(MainActivity.this, event);
             }
+            return true;
         }
     };
 
     private final Object mConversationChanged = new Object() {
-        @SuppressWarnings("unused")
-        public void onEvent(final OnConversationChanged event) {
+        @Subscribe
+        public void onConversationChanged(final OnConversationChanged event) {
             mConversation = event.conversation;
         }
     };
