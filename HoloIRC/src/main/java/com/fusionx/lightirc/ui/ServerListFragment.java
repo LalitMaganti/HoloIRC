@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -47,9 +48,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
 import gnu.trove.set.hash.THashSet;
 
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.getCheckedPositions;
 
@@ -59,8 +60,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
-        public void onEventMainThread(final OnConversationChanged event) {
+        @Subscribe
+        public void onEvent(final OnConversationChanged event) {
             if (event.conversation != null) {
                 if (event.fragmentType == FragmentType.SERVER) {
                     mService.getEventHelper(event.conversation.getServer()).clearMessagePriority();
@@ -100,7 +101,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EventBus.getDefault().register(mEventHandler);
+        getBus().register(mEventHandler);
     }
 
     @Override
@@ -139,7 +140,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onDestroy() {
         super.onDestroy();
 
-        EventBus.getDefault().unregister(mEventHandler);
+        getBus().unregister(mEventHandler);
 
         for (final ServerEventHandler handler : mEventHandlers) {
             handler.unregister();

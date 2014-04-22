@@ -12,9 +12,8 @@ import android.os.Environment;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.greenrobot.event.EventBus;
-
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class AppPreferences implements EventPreferences, LoggingPreferences {
 
@@ -62,7 +61,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
             public void onSharedPreferenceChanged(final SharedPreferences
                     sharedPreferences, final String key) {
                 setPreferences(sharedPreferences);
-                EventBus.getDefault().post(new OnPreferencesChangedEvent());
+                getBus().post(new OnPreferencesChangedEvent());
             }
         };
         final SharedPreferences preferences = getDefaultSharedPreferences(context);

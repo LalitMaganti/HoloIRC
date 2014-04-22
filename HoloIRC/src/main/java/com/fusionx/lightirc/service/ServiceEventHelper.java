@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.service;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
@@ -21,10 +22,9 @@ import android.os.Looper;
 
 import java.util.HashMap;
 
-import de.greenrobot.event.EventBus;
-
 import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
 import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public final class ServiceEventHelper {
 
@@ -47,9 +47,9 @@ public final class ServiceEventHelper {
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
 
-        EventBus.getDefault().registerSticky(new Object() {
-            @SuppressWarnings("unused")
-            public void onEvent(final OnConversationChanged conversationChanged) {
+        getBus().registerSticky(new Object() {
+            @Subscribe
+            public void onConversationChanged(final OnConversationChanged conversationChanged) {
                 mConversation = conversationChanged.conversation;
             }
         });
@@ -116,7 +116,7 @@ public final class ServiceEventHelper {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            EventBus.getDefault().post(new OnChannelMentionEvent(mServer,
+                            getBus().post(new OnChannelMentionEvent(mServer,
                                     (Channel) conversation));
                         }
                     });

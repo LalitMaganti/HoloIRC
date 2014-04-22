@@ -25,7 +25,6 @@ import com.google.common.collect.Iterables;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.channel.ChannelEvent;

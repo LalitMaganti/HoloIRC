@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
@@ -25,8 +26,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class NavigationDrawerFragment extends Fragment implements
@@ -39,7 +39,7 @@ public class NavigationDrawerFragment extends Fragment implements
     private Conversation mConversation;
 
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
             mFragmentType = conversationChanged.fragmentType;
@@ -49,7 +49,7 @@ public class NavigationDrawerFragment extends Fragment implements
             updateUserListVisibility();
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
             mStatus = statusChanged.status;
             updateUserListVisibility();
@@ -101,7 +101,7 @@ public class NavigationDrawerFragment extends Fragment implements
         mTextView = findById(getView(), R.id.user_text_view);
         mSlideUpLayout = findById(view, R.id.bottom_panel);
 
-        EventBus.getDefault().registerSticky(mEventHandler);
+        getBus().registerSticky(mEventHandler);
 
         mSlideUpLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +129,13 @@ public class NavigationDrawerFragment extends Fragment implements
         if (mIgnoreListFragment == null) {
             mIgnoreListFragment = new IgnoreListFragment();
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        getBus().unregister(mEventHandler);
     }
 
     void switchToIRCActionFragment() {

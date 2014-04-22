@@ -20,17 +20,21 @@ public class ViewPreference extends Preference {
 
     private TextView mTextView;
 
+    private final LayoutInflater mLayoutInflater;
+
     private String mText;
 
     public ViewPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
+
+        mLayoutInflater = LayoutInflater.from(getContext());
     }
 
     @Override
     public View getView(final View convertView, final ViewGroup parent) {
         if (convertView == null) {
-            mTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout
-                    .must_be_complete_textview, parent);
+            mTextView = (TextView) mLayoutInflater.inflate(R.layout.must_be_complete_textview,
+                    parent, false);
             UIUtils.setRobotoLight(getContext(), mTextView);
             mTextView.setText(mText);
             return mTextView;
