@@ -11,6 +11,7 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.interfaces.Conversation;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
@@ -66,8 +67,9 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         final View view = inflater.inflate(R.layout.default_list_view, container, false);
         final ListView listView = findById(view, android.R.id.list);
 
-        final TextView otherHeader = (TextView) inflater
-                .inflate(R.layout.sliding_menu_header, container, false);
+        @SuppressLint("InflateParams")
+        final TextView otherHeader = (TextView) inflater.inflate(R.layout.sliding_menu_header,
+                null, false);
         otherHeader.setText("Ignore List");
         listView.addHeaderView(otherHeader);
 
