@@ -370,6 +370,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         setContentView(R.layout.main_activity);
 
+        mDrawerLayout = findById(this, R.id.drawer_layout);
+        mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout.setFocusableInTouchMode(false);
+
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
         mSlidingPane.setPanelSlideListener(this);
@@ -377,10 +381,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             // TODO - fix this hack
             mSlidingPane.setSliderFadeColor(0);
         }
-
-        mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
-        mDrawerLayout.setFocusableInTouchMode(false);
 
         mRightDrawer = findById(this, R.id.right_drawer);
 

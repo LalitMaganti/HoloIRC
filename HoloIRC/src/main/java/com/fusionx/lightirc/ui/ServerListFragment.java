@@ -4,6 +4,7 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
@@ -61,7 +62,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private final Object mEventHandler = new Object() {
         @Subscribe
-        public void onEvent(final OnConversationChanged event) {
+        public void onConversationChanged(final OnConversationChanged event) {
             if (event.conversation != null) {
                 if (event.fragmentType == FragmentType.SERVER) {
                     mService.getEventHelper(event.conversation.getServer()).clearMessagePriority();
@@ -70,6 +71,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                             (event.conversation);
                 }
             }
+            mListView.invalidateViews();
+        }
+
+        // Make sure the events look up to date if the full line highlight pref is changed
+        @Subscribe
+        public void onPreferencesChanged(final OnPreferencesChangedEvent event) {
             mListView.invalidateViews();
         }
     };

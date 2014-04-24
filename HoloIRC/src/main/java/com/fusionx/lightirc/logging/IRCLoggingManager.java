@@ -11,24 +11,17 @@ import com.fusionx.relay.logging.LoggingPreferences;
 
 public class IRCLoggingManager extends LoggingManager {
 
-    private final MessageConversionUtils mConverter;
-
     private final IRCService mIRCService;
 
     public IRCLoggingManager(final IRCService service, final LoggingPreferences preferences) {
         super(preferences);
 
         mIRCService = service;
-        mConverter = MessageConversionUtils.getConverter(service);
     }
 
     @Override
     public CharSequence getMessageFromEvent(final Server server, final Event event) {
         EventDecorator decorator = mIRCService.getEventCache(server).get(event);
-        if (decorator == null) {
-            decorator = mConverter.getEventDecorator(event);
-            mIRCService.getEventCache(server).put(event, decorator);
-        }
         return decorator.getMessage();
     }
 

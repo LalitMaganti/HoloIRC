@@ -19,8 +19,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     private static AppPreferences mAppPreferences;
 
-    private final Context mContext;
-
     private boolean timestamp = false;
 
     private boolean hideUserMessages = false;
@@ -45,7 +43,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     private int numberOfReconnectEvents = 3;
 
-    private SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
+    private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
 
     // Logging
     private boolean mLoggingEnabled;
@@ -55,7 +53,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     private boolean mLoggingTimeStamp;
 
     public AppPreferences(final Context context) {
-        mContext = context.getApplicationContext();
         sPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(final SharedPreferences
