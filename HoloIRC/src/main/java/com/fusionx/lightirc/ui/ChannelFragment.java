@@ -105,7 +105,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     // Subscription methods
     @Subscribe
     public void onEventMainThread(final ChannelEvent event) {
-        if (!event.channelName.equals(mTitle)) {
+        if (!event.channel.getName().equals(mTitle)) {
             return;
         }
 
@@ -130,13 +130,14 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
                     final String finalWord = Iterables
                             .getLast(IRCUtils.splitRawLine(message, false));
                     for (final WorldUser user : users) {
-                        if (StringUtils.startsWithIgnoreCase(user.getNick(), finalWord)) {
+                        if (StringUtils.startsWithIgnoreCase(user.getNick().getNickAsString(),
+                                finalWord)) {
                             sortedList.add(user);
                         }
                     }
 
                     if (sortedList.size() == 1) {
-                        changeLastWord(Iterables.getLast(sortedList).getNick());
+                        changeLastWord(Iterables.getLast(sortedList).getNick().getNickAsString());
                     } else if (sortedList.size() > 1) {
                         if (mPopupMenu == null) {
                             mPopupMenu = new PopupMenu(getActivity(), mAutoButton);
@@ -148,7 +149,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
                         Collections.sort(sortedList, new IRCUserComparator(getChannel()));
                         for (final WorldUser user : sortedList) {
-                            innerMenu.add(user.getNick());
+                            innerMenu.add(user.getNick().getNickAsString());
                         }
                         mPopupMenu.show();
                     }

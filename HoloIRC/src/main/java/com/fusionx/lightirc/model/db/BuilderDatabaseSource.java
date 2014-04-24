@@ -12,6 +12,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;
@@ -141,7 +142,7 @@ public class BuilderDatabaseSource {
         return cursor.moveToFirst() ? getBuilderFromCursor(cursor) : null;
     }
 
-    public List<String> getIgnoreListByName(final String serverName) {
+    public Collection<String> getIgnoreListByName(final String serverName) {
         final Cursor cursor = mDatabase.query(TABLE_NAME, new String[]{COLUMN_IGNORE_LIST},
                 String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
         cursor.moveToFirst();

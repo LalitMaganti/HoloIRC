@@ -120,7 +120,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     private void showNickDialog() {
         final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
-                mConversation.getServer().getUser().getNick()) {
+                mConversation.getServer().getUser().getNick().getNickAsString()) {
             @Override
             public void onOkClicked(final String input) {
                 mConversation.getServer().getServerCallBus().sendNickChange(input);

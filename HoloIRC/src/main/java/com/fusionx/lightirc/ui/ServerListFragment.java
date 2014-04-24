@@ -450,7 +450,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final PrivateMessageClosedEvent event) {
-            mListAdapter.getGroup(mServerIndex).removeServerObject(event.privateMessageNick);
+            mListAdapter.getGroup(mServerIndex).removeServerObject(
+                    event.privateMessageNick.getNickAsString());
             mListView.setAdapter(mListAdapter);
             mListView.expandGroup(mServerIndex);
             mCallback.onPrivateMessageClosed();

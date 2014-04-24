@@ -114,10 +114,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return mLoggingEnabled;
     }
 
-    public String getLoggingRelativePath() {
-        return mLoggingDirectory;
-    }
-
     public boolean isTimestamp() {
         return timestamp;
     }
@@ -157,7 +153,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return quitReason;
     }
 
-    @Override
     public Theme getTheme() {
         return theme;
     }
@@ -173,14 +168,8 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return motdAllowed;
     }
 
-    @Override
     public boolean shouldHighlightLine() {
         return highlightLine;
-    }
-
-    @Override
-    public boolean shouldNickBeColourful() {
-        return true;
     }
 
     @Override
@@ -191,9 +180,5 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     @Override
     public String getLoggingPath() {
         return Environment.getExternalStorageDirectory() + "/" + mLoggingDirectory;
-    }
-
-    public String getRelativeLoggingPath() {
-        return mLoggingDirectory;
     }
 }

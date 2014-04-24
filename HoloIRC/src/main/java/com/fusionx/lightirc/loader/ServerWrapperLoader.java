@@ -9,7 +9,7 @@ import com.fusionx.relay.ServerConfiguration;
 import android.content.Context;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>> {
 
@@ -29,7 +29,7 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>
         source.open();
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
             final Server server = mService.getServerIfExists(builder);
-            final List<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
+            final Collection<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
             final ServerWrapper wrapper = new ServerWrapper(builder, ignoreList, server);
             listItems.add(wrapper);
         }

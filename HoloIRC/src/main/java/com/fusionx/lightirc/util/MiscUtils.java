@@ -24,10 +24,12 @@ package com.fusionx.lightirc.util;
 import com.fusionx.bus.Bus;
 import com.fusionx.lightirc.R;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.misc.InterfaceHolders;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 
 /**
  * Full of static utility methods
@@ -77,5 +79,15 @@ public class MiscUtils {
             sBus = new Bus();
         }
         return sBus;
+    }
+
+    private int normaliseColourInt(final int colour) {
+        if (colour > 255) {
+            return 255;
+        } else if (colour < 0) {
+            return 0;
+        }
+
+        return colour;
     }
 }

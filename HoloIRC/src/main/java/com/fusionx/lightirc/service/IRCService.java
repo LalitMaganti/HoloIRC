@@ -26,6 +26,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Pair;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,12 @@ public class IRCService extends Service {
         mEventHelperMap.remove(server);
     }
 
+    public void clearAllEventCaches() {
+        for (final EventCache cache : mEventCache.values()) {
+            cache.evictAll();
+        }
+    }
+
     private void onFirstStart() {
         if (mFirstStart) {
             mAppPreferences = AppPreferences.getAppPreferences();
@@ -122,7 +129,7 @@ public class IRCService extends Service {
     }
 
     public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
-            final List<String> ignoreList) {
+            final Collection<String> ignoreList) {
         final Pair<Boolean, Server> pair = mConnectionManager.requestConnection(builder
                 .build(), ignoreList, mHandler);
 
@@ -132,7 +139,7 @@ public class IRCService extends Service {
         if (!exists) {
             final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
             mEventHelperMap.put(server, serviceEventHelper);
-            mEventCache.put(server, new EventCache());
+            mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);
         }
 

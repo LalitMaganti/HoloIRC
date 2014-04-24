@@ -59,6 +59,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private static final Bus mEventBus = getBus();
 
+    public static final String CLEAR_CACHE = "clear_event_cache";
+
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
     // Fields
@@ -269,13 +271,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
 
+        final boolean fromRecents = isAppFromRecentApps(getIntent().getFlags());
+        final boolean clearCaches = getIntent().getBooleanExtra(CLEAR_CACHE, false);
+
         final String serverName = getIntent().getStringExtra("server_name");
         final String channelName = getIntent().getStringExtra("channel_name");
 
         final Conversation conversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
-        if (serverName != null && !isAppFromRecentApps(getIntent().getFlags())) {
+        if (!fromRecents && serverName != null) {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra("server_name");
@@ -287,6 +292,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             final OnConversationChanged event = mEventBus.getStickyEvent(OnConversationChanged
                     .class);
             conversation = event != null ? event.conversation : null;
+        }
+
+        if (!fromRecents && clearCaches) {
+            service.clearAllEventCaches();
         }
 
         onExternalConversationUpdate(conversation);

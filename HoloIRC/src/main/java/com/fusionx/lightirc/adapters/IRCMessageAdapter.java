@@ -30,8 +30,6 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
     private final LayoutInflater mInflater;
 
-    private final MessageConversionUtils mConverter;
-
     private boolean mShouldFilter;
 
     private Filter mFilter;
@@ -44,7 +42,6 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
-        mConverter = MessageConversionUtils.getConverter(mContext);
         mEventCache = cache;
         mShouldFilter = filter;
     }
@@ -73,7 +70,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
         final Event event = getEvent(position);
         addTimestampIfRequired(holder, event);
-        setUpMessage(holder, event);
+        holder.message.setText(mEventCache.get(event).getMessage());
 
         Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
         return view;
@@ -127,15 +124,6 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         view.setTag(holder);
 
         return view;
-    }
-
-    private void setUpMessage(final ViewHolder holder, final Event event) {
-        EventDecorator decorator = mEventCache.get(event);
-        if (decorator == null) {
-            decorator = mConverter.getEventDecorator(event);
-            mEventCache.put(event, decorator);
-        }
-        holder.message.setText(decorator.getMessage());
     }
 
     private void addTimestampIfRequired(ViewHolder holder, final Event event) {

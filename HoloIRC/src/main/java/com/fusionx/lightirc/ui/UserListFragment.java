@@ -168,15 +168,14 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final WorldUserEvent event) {
-        if (mChannel != null && event.channelName.equals(mChannel.getName())
-                && event.isUserListChangeEvent()) {
+        if (event.channel.equals(mChannel) && event.isUserListChangeEvent()) {
             onUpdateUserList();
         }
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final NameEvent event) {
-        if (mChannel != null && event.channelName.equals(mChannel.getName())) {
+        if (event.channel.equals(mChannel)) {
             onUpdateUserList();
         }
     }
@@ -219,7 +218,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         final List<WorldUser> selectedItems = getCheckedItems();
-        final String nick = selectedItems.get(0).getNick();
+        final String nick = selectedItems.get(0).getNick().getNickAsString();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
                 mCallback.onMentionMultipleUsers(selectedItems);

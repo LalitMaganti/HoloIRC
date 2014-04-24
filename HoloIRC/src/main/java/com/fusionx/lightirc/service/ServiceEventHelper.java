@@ -102,8 +102,7 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final ChannelEvent event) {
-        final Conversation conversation =
-                mServer.getUserChannelInterface().getChannel(event.channelName);
+        final Conversation conversation = event.channel;
         if (shouldStoreEvent(event)) {
             // TODO - fix this horrible code
             if (event instanceof WorldUserEvent) {
