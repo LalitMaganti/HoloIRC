@@ -317,7 +317,7 @@ public class MessageConversionUtils {
             final String response = mContext.getString(R.string.parser_message);
 
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.ourUser,
+                final String formattedResponse = String.format(response, event.ourUser.getNick(),
                         event.message);
                 setupEvent(formattedResponse, event.ourUser.getNick());
             } else {
@@ -333,7 +333,8 @@ public class MessageConversionUtils {
         public void getMessage(final WorldPrivateMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user, event.message);
+                final String formattedResponse = String.format(response, event.user.getNick(),
+                        event.message);
                 setupEvent(formattedResponse, event.user.getNick());
             } else {
                 final FormattedString[] formattedStrings = {
