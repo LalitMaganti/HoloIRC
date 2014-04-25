@@ -45,7 +45,7 @@ public class UIUtils {
         textView.setTypeface(font);
     }
 
-    public static int getThemeInt(final Context context) {
+    public static int getThemeInt() {
         return AppPreferences.getAppPreferences().getTheme() != Theme.DARK ? R.style.Light
                 : R.style.Dark;
     }
@@ -82,24 +82,27 @@ public class UIUtils {
         return checkedSessionPositions;
     }
 
-    public static CharacterStyle getSpanFromPriority(final Context context, final MessagePriority
+    // TODO - fix this horribleness
+    public static CharacterStyle getSpanFromPriority(final MessagePriority
             priority) {
-        if (priority == null) {
-            final TypedValue typedvalueattr = new TypedValue();
-            context.getTheme().resolveAttribute(R.attr.expandable_list_text, typedvalueattr, true);
-            return new ForegroundColorSpan(context.getResources().getColor(typedvalueattr
-                    .resourceId));
-        }
         final int color;
         switch (priority) {
             case LOW:
                 color = Color.parseColor("#00994C");
                 break;
             case MEDIUM:
-                color = Color.parseColor("#004C99");
+                if (AppPreferences.getAppPreferences().getTheme() == Theme.DARK) {
+                    color = Color.parseColor("#4C81B7");
+                } else {
+                    color = Color.parseColor("#004C99");
+                }
                 break;
             case HIGH:
-                color = Color.parseColor("#CC0000");
+                if (AppPreferences.getAppPreferences().getTheme() == Theme.DARK) {
+                    color = Color.parseColor("#DA4646");
+                } else {
+                    color = Color.parseColor("#CC0000");
+                }
                 break;
             default:
                 color = 0;

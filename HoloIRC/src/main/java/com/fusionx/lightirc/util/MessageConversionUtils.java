@@ -53,12 +53,17 @@ import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 
+/*
+ * TODO - cleanup this entire class - it's a total mess
+ */
 public class MessageConversionUtils {
 
     private static MessageConversionUtils sConverter;
@@ -267,27 +272,26 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void getMessage(final WorldMessageEvent event) {
-            final String response = mContext.getString(event.userMentioned
-                    ? R.string.parser_bold_message : R.string.parser_message);
+            final String response = mContext.getString(R.string.parser_message);
 
             // Get out clause for message events from ZNCs for example
             if (event.userNick == null) {
                 final String formattedResponse = String.format(response, event.userNickString,
                         event.message);
-                setupEvent(formattedResponse);
+                setupEvent(formattedResponse, event.userMentioned);
                 return;
             }
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.userNick,
                         event.message);
-                setupEvent(formattedResponse, event.userNick);
+                setupEvent(formattedResponse, event.userNick, event.userMentioned);
             } else {
                 final FormattedString[] formattedStrings = {
                         getFormattedStringForNick(event.userNick),
                         new FormattedString(event.message)
                 };
-                setupEvent(formatTextWithStyle(response, formattedStrings));
+                setupEvent(formatTextWithStyle(response, formattedStrings), event.userMentioned);
             }
         }
 
@@ -342,10 +346,10 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void getNoticeMessage(final ChannelNoticeEvent event) {
-            final String response = mContext.getString(R.string.parser_bold_message);
+            final String response = mContext.getString(R.string.parser_message);
             final String formattedResponse = String.format(response, event.originNick,
                     event.notice);
-            setupEvent(formattedResponse);
+            setupEvent(formattedResponse, true);
         }
 
         @Subscribe
@@ -370,13 +374,13 @@ public class MessageConversionUtils {
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.userNick,
                         event.action);
-                setupEvent(formattedResponse, event.userNick);
+                setupEvent(formattedResponse, event.userNick, true);
             } else {
                 final FormattedString[] formattedStrings = {
                         getFormattedStringForNick(event.user.getNick()),
                         new FormattedString(event.action),
                 };
-                setupEvent(formatTextWithStyle(response, formattedStrings));
+                setupEvent(formatTextWithStyle(response, formattedStrings), true);
             }
         }
 
@@ -386,13 +390,13 @@ public class MessageConversionUtils {
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.ourUser.getNick(),
                         event.action);
-                setupEvent(formattedResponse, event.ourUser.getNick());
+                setupEvent(formattedResponse, event.ourUser.getNick(), true);
             } else {
                 final FormattedString[] formattedStrings = {
                         getFormattedStringForNick(event.ourUser.getNick()),
                         new FormattedString(event.action),
                 };
-                setupEvent(formatTextWithStyle(response, formattedStrings));
+                setupEvent(formatTextWithStyle(response, formattedStrings), true);
             }
         }
 
@@ -435,8 +439,8 @@ public class MessageConversionUtils {
 
         @Subscribe
         public void getPrivateNoticeMessage(final PrivateNoticeEvent event) {
-            final String response = mContext.getString(R.string.parser_bold_message);
-            setupEvent(String.format(response, event.sendingNick, event.message));
+            final String response = mContext.getString(R.string.parser_message);
+            setupEvent(String.format(response, event.sendingNick, event.message), true);
         }
 
         @Subscribe
@@ -533,12 +537,30 @@ public class MessageConversionUtils {
         mMessage = new EventDecorator(message);
     }
 
+    private void setupEvent(final CharSequence message, final boolean boldText) {
+        final SpannableStringBuilder builder = new SpannableStringBuilder(message);
+        if (boldText) {
+            builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(),
+                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        }
+        mMessage = new EventDecorator(builder);
+    }
+
     private void setupEvent(final CharSequence message, final Nick defaultNick) {
         final SpannableStringBuilder builder = new SpannableStringBuilder(message);
         final NickColour colour = NickCache.getNickCache().get(defaultNick);
         builder.setSpan(new ForegroundColorSpan(colour.getColour()), 0, message.length(),
                 Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         mMessage = new EventDecorator(builder);
+    }
+
+    private void setupEvent(final CharSequence message, final Nick defaultNick,
+            final boolean boldText) {
+        final SpannableStringBuilder builder = new SpannableStringBuilder(message);
+        final NickColour colour = NickCache.getNickCache().get(defaultNick);
+        builder.setSpan(new ForegroundColorSpan(colour.getColour()), 0, message.length(),
+                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        setupEvent(builder, boldText);
     }
 
     private boolean shouldHighlightLine() {

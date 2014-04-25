@@ -65,7 +65,7 @@ public final class ServiceEventHelper {
         mMessagePriority = null;
     }
 
-    public void clearMessagePriority(Conversation conversation) {
+    public void clearMessagePriority(final Conversation conversation) {
         mMessagePriorityMap.remove(conversation);
     }
 

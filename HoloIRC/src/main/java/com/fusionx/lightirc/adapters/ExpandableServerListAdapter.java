@@ -3,6 +3,7 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.model.EventDecorator;
+import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventHelper;
@@ -15,6 +16,8 @@ import com.fusionx.relay.interfaces.Conversation;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.CharacterStyle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import static com.fusionx.lightirc.util.UIUtils.getSpanFromPriority;
 
 public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
@@ -95,15 +100,18 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final ServerWrapper listItem = getGroup(groupPos);
         final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getServer());
 
-        final TextView title = (TextView) convertView.findViewById(R.id.child_title);
+        final TextView title = (TextView) convertView.findViewById(R.id.server_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
         if (helper != null) {
-            builder.setSpan(UIUtils.getSpanFromPriority(mContext, helper.getMessagePriority()), 0,
-                    listItem.getTitle().length(), 0);
+            final MessagePriority priority = helper.getMessagePriority();
+            if (priority != null) {
+                builder.setSpan(getSpanFromPriority(priority), 0, listItem.getTitle().length(),
+                        Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            }
         }
+        title.setText(builder);
 
-        title.setText(listItem.getTitle());
-        final TextView status = ((TextView) convertView.findViewById(R.id.child_event));
+        final TextView status = ((TextView) convertView.findViewById(R.id.server_status));
         status.setText(MiscUtils.getStatusString(mContext, listItem.getServer() != null
                 ? listItem.getServer().getStatus()
                 : ConnectionStatus.DISCONNECTED));
@@ -141,19 +149,21 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final EventCache cache = mIRCService.getEventCache(listItem.getServer());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
-        final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
-        builder.setSpan(UIUtils.getSpanFromPriority(mContext, helper.getSubMessagePriority
-                (conversation)), 0, conversation.getId().length(), 0);
-        textView.setText(builder);
+
+        final MessagePriority priority = helper.getSubMessagePriority(conversation);
+        if (priority != null) {
+            final CharacterStyle span = getSpanFromPriority(priority);
+            final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
+            builder.setSpan(span, 0, conversation.getId().length(), 0);
+            textView.setText(builder);
+        } else {
+            textView.setText(conversation.getId());
+        }
 
         final Event event = helper.getSubEvent(conversation);
         final TextView textEvent = (TextView) convertView.findViewById(R.id.child_event);
 
-        EventDecorator decorator = cache.get(event);
-        if (decorator == null) {
-            decorator = mMessageConverter.getEventDecorator(event);
-            cache.put(event, decorator);
-        }
+        final EventDecorator decorator = cache.get(event);
         textEvent.setText(decorator.getMessage());
 
         final View divider = convertView.findViewById(R.id.divider);

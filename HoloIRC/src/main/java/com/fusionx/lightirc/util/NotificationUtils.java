@@ -42,7 +42,7 @@ public class NotificationUtils {
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
             final String message = String.format("Mentioned in %s on %s", event.channel.getId(),
-                    event.channel.getId());
+                    event.channel.getServer().getTitle());
             final Crouton crouton = Crouton.makeText(activity, message, Style.INFO);
             crouton.setConfiguration(sConfiguration);
             crouton.show();

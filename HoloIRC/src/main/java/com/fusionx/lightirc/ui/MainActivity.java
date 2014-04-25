@@ -119,8 +119,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
 
         if (mCurrentFragment != null) {
-            onRemoveFragment();
-            mEventBus.postSticky(new OnConversationChanged(null, null));
+            onRemoveCurrentFragmentAndConversation();
         }
         getService().removeLoggingHandlerAndEventCache(server);
 
@@ -140,8 +139,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     && mConversation.getId().equals(event.channelName);
 
             if (isCurrent) {
-                onRemoveFragment();
-                mEventBus.postSticky(new OnConversationChanged(null, null));
+                onRemoveCurrentFragmentAndConversation();
             }
         }
     }
@@ -153,8 +151,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     && mConversation.getId().equals(event.channelName);
 
             if (isCurrent) {
-                onRemoveFragment();
-                mEventBus.postSticky(new OnConversationChanged(null, null));
+                onRemoveCurrentFragmentAndConversation();
             }
             return isCurrent;
         }
@@ -164,8 +161,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onPrivateMessageClosed() {
         if (mCurrentFragment != null) {
-            onRemoveFragment();
-            mEventBus.postSticky(new OnConversationChanged(null, null));
+            onRemoveCurrentFragmentAndConversation();
         }
     }
 
@@ -381,7 +377,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         AppPreferences.setupAppPreferences(this);
-        setTheme(UIUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
 
@@ -619,7 +615,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     }
 
-    private void onRemoveFragment() {
+    private void onRemoveCurrentFragmentAndConversation() {
         final FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -627,6 +623,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mCurrentFragment = null;
 
         findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
+
+        // Don't listen for any more events from this server
+        mConversation.getServer().getServerEventBus().unregister(this);
+        mEventBus.postSticky(new OnConversationChanged(null, null));
     }
 
     private void onExternalConversationUpdate(final Conversation conversation) {

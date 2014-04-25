@@ -115,7 +115,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt(this));
+        setTheme(UIUtils.getThemeInt());
         super.onCreate(savedInstanceState);
 
         mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
