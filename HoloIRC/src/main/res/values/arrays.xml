@@ -46,25 +46,43 @@
         <item>@string/action_close_pm</item>
     </string-array>
 
-    <string-array name="notification_in_entries">
+    <string-array name="notification_in_entries_default">
         <item>@string/notification_entry_audio</item>
         <item>@string/notification_entry_vibrate</item>
     </string-array>
 
-    <string-array name="notification_in_values">
+    <string-array name="notification_in_values_default">
         <item>@string/notification_value_audio</item>
         <item>@string/notification_value_vibrate</item>
     </string-array>
 
-    <string-array name="notification_out_entries">
+    <string-array name="notification_out_entries_default">
         <item>@string/notification_entry_audio</item>
         <item>@string/notification_entry_vibrate</item>
         <item>@string/notification_entry_lights</item>
     </string-array>
 
-    <string-array name="notification_out_values">
+    <string-array name="notification_out_values_default">
         <item>@string/notification_value_audio</item>
         <item>@string/notification_value_vibrate</item>
+        <item>@string/notification_value_lights</item>
+    </string-array>
+
+    <string-array name="notification_in_entries_no_vibrator">
+        <item>@string/notification_entry_audio</item>
+    </string-array>
+
+    <string-array name="notification_in_values_no_vibrator">
+        <item>@string/notification_value_audio</item>
+    </string-array>
+
+    <string-array name="notification_out_entries_no_vibrator">
+        <item>@string/notification_entry_audio</item>
+        <item>@string/notification_entry_lights</item>
+    </string-array>
+
+    <string-array name="notification_out_values_no_vibrator">
+        <item>@string/notification_value_audio</item>
         <item>@string/notification_value_lights</item>
     </string-array>
 

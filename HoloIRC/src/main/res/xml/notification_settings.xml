@@ -12,8 +12,8 @@
                 android:key="pref_notify_in_app_settings"
                 android:title="In-app settings"
                 android:summary="Methods to notify you by"
-                android:entries="@array/notification_in_entries"
-                android:entryValues="@array/notification_in_values"
+                android:entries="@array/notification_in_entries_default"
+                android:entryValues="@array/notification_in_values_default"
                 android:defaultValue="@array/empty_array"
                 android:dependency="pref_notify_in_app"/>
     </PreferenceCategory>
@@ -28,8 +28,8 @@
                 android:key="pref_notify_out_app_settings"
                 android:title="Out of app settings"
                 android:summary="Methods to notify you by"
-                android:entries="@array/notification_out_entries"
-                android:entryValues="@array/notification_out_values"
+                android:entries="@array/notification_out_entries_default"
+                android:entryValues="@array/notification_out_values_default"
                 android:defaultValue="@array/empty_array"
                 android:dependency="pref_notify_out_app"/>
     </PreferenceCategory>
