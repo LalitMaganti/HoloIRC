@@ -41,6 +41,7 @@ import java.util.List;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
+import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
@@ -176,7 +177,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
      */
     @Override
     public void removeCurrentFragment() {
-        if (mCurrentFragment.getType() == FragmentType.CHANNEL) {
+        if (mCurrentFragment.getType() == CHANNEL) {
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
             mConversation.getServer().getServerCallBus().sendClosePrivateMessage(
@@ -187,6 +188,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void disconnectFromServer() {
         mWorkerFragment.disconnectFromServer(mConversation.getServer());
+    }
+
+    @Override
+    public boolean isDrawerOpen() {
+        return mDrawerLayout.isDrawerOpen(mRightDrawer);
     }
 
     @Override
@@ -323,9 +329,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
+        final boolean navigationDrawerEnabled = (!mSlidingPane.isSlideable() || !mSlidingPane
+                .isOpen()) && mConversation != null;
+
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible((!mSlidingPane.isSlideable() || !mSlidingPane.isOpen())
-                && mConversation != null);
+        item.setVisible(navigationDrawerEnabled);
+
+        final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
+        users.setVisible(navigationDrawerEnabled && mCurrentFragment.getType() == CHANNEL);
 
         final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());
@@ -346,6 +357,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             case R.id.activity_main_ab_actions:
                 UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
                 return true;
+            case R.id.activity_main_ab_users:
+                if (!mDrawerLayout.isDrawerOpen(mRightDrawer)) {
+                    mDrawerLayout.openDrawer(mRightDrawer);
+                }
+                // Not fully handled - still more work to do in the fragment
+                return false;
             case R.id.activity_main_ab_add:
                 addNewServer();
                 return true;
@@ -353,7 +370,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 openAppSettings();
                 return true;
         }
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

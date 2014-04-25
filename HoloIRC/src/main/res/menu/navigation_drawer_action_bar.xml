@@ -7,6 +7,10 @@
             android:title="@string/actions"
             holoirc:showAsAction="always|withText"/>
     <item
+            android:id="@+id/activity_main_ab_users"
+            android:title="@string/users"
+            holoirc:showAsAction="always|withText"/>
+    <item
             android:id="@+id/ignore_list_cab_add"
             android:icon="@drawable/ic_menu_add"
             holoirc:showAsAction="withText|ifRoom"

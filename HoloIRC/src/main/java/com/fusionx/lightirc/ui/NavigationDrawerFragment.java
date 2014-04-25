@@ -56,7 +56,7 @@ public class NavigationDrawerFragment extends Fragment implements
         }
     };
 
-    private TextView mTextView;
+    private TextView mUserListTextView;
 
     private View mSlideUpLayout;
 
@@ -98,7 +98,7 @@ public class NavigationDrawerFragment extends Fragment implements
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
         mSlidingUpPanelLayout.setSlidingEnabled(false);
 
-        mTextView = findById(getView(), R.id.user_text_view);
+        mUserListTextView = findById(getView(), R.id.user_text_view);
         mSlideUpLayout = findById(view, R.id.bottom_panel);
 
         getBus().registerSticky(mEventHandler);
@@ -210,6 +210,9 @@ public class NavigationDrawerFragment extends Fragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.activity_main_ab_users:
+                handleUserList();
+                return true;
             case R.id.ignore_list_cab_add:
                 mIgnoreListFragment.addIgnoredUser();
                 return true;
@@ -217,13 +220,21 @@ public class NavigationDrawerFragment extends Fragment implements
         return false;
     }
 
+    private void handleUserList() {
+        final boolean userListVisible = mSlidingUpPanelLayout.isExpanded();
+        if (mCallback.isDrawerOpen() && userListVisible) {
+            mSlidingUpPanelLayout.collapsePane();
+        } else if (!userListVisible) {
+            mSlidingUpPanelLayout.expandPane();
+        }
+    }
+
     public boolean onBackPressed() {
         if (mIsIgnoreListDisplayed) {
             mIgnoreListFragment.saveIgnoreList();
             switchToIRCActionFragment();
-            return true;
         }
-        return false;
+        return mIsIgnoreListDisplayed;
     }
 
     @Override
@@ -236,13 +247,17 @@ public class NavigationDrawerFragment extends Fragment implements
         if (visibility == View.VISIBLE) {
             // TODO - change this from casting
             final Channel channel = (Channel) mConversation;
-            mTextView.setText(String.format("%d users", channel.getUsers().size()));
+            setUserTextViewText(String.format("%d users", channel.getUsers().size()));
         } else {
             if (mSlidingUpPanelLayout.isExpanded()) {
                 // Collapse Pane
                 mSlidingUpPanelLayout.collapsePane();
             }
         }
+    }
+
+    private void setUserTextViewText(final CharSequence text) {
+        mUserListTextView.setText(text);
     }
 
     private void updateActionBarForIgnoreList() {
@@ -283,6 +298,8 @@ public class NavigationDrawerFragment extends Fragment implements
         public void removeCurrentFragment();
 
         public void disconnectFromServer();
+
+        public boolean isDrawerOpen();
 
         public void closeDrawer();
 
