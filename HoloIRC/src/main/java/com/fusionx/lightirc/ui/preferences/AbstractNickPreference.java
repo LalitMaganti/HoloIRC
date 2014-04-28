@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.relay.misc.NickStorage;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,56 +26,8 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     AbstractNickPreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
 
-        setPersistent(false);
+        setPersistent(true);
         setDialogLayoutResource(R.layout.nick_choices_edit_texts);
-    }
-
-    @Override
-    protected void onBindDialogView(final View view) {
-        super.onBindDialogView(view);
-
-        mFirstChoice = (EditText) view.findViewById(R.id.edit_text_nick_first_choice);
-        mSecondChoice = (EditText) view.findViewById(R.id.edit_text_nick_second_choice);
-        mThirdChoice = (EditText) view.findViewById(R.id.edit_text_nick_third_choice);
-
-        retrieveNick();
-    }
-
-    protected abstract void retrieveNick();
-
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-
-        if (positiveResult) {
-            persistNick();
-        }
-    }
-
-    protected abstract void persistNick();
-
-    void onEditTextChanged() {
-        final boolean enable = !mFirstChoice.getText().toString().isEmpty();
-        final Dialog dlg = getDialog();
-        final AlertDialog alertDlg = (AlertDialog) dlg;
-        if (alertDlg != null) {
-            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
-            btn.setEnabled(enable);
-            mFirstChoice.setError(enable ? null : "Must not be empty");
-        }
-    }
-
-    @Override
-    protected void showDialog(final Bundle state) {
-        super.showDialog(state);
-
-        final String text = mFirstChoice.getText().toString();
-        mFirstChoice.getText().clear();
-        mFirstChoice.getText().append(text);
-
-        mFirstChoice.removeTextChangedListener(this);
-        mFirstChoice.addTextChangedListener(this);
-        onEditTextChanged();
     }
 
     @Override
@@ -90,5 +43,69 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
     @Override
     public void afterTextChanged(Editable editable) {
         onEditTextChanged();
+    }
+
+    protected abstract void retrieveNick();
+
+    protected abstract void persistNick();
+
+    @Override
+    protected void showDialog(final Bundle state) {
+        super.showDialog(state);
+
+        final String text = mFirstChoice.getText().toString();
+        mFirstChoice.getText().clear();
+        mFirstChoice.getText().append(text);
+
+        mFirstChoice.removeTextChangedListener(this);
+        mFirstChoice.addTextChangedListener(this);
+        onEditTextChanged();
+    }
+
+    @Override
+    protected void onBindDialogView(final View view) {
+        super.onBindDialogView(view);
+
+        mFirstChoice = (EditText) view.findViewById(R.id.edit_text_nick_first_choice);
+        mSecondChoice = (EditText) view.findViewById(R.id.edit_text_nick_second_choice);
+        mThirdChoice = (EditText) view.findViewById(R.id.edit_text_nick_third_choice);
+
+        retrieveNick();
+    }
+
+    @Override
+    protected void onDialogClosed(boolean positiveResult) {
+        super.onDialogClosed(positiveResult);
+
+        if (positiveResult && callChangeListener(getNickStorageFromText())) {
+            persistNick();
+        }
+    }
+
+    protected String getFirstNickText() {
+        return mFirstChoice.getText().toString();
+    }
+
+    protected String getSecondNickText() {
+        return mSecondChoice.getText().toString();
+    }
+
+    protected String getThirdNickText() {
+        return mThirdChoice.getText().toString();
+    }
+
+    void onEditTextChanged() {
+        final boolean enable = !getFirstNickText().isEmpty();
+        final Dialog dlg = getDialog();
+        final AlertDialog alertDlg = (AlertDialog) dlg;
+        if (alertDlg != null) {
+            final Button btn = alertDlg.getButton(AlertDialog.BUTTON_POSITIVE);
+            btn.setEnabled(enable);
+            mFirstChoice.setError(enable ? null : "Must not be empty");
+        }
+    }
+
+    private NickStorage getNickStorageFromText() {
+        return new NickStorage(getFirstNickText(), getSecondNickText(), getThirdNickText());
     }
 }

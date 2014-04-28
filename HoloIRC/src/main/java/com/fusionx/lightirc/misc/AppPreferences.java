@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.misc;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 
@@ -29,16 +28,16 @@ public class AppPreferences implements EventPreferences {
     public static void setUpPreferences(final Context context) {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
-        final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants.Theme,
-                "1"));
+        final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
+                .FRAGMENT_SETTINGS_THEME, "1"));
         theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
-        highlightLine = preferences.getBoolean(PreferenceConstants.LineColourful, true);
-        timestamp = preferences.getBoolean(PreferenceConstants.Timestamp, false);
-        motdAllowed = preferences.getBoolean(PreferenceConstants.Motd, true);
-        hideUserMessages = preferences.getBoolean(PreferenceConstants.HideMessages, false);
-        partReason = preferences.getString(PreferenceConstants.PartReason, "");
-        quitReason = preferences.getString(PreferenceConstants.QuitReason, "");
-        numberOfReconnectEvents = preferences.getInt(PreferenceConstants.ReconnectTries, 3);
+        highlightLine = preferences.getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
+        timestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
+        motdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
+        hideUserMessages = preferences.getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
+        partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
+        quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
+        numberOfReconnectEvents = preferences.getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
     }
 
     @Override
@@ -57,24 +56,19 @@ public class AppPreferences implements EventPreferences {
     }
 
     @Override
-    public boolean getShouldTimestampMessages() {
-        return timestamp;
-    }
-
-    @Override
     public Theme getTheme() {
         return theme;
-    }
-
-    // TODO - this is broken - fixit
-    @Override
-    public boolean shouldIgnoreUser(String nick) {
-        return false;
     }
 
     @Override
     public boolean shouldLogUserListChanges() {
         return !hideUserMessages;
+    }
+
+    // We always want to display the messages that the app user sends
+    @Override
+    public boolean isSelfEventBroadcast() {
+        return true;
     }
 
     @Override
@@ -87,15 +81,8 @@ public class AppPreferences implements EventPreferences {
         return highlightLine;
     }
 
-    // We always want relay to handle the initial private message population
     @Override
-    public boolean shouldHandleInitialPrivateMessage() {
-        return true;
-    }
-
-    // We always want to display the messages that the app user sends
-    @Override
-    public boolean isSelfEventBroadcast() {
+    public boolean shouldNickBeColourful() {
         return true;
     }
 }

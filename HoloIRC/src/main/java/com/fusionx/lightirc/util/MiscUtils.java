@@ -21,15 +21,13 @@
 
 package com.fusionx.lightirc.util;
 
-import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.R;
+import com.fusionx.relay.ConnectionStatus;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
-import java.util.HashSet;
-import java.util.Set;
+import android.os.AsyncTask;
 
 /**
  * Full of static utility methods
@@ -38,26 +36,10 @@ import java.util.Set;
  */
 public class MiscUtils {
 
-    private static Set<String> ignoreList = null;
-
     /**
      * Static utility methods only - can't instantiate this class
      */
     private MiscUtils() {
-    }
-
-    public static Set<String> getIgnoreList(final Context context, final String fileName) {
-        if (ignoreList == null) {
-            final SharedPreferences preferences = context.getSharedPreferences(fileName,
-                    Context.MODE_PRIVATE);
-            ignoreList = SharedPreferencesUtils.getStringSet(preferences,
-                    PreferenceConstants.IgnoreList, new HashSet<String>());
-        }
-        return ignoreList;
-    }
-
-    public static void forceUpdateIgnoreList(final Set<String> set) {
-        ignoreList = set;
     }
 
     public static String getAppVersion(final Context context) {
@@ -70,5 +52,21 @@ public class MiscUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String getStatusString(final Context context,
+            final ConnectionStatus connectionStatus) {
+        switch (connectionStatus) {
+            case CONNECTED:
+                return context.getString(R.string.status_connected);
+            case RECONNECTING:
+                return context.getString(R.string.reconnecting);
+            case CONNECTING:
+                return context.getString(R.string.status_connecting);
+            case DISCONNECTED:
+                return context.getString(R.string.status_disconnected);
+            default:
+                return null;
+        }
     }
 }

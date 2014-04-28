@@ -1,4 +1,1 @@
-include ':HoloIRC', 'libraries:relay'
-include ':libraries:PagerSlidingTabStrip:library'
-include ':libraries:SlidingMenu:library'
-include ':libraries:android-numberpicker:library'
+include ':HoloIRC', 'libraries:relay:library', 'libraries:AndroidSlidingUpPanel:library'

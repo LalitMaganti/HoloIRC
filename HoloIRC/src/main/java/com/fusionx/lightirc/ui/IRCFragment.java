@@ -22,10 +22,13 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.IRCAnimationAdapter;
 import com.fusionx.lightirc.adapters.IRCMessageAdapter;
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.relay.Message;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.relay.event.Event;
+import com.fusionx.relay.interfaces.Conversation;
+import com.nhaarman.listviewanimations.swinginadapters.AnimationAdapter;
+import com.nhaarman.listviewanimations.swinginadapters.prepared.AlphaInAnimationAdapter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -39,53 +42,61 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class IRCFragment extends ListFragment implements TextView.OnEditorActionListener {
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import de.greenrobot.event.EventBus;
 
-    String mTitle = null;
+public abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
+        .OnEditorActionListener {
 
-    EditText mMessageBox = null;
+    Conversation mConversation;
 
-    IRCMessageAdapter mMessageAdapter;
+    @InjectView(R.id.fragment_irc_message_box)
+    EditText mMessageBox;
 
-    boolean mCachingImportant = true;
+    String mTitle;
+
+    IRCMessageAdapter<T> mMessageAdapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflate.inflate(R.layout.fragment_irc, container, false);
+        return createView(container, inflate);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onViewCreated(final View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        setupListAdapter();
-        getListView().setSelection(getListView().getCount());
-    }
+        final OnConversationChanged event = EventBus.getDefault().getStickyEvent
+                (OnConversationChanged.class);
+        mConversation = event.conversation;
 
-    void setupListAdapter() {
-        final List<Message> messages = onRetrieveMessages();
-        if (messages != null) {
-            mMessageAdapter = new IRCMessageAdapter(getActivity(), messages);
-            final IRCAnimationAdapter adapter = new IRCAnimationAdapter(mMessageAdapter);
-            adapter.setAbsListView(getListView());
-            setListAdapter(adapter);
+        // Sets up the views
+        ButterKnife.inject(this, view);
+
+        mMessageBox.setOnEditorActionListener(this);
+        mTitle = getArguments().getString("title");
+
+        mMessageAdapter = new IRCMessageAdapter<>(getActivity());
+        setListAdapter(mMessageAdapter);
+
+        onResetBuffer();
+        mConversation.getServer().getServerEventBus().register(this);
+
+        if (savedInstanceState == null) {
+            getListView().setSelection(mMessageAdapter.getCount() - 1);
         }
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onDestroyView() {
+        super.onDestroyView();
 
-        mMessageBox = (EditText) getView().findViewById(R.id.fragment_irc_message_box);
-        mMessageBox.setOnEditorActionListener(this);
-        mTitle = getArguments().getString("title");
-    }
-
-    public final void disableEditText() {
-        mMessageBox.setEnabled(false);
+        ButterKnife.reset(this);
     }
 
     @Override
@@ -98,24 +109,27 @@ public abstract class IRCFragment extends ListFragment implements TextView.OnEdi
             mMessageBox.setText("");
             onSendMessage(message);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
-    public void setCachingImportant(boolean cachingImportant) {
-        mCachingImportant = cachingImportant;
+    public void onResetBuffer() {
+        mMessageAdapter.setData(new ArrayList<>(getAdapterData()));
     }
 
-    // Abstract methods
-    protected abstract void onSendMessage(final String message);
-
-    protected abstract List<Message> onRetrieveMessages();
-
-    public abstract FragmentTypeEnum getType();
+    public abstract FragmentType getType();
 
     // Getters and setters
     public String getTitle() {
         return mTitle;
     }
+
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_irc, container, false);
+    }
+
+    protected abstract List<T> getAdapterData();
+
+    // Abstract methods
+    protected abstract void onSendMessage(final String message);
 }

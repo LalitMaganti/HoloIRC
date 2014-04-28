@@ -24,8 +24,12 @@
     <color name="server_card_background_light">#ffffffff</color>
     <color name="server_card_background_dark">#202122</color>
 
-    <color name="sliding_menu_background">#ff2f2f2f</color>
-
     <color name="holo_blue_light">#ff33b5e5</color>
+
+    <color name="very_light_grey">#f9f9f9</color>
+    <color name="medium_grey">#ff2f2f2f</color>
+    <color name="dark_gray">#cc222222</color>
+
+    <color name="off_white">#e2e2e2</color>
 
 </resources>

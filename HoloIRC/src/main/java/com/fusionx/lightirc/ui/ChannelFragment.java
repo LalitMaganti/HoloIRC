@@ -21,107 +21,181 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
+
+import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Message;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.constants.UserListChangeType;
-import com.fusionx.relay.event.ChannelEvent;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.NameEvent;
+import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
+import com.fusionx.relay.util.IRCUtils;
+import com.fusionx.relay.util.Utils;
 import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
-import android.app.Activity;
+import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
-public final class ChannelFragment extends IRCFragment {
+import butterknife.InjectView;
+import butterknife.OnClick;
 
-    private ChannelFragmentCallback mCallback;
+public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
+        .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
 
-    @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public static final ImmutableList<? extends Class<? extends ChannelEvent>> sClasses =
+            ImmutableList.of(NameEvent.class);
 
-        if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, ChannelFragmentCallback.class);
-        }
-    }
+    @InjectView(R.id.auto_complete_button)
+    ImageButton mAutoButton;
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    private PopupMenu mPopupMenu;
 
-        mCallback.getServer().getServerEventBus().register(this);
-        getChannel().setCached(true);
-    }
+    private boolean isPopupShown;
 
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        mCallback.getServer().getServerEventBus().unregister(this);
-        if (mCachingImportant) {
-            getChannel().setCached(false);
-        }
-    }
-
-    @Override
-    protected List<Message> onRetrieveMessages() {
-        if (getChannel() == null) {
-            // This is an error - should not occur but seems to be doing so
-            return new ArrayList<>();
-        } else {
-            return getChannel().getBuffer();
-        }
-    }
-
-    public void onUserMention(final List<ChannelUser> users) {
+    public void onMentionMultipleUsers(final List<WorldUser> users) {
+        final StringBuilder builder = new StringBuilder();
         final String text = String.valueOf(mMessageBox.getText());
-        String nicks = "";
-        for (final ChannelUser userNick : users) {
-            nicks += userNick.getNick() + ": ";
+        for (final WorldUser userNick : users) {
+            builder.append(userNick.getNick()).append(": ");
         }
+        builder.append(text);
+
         mMessageBox.clearComposingText();
-        mMessageBox.append(nicks + text);
+        mMessageBox.append(builder.toString());
+    }
+
+    @OnClick(R.id.auto_complete_button)
+    public void onAutoCompleteClick(final ImageButton autoComplete) {
+        if (isPopupShown) {
+            mPopupMenu.dismiss();
+        } else {
+            // TODO - this needs to be synchronized properly
+            final Collection<WorldUser> users = getChannel().getUsers();
+            final List<WorldUser> sortedList = new ArrayList<>(users.size());
+            final String message = mMessageBox.getText().toString();
+            final String finalWord = Iterables.getLast(IRCUtils.splitRawLine(message, false));
+            for (final WorldUser user : users) {
+                if (StringUtils.startsWithIgnoreCase(user.getNick(), finalWord)) {
+                    sortedList.add(user);
+                }
+            }
+
+            if (sortedList.size() == 1) {
+                changeLastWord(Iterables.getLast(sortedList).getNick());
+            } else if (sortedList.size() > 1) {
+                if (mPopupMenu == null) {
+                    mPopupMenu = new PopupMenu(getActivity(), autoComplete);
+                    mPopupMenu.setOnDismissListener(this);
+                    mPopupMenu.setOnMenuItemClickListener(this);
+                }
+                final Menu innerMenu = mPopupMenu.getMenu();
+                innerMenu.clear();
+
+                Collections.sort(sortedList, new IRCUserComparator(getChannel()));
+                for (final WorldUser user : sortedList) {
+                    innerMenu.add(user.getNick());
+                }
+                mPopupMenu.show();
+            }
+        }
     }
 
     @Override
-    public FragmentTypeEnum getType() {
-        return FragmentTypeEnum.Channel;
+    public void onDismiss(final PopupMenu popupMenu) {
+        isPopupShown = false;
     }
 
     @Override
-    public void onSendMessage(final String message) {
-        UserInputParser.channelMessageToParse(mCallback.getServer(), mTitle, message);
+    public boolean onMenuItemClick(final MenuItem menuItem) {
+        final String nick = menuItem.getTitle().toString();
+        changeLastWord(nick);
+
+        isPopupShown = false;
+        return true;
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+    }
+
+    @Override
+    public void afterTextChanged(final Editable s) {
+        mAutoButton.setEnabled(Utils.isNotEmpty(s));
     }
 
     // Subscription methods
     @Subscribe
-    public void onChannelMessage(final ChannelEvent event) {
-        if (mTitle.equals(event.channelName) && (event.changeType == UserListChangeType.NONE
-                || !AppPreferences.hideUserMessages) && StringUtils.isNotEmpty(event.message)) {
-            if (mMessageAdapter == null) {
-                setupListAdapter();
+    public void onEventMainThread(final ChannelEvent event) {
+        if (event.channelName.equals(mTitle) && !(sClasses.contains(event.getClass()))) {
+            if (WorldUserEvent.sUserListChangeEvents.contains(event.getClass())
+                    && AppPreferences.hideUserMessages) {
+                return;
             }
-            synchronized (mMessageAdapter.getMessages()) {
-                mMessageAdapter.add(new Message(event.message));
-            }
+            mMessageAdapter.add(event);
         }
     }
 
-    private Channel getChannel() {
-        return mCallback.getServer().getUserChannelInterface().getChannelIfExists(mTitle);
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
+        mMessageBox.addTextChangedListener(this);
     }
 
-    // Callback interface
-    public interface ChannelFragmentCallback {
+    @Override
+    public void onSendMessage(final String message) {
+        UserInputParser.onParseChannelMessage(mConversation.getServer(), mTitle, message);
+    }
 
-        public Server getServer();
+    @Override
+    public FragmentType getType() {
+        return FragmentType.CHANNEL;
+    }
+
+    @Override
+    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
+        return inflater.inflate(R.layout.fragment_channel, container, false);
+    }
+
+    @Override
+    protected List<ChannelEvent> getAdapterData() {
+        return getChannel().getBuffer();
+    }
+
+    private Channel getChannel() {
+        return (Channel) mConversation;
+    }
+
+    private void changeLastWord(final String newWord) {
+        final String message = mMessageBox.getText().toString();
+        final List<String> list = IRCUtils.splitRawLine(message, false);
+        list.set(list.size() - 1, newWord);
+        mMessageBox.setText("");
+        mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
     }
 }

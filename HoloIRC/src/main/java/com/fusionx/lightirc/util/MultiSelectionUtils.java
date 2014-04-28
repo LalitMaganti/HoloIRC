@@ -28,22 +28,35 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ListView;
 
 import java.util.HashSet;
 
 /**
- * Utilities for handling multiple selection in list views. Contains functionality similar to {@link
+ * Utilities for handling multiple selection in list views. Contains functionality similar to
+ * {@link
  * AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link ActionBarActivity} and
  * backward-compatible action bars.
  */
 public class MultiSelectionUtils {
 
-    public static Controller attachMultiSelectionController(final ListView listView,
+    public static Controller attachMultiSelectionController(final AbsListView listView,
             final ActionBarActivity activity,
             final MultiChoiceModeListener listener,
             boolean startModeOnClick) {
         return Controller.attach(listView, activity, listener, startModeOnClick);
+    }
+
+    /**
+     * @see android.widget.AbsListView.MultiChoiceModeListener
+     */
+    public static interface MultiChoiceModeListener extends ActionMode.Callback {
+
+        /**
+         * @see android.widget.AbsListView.MultiChoiceModeListener#onItemCheckedStateChanged(
+         *android.view.ActionMode, int, long, boolean)
+         */
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                boolean checked);
     }
 
     public static class Controller implements
@@ -53,9 +66,16 @@ public class MultiSelectionUtils {
 
         private final Handler mHandler = new Handler();
 
+        private final Runnable mSetChoiceModeNoneRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mListView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
+            }
+        };
+
         private ActionMode mActionMode;
 
-        private ListView mListView = null;
+        private AbsListView mListView = null;
 
         private ActionBarActivity mActivity = null;
 
@@ -70,7 +90,7 @@ public class MultiSelectionUtils {
         private Controller() {
         }
 
-        public static Controller attach(ListView listView, ActionBarActivity activity,
+        public static Controller attach(AbsListView listView, ActionBarActivity activity,
                 MultiChoiceModeListener listener,
                 boolean startModeOnClick) {
             Controller controller = new Controller();
@@ -82,19 +102,6 @@ public class MultiSelectionUtils {
                 listView.setOnItemClickListener(controller);
             }
             return controller;
-        }
-
-        private void readInstanceState(Bundle savedInstanceState) {
-            mTempIdsToCheckOnRestore = null;
-            if (savedInstanceState != null) {
-                long[] checkedIds = savedInstanceState.getLongArray(getStateKey());
-                if (checkedIds != null && checkedIds.length > 0) {
-                    mTempIdsToCheckOnRestore = new HashSet<Long>();
-                    for (long id : checkedIds) {
-                        mTempIdsToCheckOnRestore.add(id);
-                    }
-                }
-            }
         }
 
         public void tryRestoreInstanceState(Bundle savedInstanceState) {
@@ -119,10 +126,9 @@ public class MultiSelectionUtils {
                 if (mTempIdsToCheckOnRestore.contains(adapter.getItemId(pos))) {
                     idsFound = true;
                     if (mItemsToCheck == null) {
-                        mItemsToCheck = new HashSet<Pair<Integer, Long>>();
+                        mItemsToCheck = new HashSet<>();
                     }
-                    mItemsToCheck.add(
-                            new Pair<Integer, Long>(pos, adapter.getItemId(pos)));
+                    mItemsToCheck.add(new Pair<>(pos, adapter.getItemId(pos)));
                 }
             }
 
@@ -143,10 +149,6 @@ public class MultiSelectionUtils {
             }
 
             return false;
-        }
-
-        private String getStateKey() {
-            return MultiSelectionUtils.class.getSimpleName() + "_" + mListView.getId();
         }
 
         @Override
@@ -198,22 +200,16 @@ public class MultiSelectionUtils {
             mHandler.post(mSetChoiceModeNoneRunnable);
         }
 
-        private final Runnable mSetChoiceModeNoneRunnable = new Runnable() {
-            @Override
-            public void run() {
-                mListView.setChoiceMode(AbsListView.CHOICE_MODE_NONE);
-            }
-        };
-
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
             if (mActionMode == null) {
-                mItemsToCheck = new HashSet<Pair<Integer, Long>>();
-                mItemsToCheck.add(new Pair<Integer, Long>(position, id));
+                mItemsToCheck = new HashSet<>();
+                mItemsToCheck.add(new Pair<>(position, id));
                 mActionMode = mActivity.startSupportActionMode(Controller.this);
             } else {
                 boolean checked = mListView.isItemChecked(position);
-                mListener.onItemCheckedStateChanged(mActionMode, position, id, checked);
+                mListView.setItemChecked(position, !checked);
+                mListener.onItemCheckedStateChanged(mActionMode, position, id, !checked);
 
                 int numChecked = 0;
                 SparseBooleanArray checkedItemPositions = mListView.getCheckedItemPositions();
@@ -236,24 +232,39 @@ public class MultiSelectionUtils {
                 return false;
             }
 
-            mItemsToCheck = new HashSet<Pair<Integer, Long>>();
-            mItemsToCheck.add(new Pair<Integer, Long>(position, id));
+            mItemsToCheck = new HashSet<>();
+            mItemsToCheck.add(new Pair<>(position, id));
             mActionMode = mActivity.startSupportActionMode(Controller.this);
             return true;
         }
-    }
 
-    /**
-     * @see android.widget.AbsListView.MultiChoiceModeListener
-     */
-    public static interface MultiChoiceModeListener extends ActionMode.Callback {
+        public boolean isActionModeStarted() {
+            return mActionMode != null;
+        }
 
-        /**
-         * @see android.widget.AbsListView.MultiChoiceModeListener#onItemCheckedStateChanged(
-         *android.view.ActionMode, int, long, boolean)
-         */
-        public void onItemCheckedStateChanged(ActionMode mode,
-                int position, long id, boolean checked);
+        public void startActionMode() {
+            if (mActionMode != null) {
+                return;
+            }
+            mActionMode = mActivity.startSupportActionMode(Controller.this);
+        }
+
+        private void readInstanceState(Bundle savedInstanceState) {
+            mTempIdsToCheckOnRestore = null;
+            if (savedInstanceState != null) {
+                long[] checkedIds = savedInstanceState.getLongArray(getStateKey());
+                if (checkedIds != null && checkedIds.length > 0) {
+                    mTempIdsToCheckOnRestore = new HashSet<>();
+                    for (long id : checkedIds) {
+                        mTempIdsToCheckOnRestore.add(id);
+                    }
+                }
+            }
+        }
+
+        private String getStateKey() {
+            return MultiSelectionUtils.class.getSimpleName() + "_" + mListView.getId();
+        }
     }
 }
 

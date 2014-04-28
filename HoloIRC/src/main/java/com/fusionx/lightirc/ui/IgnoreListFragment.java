@@ -3,71 +3,102 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
-import com.fusionx.lightirc.collections.SynchronizedTreeSet;
-import com.fusionx.lightirc.constants.PreferenceConstants;
-import com.fusionx.lightirc.ui.dialogbuilder.IgnoreNickPromptDialogBuilder;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
+import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.interfaces.Conversation;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
+import android.support.v4.app.ListFragment;
+import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-public class IgnoreListFragment extends MultiChoiceListFragment<String> implements SlidingMenu
-        .OnCloseListener, OnDismissCallback {
+import de.greenrobot.event.EventBus;
+
+import static com.fusionx.lightirc.util.UIUtils.findById;
+
+public class IgnoreListFragment extends ListFragment implements OnDismissCallback,
+        AbsListView.MultiChoiceModeListener, AbsListView.OnItemClickListener {
+
+    private Conversation mConversation;
+
+    private final Object mEventHandler = new Object() {
+        @SuppressWarnings("unused")
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+        }
+    };
+
+    private BuilderDatabaseSource mDatabaseSource;
 
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        final IgnoreListCallback callback = FragmentUtils.getParent(this,
-                IgnoreListCallback.class);
-
-        final SynchronizedTreeSet<String> arrayList = new SynchronizedTreeSet<String>(MiscUtils
-                .getIgnoreList(getActivity(), callback.getServerTitle().toLowerCase()));
-        final BaseCollectionAdapter<String> ignoreAdapter = new BaseCollectionAdapter<String>
-                (getActivity(), R.layout.default_listview_textview, arrayList);
-        final DecoratedIgnoreListAdapter listAdapter = new DecoratedIgnoreListAdapter
-                (ignoreAdapter, this);
-
-        setListAdapter(listAdapter);
-
-        getListAdapter().setAbsListView(getListView());
-
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        mDatabaseSource = new BuilderDatabaseSource(getActivity());
+        mDatabaseSource.open();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        MiscUtils.forceUpdateIgnoreList(null);
+        mDatabaseSource.close();
     }
 
     @Override
-    protected void attachSelectionController() {
-        mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                getListView(), (ActionBarActivity) getActivity(), this, true);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.default_list_view, container, false);
+        final ListView listView = findById(view, android.R.id.list);
+
+        final TextView otherHeader = (TextView) inflater
+                .inflate(R.layout.sliding_menu_header, null, false);
+        otherHeader.setText("Ignore List");
+        listView.addHeaderView(otherHeader);
+
+        return view;
     }
 
     @Override
-    public void onClose() {
-        if (mMultiSelectionController != null) {
-            mMultiSelectionController.finish();
-        }
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        EventBus.getDefault().registerSticky(mEventHandler);
+
+        final List<String> arrayList = new ArrayList<>(mDatabaseSource.getIgnoreListByName(
+                mConversation.getServer().getTitle()));
+        final BaseCollectionAdapter<String> ignoreAdapter = new BaseCollectionAdapter<>
+                (getActivity(), R.layout.default_listview_textview, arrayList);
+        final DecoratedIgnoreListAdapter listAdapter = new DecoratedIgnoreListAdapter
+                (ignoreAdapter, this);
+
+        setListAdapter(listAdapter);
+        getListAdapter().setAbsListView(getListView());
+        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        getListView().setOnItemClickListener(this);
+        getListView().setMultiChoiceModeListener(this);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        EventBus.getDefault().unregister(mEventHandler);
     }
 
     @Override
@@ -75,12 +106,21 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
         return (DecoratedIgnoreListAdapter) super.getListAdapter();
     }
 
-    private BaseCollectionAdapter<String> getIgnoreAdapter() {
-        return (BaseCollectionAdapter<String>) getListAdapter().getDecoratedBaseAdapter();
+    @Override
+    public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+        for (final int position : reverseSortedPositions) {
+            getIgnoreAdapter().remove(getIgnoreAdapter().getItem(position));
+        }
     }
 
     @Override
-    public boolean onCreateActionMode(final ActionMode actionMode, final Menu menu) {
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+            boolean checked) {
+        mode.invalidate();
+    }
+
+    @Override
+    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
         // Inflate a menu resource providing context menu items
         final MenuInflater inflater = actionMode.getMenuInflater();
         inflater.inflate(R.menu.ignore_list_cab, menu);
@@ -88,74 +128,60 @@ public class IgnoreListFragment extends MultiChoiceListFragment<String> implemen
     }
 
     @Override
-    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.ignore_list_cab_add:
-                final IgnoreNickPromptDialogBuilder builder = new IgnoreNickPromptDialogBuilder
-                        (getActivity(), "") {
-                    @Override
-                    public void onOkClicked(final String input) {
-                        getIgnoreAdapter().add(input);
-                    }
-                };
-                builder.show();
-                return true;
+    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
+        final int checkedItemCount = getListView().getCheckedItemPositions().size();
+        mode.setTitle(checkedItemCount + getActivity().getString(R.string.items_checked));
+        mode.getMenu().getItem(0).setVisible(checkedItemCount > 0);
+
+        return true;
+    }
+
+    @Override
+    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.ignore_list_cab_remove:
-                getListAdapter().animateDismiss(getCheckedPositions());
+                getListAdapter().animateDismiss(UIUtils.getCheckedPositions(getListView()));
+                mode.finish();
                 return true;
-            default:
-                return false;
         }
+        return false;
     }
 
     @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        mode.setTitle("Ignore List");
-        mode.getMenu().getItem(1).setVisible(false);
-        return super.onPrepareActionMode(mode, menu);
+    public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    public void addIgnoredUser() {
+        final IgnoreListDialogBuilder builder = new IgnoreListDialogBuilder();
+        builder.show();
     }
 
     @Override
-    public void onDestroyActionMode(ActionMode actionMode) {
-        final IgnoreListCallback callback = FragmentUtils.getParent(this,
-                IgnoreListCallback.class);
-        callback.switchToIRCActionFragment();
-        final SharedPreferences preferences = getActivity().getSharedPreferences(
-                callback.getServerTitle().toLowerCase(), Context.MODE_PRIVATE);
-        final Set<String> set = getIgnoreAdapter().getSetOfItems();
-        SharedPreferencesUtils.putStringSet(preferences, PreferenceConstants.IgnoreList, set);
-        MiscUtils.forceUpdateIgnoreList(set);
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        final boolean checked = getListView().getCheckedItemPositions().get(position);
+        getListView().setItemChecked(position, !checked);
     }
 
-    @Override
-    public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
-        for (int position : reverseSortedPositions) {
-            getIgnoreAdapter().remove(getIgnoreAdapter().getItem(position));
+    public void saveIgnoreList() {
+        final List<String> list = getIgnoreAdapter().getListOfItems();
+        mDatabaseSource.updateIgnoreList(mConversation.getServer().getTitle(), list);
+        mConversation.getServer().updateIgnoreList(list);
+    }
+
+    private BaseCollectionAdapter<String> getIgnoreAdapter() {
+        return (BaseCollectionAdapter) getListAdapter().getDecoratedBaseAdapter();
+    }
+
+    public class IgnoreListDialogBuilder extends DialogBuilder {
+
+        public IgnoreListDialogBuilder() {
+            super(getActivity(), getActivity().getString(R.string.ignore_nick_title),
+                    getActivity().getString(R.string.ignore_nick_description), "");
         }
-    }
 
-    @Override
-    protected BaseCollectionAdapter<String> getRealAdapter() {
-        return getIgnoreAdapter();
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        final int checkedItemCount = getCheckedPositions().size();
-
-        if (checkedItemCount != 0) {
-            mode.setTitle(checkedItemCount + " items checked");
-        } else {
-            mode.setTitle("Ignore List");
+        @Override
+        public void onOkClicked(final String input) {
+            getIgnoreAdapter().add(input);
         }
-        mode.getMenu().getItem(0).setVisible(checkedItemCount == 0);
-        mode.getMenu().getItem(1).setVisible(checkedItemCount > 0);
-    }
-
-    public interface IgnoreListCallback {
-
-        public void switchToIRCActionFragment();
-
-        public String getServerTitle();
     }
 }

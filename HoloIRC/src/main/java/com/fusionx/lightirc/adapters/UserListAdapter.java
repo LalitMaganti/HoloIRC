@@ -24,8 +24,8 @@ package com.fusionx.lightirc.adapters;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.constants.UserLevelEnum;
+import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.constants.UserLevel;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -38,40 +38,49 @@ import java.util.TreeSet;
 
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
+public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
         StickyListHeadersAdapter {
+
+    private final LayoutInflater mInflater;
 
     private Channel mChannel;
 
-    public UserListAdapter(Context context, Set<ChannelUser> objects) {
+    public UserListAdapter(Context context, Set<WorldUser> objects) {
         super(context, R.layout.default_listview_textview, objects);
+
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
     public View getView(final int position, final View convertView, final ViewGroup parent) {
-        final TextView view = (TextView) super.getView(position, convertView, parent);
-        view.setTypeface(UIUtils.getRobotoLight(getContext()));
+        TextView view = (TextView) convertView;
+        if (view == null) {
+            view = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
+            UIUtils.setRobotoLight(getContext(), view);
+        }
         view.setText(getItem(position).getSpannedNick(mChannel));
         return view;
     }
 
     @Override
     public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        final TextView view = (TextView) ((convertView != null) ? convertView : LayoutInflater.from
-                (getContext()).inflate(R.layout.sliding_menu_header, viewGroup, false));
+        TextView view = (TextView) convertView;
+        if (convertView == null) {
+            view = (TextView) mInflater.inflate(R.layout.sliding_menu_header, viewGroup, false);
+        }
 
-        final UserLevelEnum levelEnum = getItem(i).getChannelPrivileges(mChannel);
+        final UserLevel levelEnum = getItem(i).getChannelPrivileges(mChannel);
         view.setText(mChannel.getNumberOfUsersType(levelEnum) + " " + levelEnum.getName());
         return view;
     }
 
     @Override
     public long getHeaderId(int position) {
-        final ChannelUser user = getItem(position);
+        final WorldUser user = getItem(position);
         return user.getUserPrefix(mChannel);
     }
 
-    public void setInternalSet(TreeSet<ChannelUser> set) {
+    public void setInternalSet(final TreeSet<WorldUser> set) {
         synchronized (mLock) {
             mObjects = set;
         }
@@ -80,7 +89,7 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
         }
     }
 
-    public void setChannel(Channel channel) {
+    public void setChannel(final Channel channel) {
         mChannel = channel;
     }
 }

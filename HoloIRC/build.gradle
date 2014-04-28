@@ -1,40 +1,30 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.0.+'
+    }
+}
+
 apply plugin: 'android'
-apply plugin: 'android-test'
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    compile 'com.google.guava:guava:15.0'
-    compile 'com.android.support:support-v4:19.0.0'
-    compile 'com.android.support:appcompat-v7:19.0.0'
-    compile 'org.apache.commons:commons-lang3:3.0'
-    compile 'com.squareup:otto:1.3.2'
-    compile 'com.nineoldandroids:library:2.4.0'
-    compile('de.keyboardsurfer.android.widget:crouton:1.8.1') {
-        exclude group: 'com.google.android'
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
     }
-    compile 'se.emilsjolander:stickylistheaders:2.1.3'
-    compile project(':libraries:relay')
-    compile project(':libraries:PagerSlidingTabStrip:library')
-    compile project(':libraries:SlidingMenu:library')
-    compile project(':libraries:android-numberpicker:library')
-    compile fileTree(dir: 'libs', include: '*.jar')
-
-    // TEST
-    testCompile 'junit:junit:4.10'
-    testCompile 'org.robolectric:robolectric:2.1.+'
-    testCompile 'com.squareup:fest-android:1.0.+'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19'
+    buildToolsVersion '19.0.3'
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 14
         targetSdkVersion 19
+        packageName "com.fusionx.lightirc"
     }
 
     compileOptions {
@@ -46,6 +36,10 @@ android {
         release
     }
 
+    sourceSets {
+        instrumentTest.setRoot('src/test')
+    }
+
     buildTypes {
         debug {
             packageNameSuffix '.debug'
@@ -55,6 +49,35 @@ android {
             signingConfig signingConfigs.release
         }
     }
+}
+
+apply plugin: 'android-unit-test'
+
+
+dependencies {
+    compile 'com.android.support:support-v4:19.+'
+    compile 'com.android.support:appcompat-v7:19.+'
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.4') {
+        exclude group: 'com.google.android', module: 'support-v4'
+    }
+    compile 'se.emilsjolander:stickylistheaders:2.1.3'
+    compile 'com.nhaarman.listviewanimations:library:2.+'
+
+    // TODO - remove this
+    compile "com.jakewharton:butterknife:4.0.1"
+
+    compile project(':libraries:relay:library')
+    compile project(':libraries:AndroidSlidingUpPanel:library')
+
+    // Tests stuff
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+    testCompile 'com.squareup:fest-android:1.0.+'
+
+    androidTestCompile 'junit:junit:4.10'
+    androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
+    androidTestCompile 'com.squareup:fest-android:1.0.+'
 }
 
 def Properties props = new Properties()

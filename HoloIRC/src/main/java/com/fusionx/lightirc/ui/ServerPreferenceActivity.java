@@ -1,47 +1,49 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.constants.PreferenceConstants;
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
+import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.ServerConfiguration;
+import com.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
+import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
-import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 
-import static com.fusionx.lightirc.constants.PreferenceConstants.Title;
-import static com.fusionx.lightirc.constants.PreferenceConstants.URL;
+import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
+import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_URL;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_IGNORE_LIST;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_ONE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_THREE;
+import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_TWO;
 
 public class ServerPreferenceActivity extends PreferenceActivity implements
-        ServerSettingsCallbacks,
-        Preference.OnPreferenceChangeListener {
+        ServerSettingsCallbacks {
+
+    public static final String NEW_SERVER = "new";
+
+    public static final String SERVER = "server";
+
+    private static final int CHANNEL_LIST = 10;
 
     private boolean mCanSaveChanges = true;
-
-    private boolean mNewServer = false;
-
-    private String mFileName = null;
-
-    private boolean backPressed = false;
 
     private ViewPreference mCompletePreference = null;
 
@@ -51,149 +53,65 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private PreferenceScreen mScreen;
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
+    private BuilderDatabaseSource mSource;
 
-        super.onCreate(savedInstanceState);
+    private ContentValues mContentValues;
 
-        mFileName = getIntent().getStringExtra("file");
-        mNewServer = getIntent().getBooleanExtra("new", false);
-        mCanSaveChanges = !mNewServer;
+    private boolean mNewServer;
 
-        if (UIUtils.hasHoneycomb()) {
-            final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
-            getFragmentManager().beginTransaction().replace(android.R.id.content,
-                    fragment).commit();
+    private ServerConfiguration.Builder mBuilder;
+
+    private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
+        if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
+            final PreferenceGroup pGroup = (PreferenceGroup) p;
+            int pCount = pGroup.getPreferenceCount();
+            for (int i = 0; i < pCount; i++) {
+                getPreferenceList(pGroup.getPreference(i), list);
+            }
         } else {
-            getPreferenceManager().setSharedPreferencesMode(Context.MODE_MULTI_PROCESS);
-            getPreferenceManager().setSharedPreferencesName(mFileName);
-
-            addPreferencesFromResource(R.xml.activty_server_settings_prefs);
-            setupPreferences(getPreferenceScreen(), this);
+            list.add(p);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!mCanSaveChanges) {
-            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                    (this) + "server.xml");
-            if (folder.exists()) {
-                folder.delete();
-            }
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
-                    Toast.LENGTH_SHORT).show();
-            backPressed = true;
-        } else if (mNewServer) {
-            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-            backPressed = true;
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        if (mCanSaveChanges || !mNewServer) {
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (!mCanSaveChanges && !backPressed) {
-            final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath
-                    (getApplicationContext()) + "server.xml");
-            if (folder.exists()) {
-                folder.delete();
-            }
-            Toast.makeText(this, getString(R.string.server_settings_changes_discarded),
-                    Toast.LENGTH_SHORT).show();
-        } else if (mNewServer && !backPressed) {
-            SharedPreferencesUtils.migrateFileToNewSystem(this, "server.xml");
-            Toast.makeText(this, getString(R.string.server_settings_changes_saved),
-                    Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public String getFileName() {
-        return mFileName;
     }
 
     @Override
     public void setupPreferences(final PreferenceScreen screen, final Activity activity) {
         mScreen = screen;
 
-        mTitle = (ServerTitleEditTextPreference) screen.findPreference(Title);
-        mTitle.setOnPreferenceChangeListener(this);
+        mTitle = (ServerTitleEditTextPreference) screen.findPreference(PREF_TITLE);
         mTitle.setListOfExistingServers(activity.getIntent().getStringArrayListExtra("list"));
 
-        // URL of server
         mCompletePreference = (ViewPreference) screen.findPreference("must_be_complete");
 
         // URL of server
-        mUrl = (EditTextPreference) screen.findPreference(URL);
-        mUrl.setOnPreferenceChangeListener(this);
+        mUrl = (EditTextPreference) screen.findPreference(PREF_URL);
 
-        Preference preference = screen.findPreference("pref_autojoin_intent");
-        assert preference != null;
+        final Preference preference = screen.findPreference("pref_autojoin_intent");
         preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
                 final Intent intent = new Intent(ServerPreferenceActivity.this,
                         ChannelListActivity.class);
-                intent.putExtra("filename", mFileName);
-                startActivity(intent);
+                if (mNewServer) {
+                    mSource.addServer(mContentValues);
+                    mNewServer = false;
+                }
+                intent.putExtra("contentValues", mContentValues);
+                startActivityForResult(intent, CHANNEL_LIST);
                 return false;
             }
         });
 
+        setPreferenceOnChangeListeners(screen);
+
         if (!mCanSaveChanges) {
-            setupNewServer(screen, activity);
             mCompletePreference.setInitialText(mTitle.getTitle().toString());
         } else {
             screen.removePreference(mCompletePreference);
         }
     }
 
-    private void setupNewServer(final PreferenceScreen screen, final Activity activity) {
-        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
-                (activity);
-        final String firstNick = preferences.getString(PreferenceConstants.DefaultFirstNick,
-                "holoirc");
-        final String secondNick = preferences.getString(PreferenceConstants.DefaultSecondNick, "");
-        final String thirdNick = preferences.getString(PreferenceConstants.DefaultThirdNick, "");
-
-        final String realName = preferences.getString(PreferenceConstants.DefaultRealName,
-                "HoloIRCUser");
-        final boolean autoNick = preferences.getBoolean(PreferenceConstants
-                .DefaultAutoNickChange, true);
-
-        final NickPreference nickPreference = (NickPreference) screen.findPreference
-                ("pref_nick_storage");
-        nickPreference.setFirstChoice(firstNick);
-        nickPreference.setSecondChoice(secondNick);
-        nickPreference.setThirdChoice(thirdNick);
-
-        final EditTextPreference realNamePref = (EditTextPreference) screen
-                .findPreference(PreferenceConstants.RealName);
-        realNamePref.setText(realName);
-        final CheckBoxPreference autoNickPref = (CheckBoxPreference) screen
-                .findPreference(PreferenceConstants.AutoNickChange);
-        autoNickPref.setChecked(autoNick);
-    }
-
     @Override
-    public boolean onPreferenceChange(final Preference preference, final Object newValue) {
+    public boolean onPreferenceChange(final Preference preference) {
         if (!mCanSaveChanges) {
             if (preference == mTitle && StringUtils.isEmpty(mUrl.getText())) {
                 mCompletePreference.setInitialText(mUrl.getTitle());
@@ -204,13 +122,142 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             } else {
                 mScreen.removePreference(mCompletePreference);
                 mCanSaveChanges = true;
+                setResult(RESULT_OK);
             }
         }
         return true;
     }
 
     @Override
-    protected boolean isValidFragment(String fragmentName) {
+    protected void onCreate(Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt());
+        super.onCreate(savedInstanceState);
+
+        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
+        mCanSaveChanges = !mNewServer;
+
+        mSource = new BuilderDatabaseSource(this);
+        mSource.open();
+
+        if (mNewServer) {
+            mBuilder = SharedPreferencesUtils.getDefaultNewServer(this);
+            setResult(RESULT_CANCELED);
+        } else {
+            mBuilder = getIntent().getParcelableExtra(SERVER);
+            setResult(RESULT_OK);
+        }
+        mContentValues = mSource.getContentValuesFromBuilder(mBuilder, !mNewServer);
+        // If it's a new server, we can't allow ignore list to be null - just put an empty string
+        // in for now - TODO - fix this
+        if (mNewServer) {
+            mContentValues.put(COLUMN_IGNORE_LIST, "");
+        }
+
+        final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                fragment).commit();
+    }
+
+    @Override
+    protected boolean isValidFragment(final String fragmentName) {
+        // TODO - this is a hack - fixit
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
+                "tempUselessFile.xml");
+        if (folder.exists()) {
+            folder.delete();
+        }
+        mSource.close();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CHANNEL_LIST) {
+                mContentValues = data.getParcelableExtra("contentValues");
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mCanSaveChanges) {
+            if (mNewServer) {
+                mSource.addServer(mContentValues);
+                mNewServer = false;
+            } else {
+                mSource.updateServer(mContentValues);
+            }
+        }
+    }
+
+    private void setPreferenceOnChangeListeners(final PreferenceScreen preferenceScreen) {
+        final ArrayList<Preference> list = new ArrayList<>();
+        getPreferenceList(preferenceScreen, list);
+
+        for (final Preference p : list) {
+            final Preference.OnPreferenceChangeListener listener;
+
+            if (p instanceof EditTextPreference) {
+                final EditTextPreference editTextPreference = (EditTextPreference) p;
+                final String text = mContentValues.getAsString(p.getKey());
+                editTextPreference.setText(text);
+
+                listener = new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        if (preference == mUrl || preference == mTitle) {
+                            ServerPreferenceActivity.this.onPreferenceChange(preference);
+                        }
+                        mContentValues.put(preference.getKey(), (String) newValue);
+                        return true;
+                    }
+                };
+            } else if (p instanceof CheckBoxPreference) {
+                final CheckBoxPreference checkBoxPreference = (CheckBoxPreference) p;
+                final boolean bool = mContentValues.getAsBoolean(checkBoxPreference.getKey());
+                checkBoxPreference.setChecked(bool);
+
+                listener = new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        mContentValues.put(preference.getKey(), (boolean) newValue);
+                        return true;
+                    }
+                };
+            } else if (p instanceof NickPreference) {
+                final NickPreference nickPreference = (NickPreference) p;
+                nickPreference.setNickChoices(mContentValues.getAsString(COLUMN_NICK_ONE),
+                        mContentValues.getAsString(COLUMN_NICK_TWO),
+                        mContentValues.getAsString(COLUMN_NICK_THREE));
+
+                listener = new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(Preference preference, Object newValue) {
+                        final NickStorage storage = (NickStorage) newValue;
+                        mContentValues.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
+                        mContentValues.put(COLUMN_NICK_TWO, storage.getSecondChoiceNick());
+                        mContentValues.put(COLUMN_NICK_THREE, storage.getThirdChoiceNick());
+                        return true;
+                    }
+                };
+            } else {
+                listener = null;
+            }
+
+            if (listener != null) {
+                p.setOnPreferenceChangeListener(listener);
+            }
+        }
     }
 }

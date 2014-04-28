@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
-import com.haarman.listviewanimations.BaseAdapterDecorator;
-import com.haarman.listviewanimations.itemmanipulation.OnDismissCallback;
+import com.nhaarman.listviewanimations.BaseAdapterDecorator;
+import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
@@ -39,6 +39,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
 
     private final SparseArray<AnimationInfo> mAnimators;
 
+    private final OnDismissCallback mCallback;
+
     private long mAnimationStartMillis;
 
     private int mLastAnimatedPosition;
@@ -51,7 +53,7 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
 
     public DecoratedIgnoreListAdapter(BaseAdapter baseAdapter, OnDismissCallback callback) {
         super(baseAdapter);
-        mAnimators = new SparseArray<AnimationInfo>();
+        mAnimators = new SparseArray<>();
 
         mAnimationStartMillis = -1;
         mLastAnimatedPosition = -1;
@@ -61,23 +63,6 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
             ((DecoratedIgnoreListAdapter) baseAdapter).setHasParentAnimationAdapter(true);
         }
         mCallback = callback;
-    }
-
-    /**
-     * Call this method to reset animation status on all views. The next time notifyDataSetChanged()
-     * is called on the base adapter, all views will animate again. Will also call
-     * setShouldAnimate(true).
-     */
-    void reset() {
-        mAnimators.clear();
-        mLastAnimatedPosition = -1;
-        mLastAnimatedHeaderPosition = -1;
-        mAnimationStartMillis = -1;
-        mShouldAnimate = true;
-
-        if (getDecoratedBaseAdapter() instanceof DecoratedIgnoreListAdapter) {
-            ((DecoratedIgnoreListAdapter) getDecoratedBaseAdapter()).reset();
-        }
     }
 
     public void setShouldAnimate(boolean shouldAnimate) {
@@ -133,6 +118,111 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
             return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderId(position);
         }
         return 0;
+    }
+
+    /**
+     * Animate dismissal of the item at given position.
+     */
+    public void animateDismiss(int position) {
+        animateDismiss(Arrays.asList(position));
+    }
+
+    /**
+     * Animate dismissal of the items at given positions.
+     */
+    public void animateDismiss(Collection<Integer> positions) {
+        final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
+        if (getAbsListView() == null) {
+            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter " +
+                    "before calling setAdapter()!");
+        }
+
+        List<View> views = getVisibleViewsForPositions(positionsCopy);
+
+        if (!views.isEmpty()) {
+            List<Animator> animators = new ArrayList<Animator>();
+            for (final View view : views) {
+                animators.add(createAnimatorForView(view));
+            }
+
+            AnimatorSet animatorSet = new AnimatorSet();
+
+            Animator[] animatorsArray = new Animator[animators.size()];
+            for (int i = 0; i < animatorsArray.length; i++) {
+                animatorsArray[i] = animators.get(i);
+            }
+
+            animatorSet.playTogether(animatorsArray);
+            animatorSet.addListener(new Animator.AnimatorListener() {
+
+                @Override
+                public void onAnimationStart(Animator animator) {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+                    invokeCallback(positionsCopy);
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+                }
+            });
+            animatorSet.start();
+        } else {
+            invokeCallback(positionsCopy);
+        }
+    }
+
+    /**
+     * Call this method to reset animation status on all views. The next time
+     * notifyDataSetChanged()
+     * is called on the base adapter, all views will animate again. Will also call
+     * setShouldAnimate(true).
+     */
+    void reset() {
+        mAnimators.clear();
+        mLastAnimatedPosition = -1;
+        mLastAnimatedHeaderPosition = -1;
+        mAnimationStartMillis = -1;
+        mShouldAnimate = true;
+
+        if (getDecoratedBaseAdapter() instanceof DecoratedIgnoreListAdapter) {
+            ((DecoratedIgnoreListAdapter) getDecoratedBaseAdapter()).reset();
+        }
+    }
+
+    /**
+     * Set whether this AnimationAdapter is encapsulated by another AnimationAdapter. When this is
+     * set to true, this AnimationAdapter does not apply any animations to the views. Should not be
+     * set explicitly, the AnimationAdapter class manages this by itself.
+     */
+    void setHasParentAnimationAdapter(boolean hasParentAnimationAdapter) {
+        mHasParentAnimationAdapter = hasParentAnimationAdapter;
+    }
+
+    /**
+     * Get the delay in milliseconds before the first animation should start. Defaults to {@value
+     * #INITIALDELAYMILLIS}.
+     */
+    long getInitialDelayMillis() {
+        return INITIALDELAYMILLIS;
+    }
+
+    long getAnimationDelayMillis() {
+        return DEFAULTANIMATIONDELAYMILLIS;
+    }
+
+    long getAnimationDurationMillis() {
+        return DEFAULTANIMATIONDURATIONMILLIS;
+    }
+
+    Animator[] getAnimators(ViewGroup parent, View view) {
+        return new Animator[0];
     }
 
     private boolean cancelExistingAnimation(int position, View convertView) {
@@ -241,108 +331,6 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
         return Math.max(0, delay);
     }
 
-    /**
-     * Set whether this AnimationAdapter is encapsulated by another AnimationAdapter. When this is
-     * set to true, this AnimationAdapter does not apply any animations to the views. Should not be
-     * set explicitly, the AnimationAdapter class manages this by itself.
-     */
-    void setHasParentAnimationAdapter(boolean hasParentAnimationAdapter) {
-        mHasParentAnimationAdapter = hasParentAnimationAdapter;
-    }
-
-    /**
-     * Get the delay in milliseconds before the first animation should start. Defaults to {@value
-     * #INITIALDELAYMILLIS}.
-     */
-    long getInitialDelayMillis() {
-        return INITIALDELAYMILLIS;
-    }
-
-    long getAnimationDelayMillis() {
-        return DEFAULTANIMATIONDELAYMILLIS;
-    }
-
-    long getAnimationDurationMillis() {
-        return DEFAULTANIMATIONDURATIONMILLIS;
-    }
-
-    Animator[] getAnimators(ViewGroup parent, View view) {
-        return new Animator[0];
-    }
-
-    private class AnimationInfo {
-
-        public final int position;
-
-        public final Animator animator;
-
-        public AnimationInfo(int position, Animator animator) {
-            this.position = position;
-            this.animator = animator;
-        }
-    }
-
-
-    private final OnDismissCallback mCallback;
-
-    /**
-     * Animate dismissal of the item at given position.
-     */
-    public void animateDismiss(int position) {
-        animateDismiss(Arrays.asList(position));
-    }
-
-    /**
-     * Animate dismissal of the items at given positions.
-     */
-    public void animateDismiss(Collection<Integer> positions) {
-        final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
-        if (getAbsListView() == null) {
-            throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter " +
-                    "before calling setAdapter()!");
-        }
-
-        List<View> views = getVisibleViewsForPositions(positionsCopy);
-
-        if (!views.isEmpty()) {
-            List<Animator> animators = new ArrayList<Animator>();
-            for (final View view : views) {
-                animators.add(createAnimatorForView(view));
-            }
-
-            AnimatorSet animatorSet = new AnimatorSet();
-
-            Animator[] animatorsArray = new Animator[animators.size()];
-            for (int i = 0; i < animatorsArray.length; i++) {
-                animatorsArray[i] = animators.get(i);
-            }
-
-            animatorSet.playTogether(animatorsArray);
-            animatorSet.addListener(new Animator.AnimatorListener() {
-
-                @Override
-                public void onAnimationStart(Animator animator) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animator) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animator) {
-                    invokeCallback(positionsCopy);
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animator) {
-                }
-            });
-            animatorSet.start();
-        } else {
-            invokeCallback(positionsCopy);
-        }
-    }
-
     private void invokeCallback(Collection<Integer> positions) {
         ArrayList<Integer> positionsList = new ArrayList<Integer>(positions);
         Collections.sort(positionsList);
@@ -376,10 +364,6 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
             }
 
             @Override
-            public void onAnimationRepeat(Animator animator) {
-            }
-
-            @Override
             public void onAnimationEnd(Animator animator) {
                 lp.height = 0;
                 view.setLayoutParams(lp);
@@ -387,6 +371,10 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
 
             @Override
             public void onAnimationCancel(Animator animator) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
             }
         });
 
@@ -400,5 +388,17 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator
         });
 
         return animator;
+    }
+
+    private class AnimationInfo {
+
+        public final int position;
+
+        public final Animator animator;
+
+        public AnimationInfo(int position, Animator animator) {
+            this.position = position;
+            this.animator = animator;
+        }
     }
 }

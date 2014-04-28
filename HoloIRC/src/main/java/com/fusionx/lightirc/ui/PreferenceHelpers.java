@@ -2,9 +2,14 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.constants.PreferenceConstants;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
+import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.event.Event;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,11 +24,13 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
 
+import de.greenrobot.event.EventBus;
+
 class PreferenceHelpers {
 
     public static void setupNumberPicker(final PreferenceScreen screen) {
         final NumberPickerPreference numberPickerDialogPreference = (NumberPickerPreference)
-                screen.findPreference(PreferenceConstants.ReconnectTries);
+                screen.findPreference(PreferenceConstants.PREF_RECONNECT_TRIES);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
                 .getValue()));
         numberPickerDialogPreference.setOnPreferenceChangeListener(new Preference
@@ -39,7 +46,7 @@ class PreferenceHelpers {
     public static void setupThemePreference(final PreferenceScreen screen,
             final Activity activity) {
         final ListPreference themePreference = (ListPreference) screen.findPreference
-                (PreferenceConstants.Theme);
+                (PreferenceConstants.FRAGMENT_SETTINGS_THEME);
         if (themePreference.getEntry() == null) {
             themePreference.setValue("1");
         }
@@ -50,13 +57,13 @@ class PreferenceHelpers {
     public static void setupAppVersionPreference(final PreferenceScreen screen,
             final Context context) {
         final Preference appVersionPreference = screen.findPreference(PreferenceConstants
-                .AppVersion);
+                .PREF_APP_VERSION);
 
         if (appVersionPreference != null) {
             appVersionPreference.setSummary(MiscUtils.getAppVersion(context));
         }
 
-        final Preference source = screen.findPreference(PreferenceConstants.Source);
+        final Preference source = screen.findPreference(PreferenceConstants.PREF_SOURCE);
         if (source != null) {
             source.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
@@ -66,24 +73,49 @@ class PreferenceHelpers {
                             context.startActivity(browserIntent);
                             return true;
                         }
-                    });
+                    }
+            );
         }
     }
 
     static class ThemeChangeListener implements Preference.OnPreferenceChangeListener {
 
-        private final Activity mActivity;
+        private final Context mContext;
+
+        ThemeChangeListener(final Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public boolean onPreferenceChange(final Preference preference, final Object o) {
+            final AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+            build.setMessage(mContext.getString(R.string.appearance_settings_requires_restart))
+                    .setPositiveButton(mContext.getString(R.string.restart),
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    final Intent service = new Intent(mContext, IRCService.class);
+                                    mContext.bindService(service, mConnection, 0);
+                                }
+                            }
+                    );
+            build.show();
+            return true;
+        }
 
         private final ServiceConnection mConnection = new ServiceConnection() {
             @Override
             public void onServiceConnected(final ComponentName className, final IBinder binder) {
                 final IRCService service = ((IRCService.IRCBinder) binder).getService();
-                service.onDisconnectAll();
-                mActivity.unbindService(mConnection);
-                final Intent intent = mActivity.getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage(mActivity.getBaseContext().getPackageName());
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                mActivity.startActivity(intent);
+                service.disconnectAll();
+
+                fixCurrentBusSettings();
+
+                mContext.unbindService(mConnection);
+                final Intent intent = mContext.getPackageManager()
+                        .getLaunchIntentForPackage(mContext.getPackageName());
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                mContext.startActivity(intent);
             }
 
             @Override
@@ -91,26 +123,16 @@ class PreferenceHelpers {
             }
         };
 
-        ThemeChangeListener(final Activity context) {
-            mActivity = context;
-        }
-
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object o) {
-            final AlertDialog.Builder build = new AlertDialog.Builder(mActivity);
-            build.setMessage(mActivity.getString(R.string.appearance_settings_requires_restart))
-                    .setPositiveButton(mActivity.getString(R.string.restart),
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    final Intent service = new Intent(mActivity,
-                                            IRCService.class);
-                                    service.putExtra("stop", false);
-                                    mActivity.bindService(service, mConnection, 0);
-                                }
-                            });
-            build.show();
-            return true;
+        // TODO - this is a hack - fix it
+        private void fixCurrentBusSettings() {
+            final OnConversationChanged event = EventBus.getDefault().getStickyEvent
+                    (OnConversationChanged.class);
+            if (event.conversation != null) {
+                EventBus.getDefault().postSticky(new OnConversationChanged
+                        (null, null));
+                EventBus.getDefault().postSticky(new OnCurrentServerStatusChanged
+                        (ConnectionStatus.DISCONNECTED));
+            }
         }
     }
 }

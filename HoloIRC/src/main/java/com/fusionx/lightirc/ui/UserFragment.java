@@ -21,91 +21,40 @@
 
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.constants.FragmentTypeEnum;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Message;
+import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.PrivateMessageUser;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.event.PrivateActionEvent;
-import com.fusionx.relay.event.PrivateEvent;
-import com.fusionx.relay.event.PrivateMessageEvent;
+import com.fusionx.relay.event.user.UserEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
-import org.apache.commons.lang3.StringUtils;
-
-import android.app.Activity;
-
 import java.util.List;
 
-public class UserFragment extends IRCFragment {
+public class UserFragment extends IRCFragment<UserEvent> {
 
-    private UserFragmentCallback mCallback;
+    public PrivateMessageUser getPrivateMessageUser() {
+        return (PrivateMessageUser) mConversation;
+    }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        if (mCallback == null) {
-            mCallback = FragmentUtils.getParent(this, UserFragmentCallback.class);
+    // Subscription methods
+    @Subscribe
+    public void onEventMainThread(final UserEvent event) {
+        if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
+            mMessageAdapter.add(event);
         }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mCallback.getServer().getServerEventBus().register(this);
-        mCallback.getServer().getPrivateMessageUserIfExists(mTitle).setCached(true);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        mCallback.getServer().getServerEventBus().unregister(this);
-        mCallback.getServer().getPrivateMessageUserIfExists(mTitle).setCached(false);
-    }
-
-    @Override
-    protected List<Message> onRetrieveMessages() {
-        final PrivateMessageUser uci = mCallback.getServer().getPrivateMessageUserIfExists(mTitle);
-        return uci.getBuffer();
-    }
-
-    @Override
-    public FragmentTypeEnum getType() {
-        return FragmentTypeEnum.User;
     }
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.userMessageToParse(mCallback.getServer(), mTitle, message);
+        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
     }
 
-    @Subscribe
-    public void onUserEvent(final PrivateMessageEvent event) {
-        processEvent(event);
+    @Override
+    public FragmentType getType() {
+        return FragmentType.USER;
     }
 
-    @Subscribe
-    public void onPrivateAction(final PrivateActionEvent event) {
-        processEvent(event);
-    }
-
-    private void processEvent(final PrivateEvent event) {
-        if (event.userNick.equals(mTitle) && StringUtils.isNotBlank(event.message)) {
-            if (mMessageAdapter == null) {
-                setupListAdapter();
-            }
-            synchronized (mMessageAdapter.getMessages()) {
-                mMessageAdapter.add(new Message(event.message));
-            }
-        }
-    }
-
-    public interface UserFragmentCallback {
-
-        public Server getServer();
+    @Override
+    protected List<UserEvent> getAdapterData() {
+        return getPrivateMessageUser().getBuffer();
     }
 }
