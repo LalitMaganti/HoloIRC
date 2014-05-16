@@ -28,7 +28,6 @@ import android.util.Pair;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;

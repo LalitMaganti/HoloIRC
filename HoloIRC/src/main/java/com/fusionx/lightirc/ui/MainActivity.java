@@ -100,7 +100,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private DrawerLayout mDrawerLayout;
 
-    private View mRightDrawer;
+    private View mNavigationDrawerView;
 
     // TODO - unify the server and subserver code
     @Override
@@ -188,7 +188,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean isDrawerOpen() {
-        return mDrawerLayout.isDrawerOpen(mRightDrawer);
+        return mDrawerLayout.isDrawerOpen(mNavigationDrawerView);
     }
 
     @Override
@@ -199,8 +199,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onBackPressed() {
         if (!mNavigationDrawerFragment.onBackPressed()) {
-            if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
-                mDrawerLayout.closeDrawer(mRightDrawer);
+            if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+                mDrawerLayout.closeDrawer(mNavigationDrawerView);
                 return;
             }
             if (!mSlidingPane.isOpen()) {
@@ -351,12 +351,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 UIUtils.toggleSlidingPane(mSlidingPane);
                 return true;
             case R.id.activity_main_ab_actions:
-                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
-                // Not fully handled - still more work to do in the fragment
-                return false;
+                UIUtils.toggleDrawerLayout(mDrawerLayout, mNavigationDrawerView);
+                // If the drawer is now closed then we don't need to pass on the event
+                return !mDrawerLayout.isDrawerOpen(mNavigationDrawerView);
             case R.id.activity_main_ab_users:
-                if (!mDrawerLayout.isDrawerOpen(mRightDrawer)) {
-                    mDrawerLayout.openDrawer(mRightDrawer);
+                if (!mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+                    mDrawerLayout.openDrawer(mNavigationDrawerView);
                 }
                 // Not fully handled - still more work to do in the fragment
                 return false;
@@ -396,7 +396,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mSlidingPane.setSliderFadeColor(0);
         }
 
-        mRightDrawer = findById(this, R.id.right_drawer);
+        mNavigationDrawerView = findById(this, R.id.right_drawer);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

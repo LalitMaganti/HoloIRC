@@ -141,6 +141,8 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         if (mChannel != null) {
             mChannel.getServer().getServerEventBus().unregister(this);
         }
+        // Don't keep a track of this channel - we will deal with this when we return
+        mChannel = null;
     }
 
     public void onUpdateUserList() {
