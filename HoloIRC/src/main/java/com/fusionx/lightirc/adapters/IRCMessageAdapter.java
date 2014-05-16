@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.adapters;
 
+import com.google.common.collect.ImmutableList;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
@@ -32,7 +34,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
     private boolean mShouldFilter;
 
-    private Filter mFilter;
+    private IRCFilter mFilter;
 
     private List<T> mObjects;
 
@@ -88,17 +90,19 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     }
 
     public void setData(final List<T> list) {
-        synchronized (mLock) {
-            mObjects = new ArrayList<>(list);
-        }
-        notifyDataSetChanged();
         if (mShouldFilter) {
+            getFilter().setDataToFilter(list);
             getFilter().filter(null);
+        } else {
+            synchronized (mLock) {
+                mObjects = new ArrayList<>(list);
+            }
+            notifyDataSetChanged();
         }
     }
 
     @Override
-    public Filter getFilter() {
+    public IRCFilter getFilter() {
         if (mFilter == null) {
             mFilter = new IRCFilter();
         }
@@ -149,14 +153,18 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
     private class IRCFilter extends Filter {
 
+        private List<T> mDataToFilter = new ArrayList<>();
+
+        public void setDataToFilter(final List<T> list) {
+            mDataToFilter = ImmutableList.copyOf(list);
+        }
+
         @Override
         protected FilterResults performFiltering(final CharSequence constraint) {
             final ArrayList<T> resultList = new ArrayList<>();
-            synchronized (mLock) {
-                for (final T object : mObjects) {
-                    if (EventUtils.shouldStoreEvent(object)) {
-                        resultList.add(object);
-                    }
+            for (final T object : mDataToFilter) {
+                if (EventUtils.shouldStoreEvent(object)) {
+                    resultList.add(object);
                 }
             }
 

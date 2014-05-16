@@ -352,7 +352,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 return true;
             case R.id.activity_main_ab_actions:
                 UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
-                return true;
+                // Not fully handled - still more work to do in the fragment
+                return false;
             case R.id.activity_main_ab_users:
                 if (!mDrawerLayout.isDrawerOpen(mRightDrawer)) {
                     mDrawerLayout.openDrawer(mRightDrawer);
