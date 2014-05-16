@@ -3,7 +3,7 @@ package com.fusionx.lightirc.util;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.relay.constants.Theme;
+import com.fusionx.lightirc.misc.Theme;
 
 import android.app.Activity;
 import android.content.Context;

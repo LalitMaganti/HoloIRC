@@ -67,11 +67,15 @@ dependencies {
     // Tests stuff
     testCompile 'junit:junit:4.10'
     testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-    testCompile 'com.squareup:fest-android:1.0.+'
+    testCompile('com.squareup:fest-android:1.0.7') {
+        exclude group: 'com.google.android', module: 'support-v4'
+    }
 
     androidTestCompile 'junit:junit:4.10'
     androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-    androidTestCompile 'com.squareup:fest-android:1.0.+'
+    androidTestCompile('com.squareup:fest-android:1.0.7') {
+        exclude group: 'com.google.android', module: 'support-v4'
+    }
 }
 
 def Properties props = new Properties()
