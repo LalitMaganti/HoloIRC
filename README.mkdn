@@ -2,6 +2,17 @@ What is HoloIRC?
 =====
 HoloIRC is an open source IRC client for Android. It is intended to be very lightweight and easy to use while not sacrificing on features. It has been released on the Google Play Store.
 
+Building HoloIRC
+=====
+HoloIRC is relatively easy to build after the initial setup. The following should be done:
+    * This repo should be cloned - pick which branch you want
+    * A directory called libraries should be created inside the cloned folder
+    * https://github.com/tilal6991/Relay should be cloned into a folder called relay - pick the branch matching HoloIRC's branch
+    * https://github.com/tilal6991/Bus should be cloned into a folder called Bus - clone the develop branch
+    * https://github.com/tilal6991/AndroidSlidingUpPanel should be cloned into a folder called AndroidSlidingUpPanel
+    * Then run ./gradlew assembleDebug in the root directory
+    * This should create a debug apk in HoloIRC/build/apk which you can install
+
 Forking
 =====
 Please feel free to fork the repo to add anything you want or fix any bugs you've spotted. I'd also very much appreciate if you could send a pull request to fix it my sources as well.
