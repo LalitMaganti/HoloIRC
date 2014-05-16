@@ -36,13 +36,16 @@ import com.fusionx.relay.interfaces.Conversation;
 import org.apache.commons.lang3.StringUtils;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -70,12 +73,8 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return createView(container, inflate);
-    }
-
-    @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        final View view = createView(container, inflate);
+        final ListView listView = (ListView) view.findViewById(android.R.id.list);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
@@ -85,17 +84,17 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
 
         mTitle = getArguments().getString("title");
 
+        getBus().register(mEventListener);
         mMessageAdapter = getNewAdapter();
         setListAdapter(mMessageAdapter);
 
-        getBus().register(mEventListener);
-
-        onResetBuffer();
+        final List<T> list = onResetBuffer();
+        if (savedInstanceState == null) {
+            listView.setSelection(list.size() - 1);
+        }
         mConversation.getServer().getServerEventBus().register(this);
 
-        if (savedInstanceState == null) {
-            getListView().setSelection(mMessageAdapter.getCount() - 1);
-        }
+        return view;
     }
 
     @Override
@@ -103,6 +102,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         super.onDestroyView();
 
         getBus().unregister(mEventListener);
+        mConversation.getServer().getServerEventBus().unregister(this);
     }
 
     @Override
@@ -119,8 +119,10 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         return false;
     }
 
-    public void onResetBuffer() {
-        mMessageAdapter.setData(getAdapterData());
+    public List<T> onResetBuffer() {
+        final List<T> list = getAdapterData();
+        mMessageAdapter.setData(list);
+        return list;
     }
 
     public abstract FragmentType getType();

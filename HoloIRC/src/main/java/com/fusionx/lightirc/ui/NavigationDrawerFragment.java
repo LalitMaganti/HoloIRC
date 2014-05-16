@@ -210,6 +210,9 @@ public class NavigationDrawerFragment extends Fragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.activity_main_ab_actions:
+                mSlidingUpPanelLayout.collapsePane();
+                return true;
             case R.id.activity_main_ab_users:
                 handleUserList();
                 return true;

@@ -24,12 +24,10 @@ package com.fusionx.lightirc.util;
 import com.fusionx.bus.Bus;
 import com.fusionx.lightirc.R;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.misc.InterfaceHolders;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 
 /**
  * Full of static utility methods

@@ -3,6 +3,7 @@ package com.fusionx.lightirc.misc;
 import android.text.style.CharacterStyle;
 
 public class FormattedString {
+
     private final String mString;
 
     private final CharacterStyle mCharacterStyle;

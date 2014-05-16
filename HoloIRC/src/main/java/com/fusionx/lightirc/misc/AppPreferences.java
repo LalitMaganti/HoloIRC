@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.misc;
 
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
-import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.interfaces.EventPreferences;
 import com.fusionx.relay.logging.LoggingPreferences;
 

@@ -37,6 +37,7 @@ import com.fusionx.relay.event.server.MotdEvent;
 import com.fusionx.relay.event.server.PrivateNoticeEvent;
 import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
+import com.fusionx.relay.event.server.StopEvent;
 import com.fusionx.relay.event.server.WallopsEvent;
 import com.fusionx.relay.event.server.WhoisEvent;
 import com.fusionx.relay.event.user.PrivateActionEvent;
@@ -317,7 +318,7 @@ public class MessageConversionUtils {
             final String response = mContext.getString(R.string.parser_message);
 
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.ourUser,
+                final String formattedResponse = String.format(response, event.ourUser.getNick(),
                         event.message);
                 setupEvent(formattedResponse, event.ourUser.getNick());
             } else {
@@ -333,7 +334,8 @@ public class MessageConversionUtils {
         public void getMessage(final WorldPrivateMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user, event.message);
+                final String formattedResponse = String.format(response, event.user.getNick(),
+                        event.message);
                 setupEvent(formattedResponse, event.user.getNick());
             } else {
                 final FormattedString[] formattedStrings = {
@@ -492,6 +494,12 @@ public class MessageConversionUtils {
             final String response = mContext.getString(R.string.parser_message);
             setupEvent(String.format(response, event.nick, event.message));
         }
+
+        @Subscribe
+        public void getWallopsEvent(final StopEvent event) {
+            final String response = mContext.getString(R.string.disconnected_from_server);
+            setupEvent(response);
+        }
     };
 
     public CharSequence formatTextWithStyle(final String format, final FormattedString... args) {
@@ -543,7 +551,7 @@ public class MessageConversionUtils {
             builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(),
                     Spanned.SPAN_INCLUSIVE_INCLUSIVE);
         }
-        mMessage = new EventDecorator(builder);
+        setupEvent(builder);
     }
 
     private void setupEvent(final CharSequence message, final Nick defaultNick) {
@@ -551,7 +559,7 @@ public class MessageConversionUtils {
         final NickColour colour = NickCache.getNickCache().get(defaultNick);
         builder.setSpan(new ForegroundColorSpan(colour.getColour()), 0, message.length(),
                 Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        mMessage = new EventDecorator(builder);
+        setupEvent(builder);
     }
 
     private void setupEvent(final CharSequence message, final Nick defaultNick,

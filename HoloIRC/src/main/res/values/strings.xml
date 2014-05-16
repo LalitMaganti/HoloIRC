@@ -191,5 +191,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Logging settings -->
     <string name="logging_settings_summary">Logging Settings</string>
     <string name="logging_settings_title">Control logging settings</string>
+    <string name="disconnected_from_server">Disconnected from the server</string>
 
 </resources>

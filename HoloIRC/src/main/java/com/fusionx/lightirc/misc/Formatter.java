@@ -3,12 +3,10 @@ package com.fusionx.lightirc.misc;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.CharacterStyle;
-import android.text.style.ForegroundColorSpan;
 
 import java.util.DuplicateFormatFlagsException;
 import java.util.FormatterClosedException;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingFormatArgumentException;
 import java.util.UnknownFormatConversionException;
 
@@ -147,7 +145,8 @@ public final class Formatter {
         out.append(cs, start, end);
     }
 
-    private FormattedString getArgument(FormattedString[] args, int index, FormatSpecifierParser fsp,
+    private FormattedString getArgument(FormattedString[] args, int index,
+            FormatSpecifierParser fsp,
             FormattedString lastArgument, boolean hasLastArgumentSet) {
         if (index == FormatToken.LAST_ARGUMENT_INDEX && !hasLastArgumentSet) {
             throw new MissingFormatArgumentException("<");
