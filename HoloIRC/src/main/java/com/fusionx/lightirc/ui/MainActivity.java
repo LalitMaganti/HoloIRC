@@ -102,6 +102,70 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private View mNavigationDrawerView;
 
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        AppPreferences.setupAppPreferences(this);
+        setTheme(UIUtils.getThemeInt());
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main_activity);
+
+        mDrawerLayout = findById(this, R.id.drawer_layout);
+        mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout.setFocusableInTouchMode(false);
+
+        mSlidingPane = findById(this, R.id.sliding_pane_layout);
+        mSlidingPane.setParallaxDistance(100);
+        mSlidingPane.setPanelSlideListener(this);
+        if (AppPreferences.getAppPreferences().getTheme() == Theme.DARK) {
+            // TODO - fix this hack
+            mSlidingPane.setSliderFadeColor(0);
+        }
+
+        mNavigationDrawerView = findById(this, R.id.right_drawer);
+
+        if (savedInstanceState == null) {
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            mServerListFragment = new ServerListFragment();
+            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
+
+            mNavigationDrawerFragment = new NavigationDrawerFragment();
+            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
+
+            mWorkerFragment = new WorkerFragment();
+            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
+
+            transaction.commit();
+        } else {
+            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
+                    R.id.sliding_list_frame);
+            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.right_drawer);
+            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
+                    .findFragmentByTag(WORKER_FRAGMENT);
+            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.content_frame);
+
+            // If the current fragment is not null then retrieve the matching convo
+            if (mCurrentFragment != null) {
+                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
+                // Make sure we re-register to the event bus on rotation - otherwise we miss
+                // important status updates
+                mConversation.getServer().getServerEventBus().register(this);
+
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
+                        (View.GONE);
+            }
+
+            supportInvalidateOptionsMenu();
+        }
+        if (mSlidingPane.isSlideable()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
     // TODO - unify the server and subserver code
     @Override
     public void onServerClicked(final Server server) {
@@ -297,6 +361,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
 
         if (!fromRecents && clearCaches) {
+            // Try to remove the extras from the intent - this probably won't work though if the
+            // activity finishes which is why we have the recents check
+            getIntent().removeExtra(CLEAR_CACHE);
+
             service.clearAllEventCaches();
         }
 
@@ -373,67 +441,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public EventCache getEventCache() {
         return getService().getEventCache(mConversation.getServer());
-    }
-
-    @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        AppPreferences.setupAppPreferences(this);
-        setTheme(UIUtils.getThemeInt());
-
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.main_activity);
-
-        mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
-        mDrawerLayout.setFocusableInTouchMode(false);
-
-        mSlidingPane = findById(this, R.id.sliding_pane_layout);
-        mSlidingPane.setParallaxDistance(100);
-        mSlidingPane.setPanelSlideListener(this);
-        if (AppPreferences.getAppPreferences().getTheme() == Theme.DARK) {
-            // TODO - fix this hack
-            mSlidingPane.setSliderFadeColor(0);
-        }
-
-        mNavigationDrawerView = findById(this, R.id.right_drawer);
-
-        if (savedInstanceState == null) {
-            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            mServerListFragment = new ServerListFragment();
-            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
-
-            mNavigationDrawerFragment = new NavigationDrawerFragment();
-            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
-
-            mWorkerFragment = new WorkerFragment();
-            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
-
-            transaction.commit();
-        } else {
-            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
-                    R.id.sliding_list_frame);
-            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.right_drawer);
-            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
-                    .findFragmentByTag(WORKER_FRAGMENT);
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.content_frame);
-
-            // If the current fragment is not null then retrieve the matching convo
-            if (mCurrentFragment != null) {
-                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
-
-                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
-                        (View.GONE);
-            }
-
-            supportInvalidateOptionsMenu();
-        }
-        if (mSlidingPane.isSlideable()) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
     }
 
     @Override
@@ -581,18 +588,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
     }
 
-    private void openAppSettings() {
-        final Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
-    }
-
-    private void addNewServer() {
-        final Intent intent = new Intent(this, ServerPreferenceActivity.class);
-        intent.putExtra("new", true);
-        intent.putExtra("file", "server");
-        startActivityForResult(intent, SERVER_SETTINGS);
-    }
-
     private void onChangeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
@@ -615,6 +610,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         } else {
             mHandler.post(runnable);
         }
+    }
+
+    private void openAppSettings() {
+        final Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void addNewServer() {
+        final Intent intent = new Intent(this, ServerPreferenceActivity.class);
+        intent.putExtra("new", true);
+        intent.putExtra("file", "server");
+        startActivityForResult(intent, SERVER_SETTINGS);
     }
 
     private void onRemoveCurrentFragmentAndConversation() {
