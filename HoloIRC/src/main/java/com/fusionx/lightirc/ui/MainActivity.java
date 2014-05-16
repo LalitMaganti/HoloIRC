@@ -9,6 +9,7 @@ import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -19,7 +20,6 @@ import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
@@ -602,6 +602,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                         .beginTransaction();
                 transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                 transaction.replace(R.id.content_frame, fragment).commit();
+                getSupportFragmentManager().executePendingTransactions();
 
                 findById(MainActivity.this, R.id.content_frame_empty_textview)
                         .setVisibility(View.GONE);
@@ -616,13 +617,19 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     private void onRemoveCurrentFragmentAndConversation() {
-        final FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction();
+        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.remove(mCurrentFragment).commit();
         mCurrentFragment = null;
+        getSupportFragmentManager().executePendingTransactions();
 
-        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility(View
+                        .VISIBLE);
+            }
+        }, 300);
 
         // Don't listen for any more events from this server
         mConversation.getServer().getServerEventBus().unregister(this);
