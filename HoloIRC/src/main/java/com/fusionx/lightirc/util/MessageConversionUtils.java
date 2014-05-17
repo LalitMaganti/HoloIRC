@@ -214,12 +214,15 @@ public class MessageConversionUtils {
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String
-                        .format(response, event.userNick, event.kickingNick);
+                        .format(response, event.userNick, event.kickingNick == null ? event
+                                .userNickString : event.kickingNick);
                 setupEvent(appendReasonIfNeeded(formattedResponse, event.reason), event.userNick);
             } else {
                 final FormattedString[] formattedStrings = {
                         getFormattedStringForNick(event.userNick),
-                        getFormattedStringForNick(event.kickingNick),
+                        event.kickingNick == null
+                                ? new FormattedString(event.kickingNickString)
+                                : getFormattedStringForNick(event.kickingNick)
                 };
                 setupEvent(appendReasonIfNeeded(formatTextWithStyle(response, formattedStrings),
                         event.reason));
