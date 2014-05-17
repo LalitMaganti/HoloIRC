@@ -37,9 +37,7 @@ Credits
     This project depends on several libraries each of which have their own license and deserve sincere thanks:
     * Guava by Google - licensed under the Apache License v2
     * Android Support Library (v4 and v7) by Google - licensed under the Apache License v2
-    * SlidingMenu by Jeremy Feinstein - the project can be found at https://github.com/jfeinstein10/SlidingMenu and is licensed under the Apache License v2
     * ListViewAnimations by Niek Haarman - the project can be found at https://github.com/nhaarman/ListViewAnimations and is licensed under the Apache License v2
-    * PagingSliderTabStrip by Andreas Stuetz - the project can be found at https://github.com/astuetz/PagerSlidingTabStrip and is licensed under the Apache License v2
     * StickyListHeaders by Emil Sjölander - the project can be found at https://github.com/emilsjolander/StickyListHeaders and is licensed under the Apache License v2
     * Otto by Square - licensed under the Apache License v2
     * Commons Lang by Apache - licensed under the Apache License v2

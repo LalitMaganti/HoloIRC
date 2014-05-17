@@ -58,7 +58,6 @@ dependencies {
     }
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
     compile 'com.nhaarman.listviewanimations:library:2.+'
-    compile 'net.rdrei.android.dirchooser:library:2.1-SNAPSHOT@aar'
 
     compile project(':libraries:relay:library')
     compile project(':libraries:AndroidSlidingUpPanel:library')
