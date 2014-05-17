@@ -1,0 +1,6 @@
+This is a TODO list - more to compensate for my poor memory but may provide an insight/ideas into what you may want to work on:
+* Add more options in general - this has come up a lot - people want customization. More specifically
+    - ability to customize fonts/sizes
+    - ability to customize coloursyy
+* Add back disconnect all to notification
+* Add ability to disconnect from multiple servers
