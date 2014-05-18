@@ -276,7 +276,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private void onPrivateMessageUser(final String nick) {
         if (isNickOtherUsers(nick)) {
-            mChannel.getServer().getServerCallBus().sendMessageToUser(nick, "");
+            mChannel.getServer().getServerCallBus().sendMessageToQueryUser(nick, "");
             mCallback.closeDrawer();
             mActionMode.finish();
         } else {

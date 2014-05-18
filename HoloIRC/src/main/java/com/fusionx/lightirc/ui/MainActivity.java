@@ -47,6 +47,9 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
+/**
+ * Main activity which co-ordinates everything in the app
+ */
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback, IRCFragment.Callback {
@@ -249,7 +252,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (mCurrentFragment.getType() == CHANNEL) {
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
-            mConversation.getServer().getServerCallBus().sendClosePrivateMessage(
+            mConversation.getServer().getServerCallBus().sendCloseQuery(
                     (QueryUser) mConversation);
         }
     }
@@ -548,40 +551,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final Server server, final boolean delayChange) {
-        if (!server.equals(mConversation)) {
-            final Bundle bundle = new Bundle();
-            bundle.putString("title", server.getTitle());
-
-            final IRCFragment fragment = new ServerFragment();
-            fragment.setArguments(bundle);
-
-            if (mConversation != null) {
-                if (mConversation.getServer() != server) {
-                    mConversation.getServer().getServerEventBus().unregister(this);
-                    server.getServerEventBus().register(this);
-                }
-            } else {
-                server.getServerEventBus().register(this);
-            }
-
-            setActionBarTitle(server.getTitle());
-            setActionBarSubtitle(MiscUtils.getStatusString(this, server.getStatus()));
-
-            mEventBus.postSticky(new OnConversationChanged(server, FragmentType.SERVER));
-            onChangeCurrentFragment(fragment, delayChange);
-        }
-        mSlidingPane.closePane();
-        supportInvalidateOptionsMenu();
-    }
-
     private void changeCurrentConversation(final Conversation object, boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
             final IRCFragment fragment;
-            if (object.getClass().equals(Channel.class)) {
+            if (object.getClass().equals(Server.class)) {
+                fragment = new ServerFragment();
+            } else if (object.getClass().equals(Channel.class)) {
                 fragment = new ChannelFragment();
             } else if (object.getClass().equals(QueryUser.class)) {
                 fragment = new UserFragment();
