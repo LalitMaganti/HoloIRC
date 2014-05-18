@@ -449,7 +449,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         super.onStop();
 
         mEventBus.unregister(mConversationChanged);
-        mEventBus.unregister(mMentionHelper);
     }
 
     @Override
@@ -525,6 +524,19 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         // This is just registration because we'll retrieve the sticky event later
         mEventBus.register(mConversationChanged);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mEventBus.unregister(mMentionHelper);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         mEventBus.register(mMentionHelper, 100);
     }
 

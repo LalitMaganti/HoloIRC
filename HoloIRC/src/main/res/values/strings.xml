@@ -30,7 +30,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
     <!-- Server settings -->
     <string name="server_settings_title">Server Settings</string>
-    <string name="server_settings_changes_saved">Changes have been saved</string>
     <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick
         another will automatically be used
     </string>
@@ -52,13 +51,18 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- App settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_appearance_summary">Settings to control the way the app looks</string>
-    <string name="server_channel_settings_title">Server/Channel Settings</string>
+    <string name="server_channel_settings_title">Server/Channel</string>
     <string name="server_channel_settings_summary">Common settings for all servers in the app
     </string>
     <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
     <string name="about_settings_app_version">App Version</string>
 
     <!-- Appearance settings -->
+    <string name="pref_highlight_whole_line_title">Nick line colours</string>
+    <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
+        with a nick
+    </string>
+
     <string name="appearance_settings_requires_restart">This requires a full restart of the app
     </string>
 
@@ -143,18 +147,10 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="add_channel">Add channel</string>
     <string name="server_settings_changes_discarded">Changes discarded</string>
     <string name="remove">Remove</string>
-    <string name="default_user_settings_header">Default User Settings</string>
-    <string name="default_user_settings_summary">The user settings that will be used as a base when
-        creating new servers
-    </string>
     <string name="nick_first_choice">First choice nick name</string>
     <string name="nick_second_choice">Second choice nick name</string>
     <string name="nick_third_choice">Third choice nick name</string>
 
-    <string name="pref_highlight_whole_line_title">Nick line colours</string>
-    <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
-        with a nick
-    </string>
     <string name="ignore_nick_title">Nick to ignore</string>
     <string name="ignore_nick_description">Nickname of the user to be ignored</string>
     <string name="ignore_list">Ignore List</string>
@@ -163,6 +159,11 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="done">Done</string>
     <string name="reconnecting">Reconnecting</string>
     <string name="disconnected_from_server">Disconnected from the server</string>
+
+    <string name="default_user_settings_header">Default User</string>
+    <string name="default_user_settings_summary">The user settings that will be used as a base when
+        creating new servers
+    </string>
 
     <!-- Actions -->
     <string name="action_join_channel">Join new channel</string>
@@ -175,7 +176,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="action_close_pm">Close PM</string>
 
     <!-- Notification settings -->
-    <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_title">Notifications</string>
     <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="notification_entry_audio">Audio</string>
     <string name="notification_entry_vibrate">Vibrate</string>
@@ -185,7 +186,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="notification_value_lights">lights</string>
 
     <!-- Logging settings -->
-    <string name="logging_settings_summary">Logging Settings</string>
-    <string name="logging_settings_title">Control logging settings</string>
+    <string name="logging_settings_title">Logging</string>
+    <string name="logging_settings_summary">Control logging settings</string>
 
 </resources>
