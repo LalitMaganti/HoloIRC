@@ -131,12 +131,12 @@ public class DatabasePreference extends Preference {
         return mPreference.getSummary();
     }
 
-    public void setSummary(CharSequence summary) {
-        mPreference.setSummary(summary);
-    }
-
     public void setSummary(int summaryResId) {
         mPreference.setSummary(summaryResId);
+    }
+
+    public void setSummary(CharSequence summary) {
+        mPreference.setSummary(summary);
     }
 
     public boolean isEnabled() {

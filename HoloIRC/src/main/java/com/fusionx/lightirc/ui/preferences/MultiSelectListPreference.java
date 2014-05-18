@@ -76,6 +76,18 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     /**
+     * Sets the human-readable entries to be shown in the list. This will be shown in subsequent
+     * dialogs. <p/> Each entry must have a corresponding index in {@link
+     * #setEntryValues(CharSequence[])}.
+     *
+     * @param entries The entries.
+     * @see #setEntryValues(CharSequence[])
+     */
+    void setEntries(CharSequence[] entries) {
+        mEntries = entries;
+    }
+
+    /**
      * @param entriesResId The entries array as a resource.
      * @see #setEntries(CharSequence[])
      */
@@ -90,6 +102,17 @@ public class MultiSelectListPreference extends DialogPreference {
      */
     public CharSequence[] getEntryValues() {
         return mEntryValues;
+    }
+
+    /**
+     * The array to find the value to save for a preference when an entry from entries is selected.
+     * If a user clicks on the second item in entries, the second item in this array will be saved
+     * to the preference.
+     *
+     * @param entryValues The array to be used as values to save for the preference.
+     */
+    void setEntryValues(CharSequence[] entryValues) {
+        mEntryValues = entryValues;
     }
 
     /**
@@ -186,29 +209,6 @@ public class MultiSelectListPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValues(restoreValue ? getPersistedStringSet(mValues) : (Set<String>) defaultValue);
-    }
-
-    /**
-     * Sets the human-readable entries to be shown in the list. This will be shown in subsequent
-     * dialogs. <p/> Each entry must have a corresponding index in {@link
-     * #setEntryValues(CharSequence[])}.
-     *
-     * @param entries The entries.
-     * @see #setEntryValues(CharSequence[])
-     */
-    void setEntries(CharSequence[] entries) {
-        mEntries = entries;
-    }
-
-    /**
-     * The array to find the value to save for a preference when an entry from entries is selected.
-     * If a user clicks on the second item in entries, the second item in this array will be saved
-     * to the preference.
-     *
-     * @param entryValues The array to be used as values to save for the preference.
-     */
-    void setEntryValues(CharSequence[] entryValues) {
-        mEntryValues = entryValues;
     }
 
     /**
