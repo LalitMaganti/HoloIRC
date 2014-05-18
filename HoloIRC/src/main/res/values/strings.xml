@@ -68,8 +68,9 @@
     <string name="parser_connected_generic">Connected to server</string>
     <string name="parser_connected">Connected to %1$s</string>
     <string name="parser_joined_channel">%1$s joined the channel</string>
+    <string name="parser_parted_channel">You parted from the channel</string>
     <string name="parser_quit_server">%1$s quit the server</string>
-    <string name="parser_parted_channel">%1$s parted from the channel</string>
+    <string name="parser_user_parted_channel">%1$s parted from the channel</string>
     <string name="parser_kicked_channel">%1$s was kicked from the channel by %2$s</string>
     <string name="parser_reason">(Reason: %1$s)</string>
     <string name="parser_mode_changed">Mode %1$s on %2$s by %3$s</string>

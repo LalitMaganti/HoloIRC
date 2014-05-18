@@ -3,7 +3,6 @@ package com.fusionx.lightirc.misc;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.model.EventDecorator;
-import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.relay.event.Event;
 
 import android.content.Context;
@@ -15,7 +14,7 @@ public class EventCache extends LruCache<Event, EventDecorator> {
 
     public static final int EVENT_CACHE_MAX_SIZE = 300;
 
-    private final MessageConversionUtils mConverter;
+    private final IRCEventToStringConverter mConverter;
 
     public EventCache(final Context context) {
         super(EVENT_CACHE_MAX_SIZE);
@@ -27,7 +26,7 @@ public class EventCache extends LruCache<Event, EventDecorator> {
                 evictAll();
             }
         }, 300);
-        mConverter = MessageConversionUtils.getConverter(context);
+        mConverter = IRCEventToStringConverter.getConverter(context);
     }
 
     @Override
