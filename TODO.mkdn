@@ -1,5 +1,5 @@
 This is a TODO list - more to compensate for my poor memory but may provide an insight/ideas into what you may want to work on:
-* Add more options in general - this has come up a lot - people want customization. More specifically
-    - ability to customize fonts
-    - ability to customize colours
-* Fix text for query notifications - currently still refers to mentioning
+- [ ] Add more options in general - this has come up a lot - people want customization. More specifically
+  - [ ] ability to customize fonts
+  - [ ] ability to customize colours
+- [ ] Fix text for query notifications - currently still refers to mentioning
