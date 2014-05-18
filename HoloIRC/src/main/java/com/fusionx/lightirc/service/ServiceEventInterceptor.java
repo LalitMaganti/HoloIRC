@@ -3,6 +3,7 @@ package com.fusionx.lightirc.service;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.QueryUser;
@@ -26,7 +27,10 @@ import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
 import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public final class ServiceEventHelper {
+/**
+ * Intercepts IRC events which need some special action performed on
+ */
+public final class ServiceEventInterceptor {
 
     private static final int EVENT_PRIORITY = 100;
 
@@ -42,7 +46,7 @@ public final class ServiceEventHelper {
 
     private MessagePriority mMessagePriority;
 
-    public ServiceEventHelper(final Server server) {
+    public ServiceEventInterceptor(final Server server) {
         mServer = server;
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
@@ -81,12 +85,9 @@ public final class ServiceEventHelper {
         return mMessagePriority;
     }
 
-    private void setMessagePriority(final MessagePriority priority) {
-        if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
-            mMessagePriority = priority;
-        }
-    }
-
+    /*
+     * Event interception start here
+     */
     @SuppressWarnings("unused")
     public void onEventMainThread(final NewPrivateMessage event) {
         final QueryUser user = mServer.getUserChannelInterface().getQueryUser(
@@ -102,9 +103,9 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final ChannelEvent event) {
-        final Conversation conversation = event.channel;
         if (shouldStoreEvent(event)) {
             // TODO - fix this horrible code
+            final Conversation conversation = event.channel;
             if (event instanceof ChannelWorldUserEvent) {
                 final ChannelWorldUserEvent userEvent = (ChannelWorldUserEvent) event;
 
@@ -115,8 +116,7 @@ public final class ServiceEventHelper {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            getBus().post(new OnChannelMentionEvent(mServer,
-                                    (Channel) conversation));
+                            getBus().post(new OnChannelMentionEvent(mServer, event.channel));
                         }
                     });
                 } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
@@ -133,7 +133,26 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final QueryEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.user, event);
+        if (shouldStoreEvent(event)) {
+            onIRCEvent(MessagePriority.HIGH, event.user, event);
+
+            // Forward the event UI side
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    getBus().post(new OnQueryEvent(mServer, event.user));
+                }
+            });
+        }
+    }
+    /*
+     * Event interception ends here
+     */
+
+    private void setMessagePriority(final MessagePriority priority) {
+        if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
+            mMessagePriority = priority;
+        }
     }
 
     private void setSubMessagePriority(final Conversation conversation,

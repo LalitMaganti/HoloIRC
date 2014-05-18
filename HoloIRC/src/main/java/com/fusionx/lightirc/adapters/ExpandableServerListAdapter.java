@@ -6,7 +6,7 @@ import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.service.ServiceEventHelper;
+import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.MessageConversionUtils;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
@@ -38,8 +38,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final ArrayList<ServerWrapper> mServerListItems;
 
-    private final MessageConversionUtils mMessageConverter;
-
     private final IRCService mIRCService;
 
     private ExpandableListView mListView;
@@ -47,7 +45,6 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     public ExpandableServerListAdapter(final Context context, final ArrayList<ServerWrapper>
             builders, final ExpandableListView listView, final IRCService service) {
         mInflater = LayoutInflater.from(context);
-        mMessageConverter = MessageConversionUtils.getConverter(context);
         mContext = context;
         mServerListItems = builders;
         mListView = listView;
@@ -98,7 +95,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
 
         final ServerWrapper listItem = getGroup(groupPos);
-        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getServer());
+        final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
 
         final TextView title = (TextView) convertView.findViewById(R.id.server_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
@@ -145,7 +142,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final ServerWrapper listItem = getGroup(groupPos);
         final Conversation conversation = getChild(groupPos, childPos);
 
-        final ServiceEventHelper helper = mIRCService.getEventHelper(listItem.getServer());
+        final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
         final EventCache cache = mIRCService.getEventCache(listItem.getServer());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);

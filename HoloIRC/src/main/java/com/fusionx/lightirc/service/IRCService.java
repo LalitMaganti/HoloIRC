@@ -66,7 +66,7 @@ public class IRCService extends Service {
 
     private final IRCBinder mBinder = new IRCBinder();
 
-    private final Map<Server, ServiceEventHelper> mEventHelperMap = new THashMap<>();
+    private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new THashMap<>();
 
     private final Map<Server, EventCache> mEventCache = new HashMap<>();
 
@@ -136,8 +136,8 @@ public class IRCService extends Service {
         final Server server = pair.second;
 
         if (!exists) {
-            final ServiceEventHelper serviceEventHelper = new ServiceEventHelper(server);
-            mEventHelperMap.put(server, serviceEventHelper);
+            final ServiceEventInterceptor serviceEventInterceptor = new ServiceEventInterceptor(server);
+            mEventHelperMap.put(server, serviceEventInterceptor);
             mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);
         }
@@ -180,7 +180,7 @@ public class IRCService extends Service {
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
-    public ServiceEventHelper getEventHelper(final Server server) {
+    public ServiceEventInterceptor getEventHelper(final Server server) {
         return mEventHelperMap.get(server);
     }
 
