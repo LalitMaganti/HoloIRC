@@ -79,9 +79,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->
-    <string name="parser_bold_message" translatable="false">
-        <![CDATA[<bold>%1$s: %2$s</bold>]]>
-    </string>
     <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
     <string name="parser_message" translatable="false">%1$s: %2$s</string>
     <string name="parser_connected_generic">Connected to server</string>
@@ -108,12 +105,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
     <string name="prompt_dialog_including_starting">Including the starting #</string>
-
-    <!-- Service/notification -->
-    <string name="service_disconnect_all">Disconnect all</string>
-    <string name="service_you_mentioned">You have been mentioned on</string>
-    <string name="activity_mentioned">You have been mentioned on %1$s</string>
-    <string name="activity_pm">You have a new private message from 51$s</string>
 
     <!-- User list fragment -->
     <string name="user_list_not_possible">Not possible</string>
@@ -164,8 +155,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
         with a nick
     </string>
-    <string name="notification_settings_title">Notification Settings</string>
-    <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="ignore_nick_title">Nick to ignore</string>
     <string name="ignore_nick_description">Nickname of the user to be ignored</string>
     <string name="ignore_list">Ignore List</string>
@@ -186,6 +175,8 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="action_close_pm">Close PM</string>
 
     <!-- Notification settings -->
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="notification_entry_audio">Audio</string>
     <string name="notification_entry_vibrate">Vibrate</string>
     <string name="notification_entry_lights">Lights</string>

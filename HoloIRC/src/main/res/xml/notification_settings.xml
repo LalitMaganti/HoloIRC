@@ -5,7 +5,7 @@
         <CheckBoxPreference
                 android:key="pref_notify_in_app"
                 android:title="Notify in-app"
-                android:summary="Notify when your nickname is mentioned when you are in the app"
+                android:summary="Notify when your nickname is mentioned or queried when in the app"
                 android:defaultValue="true"/>
 
         <MultiSelectListPreference
@@ -21,7 +21,7 @@
         <CheckBoxPreference
                 android:key="pref_notify_out_app"
                 android:title="Notify out of app"
-                android:summary="Notify when your nickname is mentioned when you are not in the app"
+                android:summary="Notify when your nickname is mentioned or queried when not in the app"
                 android:defaultValue="true"/>
 
         <MultiSelectListPreference

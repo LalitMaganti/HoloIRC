@@ -4,6 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -36,13 +37,13 @@ public class NotificationUtils {
         sConfiguration = new Configuration.Builder().setDuration(500).build();
     }
 
-    public static void notifyInApp(final Activity activity, final OnChannelMentionEvent event) {
+    public static void notifyInApp(final Activity activity, final Conversation conversation) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
-            final String message = String.format("Mentioned in %s on %s", event.channel.getId(),
-                    event.channel.getServer().getTitle());
+            final String message = String.format("Mentioned in %s on %s", conversation.getId(),
+                    conversation.getServer().getTitle());
             final Crouton crouton = Crouton.makeText(activity, message, Style.INFO);
             crouton.setConfiguration(sConfiguration);
             crouton.show();
@@ -60,7 +61,7 @@ public class NotificationUtils {
         }
     }
 
-    public static void notifyOutOfApp(final Context context, final OnChannelMentionEvent event) {
+    public static void notifyOutOfApp(final Context context, final Conversation conversation) {
         final Set<String> outApp = AppPreferences.getAppPreferences()
                 .getOutOfAppNotificationSettings();
 
@@ -76,7 +77,7 @@ public class NotificationUtils {
         builder.setSmallIcon(R.drawable.ic_notification);
         builder.setContentTitle(context.getString(R.string.app_name));
         builder.setContentText(String.format("Mentioned in %s on %s",
-                event.channel.getId(), event.channel.getServer().getId()));
+                conversation.getId(), conversation.getServer().getId()));
         builder.setAutoCancel(true);
 
         if (outApp.contains(context.getString(R.string.notification_value_audio))) {
@@ -93,8 +94,8 @@ public class NotificationUtils {
         final Intent resultIntent = new Intent(context, MainActivity.class);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
                 .FLAG_ACTIVITY_SINGLE_TOP);
-        resultIntent.putExtra("server_name", event.channel.getServer().getTitle());
-        resultIntent.putExtra("channel_name", event.channel.getName());
+        resultIntent.putExtra("server_name", conversation.getServer().getTitle());
+        resultIntent.putExtra("channel_name", conversation.getId());
 
         final PendingIntent resultPendingIntent = PendingIntent.getActivity(context,
                 NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);

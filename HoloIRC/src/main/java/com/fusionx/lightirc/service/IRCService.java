@@ -4,6 +4,7 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
+import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
@@ -53,7 +54,12 @@ public class IRCService extends Service {
     private final Object mEventHelper = new Object() {
         @Subscribe
         public void onMentioned(final OnChannelMentionEvent event) {
-            notifyOutOfApp(IRCService.this, event);
+            notifyOutOfApp(IRCService.this, event.channel);
+        }
+
+        @Subscribe
+        public void onQueried(final OnQueryEvent event) {
+            notifyOutOfApp(IRCService.this, event.queryUser);
         }
 
         @Subscribe

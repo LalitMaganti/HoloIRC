@@ -6,6 +6,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
+import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
@@ -52,6 +53,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     public static final int SERVER_SETTINGS = 1;
 
+    public static final String CLEAR_CACHE = "clear_event_cache";
+
     private static final String WORKER_FRAGMENT = "WorkerFragment";
 
     private static final String ACTION_BAR_TITLE = "action_bar_title";
@@ -59,8 +62,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
 
     private static final Bus mEventBus = getBus();
-
-    public static final String CLEAR_CACHE = "clear_event_cache";
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -73,7 +74,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         @Subscribe(cancellable = true)
         public boolean onMentioned(final OnChannelMentionEvent event) {
             if (!event.channel.equals(mConversation)) {
-                NotificationUtils.notifyInApp(MainActivity.this, event);
+                NotificationUtils.notifyInApp(MainActivity.this, event.channel);
+            }
+            return true;
+        }
+
+        @Subscribe(cancellable = true)
+        public boolean onQueried(final OnQueryEvent event) {
+            if (!event.queryUser.equals(mConversation)) {
+                NotificationUtils.notifyInApp(MainActivity.this, event.queryUser);
             }
             return true;
         }
