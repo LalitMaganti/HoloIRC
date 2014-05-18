@@ -20,7 +20,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
 
-    
+
     private Theme theme;
 
     private boolean timestamp = false;
@@ -81,46 +81,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     public static AppPreferences getAppPreferences() {
         return mAppPreferences;
-    }
-
-    private void setPreferences(final SharedPreferences preferences) {
-        final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
-                .FRAGMENT_SETTINGS_THEME, "1"));
-        theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
-        highlightLine = preferences
-                .getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
-
-        timestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
-        motdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
-        hideUserMessages = preferences
-                .getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
-
-        numberOfReconnectEvents = preferences
-                .getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
-
-        partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
-        quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
-
-        // Notification settings
-        inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
-                .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
-        inAppNotification = preferences.getBoolean(PreferenceConstants
-                .PREF_IN_APP_NOTIFICATION, true);
-        outOfAppNotificationSettings = preferences.getStringSet(PreferenceConstants
-                .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
-        outOfAppNotification = preferences.getBoolean(PreferenceConstants
-                .PREF_OUT_OF_APP_NOTIFICATION, true);
-
-        // Logging
-        mLoggingEnabled = preferences.getBoolean(PreferenceConstants.PREF_LOGGING, false);
-        mLoggingDirectory = preferences.getString(PreferenceConstants.PREF_LOGGING_DIRECTORY,
-                "/IRCLogs");
-        mLoggingTimeStamp = preferences.getBoolean(PreferenceConstants.PREF_LOGGING_TIMESTAMP,
-                true);
-
-        // Font settings
-        mMainFontSize = Integer.parseInt(preferences.getString(PreferenceConstants
-                .PREF_MAIN_FONT_SIZE, "14"));
     }
 
     public Theme getTheme() {
@@ -204,5 +164,45 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     @Override
     public String getLoggingPath() {
         return Environment.getExternalStorageDirectory() + "/" + mLoggingDirectory;
+    }
+
+    private void setPreferences(final SharedPreferences preferences) {
+        final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
+                .FRAGMENT_SETTINGS_THEME, "1"));
+        theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
+        highlightLine = preferences
+                .getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
+
+        timestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
+        motdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
+        hideUserMessages = preferences
+                .getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
+
+        numberOfReconnectEvents = preferences
+                .getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
+
+        partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
+        quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
+
+        // Notification settings
+        inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
+                .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
+        inAppNotification = preferences.getBoolean(PreferenceConstants
+                .PREF_IN_APP_NOTIFICATION, true);
+        outOfAppNotificationSettings = preferences.getStringSet(PreferenceConstants
+                .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
+        outOfAppNotification = preferences.getBoolean(PreferenceConstants
+                .PREF_OUT_OF_APP_NOTIFICATION, true);
+
+        // Logging
+        mLoggingEnabled = preferences.getBoolean(PreferenceConstants.PREF_LOGGING, false);
+        mLoggingDirectory = preferences.getString(PreferenceConstants.PREF_LOGGING_DIRECTORY,
+                "/IRCLogs");
+        mLoggingTimeStamp = preferences.getBoolean(PreferenceConstants.PREF_LOGGING_TIMESTAMP,
+                true);
+
+        // Font settings
+        mMainFontSize = Integer.parseInt(preferences.getString(PreferenceConstants
+                .PREF_MAIN_FONT_SIZE, "14"));
     }
 }

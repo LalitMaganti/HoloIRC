@@ -106,17 +106,6 @@ public class IRCService extends Service {
         }
     }
 
-    private void onFirstStart() {
-        if (mFirstStart) {
-            mAppPreferences = AppPreferences.getAppPreferences();
-            mLoggingManager = new IRCLoggingManager(this, mAppPreferences);
-            startWatchingExternalStorage();
-            getBus().register(mEventHelper, SERVICE_PRIORITY);
-
-            mFirstStart = false;
-        }
-    }
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -193,6 +182,17 @@ public class IRCService extends Service {
 
     public EventCache getEventCache(Server server) {
         return mEventCache.get(server);
+    }
+
+    private void onFirstStart() {
+        if (mFirstStart) {
+            mAppPreferences = AppPreferences.getAppPreferences();
+            mLoggingManager = new IRCLoggingManager(this, mAppPreferences);
+            startWatchingExternalStorage();
+            getBus().register(mEventHelper, SERVICE_PRIORITY);
+
+            mFirstStart = false;
+        }
     }
 
     private void startWatchingExternalStorage() {

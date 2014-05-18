@@ -67,18 +67,6 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     /**
-     * Sets the human-readable entries to be shown in the list. This will be shown in subsequent
-     * dialogs. <p/> Each entry must have a corresponding index in {@link
-     * #setEntryValues(CharSequence[])}.
-     *
-     * @param entries The entries.
-     * @see #setEntryValues(CharSequence[])
-     */
-    void setEntries(CharSequence[] entries) {
-        mEntries = entries;
-    }
-
-    /**
      * The list of entries to be shown in the list in subsequent dialogs.
      *
      * @return The list as an array.
@@ -96,17 +84,6 @@ public class MultiSelectListPreference extends DialogPreference {
     }
 
     /**
-     * The array to find the value to save for a preference when an entry from entries is selected.
-     * If a user clicks on the second item in entries, the second item in this array will be saved
-     * to the preference.
-     *
-     * @param entryValues The array to be used as values to save for the preference.
-     */
-    void setEntryValues(CharSequence[] entryValues) {
-        mEntryValues = entryValues;
-    }
-
-    /**
      * Returns the array of values to be saved for the preference.
      *
      * @return The array of values.
@@ -121,25 +98,6 @@ public class MultiSelectListPreference extends DialogPreference {
      */
     public void setEntryValues(int entryValuesResId) {
         setEntryValues(getContext().getResources().getTextArray(entryValuesResId));
-    }
-
-    /**
-     * Retrieves the current value of the key.
-     */
-    Set<String> getValues() {
-        return mValues;
-    }
-
-    /**
-     * Sets the value of the key. This should contain entries in {@link #getEntryValues()}.
-     *
-     * @param values The values to set for the key.
-     */
-    void setValues(Set<String> values) {
-        mValues.clear();
-        mValues.addAll(values);
-
-        persistStringSet(values);
     }
 
     /**
@@ -228,6 +186,48 @@ public class MultiSelectListPreference extends DialogPreference {
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValues(restoreValue ? getPersistedStringSet(mValues) : (Set<String>) defaultValue);
+    }
+
+    /**
+     * Sets the human-readable entries to be shown in the list. This will be shown in subsequent
+     * dialogs. <p/> Each entry must have a corresponding index in {@link
+     * #setEntryValues(CharSequence[])}.
+     *
+     * @param entries The entries.
+     * @see #setEntryValues(CharSequence[])
+     */
+    void setEntries(CharSequence[] entries) {
+        mEntries = entries;
+    }
+
+    /**
+     * The array to find the value to save for a preference when an entry from entries is selected.
+     * If a user clicks on the second item in entries, the second item in this array will be saved
+     * to the preference.
+     *
+     * @param entryValues The array to be used as values to save for the preference.
+     */
+    void setEntryValues(CharSequence[] entryValues) {
+        mEntryValues = entryValues;
+    }
+
+    /**
+     * Retrieves the current value of the key.
+     */
+    Set<String> getValues() {
+        return mValues;
+    }
+
+    /**
+     * Sets the value of the key. This should contain entries in {@link #getEntryValues()}.
+     *
+     * @param values The values to set for the key.
+     */
+    void setValues(Set<String> values) {
+        mValues.clear();
+        mValues.addAll(values);
+
+        persistStringSet(values);
     }
 
     Set<String> getPersistedStringSet(Set<String> defaultReturnValue) {

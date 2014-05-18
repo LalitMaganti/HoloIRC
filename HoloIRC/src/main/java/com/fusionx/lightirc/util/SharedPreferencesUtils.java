@@ -47,42 +47,6 @@ public class SharedPreferencesUtils {
         return context.getFilesDir().getAbsolutePath().replace("files", "shared_prefs/");
     }
 
-    private static List<File> getOldServers(final Context context) {
-        final ArrayList<File> array = new ArrayList<>();
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(context));
-
-        for (final File file : folder.listFiles()) {
-            if (!SharedPreferencesUtils.isExcludedString(file.getName())) {
-                array.add(file);
-            }
-        }
-        return array;
-    }
-
-    private static void migrateToDatabase(final List<File> array, final Context context) {
-        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
-        source.open();
-        for (final File file : array) {
-            final String prefsName = file.getName().replace(".xml", "");
-            // Get builder to transfer
-            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
-            // Only transfer if the builder is not broken
-            if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
-                    .isNotEmpty(builder.getUrl())) {
-                // Also transfer over ignore list
-                final List<String> ignoreList = getIgnoreList(context, prefsName);
-                source.addServer(builder, ignoreList);
-            }
-            file.delete();
-        }
-        source.close();
-    }
-
-    private static boolean isExcludedString(final String fileName) {
-        return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
-                fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
-    }
-
     // TODO - make these static somewhere
     public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
         final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
@@ -129,6 +93,42 @@ public class SharedPreferencesUtils {
             firstDbSetup(context);
             globalSettings.edit().putBoolean("firstDbRun", false).commit();
         }
+    }
+
+    private static List<File> getOldServers(final Context context) {
+        final ArrayList<File> array = new ArrayList<>();
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(context));
+
+        for (final File file : folder.listFiles()) {
+            if (!SharedPreferencesUtils.isExcludedString(file.getName())) {
+                array.add(file);
+            }
+        }
+        return array;
+    }
+
+    private static void migrateToDatabase(final List<File> array, final Context context) {
+        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
+        source.open();
+        for (final File file : array) {
+            final String prefsName = file.getName().replace(".xml", "");
+            // Get builder to transfer
+            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
+            // Only transfer if the builder is not broken
+            if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
+                    .isNotEmpty(builder.getUrl())) {
+                // Also transfer over ignore list
+                final List<String> ignoreList = getIgnoreList(context, prefsName);
+                source.addServer(builder, ignoreList);
+            }
+            file.delete();
+        }
+        source.close();
+    }
+
+    private static boolean isExcludedString(final String fileName) {
+        return fileName.equals("main.xml") || fileName.contains("com.fusionx.lightirc") ||
+                fileName.equals("showcase_internal.xml") || fileName.equals("tempUselessFile.xml");
     }
 
     private static void firstTimeServerSetup(final Context context) {

@@ -505,11 +505,6 @@ public class MessageConversionUtils {
         }
     };
 
-    public CharSequence formatTextWithStyle(final String format, final FormattedString... args) {
-        final Formatter f = new Formatter();
-        return f.format(format, args).getFormattedString();
-    }
-
     private EventDecorator mMessage;
 
     private MessageConversionUtils(final Context context) {
@@ -523,6 +518,11 @@ public class MessageConversionUtils {
             sConverter = new MessageConversionUtils(context);
         }
         return sConverter;
+    }
+
+    public CharSequence formatTextWithStyle(final String format, final FormattedString... args) {
+        final Formatter f = new Formatter();
+        return f.format(format, args).getFormattedString();
     }
 
     public EventDecorator getEventDecorator(final Event event) {

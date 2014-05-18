@@ -112,7 +112,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private View mNavigationDrawerView;
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    public void onCreate(final Bundle savedInstanceState) {
         AppPreferences.setupAppPreferences(this);
         setTheme(UIUtils.getThemeInt());
 
@@ -293,14 +293,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void reconnectToServer() {
         mWorkerFragment.reconnectToServer(mConversation.getServer());
-    }
-
-    void setActionBarTitle(final String title) {
-        getSupportActionBar().setTitle(title);
-    }
-
-    void setActionBarSubtitle(final String subtitle) {
-        getSupportActionBar().setSubtitle(subtitle);
     }
 
     @Override
@@ -534,6 +526,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // This is just registration because we'll retrieve the sticky event later
         mEventBus.register(mConversationChanged);
         mEventBus.register(mMentionHelper, 100);
+    }
+
+    void setActionBarTitle(final String title) {
+        getSupportActionBar().setTitle(title);
+    }
+
+    void setActionBarSubtitle(final String subtitle) {
+        getSupportActionBar().setSubtitle(subtitle);
     }
 
     private void changeCurrentConversation(final Server server, final boolean delayChange) {

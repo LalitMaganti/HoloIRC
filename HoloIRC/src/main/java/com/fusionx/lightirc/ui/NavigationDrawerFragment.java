@@ -138,15 +138,6 @@ public class NavigationDrawerFragment extends Fragment implements
         getBus().unregister(mEventHandler);
     }
 
-    void switchToIRCActionFragment() {
-        getChildFragmentManager().popBackStackImmediate();
-        mIsIgnoreListDisplayed = false;
-
-        revertActionBarToNormal();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
     @Override
     public void removeCurrentFragment() {
         mCallback.removeCurrentFragment();
@@ -223,15 +214,6 @@ public class NavigationDrawerFragment extends Fragment implements
         return false;
     }
 
-    private void handleUserList() {
-        final boolean userListVisible = mSlidingUpPanelLayout.isExpanded();
-        if (mCallback.isDrawerOpen() && userListVisible) {
-            mSlidingUpPanelLayout.collapsePane();
-        } else if (!userListVisible) {
-            mSlidingUpPanelLayout.expandPane();
-        }
-    }
-
     public boolean onBackPressed() {
         if (mIsIgnoreListDisplayed) {
             mIgnoreListFragment.saveIgnoreList();
@@ -256,6 +238,24 @@ public class NavigationDrawerFragment extends Fragment implements
                 // Collapse Pane
                 mSlidingUpPanelLayout.collapsePane();
             }
+        }
+    }
+
+    void switchToIRCActionFragment() {
+        getChildFragmentManager().popBackStackImmediate();
+        mIsIgnoreListDisplayed = false;
+
+        revertActionBarToNormal();
+        updateUserListVisibility();
+        getActivity().supportInvalidateOptionsMenu();
+    }
+
+    private void handleUserList() {
+        final boolean userListVisible = mSlidingUpPanelLayout.isExpanded();
+        if (mCallback.isDrawerOpen() && userListVisible) {
+            mSlidingUpPanelLayout.collapsePane();
+        } else if (!userListVisible) {
+            mSlidingUpPanelLayout.expandPane();
         }
     }
 

@@ -18,9 +18,9 @@ import android.widget.TextView;
  */
 public class ViewPreference extends Preference {
 
-    private TextView mTextView;
-
     private final LayoutInflater mLayoutInflater;
+
+    private TextView mTextView;
 
     private String mText;
 

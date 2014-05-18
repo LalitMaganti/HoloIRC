@@ -11,9 +11,9 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class NickCache extends LruCache<Nick, NickColour> {
 
-    private static NickCache mNickCache;
-
     public static final int NICK_CACHE_MAX_SIZE = 1000;
+
+    private static NickCache mNickCache;
 
     public NickCache() {
         super(NICK_CACHE_MAX_SIZE);

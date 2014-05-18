@@ -189,13 +189,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
-    void onEditServer(final ServerWrapper builder) {
-        final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
-        intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
-        intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
-        getActivity().startActivityForResult(intent, MainActivity.SERVER_SETTINGS);
-    }
-
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         if (!checked) {
@@ -267,6 +260,18 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         refreshServers();
     }
 
+    @Override
+    public void onDestroyActionMode(final ActionMode mode) {
+        mActionMode = null;
+    }
+
+    void onEditServer(final ServerWrapper builder) {
+        final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
+        intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
+        intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
+        getActivity().startActivityForResult(intent, MainActivity.SERVER_SETTINGS);
+    }
+
     private boolean onServerClick(final int groupPosition) {
         if (mActionMode != null && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_GROUP) {
@@ -316,11 +321,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
         };
         asyncTask.execute();
-    }
-
-    @Override
-    public void onDestroyActionMode(final ActionMode mode) {
-        mActionMode = null;
     }
 
     private ServerWrapper getFirstCheckedItem() {

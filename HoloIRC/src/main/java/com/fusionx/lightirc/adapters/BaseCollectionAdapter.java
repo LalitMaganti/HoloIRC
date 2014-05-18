@@ -238,16 +238,6 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
     }
 
     /**
-     * Returns the context associated with this array adapter. The context is used to create views
-     * from the resource passed to the constructor.
-     *
-     * @return The Context associated with this adapter.
-     */
-    Context getContext() {
-        return mContext;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public int getCount() {
@@ -297,6 +287,16 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
         synchronized (mLock) {
             return new HashSet<>(mObjects);
         }
+    }
+
+    /**
+     * Returns the context associated with this array adapter. The context is used to create views
+     * from the resource passed to the constructor.
+     *
+     * @return The Context associated with this adapter.
+     */
+    Context getContext() {
+        return mContext;
     }
 
     private void init(Context context, int resource, int textViewResourceId,

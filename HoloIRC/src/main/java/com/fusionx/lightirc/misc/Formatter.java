@@ -168,6 +168,33 @@ public final class Formatter {
     }
 
     /*
+     * Gets the formatted string according to the format token and the
+     * argument.
+     */
+    private CharSequence transform(FormatToken token, FormattedString argument) {
+        // There are only two format specifiers that matter: "%d" and "%s".
+        // Nothing else is common in the wild. We fast-path these two to
+        // avoid the heavyweight machinery needed to cope with flags, width,
+        // and precision.
+        if (token.isDefault()) {
+            switch (token.getConversionType()) {
+                case 's':
+                    if (argument == null) {
+                        return "null";
+                    } else {
+                        final CharacterStyle style = argument.getCharacterStyle();
+                        final SpannableStringBuilder builder = new SpannableStringBuilder
+                                (argument.getString());
+                        builder.setSpan(style, 0, argument.getString().length(),
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        return builder;
+                    }
+            }
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    /*
      * Complete details of a single format specifier parsed from a format string.
      */
     private static class FormatToken {
@@ -177,6 +204,12 @@ public final class Formatter {
         static final int UNSET = -1;
 
         private int argIndex = UNSET;
+
+        private char conversionType = (char) UNSET;
+
+        private int precision = UNSET;
+
+        private int width = UNSET;
 
         // These have package access for performance. They used to be represented by an int bitmask
         // and accessed via methods, but Android's JIT doesn't yet do a good job of such code.
@@ -194,12 +227,6 @@ public final class Formatter {
         boolean flagSpace;
 
         boolean flagZero;
-
-        private char conversionType = (char) UNSET;
-
-        private int precision = UNSET;
-
-        private int width = UNSET;
 
         private StringBuilder strFlags;
 
@@ -278,33 +305,6 @@ public final class Formatter {
         boolean requireArgument() {
             return conversionType != '%' && conversionType != 'n';
         }
-    }
-
-    /*
-     * Gets the formatted string according to the format token and the
-     * argument.
-     */
-    private CharSequence transform(FormatToken token, FormattedString argument) {
-        // There are only two format specifiers that matter: "%d" and "%s".
-        // Nothing else is common in the wild. We fast-path these two to
-        // avoid the heavyweight machinery needed to cope with flags, width,
-        // and precision.
-        if (token.isDefault()) {
-            switch (token.getConversionType()) {
-                case 's':
-                    if (argument == null) {
-                        return "null";
-                    } else {
-                        final CharacterStyle style = argument.getCharacterStyle();
-                        final SpannableStringBuilder builder = new SpannableStringBuilder
-                                (argument.getString());
-                        builder.setSpan(style, 0, argument.getString().length(),
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        return builder;
-                    }
-            }
-        }
-        throw new UnsupportedOperationException();
     }
 
     private static class FormatSpecifierParser {

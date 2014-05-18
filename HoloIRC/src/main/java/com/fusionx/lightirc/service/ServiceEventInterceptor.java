@@ -85,6 +85,12 @@ public final class ServiceEventInterceptor {
         return mMessagePriority;
     }
 
+    private void setMessagePriority(final MessagePriority priority) {
+        if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
+            mMessagePriority = priority;
+        }
+    }
+
     /*
      * Event interception start here
      */
@@ -130,6 +136,9 @@ public final class ServiceEventInterceptor {
             }
         }
     }
+    /*
+     * Event interception ends here
+     */
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final QueryEvent event) {
@@ -143,15 +152,6 @@ public final class ServiceEventInterceptor {
                     getBus().post(new OnQueryEvent(event.user));
                 }
             });
-        }
-    }
-    /*
-     * Event interception ends here
-     */
-
-    private void setMessagePriority(final MessagePriority priority) {
-        if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
-            mMessagePriority = priority;
         }
     }
 

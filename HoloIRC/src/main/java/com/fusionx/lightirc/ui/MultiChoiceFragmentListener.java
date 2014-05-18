@@ -19,10 +19,6 @@ abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
 
     private View mListView;
 
-    MultiSelectionUtils.Controller getMultiSelectionController() {
-        return mMultiSelectionController;
-    }
-
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mListView = view.findViewById(android.R.id.list);
 
@@ -37,13 +33,6 @@ abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
 
     public void onDestroyView() {
         finish();
-    }
-
-    void finish() {
-        if (getMultiSelectionController() != null) {
-            getMultiSelectionController().finish();
-            mMultiSelectionController = null;
-        }
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -76,6 +65,21 @@ abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
 
     protected abstract void attachSelectionController();
 
+    protected abstract ListAdapter getRealAdapter();
+
+    protected abstract SparseBooleanArray getCheckedItemPositions();
+
+    MultiSelectionUtils.Controller getMultiSelectionController() {
+        return mMultiSelectionController;
+    }
+
+    void finish() {
+        if (getMultiSelectionController() != null) {
+            getMultiSelectionController().finish();
+            mMultiSelectionController = null;
+        }
+    }
+
     List<T> getCheckedItems() {
         final List<T> checkedSessionPositions = new ArrayList<>();
         if (mListView == null) {
@@ -92,8 +96,4 @@ abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
 
         return checkedSessionPositions;
     }
-
-    protected abstract ListAdapter getRealAdapter();
-
-    protected abstract SparseBooleanArray getCheckedItemPositions();
 }

@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.interfaces.Conversation;
@@ -11,7 +10,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -32,13 +30,13 @@ import static android.media.RingtoneManager.TYPE_NOTIFICATION;
 
 public class NotificationUtils {
 
+    public static final int NOTIFICATION_MENTION = 242;
+
     private static final String CANCEL_NOTIFICATION_ACTION = "com.fusionx.lightirc"
             + ".CANCEL_NOTIFICATION";
 
-    private static final String RECEIVE_NOTIFICATION_ACTION =  "com.fusionx.lightirc"
+    private static final String RECEIVE_NOTIFICATION_ACTION = "com.fusionx.lightirc"
             + ".RECEIVE_NOTIFICATION";
-
-    public static final int NOTIFICATION_MENTION = 242;
 
     private static final Configuration sConfiguration;
 
@@ -145,7 +143,7 @@ public class NotificationUtils {
         public void onReceive(final Context context, final Intent intent) {
             sNotificationCount = 0;
             final Intent activityIntent = new Intent(context, MainActivity.class);
-            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP
+            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
                     | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             activityIntent.putExtra("server_name", intent.getStringExtra("server_name"));
             activityIntent.putExtra("channel_name", intent.getStringExtra("channel_name"));
