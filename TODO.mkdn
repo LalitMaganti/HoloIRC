@@ -2,6 +2,4 @@ This is a TODO list - more to compensate for my poor memory but may provide an i
 * Add more options in general - this has come up a lot - people want customization. More specifically
     - ability to customize fonts
     - ability to customize colours
-    - ability to notify on query
-* Add back disconnect all to notification
-* Add ability to disconnect from multiple servers
+* Fix text for query notifications - currently still refers to mentioning
