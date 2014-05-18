@@ -216,23 +216,28 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
         if (mSelectionType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
             final int count = mListView.getCheckedItemCount();
-            final boolean singleItemChecked = count == 1;
-            final boolean connected = count > 0 && getFirstCheckedItem().isConnected();
+            final boolean connected = count > 0 && getFirstCheckedItem().isServerAvailable();
 
-            menu.findItem(R.id.activity_server_list_popup_edit).setVisible(singleItemChecked &&
-                    !connected);
-
+            boolean allConnected = connected;
             boolean deleteEnabled = !connected;
-            for (int i = 1; i < count && deleteEnabled; i++) {
+            for (int i = 1; i < count && (deleteEnabled || allConnected); i++) {
                 final int pos = mListView.getCheckedItemPositions().keyAt(i);
                 final ServerWrapper listItem = (ServerWrapper) mListView
                         .getItemAtPosition(pos);
-                deleteEnabled = !listItem.isConnected();
+                final boolean available = listItem.isServerAvailable();
+                allConnected = allConnected && available;
+                deleteEnabled = deleteEnabled && !available;
             }
+            menu.findItem(R.id.activity_server_list_popup_disconnect).setVisible(allConnected);
             menu.findItem(R.id.activity_server_list_popup_delete).setVisible(deleteEnabled);
+
+            final boolean singleItemChecked = count == 1;
+            menu.findItem(R.id.activity_server_list_popup_edit).setVisible(singleItemChecked &&
+                    !connected);
         } else {
             menu.findItem(R.id.activity_server_list_popup_edit).setVisible(false);
             menu.findItem(R.id.activity_server_list_popup_delete).setVisible(false);
+            menu.findItem(R.id.activity_server_list_popup_disconnect).setVisible(false);
         }
 
         return true;
@@ -243,15 +248,24 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         final ServerWrapper listItem = getFirstCheckedItem();
 
         switch (item.getItemId()) {
+            case R.id.activity_server_list_popup_disconnect:
+                disconnectFromServer(getCheckedPositions(mListView));
+                break;
             case R.id.activity_server_list_popup_delete:
-                onDeleteServer(getCheckedPositions(mListView));
+                deleteServer(getCheckedPositions(mListView));
                 break;
             case R.id.activity_server_list_popup_edit:
-                onEditServer(listItem);
+                editServer(listItem);
         }
 
         mode.finish();
         return true;
+    }
+
+    private void disconnectFromServer(final List<Integer> checkedPositions) {
+        for (final Integer checkedPosition : checkedPositions) {
+            mService.requestConnectionStoppage(mListAdapter.getGroup(checkedPosition).getServer());
+        }
     }
 
     public void onServiceConnected(final IRCService service) {
@@ -265,7 +279,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mActionMode = null;
     }
 
-    void onEditServer(final ServerWrapper builder) {
+    void editServer(final ServerWrapper builder) {
         final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
         intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
         intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
@@ -294,7 +308,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
-    private void onDeleteServer(final List<Integer> checkedPositions) {
+    private void deleteServer(final List<Integer> checkedPositions) {
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
             private BuilderDatabaseSource source;

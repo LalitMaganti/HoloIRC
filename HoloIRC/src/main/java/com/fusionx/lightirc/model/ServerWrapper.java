@@ -32,8 +32,10 @@ public class ServerWrapper {
         setServer(server);
     }
 
-    public boolean isConnected() {
-        return mServer != null && mServer.getStatus() == ConnectionStatus.CONNECTED;
+    public boolean isServerAvailable() {
+        return mServer != null &&
+                (mServer.getStatus() == ConnectionStatus.CONNECTED
+                        || mServer.getStatus() == ConnectionStatus.RECONNECTING);
     }
 
     public String getTitle() {
@@ -47,7 +49,7 @@ public class ServerWrapper {
     public void setServer(final Server server) {
         mServer = server;
 
-        if (isConnected()) {
+        if (isServerAvailable()) {
             for (final Channel channel : server.getUser().getChannels()) {
                 mServerObjects.put(channel.getName(), channel);
             }
