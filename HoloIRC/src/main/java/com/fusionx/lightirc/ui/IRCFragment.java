@@ -64,7 +64,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     private Object mEventListener = new Object() {
         @Subscribe
         public void onEvent(final OnPreferencesChangedEvent event) {
-            onResetBuffer();
+            onResetBuffer(null);
 
             // Fix for http://stackoverflow.com/questions/12049198/how-to-clear-the-views-which-are
             // -held-in-the-listviews-recyclebin/16261588#16261588
@@ -76,7 +76,6 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
         final View view = createView(container, inflate);
-        final ListView listView = (ListView) view.findViewById(android.R.id.list);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
@@ -90,13 +89,27 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         mMessageAdapter = getNewAdapter();
         setListAdapter(mMessageAdapter);
 
-        final List<T> list = onResetBuffer();
-        if (savedInstanceState == null) {
-            listView.setSelection(list.size() - 1);
-        }
+        onResetBuffer(new Runnable() {
+            @Override
+            public void run() {
+                if (savedInstanceState == null) {
+                    getListView().setSelection(mMessageAdapter.getCount() - 1);
+                } else {
+                    getListView().onRestoreInstanceState(savedInstanceState.getParcelable
+                            ("list_view"));
+                }
+            }
+        });
         mConversation.getServer().getServerEventBus().register(this);
 
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable("list_view", getListView().onSaveInstanceState());
     }
 
     @Override
@@ -121,9 +134,9 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         return false;
     }
 
-    public List<T> onResetBuffer() {
+    public List<T> onResetBuffer(final Runnable runnable) {
         final List<T> list = getAdapterData();
-        mMessageAdapter.setData(list);
+        mMessageAdapter.setData(list, runnable);
         return list;
     }
 

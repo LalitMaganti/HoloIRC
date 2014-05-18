@@ -87,9 +87,10 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         notifyDataSetChanged();
     }
 
-    public void setData(final List<T> list) {
+    public void setData(final List<T> list, final Runnable runnable) {
         if (mShouldFilter) {
             getFilter().setDataToFilter(list);
+            getFilter().setCallback(runnable);
             getFilter().filter(null);
         } else {
             synchronized (mLock) {
@@ -155,8 +156,14 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
         private List<T> mDataToFilter = new ArrayList<>();
 
+        private Runnable mCallback;
+
         public void setDataToFilter(final List<T> list) {
             mDataToFilter = ImmutableList.copyOf(list);
+        }
+
+        public void setCallback(Runnable callback) {
+            mCallback = callback;
         }
 
         @Override
@@ -179,6 +186,9 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         protected void publishResults(final CharSequence constraint, final FilterResults results) {
             mObjects = (List<T>) results.values;
             notifyDataSetChanged();
+            if (mCallback != null) {
+                mCallback.run();
+            }
         }
     }
 }
