@@ -9,24 +9,24 @@ import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.NickColour;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.channel.ActionEvent;
+import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
 import com.fusionx.relay.event.channel.ChannelDisconnectEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
-import com.fusionx.relay.event.channel.InitialTopicEvent;
-import com.fusionx.relay.event.channel.MessageEvent;
-import com.fusionx.relay.event.channel.ModeEvent;
-import com.fusionx.relay.event.channel.NickChangeEvent;
-import com.fusionx.relay.event.channel.TopicEvent;
-import com.fusionx.relay.event.channel.UserLevelChangeEvent;
-import com.fusionx.relay.event.channel.WorldActionEvent;
-import com.fusionx.relay.event.channel.WorldJoinEvent;
-import com.fusionx.relay.event.channel.WorldKickEvent;
-import com.fusionx.relay.event.channel.WorldLevelChangeEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
-import com.fusionx.relay.event.channel.WorldNickChangeEvent;
-import com.fusionx.relay.event.channel.WorldPartEvent;
-import com.fusionx.relay.event.channel.WorldQuitEvent;
+import com.fusionx.relay.event.channel.ChannelInitialTopicEvent;
+import com.fusionx.relay.event.channel.ChannelMessageEvent;
+import com.fusionx.relay.event.channel.ChannelModeEvent;
+import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
+import com.fusionx.relay.event.channel.ChannelTopicEvent;
+import com.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
+import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
+import com.fusionx.relay.event.channel.ChannelWorldJoinEvent;
+import com.fusionx.relay.event.channel.ChannelWorldKickEvent;
+import com.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
+import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
+import com.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
+import com.fusionx.relay.event.channel.ChannelWorldPartEvent;
+import com.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
@@ -40,13 +40,13 @@ import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.event.server.StopEvent;
 import com.fusionx.relay.event.server.WallopsEvent;
 import com.fusionx.relay.event.server.WhoisEvent;
-import com.fusionx.relay.event.user.PrivateActionEvent;
-import com.fusionx.relay.event.user.PrivateMessageEvent;
-import com.fusionx.relay.event.user.PrivateMessageOpenedEvent;
-import com.fusionx.relay.event.user.UserConnectEvent;
-import com.fusionx.relay.event.user.UserDisconnectEvent;
-import com.fusionx.relay.event.user.WorldPrivateActionEvent;
-import com.fusionx.relay.event.user.WorldPrivateMessageEvent;
+import com.fusionx.relay.event.query.QueryActionSelfEvent;
+import com.fusionx.relay.event.query.QueryMessageSelfEvent;
+import com.fusionx.relay.event.query.QueryOpenedEvent;
+import com.fusionx.relay.event.query.QueryConnectEvent;
+import com.fusionx.relay.event.query.QueryDisconnectEvent;
+import com.fusionx.relay.event.query.QueryActionWorldEvent;
+import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.nick.Nick;
 import com.squareup.otto.Bus;
 import com.squareup.otto.DeadEvent;
@@ -82,7 +82,7 @@ public class MessageConversionUtils {
 
         // Messages
         @Subscribe
-        public void getInitialTopicMessage(final InitialTopicEvent event) {
+        public void getInitialTopicMessage(final ChannelInitialTopicEvent event) {
             final String response = mContext.getString(R.string.parser_new_topic);
             setupEvent(String.format(response, event.topic, event.setterNick));
         }
@@ -111,13 +111,13 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getOnConnectedMessage(final UserConnectEvent event) {
+        public void getOnConnectedMessage(final QueryConnectEvent event) {
             final String response = mContext.getString(R.string.parser_connected_generic);
             setupEvent(response);
         }
 
         @Subscribe
-        public void getJoinMessage(final WorldJoinEvent event) {
+        public void getJoinMessage(final ChannelWorldJoinEvent event) {
             final String response = mContext.getString(R.string.parser_joined_channel);
             if (shouldHighlightLine()) {
                 setupEvent(String.format(response, event.userNick), event.userNick);
@@ -127,7 +127,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getModeChangedMessage(final UserLevelChangeEvent event) {
+        public void getModeChangedMessage(final ChannelUserLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.rawMode,
@@ -144,7 +144,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getModeChangedMessage(final WorldLevelChangeEvent event) {
+        public void getModeChangedMessage(final ChannelWorldLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.rawMode,
@@ -161,7 +161,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getNickChangedMessage(final WorldNickChangeEvent event) {
+        public void getNickChangedMessage(final ChannelWorldNickChangeEvent event) {
             final String response = mContext.getString(R.string.parser_other_user_nick_change);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.oldNick,
@@ -177,7 +177,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getNickChaneMessage(final NickChangeEvent event) {
+        public void getNickChaneMessage(final ChannelNickChangeEvent event) {
             final String response = mContext.getString(R.string.parser_appuser_nick_changed);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.oldNick,
@@ -193,7 +193,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getTopicChangedMessage(final TopicEvent event) {
+        public void getTopicChangedMessage(final ChannelTopicEvent event) {
             final String response = mContext.getString(R.string.parser_topic_changed);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.topic,
@@ -209,7 +209,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getUserKickedMessage(final WorldKickEvent event) {
+        public void getUserKickedMessage(final ChannelWorldKickEvent event) {
             final String response = mContext.getString(R.string.parser_kicked_channel);
 
             if (shouldHighlightLine()) {
@@ -249,7 +249,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getPartMessage(final WorldPartEvent event) {
+        public void getPartMessage(final ChannelWorldPartEvent event) {
             final String response = mContext.getString(R.string.parser_parted_channel);
 
             if (shouldHighlightLine()) {
@@ -262,7 +262,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getQuitMessage(final WorldQuitEvent event) {
+        public void getQuitMessage(final ChannelWorldQuitEvent event) {
             final String response = mContext.getString(R.string.parser_quit_server);
 
             if (shouldHighlightLine()) {
@@ -275,7 +275,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getMessage(final WorldMessageEvent event) {
+        public void getMessage(final ChannelWorldMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
 
             // Get out clause for message events from ZNCs for example
@@ -300,7 +300,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getMessage(final MessageEvent event) {
+        public void getMessage(final ChannelMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
 
             if (shouldHighlightLine()) {
@@ -317,7 +317,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getMessage(final PrivateMessageEvent event) {
+        public void getMessage(final QueryMessageSelfEvent event) {
             final String response = mContext.getString(R.string.parser_message);
 
             if (shouldHighlightLine()) {
@@ -334,7 +334,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getMessage(final WorldPrivateMessageEvent event) {
+        public void getMessage(final QueryMessageWorldEvent event) {
             final String response = mContext.getString(R.string.parser_message);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.user.getNick(),
@@ -358,7 +358,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getActionMessage(final ActionEvent event) {
+        public void getActionMessage(final ChannelActionEvent event) {
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.user.getNick(),
@@ -374,7 +374,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getActionMessage(final WorldActionEvent event) {
+        public void getActionMessage(final ChannelWorldActionEvent event) {
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.userNick,
@@ -390,7 +390,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getActionMessage(final PrivateActionEvent event) {
+        public void getActionMessage(final QueryActionSelfEvent event) {
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.ourUser.getNick(),
@@ -406,7 +406,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getActionMessage(final WorldPrivateActionEvent event) {
+        public void getActionMessage(final QueryActionWorldEvent event) {
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.user.getNick(),
@@ -449,7 +449,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getModeMessage(final ModeEvent event) {
+        public void getModeMessage(final ChannelModeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String
@@ -476,7 +476,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getDisconnectEvent(final UserDisconnectEvent event) {
+        public void getDisconnectEvent(final QueryDisconnectEvent event) {
             setupEvent(event.message);
         }
 
@@ -487,7 +487,7 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getNewPrivateMessageEvent(final PrivateMessageOpenedEvent event) {
+        public void getNewPrivateMessageEvent(final QueryOpenedEvent event) {
             final String response = mContext.getString(R.string.parser_pm_opened);
             setupEvent(response);
         }

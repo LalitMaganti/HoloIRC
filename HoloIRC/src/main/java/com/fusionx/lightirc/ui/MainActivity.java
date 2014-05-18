@@ -17,7 +17,7 @@ import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.server.KickEvent;
@@ -241,7 +241,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
             mConversation.getServer().getServerCallBus().sendClosePrivateMessage(
-                    (PrivateMessageUser) mConversation);
+                    (QueryUser) mConversation);
         }
     }
 
@@ -562,7 +562,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             final IRCFragment fragment;
             if (object.getClass().equals(Channel.class)) {
                 fragment = new ChannelFragment();
-            } else if (object.getClass().equals(PrivateMessageUser.class)) {
+            } else if (object.getClass().equals(QueryUser.class)) {
                 fragment = new UserFragment();
             } else {
                 throw new IllegalArgumentException();

@@ -22,22 +22,22 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.PrivateMessageUser;
-import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.QueryUser;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.parser.UserInputParser;
 import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
-public class UserFragment extends IRCFragment<UserEvent> {
+public class UserFragment extends IRCFragment<QueryEvent> {
 
-    public PrivateMessageUser getPrivateMessageUser() {
-        return (PrivateMessageUser) mConversation;
+    public QueryUser getPrivateMessageUser() {
+        return (QueryUser) mConversation;
     }
 
     // Subscription methods
     @Subscribe
-    public void onEventMainThread(final UserEvent event) {
+    public void onEventMainThread(final QueryEvent event) {
         if (!event.user.getNick().equals(getPrivateMessageUser().getNick())) {
             return;
         }
@@ -55,7 +55,7 @@ public class UserFragment extends IRCFragment<UserEvent> {
     }
 
     @Override
-    protected List<UserEvent> getAdapterData() {
+    protected List<QueryEvent> getAdapterData() {
         return getPrivateMessageUser().getBuffer();
     }
 }

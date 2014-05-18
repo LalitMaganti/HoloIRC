@@ -13,7 +13,7 @@ import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
@@ -24,7 +24,7 @@ import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.StopEvent;
-import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -411,8 +411,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final NewPrivateMessage event) throws InterruptedException {
-            final PrivateMessageUser user = mServer.getUserChannelInterface()
-                    .getPrivateMessageUser(event.nick);
+            final QueryUser user = mServer.getUserChannelInterface()
+                    .getQueryUser(event.nick);
             mListAdapter.getGroup(mServerIndex).addServerObject(user);
             mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
@@ -465,7 +465,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @SuppressWarnings("unused")
-        public void onEventMainThread(final UserEvent event) {
+        public void onEventMainThread(final QueryEvent event) {
             if (mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
             }

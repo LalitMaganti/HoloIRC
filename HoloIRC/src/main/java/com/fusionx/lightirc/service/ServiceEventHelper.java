@@ -5,16 +5,16 @@ import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.WorldActionEvent;
-import com.fusionx.relay.event.channel.WorldMessageEvent;
-import com.fusionx.relay.event.channel.WorldUserEvent;
+import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
+import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
+import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
-import com.fusionx.relay.event.user.UserEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.os.Handler;
@@ -89,7 +89,7 @@ public final class ServiceEventHelper {
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final NewPrivateMessage event) {
-        final PrivateMessageUser user = mServer.getUserChannelInterface().getPrivateMessageUser(
+        final QueryUser user = mServer.getUserChannelInterface().getQueryUser(
                 event.nick);
         onIRCEvent(MessagePriority.HIGH, user, getLastStorableEvent(user.getBuffer()));
     }
@@ -105,8 +105,8 @@ public final class ServiceEventHelper {
         final Conversation conversation = event.channel;
         if (shouldStoreEvent(event)) {
             // TODO - fix this horrible code
-            if (event instanceof WorldUserEvent) {
-                final WorldUserEvent userEvent = (WorldUserEvent) event;
+            if (event instanceof ChannelWorldUserEvent) {
+                final ChannelWorldUserEvent userEvent = (ChannelWorldUserEvent) event;
 
                 if (userEvent.userMentioned) {
                     onIRCEvent(MessagePriority.HIGH, conversation, event);
@@ -119,8 +119,8 @@ public final class ServiceEventHelper {
                                     (Channel) conversation));
                         }
                     });
-                } else if (event.getClass().equals(WorldMessageEvent.class)
-                        || event.getClass().equals(WorldActionEvent.class)) {
+                } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
+                        || event.getClass().equals(ChannelWorldActionEvent.class)) {
                     onIRCEvent(MessagePriority.MEDIUM, conversation, event);
                 } else {
                     onIRCEvent(MessagePriority.LOW, conversation, event);
@@ -132,7 +132,7 @@ public final class ServiceEventHelper {
     }
 
     @SuppressWarnings("unused")
-    public void onEventMainThread(final UserEvent event) {
+    public void onEventMainThread(final QueryEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.user, event);
     }
 

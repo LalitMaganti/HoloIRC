@@ -2,7 +2,7 @@ package com.fusionx.lightirc.model;
 
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.PrivateMessageUser;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.interfaces.Conversation;
 
@@ -51,8 +51,8 @@ public class ServerWrapper {
             for (final Channel channel : server.getUser().getChannels()) {
                 mServerObjects.put(channel.getName(), channel);
             }
-            for (final PrivateMessageUser user : server.getUserChannelInterface()
-                    .getPrivateMessageUsers()) {
+            for (final QueryUser user : server.getUserChannelInterface()
+                    .getQueryUsers()) {
                 mServerObjects.put(user.getNick().getNickAsString(), user);
             }
         }
