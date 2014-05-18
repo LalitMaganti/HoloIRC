@@ -34,4 +34,13 @@
                 android:summary="@string/pref_highlight_whole_line_summary"
                 android:defaultValue="true"/>
     </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/appearance_font">
+        <ListPreference
+                android:title="@string/appearance_font_size"
+                android:key="pref_main_font_size"
+                android:defaultValue="14"
+                android:entries="@array/font_size_entries"
+                android:entryValues="@array/font_size_values"/>
+    </PreferenceCategory>
 </PreferenceScreen>

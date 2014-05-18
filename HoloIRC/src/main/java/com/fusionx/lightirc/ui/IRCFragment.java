@@ -36,14 +36,12 @@ import com.fusionx.relay.interfaces.Conversation;
 import org.apache.commons.lang3.StringUtils;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -67,6 +65,10 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         @Subscribe
         public void onEvent(final OnPreferencesChangedEvent event) {
             onResetBuffer();
+
+            // Fix for http://stackoverflow.com/questions/12049198/how-to-clear-the-views-which-are
+            // -held-in-the-listviews-recyclebin/16261588#16261588
+            getListView().setAdapter(mMessageAdapter);
         }
     };
 

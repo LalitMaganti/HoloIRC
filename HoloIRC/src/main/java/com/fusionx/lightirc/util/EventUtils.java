@@ -29,7 +29,7 @@ public class EventUtils {
         if (event instanceof ChannelWorldUserEvent) {
             final ChannelWorldUserEvent channelWorldUserEvent = (ChannelWorldUserEvent) event;
             if (channelWorldUserEvent.isUserListChangeEvent()) {
-                return !AppPreferences.getAppPreferences().isHideUserMessages();
+                return !AppPreferences.getAppPreferences().shouldHideUserMessages();
             }
         } else if (event instanceof ServerEvent) {
             final ServerEvent serverEvent = (ServerEvent) event;

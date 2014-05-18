@@ -86,5 +86,16 @@
         <item>@string/notification_value_lights</item>
     </string-array>
 
+    <string-array name="font_size_entries">
+        <item>@string/appearance_small_font_size</item>
+        <item>@string/appearance_medium_font_size</item>
+        <item>@string/appearance_large_font_size</item>
+    </string-array>
+    <string-array name="font_size_values">
+        <item>12</item>
+        <item>14</item>
+        <item>16</item>
+    </string-array>
+
     <string-array name="empty_array"/>
 </resources>

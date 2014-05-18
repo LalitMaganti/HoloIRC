@@ -4,7 +4,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.annotation.TargetApi;
-import android.app.AlertDialog;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;

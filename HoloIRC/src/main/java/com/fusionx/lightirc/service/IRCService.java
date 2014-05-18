@@ -136,7 +136,8 @@ public class IRCService extends Service {
         final Server server = pair.second;
 
         if (!exists) {
-            final ServiceEventInterceptor serviceEventInterceptor = new ServiceEventInterceptor(server);
+            final ServiceEventInterceptor serviceEventInterceptor = new ServiceEventInterceptor(
+                    server);
             mEventHelperMap.put(server, serviceEventInterceptor);
             mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);

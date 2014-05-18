@@ -36,6 +36,6 @@ public class AppearancePreferenceFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.appearance_settings_fragment);
 
-        PreferenceHelpers.setupThemePreference(getPreferenceScreen(), getActivity());
+        PreferenceHelpers.setupAppearancePreferences(getPreferenceScreen(), getActivity());
     }
 }

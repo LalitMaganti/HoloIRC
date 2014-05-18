@@ -114,4 +114,7 @@ public class PreferenceConstants {
     public static final String PREF_LOGGING_DIRECTORY = "pref_logging_directory";
 
     public static final String PREF_LOGGING_TIMESTAMP = "pref_logging_timestamp";
+
+    // Font settings
+    public static final String PREF_MAIN_FONT_SIZE = "pref_main_font_size";
 }

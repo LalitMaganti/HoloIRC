@@ -118,9 +118,11 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
         final TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
         UIUtils.setRobotoLight(mContext, timestamp);
+        timestamp.setTextSize(AppPreferences.getAppPreferences().getMainFontSize());
 
         final TextView message = (TextView) view.findViewById(R.id.message);
         UIUtils.setRobotoLight(mContext, message);
+        message.setTextSize(AppPreferences.getAppPreferences().getMainFontSize());
 
         final ViewHolder holder = new ViewHolder(timestamp, message);
         view.setTag(holder);
@@ -129,7 +131,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     }
 
     private void addTimestampIfRequired(ViewHolder holder, final Event event) {
-        if (AppPreferences.getAppPreferences().isTimestamp()) {
+        if (AppPreferences.getAppPreferences().shouldDisplayTimestamps()) {
             holder.timestamp.setVisibility(View.VISIBLE);
             holder.timestamp.setText(event.timestamp.format("%H:%M"));
         } else {

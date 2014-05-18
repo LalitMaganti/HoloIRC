@@ -18,12 +18,29 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     private static AppPreferences mAppPreferences;
 
+    private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
+
+    
+    private Theme theme;
+
     private boolean timestamp = false;
 
     private boolean hideUserMessages = false;
 
-    private Theme theme;
 
+    private boolean highlightLine = true;
+
+    private boolean motdAllowed = true;
+
+
+    private int numberOfReconnectEvents = 3;
+
+
+    private String partReason = "";
+
+    private String quitReason = "";
+
+    // Notification settings
     private boolean inAppNotification;
 
     private Set<String> inAppNotificationSettings;
@@ -32,18 +49,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     private Set<String> outOfAppNotificationSettings;
 
-    private boolean highlightLine = true;
-
-    private boolean motdAllowed = true;
-
-    private String partReason = "";
-
-    private String quitReason = "";
-
-    private int numberOfReconnectEvents = 3;
-
-    private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
-
     // Logging
     private boolean mLoggingEnabled;
 
@@ -51,7 +56,10 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     private boolean mLoggingTimeStamp;
 
-    public AppPreferences(final Context context) {
+    // Font settings
+    private int mMainFontSize;
+
+    private AppPreferences(final Context context) {
         sPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(final SharedPreferences
@@ -75,20 +83,25 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return mAppPreferences;
     }
 
-    public void setPreferences(final SharedPreferences preferences) {
+    private void setPreferences(final SharedPreferences preferences) {
         final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
                 .FRAGMENT_SETTINGS_THEME, "1"));
         theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
         highlightLine = preferences
                 .getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
+
         timestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
         motdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
         hideUserMessages = preferences
                 .getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
-        partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
-        quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
+
         numberOfReconnectEvents = preferences
                 .getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
+
+        partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
+        quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
+
+        // Notification settings
         inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
                 .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
         inAppNotification = preferences.getBoolean(PreferenceConstants
@@ -104,20 +117,29 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
                 "/IRCLogs");
         mLoggingTimeStamp = preferences.getBoolean(PreferenceConstants.PREF_LOGGING_TIMESTAMP,
                 true);
+
+        // Font settings
+        mMainFontSize = Integer.parseInt(preferences.getString(PreferenceConstants
+                .PREF_MAIN_FONT_SIZE, "14"));
     }
 
-    public boolean isLoggingEnabled() {
-        return mLoggingEnabled;
+    public Theme getTheme() {
+        return theme;
     }
 
-    public boolean isTimestamp() {
+    public boolean shouldDisplayTimestamps() {
         return timestamp;
     }
 
-    public boolean isHideUserMessages() {
+    public boolean shouldHideUserMessages() {
         return hideUserMessages;
     }
 
+    public boolean shouldHighlightLine() {
+        return highlightLine;
+    }
+
+    // Notification settings
     public boolean isInAppNotification() {
         return inAppNotification;
     }
@@ -134,6 +156,19 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return outOfAppNotificationSettings;
     }
 
+    // Logging settings
+    public boolean isLoggingEnabled() {
+        return mLoggingEnabled;
+    }
+
+    // Font settings
+    public int getMainFontSize() {
+        return mMainFontSize;
+    }
+
+    /*
+     * Interface implementation starts here
+     */
     @Override
     public int getReconnectAttemptsCount() {
         return numberOfReconnectEvents;
@@ -149,10 +184,6 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return quitReason;
     }
 
-    public Theme getTheme() {
-        return theme;
-    }
-
     // We always want to display the messages that the app user sends
     @Override
     public boolean isSelfEventBroadcast() {
@@ -164,10 +195,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return motdAllowed;
     }
 
-    public boolean shouldHighlightLine() {
-        return highlightLine;
-    }
-
+    // Logging
     @Override
     public boolean shouldLogTimestamps() {
         return mLoggingTimeStamp;

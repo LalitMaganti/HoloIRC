@@ -32,7 +32,7 @@ class PreferenceHelpers {
         });
     }
 
-    public static void setupThemePreference(final PreferenceScreen screen,
+    public static void setupAppearancePreferences(final PreferenceScreen screen,
             final Activity activity) {
         final ListPreference themePreference = (ListPreference) screen.findPreference
                 (PreferenceConstants.FRAGMENT_SETTINGS_THEME);
@@ -41,6 +41,21 @@ class PreferenceHelpers {
         }
         themePreference.setOnPreferenceChangeListener(new ThemeChangeListener(activity));
         themePreference.setSummary(themePreference.getEntry());
+
+        final ListPreference fontSize = (ListPreference) screen.findPreference
+                (PreferenceConstants.PREF_MAIN_FONT_SIZE);
+        if (fontSize != null) {
+            fontSize.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    final CharSequence summary = fontSize.getEntries()[fontSize
+                            .findIndexOfValue(String.valueOf(newValue))];
+                    fontSize.setSummary(summary);
+                    return true;
+                }
+            });
+            fontSize.setSummary(fontSize.getEntry());
+        }
     }
 
     public static void setupAppVersionPreference(final PreferenceScreen screen,

@@ -39,8 +39,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_settings_auto_join_title">Auto-join channels</string>
     <string name="server_settings_ssl_title">Use SSL</string>
     <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be
-        different to
-        normal
+        different to normal
     </string>
     <string name="server_settings_port_title">Server Port</string>
     <string name="server_settings_url_title">Server URL</string>
@@ -62,6 +61,12 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Appearance settings -->
     <string name="appearance_settings_requires_restart">This requires a full restart of the app
     </string>
+
+    <string name="appearance_font">Font</string>
+    <string name="appearance_font_size">Font size</string>
+    <string name="appearance_small_font_size">Small (12 sp)</string>
+    <string name="appearance_medium_font_size">Medium (14 sp)</string>
+    <string name="appearance_large_font_size">Large (16 sp)</string>
 
     <!-- Server/channel settings -->
     <string name="server_channel_settings_motd_title">Display MOTD</string>
@@ -168,6 +173,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="actions">Actions</string>
     <string name="done">Done</string>
     <string name="reconnecting">Reconnecting</string>
+    <string name="disconnected_from_server">Disconnected from the server</string>
 
     <!-- Actions -->
     <string name="action_join_channel">Join new channel</string>
@@ -176,7 +182,6 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="action_disconnect">Disconnect</string>
     <string name="action_close_server">Close</string>
     <string name="action_reconnect">Reconnect</string>
-
     <string name="action_part_channel">Part channel</string>
     <string name="action_close_pm">Close PM</string>
 
@@ -191,6 +196,5 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <!-- Logging settings -->
     <string name="logging_settings_summary">Logging Settings</string>
     <string name="logging_settings_title">Control logging settings</string>
-    <string name="disconnected_from_server">Disconnected from the server</string>
 
 </resources>

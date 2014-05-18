@@ -16,6 +16,7 @@ import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.JoinEvent;
@@ -24,7 +25,6 @@ import com.fusionx.relay.event.server.NewPrivateMessage;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.StopEvent;
-import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;

@@ -13,9 +13,9 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.NewPrivateMessage;
-import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.os.Handler;
@@ -116,7 +116,7 @@ public final class ServiceEventInterceptor {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            getBus().post(new OnChannelMentionEvent(mServer, event.channel));
+                            getBus().post(new OnChannelMentionEvent(event.channel));
                         }
                     });
                 } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
@@ -140,7 +140,7 @@ public final class ServiceEventInterceptor {
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    getBus().post(new OnQueryEvent(mServer, event.user));
+                    getBus().post(new OnQueryEvent(event.user));
                 }
             });
         }
