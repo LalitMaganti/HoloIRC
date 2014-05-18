@@ -163,9 +163,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
                 mConversation.getServer().getServerEventBus().register(this);
-
+            } else {
                 findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
-                        (View.GONE);
+                        (View.VISIBLE);
             }
 
             supportInvalidateOptionsMenu();
@@ -669,6 +669,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             supportInvalidateOptionsMenu();
         } else {
             mSlidingPane.openPane();
+
+            findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
+                    (View.VISIBLE);
         }
     }
 }
