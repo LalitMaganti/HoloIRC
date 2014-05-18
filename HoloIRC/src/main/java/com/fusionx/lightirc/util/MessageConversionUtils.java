@@ -17,6 +17,7 @@ import com.fusionx.relay.event.channel.ChannelMessageEvent;
 import com.fusionx.relay.event.channel.ChannelModeEvent;
 import com.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import com.fusionx.relay.event.channel.ChannelNoticeEvent;
+import com.fusionx.relay.event.channel.ChannelStopEvent;
 import com.fusionx.relay.event.channel.ChannelTopicEvent;
 import com.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
@@ -34,6 +35,7 @@ import com.fusionx.relay.event.query.QueryDisconnectEvent;
 import com.fusionx.relay.event.query.QueryMessageSelfEvent;
 import com.fusionx.relay.event.query.QueryMessageWorldEvent;
 import com.fusionx.relay.event.query.QueryOpenedEvent;
+import com.fusionx.relay.event.query.QueryStopEvent;
 import com.fusionx.relay.event.server.ConnectEvent;
 import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
@@ -499,7 +501,19 @@ public class MessageConversionUtils {
         }
 
         @Subscribe
-        public void getWallopsEvent(final StopEvent event) {
+        public void getStopEvent(final StopEvent event) {
+            final String response = mContext.getString(R.string.disconnected_from_server);
+            setupEvent(response);
+        }
+
+        @Subscribe
+        public void getStopEvent(final ChannelStopEvent event) {
+            final String response = mContext.getString(R.string.disconnected_from_server);
+            setupEvent(response);
+        }
+
+        @Subscribe
+        public void getStopEvent(final QueryStopEvent event) {
             final String response = mContext.getString(R.string.disconnected_from_server);
             setupEvent(response);
         }
