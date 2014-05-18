@@ -10,8 +10,11 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -29,9 +32,21 @@ import static android.media.RingtoneManager.TYPE_NOTIFICATION;
 
 public class NotificationUtils {
 
+    private static final String CANCEL_NOTIFICATION_ACTION = "com.fusionx.lightirc"
+            + ".CANCEL_NOTIFICATION";
+
+    private static final String RECEIVE_NOTIFICATION_ACTION =  "com.fusionx.lightirc"
+            + ".RECEIVE_NOTIFICATION";
+
     public static final int NOTIFICATION_MENTION = 242;
 
     private static final Configuration sConfiguration;
+
+    private static int sNotificationCount = 0;
+
+    private static ResultReceiver sResultReceiver;
+
+    private static DeleteReceiver sDeleteReceiver;
 
     static {
         sConfiguration = new Configuration.Builder().setDuration(500).build();
@@ -62,13 +77,14 @@ public class NotificationUtils {
     }
 
     public static void notifyOutOfApp(final Context context, final Conversation conversation) {
-        final Set<String> outApp = AppPreferences.getAppPreferences()
-                .getOutOfAppNotificationSettings();
-
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
         }
 
+        registerBroadcastReceivers(context);
+
+        final Set<String> outApp = AppPreferences.getAppPreferences()
+                .getOutOfAppNotificationSettings();
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -76,9 +92,19 @@ public class NotificationUtils {
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_notification);
         builder.setContentTitle(context.getString(R.string.app_name));
-        builder.setContentText(String.format("Mentioned in %s on %s",
-                conversation.getId(), conversation.getServer().getId()));
+        if (sNotificationCount == 0) {
+            builder.setContentText(String.format("Mentioned in %s on %s",
+                    conversation.getId(), conversation.getServer().getId()));
+        } else {
+            builder.setContentText("You have been mentioned/queried multiple times");
+        }
         builder.setAutoCancel(true);
+        builder.setNumber(++sNotificationCount);
+
+        final Intent intent = new Intent(CANCEL_NOTIFICATION_ACTION);
+        final PendingIntent deleteIntent = PendingIntent.getBroadcast(context, 0, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setDeleteIntent(deleteIntent);
 
         if (outApp.contains(context.getString(R.string.notification_value_audio))) {
             final Uri notification = RingtoneManager.getDefaultUri(TYPE_NOTIFICATION);
@@ -91,16 +117,49 @@ public class NotificationUtils {
             builder.setDefaults(Notification.DEFAULT_LIGHTS);
         }
 
-        final Intent resultIntent = new Intent(context, MainActivity.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent
-                .FLAG_ACTIVITY_SINGLE_TOP);
+        final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
         resultIntent.putExtra("server_name", conversation.getServer().getTitle());
         resultIntent.putExtra("channel_name", conversation.getId());
-
-        final PendingIntent resultPendingIntent = PendingIntent.getActivity(context,
+        final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,
                 NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
         notificationManager.notify(NOTIFICATION_MENTION, builder.build());
+    }
+
+    private static void registerBroadcastReceivers(Context context) {
+        if (sResultReceiver == null) {
+            sResultReceiver = new ResultReceiver();
+            context.registerReceiver(sResultReceiver,
+                    new IntentFilter(RECEIVE_NOTIFICATION_ACTION));
+        }
+        if (sDeleteReceiver == null) {
+            sDeleteReceiver = new DeleteReceiver();
+            context.registerReceiver(sDeleteReceiver, new IntentFilter(CANCEL_NOTIFICATION_ACTION));
+        }
+    }
+
+    public static class ResultReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            sNotificationCount = 0;
+            final Intent activityIntent = new Intent(context, MainActivity.class);
+            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            activityIntent.putExtra("server_name", intent.getStringExtra("server_name"));
+            activityIntent.putExtra("channel_name", intent.getStringExtra("channel_name"));
+            context.startActivity(activityIntent);
+        }
+    }
+
+    public static class DeleteReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            sNotificationCount = 0;
+            context.unregisterReceiver(this);
+            sDeleteReceiver = null;
+        }
     }
 }
