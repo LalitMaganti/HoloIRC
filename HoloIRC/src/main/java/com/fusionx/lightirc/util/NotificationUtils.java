@@ -13,6 +13,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -88,14 +90,20 @@ public class NotificationUtils {
 
         // If we're here, the activity has not picked it up - fire off a notification
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_notification);
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_notification);
+        builder.setLargeIcon(icon);
+        builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentTitle(context.getString(R.string.app_name));
+        final String text;
         if (sNotificationCount == 0) {
-            builder.setContentText(String.format("Mentioned in %s on %s",
-                    conversation.getId(), conversation.getServer().getId()));
+            text = String.format("Mentioned in %s on %s", conversation.getId(),
+                    conversation.getServer().getId());
         } else {
-            builder.setContentText("You have been mentioned/queried multiple times");
+            text = "You have been mentioned/queried multiple times";
         }
+        builder.setContentText(text);
+        builder.setTicker(text);
         builder.setAutoCancel(true);
         builder.setNumber(++sNotificationCount);
 
