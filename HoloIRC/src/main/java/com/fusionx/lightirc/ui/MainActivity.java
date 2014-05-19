@@ -198,9 +198,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             onRemoveCurrentFragmentAndConversation();
         }
         getService().removeLoggingHandlerAndEventCache(server);
-
-        setActionBarTitle(getString(R.string.app_name));
-        setActionBarSubtitle(null);
     }
 
     @Override
@@ -641,6 +638,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // Don't listen for any more events from this server
         mConversation.getServer().getServerEventBus().unregister(this);
         mEventBus.postSticky(new OnConversationChanged(null, null));
+
+        // Remove any title/subtitle from the action bar
+        setActionBarTitle(getString(R.string.app_name));
+        setActionBarSubtitle(null);
     }
 
     private void onExternalConversationUpdate(final Conversation conversation) {
