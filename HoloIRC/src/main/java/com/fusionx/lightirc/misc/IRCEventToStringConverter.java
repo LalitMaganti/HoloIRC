@@ -597,7 +597,7 @@ public class IRCEventToStringConverter {
             final String response = mContext.getString(R.string.parser_invited);
             final String formattedResponse = String.format(response, event.channelName,
                     event.invitingUser);
-            return setupEvent(formattedResponse);
+            return setupEvent(formattedResponse, true);
         }
     }
 }
