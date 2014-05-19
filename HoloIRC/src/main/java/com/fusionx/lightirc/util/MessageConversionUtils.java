@@ -130,14 +130,19 @@ public class MessageConversionUtils {
         public void getModeChangedMessage(final UserLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
+                final String nick = event.changingUser == null ? event.changingNick : event
+                        .changingUser.getNick().getNickAsString();
                 final String formattedResponse = String.format(response, event.rawMode,
-                        event.user.getNick(), event.changingUser.getNick());
+                        event.user.getNick(), nick);
                 setupEvent(formattedResponse, event.user.getNick());
             } else {
+                final FormattedString formattedChangingNick = event.changingUser == null
+                        ? new FormattedString(event.changingNick)
+                        : getFormattedStringForUser(event.changingUser);
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.rawMode),
                         getFormattedStringForUser(event.user),
-                        getFormattedStringForUser(event.changingUser)
+                        formattedChangingNick
                 };
                 setupEvent(formatTextWithStyle(response, formattedStrings));
             }
