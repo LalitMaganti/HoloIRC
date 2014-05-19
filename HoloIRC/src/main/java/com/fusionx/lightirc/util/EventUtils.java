@@ -8,7 +8,7 @@ import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.channel.ChannelNameEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.server.JoinEvent;
-import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.ServerEvent;
@@ -20,7 +20,7 @@ public class EventUtils {
 
     private static final ImmutableList<? extends Class<? extends ServerEvent>>
             sServerIgnoreClasses = ImmutableList.of(JoinEvent.class, PartEvent.class,
-            NewPrivateMessage.class, PrivateMessageClosedEvent.class, StatusChangeEvent.class);
+            NewPrivateMessageEvent.class, PrivateMessageClosedEvent.class, StatusChangeEvent.class);
 
     private static final ImmutableList<? extends Class<? extends ChannelEvent>>
             sChannelIgnoreClasses = ImmutableList.of(ChannelNameEvent.class);

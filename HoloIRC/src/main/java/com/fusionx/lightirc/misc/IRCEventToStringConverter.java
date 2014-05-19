@@ -41,7 +41,7 @@ import com.fusionx.relay.event.server.GenericServerEvent;
 import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.MotdEvent;
-import com.fusionx.relay.event.server.PrivateNoticeEvent;
+import com.fusionx.relay.event.server.NoticeEvent;
 import com.fusionx.relay.event.server.ReconnectEvent;
 import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.event.server.StopEvent;
@@ -541,7 +541,7 @@ public class IRCEventToStringConverter {
             return setupEvent(String.format(response, event.oldNick, event.newNick));
         }
 
-        public EventDecorator getPrivateNoticeMessage(final PrivateNoticeEvent event) {
+        public EventDecorator getPrivateNoticeMessage(final NoticeEvent event) {
             final String response = mContext.getString(R.string.parser_message);
             return setupEvent(String.format(response, event.sendingNick, event.message), true);
         }

@@ -16,7 +16,7 @@ import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.event.server.JoinEvent;
-import com.fusionx.relay.event.server.NewPrivateMessage;
+import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.os.Handler;
@@ -101,7 +101,7 @@ public final class ServiceEventInterceptor {
      * Event interception start here
      */
     @SuppressWarnings("unused")
-    public void onEventMainThread(final NewPrivateMessage event) {
+    public void onEventMainThread(final NewPrivateMessageEvent event) {
         final QueryUser user = mServer.getUserChannelInterface().getQueryUser(event.nick);
         onIRCEvent(MessagePriority.HIGH, user, getLastStorableEvent(user.getBuffer()));
     }
