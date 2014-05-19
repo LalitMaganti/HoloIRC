@@ -210,14 +210,19 @@ public class IRCEventToStringConverter {
         public EventDecorator getModeChangedMessage(final ChannelUserLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
+                final String nick = event.changingUser == null ? event.changingNick : event
+                        .changingUser.getNick().getNickAsString();
                 final String formattedResponse = String.format(response, event.rawMode,
-                        event.user.getNick(), event.changingUser.getNick());
+                        event.user.getNick(), nick);
                 return setupEvent(formattedResponse, event.user.getNick());
             } else {
+                final FormattedString formattedChangingNick = event.changingUser == null
+                        ? new FormattedString(event.changingNick)
+                        : getFormattedStringForUser(event.changingUser);
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.rawMode),
                         getFormattedStringForUser(event.user),
-                        getFormattedStringForUser(event.changingUser)
+                        formattedChangingNick
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
             }
@@ -226,18 +231,45 @@ public class IRCEventToStringConverter {
         public EventDecorator getModeChangedMessage(final ChannelWorldLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
+                final String nick = event.changingUser == null ? event.changingNick : event
+                        .changingUser.getNick().getNickAsString();
                 final String formattedResponse = String.format(response, event.rawMode,
-                        event.user.getNick(), event.changingUser.getNick());
+                        event.user.getNick(), nick);
                 return setupEvent(formattedResponse, event.user.getNick());
             } else {
+                final FormattedString formattedChangingNick = event.changingUser == null
+                        ? new FormattedString(event.changingNick)
+                        : getFormattedStringForUser(event.changingUser);
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.rawMode),
                         getFormattedStringForUser(event.user),
-                        getFormattedStringForUser(event.changingUser)
+                        formattedChangingNick
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
             }
         }
+
+        public EventDecorator getModeMessage(final ChannelModeEvent event) {
+            final String response = mContext.getString(R.string.parser_mode_changed);
+            if (shouldHighlightLine()) {
+                final String nick = event.sendingUser == null ? event.sendingNick : event
+                        .sendingUser.getNick().getNickAsString();
+                final String formattedResponse = String
+                        .format(response, event.mode, event.recipient, nick);
+                return setupEvent(formattedResponse);
+            } else {
+                final FormattedString formattedChangingNick = event.sendingUser == null
+                        ? new FormattedString(event.sendingNick)
+                        : getFormattedStringForUser(event.sendingUser);
+                final FormattedString[] formattedStrings = {
+                        new FormattedString(event.mode),
+                        new FormattedString(event.recipient),
+                        formattedChangingNick
+                };
+                return setupEvent(formatTextWithStyle(response, formattedStrings));
+            }
+        }
+
 
         public EventDecorator getNickChangedMessage(final ChannelWorldNickChangeEvent event) {
             final String response = mContext.getString(R.string.parser_other_user_nick_change);
@@ -511,22 +543,6 @@ public class IRCEventToStringConverter {
         public EventDecorator getPrivateNoticeMessage(final PrivateNoticeEvent event) {
             final String response = mContext.getString(R.string.parser_message);
             return setupEvent(String.format(response, event.sendingNick, event.message), true);
-        }
-
-        public EventDecorator getModeMessage(final ChannelModeEvent event) {
-            final String response = mContext.getString(R.string.parser_mode_changed);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String
-                        .format(response, event.mode, event.recipient, event.sendingUser.getNick());
-                return setupEvent(formattedResponse);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        new FormattedString(event.mode),
-                        new FormattedString(event.recipient),
-                        getFormattedStringForNick(event.sendingUser.getNick()),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
         }
 
         public EventDecorator getDisconnectEvent(final DisconnectEvent event) {
