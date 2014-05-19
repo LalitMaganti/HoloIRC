@@ -86,6 +86,8 @@
     <string name="parser_connecting">Connecting to server</string>
     <string name="parser_pm_opened">Private message opened</string>
     <string name="parser_reconnect">Trying to reconnect to the server…</string>
+    <string name="parser_invited">You have been invited to %1$s by %2$s (see the actions
+        menu pane to accept invite)</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -150,6 +152,7 @@
     <string name="action_join_channel">Join new channel</string>
     <string name="action_change_nick">Change nick</string>
     <string name="action_ignore_list">Ignore List</string>
+    <string name="action_pending_invites">Invites</string>
     <string name="action_disconnect">Disconnect</string>
     <string name="action_close_server">Close</string>
     <string name="action_reconnect">Reconnect</string>

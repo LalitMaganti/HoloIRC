@@ -38,6 +38,7 @@ import com.fusionx.relay.event.server.ConnectingEvent;
 import com.fusionx.relay.event.server.DisconnectEvent;
 import com.fusionx.relay.event.server.ErrorEvent;
 import com.fusionx.relay.event.server.GenericServerEvent;
+import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.MotdEvent;
 import com.fusionx.relay.event.server.PrivateNoticeEvent;
@@ -590,6 +591,13 @@ public class IRCEventToStringConverter {
         public EventDecorator getChannelPartEvent(final ChannelPartEvent event) {
             final String response = mContext.getString(R.string.parser_parted_channel);
             return setupEvent(response);
+        }
+
+        public EventDecorator getInviteEvent(final InviteEvent event) {
+            final String response = mContext.getString(R.string.parser_invited);
+            final String formattedResponse = String.format(response, event.channelName,
+                    event.invitingUser);
+            return setupEvent(formattedResponse);
         }
     }
 }

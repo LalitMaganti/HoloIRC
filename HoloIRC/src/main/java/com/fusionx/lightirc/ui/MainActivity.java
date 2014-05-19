@@ -108,7 +108,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private ServerListFragment mServerListFragment;
 
     // Views
-    private ProgrammableSlidingPaneLayout mSlidingPane;
+    private     ProgrammableSlidingPaneLayout mSlidingPane;
 
     private DrawerLayout mDrawerLayout;
 

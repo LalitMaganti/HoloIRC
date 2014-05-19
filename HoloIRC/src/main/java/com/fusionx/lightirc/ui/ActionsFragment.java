@@ -103,6 +103,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         } else if (action.equals(getString(R.string.action_ignore_list))) {
             mCallbacks.switchToIgnoreFragment();
             return;
+        } else if (action.equals(getString(R.string.action_pending_invites))) {
+            mCallbacks.switchToInviteFragment();
+            return;
         } else if (action.equals(getString(R.string.action_disconnect))) {
             mCallbacks.disconnectFromServer();
         } else if (action.equals(getString(R.string.action_close_server))) {
@@ -142,9 +145,11 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         public void disconnectFromServer();
 
+        public void reconnectToServer();
+
         public void switchToIgnoreFragment();
 
-        public void reconnectToServer();
+        public void switchToInviteFragment();
     }
 
     public class ChannelDialogBuilder extends DialogBuilder {

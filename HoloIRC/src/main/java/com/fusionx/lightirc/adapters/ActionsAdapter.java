@@ -58,7 +58,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     };
 
     public ActionsAdapter(final Context context) {
-        super(context, R.layout.default_listview_textview, new ArrayList<>(Arrays.asList
+        super(context, R.layout.default_listview_textview, new ArrayList<String>(Arrays.asList
                 (context.getResources().getStringArray(R.array.server_actions))));
         mInflater = LayoutInflater.from(context);
         mServerItemCount = super.getCount();

@@ -39,6 +39,7 @@ TODO
     - [ ] ability to customize fonts
     - [ ] ability to customize colours
 - [ ] Fix text for query notifications - currently still refers to mentioning
+- [ ] Make invites which come in as the Invite menu is showing appear straight away
 
 Credits
 =====
