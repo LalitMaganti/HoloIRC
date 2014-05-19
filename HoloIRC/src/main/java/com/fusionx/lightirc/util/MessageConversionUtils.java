@@ -152,14 +152,41 @@ public class MessageConversionUtils {
         public void getModeChangedMessage(final WorldLevelChangeEvent event) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
+                final String nick = event.changingUser == null ? event.changingNick : event
+                        .changingUser.getNick().getNickAsString();
                 final String formattedResponse = String.format(response, event.rawMode,
-                        event.user.getNick(), event.changingUser.getNick());
+                        event.user.getNick(), nick);
                 setupEvent(formattedResponse, event.user.getNick());
             } else {
+                final FormattedString formattedChangingNick = event.changingUser == null
+                        ? new FormattedString(event.changingNick)
+                        : getFormattedStringForUser(event.changingUser);
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.rawMode),
                         getFormattedStringForUser(event.user),
-                        getFormattedStringForUser(event.changingUser)
+                        formattedChangingNick
+                };
+                setupEvent(formatTextWithStyle(response, formattedStrings));
+            }
+        }
+
+        @Subscribe
+        public void getModeMessage(final ModeEvent event) {
+            final String response = mContext.getString(R.string.parser_mode_changed);
+            if (shouldHighlightLine()) {
+                final String nick = event.sendingUser == null ? event.sendingNick : event
+                        .sendingUser.getNick().getNickAsString();
+                final String formattedResponse = String
+                        .format(response, event.mode, event.recipient, nick);
+                setupEvent(formattedResponse);
+            } else {
+                final FormattedString formattedChangingNick = event.sendingUser == null
+                        ? new FormattedString(event.sendingNick)
+                        : getFormattedStringForUser(event.sendingUser);
+                final FormattedString[] formattedStrings = {
+                        new FormattedString(event.mode),
+                        new FormattedString(event.recipient),
+                        formattedChangingNick
                 };
                 setupEvent(formatTextWithStyle(response, formattedStrings));
             }
@@ -451,23 +478,6 @@ public class MessageConversionUtils {
         public void getPrivateNoticeMessage(final PrivateNoticeEvent event) {
             final String response = mContext.getString(R.string.parser_message);
             setupEvent(String.format(response, event.sendingNick, event.message), true);
-        }
-
-        @Subscribe
-        public void getModeMessage(final ModeEvent event) {
-            final String response = mContext.getString(R.string.parser_mode_changed);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String
-                        .format(response, event.mode, event.recipient, event.sendingUser.getNick());
-                setupEvent(formattedResponse);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        new FormattedString(event.mode),
-                        new FormattedString(event.recipient),
-                        getFormattedStringForNick(event.sendingUser.getNick()),
-                };
-                setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
         }
 
         @Subscribe
