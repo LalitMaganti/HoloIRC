@@ -262,12 +262,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
-    private void disconnectFromServer(final List<Integer> checkedPositions) {
-        for (final Integer checkedPosition : checkedPositions) {
-            mService.requestConnectionStoppage(mListAdapter.getGroup(checkedPosition).getServer());
-        }
-    }
-
     public void onServiceConnected(final IRCService service) {
         mService = service;
 
@@ -284,6 +278,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
         intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
         getActivity().startActivityForResult(intent, MainActivity.SERVER_SETTINGS);
+    }
+
+    private void disconnectFromServer(final List<Integer> checkedPositions) {
+        for (final Integer checkedPosition : checkedPositions) {
+            mService.requestConnectionStoppage(mListAdapter.getGroup(checkedPosition).getServer());
+        }
     }
 
     private boolean onServerClick(final int groupPosition) {

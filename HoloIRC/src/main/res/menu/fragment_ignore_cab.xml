@@ -3,7 +3,7 @@
 <menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-            android:id="@+id/ignore_list_cab_remove"
+            android:id="@+id/fragment_ignore_cab_remove"
             android:icon="@drawable/ic_menu_delete"
             holoirc:showAsAction="withText|ifRoom"
             android:title="@string/remove"/>

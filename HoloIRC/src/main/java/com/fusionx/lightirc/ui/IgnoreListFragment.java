@@ -111,7 +111,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     @Override
     public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
         for (final int position : reverseSortedPositions) {
-            getIgnoreAdapter().remove(getIgnoreAdapter().getItem(position));
+            getIgnoreAdapter().remove(getIgnoreAdapter().getItem(position - 1));
         }
     }
 
@@ -125,7 +125,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
         // Inflate a menu resource providing context menu items
         final MenuInflater inflater = actionMode.getMenuInflater();
-        inflater.inflate(R.menu.ignore_list_cab, menu);
+        inflater.inflate(R.menu.fragment_ignore_cab, menu);
         return true;
     }
 
@@ -141,7 +141,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.ignore_list_cab_remove:
+            case R.id.fragment_ignore_cab_remove:
                 getListAdapter().animateDismiss(UIUtils.getCheckedPositions(getListView()));
                 mode.finish();
                 return true;

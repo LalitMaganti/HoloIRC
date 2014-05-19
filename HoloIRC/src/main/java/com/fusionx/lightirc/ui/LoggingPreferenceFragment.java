@@ -48,7 +48,7 @@ public class LoggingPreferenceFragment extends PreferenceFragment {
 
     @Override
     public void onCreateOptionsMenu(final Menu menu, final MenuInflater inflater) {
-        inflater.inflate(R.menu.logging_action_bar, menu);
+        inflater.inflate(R.menu.fragment_logging_ab, menu);
 
         final SharedPreferences preferences = getPreferenceManager().getSharedPreferences();
         final boolean logging = preferences.getBoolean(PreferenceConstants.PREF_LOGGING, false);

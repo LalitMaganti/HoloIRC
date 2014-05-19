@@ -108,7 +108,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private ServerListFragment mServerListFragment;
 
     // Views
-    private     ProgrammableSlidingPaneLayout mSlidingPane;
+    private ProgrammableSlidingPaneLayout mSlidingPane;
 
     private DrawerLayout mDrawerLayout;
 
@@ -212,7 +212,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onPart(final String serverName, final PartEvent event) {
         if (mConversation != null) {
             final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                    && mConversation.getId().equals(event. channelName);
+                    && mConversation.getId().equals(event.channelName);
 
             if (isCurrent) {
                 onRemoveCurrentFragmentAndConversation();

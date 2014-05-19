@@ -10,6 +10,7 @@ import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -26,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -124,17 +126,24 @@ public class NavigationDrawerFragment extends Fragment implements
             mActionsFragment = new ActionsFragment();
             final UserListFragment userListFragment = new UserListFragment();
 
+            mCurrentFragment = mActionsFragment;
             final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
             transaction.add(R.id.actions_list_layout, mActionsFragment, "Actions");
             transaction.replace(R.id.user_list_frame_layout, userListFragment);
             transaction.commit();
         } else {
+            mCurrentFragment = mActionsFragment;
             mActionsFragment = (ActionsFragment) getChildFragmentManager().findFragmentByTag
                     ("Actions");
             mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager()
                     .findFragmentByTag("Ignore");
             mInviteFragment = (InviteFragment) getChildFragmentManager()
                     .findFragmentByTag("Invite");
+            if (mIgnoreListFragment != null) {
+                mCurrentFragment = mIgnoreListFragment;
+            } else if (mInviteFragment != null) {
+                mCurrentFragment = mInviteFragment;
+            }
         }
 
         if (mIgnoreListFragment == null) {
@@ -179,28 +188,39 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void switchToIgnoreFragment() {
+        mCurrentFragment = mIgnoreListFragment;
         final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
                 R.anim.slide_in_left, R.anim.slide_out_right);
         transaction.addToBackStack(null);
         transaction.replace(R.id.actions_list_layout, mIgnoreListFragment, "Ignore").commit();
-        mCurrentFragment = mIgnoreListFragment;
 
-        updateActionBarForIgnoreList();
+        updateActionBarForLists();
         updateUserListVisibility();
         getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override
     public void switchToInviteFragment() {
+        mCurrentFragment = mInviteFragment;
         final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
         transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
                 R.anim.slide_in_left, R.anim.slide_out_right);
         transaction.addToBackStack(null);
         transaction.replace(R.id.actions_list_layout, mInviteFragment, "Invite").commit();
-        mCurrentFragment = mInviteFragment;
 
+        updateActionBarForLists();
         updateUserListVisibility();
+        getActivity().supportInvalidateOptionsMenu();
+    }
+
+    void switchToActionFragment() {
+        mCurrentFragment = mActionsFragment;
+        getChildFragmentManager().popBackStackImmediate();
+
+        revertActionBarToNormal();
+        updateUserListVisibility();
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     public void onDrawerClosed() {
@@ -214,13 +234,13 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.navigation_drawer_action_bar, menu);
+        inflater.inflate(R.menu.fragment_navigation_drawer_ab, menu);
     }
 
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(item.isVisible() && !isInviteFragmentVisible());
+        item.setVisible(item.isVisible() && isActionsFragmentVisible());
 
         final MenuItem add = menu.findItem(R.id.ignore_list_cab_add);
         add.setVisible(isIgnoreFragmentVisible());
@@ -243,10 +263,10 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     public boolean onBackPressed() {
-        if (isIgnoreFragmentVisible()) {
-            mIgnoreListFragment.saveIgnoreList();
-            switchToActionFragment();
-        } else if (isInviteFragmentVisible()) {
+        if (!isActionsFragmentVisible()) {
+            if (isIgnoreFragmentVisible()) {
+                mIgnoreListFragment.saveIgnoreList();
+            }
             switchToActionFragment();
         }
         return !isActionsFragmentVisible();
@@ -272,17 +292,15 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public ServiceEventInterceptor getEventInterceptor() {
-        return mCallback.getService().getEventHelper(mConversation.getServer());
+    public void joinMultipleChannels(Collection<InviteEvent> inviteEvents) {
+        for (final InviteEvent event : inviteEvents) {
+            mConversation.getServer().getServerCallBus().sendJoin(event.channelName);
+        }
     }
 
-    void switchToActionFragment() {
-        getChildFragmentManager().popBackStackImmediate();
-        mCurrentFragment = mActionsFragment;
-
-        revertActionBarToNormal();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
+    @Override
+    public ServiceEventInterceptor getEventInterceptor() {
+        return mCallback.getService().getEventHelper(mConversation.getServer());
     }
 
     private void handleUserList() {
@@ -298,20 +316,21 @@ public class NavigationDrawerFragment extends Fragment implements
         mUserListTextView.setText(text);
     }
 
-    private void updateActionBarForIgnoreList() {
+    private void updateActionBarForLists() {
         final LayoutInflater inflater = (LayoutInflater) getActivity().getActionBar()
                 .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         final View customActionBarView = inflater
                 .inflate(R.layout.actionbar_custom_view_done, null);
-        findById(customActionBarView, R.id.actionbar_done).setOnClickListener(
-                new View.OnClickListener() {
+        findById(customActionBarView, R.id.actionbar_done)
+                .setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mIgnoreListFragment.saveIgnoreList();
+                        if (isIgnoreFragmentVisible()) {
+                            mIgnoreListFragment.saveIgnoreList();
+                        }
                         switchToActionFragment();
                     }
-                }
-        );
+                });
         final ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                 ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
