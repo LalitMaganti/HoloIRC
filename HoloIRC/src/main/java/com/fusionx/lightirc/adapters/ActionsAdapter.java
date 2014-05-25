@@ -58,7 +58,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     };
 
     public ActionsAdapter(final Context context) {
-        super(context, R.layout.default_listview_textview, new ArrayList<String>(Arrays.asList
+        super(context, R.layout.default_listview_textview, new ArrayList<>(Arrays.asList
                 (context.getResources().getStringArray(R.array.server_actions))));
         mInflater = LayoutInflater.from(context);
         mServerItemCount = super.getCount();
@@ -95,7 +95,8 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public boolean isEnabled(final int position) {
-        return position != 0 && position != 1 && position < getRealServerCount() || isConnected();
+        return position != 0 && position != 1 && position != 3 && position < getRealServerCount()
+                || isConnected();
     }
 
     @Override
@@ -130,7 +131,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             UIUtils.setRobotoLight(getContext(), row);
         }
 
-        if (position == 3) {
+        if (position == 4) {
             // TODO - improve UX by making this more precise to the specific status of the
             // connection
             row.setText(isConnected() ? getItem(position) : getContext().getString(R.string
