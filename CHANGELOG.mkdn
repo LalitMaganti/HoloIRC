@@ -1,5 +1,17 @@
 Changelog for HoloIRC
 ======
+v3.0.2:
+Fix a few bugs from the beta
+Some tablet compatibility updates 
+v3.0.1:
+Fix multiple bugs which popped up in the alpha
+Some theming improvements
+v3.0.0:
+Remove support for below 4.0 - may return in a later version
+Complete rewrite of the front end for improved tablet support and prettier UI
+Fix many bugs and crashes reported through Play Store
+Lay base for many new features including more customization and settings
+
 Version 2.9.0:
     Major stability improvements
     Multiple memory and performance optimzations
