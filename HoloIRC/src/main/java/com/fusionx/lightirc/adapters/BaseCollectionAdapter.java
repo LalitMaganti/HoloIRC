@@ -243,7 +243,7 @@ public class BaseCollectionAdapter<T> extends BaseAdapter {
      *
      * @return The Context associated with this adapter.
      */
-    public Context getContext() {
+    Context getContext() {
         return mContext;
     }
 

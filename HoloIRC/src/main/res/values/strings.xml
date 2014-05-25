@@ -74,7 +74,7 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
 
     <!-- Output for events -->
-    <string name="parser_notice" translatable="false">
+    <string name="parser_bold_message" translatable="false">
         <![CDATA[<bold>%1$s: %2$s</bold>]]>
     </string>
     <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
@@ -95,9 +95,10 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
     <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
     <string name="parser_slap_message">slaps %1$s with a trout</string>
-    <string name="parser_action"><![CDATA[<bold>* %1$s %2$s</bold>]]></string>
+    <string name="parser_action">* %1$s %2$s</string>
     <string name="parser_connecting">Connecting to server</string>
     <string name="parser_pm_opened">Private message opened</string>
+    <string name="parser_reconnect">Trying to reconnect to the server…</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -158,8 +159,8 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
     <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
         with a nick
     </string>
-    <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="notification_settings_title">Notification Settings</string>
+    <string name="notification_settings_summary">Control when you are notified by the app</string>
     <string name="ignore_nick_title">Nick to ignore</string>
     <string name="ignore_nick_description">Nickname of the user to be ignored</string>
     <string name="ignore_list">Ignore List</string>
@@ -178,5 +179,18 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 
     <string name="action_part_channel">Part channel</string>
     <string name="action_close_pm">Close PM</string>
+
+    <!-- Notification settings -->
+    <string name="notification_entry_audio">Audio</string>
+    <string name="notification_entry_vibrate">Vibrate</string>
+    <string name="notification_entry_lights">Lights</string>
+    <string name="notification_value_audio">audio</string>
+    <string name="notification_value_vibrate">vibrate</string>
+    <string name="notification_value_lights">lights</string>
+
+    <!-- Logging settings -->
+    <string name="logging_settings_summary">Logging Settings</string>
+    <string name="logging_settings_title">Control logging settings</string>
+    <string name="disconnected_from_server">Disconnected from the server</string>
 
 </resources>

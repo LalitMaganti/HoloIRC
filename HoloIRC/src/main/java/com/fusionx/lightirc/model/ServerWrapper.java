@@ -6,10 +6,10 @@ import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.interfaces.Conversation;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static com.fusionx.relay.ServerConfiguration.Builder;
 
@@ -19,11 +19,11 @@ public class ServerWrapper {
 
     private final HashMap<String, Conversation> mServerObjects;
 
-    private final List<String> mIgnoreList;
+    private final Collection<String> mIgnoreList;
 
     private Server mServer;
 
-    public ServerWrapper(final Builder builder, final List<String> ignoreList,
+    public ServerWrapper(final Builder builder, final Collection<String> ignoreList,
             final Server server) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
@@ -53,12 +53,12 @@ public class ServerWrapper {
             }
             for (final PrivateMessageUser user : server.getUserChannelInterface()
                     .getPrivateMessageUsers()) {
-                mServerObjects.put(user.getNick(), user);
+                mServerObjects.put(user.getNick().getNickAsString(), user);
             }
         }
     }
 
-    public List<String> getIgnoreList() {
+    public Collection<String> getIgnoreList() {
         return mIgnoreList;
     }
 

@@ -5,6 +5,7 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
+import com.fusionx.lightirc.util.PreferenceUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ServerConfiguration;
@@ -20,8 +21,6 @@ import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 
 import java.io.File;
@@ -58,20 +57,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     private ContentValues mContentValues;
 
     private boolean mNewServer;
-
-    private ServerConfiguration.Builder mBuilder;
-
-    private static void getPreferenceList(final Preference p, final ArrayList<Preference> list) {
-        if (p instanceof PreferenceCategory || p instanceof PreferenceScreen) {
-            final PreferenceGroup pGroup = (PreferenceGroup) p;
-            int pCount = pGroup.getPreferenceCount();
-            for (int i = 0; i < pCount; i++) {
-                getPreferenceList(pGroup.getPreference(i), list);
-            }
-        } else {
-            list.add(p);
-        }
-    }
 
     @Override
     public void setupPreferences(final PreferenceScreen screen, final Activity activity) {
@@ -139,14 +124,15 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mSource = new BuilderDatabaseSource(this);
         mSource.open();
 
+        ServerConfiguration.Builder builder;
         if (mNewServer) {
-            mBuilder = SharedPreferencesUtils.getDefaultNewServer(this);
+            builder = SharedPreferencesUtils.getDefaultNewServer(this);
             setResult(RESULT_CANCELED);
         } else {
-            mBuilder = getIntent().getParcelableExtra(SERVER);
+            builder = getIntent().getParcelableExtra(SERVER);
             setResult(RESULT_OK);
         }
-        mContentValues = mSource.getContentValuesFromBuilder(mBuilder, !mNewServer);
+        mContentValues = mSource.getContentValuesFromBuilder(builder, !mNewServer);
         // If it's a new server, we can't allow ignore list to be null - just put an empty string
         // in for now - TODO - fix this
         if (mNewServer) {
@@ -198,12 +184,13 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             } else {
                 mSource.updateServer(mContentValues);
             }
+            mNewServer = false;
         }
     }
 
     private void setPreferenceOnChangeListeners(final PreferenceScreen preferenceScreen) {
         final ArrayList<Preference> list = new ArrayList<>();
-        getPreferenceList(preferenceScreen, list);
+        PreferenceUtils.getPreferenceList(preferenceScreen, list);
 
         for (final Preference p : list) {
             final Preference.OnPreferenceChangeListener listener;

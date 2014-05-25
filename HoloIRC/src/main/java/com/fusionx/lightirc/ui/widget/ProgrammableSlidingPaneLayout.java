@@ -9,11 +9,11 @@ public class ProgrammableSlidingPaneLayout extends SlidingPaneLayout {
 
     private boolean mShouldSlide = true;
 
-    public ProgrammableSlidingPaneLayout(Context context) {
+    public ProgrammableSlidingPaneLayout(final Context context) {
         super(context);
     }
 
-    public ProgrammableSlidingPaneLayout(Context context, AttributeSet attrs) {
+    public ProgrammableSlidingPaneLayout(final Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -22,12 +22,11 @@ public class ProgrammableSlidingPaneLayout extends SlidingPaneLayout {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
+    public boolean onInterceptTouchEvent(final MotionEvent ev) {
         return mShouldSlide && super.onInterceptTouchEvent(ev);
     }
 
-
-    public void setSlideable(boolean slide) {
+    public void setSlideable(final boolean slide) {
         mShouldSlide = slide;
     }
 }

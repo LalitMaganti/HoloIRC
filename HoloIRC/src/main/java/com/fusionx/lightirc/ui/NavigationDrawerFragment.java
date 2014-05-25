@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
@@ -25,8 +26,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class NavigationDrawerFragment extends Fragment implements
@@ -39,7 +39,7 @@ public class NavigationDrawerFragment extends Fragment implements
     private Conversation mConversation;
 
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
             mFragmentType = conversationChanged.fragmentType;
@@ -49,14 +49,14 @@ public class NavigationDrawerFragment extends Fragment implements
             updateUserListVisibility();
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
             mStatus = statusChanged.status;
             updateUserListVisibility();
         }
     };
 
-    private TextView mTextView;
+    private TextView mUserListTextView;
 
     private View mSlideUpLayout;
 
@@ -98,10 +98,10 @@ public class NavigationDrawerFragment extends Fragment implements
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
         mSlidingUpPanelLayout.setSlidingEnabled(false);
 
-        mTextView = findById(getView(), R.id.user_text_view);
+        mUserListTextView = findById(getView(), R.id.user_text_view);
         mSlideUpLayout = findById(view, R.id.bottom_panel);
 
-        EventBus.getDefault().registerSticky(mEventHandler);
+        getBus().registerSticky(mEventHandler);
 
         mSlideUpLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,7 +131,14 @@ public class NavigationDrawerFragment extends Fragment implements
         }
     }
 
-    public void switchToIRCActionFragment() {
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        getBus().unregister(mEventHandler);
+    }
+
+    void switchToIRCActionFragment() {
         getChildFragmentManager().popBackStackImmediate();
         mIsIgnoreListDisplayed = false;
 
@@ -171,7 +178,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void reconnectToServer() {
-         mCallback.reconnectToServer();
+        mCallback.reconnectToServer();
     }
 
     @Override
@@ -203,6 +210,12 @@ public class NavigationDrawerFragment extends Fragment implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.activity_main_ab_actions:
+                mSlidingUpPanelLayout.collapsePane();
+                return true;
+            case R.id.activity_main_ab_users:
+                handleUserList();
+                return true;
             case R.id.ignore_list_cab_add:
                 mIgnoreListFragment.addIgnoredUser();
                 return true;
@@ -210,13 +223,44 @@ public class NavigationDrawerFragment extends Fragment implements
         return false;
     }
 
+    private void handleUserList() {
+        final boolean userListVisible = mSlidingUpPanelLayout.isExpanded();
+        if (mCallback.isDrawerOpen() && userListVisible) {
+            mSlidingUpPanelLayout.collapsePane();
+        } else if (!userListVisible) {
+            mSlidingUpPanelLayout.expandPane();
+        }
+    }
+
     public boolean onBackPressed() {
         if (mIsIgnoreListDisplayed) {
             mIgnoreListFragment.saveIgnoreList();
             switchToIRCActionFragment();
-            return true;
         }
-        return false;
+        return mIsIgnoreListDisplayed;
+    }
+
+    @Override
+    public void updateUserListVisibility() {
+        final int visibility = mStatus == ConnectionStatus.CONNECTED &&
+                mFragmentType == FragmentType.CHANNEL && !mIsIgnoreListDisplayed ?
+                View.VISIBLE : View.GONE;
+        mSlideUpLayout.setVisibility(visibility);
+
+        if (visibility == View.VISIBLE) {
+            // TODO - change this from casting
+            final Channel channel = (Channel) mConversation;
+            setUserTextViewText(String.format("%d users", channel.getUsers().size()));
+        } else {
+            if (mSlidingUpPanelLayout.isExpanded()) {
+                // Collapse Pane
+                mSlidingUpPanelLayout.collapsePane();
+            }
+        }
+    }
+
+    private void setUserTextViewText(final CharSequence text) {
+        mUserListTextView.setText(text);
     }
 
     private void updateActionBarForIgnoreList() {
@@ -252,30 +296,13 @@ public class NavigationDrawerFragment extends Fragment implements
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    @Override
-    public void updateUserListVisibility() {
-        final int visibility = mStatus == ConnectionStatus.CONNECTED &&
-                mFragmentType == FragmentType.CHANNEL && !mIsIgnoreListDisplayed ?
-                View.VISIBLE : View.GONE;
-        mSlideUpLayout.setVisibility(visibility);
-
-        if (visibility == View.VISIBLE) {
-            // TODO - change this from casting
-            final Channel channel = (Channel) mConversation;
-            mTextView.setText(String.format("%d users", channel.getUsers().size()));
-        } else {
-            if (mSlidingUpPanelLayout.isExpanded()) {
-                // Collapse Pane
-                mSlidingUpPanelLayout.collapsePane();
-            }
-        }
-    }
-
     public interface Callback {
 
         public void removeCurrentFragment();
 
         public void disconnectFromServer();
+
+        public boolean isDrawerOpen();
 
         public void closeDrawer();
 

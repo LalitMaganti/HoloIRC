@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.adapters;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
@@ -18,9 +19,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.resolveResourceIdFromAttr;
 
 // TODO - rewrite this horribly written class
@@ -40,7 +41,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @SuppressWarnings("FieldCanBeLocal")
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             mFragmentType = conversationChanged.fragmentType;
             if (conversationChanged.conversation != null) {
@@ -49,7 +50,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             notifyDataSetChanged();
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
             mStatus = statusChanged.status;
             notifyDataSetChanged();
@@ -64,7 +65,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         mChannelArray = context.getResources().getStringArray(R.array.channel_actions);
         mUserArray = context.getResources().getStringArray(R.array.user_actions);
 
-        EventBus.getDefault().registerSticky(mEventHandler);
+        getBus().registerSticky(mEventHandler);
     }
 
     @Override
@@ -149,11 +150,11 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         return row;
     }
 
-    public boolean isConnected() {
+    boolean isConnected() {
         return mStatus == ConnectionStatus.CONNECTED;
     }
 
-    public boolean isDisconnected() {
+    boolean isDisconnected() {
         return mStatus == ConnectionStatus.DISCONNECTED;
     }
 

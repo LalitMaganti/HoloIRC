@@ -12,6 +12,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;
@@ -46,48 +47,6 @@ public class BuilderDatabaseSource {
 
     public BuilderDatabaseSource(final Context context) {
         mServerDatabase = new ServerDatabase(context);
-    }
-
-    public BuilderDatabaseSource open() throws SQLException {
-        mDatabase = mServerDatabase.getWritableDatabase();
-        return this;
-    }
-
-    public void close() {
-        mServerDatabase.close();
-        mDatabase = null;
-    }
-
-    public void addServer(final ContentValues values) {
-        final long id = mDatabase.insert(TABLE_NAME, null, values);
-        values.put(_ID, (int) id);
-    }
-
-    public void addServer(final ServerConfiguration.Builder builder,
-            final List<String> ignoreList) {
-        final ContentValues values = getContentValuesFromBuilder(builder, false);
-
-        if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils.isNotEmpty(builder.getUrl())) {
-            values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
-                    convertStringListToString(ignoreList));
-
-            final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
-            builder.setId(id);
-        }
-    }
-
-    public List<ServerConfiguration.Builder> getAllBuilders() {
-        final List<ServerConfiguration.Builder> builders = new ArrayList<>();
-        final String selectQuery = "SELECT * FROM " + TABLE_NAME;
-
-        final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
-        if (cursor.moveToFirst()) {
-            do {
-                final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
-                builders.add(builder);
-            } while (cursor.moveToNext());
-        }
-        return builders;
     }
 
     private static ServerConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
@@ -134,13 +93,56 @@ public class BuilderDatabaseSource {
         return builder;
     }
 
+    public BuilderDatabaseSource open() throws SQLException {
+        mDatabase = mServerDatabase.getWritableDatabase();
+        return this;
+    }
+
+    public void close() {
+        mServerDatabase.close();
+        mDatabase = null;
+    }
+
+    public void addServer(final ContentValues values) {
+        final long id = mDatabase.insert(TABLE_NAME, null, values);
+        values.put(_ID, (int) id);
+    }
+
+    public void addServer(final ServerConfiguration.Builder builder,
+            final List<String> ignoreList) {
+        final ContentValues values = getContentValuesFromBuilder(builder, false);
+
+        if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
+                .isNotEmpty(builder.getUrl())) {
+            values.put(DatabaseContract.ServerTable.COLUMN_IGNORE_LIST,
+                    convertStringListToString(ignoreList));
+
+            final int id = (int) mDatabase.insert(TABLE_NAME, null, values);
+            builder.setId(id);
+        }
+    }
+
+    public List<ServerConfiguration.Builder> getAllBuilders() {
+        final List<ServerConfiguration.Builder> builders = new ArrayList<>();
+        final String selectQuery = "SELECT * FROM " + TABLE_NAME;
+
+        final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
+                builders.add(builder);
+            } while (cursor.moveToNext());
+        }
+        return builders;
+    }
+
     public ServerConfiguration.Builder getBuilderByName(final String serverName) {
         final Cursor cursor = mDatabase.query(TABLE_NAME, null,
                 String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
         return cursor.moveToFirst() ? getBuilderFromCursor(cursor) : null;
     }
 
-    public List<String> getIgnoreListByName(final String serverName) {
+    public Collection<String> getIgnoreListByName(final String serverName) {
         final Cursor cursor = mDatabase.query(TABLE_NAME, new String[]{COLUMN_IGNORE_LIST},
                 String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
         cursor.moveToFirst();

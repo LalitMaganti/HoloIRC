@@ -21,13 +21,13 @@
 
 package com.fusionx.lightirc.util;
 
+import com.fusionx.bus.Bus;
 import com.fusionx.lightirc.R;
 import com.fusionx.relay.ConnectionStatus;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 
 /**
  * Full of static utility methods
@@ -35,6 +35,8 @@ import android.os.AsyncTask;
  * @author Lalit Maganti
  */
 public class MiscUtils {
+
+    private static Bus sBus;
 
     /**
      * Static utility methods only - can't instantiate this class
@@ -68,5 +70,22 @@ public class MiscUtils {
             default:
                 return null;
         }
+    }
+
+    public static Bus getBus() {
+        if (sBus == null) {
+            sBus = new Bus();
+        }
+        return sBus;
+    }
+
+    private int normaliseColourInt(final int colour) {
+        if (colour > 255) {
+            return 255;
+        } else if (colour < 0) {
+            return 0;
+        }
+
+        return colour;
     }
 }

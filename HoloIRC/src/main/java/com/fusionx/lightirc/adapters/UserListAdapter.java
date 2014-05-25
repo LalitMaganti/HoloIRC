@@ -22,12 +22,16 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.NickCache;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.constants.UserLevel;
 
 import android.content.Context;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,7 +62,14 @@ public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
             view = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
             UIUtils.setRobotoLight(getContext(), view);
         }
-        view.setText(getItem(position).getSpannedNick(mChannel));
+        final WorldUser user = getItem(position);
+        final char prefix = user.getChannelPrivileges(mChannel).getPrefix();
+        final SpannableStringBuilder builder = new SpannableStringBuilder(
+                prefix + user.getNick().getNickAsString());
+        final ForegroundColorSpan span = new ForegroundColorSpan(
+                NickCache.getNickCache().get(user.getNick()).getColour());
+        builder.setSpan(span, 0, builder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        view.setText(builder);
         return view;
     }
 
@@ -77,7 +88,7 @@ public class UserListAdapter extends BaseCollectionAdapter<WorldUser> implements
     @Override
     public long getHeaderId(int position) {
         final WorldUser user = getItem(position);
-        return user.getUserPrefix(mChannel);
+        return user.getChannelPrivileges(mChannel).getPrefix();
     }
 
     public void setInternalSet(final TreeSet<WorldUser> set) {

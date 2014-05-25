@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.loader;
 
-import com.fusionx.lightirc.communication.IRCService;
+import com.fusionx.lightirc.service.IRCService;
 
 import android.content.ComponentName;
 import android.content.Context;

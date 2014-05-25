@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.loader.ServiceLoader;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.relay.Server;
 
@@ -107,7 +107,7 @@ public class WorkerFragment extends Fragment implements LoaderManager
     }
 
     public void disconnectFromServer(final Server server) {
-        mService.requestDisconnectionFromServer(server);
+        mService.requestConnectionStoppage(server);
     }
 
     public void reconnectToServer(final Server server) {

@@ -21,6 +21,7 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -53,8 +54,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
-import de.greenrobot.event.EventBus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class UserListFragment extends Fragment implements AbsListView.MultiChoiceModeListener,
         AdapterView.OnItemClickListener {
@@ -66,7 +68,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     private Channel mChannel;
 
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
+        @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             // If it's null then remove the old conversation
             if (conversationChanged.conversation == null
@@ -125,20 +127,22 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
         // On resume, we may have missed events in the background - make sure we have the most
         // up-to-date user list - register the event handler sticky so we can get the latest info
-        EventBus.getDefault().registerSticky(mEventHandler);
+        getBus().registerSticky(mEventHandler);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        EventBus.getDefault().unregister(mEventHandler);
+        getBus().unregister(mEventHandler);
 
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
         if (mChannel != null) {
             mChannel.getServer().getServerEventBus().unregister(this);
         }
+        // Don't keep a track of this channel - we will deal with this when we return
+        mChannel = null;
     }
 
     public void onUpdateUserList() {
@@ -166,15 +170,14 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final WorldUserEvent event) {
-        if (mChannel != null && event.channelName.equals(mChannel.getName())
-                && event.isUserListChangeEvent()) {
+        if (event.channel.equals(mChannel) && event.isUserListChangeEvent()) {
             onUpdateUserList();
         }
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final NameEvent event) {
-        if (mChannel != null && event.channelName.equals(mChannel.getName())) {
+        if (event.channel.equals(mChannel)) {
             onUpdateUserList();
         }
     }
@@ -217,7 +220,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
         final List<WorldUser> selectedItems = getCheckedItems();
-        final String nick = selectedItems.get(0).getNick();
+        final String nick = selectedItems.get(0).getNick().getNickAsString();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
                 mCallback.onMentionMultipleUsers(selectedItems);

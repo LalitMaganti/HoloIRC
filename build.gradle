@@ -12,16 +12,22 @@ allprojects {
     buildscript {
         repositories {
             mavenCentral()
+            maven {
+                url "https://oss.sonatype.org/content/repositories/snapshots"
+            }
         }
     }
 
     dependencies {
         repositories {
             mavenCentral()
+            maven {
+                url "https://oss.sonatype.org/content/repositories/snapshots"
+            }
         }
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.9'
+    gradleVersion = '1.11'
 }

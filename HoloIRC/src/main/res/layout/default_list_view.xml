@@ -6,4 +6,4 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:scrollbarStyle="outsideOverlay"
-        android:background="@android:color/transparent"/>
+        android:background="?attr/holo_background"/>

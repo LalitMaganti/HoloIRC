@@ -1,28 +1,30 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Bus;
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.Theme;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.PrivateMessageUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.WorldUser;
-import com.fusionx.relay.constants.Theme;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,25 +39,18 @@ import android.view.View;
 
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-import de.keyboardsurfer.android.widget.crouton.Configuration;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
+import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
-        NavigationDrawerFragment.Callback, WorkerFragment.Callback {
-
-    static {
-        sConfiguration = new Configuration.Builder().setDuration(500).build();
-    }
+        NavigationDrawerFragment.Callback, WorkerFragment.Callback, IRCFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
-
-    private static final Configuration sConfiguration;
 
     private static final String WORKER_FRAGMENT = "WorkerFragment";
 
@@ -63,7 +58,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
 
-    private static final EventBus mEventBus = EventBus.getDefault();
+    private static final Bus mEventBus = getBus();
+
+    public static final String CLEAR_CACHE = "clear_event_cache";
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -71,27 +68,20 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     // IRC
     private Conversation mConversation;
 
+    // Mention helper
     private final Object mMentionHelper = new Object() {
-
-        @SuppressWarnings("unused")
-        public void onEvent(final OnChannelMentionEvent event) {
-            mEventBus.cancelEventDelivery(event);
-
-            if (mConversation == null
-                    || !mConversation.getServer().getTitle().equals(event.serverName)
-                    || !mConversation.getId().equals(event.channelName)) {
-                final String message = String.format("Mentioned in %s on %s", event.channelName,
-                        event.serverName);
-                final Crouton crouton = Crouton.makeText(MainActivity.this, message, Style.INFO);
-                crouton.setConfiguration(sConfiguration);
-                crouton.show();
+        @Subscribe(cancellable = true)
+        public boolean onMentioned(final OnChannelMentionEvent event) {
+            if (!event.channel.equals(mConversation)) {
+                NotificationUtils.notifyInApp(MainActivity.this, event);
             }
+            return true;
         }
     };
 
     private final Object mConversationChanged = new Object() {
-        @SuppressWarnings("unused")
-        public void onEvent(final OnConversationChanged event) {
+        @Subscribe
+        public void onConversationChanged(final OnConversationChanged event) {
             mConversation = event.conversation;
         }
     };
@@ -110,7 +100,71 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private DrawerLayout mDrawerLayout;
 
-    private View mRightDrawer;
+    private View mNavigationDrawerView;
+
+    @Override
+    protected void onCreate(final Bundle savedInstanceState) {
+        AppPreferences.setupAppPreferences(this);
+        setTheme(UIUtils.getThemeInt());
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main_activity);
+
+        mDrawerLayout = findById(this, R.id.drawer_layout);
+        mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout.setFocusableInTouchMode(false);
+
+        mSlidingPane = findById(this, R.id.sliding_pane_layout);
+        mSlidingPane.setParallaxDistance(100);
+        mSlidingPane.setPanelSlideListener(this);
+        if (AppPreferences.getAppPreferences().getTheme() == Theme.DARK) {
+            // TODO - fix this hack
+            mSlidingPane.setSliderFadeColor(0);
+        }
+
+        mNavigationDrawerView = findById(this, R.id.right_drawer);
+
+        if (savedInstanceState == null) {
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            mServerListFragment = new ServerListFragment();
+            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
+
+            mNavigationDrawerFragment = new NavigationDrawerFragment();
+            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
+
+            mWorkerFragment = new WorkerFragment();
+            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
+
+            transaction.commit();
+        } else {
+            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
+                    R.id.sliding_list_frame);
+            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.right_drawer);
+            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
+                    .findFragmentByTag(WORKER_FRAGMENT);
+            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.content_frame);
+
+            // If the current fragment is not null then retrieve the matching convo
+            if (mCurrentFragment != null) {
+                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
+                // Make sure we re-register to the event bus on rotation - otherwise we miss
+                // important status updates
+                mConversation.getServer().getServerEventBus().register(this);
+
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
+                        (View.GONE);
+            }
+
+            supportInvalidateOptionsMenu();
+        }
+        if (mSlidingPane.isSlideable()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
 
     // TODO - unify the server and subserver code
     @Override
@@ -124,12 +178,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onServerDisconnected(final Server server) {
+    public void onServerStopCompleteted(final Server server) {
         closeDrawer();
         supportInvalidateOptionsMenu();
-        onRemoveFragment();
 
-        mEventBus.postSticky(new OnConversationChanged(null, null));
+        if (mCurrentFragment != null) {
+            onRemoveCurrentFragmentAndConversation();
+        }
+        getService().removeLoggingHandlerAndEventCache(server);
 
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
@@ -142,28 +198,35 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onPart(final String serverName, final PartEvent event) {
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                && mConversation.getId().equals(event.channelName);
+        if (mConversation != null) {
+            final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                    && mConversation.getId().equals(event.channelName);
 
-        if (isCurrent) {
-            onRemoveFragment();
+            if (isCurrent) {
+                onRemoveCurrentFragmentAndConversation();
+            }
         }
     }
 
     @Override
     public boolean onKick(final String serverName, final KickEvent event) {
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                && mConversation.getId().equals(event.channelName);
+        if (mConversation != null) {
+            final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                    && mConversation.getId().equals(event.channelName);
 
-        if (isCurrent) {
-            onRemoveFragment();
+            if (isCurrent) {
+                onRemoveCurrentFragmentAndConversation();
+            }
+            return isCurrent;
         }
-        return isCurrent;
+        return false;
     }
 
     @Override
     public void onPrivateMessageClosed() {
-        onRemoveFragment();
+        if (mCurrentFragment != null) {
+            onRemoveCurrentFragmentAndConversation();
+        }
     }
 
     /**
@@ -174,7 +237,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
      */
     @Override
     public void removeCurrentFragment() {
-        if (mCurrentFragment.getType() == FragmentType.CHANNEL) {
+        if (mCurrentFragment.getType() == CHANNEL) {
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
             mConversation.getServer().getServerCallBus().sendClosePrivateMessage(
@@ -188,6 +251,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    public boolean isDrawerOpen() {
+        return mDrawerLayout.isDrawerOpen(mNavigationDrawerView);
+    }
+
+    @Override
     public void closeDrawer() {
         mDrawerLayout.closeDrawers();
     }
@@ -195,8 +263,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onBackPressed() {
         if (!mNavigationDrawerFragment.onBackPressed()) {
-            if (mDrawerLayout.isDrawerOpen(mRightDrawer)) {
-                mDrawerLayout.closeDrawer(mRightDrawer);
+            if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+                mDrawerLayout.closeDrawer(mNavigationDrawerView);
                 return;
             }
             if (!mSlidingPane.isOpen()) {
@@ -218,11 +286,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mWorkerFragment.reconnectToServer(mConversation.getServer());
     }
 
-    public void setActionBarTitle(final String title) {
+    void setActionBarTitle(final String title) {
         getSupportActionBar().setTitle(title);
     }
 
-    public void setActionBarSubtitle(final String subtitle) {
+    void setActionBarSubtitle(final String subtitle) {
         getSupportActionBar().setSubtitle(subtitle);
     }
 
@@ -269,13 +337,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onServiceConnected(final IRCService service) {
         mServerListFragment.onServiceConnected(service);
 
+        final boolean fromRecents = isAppFromRecentApps(getIntent().getFlags());
+        final boolean clearCaches = getIntent().getBooleanExtra(CLEAR_CACHE, false);
+
         final String serverName = getIntent().getStringExtra("server_name");
         final String channelName = getIntent().getStringExtra("channel_name");
 
         final Conversation conversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
-        if (serverName != null && !isAppFromRecentApps(getIntent().getFlags())) {
+        if (!fromRecents && serverName != null) {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra("server_name");
@@ -287,6 +358,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             final OnConversationChanged event = mEventBus.getStickyEvent(OnConversationChanged
                     .class);
             conversation = event != null ? event.conversation : null;
+        }
+
+        if (!fromRecents && clearCaches) {
+            // Try to remove the extras from the intent - this probably won't work though if the
+            // activity finishes which is why we have the recents check
+            getIntent().removeExtra(CLEAR_CACHE);
+
+            service.clearAllEventCaches();
         }
 
         onExternalConversationUpdate(conversation);
@@ -314,9 +393,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
+        final boolean navigationDrawerEnabled = (!mSlidingPane.isSlideable() || !mSlidingPane
+                .isOpen()) && mConversation != null;
+
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible((!mSlidingPane.isSlideable() || !mSlidingPane.isOpen())
-                && mConversation != null);
+        item.setVisible(navigationDrawerEnabled);
+
+        final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
+        users.setVisible(navigationDrawerEnabled && mCurrentFragment.getType() == CHANNEL);
 
         final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());
@@ -335,8 +419,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 UIUtils.toggleSlidingPane(mSlidingPane);
                 return true;
             case R.id.activity_main_ab_actions:
-                UIUtils.toggleDrawerLayout(mDrawerLayout, mRightDrawer);
-                return true;
+                UIUtils.toggleDrawerLayout(mDrawerLayout, mNavigationDrawerView);
+                // If the drawer is now closed then we don't need to pass on the event
+                return !mDrawerLayout.isDrawerOpen(mNavigationDrawerView);
+            case R.id.activity_main_ab_users:
+                if (!mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+                    mDrawerLayout.openDrawer(mNavigationDrawerView);
+                }
+                // Not fully handled - still more work to do in the fragment
+                return false;
             case R.id.activity_main_ab_add:
                 addNewServer();
                 return true;
@@ -344,68 +435,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 openAppSettings();
                 return true;
         }
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
-        super.onCreate(savedInstanceState);
-
-        AppPreferences.setUpPreferences(this);
-
-        setContentView(R.layout.main_activity);
-
-        mSlidingPane = findById(this, R.id.sliding_pane_layout);
-        mSlidingPane.setParallaxDistance(100);
-        mSlidingPane.setPanelSlideListener(this);
-        if (AppPreferences.theme == Theme.DARK) {
-            // TODO - fix this hack
-            mSlidingPane.setSliderFadeColor(0);
-        }
-
-        mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
-        mDrawerLayout.setFocusableInTouchMode(false);
-
-        mRightDrawer = findById(this, R.id.right_drawer);
-
-        if (savedInstanceState == null) {
-            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-            mServerListFragment = new ServerListFragment();
-            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
-
-            mNavigationDrawerFragment = new NavigationDrawerFragment();
-            transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
-
-            mWorkerFragment = new WorkerFragment();
-            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
-
-            transaction.commit();
-        } else {
-            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
-                    R.id.sliding_list_frame);
-            mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.right_drawer);
-            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
-                    .findFragmentByTag(WORKER_FRAGMENT);
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.content_frame);
-
-            // If the current fragment is not null then retrieve the matching convo
-            if (mCurrentFragment != null) {
-                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
-
-                findById(MainActivity.this, R.id.content_frame_empty_textview)
-                        .setVisibility(View.GONE);
-            }
-
-            supportInvalidateOptionsMenu();
-        }
-        if (mSlidingPane.isSlideable()) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+    public EventCache getEventCache() {
+        return getService().getEventCache(mConversation.getServer());
     }
 
     @Override
@@ -553,18 +588,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
     }
 
-    private void openAppSettings() {
-        final Intent intent = new Intent(this, SettingsActivity.class);
-        startActivity(intent);
-    }
-
-    private void addNewServer() {
-        final Intent intent = new Intent(this, ServerPreferenceActivity.class);
-        intent.putExtra("new", true);
-        intent.putExtra("file", "server");
-        startActivityForResult(intent, SERVER_SETTINGS);
-    }
-
     private void onChangeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
@@ -575,6 +598,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                         .beginTransaction();
                 transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
                 transaction.replace(R.id.content_frame, fragment).commit();
+                getSupportFragmentManager().executePendingTransactions();
 
                 findById(MainActivity.this, R.id.content_frame_empty_textview)
                         .setVisibility(View.GONE);
@@ -588,14 +612,36 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     }
 
-    private void onRemoveFragment() {
-        final FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction();
+    private void openAppSettings() {
+        final Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
+    private void addNewServer() {
+        final Intent intent = new Intent(this, ServerPreferenceActivity.class);
+        intent.putExtra("new", true);
+        intent.putExtra("file", "server");
+        startActivityForResult(intent, SERVER_SETTINGS);
+    }
+
+    private void onRemoveCurrentFragmentAndConversation() {
+        final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.remove(mCurrentFragment).commit();
         mCurrentFragment = null;
+        getSupportFragmentManager().executePendingTransactions();
 
-        findById(this, R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility(View
+                        .VISIBLE);
+            }
+        }, 300);
+
+        // Don't listen for any more events from this server
+        mConversation.getServer().getServerEventBus().unregister(this);
+        mEventBus.postSticky(new OnConversationChanged(null, null));
     }
 
     private void onExternalConversationUpdate(final Conversation conversation) {

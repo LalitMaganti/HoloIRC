@@ -3,6 +3,10 @@
 <menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
       xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+            android:id="@+id/activity_main_ab_users"
+            android:title="@string/users"
+            holoirc:showAsAction="always|withText"/>
+    <item
             android:id="@+id/activity_main_ab_actions"
             android:title="@string/actions"
             holoirc:showAsAction="always|withText"/>

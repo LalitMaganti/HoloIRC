@@ -1,8 +1,11 @@
 package com.fusionx.lightirc.adapters;
 
+import com.google.common.collect.ImmutableList;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.util.MessageConversionUtils;
+import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
 
@@ -12,12 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
+public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements Filterable {
 
     private final Object mLock = new Object();
 
@@ -25,15 +30,20 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
     private final LayoutInflater mInflater;
 
-    private final MessageConversionUtils mConverter;
+    private boolean mShouldFilter;
+
+    private IRCFilter mFilter;
 
     private List<T> mObjects;
 
-    public IRCMessageAdapter(Context context) {
+    private EventCache mEventCache;
+
+    public IRCMessageAdapter(final Context context, final EventCache cache, final boolean filter) {
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
-        mConverter = MessageConversionUtils.getConverter(mContext);
+        mEventCache = cache;
+        mShouldFilter = filter;
     }
 
     @Override
@@ -60,30 +70,42 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
 
         final Event event = getEvent(position);
         addTimestampIfRequired(holder, event);
-        setUpMessage(holder, event);
+        holder.message.setText(mEventCache.get(event).getMessage());
 
         Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
         return view;
     }
 
     public void add(final T event) {
+        if (mShouldFilter && !EventUtils.shouldStoreEvent(event)) {
+            return;
+        }
+
         synchronized (mLock) {
             mObjects.add(event);
         }
         notifyDataSetChanged();
     }
 
-    public void setData(final List<T> list) {
-        synchronized (mLock) {
-            mObjects = list;
+    public void setData(final List<T> list, final Runnable runnable) {
+        if (mShouldFilter) {
+            getFilter().setDataToFilter(list);
+            getFilter().setCallback(runnable);
+            getFilter().filter(null);
+        } else {
+            synchronized (mLock) {
+                mObjects = new ArrayList<>(list);
+            }
+            notifyDataSetChanged();
         }
-        notifyDataSetChanged();
     }
 
-    public void clear() {
-        synchronized (mLock) {
-            mObjects.clear();
+    @Override
+    public IRCFilter getFilter() {
+        if (mFilter == null) {
+            mFilter = new IRCFilter();
         }
+        return mFilter;
     }
 
     private Event getEvent(final int position) {
@@ -107,15 +129,8 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         return view;
     }
 
-    private void setUpMessage(final ViewHolder holder, final Event event) {
-        if (event.store == null) {
-            mConverter.setEventMessage(event);
-        }
-        holder.message.setText((CharSequence) event.store);
-    }
-
     private void addTimestampIfRequired(ViewHolder holder, final Event event) {
-        if (AppPreferences.timestamp) {
+        if (AppPreferences.getAppPreferences().isTimestamp()) {
             holder.timestamp.setVisibility(View.VISIBLE);
             holder.timestamp.setText(event.timestamp.format("%H:%M"));
         } else {
@@ -132,6 +147,46 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter {
         private ViewHolder(final TextView timestamp, final TextView message) {
             this.timestamp = timestamp;
             this.message = message;
+        }
+    }
+
+    private class IRCFilter extends Filter {
+
+        private List<T> mDataToFilter = new ArrayList<>();
+
+        private Runnable mCallback;
+
+        public void setDataToFilter(final List<T> list) {
+            mDataToFilter = ImmutableList.copyOf(list);
+        }
+
+        public void setCallback(Runnable callback) {
+            mCallback = callback;
+        }
+
+        @Override
+        protected FilterResults performFiltering(final CharSequence constraint) {
+            final ArrayList<T> resultList = new ArrayList<>();
+            for (final T object : mDataToFilter) {
+                if (EventUtils.shouldStoreEvent(object)) {
+                    resultList.add(object);
+                }
+            }
+
+            final FilterResults results = new FilterResults();
+            results.values = resultList;
+            results.count = resultList.size();
+            return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(final CharSequence constraint, final FilterResults results) {
+            mObjects = (List<T>) results.values;
+            notifyDataSetChanged();
+            if (mCallback != null) {
+                mCallback.run();
+            }
         }
     }
 }

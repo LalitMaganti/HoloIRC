@@ -12,14 +12,14 @@ import android.widget.ListAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
+abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
         .MultiChoiceModeListener {
 
-    protected MultiSelectionUtils.Controller mMultiSelectionController;
+    MultiSelectionUtils.Controller mMultiSelectionController;
 
     private View mListView;
 
-    public MultiSelectionUtils.Controller getMultiSelectionController() {
+    MultiSelectionUtils.Controller getMultiSelectionController() {
         return mMultiSelectionController;
     }
 
@@ -39,7 +39,7 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
         finish();
     }
 
-    public void finish() {
+    void finish() {
         if (getMultiSelectionController() != null) {
             getMultiSelectionController().finish();
             mMultiSelectionController = null;
@@ -76,7 +76,7 @@ public abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUt
 
     protected abstract void attachSelectionController();
 
-    protected List<T> getCheckedItems() {
+    List<T> getCheckedItems() {
         final List<T> checkedSessionPositions = new ArrayList<>();
         if (mListView == null) {
             return checkedSessionPositions;

@@ -52,4 +52,9 @@
         <attr name="entries" format="reference"/>
         <attr name="entryValues" format="reference"/>
     </declare-styleable>
+
+
+    <declare-styleable name="DatabasePreference">
+        <attr name="preference" format="string"/>
+    </declare-styleable>
 </resources>

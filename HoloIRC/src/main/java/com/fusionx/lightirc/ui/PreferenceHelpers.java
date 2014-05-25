@@ -1,30 +1,19 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.communication.IRCService;
-import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import com.fusionx.lightirc.util.MiscUtils;
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.net.Uri;
-import android.os.IBinder;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
-
-import de.greenrobot.event.EventBus;
 
 class PreferenceHelpers {
 
@@ -94,45 +83,16 @@ class PreferenceHelpers {
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    final Intent service = new Intent(mContext, IRCService.class);
-                                    mContext.bindService(service, mConnection, 0);
+                                    final Intent intent = new Intent(mContext, MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                            | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    intent.putExtra(MainActivity.CLEAR_CACHE, true);
+                                    mContext.startActivity(intent);
                                 }
                             }
                     );
             build.show();
             return true;
-        }
-
-        private final ServiceConnection mConnection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(final ComponentName className, final IBinder binder) {
-                final IRCService service = ((IRCService.IRCBinder) binder).getService();
-                service.disconnectAll();
-
-                fixCurrentBusSettings();
-
-                mContext.unbindService(mConnection);
-                final Intent intent = mContext.getPackageManager()
-                        .getLaunchIntentForPackage(mContext.getPackageName());
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                mContext.startActivity(intent);
-            }
-
-            @Override
-            public void onServiceDisconnected(final ComponentName name) {
-            }
-        };
-
-        // TODO - this is a hack - fix it
-        private void fixCurrentBusSettings() {
-            final OnConversationChanged event = EventBus.getDefault().getStickyEvent
-                    (OnConversationChanged.class);
-            if (event.conversation != null) {
-                EventBus.getDefault().postSticky(new OnConversationChanged
-                        (null, null));
-                EventBus.getDefault().postSticky(new OnCurrentServerStatusChanged
-                        (ConnectionStatus.DISCONNECTED));
-            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
@@ -10,6 +11,7 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.interfaces.Conversation;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.ActionMode;
@@ -27,8 +29,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.greenrobot.event.EventBus;
-
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class IgnoreListFragment extends ListFragment implements OnDismissCallback,
@@ -37,8 +38,8 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     private Conversation mConversation;
 
     private final Object mEventHandler = new Object() {
-        @SuppressWarnings("unused")
-        public void onEvent(final OnConversationChanged conversationChanged) {
+        @Subscribe
+        public void onConversationChanged(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
         }
     };
@@ -66,8 +67,9 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
         final View view = inflater.inflate(R.layout.default_list_view, container, false);
         final ListView listView = findById(view, android.R.id.list);
 
-        final TextView otherHeader = (TextView) inflater
-                .inflate(R.layout.sliding_menu_header, null, false);
+        @SuppressLint("InflateParams")
+        final TextView otherHeader = (TextView) inflater.inflate(R.layout.sliding_menu_header,
+                null, false);
         otherHeader.setText("Ignore List");
         listView.addHeaderView(otherHeader);
 
@@ -78,7 +80,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        EventBus.getDefault().registerSticky(mEventHandler);
+        getBus().registerSticky(mEventHandler);
 
         final List<String> arrayList = new ArrayList<>(mDatabaseSource.getIgnoreListByName(
                 mConversation.getServer().getTitle()));
@@ -98,7 +100,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public void onDestroyView() {
         super.onDestroyView();
 
-        EventBus.getDefault().unregister(mEventHandler);
+        getBus().unregister(mEventHandler);
     }
 
     @Override
