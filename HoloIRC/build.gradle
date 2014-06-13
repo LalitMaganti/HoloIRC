@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath 'com.android.tools.build:gradle:0.11.+'
         classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.0.+'
     }
 }
@@ -24,7 +24,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 19
-        packageName "com.fusionx.lightirc"
+        applicationId "com.fusionx.lightirc"
     }
 
     compileOptions {
@@ -38,7 +38,7 @@ android {
 
     buildTypes {
         debug {
-            packageNameSuffix '.debug'
+            applicationIdSuffix '.debug'
         }
 
         release {
@@ -46,9 +46,6 @@ android {
         }
     }
 }
-
-apply plugin: 'android-unit-test'
-
 
 dependencies {
     compile 'com.android.support:support-v4:19.+'
@@ -62,19 +59,6 @@ dependencies {
     compile project(':libraries:relay:library')
     compile project(':libraries:AndroidSlidingUpPanel:library')
     compile project(':libraries:Bus:library')
-
-    // Tests stuff
-//    testCompile 'junit:junit:4.10'
-//    testCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-//    testCompile('com.squareup:fest-android:1.0.7') {
-//        exclude group: 'com.google.android', module: 'support-v4'
-//    }
-
-//    androidTestCompile 'junit:junit:4.10'
-//    androidTestCompile 'org.robolectric:robolectric:2.3-SNAPSHOT'
-//    androidTestCompile('com.squareup:fest-android:1.0.7') {
-//        exclude group: 'com.google.android', module: 'support-v4'
-//    }
 }
 
 def Properties props = new Properties()

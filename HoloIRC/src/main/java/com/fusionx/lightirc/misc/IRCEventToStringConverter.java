@@ -547,7 +547,8 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator getDisconnectEvent(final DisconnectEvent event) {
-            return setupEvent(event.serverMessage);
+            final String response = mContext.getString(R.string.disconnected_from_server);
+            return setupEvent(String.format("%s (%s)", response, event.serverMessage));
         }
 
         public EventDecorator getDisconnectEvent(final ChannelDisconnectEvent event) {
