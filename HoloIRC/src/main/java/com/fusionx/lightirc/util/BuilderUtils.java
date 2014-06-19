@@ -25,6 +25,11 @@ class BuilderUtils {
         tmwirc.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
         tmwirc.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
-        return Arrays.asList(freenode, snoonet, tmwirc);
+        final ServerConfiguration.Builder snyde = new ServerConfiguration.Builder();
+        snoonet.setTitle("Snyde").setUrl("irc.snyde.net").setPort(6667).setSsl(false);
+        snoonet.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
+        snoonet.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
+
+        return Arrays.asList(freenode, snoonet, tmwirc, snyde);
     }
 }
