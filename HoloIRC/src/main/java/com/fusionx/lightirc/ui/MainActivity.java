@@ -26,10 +26,12 @@ import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 import com.fusionx.relay.interfaces.Conversation;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -50,7 +52,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 /**
  * Main activity which co-ordinates everything in the app
  */
-public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
+public class MainActivity extends FragmentActivity implements ServerListFragment.Callback,
         SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback, IRCFragment.Callback {
 
@@ -664,5 +666,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
                     (View.VISIBLE);
         }
+    }
+
+    public ActionBar getSupportActionBar() {
+        return getActionBar();
     }
 }

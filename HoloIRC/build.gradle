@@ -3,12 +3,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.11.+'
-        classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.0.+'
+        classpath 'com.android.tools.build:gradle:0.12.+'
     }
 }
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
@@ -18,12 +17,12 @@ repositories {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 21
+    buildToolsVersion '20.0.0'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 21
         applicationId "com.fusionx.lightirc"
     }
 
@@ -48,9 +47,9 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.+'
-    compile 'com.android.support:appcompat-v7:19.+'
-    compile('de.keyboardsurfer.android.widget:crouton:1.8.4') {
+    compile 'com.android.support:support-v4:+'
+    compile 'com.android.support:appcompat-v7:+'
+    compile('de.keyboardsurfer.android.widget:crouton:1.8.4@aar') {
         exclude group: 'com.google.android', module: 'support-v4'
     }
     compile 'se.emilsjolander:stickylistheaders:2.1.3'

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Light" parent="@android:style/Theme.Material.Light.DarkActionBar">
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="main_background">@android:color/transparent</item>
+        <item name="expandable_list_background">@android:color/transparent</item>
+        <item name="holo_background">@drawable/background_holo_light</item>
+        <item name="activatableItemBackground">@drawable/activatable_item_background</item>
+        <item name="default_text_colour">@android:color/black</item>
+        <item name="expandable_list_text">@color/dark_gray</item>
+        <item name="expand_close_menu_drawable">@drawable/expander_close_holo_light</item>
+        <item name="expand_open_menu_drawable">@drawable/expander_open_holo_light</item>
+        <item name="action_divider_colour">@color/off_white</item>
+    </style>
+
+    <style name="Dark" parent="@android:style/Theme.Material">
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="main_background">@android:color/transparent</item>
+        <item name="expandable_list_background">@android:color/transparent</item>
+        <item name="holo_background">@drawable/background_holo_dark</item>
+        <item name="activatableItemBackground">@drawable/activatable_item_background</item>
+        <item name="default_text_colour">@android:color/white</item>
+        <item name="expandable_list_text">@android:color/white</item>
+        <item name="expand_close_menu_drawable">@drawable/expander_close_holo_dark</item>
+        <item name="expand_open_menu_drawable">@drawable/expander_open_holo_dark</item>
+        <item name="action_divider_colour">@color/dark_gray</item>
+    </style>
+</resources>
