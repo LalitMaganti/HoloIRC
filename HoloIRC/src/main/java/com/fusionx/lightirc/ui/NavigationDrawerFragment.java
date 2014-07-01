@@ -292,7 +292,7 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void joinMultipleChannels(Collection<InviteEvent> inviteEvents) {
+    public void joinMultipleChannels(final Collection<InviteEvent> inviteEvents) {
         for (final InviteEvent event : inviteEvents) {
             mConversation.getServer().getServerCallBus().sendJoin(event.channelName);
         }

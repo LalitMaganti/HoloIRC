@@ -33,9 +33,8 @@ public class ServerWrapper {
     }
 
     public boolean isServerAvailable() {
-        return mServer != null &&
-                (mServer.getStatus() == ConnectionStatus.CONNECTED
-                        || mServer.getStatus() == ConnectionStatus.RECONNECTING);
+        return mServer != null && (mServer.getStatus() == ConnectionStatus.CONNECTED
+                || mServer.getStatus() == ConnectionStatus.RECONNECTING);
     }
 
     public String getTitle() {
@@ -50,11 +49,12 @@ public class ServerWrapper {
         mServer = server;
 
         if (isServerAvailable()) {
-            for (final Channel channel : server.getUser().getChannels()) {
-                mServerObjects.put(channel.getName(), channel);
+            if (server.getUser() != null) {
+                for (final Channel channel : server.getUser().getChannels()) {
+                    mServerObjects.put(channel.getName(), channel);
+                }
             }
-            for (final QueryUser user : server.getUserChannelInterface()
-                    .getQueryUsers()) {
+            for (final QueryUser user : server.getUserChannelInterface().getQueryUsers()) {
                 mServerObjects.put(user.getNick().getNickAsString(), user);
             }
         }

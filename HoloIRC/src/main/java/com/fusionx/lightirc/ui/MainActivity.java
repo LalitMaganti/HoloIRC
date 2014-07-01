@@ -510,13 +510,11 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         super.onSaveInstanceState(outState);
 
         // Save the action bar title & sub-title
-        if (outState != null) {
-            outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
-            // It's null if there's no fragment currently displayed
-            if (getSupportActionBar().getSubtitle() != null) {
-                outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle()
-                        .toString());
-            }
+        outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
+        // It's null if there's no fragment currently displayed
+        if (getSupportActionBar().getSubtitle() != null) {
+            outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle()
+                    .toString());
         }
     }
 
