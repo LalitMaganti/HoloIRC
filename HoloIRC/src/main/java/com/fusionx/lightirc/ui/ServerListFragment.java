@@ -256,6 +256,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 break;
             case R.id.activity_server_list_popup_edit:
                 editServer(listItem);
+                break;
         }
 
         mode.finish();

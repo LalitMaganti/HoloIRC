@@ -229,10 +229,10 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         closeDrawer();
         supportInvalidateOptionsMenu();
 
+        getService().removeLoggingHandlerAndEventCache(server);
         if (mCurrentFragment != null) {
             onRemoveCurrentFragmentAndConversation();
         }
-        getService().removeLoggingHandlerAndEventCache(server);
     }
 
     @Override

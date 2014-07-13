@@ -146,22 +146,20 @@ public class IRCService extends Service {
 
     public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
             final Collection<String> ignoreList) {
-        final Pair<Boolean, Server> pair = mConnectionManager.requestConnection(builder
-                .build(), ignoreList, mHandler);
+        final Pair<Boolean, Server> pair
+                = mConnectionManager.requestConnection(builder.build(), ignoreList, mHandler);
 
         final boolean exists = pair.first;
         final Server server = pair.second;
 
         if (!exists) {
-            final ServiceEventInterceptor serviceEventInterceptor = new ServiceEventInterceptor(
-                    server);
+            final ServiceEventInterceptor serviceEventInterceptor
+                    = new ServiceEventInterceptor(server);
             mEventHelperMap.put(server, serviceEventInterceptor);
             mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);
         }
-
         startForeground(SERVICE_ID, getNotification());
-
         return server;
     }
 
