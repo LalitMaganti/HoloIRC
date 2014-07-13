@@ -159,8 +159,13 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final Event event = helper.getSubEvent(conversation);
         final TextView textEvent = (TextView) convertView.findViewById(R.id.child_event);
 
-        final EventDecorator decorator = cache.get(event);
-        textEvent.setText(decorator.getMessage());
+        // Event might be null when the channel is first being established
+        if (event == null) {
+            textEvent.setText(mContext.getString(R.string.no_event));
+        } else {
+            final EventDecorator decorator = cache.get(event);
+            textEvent.setText(decorator.getMessage());
+        }
 
         final View divider = convertView.findViewById(R.id.divider);
         divider.setVisibility(isLastChild ? View.VISIBLE : View.INVISIBLE);

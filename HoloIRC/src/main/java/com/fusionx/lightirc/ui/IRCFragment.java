@@ -74,7 +74,12 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        final View view = createView(container, inflate);
+        return createView(container, inflate);
+    }
+
+    @Override
+    public void onViewCreated(final View view, final Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
@@ -100,12 +105,10 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
             }
         });
         mConversation.getServer().getServerEventBus().register(this);
-
-        return view;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
 
         outState.putParcelable("list_view", getListView().onSaveInstanceState());

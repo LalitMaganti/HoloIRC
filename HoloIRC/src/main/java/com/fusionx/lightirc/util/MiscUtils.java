@@ -36,7 +36,7 @@ import android.content.pm.PackageManager;
  */
 public class MiscUtils {
 
-    private static Bus sBus;
+    private static final Bus sBus = new Bus();
 
     /**
      * Static utility methods only - can't instantiate this class
@@ -73,19 +73,6 @@ public class MiscUtils {
     }
 
     public static Bus getBus() {
-        if (sBus == null) {
-            sBus = new Bus();
-        }
         return sBus;
-    }
-
-    private int normaliseColourInt(final int colour) {
-        if (colour > 255) {
-            return 255;
-        } else if (colour < 0) {
-            return 0;
-        }
-
-        return colour;
     }
 }

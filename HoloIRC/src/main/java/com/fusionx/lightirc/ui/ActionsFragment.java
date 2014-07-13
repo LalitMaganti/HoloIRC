@@ -161,6 +161,10 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         @Override
         public void onOkClicked(final String input) {
+            // If the conversation is null (for some reason or another) then simply close the dialog
+            if (mConversation == null) {
+                return;
+            }
             mConversation.getServer().getServerCallBus().sendJoin(input);
         }
     }

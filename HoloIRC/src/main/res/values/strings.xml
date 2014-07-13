@@ -135,6 +135,7 @@
     <string name="nick_first_choice">First choice nick name</string>
     <string name="nick_second_choice">Second choice nick name</string>
     <string name="nick_third_choice">Third choice nick name</string>
+    <string name="no_event">No Event</string>
 
     <string name="ignore_nick_title">Nick to ignore</string>
     <string name="ignore_nick_description">Nickname of the user to be ignored</string>

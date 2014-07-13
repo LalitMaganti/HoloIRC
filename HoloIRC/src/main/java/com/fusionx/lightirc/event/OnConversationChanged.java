@@ -9,7 +9,7 @@ public class OnConversationChanged {
 
     public final FragmentType fragmentType;
 
-    public OnConversationChanged(final Conversation conversation, FragmentType fragmentType) {
+    public OnConversationChanged(final Conversation conversation, final FragmentType fragmentType) {
         this.conversation = conversation;
         this.fragmentType = fragmentType;
     }

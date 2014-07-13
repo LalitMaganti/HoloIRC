@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.bus.Bus;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
@@ -11,10 +10,9 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
-import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
@@ -39,11 +37,13 @@ import android.support.v4.widget.SlidingPaneLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
+import static com.fusionx.lightirc.util.MiscUtils.getStatusString;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
@@ -63,8 +63,6 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     private static final String ACTION_BAR_TITLE = "action_bar_title";
 
     private static final String ACTION_BAR_SUBTITLE = "action_bar_subtitle";
-
-    private static final Bus mEventBus = getBus();
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
@@ -151,6 +149,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
     private View mNavigationDrawerView;
 
+    private TextView mEmptyView;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         AppPreferences.setupAppPreferences(this);
@@ -159,6 +159,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main_activity);
+
+        mEmptyView = (TextView) findViewById(R.id.content_frame_empty_textview);
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(this);
@@ -195,16 +197,15 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
                     .findFragmentById(R.id.content_frame);
 
             // If the current fragment is not null then retrieve the matching convo
-            if (mCurrentFragment != null) {
-                mConversation = mEventBus.getStickyEvent(OnConversationChanged.class).conversation;
+            if (mCurrentFragment == null) {
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
+                        (View.VISIBLE);
+            } else {
+                mConversation = getBus().getStickyEvent(OnConversationChanged.class).conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
                 mConversation.getServer().getServerEventBus().register(this);
-            } else {
-                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
-                        (View.VISIBLE);
             }
-
             supportInvalidateOptionsMenu();
         }
 
@@ -241,28 +242,29 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
     @Override
     public void onPart(final String serverName, final PartEvent event) {
-        if (mConversation != null) {
-            final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                    && mConversation.getId().equals(event.channelName);
+        if (mConversation == null) {
+            return;
+        }
+        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                && mConversation.getId().equals(event.channelName);
 
-            if (isCurrent) {
-                onRemoveCurrentFragmentAndConversation();
-            }
+        if (isCurrent) {
+            onRemoveCurrentFragmentAndConversation();
         }
     }
 
     @Override
     public boolean onKick(final String serverName, final KickEvent event) {
-        if (mConversation != null) {
-            final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                    && mConversation.getId().equals(event.channelName);
-
-            if (isCurrent) {
-                onRemoveCurrentFragmentAndConversation();
-            }
-            return isCurrent;
+        if (mConversation == null) {
+            return false;
         }
-        return false;
+        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+                && mConversation.getId().equals(event.channelName);
+
+        if (isCurrent) {
+            onRemoveCurrentFragmentAndConversation();
+        }
+        return isCurrent;
     }
 
     @Override
@@ -283,8 +285,7 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         if (mCurrentFragment.getType() == CHANNEL) {
             mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
-            mConversation.getServer().getServerCallBus().sendCloseQuery(
-                    (QueryUser) mConversation);
+            mConversation.getServer().getServerCallBus().sendCloseQuery((QueryUser) mConversation);
         }
     }
 
@@ -360,7 +361,11 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         final Conversation conversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
-        if (!fromRecents && serverName != null) {
+        if (fromRecents || serverName == null) {
+            final OnConversationChanged event = getBus()
+                    .getStickyEvent(OnConversationChanged.class);
+            conversation = event != null ? event.conversation : null;
+        } else {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra("server_name");
@@ -368,17 +373,12 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
             final Server server = service.getServerIfExists(serverName);
             conversation = server.getUserChannelInterface().getChannel(channelName);
-        } else {
-            final OnConversationChanged event = mEventBus.getStickyEvent(OnConversationChanged
-                    .class);
-            conversation = event != null ? event.conversation : null;
         }
 
         if (!fromRecents && clearCaches) {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra(CLEAR_CACHE);
-
             service.clearAllEventCaches();
         }
 
@@ -390,13 +390,14 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     public void onEventMainThread(final StatusChangeEvent event) {
         // Null happens when the disconnect handler is called first & the fragment has already been
         // removed by the disconnect handler
-        if (mCurrentFragment != null) {
-            final ConnectionStatus status = mConversation.getServer().getStatus();
-            if (mCurrentFragment.getType() == FragmentType.SERVER) {
-                setActionBarSubtitle(MiscUtils.getStatusString(this, status));
-            }
-            mEventBus.postSticky(new OnCurrentServerStatusChanged(status));
+        if (mCurrentFragment == null) {
+            return;
         }
+        final ConnectionStatus status = mConversation.getServer().getStatus();
+        if (mCurrentFragment.getType() == FragmentType.SERVER) {
+            setActionBarSubtitle(getStatusString(this, status));
+        }
+        getBus().postSticky(new OnCurrentServerStatusChanged(status));
     }
 
     @Override
@@ -407,8 +408,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        final boolean navigationDrawerEnabled = (!mSlidingPane.isSlideable() || !mSlidingPane
-                .isOpen()) && mConversation != null;
+        final boolean navigationDrawerEnabled =
+                (!mSlidingPane.isSlideable() || !mSlidingPane.isOpen()) && mConversation != null;
 
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
         item.setVisible(navigationDrawerEnabled);
@@ -470,10 +471,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (RESULT_OK == resultCode) {
-            if (requestCode == SERVER_SETTINGS) {
-                mServerListFragment.refreshServers();
-            }
+        if (RESULT_OK == resultCode && requestCode == SERVER_SETTINGS) {
+            mServerListFragment.refreshServers();
         }
     }
 
@@ -494,17 +493,17 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         final String serverName = intent.getStringExtra("server_name");
         final String channelName = intent.getStringExtra("channel_name");
 
-        if (serverName != null) {
-            // Try to remove the extras from the intent - this probably won't work though if the
-            // activity finishes which is why we have the recents check
-            getIntent().removeExtra("server_name");
-            getIntent().removeExtra("channel_name");
-
-            final Server server = getService().getServerIfExists(serverName);
-            final Conversation conversation = server.getUserChannelInterface().getChannel
-                    (channelName);
-            onExternalConversationUpdate(conversation);
+        if (serverName == null) {
+            return;
         }
+        // Try to remove the extras from the intent - this probably won't work though if the
+        // activity finishes which is why we have the recents check
+        getIntent().removeExtra("server_name");
+        getIntent().removeExtra("channel_name");
+
+        final Server server = getService().getServerIfExists(serverName);
+        final Conversation conversation = server.getUserChannelInterface().getChannel(channelName);
+        onExternalConversationUpdate(conversation);
     }
 
     @Override
@@ -515,8 +514,7 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         outState.putString(ACTION_BAR_TITLE, getSupportActionBar().getTitle().toString());
         // It's null if there's no fragment currently displayed
         if (getSupportActionBar().getSubtitle() != null) {
-            outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle()
-                    .toString());
+            outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle().toString());
         }
     }
 
@@ -524,29 +522,31 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     protected void onStart() {
         super.onStart();
 
+        // TODO - what if conversation is changed when stopped
         // This is just registration because we'll retrieve the sticky event later
-        mEventBus.register(mConversationChanged);
+        getBus().register(mConversationChanged);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        mEventBus.register(mMentionHelper, 100);
+        getBus().register(mMentionHelper, 100);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        mEventBus.unregister(mMentionHelper);
+        getBus().unregister(mMentionHelper);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        mEventBus.unregister(mConversationChanged);
+        // TODO - what if conversation is changed when stopped
+        getBus().unregister(mConversationChanged);
     }
 
     void setActionBarTitle(final String title) {
@@ -558,13 +558,14 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     private void changeCurrentConversation(@NonNull final Conversation object,
-            boolean delayChange) {
+            final boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
+            final boolean isServer = object.getClass().equals(Server.class);
             final IRCFragment fragment;
-            if (object.getClass().equals(Server.class)) {
+            if (isServer) {
                 fragment = new ServerFragment();
             } else if (object.getClass().equals(Channel.class)) {
                 fragment = new ChannelFragment();
@@ -583,9 +584,11 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
             }
 
             setActionBarTitle(object.getId());
-            setActionBarSubtitle(object.getServer().getTitle());
+            setActionBarSubtitle(isServer
+                    ? getStatusString(this, object.getServer().getStatus())
+                    : object.getServer().getTitle());
 
-            mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
+            getBus().postSticky(new OnConversationChanged(object, fragment.getType()));
             changeCurrentFragment(fragment, delayChange);
         }
         mSlidingPane.closePane();
@@ -604,8 +607,7 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
                 transaction.replace(R.id.content_frame, fragment).commit();
                 getSupportFragmentManager().executePendingTransactions();
 
-                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility(
-                        View.GONE);
+                mEmptyView.setVisibility(View.GONE);
             }
         };
 
@@ -638,14 +640,13 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility(View
-                        .VISIBLE);
+                mEmptyView.setVisibility(View.VISIBLE);
             }
         }, 300);
 
         // Don't listen for any more events from this server
         mConversation.getServer().getServerEventBus().unregister(this);
-        mEventBus.postSticky(new OnConversationChanged(null, null));
+        getBus().postSticky(new OnConversationChanged(null, null));
 
         // Remove any title/subtitle from the action bar
         setActionBarTitle(getString(R.string.app_name));
@@ -655,19 +656,16 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     private void onExternalConversationUpdate(final Conversation conversation) {
         if (conversation == null) {
             mSlidingPane.openPane();
-
-            findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
-                    (View.VISIBLE);
-        } else {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    changeCurrentConversation(conversation, false);
-                }
-            });
-
-            supportInvalidateOptionsMenu();
+            mEmptyView.setVisibility(View.VISIBLE);
+            return;
         }
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                changeCurrentConversation(conversation, false);
+            }
+        });
+        supportInvalidateOptionsMenu();
     }
 
     public ActionBar getSupportActionBar() {
