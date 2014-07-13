@@ -28,7 +28,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.event.channel.ChannelNameEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
@@ -91,7 +91,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private UserListAdapter mAdapter;
 
-    private TreeSet<WorldUser> mWorldUsers;
+    private TreeSet<ChannelUser> mChannelUsers;
 
     private StickyListHeadersListView mStickyListView;
 
@@ -113,7 +113,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         super.onViewCreated(view, savedInstanceState);
 
         mStickyListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
-        mAdapter = new UserListAdapter(view.getContext(), mWorldUsers);
+        mAdapter = new UserListAdapter(view.getContext(), mChannelUsers);
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().getWrappedList().setMultiChoiceModeListener(this);
@@ -148,13 +148,13 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public void onUpdateUserList() {
         mCallback.updateUserListVisibility();
 
-        final Collection<WorldUser> userList = mChannel.getUsers();
+        final Collection<ChannelUser> userList = mChannel.getUsers();
 
         getListView().setAdapter(null);
         mAdapter.setChannel(mChannel);
-        mWorldUsers = new TreeSet<>(new IRCUserComparator(mChannel));
-        mWorldUsers.addAll(userList);
-        mAdapter.setInternalSet(mWorldUsers);
+        mChannelUsers = new TreeSet<>(new IRCUserComparator(mChannel));
+        mChannelUsers.addAll(userList);
+        mAdapter.setInternalSet(mChannelUsers);
         getListView().setAdapter(mAdapter);
 
         if (mActionMode != null) {
@@ -219,7 +219,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final List<WorldUser> selectedItems = getCheckedItems();
+        final List<ChannelUser> selectedItems = getCheckedItems();
         final String nick = selectedItems.get(0).getNick().getNickAsString();
         switch (item.getItemId()) {
             case R.id.fragment_userlist_cab_mention:
@@ -254,8 +254,8 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         }
     }
 
-    protected List<WorldUser> getCheckedItems() {
-        final List<WorldUser> checkedSessionPositions = new ArrayList<>();
+    protected List<ChannelUser> getCheckedItems() {
+        final List<ChannelUser> checkedSessionPositions = new ArrayList<>();
         if (mStickyListView == null) {
             return checkedSessionPositions;
         }
@@ -300,7 +300,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     public interface Callback {
 
-        public void onMentionMultipleUsers(final List<WorldUser> users);
+        public void onMentionMultipleUsers(final List<ChannelUser> users);
 
         public void updateUserListVisibility();
 

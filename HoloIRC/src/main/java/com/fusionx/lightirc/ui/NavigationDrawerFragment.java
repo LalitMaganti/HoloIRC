@@ -8,8 +8,8 @@ import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.interfaces.Conversation;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -182,7 +182,7 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void onMentionMultipleUsers(final List<WorldUser> users) {
+    public void onMentionMultipleUsers(final List<ChannelUser> users) {
         mCallback.onMentionMultipleUsers(users);
     }
 
@@ -374,7 +374,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
         public IRCService getService();
 
-        public void onMentionMultipleUsers(List<WorldUser> users);
+        public void onMentionMultipleUsers(List<ChannelUser> users);
 
         public void reconnectToServer();
     }

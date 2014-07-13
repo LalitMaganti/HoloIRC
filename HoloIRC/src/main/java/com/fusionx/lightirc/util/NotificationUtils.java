@@ -3,6 +3,7 @@ package com.fusionx.lightirc.util;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.lightirc.view.Snackbar;
 import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
@@ -20,12 +21,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
+import android.view.View;
 
 import java.util.Set;
-
-import de.keyboardsurfer.android.widget.crouton.Configuration;
-import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.media.RingtoneManager.TYPE_NOTIFICATION;
@@ -40,28 +38,21 @@ public class NotificationUtils {
     private static final String RECEIVE_NOTIFICATION_ACTION = "com.fusionx.lightirc"
             + ".RECEIVE_NOTIFICATION";
 
-    private static final Configuration sConfiguration;
-
     private static int sNotificationCount = 0;
 
     private static ResultReceiver sResultReceiver;
 
     private static DeleteReceiver sDeleteReceiver;
 
-    static {
-        sConfiguration = new Configuration.Builder().setDuration(500).build();
-    }
-
-    public static void notifyInApp(final Activity activity, final Conversation conversation) {
+    public static void notifyInApp(final Snackbar snackbar, final Activity activity,
+            final Conversation conversation) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
             final String message = String.format("Mentioned in %s on %s", conversation.getId(),
                     conversation.getServer().getTitle());
-            final Crouton crouton = Crouton.makeText(activity, message, Style.INFO);
-            crouton.setConfiguration(sConfiguration);
-            crouton.show();
+            snackbar.display(message);
 
             if (inApp.contains(activity.getString(R.string.notification_value_audio))) {
                 final Uri notification = RingtoneManager.getDefaultUri(TYPE_NOTIFICATION);

@@ -10,17 +10,17 @@ import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout;
+import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.lightirc.view.Snackbar;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.WorldUser;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
@@ -31,18 +31,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import java.util.List;
-
-import de.keyboardsurfer.android.widget.crouton.Crouton;
 
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -53,8 +51,8 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
  * Main activity which co-ordinates everything in the app
  */
 public class MainActivity extends FragmentActivity implements ServerListFragment.Callback,
-        SlidingPaneLayout.PanelSlideListener, DrawerLayout.DrawerListener,
-        NavigationDrawerFragment.Callback, WorkerFragment.Callback, IRCFragment.Callback {
+        DrawerLayout.DrawerListener, NavigationDrawerFragment.Callback, WorkerFragment.Callback,
+        IRCFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
 
@@ -70,6 +68,41 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
+    private final SlidingPaneLayout.PanelSlideListener mPanelSlideListener
+            = new SlidingPaneLayout.PanelSlideListener() {
+
+        // private CharSequence mTitle;
+
+        // private CharSequence mSubtitle;
+
+        @Override
+        public void onPanelSlide(final View view, final float v) {
+            // Empty
+        }
+
+        @Override
+        public void onPanelOpened(final View view) {
+            // mTitle = getSupportActionBar().getTitle();
+            // mSubtitle = getSupportActionBar().getSubtitle();
+
+            supportInvalidateOptionsMenu();
+            // TODO - write the opposing code in onPanelClosed so this is done
+            // getSupportActionBar().setTitle(R.string.app_name);
+            // getSupportActionBar().setSubtitle(null);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
+
+        @Override
+        public void onPanelClosed(final View view) {
+            // getSupportActionBar().setTitle(mTitle);
+            // getSupportActionBar().setSubtitle(mSubtitle);
+
+            supportInvalidateOptionsMenu();
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            mServerListFragment.onPanelClosed();
+        }
+    };
+
     // Fields
     // IRC
     private Conversation mConversation;
@@ -79,7 +112,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         @Subscribe(cancellable = true)
         public boolean onMentioned(final OnChannelMentionEvent event) {
             if (!event.channel.equals(mConversation)) {
-                NotificationUtils.notifyInApp(MainActivity.this, event.channel);
+                final Snackbar snackbar = (Snackbar) findViewById(R.id.snackbar);
+                NotificationUtils.notifyInApp(snackbar, MainActivity.this, event.channel);
             }
             return true;
         }
@@ -87,7 +121,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         @Subscribe(cancellable = true)
         public boolean onQueried(final OnQueryEvent event) {
             if (!event.queryUser.equals(mConversation)) {
-                NotificationUtils.notifyInApp(MainActivity.this, event.queryUser);
+                final Snackbar snackbar = (Snackbar) findViewById(R.id.snackbar);
+                NotificationUtils.notifyInApp(snackbar, MainActivity.this, event.queryUser);
             }
             return true;
         }
@@ -131,11 +166,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
-        mSlidingPane.setPanelSlideListener(this);
-        if (AppPreferences.getAppPreferences().getTheme() == Theme.DARK) {
-            // TODO - fix this hack
-            mSlidingPane.setSliderFadeColor(0);
-        }
+        mSlidingPane.setPanelSlideListener(mPanelSlideListener);
+        mSlidingPane.setSliderFadeColor(0);
 
         mNavigationDrawerView = findById(this, R.id.right_drawer);
 
@@ -175,12 +207,12 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
             supportInvalidateOptionsMenu();
         }
+
         if (mSlidingPane.isSlideable()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 
-    // TODO - unify the server and subserver code
     @Override
     public void onServerClicked(final Server server) {
         changeCurrentConversation(server, true);
@@ -273,48 +305,27 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
     @Override
     public void onBackPressed() {
-        if (!mNavigationDrawerFragment.onBackPressed()) {
-            if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
-                mDrawerLayout.closeDrawer(mNavigationDrawerView);
-                return;
-            }
-            if (!mSlidingPane.isOpen()) {
-                mSlidingPane.openPane();
-                return;
-            }
-            super.onBackPressed();
+        if (mNavigationDrawerFragment.onBackPressed()) {
+            return;
+        } else if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+            mDrawerLayout.closeDrawer(mNavigationDrawerView);
+            return;
+        } else if (!mSlidingPane.isOpen()) {
+            mSlidingPane.openPane();
+            return;
         }
+        super.onBackPressed();
     }
 
     // TODO - fix this hack
     @Override
-    public void onMentionMultipleUsers(List<WorldUser> users) {
+    public void onMentionMultipleUsers(final List<ChannelUser> users) {
         ((ChannelFragment) mCurrentFragment).onMentionMultipleUsers(users);
     }
 
     @Override
     public void reconnectToServer() {
         mWorkerFragment.reconnectToServer(mConversation.getServer());
-    }
-
-    @Override
-    public void onPanelSlide(final View view, final float v) {
-        // Empty
-    }
-
-    @Override
-    public void onPanelOpened(final View view) {
-        supportInvalidateOptionsMenu();
-        // TODO - write the opposing code in onPanelClosed so this is done
-        //getSupportActionBar().setTitle(R.string.app_name);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-    }
-
-    @Override
-    public void onPanelClosed(final View view) {
-        supportInvalidateOptionsMenu();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mServerListFragment.onPanelClosed();
     }
 
     @Override
@@ -447,14 +458,7 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-
-        mEventBus.unregister(mConversationChanged);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restore the action bar title & sub-title
@@ -475,8 +479,6 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
 
     @Override
     protected void onDestroy() {
-        Crouton.clearCroutonsForActivity(this);
-
         super.onDestroy();
 
         if (mConversation != null) {
@@ -527,6 +529,13 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        mEventBus.register(mMentionHelper, 100);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -534,10 +543,10 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStop() {
+        super.onStop();
 
-        mEventBus.register(mMentionHelper, 100);
+        mEventBus.unregister(mConversationChanged);
     }
 
     void setActionBarTitle(final String title) {
@@ -548,7 +557,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final Conversation object, boolean delayChange) {
+    private void changeCurrentConversation(@NonNull final Conversation object,
+            boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
@@ -565,12 +575,10 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
             }
             fragment.setArguments(bundle);
 
-            if (mConversation != null) {
-                if (mConversation.getServer() != object.getServer()) {
-                    mConversation.getServer().getServerEventBus().unregister(this);
-                    object.getServer().getServerEventBus().register(this);
-                }
-            } else {
+            if (mConversation == null) {
+                object.getServer().getServerEventBus().register(this);
+            } else if (mConversation.getServer() != object.getServer()) {
+                mConversation.getServer().getServerEventBus().unregister(this);
                 object.getServer().getServerEventBus().register(this);
             }
 
@@ -578,13 +586,13 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
             setActionBarSubtitle(object.getServer().getTitle());
 
             mEventBus.postSticky(new OnConversationChanged(object, fragment.getType()));
-            onChangeCurrentFragment(fragment, delayChange);
+            changeCurrentFragment(fragment, delayChange);
         }
         mSlidingPane.closePane();
         supportInvalidateOptionsMenu();
     }
 
-    private void onChangeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
+    private void changeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
         final Runnable runnable = new Runnable() {
@@ -596,8 +604,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
                 transaction.replace(R.id.content_frame, fragment).commit();
                 getSupportFragmentManager().executePendingTransactions();
 
-                findById(MainActivity.this, R.id.content_frame_empty_textview)
-                        .setVisibility(View.GONE);
+                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility(
+                        View.GONE);
             }
         };
 
@@ -645,24 +653,20 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     private void onExternalConversationUpdate(final Conversation conversation) {
-        if (conversation != null) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (conversation.getServer().equals(conversation)) {
-                        changeCurrentConversation(conversation.getServer(), false);
-                    } else {
-                        changeCurrentConversation(conversation, false);
-                    }
-                }
-            });
-
-            supportInvalidateOptionsMenu();
-        } else {
+        if (conversation == null) {
             mSlidingPane.openPane();
 
             findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
                     (View.VISIBLE);
+        } else {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    changeCurrentConversation(conversation, false);
+                }
+            });
+
+            supportInvalidateOptionsMenu();
         }
     }
 

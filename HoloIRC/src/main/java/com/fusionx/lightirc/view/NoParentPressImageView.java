@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.ui.widget;
+package com.fusionx.lightirc.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

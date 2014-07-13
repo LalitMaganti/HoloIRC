@@ -3,7 +3,7 @@ package com.fusionx.lightirc.misc;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.NickColour;
-import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelActionEvent;
 import com.fusionx.relay.event.channel.ChannelConnectEvent;
@@ -157,7 +157,7 @@ public class IRCEventToStringConverter {
         return new ForegroundColorSpan(NickCache.getNickCache().get(nick).getColour());
     }
 
-    private FormattedString getFormattedStringForUser(final WorldUser user) {
+    private FormattedString getFormattedStringForUser(final ChannelUser user) {
         return getFormattedStringForNick(user.getNick());
     }
 

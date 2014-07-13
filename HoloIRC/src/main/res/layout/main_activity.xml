@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout
+<com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout
     android:id="@+id/sliding_pane_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -33,6 +33,17 @@
                 android:textAppearance="@android:style/TextAppearance.Large"
                 android:textColor="@android:color/darker_gray"
                 android:visibility="gone" />
+
+            <com.fusionx.lightirc.view.Snackbar
+                android:id="@+id/snackbar"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:gravity="center_vertical"
+                android:paddingLeft="24dp"
+                android:text="Test"
+                android:textSize="14sp"
+                android:visibility="visible" />
         </RelativeLayout>
 
         <FrameLayout
@@ -43,4 +54,4 @@
             android:background="?attr/main_background"
             android:divider="@android:color/transparent" />
     </android.support.v4.widget.DrawerLayout>
-</com.fusionx.lightirc.ui.widget.ProgrammableSlidingPaneLayout>
+</com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout>

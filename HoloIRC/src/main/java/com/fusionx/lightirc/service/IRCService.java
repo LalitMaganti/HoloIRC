@@ -11,7 +11,7 @@ import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.connection.ConnectionManager;
+import com.fusionx.relay.ConnectionManager;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;

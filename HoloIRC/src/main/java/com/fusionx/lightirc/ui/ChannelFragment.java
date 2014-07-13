@@ -26,7 +26,7 @@ import com.google.common.collect.Iterables;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Channel;
-import com.fusionx.relay.WorldUser;
+import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
@@ -63,10 +63,10 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     private boolean mIsPopupShown;
 
-    public void onMentionMultipleUsers(final List<WorldUser> users) {
+    public void onMentionMultipleUsers(final List<ChannelUser> users) {
         final StringBuilder builder = new StringBuilder();
         final String text = String.valueOf(mMessageBox.getText());
-        for (final WorldUser userNick : users) {
+        for (final ChannelUser userNick : users) {
             builder.append(userNick.getNick()).append(": ");
         }
         builder.append(text);
@@ -124,12 +124,12 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
                     mPopupMenu.dismiss();
                 } else {
                     // TODO - this needs to be synchronized properly
-                    final Collection<WorldUser> users = getChannel().getUsers();
-                    final List<WorldUser> sortedList = new ArrayList<>(users.size());
+                    final Collection<ChannelUser> users = getChannel().getUsers();
+                    final List<ChannelUser> sortedList = new ArrayList<>(users.size());
                     final String message = mMessageBox.getText().toString();
                     final String finalWord = Iterables
                             .getLast(IRCUtils.splitRawLine(message, false));
-                    for (final WorldUser user : users) {
+                    for (final ChannelUser user : users) {
                         if (StringUtils.startsWithIgnoreCase(user.getNick().getNickAsString(),
                                 finalWord)) {
                             sortedList.add(user);
@@ -148,7 +148,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
                         innerMenu.clear();
 
                         Collections.sort(sortedList, new IRCUserComparator(getChannel()));
-                        for (final WorldUser user : sortedList) {
+                        for (final ChannelUser user : sortedList) {
                             innerMenu.add(user.getNick().getNickAsString());
                         }
                         mPopupMenu.show();

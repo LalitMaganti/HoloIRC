@@ -32,4 +32,7 @@
 
     <color name="off_white">#e2e2e2</color>
 
+
+    <color name="snackbar">#ff323232</color>
+
 </resources>

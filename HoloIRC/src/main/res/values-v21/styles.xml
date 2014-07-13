@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Light" parent="@android:style/Theme.Material.Light.DarkActionBar">
+    <!--<style name="Light" parent="@android:style/Theme.Material.Light.DarkActionBar">
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <item name="android:colorAccent">@color/accent</item>
@@ -29,5 +28,5 @@
         <item name="expand_close_menu_drawable">@drawable/expander_close_holo_dark</item>
         <item name="expand_open_menu_drawable">@drawable/expander_open_holo_dark</item>
         <item name="action_divider_colour">@color/dark_gray</item>
-    </style>
+    </style>-->
 </resources>

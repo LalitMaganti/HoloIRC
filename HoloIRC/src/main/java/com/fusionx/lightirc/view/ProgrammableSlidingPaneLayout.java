@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.ui.widget;
+package com.fusionx.lightirc.view;
 
 import android.content.Context;
 import android.support.v4.widget.SlidingPaneLayout;
