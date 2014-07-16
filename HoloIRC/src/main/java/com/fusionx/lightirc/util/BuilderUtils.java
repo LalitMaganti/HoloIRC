@@ -10,12 +10,12 @@ public class BuilderUtils {
 
     public static List<ServerConfiguration.Builder> getFirstTimeBuilderList() {
         final ServerConfiguration.Builder freenode = new ServerConfiguration.Builder();
-        freenode.setTitle("Freenode").setUrl("chat.freenode.net").setPort(6667).setSsl(false);
+        freenode.setTitle("Freenode").setUrl("chat.freenode.net").setPort(6697).setSsl(true);
         freenode.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
         freenode.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
         final ServerConfiguration.Builder snoonet = new ServerConfiguration.Builder();
-        snoonet.setTitle("Snoonet").setUrl("irc.snoonet.org").setPort(6667).setSsl(false);
+        snoonet.setTitle("Snoonet").setUrl("irc.snoonet.org").setPort(6697).setSsl(true);
         snoonet.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
         snoonet.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
         
