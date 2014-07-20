@@ -563,13 +563,13 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
-            final boolean isServer = object.getClass().isInstance(Server.class);
+            final boolean isServer = Server.class.isInstance(object);
             final IRCFragment fragment;
             if (isServer) {
                 fragment = new ServerFragment();
-            } else if (object.getClass().isInstance(Channel.class)) {
+            } else if (Channel.class.isInstance(object)) {
                 fragment = new ChannelFragment();
-            } else if (object.getClass().isInstance(QueryUser.class)) {
+            } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
             } else {
                 throw new IllegalArgumentException();

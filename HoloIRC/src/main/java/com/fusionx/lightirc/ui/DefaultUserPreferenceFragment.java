@@ -7,7 +7,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class DefaultUserPreferenceFragment extends PreferenceFragment {
 
     @Override

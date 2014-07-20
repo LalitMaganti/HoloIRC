@@ -21,7 +21,6 @@ import java.util.List;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
-@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class LoggingPreferenceFragment extends PreferenceFragment {
 
     private List<Preference> mPreferenceList;
