@@ -28,7 +28,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.interfaces.Conversation;
+import com.fusionx.relay.Conversation;
 
 import android.app.Activity;
 import android.os.Bundle;

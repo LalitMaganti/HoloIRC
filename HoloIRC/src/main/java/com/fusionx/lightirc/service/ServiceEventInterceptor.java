@@ -6,6 +6,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.Channel;
+import com.fusionx.relay.Conversation;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
@@ -17,7 +18,6 @@ import com.fusionx.relay.event.query.QueryEvent;
 import com.fusionx.relay.event.server.InviteEvent;
 import com.fusionx.relay.event.server.JoinEvent;
 import com.fusionx.relay.event.server.NewPrivateMessageEvent;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -83,6 +83,12 @@ public final class ServiceEventInterceptor {
 
     public MessagePriority getMessagePriority() {
         return mMessagePriority;
+    }
+
+    private void setMessagePriority(final MessagePriority priority) {
+        if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
+            mMessagePriority = priority;
+        }
     }
 
     public void clearMessagePriority() {
@@ -156,14 +162,14 @@ public final class ServiceEventInterceptor {
             });
         }
     }
+    /*
+     * Event interception ends here
+     */
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final InviteEvent event) {
         mInviteEvents.add(event);
     }
-    /*
-     * Event interception ends here
-     */
 
     private void onIRCEvent(final MessagePriority priority, final Conversation conversation,
             final Event event) {
@@ -191,11 +197,5 @@ public final class ServiceEventInterceptor {
 
     private void setSubEvent(final Conversation title, final Event event) {
         mEventMap.put(title, event);
-    }
-
-    private void setMessagePriority(final MessagePriority priority) {
-        if (mMessagePriority == null || mMessagePriority.compareTo(priority) < 0) {
-            mMessagePriority = priority;
-        }
     }
 }

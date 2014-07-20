@@ -2,9 +2,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.MultiSelectListPreference;

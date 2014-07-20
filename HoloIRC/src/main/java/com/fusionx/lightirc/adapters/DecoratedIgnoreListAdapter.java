@@ -31,16 +31,16 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator implements
         StickyListHeadersAdapter {
 
-    /**
-     * The {@link android.widget.BaseAdapter} this {@code BaseAdapterDecorator} decorates.
-     */
-    private final BaseAdapter mDecoratedBaseAdapter;
-
     private static final long DEFAULTANIMATIONDELAYMILLIS = 100;
 
     private static final long DEFAULTANIMATIONDURATIONMILLIS = 300;
 
     private static final long INITIALDELAYMILLIS = 150;
+
+    /**
+     * The {@link android.widget.BaseAdapter} this {@code BaseAdapterDecorator} decorates.
+     */
+    private final BaseAdapter mDecoratedBaseAdapter;
 
     private final SparseArray<AnimationInfo> mAnimators;
 
@@ -338,7 +338,8 @@ public class DecoratedIgnoreListAdapter extends BaseAdapterDecorator implements
     }
 
     /**
-     * Returns the {@link android.widget.BaseAdapter} that this {@code BaseAdapterDecorator} decorates.
+     * Returns the {@link android.widget.BaseAdapter} that this {@code BaseAdapterDecorator}
+     * decorates.
      */
     public BaseAdapter getDecoratedBaseAdapter() {
         return mDecoratedBaseAdapter;

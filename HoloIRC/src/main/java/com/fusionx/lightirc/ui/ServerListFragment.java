@@ -13,6 +13,7 @@ import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.Conversation;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
@@ -25,7 +26,6 @@ import com.fusionx.relay.event.server.NewPrivateMessageEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import com.fusionx.relay.event.server.StopEvent;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -425,7 +425,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @SuppressWarnings("unused")
-        public void onEventMainThread(final NewPrivateMessageEvent event) throws InterruptedException {
+        public void onEventMainThread(final NewPrivateMessageEvent event)
+                throws InterruptedException {
             final QueryUser user = mServer.getUserChannelInterface()
                     .getQueryUser(event.nick);
             mListAdapter.getGroup(mServerIndex).addServerObject(user);
@@ -435,8 +436,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
-            final Channel channel = mServer.getUserChannelInterface().getChannel(event
-                    .channelName);
+            final Channel channel = mServer.getUserChannelInterface().getChannel(event.channelName);
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
             mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);

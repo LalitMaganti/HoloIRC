@@ -82,17 +82,17 @@ public class IRCEventToStringConverter {
         buildReflectionCache();
     }
 
-    private void buildReflectionCache() {
-        for (final Method method : mEventConverter.getClass().getDeclaredMethods()) {
-            mClassMethodMap.put(method.getParameterTypes()[0], method);
-        }
-    }
-
     public static IRCEventToStringConverter getConverter(final Context context) {
         if (sConverter == null) {
             sConverter = new IRCEventToStringConverter(context);
         }
         return sConverter;
+    }
+
+    private void buildReflectionCache() {
+        for (final Method method : mEventConverter.getClass().getDeclaredMethods()) {
+            mClassMethodMap.put(method.getParameterTypes()[0], method);
+        }
     }
 
     public CharSequence formatTextWithStyle(final String format, final FormattedString... args) {

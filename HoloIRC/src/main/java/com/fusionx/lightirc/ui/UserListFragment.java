@@ -148,7 +148,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     public void onUpdateUserList() {
         mCallback.updateUserListVisibility();
 
-        final Collection<ChannelUser> userList = mChannel.getUsers();
+        final Collection<? extends ChannelUser> userList = mChannel.getUsers();
 
         getListView().setAdapter(null);
         mAdapter.setChannel(mChannel);
@@ -271,7 +271,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     }
 
     boolean isNickOtherUsers(final String nick) {
-        return !mChannel.getServer().getUser().getNick().equals(nick);
+        return !mChannel.getServer().getUser().getNick().getNickAsString().equals(nick);
     }
 
     private void onPrivateMessageUser(final String nick) {

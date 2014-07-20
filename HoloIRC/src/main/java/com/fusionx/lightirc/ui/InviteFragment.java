@@ -157,7 +157,7 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-           final TextView view = (TextView) (convertView != null
+            final TextView view = (TextView) (convertView != null
                     ? convertView : mLayoutInflater.inflate(R.layout.default_listview_textview,
                     parent, false));
             view.setText(getItem(position).channelName);

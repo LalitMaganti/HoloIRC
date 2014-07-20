@@ -9,9 +9,9 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.relay.ConnectionManager;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.ConnectionManager;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -146,7 +146,7 @@ public class IRCService extends Service {
 
     public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
             final Collection<String> ignoreList) {
-        final Pair<Boolean, Server> pair
+        final Pair<Boolean, ? extends Server> pair
                 = mConnectionManager.requestConnection(builder.build(), ignoreList, mHandler);
 
         final boolean exists = pair.first;

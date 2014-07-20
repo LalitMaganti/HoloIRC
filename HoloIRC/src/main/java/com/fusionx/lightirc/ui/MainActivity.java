@@ -17,12 +17,12 @@ import com.fusionx.lightirc.view.Snackbar;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.Conversation;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.app.ActionBar;
 import android.content.Intent;
@@ -563,13 +563,13 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
-            final boolean isServer = object.getClass().equals(Server.class);
+            final boolean isServer = object.getClass().isInstance(Server.class);
             final IRCFragment fragment;
             if (isServer) {
                 fragment = new ServerFragment();
-            } else if (object.getClass().equals(Channel.class)) {
+            } else if (object.getClass().isInstance(Channel.class)) {
                 fragment = new ChannelFragment();
-            } else if (object.getClass().equals(QueryUser.class)) {
+            } else if (object.getClass().isInstance(QueryUser.class)) {
                 fragment = new UserFragment();
             } else {
                 throw new IllegalArgumentException();

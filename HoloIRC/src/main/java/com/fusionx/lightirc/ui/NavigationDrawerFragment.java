@@ -10,8 +10,8 @@ import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.Conversation;
 import com.fusionx.relay.event.server.InviteEvent;
-import com.fusionx.relay.interfaces.Conversation;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import android.app.ActionBar;

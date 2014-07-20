@@ -124,7 +124,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
                     mPopupMenu.dismiss();
                 } else {
                     // TODO - this needs to be synchronized properly
-                    final Collection<ChannelUser> users = getChannel().getUsers();
+                    final Collection<? extends ChannelUser> users = getChannel().getUsers();
                     final List<ChannelUser> sortedList = new ArrayList<>(users.size());
                     final String message = mMessageBox.getText().toString();
                     final String finalWord = Iterables
@@ -178,7 +178,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     protected List<ChannelEvent> getAdapterData() {
-        return getChannel().getBuffer();
+        return (List<ChannelEvent>) getChannel().getBuffer();
     }
 
     private Channel getChannel() {

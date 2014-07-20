@@ -2,9 +2,9 @@ package com.fusionx.lightirc.model;
 
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.Conversation;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
-import com.fusionx.relay.interfaces.Conversation;
 
 import java.util.Collection;
 import java.util.HashMap;

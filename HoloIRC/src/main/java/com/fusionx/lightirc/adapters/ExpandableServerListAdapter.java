@@ -10,8 +10,8 @@ import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ConnectionStatus;
+import com.fusionx.relay.Conversation;
 import com.fusionx.relay.event.Event;
-import com.fusionx.relay.interfaces.Conversation;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;

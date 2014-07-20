@@ -60,6 +60,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
 
     @Override
     protected List<ServerEvent> getAdapterData() {
-        return mConversation.getServer().getBuffer();
+        return (List<ServerEvent>) mConversation.getServer().getBuffer();
     }
 }
