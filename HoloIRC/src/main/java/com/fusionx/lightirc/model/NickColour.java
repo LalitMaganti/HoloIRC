@@ -2,7 +2,7 @@ package com.fusionx.lightirc.model;
 
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.Theme;
-import com.fusionx.relay.nick.Nick;
+import com.fusionx.relay.Nick;
 
 import android.graphics.Color;
 

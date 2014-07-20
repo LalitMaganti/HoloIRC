@@ -47,7 +47,7 @@ import com.fusionx.relay.event.server.ServerNickChangeEvent;
 import com.fusionx.relay.event.server.StopEvent;
 import com.fusionx.relay.event.server.WallopsEvent;
 import com.fusionx.relay.event.server.WhoisEvent;
-import com.fusionx.relay.nick.Nick;
+import com.fusionx.relay.Nick;
 
 import android.content.Context;
 import android.graphics.Typeface;
