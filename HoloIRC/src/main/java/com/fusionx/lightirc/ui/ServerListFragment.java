@@ -60,26 +60,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
-    private final Object mEventHandler = new Object() {
-        @Subscribe
-        public void onConversationChanged(final OnConversationChanged event) {
-            if (event.conversation != null) {
-                if (event.fragmentType == FragmentType.SERVER) {
-                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority();
-                } else {
-                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority
-                            (event.conversation);
-                }
-            }
-            mListView.invalidateViews();
-        }
-
-        // Make sure the events look up to date if the full line highlight pref is changed
-        @Subscribe
-        public void onPreferencesChanged(final OnPreferencesChangedEvent event) {
-            mListView.invalidateViews();
-        }
-    };
+    private final EventHandler mEventHandler = new EventHandler();
 
     // Callbacks
     private Callback mCallback;
@@ -130,16 +111,35 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mListView.setOnGroupClickListener(this);
         mListView.setOnChildClickListener(this);
 
+        if (bundle == null) {
+            return;
+        }
         // If we are restoring a savedInstanceSate then a ServiceConnection is already present -
         // ask for that to be returned
-        if (bundle != null) {
-            final IRCService service = mCallback.getService();
-            // The service could be null if the rotation was done so quickly after start that a
-            // connection to the service has not been established - in that case our callback is
-            // still to come
-            if (service != null) {
-                onServiceConnected(service);
-            }
+        final IRCService service = mCallback.getService();
+        // The service could be null if the rotation was done so quickly after start that a
+        // connection to the service has not been established - in that case our callback is
+        // still to come
+        if (service != null) {
+            onServiceConnected(service);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        for (final ServerEventHandler handler : mEventHandlers) {
+            handler.register();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        for (final ServerEventHandler handler : mEventHandlers) {
+            handler.unregister();
         }
     }
 
@@ -148,10 +148,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         super.onDestroy();
 
         getBus().unregister(mEventHandler);
-
-        for (final ServerEventHandler handler : mEventHandlers) {
-            handler.unregister();
-        }
     }
 
     public void refreshServers() {
@@ -508,8 +504,34 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             });
         }
 
+        public void register() {
+            mServer.getServerEventBus().register(this);
+        }
+
         public void unregister() {
             mServer.getServerEventBus().unregister(this);
+        }
+    }
+
+    private class EventHandler {
+
+        @Subscribe
+        public void onConversationChanged(final OnConversationChanged event) {
+            if (event.conversation != null) {
+                if (event.fragmentType == FragmentType.SERVER) {
+                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority();
+                } else {
+                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority
+                            (event.conversation);
+                }
+            }
+            mListView.invalidateViews();
+        }
+
+        // Make sure the events look up to date if the full line highlight pref is changed
+        @Subscribe
+        public void onPreferencesChanged(final OnPreferencesChangedEvent event) {
+            mListView.invalidateViews();
         }
     }
 }

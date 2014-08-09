@@ -11,6 +11,7 @@ import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelEvent;
+import com.fusionx.relay.event.channel.ChannelPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
@@ -142,6 +143,9 @@ public final class ServiceEventInterceptor {
                 } else {
                     onIRCEvent(MessagePriority.LOW, conversation, event);
                 }
+            } else if (conversation == null) {
+                // Either a part or a kick
+                // TODO
             } else {
                 onIRCEvent(MessagePriority.LOW, conversation, event);
             }

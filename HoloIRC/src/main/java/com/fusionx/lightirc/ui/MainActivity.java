@@ -24,16 +24,15 @@ import com.fusionx.relay.event.server.KickEvent;
 import com.fusionx.relay.event.server.PartEvent;
 import com.fusionx.relay.event.server.StatusChangeEvent;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,7 +49,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 /**
  * Main activity which co-ordinates everything in the app
  */
-public class MainActivity extends FragmentActivity implements ServerListFragment.Callback,
+public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         DrawerLayout.DrawerListener, NavigationDrawerFragment.Callback, WorkerFragment.Callback,
         IRCFragment.Callback {
 
@@ -245,8 +244,8 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
         if (mConversation == null) {
             return;
         }
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
-                && mConversation.getId().equals(event.channelName);
+        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName) &&
+                mConversation.getId().equals(event.channelName);
 
         if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
@@ -519,8 +518,10 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
+
+        getBus().register(mMentionHelper, 100);
 
         // TODO - what if conversation is changed when stopped
         // This is just registration because we'll retrieve the sticky event later
@@ -528,22 +529,10 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        getBus().register(mMentionHelper, 100);
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
 
         getBus().unregister(mMentionHelper);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
 
         // TODO - what if conversation is changed when stopped
         getBus().unregister(mConversationChanged);
@@ -666,9 +655,5 @@ public class MainActivity extends FragmentActivity implements ServerListFragment
             }
         });
         supportInvalidateOptionsMenu();
-    }
-
-    public ActionBar getSupportActionBar() {
-        return getActionBar();
     }
 }
