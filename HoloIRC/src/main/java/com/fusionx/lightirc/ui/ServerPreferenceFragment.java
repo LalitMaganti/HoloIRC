@@ -35,6 +35,11 @@ public class ServerPreferenceFragment extends PreferenceFragment {
         getPreferenceManager().setSharedPreferencesName("tempUselessFile");
 
         addPreferencesFromResource(R.xml.activty_server_settings_prefs);
+    }
+
+    @Override
+    public void onActivityCreated(final Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
         mCallback.setupPreferences(getPreferenceScreen(), getActivity());
     }
