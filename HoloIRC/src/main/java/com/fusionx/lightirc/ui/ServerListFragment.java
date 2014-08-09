@@ -498,13 +498,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final StopEvent event) {
-            refreshServers(new Runnable() {
-                @Override
-                public void run() {
-                    unregister();
-                    mEventHandlers.remove(ServerEventHandler.this);
-                    mCallback.onServerStopCompleted(mServer);
-                }
+            refreshServers(() -> {
+                unregister();
+                mEventHandlers.remove(ServerEventHandler.this);
+                mCallback.onServerStopCompleted(mServer);
             });
         }
 

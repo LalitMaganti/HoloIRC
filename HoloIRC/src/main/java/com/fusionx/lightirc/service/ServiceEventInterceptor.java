@@ -131,12 +131,7 @@ public final class ServiceEventInterceptor {
                     onIRCEvent(MessagePriority.HIGH, conversation, event);
 
                     // Forward the event UI side
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBus().post(new OnChannelMentionEvent(event.channel));
-                        }
-                    });
+                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(event.channel)));
                 } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
                         || event.getClass().equals(ChannelWorldActionEvent.class)) {
                     onIRCEvent(MessagePriority.MEDIUM, conversation, event);
@@ -158,12 +153,7 @@ public final class ServiceEventInterceptor {
             onIRCEvent(MessagePriority.HIGH, event.user, event);
 
             // Forward the event UI side
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    getBus().post(new OnQueryEvent(event.user));
-                }
-            });
+            mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
         }
     }
     /*

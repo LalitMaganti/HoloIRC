@@ -591,17 +591,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private void changeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final FragmentTransaction transaction = getSupportFragmentManager()
-                        .beginTransaction();
-                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                transaction.replace(R.id.content_frame, fragment).commit();
-                getSupportFragmentManager().executePendingTransactions();
+        final Runnable runnable = () -> {
+            final FragmentTransaction transaction = getSupportFragmentManager()
+                    .beginTransaction();
+            transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+            transaction.replace(R.id.content_frame, fragment).commit();
+            getSupportFragmentManager().executePendingTransactions();
 
-                mEmptyView.setVisibility(View.GONE);
-            }
+            mEmptyView.setVisibility(View.GONE);
         };
 
         if (delayChange) {
@@ -630,12 +627,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mCurrentFragment = null;
         getSupportFragmentManager().executePendingTransactions();
 
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mEmptyView.setVisibility(View.VISIBLE);
-            }
-        }, 300);
+        mHandler.postDelayed(() -> mEmptyView.setVisibility(View.VISIBLE), 300);
 
         // Don't listen for any more events from this server
         mConversation.getServer().getServerEventBus().unregister(this);
@@ -652,12 +644,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mEmptyView.setVisibility(View.VISIBLE);
             return;
         }
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                changeCurrentConversation(conversation, false);
-            }
-        });
+        mHandler.post(() -> changeCurrentConversation(conversation, false));
         supportInvalidateOptionsMenu();
     }
 }

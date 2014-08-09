@@ -25,6 +25,9 @@ import com.fusionx.lightirc.R;
 
 import android.content.Context;
 
+import java8.lang.FunctionalInterface;
+
+@FunctionalInterface
 public abstract class NickDialogBuilder extends DialogBuilder {
 
     public NickDialogBuilder(final Context context, final String nick) {

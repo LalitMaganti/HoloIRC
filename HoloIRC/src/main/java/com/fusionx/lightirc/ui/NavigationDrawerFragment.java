@@ -111,14 +111,11 @@ public class NavigationDrawerFragment extends Fragment implements
 
         getBus().registerSticky(mEventHandler);
 
-        mSlideUpLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSlidingUpPanelLayout.isExpanded()) {
-                    mSlidingUpPanelLayout.collapsePane();
-                } else {
-                    mSlidingUpPanelLayout.expandPane();
-                }
+        mSlideUpLayout.setOnClickListener(v -> {
+            if (mSlidingUpPanelLayout.isExpanded()) {
+                mSlidingUpPanelLayout.collapsePane();
+            } else {
+                mSlidingUpPanelLayout.expandPane();
             }
         });
 
@@ -321,16 +318,12 @@ public class NavigationDrawerFragment extends Fragment implements
                 .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         final View customActionBarView = inflater
                 .inflate(R.layout.actionbar_custom_view_done, null);
-        findById(customActionBarView, R.id.actionbar_done)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isIgnoreFragmentVisible()) {
-                            mIgnoreListFragment.saveIgnoreList();
-                        }
-                        switchToActionFragment();
-                    }
-                });
+        findById(customActionBarView, R.id.actionbar_done).setOnClickListener(v -> {
+            if (isIgnoreFragmentVisible()) {
+                mIgnoreListFragment.saveIgnoreList();
+            }
+            switchToActionFragment();
+        });
         final ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                 ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME

@@ -24,6 +24,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import java8.util.stream.Collectors;
+import java8.util.stream.IntStreams;
+
 public class UIUtils {
 
     private static Typeface sRobotoLightTypeface = null;
@@ -37,11 +40,6 @@ public class UIUtils {
 
     public static void setRobotoLight(final Context context, final TextView textView) {
         final Typeface font = getRobotoLight(context);
-        textView.setTypeface(font);
-    }
-
-    public static void setRobotoThin(final Context context, final TextView textView) {
-        final Typeface font = getRobotoThin(context);
         textView.setTypeface(font);
     }
 
@@ -67,19 +65,15 @@ public class UIUtils {
     }
 
     public static List<Integer> getCheckedPositions(final AbsListView listView) {
-        final List<Integer> checkedSessionPositions = new ArrayList<>();
         if (listView == null) {
-            return checkedSessionPositions;
+            return new ArrayList<>();
         }
 
         final SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(checkedPositionsBool.keyAt(i));
-            }
-        }
-
-        return checkedSessionPositions;
+        return IntStreams.range(0, checkedPositionsBool.size())
+                .filter(checkedPositionsBool::valueAt)
+                .map(checkedPositionsBool::keyAt)
+                .boxed().collect(Collectors.toList());
     }
 
     // TODO - fix this horribleness
@@ -144,13 +138,5 @@ public class UIUtils {
                     "Roboto-Light.ttf");
         }
         return sRobotoLightTypeface;
-    }
-
-    private static Typeface getRobotoThin(final Context context) {
-        if (sRobotoLightTypeface == null) {
-            sRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
-                    "Roboto-Thin.ttf");
-        }
-        return sRobotoThinTypeface;
     }
 }

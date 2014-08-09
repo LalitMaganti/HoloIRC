@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
+import java8.util.stream.StreamSupport;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -58,10 +59,8 @@ public class IRCService extends Service {
     private final BroadcastReceiver mDisconnectAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for (final Map.Entry<Server, ServiceEventInterceptor> server : mEventHelperMap
-                    .entrySet()) {
-                mEventHelperMap.get(server.getKey()).unregister();
-            }
+            StreamSupport.stream(mEventHelperMap.keySet())
+                    .forEach(key -> mEventHelperMap.get(key).unregister());
 
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

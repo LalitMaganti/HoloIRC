@@ -85,13 +85,13 @@ public class SharedPreferencesUtils {
 
         if (firstRun) {
             firstTimeServerSetup(context);
-            globalSettings.edit().putBoolean("firstrun", false).commit();
-            globalSettings.edit().putBoolean("firstDbRun", false).commit();
+            globalSettings.edit().putBoolean("firstrun", false).apply();
+            globalSettings.edit().putBoolean("firstDbRun", false).apply();
         } else if (firstDbRun) {
             final List<File> fileList = SharedPreferencesUtils.getOldServers(context);
             migrateToDatabase(fileList, context);
             firstDbSetup(context);
-            globalSettings.edit().putBoolean("firstDbRun", false).commit();
+            globalSettings.edit().putBoolean("firstDbRun", false).apply();
         }
     }
 
@@ -137,7 +137,7 @@ public class SharedPreferencesUtils {
 
         final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
         for (final ServerConfiguration.Builder builder : builders) {
-            source.addServer(builder, new ArrayList<String>());
+            source.addServer(builder, new ArrayList<>());
         }
         source.close();
     }
@@ -149,7 +149,7 @@ public class SharedPreferencesUtils {
         final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
         for (final ServerConfiguration.Builder builder : builders) {
             if (source.getBuilderByName(builder.getTitle()) == null) {
-                source.addServer(builder, new ArrayList<String>());
+                source.addServer(builder, new ArrayList<>());
             }
         }
         source.close();
@@ -187,7 +187,7 @@ public class SharedPreferencesUtils {
 
         // Autojoin channels
         final ArrayList<String> auto = new ArrayList<String>(serverSettings
-                .getStringSet(PreferenceConstants.PREF_AUTOJOIN, new HashSet<String>()));
+                .getStringSet(PreferenceConstants.PREF_AUTOJOIN, new HashSet<>()));
         for (final String channel : auto) {
             builder.getAutoJoinChannels().add(channel);
         }

@@ -60,13 +60,9 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     private int mMainFontSize;
 
     private AppPreferences(final Context context) {
-        sPrefsChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(final SharedPreferences
-                    sharedPreferences, final String key) {
-                setPreferences(sharedPreferences);
-                getBus().post(new OnPreferencesChangedEvent());
-            }
+        sPrefsChangeListener = (sharedPreferences, key) -> {
+            setPreferences(sharedPreferences);
+            getBus().post(new OnPreferencesChangedEvent());
         };
         final SharedPreferences preferences = getDefaultSharedPreferences(context);
         preferences.registerOnSharedPreferenceChangeListener(sPrefsChangeListener);
@@ -186,11 +182,11 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
         // Notification settings
         inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
-                .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
+                .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<>());
         inAppNotification = preferences.getBoolean(PreferenceConstants
                 .PREF_IN_APP_NOTIFICATION, true);
         outOfAppNotificationSettings = preferences.getStringSet(PreferenceConstants
-                .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<String>());
+                .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<>());
         outOfAppNotification = preferences.getBoolean(PreferenceConstants
                 .PREF_OUT_OF_APP_NOTIFICATION, true);
 

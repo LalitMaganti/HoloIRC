@@ -56,14 +56,11 @@ public class LoggingPreferenceFragment extends PreferenceFragment {
         final Switch logSwitch = findById(actionView, R.id.logging_switch_view);
 
         logSwitch.setChecked(logging);
-        logSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                final SharedPreferences.Editor editor = getPreferenceManager()
-                        .getSharedPreferences().edit();
-                editor.putBoolean(PreferenceConstants.PREF_LOGGING, isChecked).commit();
-                updatePreferencesEnabled(logSwitch.isChecked());
-            }
+        logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            final SharedPreferences.Editor editor = getPreferenceManager()
+                    .getSharedPreferences().edit();
+            editor.putBoolean(PreferenceConstants.PREF_LOGGING, isChecked).commit();
+            updatePreferencesEnabled(logSwitch.isChecked());
         });
     }
 

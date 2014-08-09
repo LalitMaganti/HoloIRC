@@ -33,6 +33,9 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java8.lang.FunctionalInterface;
+
+@FunctionalInterface
 public abstract class DialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {
 
@@ -78,7 +81,7 @@ public abstract class DialogBuilder extends AlertDialog.Builder implements Dialo
         return dialog;
     }
 
-    abstract public void onOkClicked(final String input);
+    public abstract void onOkClicked(final String input);
 
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {

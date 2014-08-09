@@ -22,6 +22,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
+
 public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements Filterable {
 
     private final Object mLock = new Object();
@@ -162,18 +165,15 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
             mDataToFilter = ImmutableList.copyOf(list);
         }
 
-        public void setCallback(Runnable callback) {
+        public void setCallback(final Runnable callback) {
             mCallback = callback;
         }
 
         @Override
         protected FilterResults performFiltering(final CharSequence constraint) {
-            final ArrayList<T> resultList = new ArrayList<>();
-            for (final T object : mDataToFilter) {
-                if (EventUtils.shouldStoreEvent(object)) {
-                    resultList.add(object);
-                }
-            }
+            final List<T> resultList = StreamSupport.stream(mDataToFilter)
+                    .filter(EventUtils::shouldStoreEvent)
+                    .collect(Collectors.toList());
 
             final FilterResults results = new FilterResults();
             results.values = resultList;

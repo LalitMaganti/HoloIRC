@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import java8.util.stream.Stream;
+import java8.util.stream.StreamSupport;
+
 import static com.fusionx.relay.ServerConfiguration.Builder;
 
 public class ServerWrapper {
@@ -49,14 +52,10 @@ public class ServerWrapper {
         mServer = server;
 
         if (isServerAvailable()) {
-            if (server.getUser() != null) {
-                for (final Channel channel : server.getUser().getChannels()) {
-                    mServerObjects.put(channel.getName(), channel);
-                }
-            }
-            for (final QueryUser user : server.getUserChannelInterface().getQueryUsers()) {
-                mServerObjects.put(user.getNick().getNickAsString(), user);
-            }
+            StreamSupport.stream(server.getUser().getChannels())
+                    .forEach(c -> mServerObjects.put(c.getName(), c));
+            StreamSupport.stream(server.getUserChannelInterface().getQueryUsers())
+                    .forEach(u -> mServerObjects.put(u.getNick().getNickAsString(), u));
         }
     }
 

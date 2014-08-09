@@ -25,12 +25,9 @@ public class Snackbar extends TextView {
 
     public void display(final String message) {
         final int value = mAtomicInteger.incrementAndGet();
-        getHandler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (value == mAtomicInteger.get()) {
-                    setVisibility(INVISIBLE);
-                }
+        getHandler().postDelayed(() -> {
+            if (value == mAtomicInteger.get()) {
+                setVisibility(INVISIBLE);
             }
         }, 3000);
         setText(message);
