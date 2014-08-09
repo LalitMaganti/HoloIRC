@@ -50,6 +50,11 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     }
 
     @Override
+    public boolean isValid() {
+        return mConversation.isConversationValid();
+    }
+
+    @Override
     public FragmentType getType() {
         return FragmentType.USER;
     }

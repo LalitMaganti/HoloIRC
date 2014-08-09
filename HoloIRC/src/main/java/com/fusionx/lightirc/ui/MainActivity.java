@@ -526,6 +526,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // TODO - what if conversation is changed when stopped
         // This is just registration because we'll retrieve the sticky event later
         getBus().register(mConversationChanged);
+
+        if (mCurrentFragment != null && !mCurrentFragment.isValid()) {
+            onRemoveCurrentFragmentAndConversation();
+        }
     }
 
     @Override

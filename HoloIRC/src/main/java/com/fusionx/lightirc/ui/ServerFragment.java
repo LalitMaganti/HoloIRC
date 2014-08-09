@@ -48,6 +48,11 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
+    public boolean isValid() {
+        return mConversation.isConversationValid();
+    }
+
+    @Override
     public FragmentType getType() {
         return FragmentType.SERVER;
     }

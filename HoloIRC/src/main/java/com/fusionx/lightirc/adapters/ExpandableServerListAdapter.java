@@ -178,6 +178,12 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+    public void checkAndRemoveInvalidConversations() {
+        for (final ServerWrapper serverWrapper : mServerListItems) {
+            serverWrapper.checkAndRemoveInvalidConversations();
+        }
+    }
+
     public final class ExpandListener implements View.OnClickListener {
 
         private final int mGroupPos;

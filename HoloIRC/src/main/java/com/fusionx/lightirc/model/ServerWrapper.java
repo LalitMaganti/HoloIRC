@@ -87,4 +87,14 @@ public class ServerWrapper {
         }
         return iterator.next();
     }
+
+    public void checkAndRemoveInvalidConversations() {
+        for (Iterator<Conversation> iterator = mServerObjects.values().iterator();
+                iterator.hasNext(); ) {
+            final Conversation conversation = iterator.next();
+            if (!conversation.isConversationValid()) {
+                iterator.remove();
+            }
+        }
+    }
 }

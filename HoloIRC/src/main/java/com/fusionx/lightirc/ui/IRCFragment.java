@@ -163,6 +163,8 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     // Abstract methods
     protected abstract void onSendMessage(final String message);
 
+    public abstract boolean isValid();
+
     public interface Callback {
 
         public EventCache getEventCache();

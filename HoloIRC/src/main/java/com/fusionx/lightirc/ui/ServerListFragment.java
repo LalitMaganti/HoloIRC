@@ -132,6 +132,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         for (final ServerEventHandler handler : mEventHandlers) {
             handler.register();
         }
+        if (mListAdapter != null) {
+            mListAdapter.checkAndRemoveInvalidConversations();
+            mListAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
