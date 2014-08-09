@@ -43,7 +43,7 @@
                 android:paddingLeft="24dp"
                 android:text="Test"
                 android:textSize="14sp"
-                android:visibility="visible" />
+                android:visibility="gone" />
         </RelativeLayout>
 
         <FrameLayout
