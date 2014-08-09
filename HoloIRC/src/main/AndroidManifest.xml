@@ -3,7 +3,7 @@
     package="com.fusionx.lightirc"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="43"
+    android:versionCode="44"
     android:versionName="3.2.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
