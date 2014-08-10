@@ -370,8 +370,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getIntent().removeExtra("server_name");
             getIntent().removeExtra("channel_name");
 
+            // Assume on this high a level that the channel will exist - if it doesn't it
+            // indicates a serious bug
             final Server server = service.getServerIfExists(serverName);
-            conversation = server.getUserChannelInterface().getChannel(channelName);
+            conversation = server.getUserChannelInterface().getChannel(channelName).get();
         }
 
         if (!fromRecents && clearCaches) {
@@ -500,8 +502,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("server_name");
         getIntent().removeExtra("channel_name");
 
+        // Assume on this high a level that the channel will exist - if it doesn't it
+        // indicates a serious bug
         final Server server = getService().getServerIfExists(serverName);
-        final Conversation conversation = server.getUserChannelInterface().getChannel(channelName);
+        final Conversation conversation = server.getUserChannelInterface()
+                .getChannel(channelName).get();
         onExternalConversationUpdate(conversation);
     }
 

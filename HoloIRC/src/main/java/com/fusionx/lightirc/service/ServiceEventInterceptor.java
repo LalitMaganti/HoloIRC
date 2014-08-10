@@ -7,11 +7,9 @@ import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Conversation;
-import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.ChannelPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
@@ -109,14 +107,13 @@ public final class ServiceEventInterceptor {
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final NewPrivateMessageEvent event) {
-        final QueryUser user = mServer.getUserChannelInterface().getQueryUser(event.nick);
-        onIRCEvent(MessagePriority.HIGH, user, getLastStorableEvent(user.getBuffer()));
+        onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final JoinEvent event) {
-        final Channel channel = mServer.getUserChannelInterface().getChannel(event.channelName);
-        onIRCEvent(MessagePriority.LOW, channel, getLastStorableEvent(channel.getBuffer()));
+        onIRCEvent(MessagePriority.LOW, event.channel,
+                getLastStorableEvent(event.channel.getBuffer()));
     }
 
     @SuppressWarnings("unused")
