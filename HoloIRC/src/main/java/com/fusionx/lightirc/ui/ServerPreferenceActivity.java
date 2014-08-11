@@ -5,9 +5,6 @@ import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
-import com.fusionx.lightirc.util.PreferenceUtils;
-import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ServerConfiguration;
 import com.fusionx.relay.misc.NickStorage;
 

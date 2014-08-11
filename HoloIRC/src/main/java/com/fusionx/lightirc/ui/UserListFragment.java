@@ -26,7 +26,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.event.channel.ChannelNameEvent;

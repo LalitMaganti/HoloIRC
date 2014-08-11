@@ -22,11 +22,15 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.PreferenceConstants;
 
-import android.annotation.TargetApi;
-import android.os.Build;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceScreen;
 
 public class AboutPreferenceFragment extends PreferenceFragment {
 
@@ -35,6 +39,27 @@ public class AboutPreferenceFragment extends PreferenceFragment {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.about_settings_fragment);
 
-        PreferenceHelpers.setupAppVersionPreference(getPreferenceScreen(), getActivity());
+        final PreferenceScreen screen = getPreferenceScreen();
+        final Context context = getActivity();
+        final Preference appVersionPreference = screen.findPreference(PreferenceConstants
+                .PREF_APP_VERSION);
+
+        if (appVersionPreference != null) {
+            appVersionPreference.setSummary(MiscUtils.getAppVersion(context));
+        }
+
+        final Preference source = screen.findPreference(PreferenceConstants.PREF_SOURCE);
+        if (source != null) {
+            source.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
+                        public boolean onPreferenceClick(Preference preference) {
+                            Intent browserIntent = new Intent("android.intent.action.VIEW",
+                                    Uri.parse("http://github.com/tilal6991/HoloIRC"));
+                            context.startActivity(browserIntent);
+                            return true;
+                        }
+                    }
+            );
+        }
     }
 }

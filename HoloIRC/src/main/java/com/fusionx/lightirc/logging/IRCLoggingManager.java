@@ -2,7 +2,6 @@ package com.fusionx.lightirc.logging;
 
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.logging.LoggingManager;

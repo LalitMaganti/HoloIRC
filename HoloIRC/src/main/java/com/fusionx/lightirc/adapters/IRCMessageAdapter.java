@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
-import com.fusionx.lightirc.util.EventUtils;
-import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.Event;
 
 import android.content.Context;

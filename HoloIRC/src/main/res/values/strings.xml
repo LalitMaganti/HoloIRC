@@ -176,4 +176,8 @@
     <string name="logging_settings_title">Logging</string>
     <string name="logging_settings_summary">Control logging settings</string>
 
+    <!-- Crash reporting settings -->
+    <string name="bug_reporting_settings_title">Bug Reporting</string>
+    <string name="bug_reporting_summary">Control bug/crash reporting</string>
+
 </resources>

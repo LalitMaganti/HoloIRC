@@ -1,10 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.UIUtils;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
@@ -18,7 +15,6 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBuildHeaders(final List<Header> target) {
         loadHeadersFromResource(R.xml.app_settings_headers, target);

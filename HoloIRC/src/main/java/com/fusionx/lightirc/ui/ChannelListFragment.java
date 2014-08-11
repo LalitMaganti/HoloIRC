@@ -4,8 +4,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
 import com.fusionx.lightirc.model.db.DatabaseContract;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
-import com.fusionx.lightirc.util.DatabaseUtils;
-import com.fusionx.lightirc.util.MultiSelectionUtils;
 
 import android.app.Activity;
 import android.content.ContentValues;

@@ -39,6 +39,19 @@ android {
         release
     }
 
+    productFlavors {
+        simple {
+            applicationId = android.defaultConfig.applicationId
+            versionName = android.defaultConfig.versionName
+            ext.enableCrashlytics = false
+        }
+        internal {
+            applicationId = android.defaultConfig.applicationId
+            versionName = android.defaultConfig.versionName
+            ext.enableCrashlytics = true
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix '.debug'

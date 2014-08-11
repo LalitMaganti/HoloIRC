@@ -1,7 +1,6 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.UIUtils;
 
 import android.content.Context;
 import android.preference.Preference;
