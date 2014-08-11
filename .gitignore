@@ -39,5 +39,4 @@ notes
 # Crashlytics
 crashlytics.properties
 crashlytics-build.properties
-internal
 com_crashlytics_export_strings.xml
