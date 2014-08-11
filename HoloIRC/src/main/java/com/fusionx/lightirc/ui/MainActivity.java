@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.crashlytics.android.Crashlytics;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
@@ -10,6 +11,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
@@ -156,6 +158,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
+        CrashUtils.startCrashlyticsIfAppropriate(this);
 
         setContentView(R.layout.main_activity);
 

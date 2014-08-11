@@ -51,5 +51,9 @@
         </activity>
 
         <service android:name=".service.IRCService" />
+
+        <meta-data
+            android:name="com.crashlytics.ApiKey"
+            android:value="@string/crashlytics_key" />
     </application>
 </manifest>
