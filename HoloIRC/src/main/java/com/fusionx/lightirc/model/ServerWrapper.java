@@ -1,9 +1,7 @@
 package com.fusionx.lightirc.model;
 
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Conversation;
-import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 
 import java.util.Collection;
@@ -11,7 +9,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import java8.util.stream.Stream;
 import java8.util.stream.StreamSupport;
 
 import static com.fusionx.relay.ServerConfiguration.Builder;
@@ -91,7 +88,7 @@ public class ServerWrapper {
         for (Iterator<Conversation> iterator = mServerObjects.values().iterator();
                 iterator.hasNext(); ) {
             final Conversation conversation = iterator.next();
-            if (!conversation.isConversationValid()) {
+            if (!conversation.isValid()) {
                 iterator.remove();
             }
         }

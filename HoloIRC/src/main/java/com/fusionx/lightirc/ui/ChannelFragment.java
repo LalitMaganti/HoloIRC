@@ -165,7 +165,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     public boolean isValid() {
-        return mConversation.isConversationValid();
+        return mConversation.isValid();
     }
 
     @Override
