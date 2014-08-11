@@ -23,6 +23,7 @@ package com.fusionx.lightirc.adapters;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.NickCache;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.constants.UserLevel;

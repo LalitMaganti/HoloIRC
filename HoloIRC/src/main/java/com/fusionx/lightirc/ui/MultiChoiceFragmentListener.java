@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.util.MultiSelectionUtils;
+
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;

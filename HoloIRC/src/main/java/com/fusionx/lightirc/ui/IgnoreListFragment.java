@@ -7,6 +7,7 @@ import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.Conversation;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 

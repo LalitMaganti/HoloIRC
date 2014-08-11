@@ -11,6 +11,8 @@ import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.CrashUtils;
+import com.fusionx.lightirc.util.NotificationUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
 import com.fusionx.relay.Channel;

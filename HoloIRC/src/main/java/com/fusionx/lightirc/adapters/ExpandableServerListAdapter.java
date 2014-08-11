@@ -7,6 +7,8 @@ import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
+import com.fusionx.lightirc.util.MiscUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Conversation;
 import com.fusionx.relay.event.Event;

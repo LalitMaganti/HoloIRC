@@ -23,6 +23,7 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceConstants;
+import com.fusionx.lightirc.util.MiscUtils;
 
 import android.content.Context;
 import android.content.Intent;

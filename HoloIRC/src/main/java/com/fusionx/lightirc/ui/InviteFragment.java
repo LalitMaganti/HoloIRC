@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
+import com.fusionx.lightirc.util.FragmentUtils;
+import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.relay.event.server.InviteEvent;
 
 import android.annotation.SuppressLint;

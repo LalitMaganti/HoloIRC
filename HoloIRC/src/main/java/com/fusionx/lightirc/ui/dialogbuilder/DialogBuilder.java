@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.ui.dialogbuilder;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.UIUtils;
 
 import android.app.AlertDialog;
 import android.content.Context;
