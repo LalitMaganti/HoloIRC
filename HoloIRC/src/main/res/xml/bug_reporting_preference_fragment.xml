@@ -20,27 +20,10 @@
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:title="@string/appearance">
-    <PreferenceCategory
-            android:title="@string/appearance">
-        <ListPreference
-                android:title="@string/theme"
-                android:key="fragment_settings_theme"
-                android:entries="@array/themes"
-                android:entryValues="@array/themes_values"/>
-        <CheckBoxPreference
-                android:key="pref_highlight_whole_line"
-                android:title="@string/pref_highlight_whole_line_title"
-                android:summary="@string/pref_highlight_whole_line_summary"
-                android:defaultValue="true"/>
-    </PreferenceCategory>
-    <PreferenceCategory
-            android:title="@string/appearance_font">
-        <ListPreference
-                android:title="@string/appearance_font_size"
-                android:key="pref_main_font_size"
-                android:defaultValue="14"
-                android:entries="@array/font_size_entries"
-                android:entryValues="@array/font_size_values"/>
-    </PreferenceCategory>
+    android:title="@string/appearance">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_bug_reporting"
+        android:summary="@string/report_bugs_summary"
+        android:title="@string/report_bugs_title" />
 </PreferenceScreen>

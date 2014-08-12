@@ -23,15 +23,15 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceConstants;
+import com.fusionx.lightirc.ui.helper.RestartAppPreferenceListener;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
+
+import static com.fusionx.lightirc.misc.PreferenceConstants.FRAGMENT_SETTINGS_THEME;
 
 public class AppearancePreferenceFragment extends PreferenceFragment {
 
@@ -41,51 +41,25 @@ public class AppearancePreferenceFragment extends PreferenceFragment {
         addPreferencesFromResource(R.xml.appearance_settings_fragment);
 
         final PreferenceScreen screen = getPreferenceScreen();
-        final ListPreference themePreference = (ListPreference) screen.findPreference
-                (PreferenceConstants.FRAGMENT_SETTINGS_THEME);
-        if (themePreference.getEntry() == null) {
-            themePreference.setValue("1");
+        final ListPreference theme = (ListPreference) screen.findPreference
+                (FRAGMENT_SETTINGS_THEME);
+        if (theme.getEntry() == null) {
+            theme.setValue("1");
         }
-        themePreference.setOnPreferenceChangeListener(new ThemePreferenceListener());
-        themePreference.setSummary(themePreference.getEntry());
+        theme.setOnPreferenceChangeListener(new RestartAppPreferenceListener(getActivity()));
+        theme.setSummary(theme.getEntry());
 
         final ListPreference fontSize = (ListPreference) screen.findPreference
                 (PreferenceConstants.PREF_MAIN_FONT_SIZE);
-        if (fontSize != null) {
-            fontSize.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    final CharSequence summary = fontSize.getEntries()[fontSize
-                            .findIndexOfValue(String.valueOf(newValue))];
-                    fontSize.setSummary(summary);
-                    return true;
-                }
-            });
-            fontSize.setSummary(fontSize.getEntry());
-        }
-    }
-
-    private class ThemePreferenceListener implements Preference.OnPreferenceChangeListener {
-
-        @Override
-        public boolean onPreferenceChange(final Preference preference, final Object o) {
-            final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
-            final DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    final Intent intent = new Intent(getActivity(),
-                            MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(MainActivity.CLEAR_CACHE, true);
-                    getActivity().startActivity(intent);
-                }
-            };
-
-            build.setMessage(getString(R.string.appearance_settings_requires_restart))
-                    .setPositiveButton(getString(R.string.restart), listener)
-                    .show();
-            return true;
-        }
+        fontSize.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                final CharSequence summary = fontSize.getEntries()[fontSize
+                        .findIndexOfValue(String.valueOf(newValue))];
+                fontSize.setSummary(summary);
+                return true;
+            }
+        });
+        fontSize.setSummary(fontSize.getEntry());
     }
 }
