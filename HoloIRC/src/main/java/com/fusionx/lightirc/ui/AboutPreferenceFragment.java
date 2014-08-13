@@ -51,16 +51,12 @@ public class AboutPreferenceFragment extends PreferenceFragment {
 
         final Preference source = screen.findPreference(PreferenceConstants.PREF_SOURCE);
         if (source != null) {
-            source.setOnPreferenceClickListener(
-                    new Preference.OnPreferenceClickListener() {
-                        public boolean onPreferenceClick(Preference preference) {
-                            Intent browserIntent = new Intent("android.intent.action.VIEW",
-                                    Uri.parse("http://github.com/tilal6991/HoloIRC"));
-                            context.startActivity(browserIntent);
-                            return true;
-                        }
-                    }
-            );
+            source.setOnPreferenceClickListener(preference -> {
+                final Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("http://github.com/tilal6991/HoloIRC"));
+                context.startActivity(browserIntent);
+                return true;
+            });
         }
     }
 }

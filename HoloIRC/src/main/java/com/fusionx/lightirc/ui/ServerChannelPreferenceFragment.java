@@ -28,7 +28,6 @@ import com.fusionx.lightirc.ui.preferences.NumberPickerPreference;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -43,13 +42,10 @@ public class ServerChannelPreferenceFragment extends PreferenceFragment {
                 getPreferenceScreen().findPreference(PreferenceConstants.PREF_RECONNECT_TRIES);
         numberPickerDialogPreference.setSummary(String.valueOf(numberPickerDialogPreference
                 .getValue()));
-        numberPickerDialogPreference.setOnPreferenceChangeListener(new Preference
-                .OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                preference.setSummary(String.valueOf(newValue));
-                return true;
-            }
+
+        numberPickerDialogPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+            preference.setSummary(String.valueOf(newValue));
+            return true;
         });
     }
 }

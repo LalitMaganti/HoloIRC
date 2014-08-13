@@ -71,19 +71,16 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mUrl = (EditTextPreference) screen.findPreference(PREF_URL);
 
         final Preference preference = screen.findPreference("pref_autojoin_intent");
-        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(final Preference preference) {
-                final Intent intent = new Intent(ServerPreferenceActivity.this,
-                        ChannelListActivity.class);
-                if (mNewServer) {
-                    mSource.addServer(mContentValues);
-                    mNewServer = false;
-                }
-                intent.putExtra("contentValues", mContentValues);
-                startActivityForResult(intent, CHANNEL_LIST);
-                return false;
+        preference.setOnPreferenceClickListener(unused -> {
+            final Intent intent = new Intent(ServerPreferenceActivity.this,
+                    ChannelListActivity.class);
+            if (mNewServer) {
+                mSource.addServer(mContentValues);
+                mNewServer = false;
             }
+            intent.putExtra("contentValues", mContentValues);
+            startActivityForResult(intent, CHANNEL_LIST);
+            return false;
         });
 
         setPreferenceOnChangeListeners(screen);

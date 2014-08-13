@@ -150,8 +150,8 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     // We always want to display the messages that the app user sends
     @Override
-    public boolean isSelfEventBroadcast() {
-        return true;
+    public boolean isSelfEventHidden() {
+        return false;
     }
 
     @Override

@@ -27,7 +27,6 @@ import com.fusionx.lightirc.ui.helper.RestartAppPreferenceListener;
 
 import android.os.Bundle;
 import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
@@ -51,14 +50,11 @@ public class AppearancePreferenceFragment extends PreferenceFragment {
 
         final ListPreference fontSize = (ListPreference) screen.findPreference
                 (PreferenceConstants.PREF_MAIN_FONT_SIZE);
-        fontSize.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                final CharSequence summary = fontSize.getEntries()[fontSize
-                        .findIndexOfValue(String.valueOf(newValue))];
-                fontSize.setSummary(summary);
-                return true;
-            }
+        fontSize.setOnPreferenceChangeListener((preference, newValue) -> {
+            final CharSequence summary = fontSize.getEntries()[fontSize
+                    .findIndexOfValue(String.valueOf(newValue))];
+            fontSize.setSummary(summary);
+            return true;
         });
         fontSize.setSummary(fontSize.getEntry());
     }
