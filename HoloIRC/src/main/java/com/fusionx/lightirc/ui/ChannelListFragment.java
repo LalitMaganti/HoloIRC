@@ -24,8 +24,6 @@ import android.widget.ListAdapter;
 import java.util.List;
 import java.util.TreeSet;
 
-import java8.util.stream.StreamSupport;
-
 public class ChannelListFragment extends ListFragment {
 
     private BaseCollectionAdapter<String> mAdapter;
@@ -58,7 +56,9 @@ public class ChannelListFragment extends ListFragment {
                     mode.finish();
                     return true;
                 case R.id.activity_server_settings_cab_delete:
-                    StreamSupport.stream(positions).forEach(mAdapter::remove);
+                    for (final String position : positions) {
+                        mAdapter.remove(position);
+                    }
                     mode.finish();
                     return true;
                 default:

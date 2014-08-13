@@ -21,6 +21,8 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
 import com.fusionx.lightirc.R;
@@ -53,9 +55,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
-
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
@@ -69,10 +68,10 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     public void onMentionMultipleUsers(final List<ChannelUser> users) {
         final String text = String.valueOf(mMessageBox.getText());
-        final String total = StreamSupport.stream(users)
-                .map(ChannelUser::getNick)
-                .map(Nick::getNickAsString)
-                .collect(Collectors.joining(": ", "", ": " + text));
+        final String total = FluentIterable.from(users)
+                .transform(ChannelUser::getNick)
+                .transform(Nick::getNickAsString)
+                .join(Joiner.on(": ")) + ": " + text;
 
         mMessageBox.clearComposingText();
         mMessageBox.append(total);
@@ -129,10 +128,10 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
                 final List<ChannelUser> sortedList = new ArrayList<>(users.size());
                 final String message = mMessageBox.getText().toString();
                 final String finalWord = Iterables.getLast(IRCUtils.splitRawLine(message, false));
-                sortedList.addAll(StreamSupport.stream(users)
+                FluentIterable.from(users)
                         .filter(user -> StringUtils.startsWithIgnoreCase(user.getNick()
                                 .getNickAsString(), finalWord))
-                        .collect(Collectors.toList()));
+                        .copyInto(sortedList);
 
                 if (sortedList.size() == 1) {
                     changeLastWord(Iterables.getLast(sortedList).getNick().getNickAsString());
@@ -146,9 +145,13 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
                     innerMenu.clear();
 
                     Collections.sort(sortedList, new IRCUserComparator(getChannel()));
-                    StreamSupport.stream(sortedList)
-                            .map(ChannelUser::getNick).map(Nick::getNickAsString)
-                            .forEach(innerMenu::add);
+
+                    final List<String> list = FluentIterable.from(sortedList)
+                            .transform(ChannelUser::getNick).transform(Nick::getNickAsString)
+                            .toList();
+                    for (final String string : list) {
+                        innerMenu.add(string);
+                    }
                     mPopupMenu.show();
                 }
             }

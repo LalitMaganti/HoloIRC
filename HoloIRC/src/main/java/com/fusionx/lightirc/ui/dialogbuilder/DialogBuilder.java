@@ -33,9 +33,6 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java8.lang.FunctionalInterface;
-
-@FunctionalInterface
 public abstract class DialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {
 

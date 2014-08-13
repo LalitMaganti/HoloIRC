@@ -24,9 +24,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import java8.util.stream.Collectors;
-import java8.util.stream.IntStreams;
-
 public class UIUtils {
 
     private static Typeface sRobotoLightTypeface = null;
@@ -69,11 +66,15 @@ public class UIUtils {
             return new ArrayList<>();
         }
 
+        final List<Integer> list = new ArrayList<>();
         final SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
-        return IntStreams.range(0, checkedPositionsBool.size())
-                .filter(checkedPositionsBool::valueAt)
-                .map(checkedPositionsBool::keyAt)
-                .boxed().collect(Collectors.toList());
+        for (int i = 0; i < checkedPositionsBool.size(); i++) {
+            if (checkedPositionsBool.valueAt(i)) {
+                final Integer index = checkedPositionsBool.keyAt(i);
+                list.add(index);
+            }
+        }
+        return list;
     }
 
     // TODO - fix this horribleness

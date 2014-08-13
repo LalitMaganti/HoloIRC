@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.service;
 
+import com.google.common.collect.FluentIterable;
+
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
@@ -34,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
-import java8.util.stream.StreamSupport;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -59,8 +60,9 @@ public class IRCService extends Service {
     private final BroadcastReceiver mDisconnectAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            StreamSupport.stream(mEventHelperMap.keySet())
-                    .forEach(key -> mEventHelperMap.get(key).unregister());
+            for (final ServiceEventInterceptor interceptor : mEventHelperMap.values()) {
+                interceptor.unregister();
+            }
 
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

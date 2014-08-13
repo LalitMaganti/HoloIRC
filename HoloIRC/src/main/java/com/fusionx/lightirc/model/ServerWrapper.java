@@ -1,15 +1,15 @@
 package com.fusionx.lightirc.model;
 
+import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Conversation;
+import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-
-import java8.util.stream.StreamSupport;
 
 import static com.fusionx.relay.ServerConfiguration.Builder;
 
@@ -49,10 +49,12 @@ public class ServerWrapper {
         mServer = server;
 
         if (isServerAvailable()) {
-            StreamSupport.stream(server.getUser().getChannels())
-                    .forEach(c -> mServerObjects.put(c.getName(), c));
-            StreamSupport.stream(server.getUserChannelInterface().getQueryUsers())
-                    .forEach(u -> mServerObjects.put(u.getNick().getNickAsString(), u));
+            for (final Channel c : server.getUser().getChannels()) {
+                mServerObjects.put(c.getName(), c);
+            }
+            for (final QueryUser u : server.getUserChannelInterface().getQueryUsers()) {
+                mServerObjects.put(u.getNick().getNickAsString(), u);
+            }
         }
     }
 

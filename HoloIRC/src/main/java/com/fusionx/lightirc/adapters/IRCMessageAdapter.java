@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.adapters;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.R;
@@ -21,9 +22,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
 
 public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements Filterable {
 
@@ -171,9 +169,10 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
         @Override
         protected FilterResults performFiltering(final CharSequence constraint) {
-            final List<T> resultList = StreamSupport.stream(mDataToFilter)
+            final List<T> resultList = new ArrayList<>();
+            FluentIterable.from(mDataToFilter)
                     .filter(EventUtils::shouldStoreEvent)
-                    .collect(Collectors.toList());
+                    .copyInto(resultList);
 
             final FilterResults results = new FilterResults();
             results.values = resultList;

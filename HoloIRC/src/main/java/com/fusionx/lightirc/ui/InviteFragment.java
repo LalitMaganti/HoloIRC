@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.R;
@@ -28,9 +29,6 @@ import android.widget.TextView;
 
 import java.util.Collection;
 import java.util.Set;
-
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
@@ -134,9 +132,9 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
     // Index needs to be decreased by one because the header is counted as an item
     private Collection<InviteEvent> getInviteEventsFromPositions() {
         final Collection<Integer> positions = UIUtils.getCheckedPositions(getListView());
-        return StreamSupport.stream(positions)
-                .map(pos -> mInviteAdapter.getItem(pos - 1))
-                .collect(Collectors.toList());
+        return FluentIterable.from(positions)
+                .transform(pos -> mInviteAdapter.getItem(pos - 1))
+                .toList();
     }
 
     public interface Callbacks {
