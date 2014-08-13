@@ -54,8 +54,6 @@ dependencies {
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
     compile 'com.nhaarman.listviewanimations:library:2.+'
 
-    compile fileTree(dir: 'libs', include: '*.jar')
-
     compile project(':relay')
     compile project(':libraries:AndroidSlidingUpPanel:library')
     compile project(':libraries:Bus:library')

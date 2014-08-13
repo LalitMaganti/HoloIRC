@@ -217,8 +217,8 @@ public class IRCEventToStringConverter {
                 return setupEvent(formattedResponse, event.user.getNick());
             } else {
                 final FormattedString formattedChangingNick = event.changingUser
-                        .map(IRCEventToStringConverter.this::getFormattedStringForUser)
-                        .orElse(new FormattedString(event.changingNick));
+                        .transform(IRCEventToStringConverter.this::getFormattedStringForUser)
+                        .or(new FormattedString(event.changingNick));
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.rawMode),
                         getFormattedStringForUser(event.user),
@@ -237,8 +237,8 @@ public class IRCEventToStringConverter {
                 return setupEvent(formattedResponse, event.user.getNick());
             } else {
                 final FormattedString formattedChangingNick = event.changingUser
-                        .map(IRCEventToStringConverter.this::getFormattedStringForUser)
-                        .orElse(new FormattedString(event.changingNick));
+                        .transform(IRCEventToStringConverter.this::getFormattedStringForUser)
+                        .or(new FormattedString(event.changingNick));
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.rawMode),
                         getFormattedStringForUser(event.user),
@@ -257,8 +257,8 @@ public class IRCEventToStringConverter {
                 return setupEvent(formattedResponse);
             } else {
                 final FormattedString formattedChangingNick = event.sendingUser
-                        .map(IRCEventToStringConverter.this::getFormattedStringForUser)
-                        .orElse(new FormattedString(event.sendingNick));
+                        .transform(IRCEventToStringConverter.this::getFormattedStringForUser)
+                        .or(new FormattedString(event.sendingNick));
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.mode),
                         new FormattedString(event.recipient),
