@@ -29,7 +29,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -462,7 +461,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull final Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restore the action bar title & sub-title
@@ -557,7 +556,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(@NonNull final Conversation object,
+    private void changeCurrentConversation(final Conversation object,
             final boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();

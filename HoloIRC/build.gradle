@@ -70,11 +70,12 @@ dependencies {
     compile 'com.android.support:appcompat-v7:19.+'
     compile 'se.emilsjolander:stickylistheaders:2.1.3'
     compile 'com.nhaarman.listviewanimations:library:2.+'
+    compile 'com.sothree.slidinguppanel:library:+'
+
+    compile 'com.crashlytics.android:crashlytics:1.+'
 
     compile project(':relay')
-    compile project(':libraries:AndroidSlidingUpPanel:library')
     compile project(':libraries:Bus:library')
-    compile 'com.crashlytics.android:crashlytics:1.+'
 }
 
 retrolambda {

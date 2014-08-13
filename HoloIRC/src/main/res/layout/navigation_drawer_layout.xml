@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
-        custom:collapsedHeight="40dp"
+        custom:panelHeight="40dp"
         android:background="@android:color/transparent">
 
     <FrameLayout

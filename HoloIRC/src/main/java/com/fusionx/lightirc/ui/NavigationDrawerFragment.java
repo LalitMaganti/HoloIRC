@@ -112,10 +112,10 @@ public class NavigationDrawerFragment extends Fragment implements
         getBus().registerSticky(mEventHandler);
 
         mSlideUpLayout.setOnClickListener(v -> {
-            if (mSlidingUpPanelLayout.isExpanded()) {
-                mSlidingUpPanelLayout.collapsePane();
+            if (mSlidingUpPanelLayout.isPanelExpanded()) {
+                mSlidingUpPanelLayout.collapsePanel();
             } else {
-                mSlidingUpPanelLayout.expandPane();
+                mSlidingUpPanelLayout.expandPanel();
             }
         });
 
@@ -247,7 +247,7 @@ public class NavigationDrawerFragment extends Fragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.activity_main_ab_actions:
-                mSlidingUpPanelLayout.collapsePane();
+                mSlidingUpPanelLayout.collapsePanel();
                 return true;
             case R.id.activity_main_ab_users:
                 handleUserList();
@@ -281,9 +281,9 @@ public class NavigationDrawerFragment extends Fragment implements
             final Channel channel = (Channel) mConversation;
             setUserTextViewText(String.format("%d users", channel.getUsers().size()));
         } else {
-            if (mSlidingUpPanelLayout.isExpanded()) {
+            if (mSlidingUpPanelLayout.isPanelExpanded()) {
                 // Collapse Pane
-                mSlidingUpPanelLayout.collapsePane();
+                mSlidingUpPanelLayout.collapsePanel();
             }
         }
     }
@@ -301,11 +301,11 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     private void handleUserList() {
-        final boolean userListVisible = mSlidingUpPanelLayout.isExpanded();
+        final boolean userListVisible = mSlidingUpPanelLayout.isPanelExpanded();
         if (mCallback.isDrawerOpen() && userListVisible) {
-            mSlidingUpPanelLayout.collapsePane();
+            mSlidingUpPanelLayout.collapsePanel();
         } else if (!userListVisible) {
-            mSlidingUpPanelLayout.expandPane();
+            mSlidingUpPanelLayout.expandPanel();
         }
     }
 
