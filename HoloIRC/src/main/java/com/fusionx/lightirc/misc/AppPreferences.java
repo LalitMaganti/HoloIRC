@@ -21,33 +21,33 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
 
 
-    private Theme theme;
+    private Theme mTheme;
 
-    private boolean timestamp = false;
+    private boolean mTimestamp = false;
 
-    private boolean hideUserMessages = false;
-
-
-    private boolean highlightLine = true;
-
-    private boolean motdAllowed = true;
+    private boolean mHideUserMessages = false;
 
 
-    private int numberOfReconnectEvents = 3;
+    private boolean mHighlightLine = true;
+
+    private boolean mMotdAllowed = true;
 
 
-    private String partReason = "";
+    private int mNumberOfReconnectEvents = 3;
 
-    private String quitReason = "";
+
+    private String mPartReason = "";
+
+    private String mQuitReason = "";
 
     // Notification settings
-    private boolean inAppNotification;
+    private boolean mInAppNotification;
 
-    private Set<String> inAppNotificationSettings;
+    private Set<String> mInAppNotificationSettings;
 
-    private boolean outOfAppNotification;
+    private boolean mOutOfAppNotification;
 
-    private Set<String> outOfAppNotificationSettings;
+    private Set<String> mOutOfAppNotificationSettings;
 
     // Logging
     private boolean mLoggingEnabled;
@@ -58,6 +58,9 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     // Font settings
     private int mMainFontSize;
+
+    // Bug reporting
+    private boolean mBugReportingEnabled;
 
     private AppPreferences(final Context context) {
         sPrefsChangeListener = (sharedPreferences, key) -> {
@@ -80,36 +83,36 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     }
 
     public Theme getTheme() {
-        return theme;
+        return mTheme;
     }
 
     public boolean shouldDisplayTimestamps() {
-        return timestamp;
+        return mTimestamp;
     }
 
     public boolean shouldHideUserMessages() {
-        return hideUserMessages;
+        return mHideUserMessages;
     }
 
     public boolean shouldHighlightLine() {
-        return highlightLine;
+        return mHighlightLine;
     }
 
     // Notification settings
     public boolean isInAppNotification() {
-        return inAppNotification;
+        return mInAppNotification;
     }
 
     public Set<String> getInAppNotificationSettings() {
-        return inAppNotificationSettings;
+        return mInAppNotificationSettings;
     }
 
     public boolean isOutOfAppNotification() {
-        return outOfAppNotification;
+        return mOutOfAppNotification;
     }
 
     public Set<String> getOutOfAppNotificationSettings() {
-        return outOfAppNotificationSettings;
+        return mOutOfAppNotificationSettings;
     }
 
     // Logging settings
@@ -122,22 +125,27 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         return mMainFontSize;
     }
 
+    // Bug reporting settings
+    public boolean isBugReportingEnabled() {
+        return mBugReportingEnabled;
+    }
+
     /*
      * Interface implementation starts here
      */
     @Override
     public int getReconnectAttemptsCount() {
-        return numberOfReconnectEvents;
+        return mNumberOfReconnectEvents;
     }
 
     @Override
     public String getPartReason() {
-        return partReason;
+        return mPartReason;
     }
 
     @Override
     public String getQuitReason() {
-        return quitReason;
+        return mQuitReason;
     }
 
     // We always want to display the messages that the app user sends
@@ -148,7 +156,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
 
     @Override
     public boolean isMOTDShown() {
-        return motdAllowed;
+        return mMotdAllowed;
     }
 
     // Logging
@@ -165,29 +173,31 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     private void setPreferences(final SharedPreferences preferences) {
         final int themeInt = Integer.parseInt(preferences.getString(PreferenceConstants
                 .FRAGMENT_SETTINGS_THEME, "1"));
-        theme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
-        highlightLine = preferences
+        mTheme = themeInt != 0 ? Theme.LIGHT : Theme.DARK;
+        mHighlightLine = preferences
                 .getBoolean(PreferenceConstants.PREF_HIGHLIGHT_WHOLE_LINE, true);
 
-        timestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
-        motdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
-        hideUserMessages = preferences
+        mTimestamp = preferences.getBoolean(PreferenceConstants.PREF_TIMESTAMPS, false);
+        mMotdAllowed = preferences.getBoolean(PreferenceConstants.PREF_MOTD, true);
+        mHideUserMessages = preferences
                 .getBoolean(PreferenceConstants.PREF_HIDE_MESSAGES, false);
+        mMainFontSize = Integer.parseInt(preferences.getString(PreferenceConstants
+                .PREF_MAIN_FONT_SIZE, "14"));
 
-        numberOfReconnectEvents = preferences
+        mNumberOfReconnectEvents = preferences
                 .getInt(PreferenceConstants.PREF_RECONNECT_TRIES, 3);
 
-        partReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
-        quitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
+        mPartReason = preferences.getString(PreferenceConstants.PREF_PART_REASON, "");
+        mQuitReason = preferences.getString(PreferenceConstants.PREF_QUIT_REASON, "");
 
         // Notification settings
-        inAppNotificationSettings = preferences.getStringSet(PreferenceConstants
+        mInAppNotificationSettings = preferences.getStringSet(PreferenceConstants
                 .PREF_IN_APP_NOTIFICATION_SETTINGS, new HashSet<>());
-        inAppNotification = preferences.getBoolean(PreferenceConstants
+        mInAppNotification = preferences.getBoolean(PreferenceConstants
                 .PREF_IN_APP_NOTIFICATION, true);
-        outOfAppNotificationSettings = preferences.getStringSet(PreferenceConstants
+        mOutOfAppNotificationSettings = preferences.getStringSet(PreferenceConstants
                 .PREF_OUT_OF_APP_NOTIFICATION_SETTINGS, new HashSet<>());
-        outOfAppNotification = preferences.getBoolean(PreferenceConstants
+        mOutOfAppNotification = preferences.getBoolean(PreferenceConstants
                 .PREF_OUT_OF_APP_NOTIFICATION, true);
 
         // Logging
@@ -197,8 +207,7 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
         mLoggingTimeStamp = preferences.getBoolean(PreferenceConstants.PREF_LOGGING_TIMESTAMP,
                 true);
 
-        // Font settings
-        mMainFontSize = Integer.parseInt(preferences.getString(PreferenceConstants
-                .PREF_MAIN_FONT_SIZE, "14"));
+        // Bug reporting settings
+        mBugReportingEnabled = preferences.getBoolean(PreferenceConstants.PREF_BUG_REPORTING, true);
     }
 }

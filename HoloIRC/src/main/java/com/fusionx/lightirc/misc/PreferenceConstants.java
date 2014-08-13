@@ -117,4 +117,7 @@ public class PreferenceConstants {
 
     // Font settings
     public static final String PREF_MAIN_FONT_SIZE = "pref_main_font_size";
+
+    // Bug reporting settings
+    public static final String PREF_BUG_REPORTING = "pref_bug_reporting";
 }
