@@ -1,7 +1,9 @@
 package com.fusionx.lightirc.misc;
 
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
-import com.fusionx.relay.interfaces.EventPreferences;
+import com.fusionx.lightirc.util.CrashUtils;
+import com.fusionx.relay.Server;
+import com.fusionx.relay.interfaces.RelayConfiguration;
 import com.fusionx.relay.logging.LoggingPreferences;
 
 import android.content.Context;
@@ -14,7 +16,7 @@ import java.util.Set;
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class AppPreferences implements EventPreferences, LoggingPreferences {
+public class AppPreferences implements RelayConfiguration, LoggingPreferences {
 
     private static AppPreferences mAppPreferences;
 
@@ -157,6 +159,11 @@ public class AppPreferences implements EventPreferences, LoggingPreferences {
     @Override
     public boolean isMOTDShown() {
         return mMotdAllowed;
+    }
+
+    @Override
+    public void logMissingData(final Server server) {
+        CrashUtils.logMissingData(server);
     }
 
     // Logging
