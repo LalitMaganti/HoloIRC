@@ -9,7 +9,6 @@ HoloIRC is relatively easy to build after the initial setup. The following shoul
 - A directory called libraries should be created inside the cloned folder
 - https://github.com/tilal6991/Relay should be cloned into a folder called relay - pick the branch matching HoloIRC's branch
 - https://github.com/tilal6991/Bus should be cloned into a folder called Bus - clone the develop branch
-- https://github.com/tilal6991/AndroidSlidingUpPanel should be cloned into a folder called AndroidSlidingUpPanel
 - Then run ./gradlew assembleDebug in the root directory
 - This should create a debug apk in HoloIRC/build/apk which you can install
 
@@ -19,7 +18,7 @@ Please feel free to fork the repo to add anything you want or fix any bugs you'v
 
 License
 =====
-    HoloIRC - Copyright (c) Lalit Maganti 2013
+    HoloIRC - Copyright (c) Lalit Maganti 2013-2014
 
     HoloIRC is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
