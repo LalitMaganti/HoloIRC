@@ -21,12 +21,15 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
+import com.fusionx.relay.Nick;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
@@ -64,15 +67,14 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     private boolean mIsPopupShown;
 
     public void onMentionMultipleUsers(final List<ChannelUser> users) {
-        final StringBuilder builder = new StringBuilder();
         final String text = String.valueOf(mMessageBox.getText());
-        for (final ChannelUser userNick : users) {
-            builder.append(userNick.getNick()).append(": ");
-        }
-        builder.append(text);
+        final String total = FluentIterable.from(users)
+                .transform(ChannelUser::getNick)
+                .transform(Nick::getNickAsString)
+                .join(Joiner.on(": ")) + ": " + text;
 
         mMessageBox.clearComposingText();
-        mMessageBox.append(builder.toString());
+        mMessageBox.append(total);
     }
 
     @Override
@@ -117,42 +119,40 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         super.onViewCreated(view, savedInstanceState);
 
         mAutoButton = findById(view, R.id.auto_complete_button);
-        mAutoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mIsPopupShown) {
-                    mPopupMenu.dismiss();
-                } else {
-                    // TODO - this needs to be synchronized properly
-                    final Collection<? extends ChannelUser> users = getChannel().getUsers();
-                    final List<ChannelUser> sortedList = new ArrayList<>(users.size());
-                    final String message = mMessageBox.getText().toString();
-                    final String finalWord = Iterables
-                            .getLast(IRCUtils.splitRawLine(message, false));
-                    for (final ChannelUser user : users) {
-                        if (StringUtils.startsWithIgnoreCase(user.getNick().getNickAsString(),
-                                finalWord)) {
-                            sortedList.add(user);
-                        }
-                    }
+        mAutoButton.setOnClickListener(v -> {
+            if (mIsPopupShown) {
+                mPopupMenu.dismiss();
+            } else {
+                // TODO - this needs to be synchronized properly
+                final Collection<? extends ChannelUser> users = getChannel().getUsers();
+                final List<ChannelUser> sortedList = new ArrayList<>(users.size());
+                final String message = mMessageBox.getText().toString();
+                final String finalWord = Iterables.getLast(IRCUtils.splitRawLine(message, false));
+                FluentIterable.from(users)
+                        .filter(user -> StringUtils.startsWithIgnoreCase(user.getNick()
+                                .getNickAsString(), finalWord))
+                        .copyInto(sortedList);
 
-                    if (sortedList.size() == 1) {
-                        changeLastWord(Iterables.getLast(sortedList).getNick().getNickAsString());
-                    } else if (sortedList.size() > 1) {
-                        if (mPopupMenu == null) {
-                            mPopupMenu = new PopupMenu(getActivity(), mAutoButton);
-                            mPopupMenu.setOnDismissListener(ChannelFragment.this);
-                            mPopupMenu.setOnMenuItemClickListener(ChannelFragment.this);
-                        }
-                        final Menu innerMenu = mPopupMenu.getMenu();
-                        innerMenu.clear();
-
-                        Collections.sort(sortedList, new IRCUserComparator(getChannel()));
-                        for (final ChannelUser user : sortedList) {
-                            innerMenu.add(user.getNick().getNickAsString());
-                        }
-                        mPopupMenu.show();
+                if (sortedList.size() == 1) {
+                    changeLastWord(Iterables.getLast(sortedList).getNick().getNickAsString());
+                } else if (sortedList.size() > 1) {
+                    if (mPopupMenu == null) {
+                        mPopupMenu = new PopupMenu(getActivity(), mAutoButton);
+                        mPopupMenu.setOnDismissListener(ChannelFragment.this);
+                        mPopupMenu.setOnMenuItemClickListener(ChannelFragment.this);
                     }
+                    final Menu innerMenu = mPopupMenu.getMenu();
+                    innerMenu.clear();
+
+                    Collections.sort(sortedList, new IRCUserComparator(getChannel()));
+
+                    final List<String> list = FluentIterable.from(sortedList)
+                            .transform(ChannelUser::getNick).transform(Nick::getNickAsString)
+                            .toList();
+                    for (final String string : list) {
+                        innerMenu.add(string);
+                    }
+                    mPopupMenu.show();
                 }
             }
         });
@@ -168,7 +168,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     public boolean isValid() {
-        return mConversation.isConversationValid();
+        return mConversation.isValid();
     }
 
     @Override

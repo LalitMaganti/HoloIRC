@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.adapters;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.R;
@@ -162,18 +163,16 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
             mDataToFilter = ImmutableList.copyOf(list);
         }
 
-        public void setCallback(Runnable callback) {
+        public void setCallback(final Runnable callback) {
             mCallback = callback;
         }
 
         @Override
         protected FilterResults performFiltering(final CharSequence constraint) {
-            final ArrayList<T> resultList = new ArrayList<>();
-            for (final T object : mDataToFilter) {
-                if (EventUtils.shouldStoreEvent(object)) {
-                    resultList.add(object);
-                }
-            }
+            final List<T> resultList = new ArrayList<>();
+            FluentIterable.from(mDataToFilter)
+                    .filter(EventUtils::shouldStoreEvent)
+                    .copyInto(resultList);
 
             final FilterResults results = new FilterResults();
             results.values = resultList;

@@ -104,21 +104,17 @@ public class NavigationDrawerFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
-        mSlidingUpPanelLayout.setSlidingEnabled(false);
 
         mUserListTextView = findById(getView(), R.id.user_text_view);
         mSlideUpLayout = findById(view, R.id.bottom_panel);
 
         getBus().registerSticky(mEventHandler);
 
-        mSlideUpLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mSlidingUpPanelLayout.isExpanded()) {
-                    mSlidingUpPanelLayout.collapsePane();
-                } else {
-                    mSlidingUpPanelLayout.expandPane();
-                }
+        mSlideUpLayout.setOnClickListener(v -> {
+            if (mSlidingUpPanelLayout.isPanelExpanded()) {
+                mSlidingUpPanelLayout.collapsePanel();
+            } else {
+                mSlidingUpPanelLayout.expandPanel();
             }
         });
 
@@ -250,7 +246,7 @@ public class NavigationDrawerFragment extends Fragment implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.activity_main_ab_actions:
-                mSlidingUpPanelLayout.collapsePane();
+                mSlidingUpPanelLayout.collapsePanel();
                 return true;
             case R.id.activity_main_ab_users:
                 handleUserList();
@@ -284,9 +280,9 @@ public class NavigationDrawerFragment extends Fragment implements
             final Channel channel = (Channel) mConversation;
             setUserTextViewText(String.format("%d users", channel.getUsers().size()));
         } else {
-            if (mSlidingUpPanelLayout.isExpanded()) {
+            if (mSlidingUpPanelLayout.isPanelExpanded()) {
                 // Collapse Pane
-                mSlidingUpPanelLayout.collapsePane();
+                mSlidingUpPanelLayout.collapsePanel();
             }
         }
     }
@@ -304,11 +300,11 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     private void handleUserList() {
-        final boolean userListVisible = mSlidingUpPanelLayout.isExpanded();
+        final boolean userListVisible = mSlidingUpPanelLayout.isPanelExpanded();
         if (mCallback.isDrawerOpen() && userListVisible) {
-            mSlidingUpPanelLayout.collapsePane();
+            mSlidingUpPanelLayout.collapsePanel();
         } else if (!userListVisible) {
-            mSlidingUpPanelLayout.expandPane();
+            mSlidingUpPanelLayout.expandPanel();
         }
     }
 
@@ -321,16 +317,12 @@ public class NavigationDrawerFragment extends Fragment implements
                 .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         final View customActionBarView = inflater
                 .inflate(R.layout.actionbar_custom_view_done, null);
-        findById(customActionBarView, R.id.actionbar_done)
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (isIgnoreFragmentVisible()) {
-                            mIgnoreListFragment.saveIgnoreList();
-                        }
-                        switchToActionFragment();
-                    }
-                });
+        findById(customActionBarView, R.id.actionbar_done).setOnClickListener(v -> {
+            if (isIgnoreFragmentVisible()) {
+                mIgnoreListFragment.saveIgnoreList();
+            }
+            switchToActionFragment();
+        });
         final ActionBar actionBar = getActivity().getActionBar();
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
                 ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME

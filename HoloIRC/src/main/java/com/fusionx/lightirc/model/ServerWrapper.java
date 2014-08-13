@@ -49,13 +49,11 @@ public class ServerWrapper {
         mServer = server;
 
         if (isServerAvailable()) {
-            if (server.getUser() != null) {
-                for (final Channel channel : server.getUser().getChannels()) {
-                    mServerObjects.put(channel.getName(), channel);
-                }
+            for (final Channel c : server.getUser().getChannels()) {
+                mServerObjects.put(c.getName(), c);
             }
-            for (final QueryUser user : server.getUserChannelInterface().getQueryUsers()) {
-                mServerObjects.put(user.getNick().getNickAsString(), user);
+            for (final QueryUser u : server.getUserChannelInterface().getQueryUsers()) {
+                mServerObjects.put(u.getNick().getNickAsString(), u);
             }
         }
     }
@@ -92,7 +90,7 @@ public class ServerWrapper {
         for (Iterator<Conversation> iterator = mServerObjects.values().iterator();
                 iterator.hasNext(); ) {
             final Conversation conversation = iterator.next();
-            if (!conversation.isConversationValid()) {
+            if (!conversation.isValid()) {
                 iterator.remove();
             }
         }

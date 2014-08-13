@@ -40,11 +40,6 @@ public class UIUtils {
         textView.setTypeface(font);
     }
 
-    public static void setRobotoThin(final Context context, final TextView textView) {
-        final Typeface font = getRobotoThin(context);
-        textView.setTypeface(font);
-    }
-
     public static int getThemeInt() {
         return AppPreferences.getAppPreferences().getTheme() != Theme.DARK ? R.style.Light
                 : R.style.Dark;
@@ -67,19 +62,19 @@ public class UIUtils {
     }
 
     public static List<Integer> getCheckedPositions(final AbsListView listView) {
-        final List<Integer> checkedSessionPositions = new ArrayList<>();
         if (listView == null) {
-            return checkedSessionPositions;
+            return new ArrayList<>();
         }
 
+        final List<Integer> list = new ArrayList<>();
         final SparseBooleanArray checkedPositionsBool = listView.getCheckedItemPositions();
         for (int i = 0; i < checkedPositionsBool.size(); i++) {
             if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(checkedPositionsBool.keyAt(i));
+                final Integer index = checkedPositionsBool.keyAt(i);
+                list.add(index);
             }
         }
-
-        return checkedSessionPositions;
+        return list;
     }
 
     // TODO - fix this horribleness
@@ -144,13 +139,5 @@ public class UIUtils {
                     "Roboto-Light.ttf");
         }
         return sRobotoLightTypeface;
-    }
-
-    private static Typeface getRobotoThin(final Context context) {
-        if (sRobotoLightTypeface == null) {
-            sRobotoThinTypeface = Typeface.createFromAsset(context.getAssets(),
-                    "Roboto-Thin.ttf");
-        }
-        return sRobotoThinTypeface;
     }
 }

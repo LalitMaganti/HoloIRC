@@ -78,7 +78,7 @@ public abstract class DialogBuilder extends AlertDialog.Builder implements Dialo
         return dialog;
     }
 
-    abstract public void onOkClicked(final String input);
+    public abstract void onOkClicked(final String input);
 
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3) {

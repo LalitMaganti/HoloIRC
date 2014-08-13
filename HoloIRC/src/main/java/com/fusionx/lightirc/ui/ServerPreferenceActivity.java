@@ -71,19 +71,16 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mUrl = (EditTextPreference) screen.findPreference(PREF_URL);
 
         final Preference preference = screen.findPreference("pref_autojoin_intent");
-        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(final Preference preference) {
-                final Intent intent = new Intent(ServerPreferenceActivity.this,
-                        ChannelListActivity.class);
-                if (mNewServer) {
-                    mSource.addServer(mContentValues);
-                    mNewServer = false;
-                }
-                intent.putExtra("contentValues", mContentValues);
-                startActivityForResult(intent, CHANNEL_LIST);
-                return false;
+        preference.setOnPreferenceClickListener(unused -> {
+            final Intent intent = new Intent(ServerPreferenceActivity.this,
+                    ChannelListActivity.class);
+            if (mNewServer) {
+                mSource.addServer(mContentValues);
+                mNewServer = false;
             }
+            intent.putExtra("contentValues", mContentValues);
+            startActivityForResult(intent, CHANNEL_LIST);
+            return false;
         });
 
         setPreferenceOnChangeListeners(screen);
@@ -200,27 +197,21 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                 final String text = mContentValues.getAsString(p.getKey());
                 editTextPreference.setText(text);
 
-                listener = new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        if (preference == mUrl || preference == mTitle) {
-                            ServerPreferenceActivity.this.onPreferenceChange(preference);
-                        }
-                        mContentValues.put(preference.getKey(), (String) newValue);
-                        return true;
+                listener = (preference, newValue) -> {
+                    if (preference == mUrl || preference == mTitle) {
+                        ServerPreferenceActivity.this.onPreferenceChange(preference);
                     }
+                    mContentValues.put(preference.getKey(), (String) newValue);
+                    return true;
                 };
             } else if (p instanceof CheckBoxPreference) {
                 final CheckBoxPreference checkBoxPreference = (CheckBoxPreference) p;
                 final boolean bool = mContentValues.getAsBoolean(checkBoxPreference.getKey());
                 checkBoxPreference.setChecked(bool);
 
-                listener = new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        mContentValues.put(preference.getKey(), (boolean) newValue);
-                        return true;
-                    }
+                listener = (preference, newValue) -> {
+                    mContentValues.put(preference.getKey(), (boolean) newValue);
+                    return true;
                 };
             } else if (p instanceof NickPreference) {
                 final NickPreference nickPreference = (NickPreference) p;
@@ -228,15 +219,12 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                         mContentValues.getAsString(COLUMN_NICK_TWO),
                         mContentValues.getAsString(COLUMN_NICK_THREE));
 
-                listener = new Preference.OnPreferenceChangeListener() {
-                    @Override
-                    public boolean onPreferenceChange(Preference preference, Object newValue) {
-                        final NickStorage storage = (NickStorage) newValue;
-                        mContentValues.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
-                        mContentValues.put(COLUMN_NICK_TWO, storage.getSecondChoiceNick());
-                        mContentValues.put(COLUMN_NICK_THREE, storage.getThirdChoiceNick());
-                        return true;
-                    }
+                listener = (preference, newValue) -> {
+                    final NickStorage storage = (NickStorage) newValue;
+                    mContentValues.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
+                    mContentValues.put(COLUMN_NICK_TWO, storage.getSecondChoiceNick());
+                    mContentValues.put(COLUMN_NICK_THREE, storage.getThirdChoiceNick());
+                    return true;
                 };
             } else {
                 listener = null;

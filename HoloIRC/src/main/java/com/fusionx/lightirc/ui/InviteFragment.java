@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.R;
@@ -26,7 +27,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
@@ -46,13 +46,13 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
         mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.default_list_view, container, false);
         final ListView listView = findById(view, android.R.id.list);
 
-        @SuppressLint("InflateParams")
         final TextView otherHeader = (TextView) inflater.inflate(R.layout.sliding_menu_header,
                 null, false);
         otherHeader.setText("Invites");
@@ -131,11 +131,10 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
 
     // Index needs to be decreased by one because the header is counted as an item
     private Collection<InviteEvent> getInviteEventsFromPositions() {
-        final Collection<InviteEvent> inviteEvents = new ArrayList<>();
-        for (Integer pos : UIUtils.getCheckedPositions(getListView())) {
-            inviteEvents.add(mInviteAdapter.getItem(pos - 1));
-        }
-        return inviteEvents;
+        final Collection<Integer> positions = UIUtils.getCheckedPositions(getListView());
+        return FluentIterable.from(positions)
+                .transform(pos -> mInviteAdapter.getItem(pos - 1))
+                .toList();
     }
 
     public interface Callbacks {

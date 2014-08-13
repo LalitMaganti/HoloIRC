@@ -176,4 +176,15 @@
     <string name="logging_settings_title">Logging</string>
     <string name="logging_settings_summary">Control logging settings</string>
 
+    <!-- Crash reporting settings -->
+    <string name="bug_reporting_settings_title">Bug Reporting</string>
+    <string name="bug_reporting_summary">Control bug/crash reporting</string>
+    <string name="report_bugs_title">Bug/Crash reporting</string>
+    <string name="report_bugs_summary">
+        Report any issues to the developer to allow me to make
+        the app better. Turning this off will render me unable to fix any issues you have
+        with the app. Please consider carefully before you switch this off. No personal data is
+        included in these reports.
+    </string>
+
 </resources>

@@ -49,7 +49,7 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
 
     @Override
     public boolean isValid() {
-        return mConversation.isConversationValid();
+        return mConversation.isValid();
     }
 
     @Override

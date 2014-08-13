@@ -1,4 +1,3 @@
-include ':HoloIRC', 'libraries:relay:library', 'libraries:AndroidSlidingUpPanel:library',
-        'libraries:Bus:library', ':library', ':example'
-project(':library').projectDir = new File('libraries/relay/library')
-project(':example').projectDir = new File('libraries/relay/example')
+include ':HoloIRC', 'libraries:Bus:library', ':relay', ':relayexample'
+project(':relay').projectDir = new File('libraries/relay/library')
+project(':relayexample').projectDir = new File('libraries/relay/example')

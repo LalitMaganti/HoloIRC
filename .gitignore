@@ -35,3 +35,8 @@ project.properties
 # Contains release info
 signing.properties
 notes
+
+# Crashlytics
+crashlytics.properties
+crashlytics-build.properties
+com_crashlytics_export_strings.xml

@@ -285,14 +285,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
                     .setMessage(getActivity()
                             .getString(R.string.user_list_pm_self_not_possible))
                     .setPositiveButton(getActivity().getString(R.string.ok),
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(
-                                        DialogInterface dialogInterface,
-                                        int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            }
+                            (dialogInterface, i) -> dialogInterface.dismiss()
                     );
             build.show();
         }

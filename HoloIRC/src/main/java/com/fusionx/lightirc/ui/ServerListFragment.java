@@ -427,8 +427,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @SuppressWarnings("unused")
         public void onEventMainThread(final NewPrivateMessageEvent event)
                 throws InterruptedException {
-            final QueryUser user = mServer.getUserChannelInterface()
-                    .getQueryUser(event.nick);
+            final QueryUser user = event.user;
             mListAdapter.getGroup(mServerIndex).addServerObject(user);
             mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
@@ -436,7 +435,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
-            final Channel channel = mServer.getUserChannelInterface().getChannel(event.channelName);
+            final Channel channel = event.channel;
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
             mListAdapter.notifyDataSetChanged();
             mListView.expandGroup(mServerIndex);
@@ -498,13 +497,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @SuppressWarnings("unused")
         public void onEventMainThread(final StopEvent event) {
-            refreshServers(new Runnable() {
-                @Override
-                public void run() {
-                    unregister();
-                    mEventHandlers.remove(ServerEventHandler.this);
-                    mCallback.onServerStopCompleted(mServer);
-                }
+            refreshServers(() -> {
+                unregister();
+                mEventHandlers.remove(ServerEventHandler.this);
+                mCallback.onServerStopCompleted(mServer);
             });
         }
 

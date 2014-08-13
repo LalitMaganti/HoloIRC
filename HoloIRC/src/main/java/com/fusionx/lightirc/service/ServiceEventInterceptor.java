@@ -7,11 +7,9 @@ import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.relay.Channel;
 import com.fusionx.relay.Conversation;
-import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.ChannelPartEvent;
 import com.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import com.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
@@ -109,14 +107,13 @@ public final class ServiceEventInterceptor {
      */
     @SuppressWarnings("unused")
     public void onEventMainThread(final NewPrivateMessageEvent event) {
-        final QueryUser user = mServer.getUserChannelInterface().getQueryUser(event.nick);
-        onIRCEvent(MessagePriority.HIGH, user, getLastStorableEvent(user.getBuffer()));
+        onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
     }
 
     @SuppressWarnings("unused")
     public void onEventMainThread(final JoinEvent event) {
-        final Channel channel = mServer.getUserChannelInterface().getChannel(event.channelName);
-        onIRCEvent(MessagePriority.LOW, channel, getLastStorableEvent(channel.getBuffer()));
+        onIRCEvent(MessagePriority.LOW, event.channel,
+                getLastStorableEvent(event.channel.getBuffer()));
     }
 
     @SuppressWarnings("unused")
@@ -131,12 +128,7 @@ public final class ServiceEventInterceptor {
                     onIRCEvent(MessagePriority.HIGH, conversation, event);
 
                     // Forward the event UI side
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            getBus().post(new OnChannelMentionEvent(event.channel));
-                        }
-                    });
+                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(event.channel)));
                 } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
                         || event.getClass().equals(ChannelWorldActionEvent.class)) {
                     onIRCEvent(MessagePriority.MEDIUM, conversation, event);
@@ -158,12 +150,7 @@ public final class ServiceEventInterceptor {
             onIRCEvent(MessagePriority.HIGH, event.user, event);
 
             // Forward the event UI side
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    getBus().post(new OnQueryEvent(event.user));
-                }
-            });
+            mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
         }
     }
     /*

@@ -4,9 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.util.PreferenceUtils;
 
-import android.annotation.TargetApi;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -56,14 +54,11 @@ public class LoggingPreferenceFragment extends PreferenceFragment {
         final Switch logSwitch = findById(actionView, R.id.logging_switch_view);
 
         logSwitch.setChecked(logging);
-        logSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                final SharedPreferences.Editor editor = getPreferenceManager()
-                        .getSharedPreferences().edit();
-                editor.putBoolean(PreferenceConstants.PREF_LOGGING, isChecked).commit();
-                updatePreferencesEnabled(logSwitch.isChecked());
-            }
+        logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            final SharedPreferences.Editor editor = getPreferenceManager()
+                    .getSharedPreferences().edit();
+            editor.putBoolean(PreferenceConstants.PREF_LOGGING, isChecked).commit();
+            updatePreferencesEnabled(logSwitch.isChecked());
         });
     }
 

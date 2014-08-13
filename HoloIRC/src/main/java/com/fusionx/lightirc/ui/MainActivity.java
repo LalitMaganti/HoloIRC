@@ -10,6 +10,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
@@ -28,7 +29,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -156,6 +156,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setTheme(UIUtils.getThemeInt());
 
         super.onCreate(savedInstanceState);
+        CrashUtils.startCrashlyticsIfAppropriate(this);
 
         setContentView(R.layout.main_activity);
 
@@ -370,8 +371,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getIntent().removeExtra("server_name");
             getIntent().removeExtra("channel_name");
 
+            // Assume on this high a level that the channel will exist - if it doesn't it
+            // indicates a serious bug
             final Server server = service.getServerIfExists(serverName);
-            conversation = server.getUserChannelInterface().getChannel(channelName);
+            conversation = server.getUserChannelInterface().getChannel(channelName).get();
         }
 
         if (!fromRecents && clearCaches) {
@@ -458,7 +461,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull final Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restore the action bar title & sub-title
@@ -500,8 +503,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("server_name");
         getIntent().removeExtra("channel_name");
 
+        // Assume on this high a level that the channel will exist - if it doesn't it
+        // indicates a serious bug
         final Server server = getService().getServerIfExists(serverName);
-        final Conversation conversation = server.getUserChannelInterface().getChannel(channelName);
+        final Conversation conversation = server.getUserChannelInterface()
+                .getChannel(channelName).get();
         onExternalConversationUpdate(conversation);
     }
 
@@ -550,7 +556,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(@NonNull final Conversation object,
+    private void changeCurrentConversation(final Conversation object,
             final boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
@@ -591,17 +597,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private void changeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
-        final Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                final FragmentTransaction transaction = getSupportFragmentManager()
-                        .beginTransaction();
-                transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-                transaction.replace(R.id.content_frame, fragment).commit();
-                getSupportFragmentManager().executePendingTransactions();
+        final Runnable runnable = () -> {
+            final FragmentTransaction transaction = getSupportFragmentManager()
+                    .beginTransaction();
+            transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+            transaction.replace(R.id.content_frame, fragment).commit();
+            getSupportFragmentManager().executePendingTransactions();
 
-                mEmptyView.setVisibility(View.GONE);
-            }
+            mEmptyView.setVisibility(View.GONE);
         };
 
         if (delayChange) {
@@ -630,12 +633,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mCurrentFragment = null;
         getSupportFragmentManager().executePendingTransactions();
 
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mEmptyView.setVisibility(View.VISIBLE);
-            }
-        }, 300);
+        mHandler.postDelayed(() -> mEmptyView.setVisibility(View.VISIBLE), 300);
 
         // Don't listen for any more events from this server
         mConversation.getServer().getServerEventBus().unregister(this);
@@ -652,12 +650,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mEmptyView.setVisibility(View.VISIBLE);
             return;
         }
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                changeCurrentConversation(conversation, false);
-            }
-        });
+        mHandler.post(() -> changeCurrentConversation(conversation, false));
         supportInvalidateOptionsMenu();
     }
 }

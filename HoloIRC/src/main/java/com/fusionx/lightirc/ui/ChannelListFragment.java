@@ -56,8 +56,8 @@ public class ChannelListFragment extends ListFragment {
                     mode.finish();
                     return true;
                 case R.id.activity_server_settings_cab_delete:
-                    for (String selected : positions) {
-                        mAdapter.remove(selected);
+                    for (final String position : positions) {
+                        mAdapter.remove(position);
                     }
                     mode.finish();
                     return true;

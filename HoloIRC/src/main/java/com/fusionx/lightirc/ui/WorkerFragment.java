@@ -46,19 +46,9 @@ public class WorkerFragment extends Fragment implements LoaderManager
             @Override
             protected Void doInBackground(final Void... params) {
                 if (SharedPreferencesUtils.isInitialDatabaseRun(getActivity())) {
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDialog.show();
-                        }
-                    });
+                    mHandler.post(mDialog::show);
                     SharedPreferencesUtils.onInitialSetup(getActivity());
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mDialog.cancel();
-                        }
-                    });
+                    mHandler.post(mDialog::cancel);
                 }
                 return null;
             }
