@@ -104,7 +104,6 @@ public class NavigationDrawerFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
-        mSlidingUpPanelLayout.setSlidingEnabled(false);
 
         mUserListTextView = findById(getView(), R.id.user_text_view);
         mSlideUpLayout = findById(view, R.id.bottom_panel);

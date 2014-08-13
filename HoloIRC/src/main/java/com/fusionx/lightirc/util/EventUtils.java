@@ -18,12 +18,12 @@ import java.util.List;
 
 public class EventUtils {
 
-    private static final ImmutableList<? extends Class<? extends ServerEvent>>
-            sServerIgnoreClasses = ImmutableList.of(JoinEvent.class, PartEvent.class,
-            NewPrivateMessageEvent.class, PrivateMessageClosedEvent.class, StatusChangeEvent.class);
+    private static final List<Class<? extends ServerEvent>> sServerIgnoreClasses
+            = ImmutableList.of(JoinEvent.class, PartEvent.class, NewPrivateMessageEvent.class,
+            PrivateMessageClosedEvent.class, StatusChangeEvent.class);
 
-    private static final ImmutableList<? extends Class<? extends ChannelEvent>>
-            sChannelIgnoreClasses = ImmutableList.of(ChannelNameEvent.class);
+    private static final List<Class<? extends ChannelEvent>> sChannelIgnoreClasses
+            = ImmutableList.of(ChannelNameEvent.class);
 
     public static boolean shouldStoreEvent(final Event event) {
         if (event instanceof ChannelWorldUserEvent) {
