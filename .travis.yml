@@ -12,5 +12,5 @@ before_install:
   - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
   - mkdir libraries
   - git clone https://github.com/tilal6991/Relay.git libraries/relay -b develop
-  - git clone https://github.com/tilal6991/Bus.git libraries/bus -b develop
+  - git clone https://github.com/tilal6991/Bus.git libraries/Bus -b develop
 script: ./gradlew test
