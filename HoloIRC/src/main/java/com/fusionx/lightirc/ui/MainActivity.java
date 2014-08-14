@@ -285,9 +285,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void removeCurrentFragment() {
         if (mCurrentFragment.getType() == CHANNEL) {
-            mConversation.getServer().getServerCallBus().sendPart(mConversation.getId());
+            mConversation.getServer().getServerCallHandler().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
-            mConversation.getServer().getServerCallBus().sendCloseQuery((QueryUser) mConversation);
+            mConversation.getServer().getServerCallHandler().sendCloseQuery((QueryUser) mConversation);
         }
     }
 

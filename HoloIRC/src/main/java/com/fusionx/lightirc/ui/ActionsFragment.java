@@ -126,7 +126,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 mConversation.getServer().getUser().getNick().getNickAsString()) {
             @Override
             public void onOkClicked(final String input) {
-                mConversation.getServer().getServerCallBus().sendNickChange(input);
+                mConversation.getServer().getServerCallHandler().sendNickChange(input);
             }
         };
         nickDialog.show();
@@ -165,7 +165,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
             if (mConversation == null) {
                 return;
             }
-            mConversation.getServer().getServerCallBus().sendJoin(input);
+            mConversation.getServer().getServerCallHandler().sendJoin(input);
         }
     }
 }

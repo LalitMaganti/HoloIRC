@@ -35,7 +35,6 @@ import com.fusionx.relay.misc.IRCUserComparator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.SparseBooleanArray;
@@ -232,7 +231,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
                 return true;
             }
             case R.id.fragment_userlist_cab_whois:
-                mChannel.getServer().getServerCallBus().sendUserWhois(nick);
+                mChannel.getServer().getServerCallHandler().sendUserWhois(nick);
                 return true;
             default:
                 return false;
@@ -276,7 +275,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private void onPrivateMessageUser(final String nick) {
         if (isNickOtherUsers(nick)) {
-            mChannel.getServer().getServerCallBus().sendMessageToQueryUser(nick, "");
+            mChannel.getServer().getServerCallHandler().sendMessageToQueryUser(nick, "");
             mCallback.closeDrawer();
             mActionMode.finish();
         } else {
