@@ -1,4 +1,4 @@
-include ':HoloIRC', ':Bus', ':relay', ':relayexample'
+include ':android', ':Bus', ':relay', ':relayexample'
 
 project(':Bus').projectDir = new File('libraries/Bus/library')
 project(':relay').projectDir = new File('libraries/relay/library')
