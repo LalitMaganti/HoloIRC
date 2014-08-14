@@ -367,7 +367,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (fromRecents || serverName == null) {
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
-            optConversation = event == null ? Optional.absent() : Optional.of(event.conversation);
+            optConversation = event == null
+                    ? Optional.absent()
+                    : Optional.fromNullable(event.conversation);
         } else {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
