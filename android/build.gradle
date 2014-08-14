@@ -74,8 +74,8 @@ dependencies {
 
     compile 'com.crashlytics.android:crashlytics:1.+'
 
-    compile project(':relay')
-    compile project(':Bus')
+    compile project(':relay-library')
+    compile project(':bus-library')
 }
 
 retrolambda {

@@ -8,7 +8,7 @@ HoloIRC is relatively easy to build after the initial setup. The following shoul
 - This repo should be cloned - pick which branch you want
 - A directory called libraries should be created inside the cloned folder
 - https://github.com/tilal6991/Relay should be cloned into a folder called relay - pick the branch matching HoloIRC's branch
-- https://github.com/tilal6991/Bus should be cloned into a folder called Bus - clone the develop branch
+- https://github.com/tilal6991/Bus should be cloned into a folder called bus - clone the develop branch
 - Then run ./gradlew assembleDebug in the root directory
 - This should create a debug apk in HoloIRC/build/apk which you can install
 
@@ -30,8 +30,8 @@ License
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
     along with HoloIRC.  If not, see <http://www.gnu.org/licenses/>.
-    
-    
+
+
 TODO
 ====
 - [ ] Add more options in general - this has come up a lot - people want customization. More specifically
