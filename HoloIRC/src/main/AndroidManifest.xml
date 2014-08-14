@@ -3,8 +3,8 @@
     package="com.fusionx.lightirc"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:versionCode="47"
-    android:versionName="3.3.1">
+    android:versionCode="48"
+    android:versionName="3.3.2">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />

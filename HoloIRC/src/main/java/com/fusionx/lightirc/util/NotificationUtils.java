@@ -66,7 +66,8 @@ public class NotificationUtils {
         }
     }
 
-    public static void notifyOutOfApp(final Context context, final Conversation conversation) {
+    public static void notifyOutOfApp(final Context context, final Conversation conversation,
+            final boolean channel) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
         }
@@ -115,7 +116,8 @@ public class NotificationUtils {
 
         final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
         resultIntent.putExtra("server_name", conversation.getServer().getTitle());
-        resultIntent.putExtra("channel_name", conversation.getId());
+        resultIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
+
         final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,
                 NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
@@ -145,6 +147,7 @@ public class NotificationUtils {
                     | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             activityIntent.putExtra("server_name", intent.getStringExtra("server_name"));
             activityIntent.putExtra("channel_name", intent.getStringExtra("channel_name"));
+            activityIntent.putExtra("query_nick", intent.getStringExtra("query_nick"));
             context.startActivity(activityIntent);
         }
     }

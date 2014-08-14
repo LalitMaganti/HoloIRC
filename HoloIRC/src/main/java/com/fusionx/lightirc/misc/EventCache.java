@@ -19,6 +19,8 @@ public class EventCache extends LruCache<Event, EventDecorator> {
     public EventCache(final Context context) {
         super(EVENT_CACHE_MAX_SIZE);
 
+        mConverter = IRCEventToStringConverter.getConverter(context);
+
         // If the preferences change then clear the cache
         getBus().register(new Object() {
             @Subscribe
@@ -26,12 +28,11 @@ public class EventCache extends LruCache<Event, EventDecorator> {
                 evictAll();
             }
         }, 300);
-        mConverter = IRCEventToStringConverter.getConverter(context);
     }
 
     @Override
     protected EventDecorator create(final Event key) {
-        synchronized (this) {
+        synchronized (mConverter) {
             return mConverter.getEventDecorator(key);
         }
     }

@@ -8,10 +8,6 @@ buildscript {
     }
 }
 
-def isReleaseBuild() {
-    return version.contains("SNAPSHOT") == false
-}
-
 allprojects {
     buildscript {
         repositories {
