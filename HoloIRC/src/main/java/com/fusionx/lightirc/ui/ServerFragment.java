@@ -21,10 +21,11 @@
 
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.event.server.ServerEvent;
 import com.fusionx.relay.parser.UserInputParser;
-import com.squareup.otto.Subscribe;
 
 import android.os.Bundle;
 import android.view.View;
@@ -58,8 +59,8 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     // Subscription methods
-    @Subscribe
-    public void onEventMainThread(final ServerEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final ServerEvent event) {
         mMessageAdapter.add(event);
     }
 

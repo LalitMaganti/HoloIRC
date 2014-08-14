@@ -22,6 +22,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.UserListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -167,14 +168,14 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
      * Only perform an action if the channel that is being observed currently is the one the
      * event is referring to
      */
-    @SuppressWarnings("unused")
+    @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldUserEvent event) {
         if (event.channel.equals(mChannel) && event.isUserListChangeEvent()) {
             onUpdateUserList();
         }
     }
 
-    @SuppressWarnings("unused")
+    @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelNameEvent event) {
         if (event.channel.equals(mChannel)) {
             onUpdateUserList();

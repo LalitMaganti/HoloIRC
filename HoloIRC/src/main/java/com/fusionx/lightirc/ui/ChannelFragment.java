@@ -25,6 +25,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
+import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.relay.Channel;
@@ -35,7 +37,6 @@ import com.fusionx.relay.misc.IRCUserComparator;
 import com.fusionx.relay.parser.UserInputParser;
 import com.fusionx.relay.util.IRCUtils;
 import com.fusionx.relay.util.Utils;
-import com.squareup.otto.Subscribe;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -105,8 +106,8 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     }
 
     // Subscription methods
-    @Subscribe
-    public void onEventMainThread(final ChannelEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final ChannelEvent event) {
         if (event.channel == null || !event.channel.getName().equals(mTitle)) {
             return;
         }

@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -424,7 +425,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             server.getServerEventBus().register(this, 50);
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final NewPrivateMessageEvent event)
                 throws InterruptedException {
             final QueryUser user = event.user;
@@ -433,7 +434,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.expandGroup(mServerIndex);
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
             final Channel channel = event.channel;
             mListAdapter.getGroup(mServerIndex).addServerObject(channel);
@@ -441,7 +442,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.expandGroup(mServerIndex);
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
             mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
@@ -449,7 +450,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mCallback.onPart(mServer.getTitle(), event);
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) throws InterruptedException {
             mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
@@ -461,7 +462,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final ChannelEvent event) {
             if (EventUtils.shouldStoreEvent(event)
                     && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
@@ -469,7 +470,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PrivateMessageClosedEvent event) {
             mListAdapter.getGroup(mServerIndex).removeServerObject(
                     event.privateMessageNick.getNickAsString());
@@ -478,24 +479,24 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mCallback.onPrivateMessageClosed();
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryEvent event) {
             if (mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
             }
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final ConnectEvent event) {
             mListView.invalidateViews();
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DisconnectEvent event) {
             mListView.invalidateViews();
         }
 
-        @SuppressWarnings("unused")
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final StopEvent event) {
             refreshServers(() -> {
                 unregister();

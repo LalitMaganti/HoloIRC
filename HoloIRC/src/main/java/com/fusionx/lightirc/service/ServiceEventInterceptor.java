@@ -1,11 +1,11 @@
 package com.fusionx.lightirc.service;
 
 import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.Conversation;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.Event;
@@ -105,19 +105,19 @@ public final class ServiceEventInterceptor {
     /*
      * Event interception start here
      */
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final NewPrivateMessageEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onPrivateMessage(final NewPrivateMessageEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
     }
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final JoinEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final JoinEvent event) {
         onIRCEvent(MessagePriority.LOW, event.channel,
                 getLastStorableEvent(event.channel.getBuffer()));
     }
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final ChannelEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final ChannelEvent event) {
         if (shouldStoreEvent(event)) {
             // TODO - fix this horrible code
             final Conversation conversation = event.channel;
@@ -144,8 +144,8 @@ public final class ServiceEventInterceptor {
         }
     }
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final QueryEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final QueryEvent event) {
         if (shouldStoreEvent(event)) {
             onIRCEvent(MessagePriority.HIGH, event.user, event);
 
@@ -157,8 +157,8 @@ public final class ServiceEventInterceptor {
      * Event interception ends here
      */
 
-    @SuppressWarnings("unused")
-    public void onEventMainThread(final InviteEvent event) {
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final InviteEvent event) {
         mInviteEvents.add(event);
     }
 
