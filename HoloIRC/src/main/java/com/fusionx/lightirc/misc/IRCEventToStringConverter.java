@@ -3,6 +3,7 @@ package com.fusionx.lightirc.misc;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.NickColour;
+import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.event.Event;
 import com.fusionx.relay.event.channel.ChannelActionEvent;
@@ -105,11 +106,10 @@ public class IRCEventToStringConverter {
             final Object result = mClassMethodMap.get(event.getClass()).invoke(mEventConverter,
                     event);
             return (EventDecorator) result;
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            CrashUtils.logIssue("Dead event of type " + event.getClass() + " received");
+            return new EventDecorator("");
         }
-        Log.d("HoloIRC", "Dead event of type " + event.getClass() + " received");
-        return new EventDecorator("");
     }
 
     private CharSequence appendReasonIfNeeded(final CharSequence response, final String reason) {
