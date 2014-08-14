@@ -166,6 +166,11 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
         CrashUtils.logMissingData(server);
     }
 
+    @Override
+    public void logServerLine(final String line) {
+        CrashUtils.logIssue(line);
+    }
+
     // Logging
     @Override
     public boolean shouldLogTimestamps() {

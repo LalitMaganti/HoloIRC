@@ -62,7 +62,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private TextView mUserListTextView;
 
-    private View mSlideUpLayout;
+    private View mBottomPanel;
 
     private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
@@ -106,11 +106,12 @@ public class NavigationDrawerFragment extends Fragment implements
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
 
         mUserListTextView = findById(getView(), R.id.user_text_view);
-        mSlideUpLayout = findById(view, R.id.bottom_panel);
+        mBottomPanel = findById(view, R.id.bottom_panel);
 
         getBus().registerSticky(mEventHandler);
 
-        mSlideUpLayout.setOnClickListener(v -> {
+        final View dragView = view.findViewById(R.id.drag_view);
+        dragView.setOnClickListener(v -> {
             if (mSlidingUpPanelLayout.isPanelExpanded()) {
                 mSlidingUpPanelLayout.collapsePanel();
             } else {
@@ -270,20 +271,22 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void updateUserListVisibility() {
-        final int visibility = mStatus == ConnectionStatus.CONNECTED
+        final boolean visibility = mStatus == ConnectionStatus.CONNECTED
                 && mFragmentType == FragmentType.CHANNEL
-                && isActionsFragmentVisible() ? View.VISIBLE : View.GONE;
-        mSlideUpLayout.setVisibility(visibility);
+                && isActionsFragmentVisible();
 
-        if (visibility == View.VISIBLE) {
+        if (visibility) {
             // TODO - change this from casting
             final Channel channel = (Channel) mConversation;
             setUserTextViewText(String.format("%d users", channel.getUsers().size()));
+
+            mSlidingUpPanelLayout.showPanel();
         } else {
             if (mSlidingUpPanelLayout.isPanelExpanded()) {
                 // Collapse Pane
                 mSlidingUpPanelLayout.collapsePanel();
             }
+            mSlidingUpPanelLayout.hidePanel();
         }
     }
 
