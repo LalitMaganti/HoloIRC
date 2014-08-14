@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.ui;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
@@ -357,24 +359,26 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         final String serverName = getIntent().getStringExtra("server_name");
         final String channelName = getIntent().getStringExtra("channel_name");
+        final String queryNick = getIntent().getStringExtra("query_nick");
 
-        final Conversation conversation;
+        final Optional<? extends Conversation> optConversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
         if (fromRecents || serverName == null) {
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
-            conversation = event != null ? event.conversation : null;
+            optConversation = event == null ? Optional.absent() : Optional.of(event.conversation);
         } else {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra("server_name");
             getIntent().removeExtra("channel_name");
+            getIntent().removeExtra("query_nick");
 
-            // Assume on this high a level that the channel will exist - if it doesn't it
-            // indicates a serious bug
             final Server server = service.getServerIfExists(serverName);
-            conversation = server.getUserChannelInterface().getChannel(channelName).get();
+            optConversation = channelName == null
+                    ? server.getUserChannelInterface().getQueryUser(queryNick)
+                    : server.getUserChannelInterface().getChannel(channelName);
         }
 
         if (!fromRecents && clearCaches) {
@@ -384,7 +388,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             service.clearAllEventCaches();
         }
 
-        onExternalConversationUpdate(conversation);
+        onExternalConversationUpdate(optConversation);
     }
 
     // Subscribe events
@@ -494,6 +498,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         final String serverName = intent.getStringExtra("server_name");
         final String channelName = intent.getStringExtra("channel_name");
+        final String queryNick = intent.getStringExtra("query_nick");
 
         if (serverName == null) {
             return;
@@ -502,13 +507,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // activity finishes which is why we have the recents check
         getIntent().removeExtra("server_name");
         getIntent().removeExtra("channel_name");
+        getIntent().removeExtra("query_nick");
 
-        // Assume on this high a level that the channel will exist - if it doesn't it
-        // indicates a serious bug
         final Server server = getService().getServerIfExists(serverName);
-        final Conversation conversation = server.getUserChannelInterface()
-                .getChannel(channelName).get();
-        onExternalConversationUpdate(conversation);
+        final Optional<? extends Conversation> optConversation = channelName == null
+                ? server.getUserChannelInterface().getQueryUser(queryNick)
+                : server.getUserChannelInterface().getChannel(channelName);
+        onExternalConversationUpdate(optConversation);
     }
 
     @Override
@@ -644,13 +649,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setActionBarSubtitle(null);
     }
 
-    private void onExternalConversationUpdate(final Conversation conversation) {
-        if (conversation == null) {
+    private void onExternalConversationUpdate(final Optional<? extends Conversation>
+            optConversation) {
+        if (optConversation.isPresent()) {
+            mHandler.post(() -> changeCurrentConversation(optConversation.get(), false));
+            supportInvalidateOptionsMenu();
+        } else {
             mSlidingPane.openPane();
             mEmptyView.setVisibility(View.VISIBLE);
-            return;
         }
-        mHandler.post(() -> changeCurrentConversation(conversation, false));
-        supportInvalidateOptionsMenu();
     }
 }
