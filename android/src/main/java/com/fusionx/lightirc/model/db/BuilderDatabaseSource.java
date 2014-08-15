@@ -130,7 +130,12 @@ public class BuilderDatabaseSource {
         if (cursor.moveToFirst()) {
             do {
                 final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
-                builders.add(builder);
+                if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
+                        .isNotEmpty(builder.getUrl())) {
+                    builders.add(builder);
+                } else {
+                    removeServer(builder.getId());
+                }
             } while (cursor.moveToNext());
         }
         return builders;
