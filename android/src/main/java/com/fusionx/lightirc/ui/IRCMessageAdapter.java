@@ -169,11 +169,9 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
         @Override
         protected FilterResults performFiltering(final CharSequence constraint) {
-            final List<T> resultList = new ArrayList<>();
-            FluentIterable.from(mDataToFilter)
+            final List<T> resultList = FluentIterable.from(mDataToFilter)
                     .filter(EventUtils::shouldStoreEvent)
-                    .copyInto(resultList);
-
+                    .copyInto(new ArrayList<>());
             final FilterResults results = new FilterResults();
             results.values = resultList;
             results.count = resultList.size();

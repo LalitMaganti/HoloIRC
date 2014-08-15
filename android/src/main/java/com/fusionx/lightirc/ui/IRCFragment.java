@@ -93,11 +93,14 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         setListAdapter(mMessageAdapter);
 
         onResetBuffer(() -> {
-            if (savedInstanceState == null) {
-                getListView().setSelection(mMessageAdapter.getCount() - 1);
-            } else {
-                getListView().onRestoreInstanceState(savedInstanceState.getParcelable
-                        ("list_view"));
+            // While the processing is occurring we could have destroyed the view by rotation
+            if (getView() != null) {
+                if (savedInstanceState == null) {
+                    getListView().setSelection(mMessageAdapter.getCount() - 1);
+                } else {
+                    getListView().onRestoreInstanceState(savedInstanceState.getParcelable
+                            ("list_view"));
+                }
             }
         });
         mConversation.getServer().getServerEventBus().register(this);

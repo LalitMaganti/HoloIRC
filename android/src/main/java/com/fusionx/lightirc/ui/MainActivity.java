@@ -473,7 +473,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public EventCache getEventCache() {
-        return getService().getEventCache(mConversation.getServer());
+        return IRCService.getEventCache(mConversation.getServer());
     }
 
     @Override

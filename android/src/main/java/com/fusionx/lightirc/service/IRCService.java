@@ -1,7 +1,5 @@
 package com.fusionx.lightirc.service;
 
-import com.google.common.collect.FluentIterable;
-
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
@@ -43,6 +41,8 @@ import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
 import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
+
+    public static final Map<Server, EventCache> mEventCache = new HashMap<>();
 
     private static final int SERVICE_PRIORITY = 50;
 
@@ -96,8 +96,6 @@ public class IRCService extends Service {
 
     private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new THashMap<>();
 
-    private final Map<Server, EventCache> mEventCache = new HashMap<>();
-
     private boolean mExternalStorageWriteable = false;
 
     private IRCLoggingManager mLoggingManager;
@@ -107,6 +105,10 @@ public class IRCService extends Service {
     private boolean mFirstStart = true;
 
     private ConnectionManager mConnectionManager;
+
+    public static EventCache getEventCache(final Server server) {
+        return mEventCache.get(server);
+    }
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
@@ -199,10 +201,6 @@ public class IRCService extends Service {
 
     public ServiceEventInterceptor getEventHelper(final Server server) {
         return mEventHelperMap.get(server);
-    }
-
-    public EventCache getEventCache(Server server) {
-        return mEventCache.get(server);
     }
 
     private void onFirstStart() {
