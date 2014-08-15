@@ -105,27 +105,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     };
 
-    // Fields
-    // Mention helper
-    private final Object mMentionHelper = new Object() {
-        @Subscribe(cancellable = true)
-        public boolean onMentioned(final OnChannelMentionEvent event) {
-            if (!event.channel.equals(mConversation)) {
-                final Snackbar snackbar = (Snackbar) findViewById(R.id.snackbar);
-                NotificationUtils.notifyInApp(snackbar, MainActivity.this, event.channel);
-            }
-            return true;
-        }
+    // Fragments
+    private WorkerFragment mWorkerFragment;
 
-        @Subscribe(cancellable = true)
-        public boolean onQueried(final OnQueryEvent event) {
-            if (!event.queryUser.equals(mConversation)) {
-                final Snackbar snackbar = (Snackbar) findViewById(R.id.snackbar);
-                NotificationUtils.notifyInApp(snackbar, MainActivity.this, event.queryUser);
-            }
-            return true;
-        }
-    };
+    // IRC
+    private Conversation mConversation;
 
     private final Object mConversationChanged = new Object() {
         @Subscribe
@@ -133,12 +117,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mConversation = event.conversation;
         }
     };
-
-    // Fragments
-    private WorkerFragment mWorkerFragment;
-
-    // IRC
-    private Conversation mConversation;
 
     private IRCFragment mCurrentFragment;
 
@@ -155,6 +133,28 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private TextView mEmptyView;
 
+    private Snackbar mSnackbar;
+
+    // Fields
+    // Mention helper
+    private final Object mMentionHelper = new Object() {
+        @Subscribe(cancellable = true)
+        public boolean onMentioned(final OnChannelMentionEvent event) {
+            if (!event.channel.equals(mConversation)) {
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.channel);
+            }
+            return true;
+        }
+
+        @Subscribe(cancellable = true)
+        public boolean onQueried(final OnQueryEvent event) {
+            if (!event.queryUser.equals(mConversation)) {
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.queryUser);
+            }
+            return true;
+        }
+    };
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         AppPreferences.setupAppPreferences(this);
@@ -166,6 +166,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         setContentView(R.layout.main_activity);
 
         mEmptyView = (TextView) findViewById(R.id.content_frame_empty_textview);
+
+        mSnackbar = (Snackbar) findViewById(R.id.snackbar);
+        mSnackbar.post(mSnackbar::hide);
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(this);
