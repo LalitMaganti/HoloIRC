@@ -666,6 +666,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // Remove any title/subtitle from the action bar
         setActionBarTitle(getString(R.string.app_name));
         setActionBarSubtitle(null);
+
+        // Close the nav drawer when the current fragment is removed
+        closeDrawer();
     }
 
     private void onExternalConversationUpdate(final Optional<? extends Conversation>

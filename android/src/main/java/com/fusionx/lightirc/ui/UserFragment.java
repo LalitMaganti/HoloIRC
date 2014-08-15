@@ -39,10 +39,9 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final QueryEvent event) {
-        if (!event.user.getNick().equals(getPrivateMessageUser().getNick())) {
-            return;
+        if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
+            mMessageAdapter.add(event);
         }
-        mMessageAdapter.add(event);
     }
 
     @Override

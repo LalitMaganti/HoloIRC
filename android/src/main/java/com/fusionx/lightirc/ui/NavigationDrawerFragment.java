@@ -285,6 +285,7 @@ public class NavigationDrawerFragment extends Fragment implements
             }
             mSlidingUpPanelLayout.hidePanel();
         }
+        getActivity().supportInvalidateOptionsMenu();
     }
 
     @Override

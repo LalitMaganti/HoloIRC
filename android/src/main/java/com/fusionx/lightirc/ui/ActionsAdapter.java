@@ -6,7 +6,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.ConnectionStatus;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import co.fusionx.relay.ConnectionStatus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -104,8 +104,9 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
 
     @Override
     public boolean isEnabled(final int position) {
-        return position != 0 && position != 1 && position != 3 && position < getRealServerCount()
-                || isConnected();
+        return mFragmentType != null &&
+                position != 0 && position != 1 && position != 3 &&
+                position < getRealServerCount() || isConnected();
     }
 
     @Override
@@ -149,12 +150,12 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             row.setText(getItem(position));
         }
 
-        if (!isEnabled(position)) {
-            row.setTextColor(Color.GRAY);
-        } else {
+        if (isEnabled(position)) {
             final int resId = resolveResourceIdFromAttr(getContext(), R.attr.default_text_colour);
             final int colour = UIUtils.getColourFromResource(getContext(), resId);
             row.setTextColor(colour);
+        } else {
+            row.setTextColor(Color.GRAY);
         }
 
         return row;
