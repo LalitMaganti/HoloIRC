@@ -18,16 +18,6 @@ import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Nick;
-import co.fusionx.relay.QueryUser;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.event.server.KickEvent;
-import co.fusionx.relay.event.server.PartEvent;
-import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -43,6 +33,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.Nick;
+import co.fusionx.relay.QueryUser;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.event.server.KickEvent;
+import co.fusionx.relay.event.server.PartEvent;
+import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -206,11 +207,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             if (mCurrentFragment == null) {
                 findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
                         (View.VISIBLE);
-            } else {
+            } else if (event != null) {
                 mConversation = event.conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
                 mConversation.getServer().getServerEventBus().register(this);
+            } else {
+                onRemoveCurrentFragment();
             }
             supportInvalidateOptionsMenu();
         }
@@ -644,6 +647,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     private void onRemoveCurrentFragmentAndConversation() {
+        onRemoveCurrentFragment();
+
+        // Don't listen for any more events from this server
+        mConversation.getServer().getServerEventBus().unregister(this);
+        getBus().postSticky(new OnConversationChanged(null, null));
+    }
+
+    private void onRemoveCurrentFragment() {
         final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.remove(mCurrentFragment).commit();
@@ -651,10 +662,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportFragmentManager().executePendingTransactions();
 
         mHandler.postDelayed(() -> mEmptyView.setVisibility(View.VISIBLE), 300);
-
-        // Don't listen for any more events from this server
-        mConversation.getServer().getServerEventBus().unregister(this);
-        getBus().postSticky(new OnConversationChanged(null, null));
 
         // Remove any title/subtitle from the action bar
         setActionBarTitle(getString(R.string.app_name));

@@ -29,8 +29,6 @@ import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.event.Event;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,6 +43,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.util.List;
+
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -163,6 +164,8 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     protected abstract void onSendMessage(final String message);
 
     public abstract boolean isValid();
+
+    public abstract Conversation getConversation();
 
     public interface Callback {
 
