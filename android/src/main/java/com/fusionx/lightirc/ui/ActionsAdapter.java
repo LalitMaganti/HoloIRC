@@ -65,7 +65,16 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
         mChannelArray = context.getResources().getStringArray(R.array.channel_actions);
         mUserArray = context.getResources().getStringArray(R.array.user_actions);
 
-        getBus().registerSticky(mEventHandler);
+        getBus().register(mEventHandler);
+        final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
+        if (event == null) {
+            return;
+        }
+
+        mFragmentType = event.fragmentType;
+        if (event.conversation != null) {
+            mStatus = event.conversation.getServer().getStatus();
+        }
     }
 
     @Override

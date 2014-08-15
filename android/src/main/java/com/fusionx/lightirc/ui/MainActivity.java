@@ -22,6 +22,7 @@ import com.fusionx.relay.Channel;
 import com.fusionx.relay.ChannelUser;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Conversation;
+import com.fusionx.relay.Nick;
 import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.server.KickEvent;
@@ -200,11 +201,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     .findFragmentById(R.id.content_frame);
 
             // If the current fragment is not null then retrieve the matching convo
+            final OnConversationChanged event = getBus()
+                    .getStickyEvent(OnConversationChanged.class);
             if (mCurrentFragment == null) {
                 findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
                         (View.VISIBLE);
             } else {
-                mConversation = getBus().getStickyEvent(OnConversationChanged.class).conversation;
+                mConversation = event.conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
                 mConversation.getServer().getServerEventBus().register(this);
@@ -257,11 +260,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public boolean onKick(final String serverName, final KickEvent event) {
+    public boolean onKick(final Server server, final KickEvent event) {
         if (mConversation == null) {
             return false;
         }
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName)
+        final boolean isCurrent = mConversation.getServer().equals(server)
                 && mConversation.getId().equals(event.channelName);
 
         if (isCurrent) {
@@ -271,8 +274,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onPrivateMessageClosed() {
-        if (mCurrentFragment != null) {
+    public void onPrivateMessageClosed(final Server server, final Nick privateMessageNick) {
+        if (mConversation == null) {
+            return;
+        }
+        final boolean isCurrent = mConversation.getServer().equals(server)
+                && mConversation.getId().equals(privateMessageNick.getNickAsString());
+        if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
         }
     }

@@ -129,18 +129,14 @@ public class NavigationDrawerFragment extends Fragment implements
             transaction.replace(R.id.user_list_frame_layout, userListFragment);
             transaction.commit();
         } else {
-            mCurrentFragment = mActionsFragment;
-            mActionsFragment = (ActionsFragment) getChildFragmentManager().findFragmentByTag
-                    ("Actions");
+            mCurrentFragment = getChildFragmentManager().findFragmentById(R.id.actions_list_layout);
+
+            mActionsFragment = (ActionsFragment) getChildFragmentManager()
+                    .findFragmentByTag("Actions");
             mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager()
                     .findFragmentByTag("Ignore");
             mInviteFragment = (InviteFragment) getChildFragmentManager()
                     .findFragmentByTag("Invite");
-            if (mIgnoreListFragment != null) {
-                mCurrentFragment = mIgnoreListFragment;
-            } else if (mInviteFragment != null) {
-                mCurrentFragment = mInviteFragment;
-            }
         }
 
         if (mIgnoreListFragment == null) {
@@ -149,6 +145,7 @@ public class NavigationDrawerFragment extends Fragment implements
         if (mInviteFragment == null) {
             mInviteFragment = new InviteFragment();
         }
+        updateUserListVisibility();
     }
 
     @Override

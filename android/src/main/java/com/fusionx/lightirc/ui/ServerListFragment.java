@@ -13,6 +13,7 @@ import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Conversation;
+import com.fusionx.relay.Nick;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.query.QueryEvent;
@@ -300,7 +301,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         if (item.getServer() == null) {
             item.setServer(mService.requestConnectionToServer(item.getBuilder(),
                     item.getIgnoreList()));
-            mEventHandlers.add(new ServerEventHandler(item , groupPosition));
+            mEventHandlers.add(new ServerEventHandler(item, groupPosition));
         }
         mCallback.onServerClicked(item.getServer());
 
@@ -406,9 +407,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public void onPart(final String serverName, final PartEvent event);
 
-        public boolean onKick(final String serverName, final KickEvent event);
+        public boolean onKick(final Server server, final KickEvent event);
 
-        public void onPrivateMessageClosed();
+        public void onPrivateMessageClosed(final Server server, final Nick privateMessageNick);
     }
 
     public class ServerEventHandler {
@@ -431,7 +432,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onEventMainThread(final NewPrivateMessageEvent event)
                 throws InterruptedException {
             mServerWrapper.addServerObject(event.user);
-            mListAdapter.notifyDataSetChanged();
+            mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
         }
@@ -439,7 +440,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
             mServerWrapper.addServerObject(event.channel);
-            mListAdapter.notifyDataSetChanged();
+            mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
         }
@@ -459,7 +460,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
-            final boolean switchToServer = mCallback.onKick(mServer.getTitle(), event);
+            final boolean switchToServer = mCallback.onKick(mServer, event);
             if (switchToServer) {
                 onServerClick(mServerIndex);
             }
@@ -479,7 +480,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
-            mCallback.onPrivateMessageClosed();
+            mCallback.onPrivateMessageClosed(mServer, event.privateMessageNick);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
