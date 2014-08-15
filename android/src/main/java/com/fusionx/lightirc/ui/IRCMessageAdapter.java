@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.ui;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;

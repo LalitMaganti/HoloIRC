@@ -19,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.NickCache;

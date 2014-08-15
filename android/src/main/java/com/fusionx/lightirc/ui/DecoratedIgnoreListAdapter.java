@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.ui;
 
 import com.nhaarman.listviewanimations.BaseAdapterDecorator;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;

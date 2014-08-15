@@ -23,7 +23,6 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.ActionsAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;

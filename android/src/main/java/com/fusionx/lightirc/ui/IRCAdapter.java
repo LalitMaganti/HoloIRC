@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.ui;
 
 /*
 public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter.IRCViewHolder>

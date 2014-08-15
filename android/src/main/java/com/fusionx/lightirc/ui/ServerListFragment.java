@@ -3,7 +3,6 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.ExpandableServerListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;

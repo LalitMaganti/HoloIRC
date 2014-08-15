@@ -1,4 +1,4 @@
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;

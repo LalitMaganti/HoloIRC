@@ -2,8 +2,6 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.adapters.BaseCollectionAdapter;
-import com.fusionx.lightirc.adapters.DecoratedIgnoreListAdapter;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;

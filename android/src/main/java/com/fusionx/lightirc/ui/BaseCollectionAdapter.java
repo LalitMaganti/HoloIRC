@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fusionx.lightirc.adapters;
+package com.fusionx.lightirc.ui;
 
 import android.content.Context;
 import android.util.Log;
