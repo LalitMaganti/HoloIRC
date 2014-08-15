@@ -282,7 +282,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private void disconnectFromServer(final List<Integer> checkedPositions) {
         for (final Integer checkedPosition : checkedPositions) {
-            mService.requestConnectionStoppage(mListAdapter.getGroup(checkedPosition).getServer());
+            final long packed = mListView.getExpandableListPosition(checkedPosition);
+            final int group = ExpandableListView.getPackedPositionGroup(packed);
+            mService.requestConnectionStoppage(mListAdapter.getGroup(group).getServer());
         }
     }
 
@@ -321,7 +323,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
             @Override
             protected Void doInBackground(Void... params) {
-                for (final int group : checkedPositions) {
+                for (final int checkedPosition : checkedPositions) {
+                    final long packed = mListView.getExpandableListPosition(checkedPosition);
+                    final int group = ExpandableListView.getPackedPositionGroup(packed);
+
                     final ServerWrapper listItem = mListAdapter.getGroup(group);
                     source.removeServer(listItem.getBuilder().getId());
                 }
