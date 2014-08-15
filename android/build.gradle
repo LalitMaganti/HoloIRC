@@ -7,6 +7,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:0.12.+'
         classpath 'me.tatarka:gradle-retrolambda:2.2.1'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
+        classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.+'
     }
 }
 
@@ -64,6 +65,7 @@ android {
         }
     }
 }
+apply plugin: 'android-unit-test'
 
 dependencies {
     compile 'com.android.support:support-v4:19.+'
@@ -73,6 +75,10 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:+'
 
     compile 'com.crashlytics.android:crashlytics:1.+'
+
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.robolectric:robolectric:+'
+    testCompile 'org.assertj:assertj-core:1.+'
 
     compile project(':relay-library')
     compile project(':bus-library')
