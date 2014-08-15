@@ -1,3 +1,4 @@
-include ':HoloIRC', 'libraries:Bus:library', ':relay', ':relayexample'
-project(':relay').projectDir = new File('libraries/relay/library')
-project(':relayexample').projectDir = new File('libraries/relay/example')
+include ':android', ':bus-library', ':relay-library'
+
+project(':bus-library').projectDir = new File('libraries/bus/library')
+project(':relay-library').projectDir = new File('libraries/relay/library')
