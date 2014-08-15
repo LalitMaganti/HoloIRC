@@ -11,10 +11,8 @@ import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
-import com.fusionx.relay.Channel;
 import com.fusionx.relay.ConnectionStatus;
 import com.fusionx.relay.Conversation;
-import com.fusionx.relay.QueryUser;
 import com.fusionx.relay.Server;
 import com.fusionx.relay.event.channel.ChannelEvent;
 import com.fusionx.relay.event.query.QueryEvent;
@@ -58,9 +56,9 @@ import static com.fusionx.lightirc.util.UIUtils.getCheckedPositions;
 public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
         ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
 
-    private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
-
     private final EventHandler mEventHandler = new EventHandler();
+
+    private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
 
     // Callbacks
     private Callback mCallback;
@@ -302,7 +300,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         if (item.getServer() == null) {
             item.setServer(mService.requestConnectionToServer(item.getBuilder(),
                     item.getIgnoreList()));
-            mEventHandlers.add(new ServerEventHandler(item.getServer(), groupPosition));
+            mEventHandlers.add(new ServerEventHandler(item , groupPosition));
         }
         mCallback.onServerClicked(item.getServer());
 
@@ -370,10 +368,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 for (final ServerEventHandler handler : mEventHandlers) {
                     handler.unregister();
                 }
+                mEventHandlers.clear();
+
                 for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
                     ServerWrapper wrapper = listItems.get(i);
                     if (wrapper.getServer() != null) {
-                        mEventHandlers.add(new ServerEventHandler(wrapper.getServer(), i));
+                        mEventHandlers.add(new ServerEventHandler(wrapper, i));
                     }
                     // Expand all the groups - TODO - fix this properly
                     mListView.expandGroup(i);
@@ -417,44 +417,48 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         private final Server mServer;
 
-        public ServerEventHandler(final Server server, final int serverIndex) {
-            mServer = server;
-            mServerIndex = serverIndex;
+        private final ServerWrapper mServerWrapper;
 
-            server.getServerEventBus().register(this, 50);
+        public ServerEventHandler(final ServerWrapper wrapper, final int serverIndex) {
+            mServer = wrapper.getServer();
+            mServerIndex = serverIndex;
+            mServerWrapper = wrapper;
+
+            mServer.getServerEventBus().register(this, 50);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final NewPrivateMessageEvent event)
                 throws InterruptedException {
-            final QueryUser user = event.user;
-            mListAdapter.getGroup(mServerIndex).addServerObject(user);
+            mServerWrapper.addServerObject(event.user);
             mListAdapter.notifyDataSetChanged();
+
             mListView.expandGroup(mServerIndex);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
-            final Channel channel = event.channel;
-            mListAdapter.getGroup(mServerIndex).addServerObject(channel);
+            mServerWrapper.addServerObject(event.channel);
             mListAdapter.notifyDataSetChanged();
+
             mListView.expandGroup(mServerIndex);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
+            mServerWrapper.removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
+
             mListView.expandGroup(mServerIndex);
             mCallback.onPart(mServer.getTitle(), event);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) throws InterruptedException {
-            mListAdapter.getGroup(mServerIndex).removeServerObject(event.channelName);
+            mServerWrapper.removeServerObject(event.channelName);
             mListView.setAdapter(mListAdapter);
-            mListView.expandGroup(mServerIndex);
 
+            mListView.expandGroup(mServerIndex);
             final boolean switchToServer = mCallback.onKick(mServer.getTitle(), event);
             if (switchToServer) {
                 onServerClick(mServerIndex);
@@ -471,9 +475,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PrivateMessageClosedEvent event) {
-            mListAdapter.getGroup(mServerIndex).removeServerObject(
-                    event.privateMessageNick.getNickAsString());
+            mServerWrapper.removeServerObject(event.privateMessageNick.getNickAsString());
             mListView.setAdapter(mListAdapter);
+
             mListView.expandGroup(mServerIndex);
             mCallback.onPrivateMessageClosed();
         }
@@ -497,11 +501,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final StopEvent event) {
-            refreshServers(() -> {
-                unregister();
-                mEventHandlers.remove(ServerEventHandler.this);
-                mCallback.onServerStopCompleted(mServer);
-            });
+            refreshServers(() -> mCallback.onServerStopCompleted(mServer));
         }
 
         public void register() {

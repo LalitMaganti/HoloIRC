@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.fusionx.lightirc.util.UIUtils.getSpanFromPriority;
 
@@ -35,7 +36,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final Context mContext;
 
-    private final ArrayList<ServerWrapper> mServerListItems;
+    private final List<ServerWrapper> mServerListItems;
 
     private final IRCService mIRCService;
 

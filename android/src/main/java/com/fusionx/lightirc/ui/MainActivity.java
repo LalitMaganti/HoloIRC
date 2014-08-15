@@ -3,6 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.google.common.base.Optional;
 
 import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
@@ -287,7 +288,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (mCurrentFragment.getType() == CHANNEL) {
             mConversation.getServer().getServerCallHandler().sendPart(mConversation.getId());
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
-            mConversation.getServer().getServerCallHandler().sendCloseQuery((QueryUser) mConversation);
+            mConversation.getServer().getServerCallHandler()
+                    .sendCloseQuery((QueryUser) mConversation);
         }
     }
 
@@ -394,7 +396,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     // Subscribe events
-    @SuppressWarnings("unused")
+    @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final StatusChangeEvent event) {
         // Null happens when the disconnect handler is called first & the fragment has already been
         // removed by the disconnect handler
