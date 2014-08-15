@@ -6,6 +6,13 @@ import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.model.MessagePriority;
+
+import android.os.Handler;
+import android.os.Looper;
+
+import java.util.Map;
+import java.util.Set;
+
 import co.fusionx.relay.Conversation;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.event.Event;
@@ -14,16 +21,10 @@ import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-
-import android.os.Handler;
-import android.os.Looper;
-
-import java.util.Map;
-import java.util.Set;
-
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -48,6 +49,8 @@ public final class ServiceEventInterceptor {
 
     private final Set<InviteEvent> mInviteEvents;
 
+    private Set<DCCRequestEvent> mDCCRequests;
+
     private Conversation mConversation;
 
     private MessagePriority mMessagePriority;
@@ -57,6 +60,7 @@ public final class ServiceEventInterceptor {
         mMessagePriorityMap = new THashMap<>();
         mEventMap = new THashMap<>();
         mInviteEvents = new THashSet<>();
+        mDCCRequests = new THashSet<>();
 
         getBus().registerSticky(new Object() {
             @Subscribe
@@ -100,6 +104,10 @@ public final class ServiceEventInterceptor {
 
     public Set<InviteEvent> getInviteEvents() {
         return mInviteEvents;
+    }
+
+    public Set<DCCRequestEvent> getDCCRequests() {
+        return mDCCRequests;
     }
 
     /*
@@ -162,6 +170,11 @@ public final class ServiceEventInterceptor {
         mInviteEvents.add(event);
     }
 
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final DCCRequestEvent event) {
+        mDCCRequests.add(event);
+    }
+
     private void onIRCEvent(final MessagePriority priority, final Conversation conversation,
             final Event event) {
         if (conversation.equals(mConversation)) {
@@ -188,5 +201,9 @@ public final class ServiceEventInterceptor {
 
     private void setSubEvent(final Conversation title, final Event event) {
         mEventMap.put(title, event);
+    }
+
+    public Server getServer() {
+        return mServer;
     }
 }

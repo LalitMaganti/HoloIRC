@@ -34,7 +34,8 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class NavigationDrawerFragment extends Fragment implements
-        ActionsFragment.Callbacks, UserListFragment.Callback, InviteFragment.Callbacks {
+        ActionsFragment.Callbacks, UserListFragment.Callback, InviteFragment.Callbacks,
+        DCCPendingFragment.Callbacks {
 
     private ConnectionStatus mStatus;
 
