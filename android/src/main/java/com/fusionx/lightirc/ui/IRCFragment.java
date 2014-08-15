@@ -165,8 +165,6 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
 
     public abstract boolean isValid();
 
-    public abstract Conversation getConversation();
-
     public interface Callback {
 
         public EventCache getEventCache();
