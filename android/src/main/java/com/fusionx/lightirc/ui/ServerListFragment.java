@@ -5,26 +5,14 @@ import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
+import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.EventUtils;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Nick;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.event.server.ConnectEvent;
-import co.fusionx.relay.event.server.DisconnectEvent;
-import co.fusionx.relay.event.server.JoinEvent;
-import co.fusionx.relay.event.server.KickEvent;
-import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import co.fusionx.relay.event.server.PartEvent;
-import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
-import co.fusionx.relay.event.server.StopEvent;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -48,6 +36,19 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.Nick;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.event.server.ConnectEvent;
+import co.fusionx.relay.event.server.DisconnectEvent;
+import co.fusionx.relay.event.server.JoinEvent;
+import co.fusionx.relay.event.server.KickEvent;
+import co.fusionx.relay.event.server.NewPrivateMessageEvent;
+import co.fusionx.relay.event.server.PartEvent;
+import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -371,8 +372,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
                 findById(getView(), R.id.progress_bar_empty).setVisibility(View.GONE);
 
-                for (final ServerEventHandler handler : mEventHandlers) {
-                    handler.unregister();
+                for (final ServerEventHandler eventHandler : mEventHandlers) {
+                    eventHandler.unregister();
                 }
                 mEventHandlers.clear();
 
@@ -406,7 +407,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public void onSubServerClicked(final Conversation object);
 
-        public void onServerStopCompleted(final Server server);
+        public void onServerStopped(final Server server);
 
         public IRCService getService();
 
@@ -430,7 +431,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mServerIndex = serverIndex;
             mServerWrapper = wrapper;
 
-            mServer.getServerEventBus().register(this, 50);
+            register();
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
@@ -505,13 +506,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.invalidateViews();
         }
 
-        @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final StopEvent event) {
-            refreshServers(() -> mCallback.onServerStopCompleted(mServer));
-        }
-
         public void register() {
-            mServer.getServerEventBus().register(this);
+            mServer.getServerEventBus().register(this, 50);
         }
 
         public void unregister() {
@@ -524,11 +520,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe
         public void onConversationChanged(final OnConversationChanged event) {
             if (event.conversation != null) {
+                final ServiceEventInterceptor eventInterceptor =
+                        mService.getEventHelper(event.conversation.getServer());
                 if (event.fragmentType == FragmentType.SERVER) {
-                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority();
+                    eventInterceptor.clearMessagePriority();
                 } else {
-                    mService.getEventHelper(event.conversation.getServer()).clearMessagePriority
-                            (event.conversation);
+                    eventInterceptor.clearMessagePriority(event.conversation);
                 }
             }
             mListView.invalidateViews();
@@ -538,6 +535,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe
         public void onPreferencesChanged(final OnPreferencesChangedEvent event) {
             mListView.invalidateViews();
+        }
+
+        @Subscribe
+        public void onStopEvent(final ServerStopRequestedEvent event) {
+            refreshServers(() -> mCallback.onServerStopped(event.server));
         }
     }
 }

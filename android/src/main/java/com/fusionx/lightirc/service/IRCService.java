@@ -5,6 +5,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
@@ -187,6 +188,7 @@ public class IRCService extends Service {
         } else {
             startForeground(SERVICE_ID, getNotification());
         }
+        getBus().post(new ServerStopRequestedEvent(server));
     }
 
     public void requestReconnectionToServer(final Server server) {

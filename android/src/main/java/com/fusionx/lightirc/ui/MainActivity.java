@@ -106,9 +106,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     };
 
     // Fields
-    // IRC
-    private Conversation mConversation;
-
     // Mention helper
     private final Object mMentionHelper = new Object() {
         @Subscribe(cancellable = true)
@@ -139,6 +136,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     // Fragments
     private WorkerFragment mWorkerFragment;
+
+    // IRC
+    private Conversation mConversation;
 
     private IRCFragment mCurrentFragment;
 
@@ -234,12 +234,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onServerStopCompleted(final Server server) {
+    public void onServerStopped(final Server server) {
         closeDrawer();
         supportInvalidateOptionsMenu();
 
         getService().removeLoggingHandlerAndEventCache(server);
-        if (mCurrentFragment != null) {
+        if (mCurrentFragment != null && server.equals(mConversation.getServer())) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
