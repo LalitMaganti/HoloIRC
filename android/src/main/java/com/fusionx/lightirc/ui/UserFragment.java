@@ -24,9 +24,9 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.QueryUser;
-import com.fusionx.relay.event.query.QueryEvent;
-import com.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.QueryUser;
+import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.parser.UserInputParser;
 
 import java.util.List;
 

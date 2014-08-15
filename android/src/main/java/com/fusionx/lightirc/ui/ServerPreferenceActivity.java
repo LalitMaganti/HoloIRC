@@ -8,8 +8,8 @@ import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.PreferenceUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 

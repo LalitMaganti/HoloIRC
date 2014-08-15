@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
-import com.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.misc.NickStorage;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

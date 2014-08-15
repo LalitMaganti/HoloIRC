@@ -6,7 +6,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.ConnectionStatus;
 
 import android.content.Context;
 import android.graphics.Color;

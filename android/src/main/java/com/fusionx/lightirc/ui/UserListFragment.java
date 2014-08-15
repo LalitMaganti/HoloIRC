@@ -27,11 +27,11 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.event.channel.ChannelNameEvent;
-import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import com.fusionx.relay.misc.IRCUserComparator;
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.event.channel.ChannelNameEvent;
+import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.misc.IRCUserComparator;
 
 import android.app.Activity;
 import android.app.AlertDialog;

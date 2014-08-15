@@ -9,9 +9,9 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
-import com.fusionx.relay.ConnectionManager;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.ConnectionManager;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
 
 import android.app.Notification;
 import android.app.NotificationManager;

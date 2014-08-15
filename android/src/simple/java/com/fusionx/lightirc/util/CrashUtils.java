@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.util;
 
-import com.fusionx.relay.Server;
+import co.fusionx.relay.Server;
 
 import android.content.Context;
 

@@ -8,7 +8,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.event.Event;
+import co.fusionx.relay.event.Event;
 
 import android.content.Context;
 import android.text.util.Linkify;

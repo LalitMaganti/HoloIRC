@@ -7,11 +7,11 @@ import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Conversation;
-import com.fusionx.relay.event.server.InviteEvent;
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.event.server.InviteEvent;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import android.app.ActionBar;

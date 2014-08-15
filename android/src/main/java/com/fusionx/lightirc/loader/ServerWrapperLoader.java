@@ -3,8 +3,8 @@ package com.fusionx.lightirc.loader;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
 
 import android.content.Context;
 

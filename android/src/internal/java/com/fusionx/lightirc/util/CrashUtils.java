@@ -2,7 +2,7 @@ package com.fusionx.lightirc.util;
 
 import com.crashlytics.android.Crashlytics;
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.relay.Server;
+import co.fusionx.relay.Server;
 
 import android.content.Context;
 
