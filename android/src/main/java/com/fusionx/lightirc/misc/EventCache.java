@@ -3,7 +3,7 @@ package com.fusionx.lightirc.misc;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.model.EventDecorator;
-import com.fusionx.relay.event.Event;
+import co.fusionx.relay.event.Event;
 
 import android.content.Context;
 import android.support.v4.util.LruCache;

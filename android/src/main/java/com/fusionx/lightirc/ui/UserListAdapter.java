@@ -24,9 +24,6 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.NickCache;
 import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.constants.UserLevel;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
@@ -40,6 +37,9 @@ import android.widget.TextView;
 import java.util.Set;
 import java.util.TreeSet;
 
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.constants.UserLevel;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
@@ -63,7 +63,8 @@ public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implemen
             UIUtils.setRobotoLight(getContext(), view);
         }
         final ChannelUser user = getItem(position);
-        final char prefix = user.getChannelPrivileges(mChannel).getPrefix();
+        final UserLevel level = user.getChannelPrivileges(mChannel);
+        final char prefix = level == null ? '\0' : level.getPrefix();
         final SpannableStringBuilder builder = new SpannableStringBuilder(
                 prefix + user.getNick().getNickAsString());
         final ForegroundColorSpan span = new ForegroundColorSpan(

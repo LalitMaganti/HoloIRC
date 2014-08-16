@@ -29,14 +29,14 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ChannelUser;
-import com.fusionx.relay.Nick;
-import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.misc.IRCUserComparator;
-import com.fusionx.relay.parser.UserInputParser;
-import com.fusionx.relay.util.IRCUtils;
-import com.fusionx.relay.util.Utils;
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.Nick;
+import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.misc.IRCUserComparator;
+import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 

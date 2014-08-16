@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.view.Snackbar;
-import com.fusionx.relay.Conversation;
+import co.fusionx.relay.Conversation;
 
 import android.app.Activity;
 import android.app.Notification;

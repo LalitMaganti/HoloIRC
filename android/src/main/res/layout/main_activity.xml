@@ -1,57 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout
-    android:id="@+id/sliding_pane_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/sliding_list_frame"
-        android:layout_width="240dp"
-        android:layout_height="match_parent" />
-
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/drawer_layout"
-        android:layout_width="400dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <RelativeLayout
-            android:id="@+id/content_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/main_background">
-
-            <TextView
-                android:id="@+id/content_frame_empty_textview"
-                android:layout_width="250dp"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:text="Welcome to HoloIRC! Click a server on the left to connect :)"
-                android:textAppearance="@android:style/TextAppearance.Large"
-                android:textColor="@android:color/darker_gray"
-                android:visibility="gone" />
-
-            <com.fusionx.lightirc.view.Snackbar
-                android:id="@+id/snackbar"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_alignParentBottom="true"
-                android:gravity="center_vertical"
-                android:paddingLeft="24dp"
-                android:text="Test"
-                android:textSize="14sp"
-                android:visibility="gone" />
-        </RelativeLayout>
+    <com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout
+        android:id="@+id/sliding_pane_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <FrameLayout
-            android:id="@+id/right_drawer"
-            android:layout_width="250dip"
+            android:id="@+id/sliding_list_frame"
+            android:layout_width="240dp"
+            android:layout_height="match_parent" />
+
+        <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
+            android:layout_width="400dp"
             android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:background="?attr/main_background"
-            android:divider="@android:color/transparent" />
-    </android.support.v4.widget.DrawerLayout>
-</com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout>
+            android:layout_weight="1">
+
+            <RelativeLayout
+                android:id="@+id/content_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/main_background">
+
+                <TextView
+                    android:id="@+id/content_frame_empty_textview"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center"
+                    android:text="Welcome to HoloIRC! Click a server on the left to connect :)"
+                    android:textAppearance="@android:style/TextAppearance.Large"
+                    android:textColor="@android:color/darker_gray"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+            <FrameLayout
+                android:id="@+id/right_drawer"
+                android:layout_width="250dip"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:background="?attr/main_background"
+                android:divider="@android:color/transparent" />
+        </android.support.v4.widget.DrawerLayout>
+
+    </com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout>
+
+    <com.fusionx.lightirc.view.Snackbar
+        android:id="@+id/snackbar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="24dp"
+        android:text="Test"
+        android:textSize="14sp"
+        android:visibility="gone" />
+</RelativeLayout>

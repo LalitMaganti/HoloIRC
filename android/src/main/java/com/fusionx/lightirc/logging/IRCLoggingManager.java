@@ -3,10 +3,10 @@ package com.fusionx.lightirc.logging;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
-import com.fusionx.relay.Server;
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.logging.LoggingManager;
-import com.fusionx.relay.logging.LoggingPreferences;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.event.Event;
+import co.fusionx.relay.logging.LoggingManager;
+import co.fusionx.relay.logging.LoggingPreferences;
 
 public class IRCLoggingManager extends LoggingManager {
 

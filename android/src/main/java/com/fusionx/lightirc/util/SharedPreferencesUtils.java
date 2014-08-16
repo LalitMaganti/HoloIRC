@@ -23,8 +23,8 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
-import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 

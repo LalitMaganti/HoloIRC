@@ -3,16 +3,16 @@ package com.fusionx.lightirc.util;
 import com.google.common.collect.ImmutableList;
 
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.relay.event.Event;
-import com.fusionx.relay.event.channel.ChannelEvent;
-import com.fusionx.relay.event.channel.ChannelNameEvent;
-import com.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import com.fusionx.relay.event.server.JoinEvent;
-import com.fusionx.relay.event.server.NewPrivateMessageEvent;
-import com.fusionx.relay.event.server.PartEvent;
-import com.fusionx.relay.event.server.PrivateMessageClosedEvent;
-import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.event.server.StatusChangeEvent;
+import co.fusionx.relay.event.Event;
+import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.event.channel.ChannelNameEvent;
+import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.event.server.JoinEvent;
+import co.fusionx.relay.event.server.NewPrivateMessageEvent;
+import co.fusionx.relay.event.server.PartEvent;
+import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
+import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import java.util.List;
 

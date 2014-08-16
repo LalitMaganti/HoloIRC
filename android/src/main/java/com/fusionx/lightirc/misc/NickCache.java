@@ -3,7 +3,7 @@ package com.fusionx.lightirc.misc;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.model.NickColour;
-import com.fusionx.relay.Nick;
+import co.fusionx.relay.Nick;
 
 import android.support.v4.util.LruCache;
 

@@ -13,4 +13,4 @@ before_install:
   - mkdir libraries
   - git clone https://github.com/tilal6991/Relay.git libraries/relay -b develop
   - git clone https://github.com/tilal6991/Bus.git libraries/bus -b develop
-script: ./gradlew test
+script: ./gradlew assembleSimpleDebug && ./gradlew testSimpleDebug

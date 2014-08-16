@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.model.db;
 
-import com.fusionx.relay.ServerConfiguration;
-import com.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 

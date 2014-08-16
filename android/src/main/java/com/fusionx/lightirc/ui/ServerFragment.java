@@ -24,8 +24,8 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.relay.event.server.ServerEvent;
-import com.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.parser.UserInputParser;
 
 import android.os.Bundle;
 import android.view.View;

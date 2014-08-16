@@ -1,17 +1,17 @@
 package com.fusionx.lightirc.model;
 
-import com.fusionx.relay.Channel;
-import com.fusionx.relay.ConnectionStatus;
-import com.fusionx.relay.Conversation;
-import com.fusionx.relay.QueryUser;
-import com.fusionx.relay.Server;
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.QueryUser;
+import co.fusionx.relay.Server;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import static com.fusionx.relay.ServerConfiguration.Builder;
+import static co.fusionx.relay.ServerConfiguration.Builder;
 
 public class ServerWrapper {
 

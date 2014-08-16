@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import com.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.ConnectionStatus;
 
 public class OnCurrentServerStatusChanged {
 

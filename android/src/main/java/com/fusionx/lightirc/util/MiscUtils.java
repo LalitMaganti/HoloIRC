@@ -23,7 +23,7 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.bus.Bus;
 import com.fusionx.lightirc.R;
-import com.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.ConnectionStatus;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
