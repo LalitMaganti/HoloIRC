@@ -89,6 +89,10 @@
     <string name="parser_invited">You have been invited to %1$s by %2$s (see the actions
         menu pane to accept invite)</string>
 
+    <!-- DCC Chat Events -->
+    <string name="parser_dcc_chat_opened">DCC Chat Opened</string>
+    <string name="parser_dcc_chat_requested">>%1$s requested a DCC chat with you (Offered server %2$s and port %3$s)</string>
+
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
     <string name="prompt_dialog_including_starting">Including the starting #</string>
@@ -186,5 +190,6 @@
         with the app. Please consider carefully before you switch this off. No personal data is
         included in these reports.
     </string>
+    <string name="close">Close</string>
 
 </resources>

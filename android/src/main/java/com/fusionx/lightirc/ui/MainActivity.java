@@ -41,6 +41,7 @@ import co.fusionx.relay.Conversation;
 import co.fusionx.relay.Nick;
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
+import co.fusionx.relay.dcc.connection.DCCChatConnection;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.PartEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
@@ -592,6 +593,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
+            } else if (DCCChatConnection.class.isInstance(object)) {
+                fragment = new DCCChatFragment();
             } else {
                 throw new IllegalArgumentException();
             }

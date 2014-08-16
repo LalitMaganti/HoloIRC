@@ -27,7 +27,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import co.fusionx.relay.Conversation;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -37,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import co.fusionx.relay.Conversation;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -102,6 +102,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         } else if (action.equals(getString(R.string.action_ignore_list))) {
             mCallbacks.switchToIgnoreFragment();
             return;
+        } else if (action.equals(getString(R.string.action_pending_dcc))) {
+            showDCCFragment();
+            return;
         } else if (action.equals(getString(R.string.action_pending_invites))) {
             mCallbacks.switchToInviteFragment();
             return;
@@ -118,6 +121,11 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         }
 
         mCallbacks.closeDrawer();
+    }
+
+    private void showDCCFragment() {
+        final DCCPendingFragment fragment = new DCCPendingFragment();
+        fragment.show(getFragmentManager(), "dialog");
     }
 
     private void showNickDialog() {

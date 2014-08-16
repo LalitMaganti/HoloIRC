@@ -41,8 +41,9 @@ public class UIUtils {
     }
 
     public static int getThemeInt() {
-        return AppPreferences.getAppPreferences().getTheme() != Theme.DARK ? R.style.Light
-                : R.style.Dark;
+        return AppPreferences.getAppPreferences().getTheme() == Theme.DARK
+                ? R.style.Dark
+                : R.style.Light;
     }
 
     public static void toggleSlidingPane(final SlidingPaneLayout slidingPaneLayout) {
