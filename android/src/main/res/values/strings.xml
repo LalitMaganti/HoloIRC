@@ -186,5 +186,6 @@
         with the app. Please consider carefully before you switch this off. No personal data is
         included in these reports.
     </string>
+    <string name="close">Close</string>
 
 </resources>

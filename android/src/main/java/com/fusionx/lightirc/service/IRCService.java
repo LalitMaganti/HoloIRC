@@ -218,7 +218,7 @@ public class IRCService extends Service {
         if (mFirstStart) {
             AppPreferences.setupAppPreferences(this);
             mAppPreferences = AppPreferences.getAppPreferences();
-            mLoggingManager = new IRCLoggingManager(this, mAppPreferences);
+            mLoggingManager = new IRCLoggingManager(mAppPreferences);
             startWatchingExternalStorage();
             getBus().register(mEventHelper, SERVICE_PRIORITY);
             registerReceiver(mDisconnectAllReceiver, new IntentFilter(DISCONNECT_ALL_INTENT));
@@ -271,7 +271,7 @@ public class IRCService extends Service {
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 199,
                 new Intent(DISCONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.addAction(R.drawable.ic_action_cancel, "Disconnect all", intent);
+        builder.addAction(R.drawable.ic_clear, "Disconnect all", intent);
 
         return builder.build();
     }

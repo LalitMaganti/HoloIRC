@@ -5,11 +5,13 @@ import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
 
 import android.os.Handler;
 import android.os.Looper;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +23,8 @@ import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.event.server.DCCChatRequestEvent;
+import co.fusionx.relay.event.server.DCCFileRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
@@ -205,5 +209,23 @@ public final class ServiceEventInterceptor {
 
     public Server getServer() {
         return mServer;
+    }
+
+    public void acceptDCCConnection(final DCCRequestEvent event) {
+        mDCCRequests.remove(event);
+        if (event instanceof DCCChatRequestEvent) {
+            final DCCChatRequestEvent chat = (DCCChatRequestEvent) event;
+            chat.getPendingConnection().acceptConnection();
+        } else if (event instanceof DCCFileRequestEvent) {
+            final DCCFileRequestEvent file = (DCCFileRequestEvent) event;
+            final File output = new File(AppPreferences.getAppPreferences()
+                    .getDCCDownloadDirectory(), file.getPendingConnection().getArgument());
+            file.getPendingConnection().acceptConnection(output);
+        }
+    }
+
+    public void declineDCCRequestEvent(final DCCRequestEvent event) {
+        mDCCRequests.remove(event);
+        event.pendingConnection.declineConnection();
     }
 }

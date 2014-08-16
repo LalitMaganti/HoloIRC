@@ -10,17 +10,13 @@ import co.fusionx.relay.logging.LoggingPreferences;
 
 public class IRCLoggingManager extends LoggingManager {
 
-    private final IRCService mIRCService;
-
-    public IRCLoggingManager(final IRCService service, final LoggingPreferences preferences) {
+    public IRCLoggingManager(final LoggingPreferences preferences) {
         super(preferences);
-
-        mIRCService = service;
     }
 
     @Override
     public CharSequence getMessageFromEvent(final Server server, final Event event) {
-        EventDecorator decorator = mIRCService.getEventCache(server).get(event);
+        EventDecorator decorator = IRCService.getEventCache(server).get(event);
         return decorator.getMessage();
     }
 

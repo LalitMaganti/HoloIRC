@@ -21,6 +21,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:padding="16dp"
-        android:text="@string/ok"
+        android:text="@string/close"
         android:textSize="14sp" />
 </RelativeLayout>
