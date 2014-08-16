@@ -28,7 +28,7 @@ import co.fusionx.relay.event.dcc.DCCChatEvent;
 import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
-import co.fusionx.relay.event.server.DCCFileRequestEvent;
+import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
@@ -238,8 +238,8 @@ public final class ServiceEventInterceptor {
         if (event instanceof DCCChatRequestEvent) {
             final DCCChatRequestEvent chat = (DCCChatRequestEvent) event;
             chat.getPendingConnection().acceptConnection();
-        } else if (event instanceof DCCFileRequestEvent) {
-            final DCCFileRequestEvent file = (DCCFileRequestEvent) event;
+        } else if (event instanceof DCCSendRequestEvent) {
+            final DCCSendRequestEvent file = (DCCSendRequestEvent) event;
             final File output = new File(AppPreferences.getAppPreferences()
                     .getDCCDownloadDirectory(), file.getPendingConnection().getArgument());
             file.getPendingConnection().acceptConnection(output);

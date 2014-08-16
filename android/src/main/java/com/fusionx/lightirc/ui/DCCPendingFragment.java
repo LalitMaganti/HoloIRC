@@ -18,13 +18,16 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
+import co.fusionx.relay.event.server.DCCSendRequestEvent;
 
 import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 
@@ -146,6 +149,28 @@ public class DCCPendingFragment extends DialogFragment {
                 convertView = mLayoutInflater.inflate(R.layout.dcc_pending_list_item, parent,
                         false);
             }
+
+            final DCCRequestEvent requestEvent = getItem(position);
+            String type = "";
+            if (requestEvent instanceof DCCChatRequestEvent) {
+                type = "CHAT";
+            } else if (requestEvent instanceof DCCSendRequestEvent) {
+                type = "SEND";
+            }
+            final String titleText = String.format("%1$s requested by %2$s", type,
+                    requestEvent.getPendingConnection().getDccRequestNick());
+            final TextView title = (TextView) convertView
+                    .findViewById(R.id.dcc_pending_list_item_title);
+            title.setText(titleText);
+
+            final String contentText = String.format("Suggested IP %1$s and port %2$d for %3$s",
+                    requestEvent.getPendingConnection().getIP(),
+                    requestEvent.getPendingConnection().getPort(),
+                    requestEvent.getPendingConnection().getArgument());
+            final TextView content = (TextView) convertView
+                    .findViewById(R.id.dcc_pending_list_item_content);
+            content.setText(contentText);
+
             final ImageView accept = (ImageView) convertView
                     .findViewById(R.id.dcc_pending_list_item_accept);
             accept.setOnClickListener(mAcceptListener);
