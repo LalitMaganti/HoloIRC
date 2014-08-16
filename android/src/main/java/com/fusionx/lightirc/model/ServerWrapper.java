@@ -72,12 +72,16 @@ public class ServerWrapper {
         mServerObjects.add(conversation);
     }
 
-    public void removeServerObject(final String id) {
+    public void removeConversation(final String id) {
         final Optional<Conversation> conversation =
                 FluentIterable.from(mServerObjects)
                         .filter(c -> id.equals(c.getId()))
                         .first();
         Optionals.ifPresent(conversation, mServerObjects::remove);
+    }
+
+    public void removeConversation(final Conversation conversation) {
+        mServerObjects.remove(conversation);
     }
 
     public int getSubServerSize() {

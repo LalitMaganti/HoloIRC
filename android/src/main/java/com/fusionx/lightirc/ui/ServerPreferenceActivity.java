@@ -8,8 +8,6 @@ import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.PreferenceUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.ServerConfiguration;
-import co.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +23,9 @@ import android.preference.PreferenceScreen;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_URL;

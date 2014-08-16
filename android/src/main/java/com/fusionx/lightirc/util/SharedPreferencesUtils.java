@@ -23,8 +23,6 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
-import co.fusionx.relay.ServerConfiguration;
-import co.fusionx.relay.misc.NickStorage;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,6 +35,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_IGNORE_LIST;

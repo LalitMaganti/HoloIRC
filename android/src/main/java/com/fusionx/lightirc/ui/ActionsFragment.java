@@ -129,13 +129,7 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     private void showNickDialog() {
-        final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
-                mConversation.getServer().getUser().getNick().getNickAsString()) {
-            @Override
-            public void onOkClicked(final String input) {
-                mConversation.getServer().getServerCallHandler().sendNickChange(input);
-            }
-        };
+        final NickDialogBuilder nickDialog = new ChannelNickDialogBuilder();
         nickDialog.show();
     }
 
@@ -162,17 +156,33 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public class ChannelDialogBuilder extends DialogBuilder {
 
         public ChannelDialogBuilder() {
-            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
-                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
+            super(getActivity(), getString(R.string.prompt_dialog_channel_name),
+                    getString(R.string.prompt_dialog_including_starting), "");
         }
 
         @Override
-        public void onOkClicked(final String input) {
+        public void onOkClicked(final String channelName) {
             // If the conversation is null (for some reason or another) then simply close the dialog
             if (mConversation == null) {
                 return;
             }
-            mConversation.getServer().getServerCallHandler().sendJoin(input);
+            mConversation.getServer().sendJoin(channelName);
+        }
+    }
+
+    private class ChannelNickDialogBuilder extends NickDialogBuilder {
+
+        public ChannelNickDialogBuilder() {
+            super(getActivity(), mConversation.getServer().getUser().getNick().getNickAsString());
+        }
+
+        @Override
+        public void onOkClicked(final String nick) {
+            // If the conversation is null (for some reason) then simply close the dialog
+            if (mConversation == null) {
+                return;
+            }
+            mConversation.getServer().sendNick(nick);
         }
     }
 }

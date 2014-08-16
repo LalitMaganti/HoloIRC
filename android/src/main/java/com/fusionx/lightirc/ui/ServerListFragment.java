@@ -38,18 +38,18 @@ import java.util.List;
 
 import co.fusionx.relay.ConnectionStatus;
 import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Nick;
+import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
 import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import co.fusionx.relay.event.server.PartEvent;
-import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -416,7 +416,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public boolean onKick(final Server server, final KickEvent event);
 
-        public void onPrivateMessageClosed(final Server server, final Nick privateMessageNick);
+        public void onPrivateMessageClosed(final QueryUser queryUser);
     }
 
     public class ServerEventHandler {
@@ -462,7 +462,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mServerWrapper.removeServerObject(event.channelName);
+            mServerWrapper.removeConversation(event.channelName);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -471,7 +471,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) throws InterruptedException {
-            mServerWrapper.removeServerObject(event.channelName);
+            mServerWrapper.removeConversation(event.channelName);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -490,12 +490,12 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final PrivateMessageClosedEvent event) {
-            mServerWrapper.removeServerObject(event.privateMessageNick.getNickAsString());
+        public void onEventMainThread(final QueryClosedEvent event) {
+            mServerWrapper.removeConversation(event.user);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
-            mCallback.onPrivateMessageClosed(mServer, event.privateMessageNick);
+            mCallback.onPrivateMessageClosed(event.user);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)

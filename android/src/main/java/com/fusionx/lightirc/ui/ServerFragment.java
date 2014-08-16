@@ -24,13 +24,14 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.misc.FragmentType;
-import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.parser.UserInputParser;
 
 import android.os.Bundle;
 import android.view.View;
 
 import java.util.List;
+
+import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.parser.UserInputParser;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 

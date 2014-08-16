@@ -8,7 +8,6 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.event.Event;
 
 import android.content.Context;
 import android.text.util.Linkify;
@@ -22,6 +21,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import co.fusionx.relay.event.Event;
 
 public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements Filterable {
 

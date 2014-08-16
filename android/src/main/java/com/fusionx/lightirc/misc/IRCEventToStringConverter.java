@@ -29,7 +29,6 @@ import co.fusionx.relay.event.channel.ChannelMessageEvent;
 import co.fusionx.relay.event.channel.ChannelModeEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelNoticeEvent;
-import co.fusionx.relay.event.channel.ChannelPartEvent;
 import co.fusionx.relay.event.channel.ChannelStopEvent;
 import co.fusionx.relay.event.channel.ChannelTopicEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
@@ -41,6 +40,7 @@ import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
+import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.dcc.DCCChatSelfMessageEvent;
 import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
 import co.fusionx.relay.event.dcc.DCCChatWorldMessageEvent;
@@ -625,7 +625,7 @@ public class IRCEventToStringConverter {
             return setupEvent(response);
         }
 
-        public EventDecorator getChannelPartEvent(final ChannelPartEvent event) {
+        public EventDecorator getChannelPartEvent(final PartEvent event) {
             final String response = mContext.getString(R.string.parser_parted_channel);
             return setupEvent(response);
         }

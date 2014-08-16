@@ -7,11 +7,6 @@ import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.event.server.InviteEvent;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import android.app.ActionBar;
@@ -29,6 +24,12 @@ import android.widget.TextView;
 
 import java.util.Collection;
 import java.util.List;
+
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
@@ -62,8 +63,6 @@ public class NavigationDrawerFragment extends Fragment implements
     };
 
     private TextView mUserListTextView;
-
-    private View mBottomPanel;
 
     private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
@@ -107,7 +106,6 @@ public class NavigationDrawerFragment extends Fragment implements
         mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
 
         mUserListTextView = findById(getView(), R.id.user_text_view);
-        mBottomPanel = findById(view, R.id.bottom_panel);
 
         getBus().registerSticky(mEventHandler);
 
@@ -290,10 +288,13 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void joinMultipleChannels(final Collection<InviteEvent> inviteEvents) {
-        for (final InviteEvent event : inviteEvents) {
-            mConversation.getServer().getServerCallHandler().sendJoin(event.channelName);
-        }
+    public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
+        getEventInterceptor().acceptInviteEvents(inviteEvents);
+    }
+
+    @Override
+    public void declineInviteEvents(final Collection<InviteEvent> inviteEvents) {
+        getEventInterceptor().declineInviteEvents(inviteEvents);
     }
 
     @Override

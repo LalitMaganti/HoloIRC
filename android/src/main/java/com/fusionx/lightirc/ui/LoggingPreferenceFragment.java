@@ -11,7 +11,6 @@ import android.preference.PreferenceFragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import java.util.ArrayList;

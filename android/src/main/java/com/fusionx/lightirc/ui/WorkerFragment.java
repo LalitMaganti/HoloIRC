@@ -3,7 +3,6 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.lightirc.loader.ServiceLoader;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
-import co.fusionx.relay.Server;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -13,6 +12,8 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+
+import co.fusionx.relay.Server;
 
 /**
  * Class where all the IRC work is carried out

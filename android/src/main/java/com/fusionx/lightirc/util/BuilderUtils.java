@@ -1,10 +1,10 @@
 package com.fusionx.lightirc.util;
 
-import co.fusionx.relay.ServerConfiguration;
-import co.fusionx.relay.misc.NickStorage;
-
 import java.util.Arrays;
 import java.util.List;
+
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 class BuilderUtils {
 

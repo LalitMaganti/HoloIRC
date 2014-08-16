@@ -2,9 +2,6 @@ package com.fusionx.lightirc.misc;
 
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.util.CrashUtils;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.interfaces.RelayConfiguration;
-import co.fusionx.relay.logging.LoggingPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +10,10 @@ import android.os.Environment;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+
+import co.fusionx.relay.Server;
+import co.fusionx.relay.interfaces.RelayConfiguration;
+import co.fusionx.relay.logging.LoggingPreferences;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

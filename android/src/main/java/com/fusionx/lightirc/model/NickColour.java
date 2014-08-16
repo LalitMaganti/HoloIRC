@@ -2,9 +2,10 @@ package com.fusionx.lightirc.model;
 
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.Theme;
-import co.fusionx.relay.Nick;
 
 import android.graphics.Color;
+
+import co.fusionx.relay.Nick;
 
 public class NickColour {
 

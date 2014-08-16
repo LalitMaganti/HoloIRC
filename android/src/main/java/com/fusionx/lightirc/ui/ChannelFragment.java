@@ -29,14 +29,6 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.Nick;
-import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.misc.IRCUserComparator;
-import co.fusionx.relay.parser.UserInputParser;
-import co.fusionx.relay.util.IRCUtils;
-import co.fusionx.relay.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -55,6 +47,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.Nick;
+import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.misc.IRCUserComparator;
+import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.Utils;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
@@ -164,7 +165,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseChannelMessage(mConversation.getServer(), mTitle, message);
+        UserInputParser.onParseChannelMessage(getChannel(), message);
     }
 
     @Override

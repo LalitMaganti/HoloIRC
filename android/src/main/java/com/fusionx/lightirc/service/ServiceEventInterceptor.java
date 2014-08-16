@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -245,5 +246,16 @@ public final class ServiceEventInterceptor {
     public void declineDCCRequestEvent(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
         event.pendingConnection.declineConnection();
+    }
+
+    public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
+        for (final InviteEvent event : inviteEvents) {
+            mServer.sendJoin(event.channelName);
+        }
+        mInviteEvents.removeAll(inviteEvents);
+    }
+
+    public void declineInviteEvents(final Collection<InviteEvent> inviteEvents) {
+        mInviteEvents.removeAll(inviteEvents);
     }
 }
