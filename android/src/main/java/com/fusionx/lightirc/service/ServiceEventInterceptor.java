@@ -22,6 +22,8 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.event.dcc.DCCChatEvent;
+import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCFileRequestEvent;
@@ -118,8 +120,23 @@ public final class ServiceEventInterceptor {
      * Event interception start here
      */
     @Subscribe(threadType = ThreadType.MAIN)
+    public void onChatEvent(final DCCChatEvent event) {
+        onIRCEvent(MessagePriority.HIGH, event.getConnection(),
+                getLastStorableEvent(event.getConnection().getBuffer()));
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onChatEvent(final DCCChatStartedEvent event) {
+        onIRCEvent(MessagePriority.HIGH, event.dccConnection,
+                getLastStorableEvent(event.getConnection().getBuffer()));
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
     public void onPrivateMessage(final NewPrivateMessageEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
+
+        // Forward the event UI side
+        mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
@@ -165,9 +182,6 @@ public final class ServiceEventInterceptor {
             mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
         }
     }
-    /*
-     * Event interception ends here
-     */
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final InviteEvent event) {
@@ -178,13 +192,17 @@ public final class ServiceEventInterceptor {
     public void onEvent(final DCCRequestEvent event) {
         mDCCRequests.add(event);
     }
+    /*
+     * Event interception ends here
+     */
 
     private void onIRCEvent(final MessagePriority priority, final Conversation conversation,
             final Event event) {
         if (conversation.equals(mConversation)) {
-            if (!conversation.equals(conversation.getServer())) {
-                setSubEvent(conversation, event);
+            if (conversation.equals(conversation.getServer())) {
+                return;
             }
+            setSubEvent(conversation, event);
         } else {
             if (conversation.equals(conversation.getServer())) {
                 setMessagePriority(priority);
