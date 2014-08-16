@@ -18,7 +18,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -133,10 +132,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         for (final ServerEventHandler handler : mEventHandlers) {
             handler.register();
         }
-        if (mListAdapter != null) {
-            mListAdapter.checkAndRemoveInvalidConversations();
-            mListAdapter.notifyDataSetChanged();
+        if (mListAdapter == null) {
+            return;
         }
+        mListAdapter.refreshConversations();
+        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -153,10 +153,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         super.onDestroy();
 
         getBus().unregister(mEventHandler);
-    }
-
-    public void refreshServers() {
-        refreshServers(null);
     }
 
     @Override
@@ -259,7 +255,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 editServer(listItem);
                 break;
         }
-
         mode.finish();
         return true;
     }
@@ -353,7 +348,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return (ServerWrapper) mListView.getItemAtPosition(position);
     }
 
-    private void refreshServers(final Runnable runnable) {
+    void refreshServers() {
         final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
                 .LoaderCallbacks<ArrayList<ServerWrapper>>() {
             @Override
@@ -385,12 +380,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     }
                     // Expand all the groups - TODO - fix this properly
                     mListView.expandGroup(i);
-                }
-
-                // Run any code that is meant to be run after the new servers are in place
-                if (runnable != null) {
-                    final Handler handler = new Handler();
-                    handler.post(runnable);
                 }
             }
 

@@ -181,18 +181,19 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    public void checkAndRemoveInvalidConversations() {
+    public void refreshConversations() {
         for (final ServerWrapper serverWrapper : mServerListItems) {
-            serverWrapper.checkAndRemoveInvalidConversations();
+            serverWrapper.refreshConversations();
         }
     }
 
     public void removeServer(final Server server) {
         for (final ServerWrapper serverWrapper : mServerListItems) {
-            if (server.equals(serverWrapper.getServer())) {
-                serverWrapper.setServer(null);
-                serverWrapper.removeAll();
+            if (!server.equals(serverWrapper.getServer())) {
+                continue;
             }
+            serverWrapper.setServer(null);
+            serverWrapper.removeAll();
         }
         notifyDataSetChanged();
     }
