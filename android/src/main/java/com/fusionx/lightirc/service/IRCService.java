@@ -10,9 +10,6 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
-import co.fusionx.relay.ConnectionManager;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.ServerConfiguration;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -33,7 +30,11 @@ import android.util.Pair;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import co.fusionx.relay.ConnectionManager;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
 import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;
@@ -69,8 +70,14 @@ public class IRCService extends Service {
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFICATION_MENTION);
 
+            final Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
+
             mConnectionManager.requestDisconnectAll();
             stopForeground(true);
+
+            for (final Server server : servers) {
+                cleanupPostDisconnect(server);
+            }
         }
     };
 
@@ -117,12 +124,6 @@ public class IRCService extends Service {
         mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
 
         return START_STICKY;
-    }
-
-    public void removeLoggingHandlerAndEventCache(final Server server) {
-        mLoggingManager.removeServerFromManager(server);
-        mEventCache.remove(server);
-        mEventHelperMap.remove(server);
     }
 
     public void clearAllEventCaches() {
@@ -188,7 +189,15 @@ public class IRCService extends Service {
         } else {
             startForeground(SERVICE_ID, getNotification());
         }
+        cleanupPostDisconnect(server);
+    }
+
+    private void cleanupPostDisconnect(final Server server) {
         getBus().post(new ServerStopRequestedEvent(server));
+
+        mLoggingManager.removeServerFromManager(server);
+        mEventCache.remove(server);
+        mEventHelperMap.remove(server);
     }
 
     public void requestReconnectionToServer(final Server server) {
