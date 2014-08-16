@@ -20,6 +20,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:background="?android:attr/selectableItemBackground"
         android:padding="16dp"
         android:text="@string/close"
         android:textSize="14sp" />

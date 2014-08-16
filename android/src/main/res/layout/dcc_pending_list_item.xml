@@ -11,6 +11,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:background="?android:attr/selectableItemBackground"
         android:padding="8dp"
         android:src="@drawable/ic_clear" />
 
@@ -21,6 +22,7 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/dcc_pending_list_item_decline"
         android:layout_toStartOf="@id/dcc_pending_list_item_decline"
+        android:background="?android:attr/selectableItemBackground"
         android:padding="8dp"
         android:src="@drawable/ic_check_light" />
 

@@ -4,6 +4,7 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnDCCChatEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
@@ -122,8 +123,10 @@ public final class ServiceEventInterceptor {
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCChatEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.getConnection(),
-                getLastStorableEvent(event.getConnection().getBuffer()));
+        onIRCEvent(MessagePriority.HIGH, event.getConnection(), event);
+
+        // Forward the event UI side
+        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.getConnection())));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)

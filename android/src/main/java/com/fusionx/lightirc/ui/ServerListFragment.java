@@ -41,6 +41,7 @@ import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.PartEvent;
+import co.fusionx.relay.event.dcc.DCCChatEvent;
 import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
@@ -472,6 +473,14 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final ChannelEvent event) {
+            if (EventUtils.shouldStoreEvent(event)
+                    && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
+                mListView.invalidateViews();
+            }
+        }
+
+        @Subscribe(threadType = ThreadType.MAIN)
+        public void onEventMainThread(final DCCChatEvent event) {
             if (EventUtils.shouldStoreEvent(event)
                     && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
