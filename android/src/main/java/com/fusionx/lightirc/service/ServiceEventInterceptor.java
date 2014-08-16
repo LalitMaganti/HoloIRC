@@ -20,6 +20,7 @@ import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import java.util.Map;
 import java.util.Set;

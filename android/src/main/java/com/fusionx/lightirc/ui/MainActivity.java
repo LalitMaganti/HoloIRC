@@ -241,7 +241,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         closeDrawer();
         supportInvalidateOptionsMenu();
 
-        getService().removeLoggingHandlerAndEventCache(server);
         if (mCurrentFragment != null && server.equals(mConversation.getServer())) {
             onRemoveCurrentFragmentAndConversation();
         }

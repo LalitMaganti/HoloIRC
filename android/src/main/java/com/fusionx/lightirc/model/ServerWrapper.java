@@ -95,4 +95,8 @@ public class ServerWrapper {
             }
         }
     }
+
+    public void removeAll() {
+        mServerObjects.clear();
+    }
 }

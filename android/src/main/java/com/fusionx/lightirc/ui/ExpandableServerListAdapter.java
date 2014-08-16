@@ -9,9 +9,6 @@ import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.MiscUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.event.Event;
 
 import android.content.Context;
 import android.text.SpannableStringBuilder;
@@ -27,6 +24,11 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.UIUtils.getSpanFromPriority;
 
@@ -143,7 +145,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final Conversation conversation = getChild(groupPos, childPos);
 
         final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
-        final EventCache cache = mIRCService.getEventCache(listItem.getServer());
+        final EventCache cache = IRCService.getEventCache(listItem.getServer());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
 
@@ -183,6 +185,16 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         for (final ServerWrapper serverWrapper : mServerListItems) {
             serverWrapper.checkAndRemoveInvalidConversations();
         }
+    }
+
+    public void removeServer(final Server server) {
+        for (final ServerWrapper serverWrapper : mServerListItems) {
+            if (server.equals(serverWrapper.getServer())) {
+                serverWrapper.setServer(null);
+                serverWrapper.removeAll();
+            }
+        }
+        notifyDataSetChanged();
     }
 
     public final class ExpandListener implements View.OnClickListener {

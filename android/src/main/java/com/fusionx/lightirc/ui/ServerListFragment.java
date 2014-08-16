@@ -539,7 +539,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe
         public void onStopEvent(final ServerStopRequestedEvent event) {
-            refreshServers(() -> mCallback.onServerStopped(event.server));
+            mListAdapter.removeServer(event.server);
+            mCallback.onServerStopped(event.server);
         }
     }
 }
