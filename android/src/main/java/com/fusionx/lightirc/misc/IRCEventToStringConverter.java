@@ -4,7 +4,22 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.NickColour;
 import com.fusionx.lightirc.util.CrashUtils;
+
+import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
+
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.Nick;
+import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
@@ -26,6 +41,9 @@ import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
+import co.fusionx.relay.event.dcc.DCCChatSelfMessageEvent;
+import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.event.dcc.DCCChatWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryConnectEvent;
@@ -36,6 +54,7 @@ import co.fusionx.relay.event.query.QueryOpenedEvent;
 import co.fusionx.relay.event.query.QueryStopEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
 import co.fusionx.relay.event.server.ConnectingEvent;
+import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.ErrorEvent;
 import co.fusionx.relay.event.server.GenericServerEvent;
@@ -48,19 +67,6 @@ import co.fusionx.relay.event.server.ServerNickChangeEvent;
 import co.fusionx.relay.event.server.StopEvent;
 import co.fusionx.relay.event.server.WallopsEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
-import co.fusionx.relay.Nick;
-
-import android.content.Context;
-import android.graphics.Typeface;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
-
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 /*
  * TODO - cleanup this entire class - it's a total mess
@@ -161,6 +167,41 @@ public class IRCEventToStringConverter {
 
     private FormattedString getFormattedStringForNick(final Nick nick) {
         return new FormattedString(nick.getNickAsString(), getColourForUser(nick));
+    }
+
+    // Simple class for storing DCC nicks
+    private static class DCCNick implements Nick {
+
+        private final String mNick;
+
+        private DCCNick(final String nick) {
+            mNick = nick;
+        }
+
+        @Override
+        public String getNickAsString() {
+            return mNick;
+        }
+
+        @Override
+        public String toString() {
+            return mNick;
+        }
+
+        @Override
+        public int hashCode() {
+            return mNick.hashCode();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (!(o instanceof DCCNick)) {
+                return false;
+            }
+
+            final DCCNick other = (DCCNick) o;
+            return mNick.equals(other.getNickAsString());
+        }
     }
 
     @SuppressWarnings("unused")
@@ -595,5 +636,52 @@ public class IRCEventToStringConverter {
                     event.invitingUser);
             return setupEvent(formattedResponse, true);
         }
+
+        // DCC chat events start
+        public EventDecorator getDCCChatRequestedEvent(final DCCChatRequestEvent event) {
+            final DCCPendingChatConnection connection = event.getPendingConnection();
+            final String response = mContext.getString(R.string.parser_dcc_chat_requested);
+            final String formattedResponse = String.format(response, connection.getDccRequestNick(),
+                    connection.getIP(), connection.getPort());
+            return setupEvent(formattedResponse, true);
+        }
+
+        public EventDecorator getDCCChatStartedEvent(final DCCChatStartedEvent event) {
+            final String response = mContext.getString(R.string.parser_dcc_chat_opened);
+            return setupEvent(response);
+        }
+
+        public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event) {
+            final String response = mContext.getString(R.string.parser_message);
+            final Nick nick = event.dccConnection.getServer().getUser().getNick();
+            if (shouldHighlightLine()) {
+                final String formattedResponse = String.format(response,
+                        nick, event.message);
+                return setupEvent(formattedResponse, nick);
+            } else {
+                final FormattedString[] formattedStrings = {
+                        getFormattedStringForNick(nick),
+                        new FormattedString(event.message),
+                };
+                return setupEvent(formatTextWithStyle(response, formattedStrings));
+            }
+        }
+
+        public EventDecorator getDCCChatEvent(final DCCChatWorldMessageEvent event) {
+            final String response = mContext.getString(R.string.parser_message);
+            final Nick nick = new DCCNick(event.dccConnection.getId());
+            if (shouldHighlightLine()) {
+                final String formattedResponse = String.format(response,
+                        nick, event.message);
+                return setupEvent(formattedResponse, nick);
+            } else {
+                final FormattedString[] formattedStrings = {
+                        getFormattedStringForNick(nick),
+                        new FormattedString(event.message),
+                };
+                return setupEvent(formatTextWithStyle(response, formattedStrings));
+            }
+        }
+        // DCC chat events end
     }
 }

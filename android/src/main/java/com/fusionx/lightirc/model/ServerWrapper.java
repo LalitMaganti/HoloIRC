@@ -1,15 +1,17 @@
 package com.fusionx.lightirc.model;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.QueryUser;
-import co.fusionx.relay.Server;
+import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.function.Optionals;
 
 import static co.fusionx.relay.ServerConfiguration.Builder;
 
@@ -17,7 +19,7 @@ public class ServerWrapper {
 
     private final Builder mBuilder;
 
-    private final HashMap<String, Conversation> mServerObjects;
+    private final Set<Conversation> mServerObjects;
 
     private final Collection<String> mIgnoreList;
 
@@ -27,7 +29,7 @@ public class ServerWrapper {
             final Server server) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
-        mServerObjects = new LinkedHashMap<>();
+        mServerObjects = new LinkedHashSet<>();
 
         setServer(server);
     }
@@ -48,14 +50,14 @@ public class ServerWrapper {
     public void setServer(final Server server) {
         mServer = server;
 
-        if (isServerAvailable()) {
-            for (final Channel c : server.getUser().getChannels()) {
-                mServerObjects.put(c.getName(), c);
-            }
-            for (final QueryUser u : server.getUserChannelInterface().getQueryUsers()) {
-                mServerObjects.put(u.getNick().getNickAsString(), u);
-            }
+        if (server == null) {
+            return;
         }
+        FluentIterable.from(server.getUser().getChannels()).copyInto(mServerObjects);
+        FluentIterable.from(server.getUserChannelInterface().getQueryUsers())
+                .copyInto(mServerObjects);
+        FluentIterable.from(server.getDCCManager().getActiveConnections())
+                .copyInto(mServerObjects);
     }
 
     public Collection<String> getIgnoreList() {
@@ -67,11 +69,15 @@ public class ServerWrapper {
     }
 
     public void addServerObject(final Conversation conversation) {
-        mServerObjects.put(conversation.getId(), conversation);
+        mServerObjects.add(conversation);
     }
 
     public void removeServerObject(final String id) {
-        mServerObjects.remove(id);
+        final Optional<Conversation> conversation =
+                FluentIterable.from(mServerObjects)
+                        .filter(c -> id.equals(c.getId()))
+                        .first();
+        Optionals.ifPresent(conversation, mServerObjects::remove);
     }
 
     public int getSubServerSize() {
@@ -79,7 +85,7 @@ public class ServerWrapper {
     }
 
     public Conversation getSubServer(int childPos) {
-        final Iterator<Conversation> iterator = mServerObjects.values().iterator();
+        final Iterator<Conversation> iterator = mServerObjects.iterator();
         for (int i = 0; i < childPos; i++) {
             iterator.next();
         }
@@ -87,7 +93,7 @@ public class ServerWrapper {
     }
 
     public void checkAndRemoveInvalidConversations() {
-        for (Iterator<Conversation> iterator = mServerObjects.values().iterator();
+        for (Iterator<Conversation> iterator = mServerObjects.iterator();
                 iterator.hasNext(); ) {
             final Conversation conversation = iterator.next();
             if (!conversation.isValid()) {

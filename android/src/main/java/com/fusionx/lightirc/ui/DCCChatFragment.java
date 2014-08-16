@@ -48,7 +48,7 @@ public class DCCChatFragment extends IRCFragment<DCCEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
+        UserInputParser.onParseDCCChatEvent(getChatConnection(), message);
     }
 
     @Override
