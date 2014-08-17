@@ -56,7 +56,7 @@ public class ServerWrapper {
         FluentIterable.from(server.getUser().getChannels()).copyInto(mServerObjects);
         FluentIterable.from(server.getUserChannelInterface().getQueryUsers())
                 .copyInto(mServerObjects);
-        FluentIterable.from(server.getDCCManager().getActiveConnections())
+        FluentIterable.from(server.getDCCManager().getChatConversations())
                 .copyInto(mServerObjects);
     }
 

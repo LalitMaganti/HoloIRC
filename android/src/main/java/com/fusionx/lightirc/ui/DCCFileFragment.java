@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import co.fusionx.relay.event.dcc.DCCFileEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileEvent;
 
 public class DCCFileFragment extends IRCFragment<DCCFileEvent> {
 

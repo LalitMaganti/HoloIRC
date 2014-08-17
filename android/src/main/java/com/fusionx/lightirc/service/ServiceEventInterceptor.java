@@ -24,8 +24,8 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import co.fusionx.relay.event.dcc.DCCChatEvent;
-import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
@@ -123,16 +123,16 @@ public final class ServiceEventInterceptor {
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCChatEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.getConnection(), event);
+        onIRCEvent(MessagePriority.HIGH, event.chatConversation, event);
 
         // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.getConnection())));
+        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.chatConversation)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCChatStartedEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.dccConnection,
-                getLastStorableEvent(event.getConnection().getBuffer()));
+        onIRCEvent(MessagePriority.HIGH, event.chatConversation,
+                getLastStorableEvent(event.chatConversation.getBuffer()));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)

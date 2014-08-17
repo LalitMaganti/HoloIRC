@@ -41,9 +41,9 @@ import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.channel.PartEvent;
-import co.fusionx.relay.event.dcc.DCCChatSelfMessageEvent;
-import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
-import co.fusionx.relay.event.dcc.DCCChatWorldMessageEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryConnectEvent;
@@ -653,7 +653,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = event.dccConnection.getServer().getUser().getNick();
+            final Nick nick = event.chatConversation.getServer().getUser().getNick();
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);
@@ -669,7 +669,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getDCCChatEvent(final DCCChatWorldMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = new DCCNick(event.dccConnection.getId());
+            final Nick nick = new DCCNick(event.chatConversation.getId());
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);

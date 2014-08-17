@@ -40,9 +40,8 @@ import co.fusionx.relay.ConnectionStatus;
 import co.fusionx.relay.Conversation;
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
-import co.fusionx.relay.dcc.connection.DCCChatConnection;
-import co.fusionx.relay.dcc.connection.DCCFileConnection;
-import co.fusionx.relay.dcc.connection.DCCGetConnection;
+import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
@@ -558,7 +557,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // This is just registration because we'll retrieve the sticky event later
         getBus().register(mConversationChanged);
 
-        if (mCurrentFragment != null  && !mCurrentFragment.isValid()) {
+        if (mCurrentFragment != null && !mCurrentFragment.isValid()) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
@@ -595,9 +594,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
-            } else if (DCCChatConnection.class.isInstance(object)) {
+            } else if (DCCChatConversation.class.isInstance(object)) {
                 fragment = new DCCChatFragment();
-            } else if (DCCFileConnection.class.isInstance(object)) {
+            } else if (DCCFileConversation.class.isInstance(object)) {
                 fragment = new DCCFileFragment();
             } else {
                 throw new IllegalArgumentException();

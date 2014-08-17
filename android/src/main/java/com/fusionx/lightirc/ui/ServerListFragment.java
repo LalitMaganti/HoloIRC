@@ -41,8 +41,8 @@ import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.PartEvent;
-import co.fusionx.relay.event.dcc.DCCChatEvent;
-import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
@@ -444,7 +444,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatStartedEvent event) throws InterruptedException {
-            mServerWrapper.addServerObject(event.dccConnection);
+            mServerWrapper.addServerObject(event.chatConversation);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
