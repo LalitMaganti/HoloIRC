@@ -8,7 +8,7 @@ import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.model.ServerWrapper;
+import com.fusionx.lightirc.model.ServerConversationContainer;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
@@ -39,10 +39,11 @@ import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
-import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;
+import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
@@ -220,7 +221,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             boolean deleteEnabled = !connected;
             for (int i = 1; i < count && (deleteEnabled || allConnected); i++) {
                 final int pos = mListView.getCheckedItemPositions().keyAt(i);
-                final ServerWrapper listItem = (ServerWrapper) mListView
+                final ServerConversationContainer listItem = (ServerConversationContainer) mListView
                         .getItemAtPosition(pos);
                 final boolean available = listItem.isServerAvailable();
                 allConnected = allConnected && available;
@@ -243,7 +244,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        final ServerWrapper listItem = getFirstCheckedItem();
+        final ServerConversationContainer listItem = getFirstCheckedItem();
 
         switch (item.getItemId()) {
             case R.id.activity_server_list_popup_disconnect:
@@ -271,7 +272,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mActionMode = null;
     }
 
-    void editServer(final ServerWrapper builder) {
+    void editServer(final ServerConversationContainer builder) {
         final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
         intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
         intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
@@ -297,7 +298,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             return true;
         }
 
-        final ServerWrapper item = mListAdapter.getGroup(groupPosition);
+        final ServerConversationContainer item = mListAdapter.getGroup(groupPosition);
         if (item.getServer() == null) {
             item.setServer(mService.requestConnectionToServer(item.getBuilder(),
                     item.getIgnoreList()));
@@ -325,7 +326,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     final long packed = mListView.getExpandableListPosition(checkedPosition);
                     final int group = ExpandableListView.getPackedPositionGroup(packed);
 
-                    final ServerWrapper listItem = mListAdapter.getGroup(group);
+                    final ServerConversationContainer listItem = mListAdapter.getGroup(group);
                     source.removeServer(listItem.getBuilder().getId());
                 }
                 return null;
@@ -340,26 +341,28 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         asyncTask.execute();
     }
 
-    private ServerWrapper getFirstCheckedItem() {
+    private ServerConversationContainer getFirstCheckedItem() {
         if (mListView.getCheckedItemCount() == 0) {
             return null;
         }
 
         final int position = mListView.getCheckedItemPositions().keyAt(0);
-        return (ServerWrapper) mListView.getItemAtPosition(position);
+        return (ServerConversationContainer) mListView.getItemAtPosition(position);
     }
 
     void refreshServers() {
-        final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
-                .LoaderCallbacks<ArrayList<ServerWrapper>>() {
+        final LoaderManager.LoaderCallbacks<ArrayList<ServerConversationContainer>> callbacks
+                = new LoaderManager
+                .LoaderCallbacks<ArrayList<ServerConversationContainer>>() {
             @Override
-            public Loader<ArrayList<ServerWrapper>> onCreateLoader(int id, Bundle args) {
+            public Loader<ArrayList<ServerConversationContainer>> onCreateLoader(int id,
+                    Bundle args) {
                 return new ServerWrapperLoader(getActivity(), mService);
             }
 
             @Override
-            public void onLoadFinished(final Loader<ArrayList<ServerWrapper>> loader,
-                    final ArrayList<ServerWrapper> listItems) {
+            public void onLoadFinished(final Loader<ArrayList<ServerConversationContainer>> loader,
+                    final ArrayList<ServerConversationContainer> listItems) {
                 mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
                         mListView, mService);
                 mListView.setAdapter(mListAdapter);
@@ -375,7 +378,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 mEventHandlers.clear();
 
                 for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
-                    ServerWrapper wrapper = listItems.get(i);
+                    ServerConversationContainer wrapper = listItems.get(i);
                     if (wrapper.getServer() != null) {
                         mEventHandlers.add(new ServerEventHandler(wrapper, i));
                     }
@@ -385,7 +388,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             }
 
             @Override
-            public void onLoaderReset(Loader<ArrayList<ServerWrapper>> loader) {
+            public void onLoaderReset(Loader<ArrayList<ServerConversationContainer>> loader) {
             }
         };
 
@@ -415,12 +418,13 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         private final Server mServer;
 
-        private final ServerWrapper mServerWrapper;
+        private final ServerConversationContainer mServerConversationContainer;
 
-        public ServerEventHandler(final ServerWrapper wrapper, final int serverIndex) {
+        public ServerEventHandler(final ServerConversationContainer wrapper,
+                final int serverIndex) {
             mServer = wrapper.getServer();
             mServerIndex = serverIndex;
-            mServerWrapper = wrapper;
+            mServerConversationContainer = wrapper;
 
             register();
         }
@@ -428,7 +432,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final NewPrivateMessageEvent event)
                 throws InterruptedException {
-            mServerWrapper.addServerObject(event.user);
+            mServerConversationContainer.addConversation(event.user);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -436,15 +440,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final JoinEvent event) throws InterruptedException {
-            mServerWrapper.addServerObject(event.channel);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
-        }
-
-        @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final DCCChatStartedEvent event) throws InterruptedException {
-            mServerWrapper.addServerObject(event.chatConversation);
+            mServerConversationContainer.addConversation(event.channel);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -452,7 +448,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mServerWrapper.removeConversation(event.channelName);
+            mServerConversationContainer.removeConversation(event.channelName);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -461,7 +457,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) throws InterruptedException {
-            mServerWrapper.removeConversation(event.channelName);
+            mServerConversationContainer.removeConversation(event.channelName);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -480,16 +476,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final DCCChatEvent event) {
-            if (EventUtils.shouldStoreEvent(event)
-                    && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
-                mListView.invalidateViews();
-            }
-        }
-
-        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryClosedEvent event) {
-            mServerWrapper.removeConversation(event.user);
+            mServerConversationContainer.removeConversation(event.user);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -511,6 +499,31 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DisconnectEvent event) {
             mListView.invalidateViews();
+        }
+
+        // DCC Events
+        @Subscribe(threadType = ThreadType.MAIN)
+        public void onEventMainThread(final DCCChatStartedEvent event) {
+            mServerConversationContainer.addConversation(event.chatConversation);
+            mListView.setAdapter(mListAdapter);
+
+            mListView.expandGroup(mServerIndex);
+        }
+
+        @Subscribe(threadType = ThreadType.MAIN)
+        public void onEventMainThread(final DCCChatEvent event) {
+            if (EventUtils.shouldStoreEvent(event)
+                    && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
+                mListView.invalidateViews();
+            }
+        }
+
+        @Subscribe(threadType = ThreadType.MAIN)
+        public void onEventMainThread(final DCCFileConversationStartedEvent event) {
+            mServerConversationContainer.addConversation(event.fileConversation);
+            mListView.setAdapter(mListAdapter);
+
+            mListView.expandGroup(mServerIndex);
         }
 
         public void register() {

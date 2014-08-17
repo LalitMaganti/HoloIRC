@@ -7,11 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
-import co.fusionx.relay.dcc.event.file.DCCFileEvent;
-
-public class DCCFileFragment extends IRCFragment<DCCFileEvent> {
+public class DCCFileFragment extends BaseIRCFragment {
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
@@ -30,17 +26,7 @@ public class DCCFileFragment extends IRCFragment<DCCFileEvent> {
     }
 
     @Override
-    protected List<DCCFileEvent> getAdapterData() {
-        return null;
-    }
-
-    @Override
-    protected void onSendMessage(final String message) {
-
-    }
-
-    @Override
     public boolean isValid() {
-        return false;
+        return true;
     }
 }

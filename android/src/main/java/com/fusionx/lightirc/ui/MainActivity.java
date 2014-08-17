@@ -120,7 +120,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     };
 
-    private IRCFragment mCurrentFragment;
+    private BaseIRCFragment mCurrentFragment;
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
@@ -580,14 +580,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final Conversation object,
-            final boolean delayChange) {
+    private void changeCurrentConversation(final Conversation object, final boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
             final boolean isServer = Server.class.isInstance(object);
-            final IRCFragment fragment;
+            final BaseIRCFragment fragment;
             if (isServer) {
                 fragment = new ServerFragment();
             } else if (Channel.class.isInstance(object)) {
@@ -622,7 +621,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
     }
 
-    private void changeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
+    private void changeCurrentFragment(final BaseIRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
         final Runnable runnable = () -> {

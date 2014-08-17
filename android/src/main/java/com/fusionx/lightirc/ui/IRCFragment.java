@@ -26,20 +26,19 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.EventCache;
-import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -49,7 +48,7 @@ import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-abstract class IRCFragment<T extends Event> extends ListFragment implements TextView
+abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements TextView
         .OnEditorActionListener {
 
     Conversation mConversation;
@@ -67,9 +66,11 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
 
             // Fix for http://stackoverflow.com/questions/12049198/how-to-clear-the-views-which-are
             // -held-in-the-listviews-recyclebin/16261588#16261588
-            getListView().setAdapter(mMessageAdapter);
+            mListView.setAdapter(mMessageAdapter);
         }
     };
+
+    ListView mListView;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
@@ -81,6 +82,8 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mListView = (ListView) view.findViewById(android.R.id.list);
+
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
 
@@ -91,17 +94,15 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
 
         getBus().register(mEventListener);
         mMessageAdapter = getNewAdapter();
-        setListAdapter(mMessageAdapter);
+        mListView.setAdapter(mMessageAdapter);
 
         onResetBuffer(() -> {
             // While the processing is occurring we could have destroyed the view by rotation
-            if (getView() != null) {
-                if (savedInstanceState == null) {
-                    getListView().setSelection(mMessageAdapter.getCount() - 1);
-                } else {
-                    getListView().onRestoreInstanceState(savedInstanceState.getParcelable
-                            ("list_view"));
-                }
+            if (savedInstanceState == null) {
+                mListView.setSelection(mMessageAdapter.getCount() - 1);
+            } else {
+                mListView.onRestoreInstanceState(savedInstanceState.getParcelable
+                        ("list_view"));
             }
         });
         mConversation.getServer().getServerEventBus().register(this);
@@ -111,9 +112,7 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if (getView() != null) {
-            outState.putParcelable("list_view", getListView().onSaveInstanceState());
-        }
+        outState.putParcelable("list_view", mListView.onSaveInstanceState());
     }
 
     @Override
@@ -144,8 +143,6 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
         return list;
     }
 
-    public abstract FragmentType getType();
-
     // Getters and setters
     public String getTitle() {
         return mTitle;
@@ -164,8 +161,6 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);
-
-    public abstract boolean isValid();
 
     public interface Callback {
 

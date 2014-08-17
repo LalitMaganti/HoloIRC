@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.loader;
 
-import com.fusionx.lightirc.model.ServerWrapper;
+import com.fusionx.lightirc.model.ServerConversationContainer;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
 
@@ -12,7 +12,7 @@ import java.util.Collection;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 
-public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>> {
+public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerConversationContainer>> {
 
     private final IRCService mService;
 
@@ -23,15 +23,15 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>
     }
 
     @Override
-    public ArrayList<ServerWrapper> loadInBackground() {
-        final ArrayList<ServerWrapper> listItems = new ArrayList<>();
+    public ArrayList<ServerConversationContainer> loadInBackground() {
+        final ArrayList<ServerConversationContainer> listItems = new ArrayList<>();
         final BuilderDatabaseSource source = new BuilderDatabaseSource(getContext());
 
         source.open();
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
             final Server server = mService.getServerIfExists(builder);
             final Collection<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
-            final ServerWrapper wrapper = new ServerWrapper(builder, ignoreList, server);
+            final ServerConversationContainer wrapper = new ServerConversationContainer(builder, ignoreList, server);
             listItems.add(wrapper);
         }
         source.close();

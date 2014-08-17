@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.lightirc.model.ServerWrapper;
+import com.fusionx.lightirc.model.ServerConversationContainer;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -38,13 +38,13 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final Context mContext;
 
-    private final List<ServerWrapper> mServerListItems;
+    private final List<ServerConversationContainer> mServerListItems;
 
     private final IRCService mIRCService;
 
     private ExpandableListView mListView;
 
-    public ExpandableServerListAdapter(final Context context, final ArrayList<ServerWrapper>
+    public ExpandableServerListAdapter(final Context context, final ArrayList<ServerConversationContainer>
             builders, final ExpandableListView listView, final IRCService service) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
@@ -60,17 +60,17 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(final int groupPos) {
-        return mServerListItems.get(groupPos).getSubServerSize();
+        return mServerListItems.get(groupPos).getConversationCount();
     }
 
     @Override
-    public ServerWrapper getGroup(final int groupPos) {
+    public ServerConversationContainer getGroup(final int groupPos) {
         return mServerListItems.get(groupPos);
     }
 
     @Override
     public Conversation getChild(final int groupPos, final int childPos) {
-        return mServerListItems.get(groupPos).getSubServer(childPos);
+        return mServerListItems.get(groupPos).getConversation(childPos);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_group, parent, false);
         }
 
-        final ServerWrapper listItem = getGroup(groupPos);
+        final ServerConversationContainer listItem = getGroup(groupPos);
         final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
 
         final TextView title = (TextView) convertView.findViewById(R.id.server_title);
@@ -117,7 +117,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
         final View divider = convertView.findViewById(R.id.divider);
         final ImageView expandButton = (ImageView) convertView.findViewById(R.id.button_expand);
-        if (listItem.getSubServerSize() == 0) {
+        if (listItem.getConversationCount() == 0) {
             expandButton.setVisibility(View.INVISIBLE);
             divider.setVisibility(View.VISIBLE);
         } else {
@@ -141,7 +141,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_child, parent, false);
         }
 
-        final ServerWrapper listItem = getGroup(groupPos);
+        final ServerConversationContainer listItem = getGroup(groupPos);
         final Conversation conversation = getChild(groupPos, childPos);
 
         final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
@@ -182,18 +182,18 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     }
 
     public void refreshConversations() {
-        for (final ServerWrapper serverWrapper : mServerListItems) {
-            serverWrapper.refreshConversations();
+        for (final ServerConversationContainer serverConversationContainer : mServerListItems) {
+            serverConversationContainer.refreshConversations();
         }
     }
 
     public void removeServer(final Server server) {
-        for (final ServerWrapper serverWrapper : mServerListItems) {
-            if (!server.equals(serverWrapper.getServer())) {
+        for (final ServerConversationContainer serverConversationContainer : mServerListItems) {
+            if (!server.equals(serverConversationContainer.getServer())) {
                 continue;
             }
-            serverWrapper.setServer(null);
-            serverWrapper.removeAll();
+            serverConversationContainer.setServer(null);
+            serverConversationContainer.removeAll();
         }
         notifyDataSetChanged();
     }
