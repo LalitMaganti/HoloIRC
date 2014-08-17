@@ -105,7 +105,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
     @Override
     public boolean isEnabled(final int position) {
         return mFragmentType != null &&
-                position != 0 && position != 1 && position != 3 && position != 4 &&
+                position != 0 && position != 1 && position != 3 &&
                 position < getRealServerCount() || isConnected();
     }
 
@@ -141,7 +141,7 @@ public class ActionsAdapter extends ArrayAdapter<String> implements StickyListHe
             UIUtils.setRobotoLight(getContext(), row);
         }
 
-        if (position == 5) {
+        if (position == 4) {
             // TODO - improve UX by making this more precise to the specific status of the
             // connection
             row.setText(isConnected() ? getItem(position) : getContext().getString(R.string

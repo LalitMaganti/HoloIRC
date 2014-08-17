@@ -35,7 +35,6 @@
         <item>@string/action_change_nick</item>
         <item>@string/action_ignore_list</item>
         <item>@string/action_pending_invites</item>
-        <item>@string/action_pending_dcc</item>
         <item>@string/action_disconnect</item>
         <item>@string/action_reconnect</item>
     </string-array>
