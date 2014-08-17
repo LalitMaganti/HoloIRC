@@ -7,7 +7,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.FragmentUtils;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.event.server.InviteEvent;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -29,6 +28,8 @@ import android.widget.TextView;
 
 import java.util.Collection;
 import java.util.Set;
+
+import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
@@ -65,9 +66,7 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mInviteAdapter = new InviteAdapter(getActivity(),
-                mCallbacks.getEventInterceptor().getInviteEvents());
-        setListAdapter(mInviteAdapter);
+        updateAdapter();
 
         getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
         getListView().setMultiChoiceModeListener(this);
@@ -99,23 +98,23 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
 
     @Override
     public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
+        final Collection<InviteEvent> events = getInviteEventsFromPositions();
         switch (item.getItemId()) {
             case R.id.fragment_invite_cab_accept:
-                mCallbacks.joinMultipleChannels(getInviteEventsFromPositions());
-                // Fall through intentional
+                mCallbacks.acceptInviteEvents(events);
+                break;
             case R.id.fragment_invite_cab_clear:
-                removeInvitesFromAdapterAndService(getInviteEventsFromPositions());
-                mode.finish();
-                return true;
+                mCallbacks.declineInviteEvents(events);
+                break;
         }
+        updateAdapter();
+        mode.finish();
         return false;
     }
 
-    private void removeInvitesFromAdapterAndService(final Collection<InviteEvent>
-            inviteEventsFromPositions) {
-        mCallbacks.getEventInterceptor().getInviteEvents().removeAll(inviteEventsFromPositions);
-        mInviteAdapter = new InviteAdapter(getActivity(), mCallbacks.getEventInterceptor()
-                .getInviteEvents());
+    private void updateAdapter() {
+        mInviteAdapter = new InviteAdapter(getActivity(),
+                mCallbacks.getEventInterceptor().getInviteEvents());
         setListAdapter(mInviteAdapter);
     }
 
@@ -139,9 +138,11 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
 
     public interface Callbacks {
 
-        public void joinMultipleChannels(Collection<InviteEvent> inviteEventsFromPositions);
+        public void acceptInviteEvents(Collection<InviteEvent> inviteEventsFromPositions);
 
         public ServiceEventInterceptor getEventInterceptor();
+
+        public void declineInviteEvents(Collection<InviteEvent> inviteEventsFromPositions);
     }
 
     private static class InviteAdapter extends ArrayAdapter<InviteEvent> {

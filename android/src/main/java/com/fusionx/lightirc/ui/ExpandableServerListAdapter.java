@@ -150,13 +150,13 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
 
         final MessagePriority priority = helper.getSubMessagePriority(conversation);
-        if (priority != null) {
+        if (priority == null) {
+            textView.setText(conversation.getId());
+        } else {
             final CharacterStyle span = getSpanFromPriority(priority);
             final SpannableStringBuilder builder = new SpannableStringBuilder(conversation.getId());
             builder.setSpan(span, 0, conversation.getId().length(), 0);
             textView.setText(builder);
-        } else {
-            textView.setText(conversation.getId());
         }
 
         final Event event = helper.getSubEvent(conversation);
@@ -164,7 +164,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
         // Event might be null when the channel is first being established
         if (event == null) {
-            textEvent.setText(mContext.getString(R.string.no_event));
+            textEvent.setText(R.string.no_event);
         } else {
             final EventDecorator decorator = cache.get(event);
             textEvent.setText(decorator.getMessage());
@@ -181,18 +181,19 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
-    public void checkAndRemoveInvalidConversations() {
+    public void refreshConversations() {
         for (final ServerWrapper serverWrapper : mServerListItems) {
-            serverWrapper.checkAndRemoveInvalidConversations();
+            serverWrapper.refreshConversations();
         }
     }
 
     public void removeServer(final Server server) {
         for (final ServerWrapper serverWrapper : mServerListItems) {
-            if (server.equals(serverWrapper.getServer())) {
-                serverWrapper.setServer(null);
-                serverWrapper.removeAll();
+            if (!server.equals(serverWrapper.getServer())) {
+                continue;
             }
+            serverWrapper.setServer(null);
+            serverWrapper.removeAll();
         }
         notifyDataSetChanged();
     }

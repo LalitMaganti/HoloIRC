@@ -24,5 +24,7 @@ package com.fusionx.lightirc.misc;
 public enum FragmentType {
     SERVER,
     CHANNEL,
-    USER
+    USER,
+    DCCCHAT,
+    DCCFILE
 }

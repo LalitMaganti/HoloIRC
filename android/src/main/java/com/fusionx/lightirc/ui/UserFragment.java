@@ -24,34 +24,36 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.misc.FragmentType;
+
+import java.util.List;
+
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.parser.UserInputParser;
 
-import java.util.List;
-
 public class UserFragment extends IRCFragment<QueryEvent> {
 
-    public QueryUser getPrivateMessageUser() {
+    public QueryUser getQueryUser() {
         return (QueryUser) mConversation;
     }
 
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final QueryEvent event) {
-        if (event.user.getNick().equals(getPrivateMessageUser().getNick())) {
-            mMessageAdapter.add(event);
+        if (!event.user.equals(getQueryUser())) {
+            return;
         }
+        mMessageAdapter.add(event);
     }
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(mConversation.getServer(), mTitle, message);
+        UserInputParser.onParseUserMessage(getQueryUser(), message);
     }
 
     @Override
     public boolean isValid() {
-        return mConversation.isValid();
+        return mConversation != null && mConversation.isValid();
     }
 
     @Override
@@ -61,6 +63,6 @@ public class UserFragment extends IRCFragment<QueryEvent> {
 
     @Override
     protected List<QueryEvent> getAdapterData() {
-        return getPrivateMessageUser().getBuffer();
+        return getQueryUser().getBuffer();
     }
 }

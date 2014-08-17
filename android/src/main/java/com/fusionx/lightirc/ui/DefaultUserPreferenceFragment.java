@@ -2,8 +2,6 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 

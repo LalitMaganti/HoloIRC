@@ -18,7 +18,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -38,17 +37,19 @@ import java.util.List;
 
 import co.fusionx.relay.ConnectionStatus;
 import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Nick;
+import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.event.channel.PartEvent;
+import co.fusionx.relay.event.dcc.DCCChatEvent;
+import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
+import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
 import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import co.fusionx.relay.event.server.PartEvent;
-import co.fusionx.relay.event.server.PrivateMessageClosedEvent;
 import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -132,10 +133,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         for (final ServerEventHandler handler : mEventHandlers) {
             handler.register();
         }
-        if (mListAdapter != null) {
-            mListAdapter.checkAndRemoveInvalidConversations();
-            mListAdapter.notifyDataSetChanged();
+        if (mListAdapter == null) {
+            return;
         }
+        mListAdapter.refreshConversations();
+        mListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -152,10 +154,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         super.onDestroy();
 
         getBus().unregister(mEventHandler);
-    }
-
-    public void refreshServers() {
-        refreshServers(null);
     }
 
     @Override
@@ -258,7 +256,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 editServer(listItem);
                 break;
         }
-
         mode.finish();
         return true;
     }
@@ -352,7 +349,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return (ServerWrapper) mListView.getItemAtPosition(position);
     }
 
-    private void refreshServers(final Runnable runnable) {
+    void refreshServers() {
         final LoaderManager.LoaderCallbacks<ArrayList<ServerWrapper>> callbacks = new LoaderManager
                 .LoaderCallbacks<ArrayList<ServerWrapper>>() {
             @Override
@@ -385,12 +382,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                     // Expand all the groups - TODO - fix this properly
                     mListView.expandGroup(i);
                 }
-
-                // Run any code that is meant to be run after the new servers are in place
-                if (runnable != null) {
-                    final Handler handler = new Handler();
-                    handler.post(runnable);
-                }
             }
 
             @Override
@@ -415,7 +406,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         public boolean onKick(final Server server, final KickEvent event);
 
-        public void onPrivateMessageClosed(final Server server, final Nick privateMessageNick);
+        public void onPrivateMessageClosed(final QueryUser queryUser);
     }
 
     public class ServerEventHandler {
@@ -452,8 +443,16 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
+        public void onEventMainThread(final DCCChatStartedEvent event) throws InterruptedException {
+            mServerWrapper.addServerObject(event.dccConnection);
+            mListView.setAdapter(mListAdapter);
+
+            mListView.expandGroup(mServerIndex);
+        }
+
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mServerWrapper.removeServerObject(event.channelName);
+            mServerWrapper.removeConversation(event.channelName);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -462,7 +461,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) throws InterruptedException {
-            mServerWrapper.removeServerObject(event.channelName);
+            mServerWrapper.removeConversation(event.channelName);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -481,12 +480,20 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final PrivateMessageClosedEvent event) {
-            mServerWrapper.removeServerObject(event.privateMessageNick.getNickAsString());
+        public void onEventMainThread(final DCCChatEvent event) {
+            if (EventUtils.shouldStoreEvent(event)
+                    && mServer.getStatus() != ConnectionStatus.DISCONNECTED) {
+                mListView.invalidateViews();
+            }
+        }
+
+        @Subscribe(threadType = ThreadType.MAIN)
+        public void onEventMainThread(final QueryClosedEvent event) {
+            mServerWrapper.removeConversation(event.user);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
-            mCallback.onPrivateMessageClosed(mServer, event.privateMessageNick);
+            mCallback.onPrivateMessageClosed(event.user);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)

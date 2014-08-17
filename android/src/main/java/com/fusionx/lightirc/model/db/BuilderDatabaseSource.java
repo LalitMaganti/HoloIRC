@@ -1,8 +1,5 @@
 package com.fusionx.lightirc.model.db;
 
-import co.fusionx.relay.ServerConfiguration;
-import co.fusionx.relay.misc.NickStorage;
-
 import org.apache.commons.lang3.StringUtils;
 
 import android.content.ContentValues;
@@ -14,6 +11,9 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import co.fusionx.relay.ServerConfiguration;
+import co.fusionx.relay.misc.NickStorage;
 
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_IGNORE_LIST;

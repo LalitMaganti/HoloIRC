@@ -4,7 +4,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.view.Snackbar;
-import co.fusionx.relay.Conversation;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -23,6 +22,8 @@ import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 
 import java.util.Set;
+
+import co.fusionx.relay.Conversation;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.media.RingtoneManager.TYPE_NOTIFICATION;

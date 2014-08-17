@@ -2,16 +2,18 @@ package com.fusionx.lightirc.misc;
 
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.util.CrashUtils;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.interfaces.RelayConfiguration;
-import co.fusionx.relay.logging.LoggingPreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+
+import co.fusionx.relay.Server;
+import co.fusionx.relay.interfaces.RelayConfiguration;
+import co.fusionx.relay.logging.LoggingPreferences;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -63,6 +65,10 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
 
     // Bug reporting
     private boolean mBugReportingEnabled;
+
+    // DCC
+    private File mDCCDownloadPath = Environment.getExternalStoragePublicDirectory(Environment
+            .DIRECTORY_DOWNLOADS);
 
     private AppPreferences(final Context context) {
         sPrefsChangeListener = (sharedPreferences, key) -> {
@@ -221,5 +227,9 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
 
         // Bug reporting settings
         mBugReportingEnabled = preferences.getBoolean(PreferenceConstants.PREF_BUG_REPORTING, true);
+    }
+
+    public File getDCCDownloadDirectory() {
+        return mDCCDownloadPath;
     }
 }

@@ -25,28 +25,30 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.misc.FragmentType;
 
-import android.os.Bundle;
-import android.view.View;
-
 import java.util.List;
 
-import co.fusionx.relay.event.server.ServerEvent;
+import co.fusionx.relay.dcc.connection.DCCChatConnection;
+import co.fusionx.relay.event.dcc.DCCChatEvent;
+import co.fusionx.relay.event.dcc.DCCEvent;
 import co.fusionx.relay.parser.UserInputParser;
 
-import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
+public class DCCChatFragment extends IRCFragment<DCCEvent> {
 
-public class ServerFragment extends IRCFragment<ServerEvent> {
+    public DCCChatConnection getChatConnection() {
+        return (DCCChatConnection) mConversation;
+    }
 
-    @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        getActivity().getWindow().setSoftInputMode(SOFT_INPUT_STATE_HIDDEN);
+    // Subscription methods
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final DCCChatEvent event) {
+        if (event.dccConnection.equals(getChatConnection())) {
+            mMessageAdapter.add(event);
+        }
     }
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseServerMessage(mConversation.getServer(), message);
+        UserInputParser.onParseDCCChatEvent(getChatConnection(), message);
     }
 
     @Override
@@ -56,17 +58,11 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
 
     @Override
     public FragmentType getType() {
-        return FragmentType.SERVER;
-    }
-
-    // Subscription methods
-    @Subscribe(threadType = ThreadType.MAIN)
-    public void onEvent(final ServerEvent event) {
-        mMessageAdapter.add(event);
+        return FragmentType.DCCCHAT;
     }
 
     @Override
-    protected List<ServerEvent> getAdapterData() {
-        return (List<ServerEvent>) mConversation.getServer().getBuffer();
+    protected List<DCCEvent> getAdapterData() {
+        return getChatConnection().getBuffer();
     }
 }

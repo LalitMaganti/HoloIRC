@@ -3,13 +3,14 @@ package com.fusionx.lightirc.loader;
 import com.fusionx.lightirc.model.ServerWrapper;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.service.IRCService;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.ServerConfiguration;
 
 import android.content.Context;
 
 import java.util.ArrayList;
 import java.util.Collection;
+
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerWrapper>> {
 

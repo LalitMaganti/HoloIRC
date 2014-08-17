@@ -27,7 +27,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
-import co.fusionx.relay.Conversation;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -37,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import co.fusionx.relay.Conversation;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -102,6 +102,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         } else if (action.equals(getString(R.string.action_ignore_list))) {
             mCallbacks.switchToIgnoreFragment();
             return;
+        } else if (action.equals(getString(R.string.action_pending_dcc))) {
+            showDCCFragment();
+            return;
         } else if (action.equals(getString(R.string.action_pending_invites))) {
             mCallbacks.switchToInviteFragment();
             return;
@@ -120,14 +123,13 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         mCallbacks.closeDrawer();
     }
 
+    private void showDCCFragment() {
+        final DCCPendingFragment fragment = new DCCPendingFragment();
+        fragment.show(getFragmentManager(), "dialog");
+    }
+
     private void showNickDialog() {
-        final NickDialogBuilder nickDialog = new NickDialogBuilder(getActivity(),
-                mConversation.getServer().getUser().getNick().getNickAsString()) {
-            @Override
-            public void onOkClicked(final String input) {
-                mConversation.getServer().getServerCallHandler().sendNickChange(input);
-            }
-        };
+        final NickDialogBuilder nickDialog = new ChannelNickDialogBuilder();
         nickDialog.show();
     }
 
@@ -154,17 +156,33 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     public class ChannelDialogBuilder extends DialogBuilder {
 
         public ChannelDialogBuilder() {
-            super(getActivity(), getActivity().getString(R.string.prompt_dialog_channel_name),
-                    getActivity().getString(R.string.prompt_dialog_including_starting), "");
+            super(getActivity(), getString(R.string.prompt_dialog_channel_name),
+                    getString(R.string.prompt_dialog_including_starting), "");
         }
 
         @Override
-        public void onOkClicked(final String input) {
+        public void onOkClicked(final String channelName) {
             // If the conversation is null (for some reason or another) then simply close the dialog
             if (mConversation == null) {
                 return;
             }
-            mConversation.getServer().getServerCallHandler().sendJoin(input);
+            mConversation.getServer().sendJoin(channelName);
+        }
+    }
+
+    private class ChannelNickDialogBuilder extends NickDialogBuilder {
+
+        public ChannelNickDialogBuilder() {
+            super(getActivity(), mConversation.getServer().getUser().getNick().getNickAsString());
+        }
+
+        @Override
+        public void onOkClicked(final String nick) {
+            // If the conversation is null (for some reason) then simply close the dialog
+            if (mConversation == null) {
+                return;
+            }
+            mConversation.getServer().sendNick(nick);
         }
     }
 }

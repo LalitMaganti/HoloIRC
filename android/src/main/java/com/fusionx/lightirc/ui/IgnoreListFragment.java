@@ -6,7 +6,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.util.UIUtils;
-import co.fusionx.relay.Conversation;
 import com.nhaarman.listviewanimations.itemmanipulation.OnDismissCallback;
 
 import android.annotation.SuppressLint;
@@ -26,6 +25,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import co.fusionx.relay.Conversation;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
@@ -165,7 +166,7 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public void saveIgnoreList() {
         final List<String> list = getIgnoreAdapter().getListOfItems();
         mDatabaseSource.updateIgnoreList(mConversation.getServer().getTitle(), list);
-        mConversation.getServer().updateIgnoreList(list);
+        mConversation.getServer().getUserChannelInterface().updateIgnoreList(list);
     }
 
     private BaseCollectionAdapter<String> getIgnoreAdapter() {

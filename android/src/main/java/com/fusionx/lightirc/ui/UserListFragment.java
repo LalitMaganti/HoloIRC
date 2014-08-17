@@ -27,11 +27,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.event.channel.ChannelNameEvent;
-import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import co.fusionx.relay.misc.IRCUserComparator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -53,6 +48,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
+import co.fusionx.relay.Channel;
+import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.event.channel.ChannelNameEvent;
+import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.misc.IRCUserComparator;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -231,7 +231,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
                 return true;
             }
             case R.id.fragment_userlist_cab_whois:
-                mChannel.getServer().getServerCallHandler().sendUserWhois(nick);
+                mChannel.getServer().sendWhois(nick);
                 return true;
             default:
                 return false;
@@ -275,7 +275,7 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
 
     private void onPrivateMessageUser(final String nick) {
         if (isNickOtherUsers(nick)) {
-            mChannel.getServer().getServerCallHandler().sendMessageToQueryUser(nick, "");
+            mChannel.getServer().sendQuery(nick, null);
             mCallback.closeDrawer();
             mActionMode.finish();
         } else {

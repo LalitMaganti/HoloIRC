@@ -38,13 +38,16 @@ import co.fusionx.relay.Channel;
 import co.fusionx.relay.ChannelUser;
 import co.fusionx.relay.ConnectionStatus;
 import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Nick;
 import co.fusionx.relay.QueryUser;
 import co.fusionx.relay.Server;
+import co.fusionx.relay.dcc.connection.DCCChatConnection;
+import co.fusionx.relay.dcc.connection.DCCFileConnection;
+import co.fusionx.relay.dcc.connection.DCCGetConnection;
+import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.server.KickEvent;
-import co.fusionx.relay.event.server.PartEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
 
+import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.MiscUtils.getStatusString;
@@ -279,12 +282,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onPrivateMessageClosed(final Server server, final Nick privateMessageNick) {
+    public void onPrivateMessageClosed(final QueryUser queryUser) {
         if (mConversation == null) {
             return;
         }
-        final boolean isCurrent = mConversation.getServer().equals(server)
-                && mConversation.getId().equals(privateMessageNick.getNickAsString());
+        final boolean isCurrent = mConversation.equals(queryUser);
         if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
         }
@@ -299,10 +301,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void removeCurrentFragment() {
         if (mCurrentFragment.getType() == CHANNEL) {
-            mConversation.getServer().getServerCallHandler().sendPart(mConversation.getId());
+            final Channel channel = (Channel) mConversation;
+            channel.sendPart(Optional.fromNullable(getAppPreferences().getPartReason()));
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
-            mConversation.getServer().getServerCallHandler()
-                    .sendCloseQuery((QueryUser) mConversation);
+            final QueryUser user = (QueryUser) mConversation;
+            user.close();
         }
     }
 
@@ -555,7 +558,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // This is just registration because we'll retrieve the sticky event later
         getBus().register(mConversationChanged);
 
-        if (mCurrentFragment != null && !mCurrentFragment.isValid()) {
+        if (mCurrentFragment != null  && !mCurrentFragment.isValid()) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
@@ -592,6 +595,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
+            } else if (DCCChatConnection.class.isInstance(object)) {
+                fragment = new DCCChatFragment();
+            } else if (DCCFileConnection.class.isInstance(object)) {
+                fragment = new DCCFileFragment();
             } else {
                 throw new IllegalArgumentException();
             }
