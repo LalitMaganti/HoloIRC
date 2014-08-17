@@ -111,7 +111,9 @@ abstract class IRCFragment<T extends Event> extends ListFragment implements Text
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putParcelable("list_view", getListView().onSaveInstanceState());
+        if (getView() != null) {
+            outState.putParcelable("list_view", getListView().onSaveInstanceState());
+        }
     }
 
     @Override

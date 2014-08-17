@@ -53,7 +53,7 @@ public class UserFragment extends IRCFragment<QueryEvent> {
 
     @Override
     public boolean isValid() {
-        return mConversation.isValid();
+        return mConversation != null && mConversation.isValid();
     }
 
     @Override
