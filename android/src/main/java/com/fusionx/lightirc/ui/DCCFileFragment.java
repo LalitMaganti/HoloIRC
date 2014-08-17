@@ -129,6 +129,12 @@ public class DCCFileFragment extends BaseIRCFragment {
 
             return convertView;
         }
+
+        public void replaceAll(final Collection<DCCFileConnection> fileConnections) {
+            mConnectionList.clear();
+            mConnectionList.addAll(fileConnections);
+            notifyDataSetChanged();
+        }
     }
 
     private class EventHandler {
@@ -140,9 +146,7 @@ public class DCCFileFragment extends BaseIRCFragment {
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onNewFileConnection(final DCCFileGetStartedEvent event) {
-            mAdapter = new DCCFileAdapter(getActivity(),
-                    event.fileConversation.getFileConnections());
-            mListView.setAdapter(mAdapter);
+            mAdapter.replaceAll(event.fileConversation.getFileConnections());
         }
     }
 }
