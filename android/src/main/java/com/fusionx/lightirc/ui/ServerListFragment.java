@@ -35,10 +35,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.QueryUser;
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;

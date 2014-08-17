@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;

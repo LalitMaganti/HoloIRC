@@ -36,7 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
-import co.fusionx.relay.Conversation;
+import co.fusionx.relay.base.Conversation;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

@@ -17,8 +17,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.Nick;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.dcc.chat.DCCChatWorldActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;

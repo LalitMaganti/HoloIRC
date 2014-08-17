@@ -37,8 +37,8 @@ import android.widget.TextView;
 import java.util.Set;
 import java.util.TreeSet;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.constants.UserLevel;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
