@@ -203,7 +203,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     .findFragmentById(R.id.right_drawer);
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+            mCurrentFragment = (BaseIRCFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.content_frame);
 
             // If the current fragment is not null then retrieve the matching convo

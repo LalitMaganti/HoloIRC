@@ -92,6 +92,7 @@
     <!-- DCC Chat Events -->
     <string name="parser_dcc_chat_opened">DCC Chat Opened</string>
     <string name="parser_dcc_chat_requested">%1$s requested a DCC chat with you (Offered server %2$s and port %3$s)</string>
+    <string name="parser_dcc_files_count">%d files</string>
 
     <!-- Prompt dialog -->
     <string name="prompt_dialog_channel_name">Channel Name</string>
@@ -191,5 +192,7 @@
         included in these reports.
     </string>
     <string name="close">Close</string>
+    <string name="dcc_pending_title">Pending DCC Connections</string>
+    <string name="dcc_progress_complete">%1$d%% complete</string>
 
 </resources>

@@ -21,6 +21,10 @@ import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.dcc.chat.DCCChatWorldActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
@@ -43,9 +47,6 @@ import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.channel.PartEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryConnectEvent;
@@ -715,6 +716,12 @@ public class IRCEventToStringConverter {
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
             }
+        }
+
+        public EventDecorator get(final DCCFileGetStartedEvent event) {
+            final int count = event.fileConversation.getFileConnections().size();
+            return setupEvent(String.format(mContext.getString(R.string.parser_dcc_files_count),
+                    count));
         }
         // DCC chat events end
     }
