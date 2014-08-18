@@ -40,6 +40,9 @@ import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
+import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
@@ -500,7 +503,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         // DCC Events
-        /*@Subscribe(threadType = ThreadType.MAIN)
+        @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatStartedEvent event) {
             mServerConversationContainer.addConversation(event.chatConversation);
             mListView.setAdapter(mListAdapter);
@@ -522,7 +525,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
-        }*/
+        }
 
         public void register() {
             mServer.getServerEventBus().register(this, 50);

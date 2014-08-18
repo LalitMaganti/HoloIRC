@@ -4,25 +4,32 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnDCCChatEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
 
 import android.os.Handler;
 import android.os.Looper;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.Server;
+import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
+import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
@@ -171,12 +178,12 @@ public final class ServiceEventInterceptor {
         mInviteEvents.add(event);
     }
 
-    // DCC Events
-    /*@Subscribe(threadType = ThreadType.MAIN)
+    @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final DCCRequestEvent event) {
         mDCCRequests.add(event);
     }
 
+    // DCC Events
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCChatEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.chatConversation, event);
@@ -189,7 +196,7 @@ public final class ServiceEventInterceptor {
     public void onChatEvent(final DCCFileGetStartedEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.fileConversation,
                 getLastStorableEvent(event.fileConversation.getBuffer()));
-    }*/
+    }
     /*
      * Event interception ends here
      */
@@ -224,7 +231,7 @@ public final class ServiceEventInterceptor {
         return mServer;
     }
 
-    /*public void acceptDCCConnection(final DCCRequestEvent event) {
+    public void acceptDCCConnection(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
 
         if (event instanceof DCCChatRequestEvent) {
@@ -241,7 +248,7 @@ public final class ServiceEventInterceptor {
     public void declineDCCRequestEvent(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
         event.pendingConnection.declineConnection();
-    }*/
+    }
 
     public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
         for (final InviteEvent event : inviteEvents) {

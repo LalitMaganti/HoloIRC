@@ -56,10 +56,10 @@ public class ServerConversationContainer {
         FluentIterable.from(server.getUser().getChannels()).copyInto(mConversations);
         FluentIterable.from(server.getUserChannelInterface().getQueryUsers())
                 .copyInto(mConversations);
-        // FluentIterable.from(server.getDCCManager().getChatConversations())
-        //         .copyInto(mConversations);
-        // FluentIterable.from(server.getDCCManager().getFileConversations())
-        //        .copyInto(mConversations);
+        FluentIterable.from(server.getDCCManager().getChatConversations())
+                .copyInto(mConversations);
+        FluentIterable.from(server.getDCCManager().getFileConversations())
+                .copyInto(mConversations);
     }
 
     public Collection<String> getIgnoreList() {
