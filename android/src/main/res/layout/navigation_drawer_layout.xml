@@ -31,11 +31,10 @@
                 android:id="@+id/user_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/medium_grey"
+                android:background="@color/user_list_drag_up_background"
                 android:gravity="center"
                 android:text="@string/user"
-                android:textAppearance="@android:style/TextAppearance.Small"
-                android:textColor="@android:color/white" />
+                android:textAppearance="?android:attr/textAppearanceSmallInverse" />
         </LinearLayout>
 
         <FrameLayout

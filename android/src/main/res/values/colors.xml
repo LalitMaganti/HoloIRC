@@ -1,24 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    HoloIRC - an IRC client for Android
-
-    Copyright 2013 Lalit Maganti
-
-    This file is part of HoloIRC.
-
-    HoloIRC is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HoloIRC is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
--->
 <resources>
 
     <color name="server_card_background_light">#ffffffff</color>
@@ -29,10 +9,18 @@
     <color name="very_light_grey">#f9f9f9</color>
     <color name="medium_grey">#ff2f2f2f</color>
     <color name="dark_gray">#cc222222</color>
+    <color name="snackbar_dark_gray">#ff323232</color>
 
     <color name="off_white">#e2e2e2</color>
 
+    <color name="colorPrimary">#215C94</color>
+    <color name="colorPrimaryDark">#18436D</color>
 
-    <color name="snackbar">#ff323232</color>
+    <color name="snackbar">@color/colorPrimary</color>
+
+    <color name="list_header_color">@color/colorPrimary</color>
+
+    <color name="action_bar_background_color">@color/colorPrimaryDark</color>
+    <color name="user_list_drag_up_background">@color/colorPrimary</color>
 
 </resources>

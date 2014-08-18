@@ -13,11 +13,13 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.CompatUtils;
 import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.List;
@@ -161,11 +164,21 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     public void onCreate(final Bundle savedInstanceState) {
         AppPreferences.setupAppPreferences(this);
         setTheme(UIUtils.getThemeInt());
-
+        if (CompatUtils.hasKitKat()) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        }
         super.onCreate(savedInstanceState);
         CrashUtils.startCrashlyticsIfAppropriate(this);
 
         setContentView(R.layout.main_activity);
+
+        // create our manager instance after the content view is set
+        final SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        // set a custom tint color for all system bars
+        tintManager.setTintColor(getResources().getColor(R.color.action_bar_background_color));
 
         mEmptyView = (TextView) findViewById(R.id.content_frame_empty_textview);
 
