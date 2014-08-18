@@ -1,11 +1,14 @@
 package com.fusionx.lightirc.util;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import com.fusionx.lightirc.misc.AppPreferences;
 
 import java.util.List;
+import java.util.Set;
 
+import co.fusionx.relay.dcc.event.file.DCCFileEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileProgressEvent;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
@@ -17,12 +20,15 @@ import co.fusionx.relay.event.server.StatusChangeEvent;
 
 public class EventUtils {
 
-    private static final List<Class<? extends ServerEvent>> sServerIgnoreClasses
-            = ImmutableList.of(JoinEvent.class, NewPrivateMessageEvent.class,
+    private static final Set<Class<? extends ServerEvent>> SERVER_IGNORE_EVENTS
+            = ImmutableSet.of(JoinEvent.class, NewPrivateMessageEvent.class,
             StatusChangeEvent.class);
 
-    private static final List<Class<? extends ChannelEvent>> sChannelIgnoreClasses
-            = ImmutableList.of(ChannelNameEvent.class);
+    private static final Set<Class<? extends ChannelEvent>> CHANNEL_IGNORE_EVENTS
+            = ImmutableSet.of(ChannelNameEvent.class);
+
+    private static final Set<Class<? extends DCCFileEvent>> DCC_FILE_IGNORE_EVENTS
+            = ImmutableSet.of(DCCFileProgressEvent.class);
 
     public static boolean shouldStoreEvent(final Event event) {
         if (event instanceof ChannelWorldUserEvent) {
@@ -32,10 +38,13 @@ public class EventUtils {
             }
         } else if (event instanceof ServerEvent) {
             final ServerEvent serverEvent = (ServerEvent) event;
-            return !sServerIgnoreClasses.contains(serverEvent.getClass());
+            return !SERVER_IGNORE_EVENTS.contains(serverEvent.getClass());
         } else if (event instanceof ChannelEvent) {
             final ChannelEvent channelEvent = (ChannelEvent) event;
-            return !sChannelIgnoreClasses.contains(channelEvent.getClass());
+            return !CHANNEL_IGNORE_EVENTS.contains(channelEvent.getClass());
+        } else if (event instanceof DCCFileEvent) {
+            final DCCFileEvent fileEvent = (DCCFileEvent) event;
+            return DCC_FILE_IGNORE_EVENTS.contains(fileEvent.getClass());
         }
         return true;
     }

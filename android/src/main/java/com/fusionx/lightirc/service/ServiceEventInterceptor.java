@@ -4,31 +4,24 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.event.OnDCCChatEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
-import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
 
 import android.os.Handler;
 import android.os.Looper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.Server;
+import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import co.fusionx.relay.event.dcc.DCCChatEvent;
-import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.event.server.DCCChatRequestEvent;
-import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
@@ -122,20 +115,6 @@ public final class ServiceEventInterceptor {
      * Event interception start here
      */
     @Subscribe(threadType = ThreadType.MAIN)
-    public void onChatEvent(final DCCChatEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.getConnection(), event);
-
-        // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.getConnection())));
-    }
-
-    @Subscribe(threadType = ThreadType.MAIN)
-    public void onChatEvent(final DCCChatStartedEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.dccConnection,
-                getLastStorableEvent(event.getConnection().getBuffer()));
-    }
-
-    @Subscribe(threadType = ThreadType.MAIN)
     public void onPrivateMessage(final NewPrivateMessageEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
 
@@ -192,32 +171,44 @@ public final class ServiceEventInterceptor {
         mInviteEvents.add(event);
     }
 
-    @Subscribe(threadType = ThreadType.MAIN)
+    // DCC Events
+    /*@Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final DCCRequestEvent event) {
         mDCCRequests.add(event);
     }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onChatEvent(final DCCChatEvent event) {
+        onIRCEvent(MessagePriority.HIGH, event.chatConversation, event);
+
+        // Forward the event UI side
+        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.chatConversation)));
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onChatEvent(final DCCFileGetStartedEvent event) {
+        onIRCEvent(MessagePriority.HIGH, event.fileConversation,
+                getLastStorableEvent(event.fileConversation.getBuffer()));
+    }*/
     /*
      * Event interception ends here
      */
 
     private void onIRCEvent(final MessagePriority priority, final Conversation conversation,
             final Event event) {
-        if (conversation.equals(mConversation)) {
-            if (conversation.equals(conversation.getServer())) {
-                return;
-            }
-            setSubEvent(conversation, event);
-        } else {
-            if (conversation.equals(conversation.getServer())) {
+        if (conversation.equals(conversation.getServer())) {
+            if (!conversation.equals(mConversation)) {
                 setMessagePriority(priority);
-            } else {
-                setSubMessagePriority(conversation, priority);
-                setSubEvent(conversation, event);
             }
+        } else {
+            if (!conversation.equals(mConversation)) {
+                setConversationPriority(conversation, priority);
+            }
+            setConversationEvent(conversation, event);
         }
     }
 
-    private void setSubMessagePriority(final Conversation conversation,
+    private void setConversationPriority(final Conversation conversation,
             final MessagePriority priority) {
         final MessagePriority oldPriority = mMessagePriorityMap.get(conversation);
         if (oldPriority == null || oldPriority.compareTo(priority) < 0) {
@@ -225,16 +216,17 @@ public final class ServiceEventInterceptor {
         }
     }
 
-    private void setSubEvent(final Conversation title, final Event event) {
-        mEventMap.put(title, event);
+    private void setConversationEvent(final Conversation conversation, final Event event) {
+        mEventMap.put(conversation, event);
     }
 
     public Server getServer() {
         return mServer;
     }
 
-    public void acceptDCCConnection(final DCCRequestEvent event) {
+    /*public void acceptDCCConnection(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
+
         if (event instanceof DCCChatRequestEvent) {
             final DCCChatRequestEvent chat = (DCCChatRequestEvent) event;
             chat.getPendingConnection().acceptConnection();
@@ -249,7 +241,7 @@ public final class ServiceEventInterceptor {
     public void declineDCCRequestEvent(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
         event.pendingConnection.declineConnection();
-    }
+    }*/
 
     public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
         for (final InviteEvent event : inviteEvents) {

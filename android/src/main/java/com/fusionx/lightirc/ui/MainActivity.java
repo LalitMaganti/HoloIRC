@@ -34,15 +34,14 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
-import co.fusionx.relay.QueryUser;
-import co.fusionx.relay.Server;
-import co.fusionx.relay.dcc.connection.DCCChatConnection;
-import co.fusionx.relay.dcc.connection.DCCFileConnection;
-import co.fusionx.relay.dcc.connection.DCCGetConnection;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.base.Server;
+import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
@@ -121,7 +120,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     };
 
-    private IRCFragment mCurrentFragment;
+    private BaseIRCFragment mCurrentFragment;
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
@@ -204,7 +203,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     .findFragmentById(R.id.right_drawer);
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
                     .findFragmentByTag(WORKER_FRAGMENT);
-            mCurrentFragment = (IRCFragment) getSupportFragmentManager()
+            mCurrentFragment = (BaseIRCFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.content_frame);
 
             // If the current fragment is not null then retrieve the matching convo
@@ -480,8 +479,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public EventCache getEventCache() {
-        return IRCService.getEventCache(mConversation.getServer());
+    public EventCache getEventCache(final Conversation conversation) {
+        return IRCService.getEventCache(conversation.getServer());
     }
 
     @Override
@@ -558,7 +557,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         // This is just registration because we'll retrieve the sticky event later
         getBus().register(mConversationChanged);
 
-        if (mCurrentFragment != null  && !mCurrentFragment.isValid()) {
+        if (mCurrentFragment != null && !mCurrentFragment.isValid()) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
@@ -581,24 +580,23 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final Conversation object,
-            final boolean delayChange) {
+    private void changeCurrentConversation(final Conversation object, final boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
             final boolean isServer = Server.class.isInstance(object);
-            final IRCFragment fragment;
+            final BaseIRCFragment fragment;
             if (isServer) {
                 fragment = new ServerFragment();
             } else if (Channel.class.isInstance(object)) {
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
-            } else if (DCCChatConnection.class.isInstance(object)) {
+            /*} else if (DCCChatConversation.class.isInstance(object)) {
                 fragment = new DCCChatFragment();
-            } else if (DCCFileConnection.class.isInstance(object)) {
-                fragment = new DCCFileFragment();
+            } else if (DCCFileConversation.class.isInstance(object)) {
+                fragment = new DCCFileFragment();*/
             } else {
                 throw new IllegalArgumentException();
             }
@@ -623,7 +621,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         supportInvalidateOptionsMenu();
     }
 
-    private void changeCurrentFragment(final IRCFragment fragment, boolean delayChange) {
+    private void changeCurrentFragment(final BaseIRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
         final Runnable runnable = () -> {

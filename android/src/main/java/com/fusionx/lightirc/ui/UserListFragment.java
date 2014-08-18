@@ -48,8 +48,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.misc.IRCUserComparator;

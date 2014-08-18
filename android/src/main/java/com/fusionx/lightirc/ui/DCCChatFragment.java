@@ -27,21 +27,20 @@ import com.fusionx.lightirc.misc.FragmentType;
 
 import java.util.List;
 
-import co.fusionx.relay.dcc.connection.DCCChatConnection;
-import co.fusionx.relay.event.dcc.DCCChatEvent;
-import co.fusionx.relay.event.dcc.DCCEvent;
-import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.parser.user.UserInputParser;
 
-public class DCCChatFragment extends IRCFragment<DCCEvent> {
+public class DCCChatFragment extends IRCFragment<DCCChatEvent> {
 
-    public DCCChatConnection getChatConnection() {
-        return (DCCChatConnection) mConversation;
+    public DCCChatConversation getChatConnection() {
+        return (DCCChatConversation) mConversation;
     }
 
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final DCCChatEvent event) {
-        if (event.dccConnection.equals(getChatConnection())) {
+        if (event.chatConversation.equals(getChatConnection())) {
             mMessageAdapter.add(event);
         }
     }
@@ -62,7 +61,7 @@ public class DCCChatFragment extends IRCFragment<DCCEvent> {
     }
 
     @Override
-    protected List<DCCEvent> getAdapterData() {
+    protected List<DCCChatEvent> getAdapterData() {
         return getChatConnection().getBuffer();
     }
 }

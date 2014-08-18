@@ -3,14 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/dcc_pending_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/server_card_background_dark"
+        android:padding="16dp"
+        android:text="@string/dcc_pending_title"
+        android:textAppearance="?android:attr/textAppearanceMediumInverse" />
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/dcc_pending_ok"
+        android:layout_below="@id/dcc_pending_title"
         android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp" />
+        android:paddingBottom="8dp" />
 
     <Button
         android:id="@+id/dcc_pending_ok"

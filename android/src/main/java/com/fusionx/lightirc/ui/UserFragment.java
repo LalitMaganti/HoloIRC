@@ -27,9 +27,9 @@ import com.fusionx.lightirc.misc.FragmentType;
 
 import java.util.List;
 
-import co.fusionx.relay.QueryUser;
+import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.parser.user.UserInputParser;
 
 public class UserFragment extends IRCFragment<QueryEvent> {
 

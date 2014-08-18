@@ -28,7 +28,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.base.ConnectionStatus;
 
 /**
  * Full of static utility methods

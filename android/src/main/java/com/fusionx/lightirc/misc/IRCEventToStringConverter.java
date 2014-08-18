@@ -17,8 +17,14 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.Nick;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.dcc.chat.DCCChatWorldActionEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
@@ -41,9 +47,6 @@ import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.channel.PartEvent;
-import co.fusionx.relay.event.dcc.DCCChatSelfMessageEvent;
-import co.fusionx.relay.event.dcc.DCCChatStartedEvent;
-import co.fusionx.relay.event.dcc.DCCChatWorldMessageEvent;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryConnectEvent;
@@ -653,7 +656,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = event.dccConnection.getServer().getUser().getNick();
+            final Nick nick = event.chatConversation.getServer().getUser().getNick();
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);
@@ -667,9 +670,25 @@ public class IRCEventToStringConverter {
             }
         }
 
+        public EventDecorator getActionMessage(final DCCChatSelfActionEvent event) {
+            final String response = mContext.getString(R.string.parser_action);
+            final Nick nick = event.chatConversation.getServer().getUser().getNick();
+            if (shouldHighlightLine()) {
+                final String formattedResponse = String.format(response,
+                        nick, event.action);
+                return setupEvent(formattedResponse, nick);
+            } else {
+                final FormattedString[] formattedStrings = {
+                        getFormattedStringForNick(nick),
+                        new FormattedString(event.action),
+                };
+                return setupEvent(formatTextWithStyle(response, formattedStrings));
+            }
+        }
+
         public EventDecorator getDCCChatEvent(final DCCChatWorldMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = new DCCNick(event.dccConnection.getId());
+            final Nick nick = new DCCNick(event.chatConversation.getId());
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);
@@ -681,6 +700,28 @@ public class IRCEventToStringConverter {
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
             }
+        }
+
+        public EventDecorator getActionMessage(final DCCChatWorldActionEvent event) {
+            final String response = mContext.getString(R.string.parser_action);
+            final Nick nick = new DCCNick(event.chatConversation.getId());
+            if (shouldHighlightLine()) {
+                final String formattedResponse = String.format(response,
+                        nick, event.action);
+                return setupEvent(formattedResponse, nick);
+            } else {
+                final FormattedString[] formattedStrings = {
+                        getFormattedStringForNick(nick),
+                        new FormattedString(event.action),
+                };
+                return setupEvent(formatTextWithStyle(response, formattedStrings));
+            }
+        }
+
+        public EventDecorator get(final DCCFileGetStartedEvent event) {
+            final int count = event.fileConversation.getFileConnections().size();
+            return setupEvent(String.format(mContext.getString(R.string.parser_dcc_files_count),
+                    count));
         }
         // DCC chat events end
     }

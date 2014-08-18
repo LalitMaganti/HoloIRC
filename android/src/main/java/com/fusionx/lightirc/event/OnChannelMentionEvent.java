@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.Channel;
+import co.fusionx.relay.base.Channel;
 
 public class OnChannelMentionEvent {
 

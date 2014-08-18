@@ -25,10 +25,10 @@ import android.widget.TextView;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.Channel;
-import co.fusionx.relay.ChannelUser;
-import co.fusionx.relay.ConnectionStatus;
-import co.fusionx.relay.Conversation;
+import co.fusionx.relay.base.Channel;
+import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
