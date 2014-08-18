@@ -150,7 +150,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements T
 
     protected IRCMessageAdapter<T> getNewAdapter() {
         final Callback callback = FragmentUtils.getParent(this, Callback.class);
-        return new IRCMessageAdapter<>(getActivity(), callback.getEventCache(), true);
+        return new IRCMessageAdapter<>(getActivity(), callback.getEventCache(mConversation), true);
     }
 
     protected View createView(final ViewGroup container, final LayoutInflater inflater) {
@@ -164,6 +164,6 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements T
 
     public interface Callback {
 
-        public EventCache getEventCache();
+        public EventCache getEventCache(final Conversation conversation);
     }
 }
