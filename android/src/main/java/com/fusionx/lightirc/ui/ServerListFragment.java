@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
@@ -51,7 +52,7 @@ import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.THashMap;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
@@ -62,7 +63,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private final EventHandler mEventHandler = new EventHandler();
 
-    private final THashSet<ServerEventHandler> mEventHandlers = new THashSet<>();
+    private final Map<Server, ServerEventHandler> mEventHandlers = new THashMap<>();
 
     // Callbacks
     private Callback mCallback;
@@ -131,7 +132,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onResume() {
         super.onResume();
 
-        for (final ServerEventHandler handler : mEventHandlers) {
+        for (final ServerEventHandler handler : mEventHandlers.values()) {
             handler.register();
         }
         if (mListAdapter == null) {
@@ -145,7 +146,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onPause() {
         super.onPause();
 
-        for (final ServerEventHandler handler : mEventHandlers) {
+        for (final ServerEventHandler handler : mEventHandlers.values()) {
             handler.unregister();
         }
     }
@@ -302,7 +303,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         if (item.getServer() == null) {
             item.setServer(mService.requestConnectionToServer(item.getBuilder(),
                     item.getIgnoreList()));
-            mEventHandlers.add(new ServerEventHandler(item, groupPosition));
+            mEventHandlers.put(item.getServer(), new ServerEventHandler(item, groupPosition));
         }
         mCallback.onServerClicked(item.getServer());
 
@@ -372,7 +373,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
                 findById(getView(), R.id.progress_bar_empty).setVisibility(View.GONE);
 
-                for (final ServerEventHandler eventHandler : mEventHandlers) {
+                for (final ServerEventHandler eventHandler : mEventHandlers.values()) {
                     eventHandler.unregister();
                 }
                 mEventHandlers.clear();
@@ -380,7 +381,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
                     ServerConversationContainer wrapper = listItems.get(i);
                     if (wrapper.getServer() != null) {
-                        mEventHandlers.add(new ServerEventHandler(wrapper, i));
+                        mEventHandlers.put(wrapper.getServer(), new ServerEventHandler(wrapper, i));
                     }
                     // Expand all the groups - TODO - fix this properly
                     mListView.expandGroup(i);
@@ -561,6 +562,9 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onStopEvent(final ServerStopRequestedEvent event) {
             mListAdapter.removeServer(event.server);
             mCallback.onServerStopped(event.server);
+
+            final ServerEventHandler eventHandler = mEventHandlers.remove(event.server);
+            eventHandler.unregister();
         }
     }
 }
