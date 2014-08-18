@@ -72,6 +72,11 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
         final Event event = getEvent(position);
         addTimestampIfRequired(holder, event);
+        if (mEventCache == null) {
+            // This should only happen when the fragment is about to be removed anyway so it
+            // doesn't matter that we are displaying invalid data
+            return view;
+        }
         holder.message.setText(mEventCache.get(event).getMessage());
 
         Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
