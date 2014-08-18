@@ -16,11 +16,12 @@
     <color name="colorPrimary">#215C94</color>
     <color name="colorPrimaryDark">#18436D</color>
 
-    <color name="snackbar">@color/colorPrimary</color>
+    <color name="snackbar">@color/colorPrimaryDark</color>
 
-    <color name="list_header_color">@color/colorPrimary</color>
+    <color name="list_header_color">@color/colorPrimaryDark</color>
 
-    <color name="action_bar_background_color">@color/colorPrimaryDark</color>
-    <color name="user_list_drag_up_background">@color/colorPrimary</color>
+    <color name="user_list_drag_up_background">@color/colorPrimaryDark</color>
+
+    <color name="action_bar_background_color">@color/colorPrimary</color>
 
 </resources>
