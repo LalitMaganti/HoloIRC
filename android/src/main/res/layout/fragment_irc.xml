@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
     HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
@@ -19,37 +18,36 @@
     You should have received a copy of the GNU General Public License
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ListView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/fragment_irc_message_box"
-            android:paddingTop="12dip"
-            android:paddingBottom="8dip"
-            android:paddingLeft="16dip"
-            android:paddingRight="16dip"
-            android:transcriptMode="normal"
-            android:dividerHeight="0dp"
-            android:divider="@null"
-            android:clipToPadding="false"
-            android:scrollbarStyle="outsideOverlay"/>
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fragment_irc_message_box"
+        android:clipToPadding="false"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:paddingBottom="8dip"
+        android:paddingLeft="16dip"
+        android:paddingRight="16dip"
+        android:paddingTop="8dip"
+        android:scrollbarStyle="outsideOverlay"
+        android:transcriptMode="normal" />
 
     <EditText
-            android:id="@+id/fragment_irc_message_box"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textCapSentences|textAutoCorrect"
-            android:ems="10"
-            android:hint="@string/message"
-            android:imeOptions="actionSend"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"/>
+        android:id="@+id/fragment_irc_message_box"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:ems="10"
+        android:hint="@string/message"
+        android:imeOptions="actionSend"
+        android:inputType="textCapSentences|textAutoCorrect" />
 </RelativeLayout>

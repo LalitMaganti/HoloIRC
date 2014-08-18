@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     LightIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
@@ -20,14 +19,14 @@
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
 <CheckedTextView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/text1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="?android:listPreferredItemHeight"
-        android:paddingLeft="8dip"
-        android:paddingRight="8dip"
-        android:textAppearance="@android:style/TextAppearance.Medium"
-        android:background="?activatableItemBackground"
-        android:textIsSelectable="false"/>
+    android:id="@+id/text1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?activatableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="?android:listPreferredItemHeight"
+    android:paddingLeft="8dip"
+    android:paddingRight="8dip"
+    android:textAppearance="@android:style/TextAppearance.Medium"
+    android:textIsSelectable="false" />

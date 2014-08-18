@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
-      xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:holoirc="http://schemas.android.com/apk/res-auto">
     <item
-            android:id="@+id/fragment_ignore_cab_remove"
-            android:icon="@drawable/ic_menu_delete"
-            holoirc:showAsAction="withText|ifRoom"
-            android:title="@string/remove"/>
+        android:id="@+id/fragment_ignore_cab_remove"
+        android:icon="@drawable/ic_delete_light"
+        android:title="@string/remove"
+        holoirc:showAsAction="withText|ifRoom" />
 </menu>

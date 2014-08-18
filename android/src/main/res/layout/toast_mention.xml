@@ -1,19 +1,20 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/toast_layout_root"
-              android:orientation="horizontal"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:paddingLeft="40dp"
-              android:paddingRight="40dp"
-              android:paddingTop="13dp"
-              android:paddingBottom="13dp"
-              android:background="@color/holo_blue_light">
+<LinearLayout
+    android:id="@+id/toast_layout_root"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/holo_blue_light"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="40dp"
+    android:paddingRight="40dp"
+    android:paddingTop="16dp">
 
     <TextView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/toast_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/holo_blue_light"
-            android:textColor="@android:color/white"/>
+        android:id="@+id/toast_text"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/holo_blue_light"
+        android:textColor="@android:color/white" />
 </LinearLayout>
