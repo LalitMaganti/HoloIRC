@@ -73,13 +73,13 @@ public class DCCPendingFragment extends DialogFragment {
                 a -> {
                     final int position = (int) a.getTag();
                     final DCCRequestEvent event = mAdapter.getItem(position);
-                    interceptor.acceptDCCConnection(event);
+                    // interceptor.acceptDCCConnection(event);
                     mAdapter.replaceAll(interceptor.getDCCRequests());
                 },
                 d -> {
                     final int position = (int) d.getTag();
                     final DCCRequestEvent event = mAdapter.getItem(position);
-                    interceptor.declineDCCRequestEvent(event);
+                    // interceptor.declineDCCRequestEvent(event);
                     mAdapter.replaceAll(interceptor.getDCCRequests());
                 });
 

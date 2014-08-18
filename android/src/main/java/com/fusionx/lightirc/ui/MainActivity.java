@@ -593,10 +593,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
-            } else if (DCCChatConversation.class.isInstance(object)) {
+            /*} else if (DCCChatConversation.class.isInstance(object)) {
                 fragment = new DCCChatFragment();
             } else if (DCCFileConversation.class.isInstance(object)) {
-                fragment = new DCCFileFragment();
+                fragment = new DCCFileFragment();*/
             } else {
                 throw new IllegalArgumentException();
             }
