@@ -31,7 +31,7 @@ import android.view.View;
 import java.util.List;
 
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.parser.user.UserInputParser;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 

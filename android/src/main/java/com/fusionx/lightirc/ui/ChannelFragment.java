@@ -53,7 +53,7 @@ import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.misc.IRCUserComparator;
-import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.parser.user.UserInputParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.Utils;
 

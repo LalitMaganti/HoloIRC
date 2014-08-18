@@ -29,7 +29,7 @@ import java.util.List;
 
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
-import co.fusionx.relay.parser.UserInputParser;
+import co.fusionx.relay.parser.user.UserInputParser;
 
 public class DCCChatFragment extends IRCFragment<DCCChatEvent> {
 
