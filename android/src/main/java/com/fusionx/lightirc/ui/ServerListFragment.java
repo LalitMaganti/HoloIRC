@@ -33,6 +33,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,6 @@ import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import gnu.trove.map.hash.THashMap;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
@@ -63,7 +63,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private final EventHandler mEventHandler = new EventHandler();
 
-    private final Map<Server, ServerEventHandler> mEventHandlers = new THashMap<>();
+    private final Map<Server, ServerEventHandler> mEventHandlers = new HashMap<>();
 
     // Callbacks
     private Callback mCallback;

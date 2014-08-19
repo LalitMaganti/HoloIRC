@@ -14,6 +14,8 @@ import android.os.Looper;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,8 +35,6 @@ import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
 
 import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
 import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;
@@ -65,10 +65,10 @@ public final class ServiceEventInterceptor {
 
     public ServiceEventInterceptor(final Server server) {
         mServer = server;
-        mMessagePriorityMap = new THashMap<>();
-        mEventMap = new THashMap<>();
-        mInviteEvents = new THashSet<>();
-        mDCCRequests = new THashSet<>();
+        mMessagePriorityMap = new HashMap<>();
+        mEventMap = new HashMap<>();
+        mInviteEvents = new HashSet<>();
+        mDCCRequests = new HashSet<>();
 
         getBus().registerSticky(new Object() {
             @Subscribe

@@ -36,7 +36,6 @@ import co.fusionx.relay.base.ConnectionManager;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.base.relay.RelayConnectionManager;
-import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -103,7 +102,7 @@ public class IRCService extends Service {
 
     private final IRCBinder mBinder = new IRCBinder();
 
-    private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new THashMap<>();
+    private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
 
     private boolean mExternalStorageWriteable = false;
 
