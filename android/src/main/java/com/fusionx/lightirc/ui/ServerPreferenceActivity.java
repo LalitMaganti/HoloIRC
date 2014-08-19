@@ -222,7 +222,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
                 listener = (preference, newValue) -> {
                     final NickStorage storage = (NickStorage) newValue;
-                    mContentValues.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
+                    mContentValues.put(COLUMN_NICK_ONE, storage.getFirst());
                     mContentValues.put(COLUMN_NICK_TWO, storage.getNickAtPosition(1));
                     mContentValues.put(COLUMN_NICK_THREE, storage.getNickAtPosition(2));
                     return true;
