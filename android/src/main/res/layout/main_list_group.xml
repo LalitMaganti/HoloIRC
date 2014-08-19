@@ -4,21 +4,20 @@
     android:layout_height="wrap_content"
     android:background="@drawable/group_background">
 
-    <com.fusionx.lightirc.view.NoParentPressImageView
+    <ImageView
         android:id="@+id/button_expand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical"
-        android:background="@drawable/overflow_selector"
+        android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:contentDescription="expander_status"
-        android:paddingBottom="16dip"
-        android:paddingLeft="8dip"
-        android:paddingTop="16dip"
-        android:scaleType="center"
+        android:duplicateParentState="false"
+        android:padding="8dp"
+        android:scaleType="fitXY"
         android:src="?expand_close_menu_drawable" />
 
     <LinearLayout
