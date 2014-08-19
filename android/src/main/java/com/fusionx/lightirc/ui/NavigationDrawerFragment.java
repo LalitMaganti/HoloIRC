@@ -235,6 +235,9 @@ public class NavigationDrawerFragment extends Fragment implements
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
         item.setVisible(item.isVisible() && isActionsFragmentVisible());
 
+        final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
+        users.setVisible(item.isVisible() && isActionsFragmentVisible());
+
         final MenuItem add = menu.findItem(R.id.ignore_list_cab_add);
         add.setVisible(isIgnoreFragmentVisible());
     }
@@ -256,13 +259,14 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     public boolean onBackPressed() {
-        if (!isActionsFragmentVisible()) {
-            if (isIgnoreFragmentVisible()) {
-                mIgnoreListFragment.saveIgnoreList();
-            }
-            switchToActionFragment();
+        if (isActionsFragmentVisible()) {
+            return false;
         }
-        return !isActionsFragmentVisible();
+        if (isIgnoreFragmentVisible()) {
+            mIgnoreListFragment.saveIgnoreList();
+        }
+        switchToActionFragment();
+        return true;
     }
 
     @Override
