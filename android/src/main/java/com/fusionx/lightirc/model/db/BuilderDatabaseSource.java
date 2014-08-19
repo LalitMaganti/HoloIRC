@@ -186,8 +186,8 @@ public class BuilderDatabaseSource {
         // User settings
         final NickStorage storage = builder.getNickStorage();
         values.put(COLUMN_NICK_ONE, storage.getFirstChoiceNick());
-        values.put(COLUMN_NICK_TWO, storage.getSecondChoiceNick());
-        values.put(COLUMN_NICK_THREE, storage.getThirdChoiceNick());
+        values.put(COLUMN_NICK_TWO, storage.getNickAtPosition(1));
+        values.put(COLUMN_NICK_THREE, storage.getNickAtPosition(2));
 
         values.put(COLUMN_REAL_NAME, builder.getRealName());
         values.put(COLUMN_NICK_CHANGEABLE, builder.isNickChangeable() ? 1 : 0);
