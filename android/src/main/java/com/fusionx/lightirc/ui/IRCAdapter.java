@@ -10,11 +10,11 @@ import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
@@ -24,7 +24,8 @@ import java.util.List;
 
 import co.fusionx.relay.event.Event;
 
-public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements Filterable {
+public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter.IRCViewHolder>
+        implements Filterable {
 
     private final Object mLock = new Object();
 
@@ -40,7 +41,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
 
     private EventCache mEventCache;
 
-    public IRCMessageAdapter(final Context context, final EventCache cache, final boolean filter) {
+    public IRCAdapter(final Context context, final EventCache cache, final boolean filter) {
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
@@ -49,38 +50,35 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     }
 
     @Override
-    public int getCount() {
+    public IRCViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+        final View view = initView(parent);
+        return new IRCViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final IRCViewHolder holder, final int position) {
+        final Event event = getEvent(position);
+        addTimestampIfRequired(holder, event);
+        if (mEventCache == null) {
+            // This should only happen when the fragment is about to be removed anyway so it
+            // doesn't matter that we are displaying invalid data
+            return;
+        }
+        holder.message.setText(mEventCache.get(event).getMessage());
+
+        Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
+    }
+
+    @Override
+    public int getItemCount() {
         synchronized (mLock) {
             return mObjects.size();
         }
     }
 
     @Override
-    public Object getItem(final int position) {
-        return getEvent(position);
-    }
-
-    @Override
     public long getItemId(int position) {
         return position;
-    }
-
-    @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
-        final View view = convertView == null ? initView(parent) : convertView;
-        final ViewHolder holder = (ViewHolder) view.getTag();
-
-        final Event event = getEvent(position);
-        addTimestampIfRequired(holder, event);
-        if (mEventCache == null) {
-            // This should only happen when the fragment is about to be removed anyway so it
-            // doesn't matter that we are displaying invalid data
-            return view;
-        }
-        holder.message.setText(mEventCache.get(event).getMessage());
-
-        Linkify.addLinks(holder.message, Linkify.WEB_URLS | Linkify.EMAIL_ADDRESSES);
-        return view;
     }
 
     public void add(final T event) {
@@ -89,9 +87,10 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         }
 
         synchronized (mLock) {
+            final int size = mObjects.size();
             mObjects.add(event);
+            notifyItemInserted(size);
         }
-        notifyDataSetChanged();
     }
 
     public void setData(final List<T> list, final Runnable runnable) {
@@ -115,7 +114,7 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         return mFilter;
     }
 
-    private Event getEvent(final int position) {
+    public Event getEvent(final int position) {
         synchronized (mLock) {
             return mObjects.get(position);
         }
@@ -124,21 +123,18 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
     private View initView(final ViewGroup parent) {
         final View view = mInflater.inflate(R.layout.irc_listview_textview, parent, false);
 
-        final TextView timestamp = (TextView) view.findViewById(R.id.timestamp);
-        UIUtils.setRobotoLight(mContext, timestamp);
-        timestamp.setTextSize(AppPreferences.getAppPreferences().getMainFontSize());
+        final IRCViewHolder holder = new IRCViewHolder(view);
 
-        final TextView message = (TextView) view.findViewById(R.id.message);
-        UIUtils.setRobotoLight(mContext, message);
-        message.setTextSize(AppPreferences.getAppPreferences().getMainFontSize());
+        UIUtils.setRobotoLight(mContext, holder.timestamp);
+        holder.timestamp.setTextSize(AppPreferences.getAppPreferences().getMainFontSize());
 
-        final ViewHolder holder = new ViewHolder(timestamp, message);
-        view.setTag(holder);
+        UIUtils.setRobotoLight(mContext, holder.message);
+        holder.message.setTextSize(AppPreferences.getAppPreferences().getMainFontSize());
 
         return view;
     }
 
-    private void addTimestampIfRequired(ViewHolder holder, final Event event) {
+    private void addTimestampIfRequired(IRCViewHolder holder, final Event event) {
         if (AppPreferences.getAppPreferences().shouldDisplayTimestamps()) {
             holder.timestamp.setVisibility(View.VISIBLE);
             holder.timestamp.setText(event.timestamp.format("%H:%M"));
@@ -147,15 +143,17 @@ public class IRCMessageAdapter<T extends Event> extends BaseAdapter implements F
         }
     }
 
-    private static class ViewHolder {
+    public static class IRCViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView timestamp;
 
         public final TextView message;
 
-        private ViewHolder(final TextView timestamp, final TextView message) {
-            this.timestamp = timestamp;
-            this.message = message;
+        public IRCViewHolder(final View itemView) {
+            super(itemView);
+
+            timestamp = (TextView) itemView.findViewById(R.id.timestamp);
+            message = (TextView) itemView.findViewById(R.id.message);
         }
     }
 

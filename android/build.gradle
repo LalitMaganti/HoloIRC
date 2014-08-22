@@ -88,6 +88,9 @@ dependencies {
 
     compile project(':relay-library')
     compile project(':bus-library')
+
+    compile project(':libraries:cardview-v7')
+    compile project(':libraries:recyclerview-v7')
 }
 
 retrolambda {

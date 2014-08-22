@@ -59,8 +59,8 @@ import co.fusionx.relay.util.Utils;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
-public final class ChannelFragment extends IRCFragment<ChannelEvent> implements PopupMenu
-        .OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
+public final class ChannelFragment extends IRCFragment<ChannelEvent>
+        implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
 
     private ImageButton mAutoButton;
 
@@ -106,6 +106,12 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
         mAutoButton.setEnabled(Utils.isNotEmpty(s));
     }
 
+    @Override
+    public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
+            final Bundle savedInstanceState) {
+        return inflate.inflate(R.layout.fragment_channel, container, false);
+    }
+
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final ChannelEvent event) {
@@ -113,7 +119,11 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
             return;
         }
 
+        final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
+        if (position == mMessageAdapter.getItemCount() - 2) {
+            mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        }
     }
 
     @Override
@@ -176,11 +186,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent> implements 
     @Override
     public FragmentType getType() {
         return FragmentType.CHANNEL;
-    }
-
-    @Override
-    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
-        return inflater.inflate(R.layout.fragment_channel, container, false);
     }
 
     @Override

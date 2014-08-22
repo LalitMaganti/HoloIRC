@@ -32,13 +32,15 @@ import com.fusionx.lightirc.util.UIUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import android.os.Bundle;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -48,8 +50,8 @@ import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements TextView
-        .OnEditorActionListener {
+abstract class IRCFragment<T extends Event> extends BaseIRCFragment
+        implements TextView.OnEditorActionListener {
 
     Conversation mConversation;
 
@@ -57,32 +59,34 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements T
 
     String mTitle;
 
-    IRCMessageAdapter<T> mMessageAdapter;
+    IRCAdapter<T> mMessageAdapter;
 
     private Object mEventListener = new Object() {
         @Subscribe
         public void onEvent(final OnPreferencesChangedEvent event) {
             onResetBuffer(null);
-
-            // Fix for http://stackoverflow.com/questions/12049198/how-to-clear-the-views-which-are
-            // -held-in-the-listviews-recyclebin/16261588#16261588
-            mListView.setAdapter(mMessageAdapter);
         }
     };
 
-    ListView mListView;
+    RecyclerView mRecyclerView;
+
+    LinearLayoutManager mLayoutManager;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return createView(container, inflate);
+        return inflate.inflate(R.layout.fragment_irc, container, false);
     }
 
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mListView = (ListView) view.findViewById(android.R.id.list);
+        mRecyclerView = (RecyclerView) view.findViewById(android.R.id.list);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        ViewCompat.setOverScrollMode(mRecyclerView, ViewCompat.OVER_SCROLL_NEVER);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
@@ -94,25 +98,11 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements T
 
         getBus().register(mEventListener);
         mMessageAdapter = getNewAdapter();
-        mListView.setAdapter(mMessageAdapter);
+        mRecyclerView.setAdapter(mMessageAdapter);
 
         onResetBuffer(() -> {
-            // While the processing is occurring we could have destroyed the view by rotation
-            if (savedInstanceState == null) {
-                mListView.setSelection(mMessageAdapter.getCount() - 1);
-            } else {
-                mListView.onRestoreInstanceState(savedInstanceState.getParcelable
-                        ("list_view"));
-            }
         });
         mConversation.getServer().getServerEventBus().register(this);
-    }
-
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable("list_view", mListView.onSaveInstanceState());
     }
 
     @Override
@@ -139,7 +129,10 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements T
 
     public List<T> onResetBuffer(final Runnable runnable) {
         final List<T> list = getAdapterData();
-        mMessageAdapter.setData(list, runnable);
+        mMessageAdapter.setData(list, () -> {
+            runnable.run();
+            mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        });
         return list;
     }
 
@@ -148,13 +141,9 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment implements T
         return mTitle;
     }
 
-    protected IRCMessageAdapter<T> getNewAdapter() {
+    protected IRCAdapter<T> getNewAdapter() {
         final Callback callback = FragmentUtils.getParent(this, Callback.class);
-        return new IRCMessageAdapter<>(getActivity(), callback.getEventCache(mConversation), true);
-    }
-
-    protected View createView(final ViewGroup container, final LayoutInflater inflater) {
-        return inflater.inflate(R.layout.fragment_irc, container, false);
+        return new IRCAdapter<>(getActivity(), callback.getEventCache(mConversation), true);
     }
 
     protected abstract List<T> getAdapterData();

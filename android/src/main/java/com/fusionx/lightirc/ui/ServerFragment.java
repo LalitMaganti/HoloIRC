@@ -62,7 +62,11 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final ServerEvent event) {
+        final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
+        if (position == mMessageAdapter.getItemCount() - 2) {
+            mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        }
     }
 
     @Override

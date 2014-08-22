@@ -43,7 +43,11 @@ public class UserFragment extends IRCFragment<QueryEvent> {
         if (!event.user.equals(getQueryUser())) {
             return;
         }
+        final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
+        if (position == mMessageAdapter.getItemCount() - 2) {
+            mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        }
     }
 
     @Override
