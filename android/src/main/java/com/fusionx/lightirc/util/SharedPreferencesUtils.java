@@ -215,7 +215,7 @@ public class SharedPreferencesUtils {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 MODE_PRIVATE);
         final Set<String> ignoreSet = serverSettings.getStringSet(PREF_IGNORE_LIST,
-                new HashSet<String>());
+                new HashSet<>());
         return new ArrayList<>(ignoreSet);
     }
 }

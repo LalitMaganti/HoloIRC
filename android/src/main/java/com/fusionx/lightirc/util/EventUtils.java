@@ -36,6 +36,8 @@ public class EventUtils {
             if (channelWorldUserEvent.isUserListChangeEvent()) {
                 return !AppPreferences.getAppPreferences().shouldHideUserMessages();
             }
+
+            // TODO - readd ignore list functionality back in here
         } else if (event instanceof ServerEvent) {
             final ServerEvent serverEvent = (ServerEvent) event;
             return !SERVER_IGNORE_EVENTS.contains(serverEvent.getClass());

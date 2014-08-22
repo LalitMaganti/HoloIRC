@@ -6,6 +6,8 @@ import com.fusionx.lightirc.util.CrashUtils;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.io.File;
 import java.util.HashSet;
@@ -21,6 +23,8 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 public class AppPreferences implements RelayConfiguration, LoggingPreferences {
 
     private static AppPreferences mAppPreferences;
+
+    private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
     private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
 
@@ -175,6 +179,13 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
     @Override
     public void logServerLine(final String line) {
         CrashUtils.logIssue(line);
+    }
+
+    @Override
+    public void handleException(final Exception ex) {
+        HANDLER.post(() -> {
+            throw new RuntimeException(ex);
+        });
     }
 
     // Logging

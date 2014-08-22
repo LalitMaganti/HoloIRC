@@ -166,7 +166,6 @@ public class IgnoreListFragment extends ListFragment implements OnDismissCallbac
     public void saveIgnoreList() {
         final List<String> list = getIgnoreAdapter().getListOfItems();
         mDatabaseSource.updateIgnoreList(mConversation.getServer().getTitle(), list);
-        mConversation.getServer().getUserChannelInterface().updateIgnoreList(list);
     }
 
     private BaseCollectionAdapter<String> getIgnoreAdapter() {

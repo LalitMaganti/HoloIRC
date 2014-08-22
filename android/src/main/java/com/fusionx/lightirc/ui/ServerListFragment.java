@@ -301,8 +301,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         final ServerConversationContainer item = mListAdapter.getGroup(groupPosition);
         if (item.getServer() == null) {
-            item.setServer(mService.requestConnectionToServer(item.getBuilder(),
-                    item.getIgnoreList()));
+            item.setServer(mService.requestConnectionToServer(item.getBuilder()));
             mEventHandlers.put(item.getServer(), new ServerEventHandler(item, groupPosition));
         }
         mCallback.onServerClicked(item.getServer());

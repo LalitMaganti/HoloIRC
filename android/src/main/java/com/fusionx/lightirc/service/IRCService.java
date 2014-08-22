@@ -98,8 +98,6 @@ public class IRCService extends Service {
         }
     };
 
-    private final Handler mHandler = new Handler();
-
     private final IRCBinder mBinder = new IRCBinder();
 
     private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
@@ -149,10 +147,9 @@ public class IRCService extends Service {
         return mBinder;
     }
 
-    public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
-            final Collection<String> ignoreList) {
+    public Server requestConnectionToServer(final ServerConfiguration.Builder builder) {
         final Pair<Boolean, ? extends Server> pair
-                = mConnectionManager.requestConnection(builder.build(), ignoreList, mHandler);
+                = mConnectionManager.requestConnection(builder.build());
 
         final boolean exists = pair.first;
         final Server server = pair.second;
