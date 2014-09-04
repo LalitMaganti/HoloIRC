@@ -60,7 +60,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
  * Main activity which co-ordinates everything in the app
  */
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
-        DrawerLayout.DrawerListener, NavigationDrawerFragment.Callback, WorkerFragment.Callback,
+        NavigationDrawerFragment.Callback, WorkerFragment.Callback,
         IRCFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
@@ -78,10 +78,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private final SlidingPaneLayout.PanelSlideListener mPanelSlideListener
             = new SlidingPaneLayout.PanelSlideListener() {
 
-        // private CharSequence mTitle;
-
-        // private CharSequence mSubtitle;
-
         @Override
         public void onPanelSlide(final View view, final float v) {
             // Empty
@@ -89,21 +85,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         @Override
         public void onPanelOpened(final View view) {
-            // mTitle = getSupportActionBar().getTitle();
-            // mSubtitle = getSupportActionBar().getSubtitle();
-
             supportInvalidateOptionsMenu();
-            // TODO - write the opposing code in onPanelClosed so this is done
-            // getSupportActionBar().setTitle(R.string.app_name);
-            // getSupportActionBar().setSubtitle(null);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
 
         @Override
         public void onPanelClosed(final View view) {
-            // getSupportActionBar().setTitle(mTitle);
-            // getSupportActionBar().setSubtitle(mSubtitle);
-
             supportInvalidateOptionsMenu();
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             mServerListFragment.onPanelClosed();
@@ -186,7 +173,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSnackbar.post(mSnackbar::hide);
 
         mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout.setDrawerListener(new DrawerListener());
         mDrawerLayout.setFocusableInTouchMode(false);
 
         mSlidingPane = findById(this, R.id.sliding_pane_layout);
@@ -323,7 +310,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void disconnectFromServer() {
-        mWorkerFragment.disconnectFromServer(mConversation.getServer());
+        getService().requestConnectionStoppage(mConversation.getServer());
     }
 
     @Override
@@ -358,26 +345,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void reconnectToServer() {
-        mWorkerFragment.reconnectToServer(mConversation.getServer());
-    }
-
-    @Override
-    public void onDrawerSlide(final View drawerView, final float slideOffset) {
-    }
-
-    @Override
-    public void onDrawerOpened(final View drawerView) {
-        mSlidingPane.setSlideable(false);
-    }
-
-    @Override
-    public void onDrawerClosed(final View drawerView) {
-        mNavigationDrawerFragment.onDrawerClosed();
-        mSlidingPane.setSlideable(true);
-    }
-
-    @Override
-    public void onDrawerStateChanged(final int newState) {
+        getService().requestReconnectionToServer(mConversation.getServer());
     }
 
     @Override
@@ -699,6 +667,28 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         } else {
             mSlidingPane.openPane();
             mEmptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class DrawerListener implements DrawerLayout.DrawerListener {
+
+        @Override
+        public void onDrawerSlide(final View drawerView, final float slideOffset) {
+        }
+
+        @Override
+        public void onDrawerOpened(final View drawerView) {
+            mSlidingPane.setSlideable(false);
+        }
+
+        @Override
+        public void onDrawerClosed(final View drawerView) {
+            mNavigationDrawerFragment.onDrawerClosed();
+            mSlidingPane.setSlideable(true);
+        }
+
+        @Override
+        public void onDrawerStateChanged(final int newState) {
         }
     }
 }

@@ -97,14 +97,6 @@ public class WorkerFragment extends Fragment implements LoaderManager
         return mService;
     }
 
-    public void disconnectFromServer(final Server server) {
-        mService.requestConnectionStoppage(server);
-    }
-
-    public void reconnectToServer(final Server server) {
-        mService.requestReconnectionToServer(server);
-    }
-
     public interface Callback {
 
         public void onServiceConnected(final IRCService service);
