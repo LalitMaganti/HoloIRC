@@ -66,7 +66,7 @@ public class UserListFragment extends Fragment {
             // If it's null then remove the old conversation
             if (conversationChanged.fragmentType != FragmentType.CHANNEL) {
                 if (mChannel != null) {
-                    mChannel.getServer().getEventBus().unregister(UserListFragment.this);
+                    mChannel.getServer().getServerWideBus().unregister(UserListFragment.this);
                 }
                 mChannel = null;
 
@@ -76,11 +76,11 @@ public class UserListFragment extends Fragment {
                 return;
             }
             if (mChannel != null) {
-                mChannel.getServer().getEventBus().unregister(UserListFragment.this);
+                mChannel.getServer().getServerWideBus().unregister(UserListFragment.this);
             }
 
             mChannel = (Channel) conversationChanged.conversation;
-            mChannel.getServer().getEventBus().register(UserListFragment.this);
+            mChannel.getServer().getServerWideBus().register(UserListFragment.this);
 
             updateAdapter(mChannel);
             onUserListChanged();
@@ -137,7 +137,7 @@ public class UserListFragment extends Fragment {
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
         if (mChannel != null) {
-            mChannel.getServer().getEventBus().unregister(this);
+            mChannel.getServer().getServerWideBus().unregister(this);
         }
         // Don't keep a track of this channel - we will deal with this when we return
         mChannel = null;

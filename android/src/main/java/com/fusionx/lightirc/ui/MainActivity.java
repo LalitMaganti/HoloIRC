@@ -216,7 +216,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 mConversation = event.conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
-                mConversation.getServer().getEventBus().register(this);
+                mConversation.getServer().getServerWideBus().register(this);
             } else {
                 onRemoveCurrentFragment();
             }
@@ -487,7 +487,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         super.onDestroy();
 
         if (mConversation != null) {
-            mConversation.getServer().getEventBus().unregister(this);
+            mConversation.getServer().getServerWideBus().unregister(this);
         }
     }
 
@@ -584,10 +584,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             fragment.setArguments(bundle);
 
             if (mConversation == null) {
-                object.getServer().getEventBus().register(this);
+                object.getServer().getServerWideBus().register(this);
             } else if (mConversation.getServer() != object.getServer()) {
-                mConversation.getServer().getEventBus().unregister(this);
-                object.getServer().getEventBus().register(this);
+                mConversation.getServer().getServerWideBus().unregister(this);
+                object.getServer().getServerWideBus().register(this);
             }
 
             setActionBarTitle(object.getId());
@@ -638,7 +638,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveCurrentFragment();
 
         // Don't listen for any more events from this server
-        mConversation.getServer().getEventBus().unregister(this);
+        mConversation.getServer().getServerWideBus().unregister(this);
         getBus().postSticky(new OnConversationChanged(null, null));
     }
 

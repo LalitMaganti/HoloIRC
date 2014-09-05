@@ -66,7 +66,7 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     }
 
     @Override
-    protected List<QueryEvent> getAdapterData() {
+    protected List<? extends QueryEvent> getAdapterData() {
         return getQueryUser().getBuffer();
     }
 }

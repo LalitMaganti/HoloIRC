@@ -93,7 +93,7 @@ public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter
         }
     }
 
-    public void setData(final List<T> list, final Runnable runnable) {
+    public void setData(final List<? extends T> list, final Runnable runnable) {
         if (mShouldFilter) {
             getFilter().setDataToFilter(list);
             getFilter().setCallback(runnable);
@@ -163,7 +163,7 @@ public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter
 
         private Runnable mCallback;
 
-        public void setDataToFilter(final List<T> list) {
+        public void setDataToFilter(final List<? extends T> list) {
             mDataToFilter = ImmutableList.copyOf(list);
         }
 

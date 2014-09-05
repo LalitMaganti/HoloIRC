@@ -61,16 +61,16 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
     IRCAdapter<T> mMessageAdapter;
 
+    RecyclerView mRecyclerView;
+
+    LinearLayoutManager mLayoutManager;
+
     private Object mEventListener = new Object() {
         @Subscribe
         public void onEvent(final OnPreferencesChangedEvent event) {
             onResetBuffer(null);
         }
     };
-
-    RecyclerView mRecyclerView;
-
-    LinearLayoutManager mLayoutManager;
 
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
@@ -101,7 +101,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
         onResetBuffer(() -> {
         });
-        mConversation.getServer().getEventBus().register(this);
+        mConversation.getServer().getServerWideBus().register(this);
     }
 
     @Override
@@ -109,7 +109,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         super.onDestroyView();
 
         getBus().unregister(mEventListener);
-        mConversation.getServer().getEventBus().unregister(this);
+        mConversation.getServer().getServerWideBus().unregister(this);
     }
 
     @Override
@@ -126,8 +126,8 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         return false;
     }
 
-    public List<T> onResetBuffer(final Runnable runnable) {
-        final List<T> list = getAdapterData();
+    public List<? extends T> onResetBuffer(final Runnable runnable) {
+        final List<? extends T> list = getAdapterData();
         mMessageAdapter.setData(list, () -> {
             runnable.run();
             mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
@@ -145,7 +145,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         return new IRCAdapter<>(getActivity(), callback.getEventCache(mConversation), true);
     }
 
-    protected abstract List<T> getAdapterData();
+    protected abstract List<? extends T> getAdapterData();
 
     // Abstract methods
     protected abstract void onSendMessage(final String message);
