@@ -111,7 +111,8 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
     @Override
     public void onBindViewHolder(final UserViewHolder holder, final int position) {
         if (isSectionHeaderPosition(position)) {
-            holder.textView.setText("TEST");
+            final Section section = mSections.get(position);
+            holder.textView.setText("Prefix: " + section.level.getPrefix());
         } else {
             final Pair<Nick, UserLevel> user = getItem(sectionedPositionToPosition(position));
             final UserLevel level = user.second;
