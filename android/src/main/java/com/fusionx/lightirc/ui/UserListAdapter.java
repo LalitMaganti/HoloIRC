@@ -92,13 +92,12 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         addPair(pair);
     }
 
-    public void removeUser(final ChannelUser user) {
+    public void removeUser(final ChannelUser user, final UserLevel level) {
         if (user == null) {
             return;
         }
 
-        final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(),
-                user.getChannelPrivileges(mChannel));
+        final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(), level);
         removePair(pair);
     }
 

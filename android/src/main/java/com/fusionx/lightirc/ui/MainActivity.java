@@ -421,7 +421,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         item.setVisible(navigationDrawerEnabled);
 
         final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
-        users.setVisible(navigationDrawerEnabled && mCurrentFragment.getType() == CHANNEL);
+        users.setVisible(navigationDrawerEnabled);
 
         final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());

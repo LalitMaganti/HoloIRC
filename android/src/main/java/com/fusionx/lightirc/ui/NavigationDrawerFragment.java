@@ -236,7 +236,8 @@ public class NavigationDrawerFragment extends Fragment implements
         item.setVisible(item.isVisible() && isActionsFragmentVisible());
 
         final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
-        users.setVisible(item.isVisible() && isActionsFragmentVisible());
+        users.setVisible(item.isVisible() && mFragmentType == FragmentType.CHANNEL
+                && isActionsFragmentVisible());
 
         final MenuItem add = menu.findItem(R.id.ignore_list_cab_add);
         add.setVisible(isIgnoreFragmentVisible());

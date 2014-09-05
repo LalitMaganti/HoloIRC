@@ -34,7 +34,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,6 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.event.channel.ChannelModeEvent;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
@@ -58,8 +56,6 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class UserListFragment extends Fragment {
 
-    private ActionMode mActionMode;
-
     private Callback mCallback;
 
     private Channel mChannel;
@@ -68,13 +64,15 @@ public class UserListFragment extends Fragment {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             // If it's null then remove the old conversation
-            if (conversationChanged.conversation == null ||
-                    conversationChanged.fragmentType != FragmentType.CHANNEL) {
+            if (conversationChanged.fragmentType != FragmentType.CHANNEL) {
                 if (mChannel != null) {
                     mChannel.getServer().getEventBus().unregister(UserListFragment.this);
                 }
                 mChannel = null;
+
                 updateAdapter(null);
+                onUserListChanged();
+
                 return;
             }
             if (mChannel != null) {
@@ -85,18 +83,18 @@ public class UserListFragment extends Fragment {
             mChannel.getServer().getEventBus().register(UserListFragment.this);
 
             updateAdapter(mChannel);
-            bar();
+            onUserListChanged();
         }
     };
+
+    private UserListAdapter mAdapter;
+
+    private RecyclerView mRecyclerView;
 
     private void updateAdapter(final Channel channel) {
         mAdapter = channel == null ? null : new UserListAdapter(getActivity(), channel);
         mRecyclerView.setAdapter(mAdapter);
     }
-
-    private UserListAdapter mAdapter;
-
-    private RecyclerView mRecyclerView;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -145,12 +143,8 @@ public class UserListFragment extends Fragment {
         mChannel = null;
     }
 
-    public void bar() {
+    public void onUserListChanged() {
         mCallback.updateUserListVisibility();
-
-        if (mActionMode != null) {
-            mActionMode.finish();
-        }
     }
 
     /*
@@ -163,15 +157,15 @@ public class UserListFragment extends Fragment {
     public void onEventMainThread(final ChannelWorldJoinEvent event) {
         if (event.channel.equals(mChannel)) {
             mAdapter.addUser(event.user);
-            bar();
+            onUserListChanged();
         }
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldKickEvent event) {
         if (event.channel.equals(mChannel)) {
-            mAdapter.removeUser(event.user);
-            bar();
+            mAdapter.removeUser(event.user, event.level);
+            onUserListChanged();
         }
     }
 
@@ -179,7 +173,7 @@ public class UserListFragment extends Fragment {
     public void onEventMainThread(final ChannelWorldLevelChangeEvent event) {
         if (event.channel.equals(mChannel)) {
             mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
-            bar();
+            onUserListChanged();
         }
     }
 
@@ -187,23 +181,23 @@ public class UserListFragment extends Fragment {
     public void onEventMainThread(final ChannelWorldNickChangeEvent event) {
         if (event.channel.equals(mChannel)) {
             mAdapter.changeNick(event.user, event.oldNick, event.userNick);
-            bar();
+            onUserListChanged();
         }
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldPartEvent event) {
         if (event.channel.equals(mChannel)) {
-            mAdapter.removeUser(event.user);
-            bar();
+            mAdapter.removeUser(event.user, event.level);
+            onUserListChanged();
         }
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldQuitEvent event) {
         if (event.channel.equals(mChannel)) {
-            mAdapter.removeUser(event.user);
-            bar();
+            mAdapter.removeUser(event.user, event.level);
+            onUserListChanged();
         }
     }
 
@@ -211,7 +205,7 @@ public class UserListFragment extends Fragment {
     public void onEventMainThread(final ChannelNickChangeEvent event) {
         if (event.channel.equals(mChannel)) {
             mAdapter.changeNick(event.relayUser, event.oldNick, event.newNick);
-            bar();
+            onUserListChanged();
         }
     }
 
@@ -219,7 +213,7 @@ public class UserListFragment extends Fragment {
     public void onEventMainThread(final ChannelUserLevelChangeEvent event) {
         if (event.channel.equals(mChannel)) {
             mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
-            bar();
+            onUserListChanged();
         }
     }
 
@@ -227,94 +221,10 @@ public class UserListFragment extends Fragment {
     public void onEventMainThread(final ChannelNameEvent event) {
         if (event.channel.equals(mChannel)) {
             updateAdapter(mChannel);
-            bar();
+            onUserListChanged();
         }
     }
     // End of subscribed events
-
-/*
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-            boolean checked) {
-        int selectedItemCount = getCheckedItems().size();
-
-        if (selectedItemCount != 0) {
-            final String quantityString = getResources()
-                    .getQuantityString(R.plurals.user_selection,
-                            selectedItemCount, selectedItemCount);
-            mode.setTitle(quantityString);
-
-            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
-        }
-    }
-
-    @Override
-    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        mActionMode = mode;
-
-        final MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.fragment_userlist_cab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final List<ChannelUser> selectedItems = getCheckedItems();
-        final String nick = selectedItems.get(0).getNick().getNickAsString();
-        switch (item.getItemId()) {
-            case R.id.fragment_userlist_cab_mention:
-                mCallback.onMentionMultipleUsers(selectedItems);
-                mode.finish();
-                mCallback.closeDrawer();
-                return true;
-            case R.id.fragment_userlist_cab_pm: {
-                onPrivateMessageUser(nick);
-                return true;
-            }
-            case R.id.fragment_userlist_cab_whois:
-                mChannel.getServer().sendWhois(nick);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mActionMode = null;
-    }
-
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        /*final boolean checked = getListView().getCheckedItemPositions().get(position);
-        getListView().setItemChecked(position, !checked);
-
-        if (mActionMode == null) {
-            getActivity().startActionMode(this);
-        }
-    }
-
-    protected List<ChannelUser> getCheckedItems() {
-        /*final List<ChannelUser> checkedSessionPositions = new ArrayList<>();
-        if (mRecyclerView == null) {
-            return checkedSessionPositions;
-        }
-
-        final SparseBooleanArray checkedPositionsBool = mRecyclerView.getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(mAdapter.getItem(checkedPositionsBool.keyAt(i)));
-            }
-        }
-
-        return checkedSessionPositions;
-    }
-*/
 
     boolean isNickOtherUsers(final String nick) {
         return !mChannel.getServer().getUser().getNick().getNickAsString().equals(nick);
@@ -324,7 +234,6 @@ public class UserListFragment extends Fragment {
         if (isNickOtherUsers(nick)) {
             mChannel.getServer().sendQuery(nick, null);
             mCallback.closeDrawer();
-            mActionMode.finish();
         } else {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
             build.setTitle(getActivity().getString(R.string.user_list_not_possible))
