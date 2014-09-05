@@ -154,7 +154,7 @@ public class UserListFragment extends Fragment {
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldJoinEvent event) {
-        mAdapter.addUser(event.user);
+        mAdapter.addUser(event.user, event.user.getChannelPrivileges(event.channel));
         onUserListChanged();
     }
 

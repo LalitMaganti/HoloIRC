@@ -15,8 +15,6 @@ public class SimpleSectionedRecyclerViewAdapter
 
     private static final int SECTION_TYPE = 0;
 
-    private final Context mContext;
-
     private boolean mValid = true;
 
     private int mSectionResourceId;
@@ -37,7 +35,6 @@ public class SimpleSectionedRecyclerViewAdapter
         mSectionResourceId = sectionResourceId;
         mTextResourceId = textResourceId;
         mBaseAdapter = baseAdapter;
-        mContext = context;
 
         mBaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -83,7 +80,6 @@ public class SimpleSectionedRecyclerViewAdapter
         } else {
             mBaseAdapter.onBindViewHolder(sectionViewHolder, sectionedPositionToPosition(position));
         }
-
     }
 
     @Override

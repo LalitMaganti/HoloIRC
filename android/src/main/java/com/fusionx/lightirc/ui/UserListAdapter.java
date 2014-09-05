@@ -15,6 +15,7 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +30,6 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.constants.UserLevel;
-import co.fusionx.relay.function.FluentIterables;
 
 public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserViewHolder> {
 
@@ -42,6 +42,8 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
     private final List<Pair<Nick, UserLevel>> mUsers;
 
     private final UserListComparator mComparator;
+
+    private SparseArray<Section> mSections = new SparseArray<>();
 
     public UserListAdapter(final Context context, final Channel channel) {
         mContext = context;
@@ -56,6 +58,42 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
                 .transform(u -> new Pair<>(u.getNick(), u.getChannelPrivileges(channel)))
                 .copyInto(mUsers);
         Collections.sort(mUsers, mComparator);
+
+        updateSections();
+    }
+
+    private void updateSections() {
+        mSections.clear();
+
+        if (mUsers.isEmpty()) {
+            return;
+        }
+        final UserLevel[] values = UserLevel.values();
+
+        // Position stores the position in the lists
+        int position = 0;
+        int offset = 0;
+        for (final UserLevel level : values) {
+            // If we have at least one user of with at a level then we need a header
+            if (mUsers.get(position).second == level) {
+                // Add the header
+                final Section section = new Section(position, level);
+                // Account for the previously added headers
+                section.sectionedPosition = section.firstPosition + offset;
+                mSections.append(section.sectionedPosition, section);
+                // Increment the header count for the next header
+                ++offset;
+
+                // Consume the users with the same level
+                do {
+                    position++;
+                } while (position < mUsers.size() && mUsers.get(position).second == level);
+                if (position >= mUsers.size()) {
+                    break;
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
     public Pair<Nick, UserLevel> getItem(final int position) {
@@ -72,30 +110,39 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
 
     @Override
     public void onBindViewHolder(final UserViewHolder holder, final int position) {
-        final Pair<Nick, UserLevel> user = getItem(position);
-        final UserLevel level = user.second;
-        final char prefix = level == null ? '\0' : level.getPrefix();
-        final SpannableStringBuilder builder = new SpannableStringBuilder(
-                prefix + user.first.getNickAsString());
-        final ForegroundColorSpan span = new ForegroundColorSpan(
-                NickCache.getNickCache().get(user.first).getColour());
-        builder.setSpan(span, 0, builder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        holder.textView.setText(builder);
+        if (isSectionHeaderPosition(position)) {
+            holder.textView.setText("TEST");
+        } else {
+            final Pair<Nick, UserLevel> user = getItem(sectionedPositionToPosition(position));
+            final UserLevel level = user.second;
+            final char prefix = level == null ? '\0' : level.getPrefix();
+            final SpannableStringBuilder builder = new SpannableStringBuilder(
+                    prefix + user.first.getNickAsString());
+            final ForegroundColorSpan span = new ForegroundColorSpan(
+                    NickCache.getNickCache().get(user.first).getColour());
+            builder.setSpan(span, 0, builder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            holder.textView.setText(builder);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mUsers.size();
+        return mUsers.size() + mSections.size();
     }
 
-    public void addUser(final ChannelUser user) {
+    @Override
+    public int getItemViewType(final int position) {
+        return isSectionHeaderPosition(position) ? 0 : 1;
+    }
+
+    public void addUser(final ChannelUser user, final UserLevel level) {
         if (user == null) {
             return;
         }
 
-        final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(),
-                user.getChannelPrivileges(mChannel));
-        addPair(pair);
+        final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(), level);
+        final int index = insertPair(pair);
+        notifyInsertOrUpdateHeaders(index, pair.second);
     }
 
     public void removeUser(final ChannelUser user, final UserLevel level) {
@@ -104,7 +151,8 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
         }
 
         final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(), level);
-        removePair(pair);
+        final int index = removePair(pair);
+        notifyRemoveOrUpdateHeaders(index, pair.second);
     }
 
     public void changeNick(final ChannelUser user, final Nick oldNick, final Nick newNick) {
@@ -115,10 +163,12 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
         final UserLevel level = user.getChannelPrivileges(mChannel);
 
         final Pair<Nick, UserLevel> oldPair = new Pair<>(oldNick, level);
-        removePair(oldPair);
+        final int removed = removePair(oldPair);
+        notifyItemRemoved(positionToSectionedPosition(removed));
 
         final Pair<Nick, UserLevel> newPair = new Pair<>(newNick, level);
-        addPair(newPair);
+        final int inserted = insertPair(newPair);
+        notifyItemInserted(positionToSectionedPosition(inserted));
     }
 
     public void changeMode(final ChannelUser user, final UserLevel oldLevel,
@@ -133,33 +183,88 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
         removePair(oldPair);
 
         final Pair<Nick, UserLevel> newPair = new Pair<>(nick, newLevel);
-        addPair(newPair);
+        insertPair(newPair);
+
+        updateSections();
     }
 
-    private void addPair(final Pair<Nick, UserLevel> pair) {
+    private int insertPair(final Pair<Nick, UserLevel> pair) {
         final int index = Collections.binarySearch(mUsers, pair, mComparator);
-        if (index < 0) {
-            final int actual = ~index;
-            mUsers.add(actual, pair);
-            notifyItemInserted(actual);
-        } else {
+        if (index >= 0) {
             // TODO - this is invalid
             Log.e("HoloIRC", "Invalid");
+        } else {
+            final int actual = ~index;
+            mUsers.add(actual, pair);
+            return actual;
         }
+        return -1;
     }
 
-    private void removePair(final Pair<Nick, UserLevel> pair) {
+    private int removePair(final Pair<Nick, UserLevel> pair) {
         final int index = Collections.binarySearch(mUsers, pair, mComparator);
         if (index < 0) {
             // TODO - this is invalid
             Log.e("HoloIRC", "Invalid");
         } else {
             mUsers.remove(index);
-            notifyItemRemoved(index);
+            return index;
+        }
+        return -1;
+    }
+
+    private void notifyInsertOrUpdateHeaders(final int index, final UserLevel level) {
+        if (getLastSection().level.ordinal() != level.ordinal()) {
+            updateSections();
+        } else {
+            notifyItemInserted(positionToSectionedPosition(index));
         }
     }
 
-    public static class UserViewHolder extends RecyclerView.ViewHolder {
+    private void notifyRemoveOrUpdateHeaders(final int index, final UserLevel level) {
+        final Section last = getLastSection();
+        if (last.level.ordinal() > level.ordinal() || last.firstPosition >= mUsers.size()) {
+            updateSections();
+        } else {
+            notifyItemRemoved(positionToSectionedPosition(index));
+        }
+    }
+
+    public int positionToSectionedPosition(int position) {
+        int offset = 0;
+        for (int i = 0; i < mSections.size(); i++) {
+            if (mSections.valueAt(i).firstPosition > position) {
+                break;
+            }
+            ++offset;
+        }
+        return position + offset;
+    }
+
+    public int sectionedPositionToPosition(int sectionedPosition) {
+        if (isSectionHeaderPosition(sectionedPosition)) {
+            return RecyclerView.NO_POSITION;
+        }
+
+        int offset = 0;
+        for (int i = 0; i < mSections.size(); i++) {
+            if (mSections.valueAt(i).sectionedPosition > sectionedPosition) {
+                break;
+            }
+            --offset;
+        }
+        return sectionedPosition + offset;
+    }
+
+    public boolean isSectionHeaderPosition(int position) {
+        return mSections.get(position) != null;
+    }
+
+    public Section getLastSection() {
+        return mSections.valueAt(mSections.size() - 1);
+    }
+
+    protected static class UserViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView textView;
 
@@ -170,7 +275,7 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
         }
     }
 
-    private class UserListComparator implements Comparator<Pair<Nick, UserLevel>> {
+    private static class UserListComparator implements Comparator<Pair<Nick, UserLevel>> {
 
         @Override
         public int compare(final Pair<Nick, UserLevel> lhs, final Pair<Nick, UserLevel> rhs) {
@@ -198,6 +303,20 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
             } else {
                 return -1;
             }
+        }
+    }
+
+    private static class Section {
+
+        int firstPosition;
+
+        int sectionedPosition;
+
+        UserLevel level;
+
+        public Section(int firstPosition, UserLevel level) {
+            this.firstPosition = firstPosition;
+            this.level = level;
         }
     }
 }
