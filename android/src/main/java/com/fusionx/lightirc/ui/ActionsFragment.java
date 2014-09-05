@@ -1,24 +1,3 @@
-/*
-    HoloIRC - an IRC client for Android
-
-    Copyright 2013 Lalit Maganti
-
-    This file is part of HoloIRC.
-
-    HoloIRC is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HoloIRC is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
@@ -28,21 +7,23 @@ import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 
+import org.lucasr.twowayview.ItemClickSupport;
+import org.lucasr.twowayview.TwoWayView;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import co.fusionx.relay.base.Conversation;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;
 
-public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ActionsFragment extends Fragment implements ItemClickSupport.OnItemClickListener {
 
     private Conversation mConversation;
 
@@ -57,6 +38,8 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     private ActionsAdapter mAdapter;
 
+    private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -65,9 +48,19 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
     }
 
     @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mAdapter = new ActionsAdapter(getActivity());
+        mSectionedAdapter = new SimpleSectionedRecyclerViewAdapter(getActivity(),
+                R.layout.sliding_menu_header, R.id.sliding_menu_heading_textview, mAdapter);
+        mAdapter.setSectionedAdapter(mSectionedAdapter);
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.default_stickylist_view, container, false);
+        return inflater.inflate(R.layout.user_list_fragment, container, false);
     }
 
     @Override
@@ -76,11 +69,11 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         getBus().registerSticky(mEventHandler);
 
-        mAdapter = new ActionsAdapter(getActivity());
-        final StickyListHeadersListView listView = findById(view, android.R.id.list);
-        listView.setAdapter(mAdapter);
+        final TwoWayView twoWayView = findById(view, android.R.id.list);
+        twoWayView.setAdapter(mSectionedAdapter);
 
-        listView.setOnItemClickListener(this);
+        final ItemClickSupport support = ItemClickSupport.addTo(twoWayView);
+        support.setOnItemClickListener(this);
     }
 
     @Override
@@ -90,10 +83,26 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         getBus().unregister(mEventHandler);
     }
 
+    private void showDCCFragment() {
+        final DCCPendingFragment fragment = new DCCPendingFragment();
+        fragment.show(getFragmentManager(), "dialog");
+    }
+
+    private void showNickDialog() {
+        final NickDialogBuilder nickDialog = new ChannelNickDialogBuilder();
+        nickDialog.show();
+    }
+
+    private void showChannelDialog() {
+        final ChannelDialogBuilder builder = new ChannelDialogBuilder();
+        builder.show();
+    }
+
     @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
+    public void onItemClick(final RecyclerView recyclerView, final View view, final int i,
             final long l) {
-        final String action = mAdapter.getItem(i);
+        final int actual = mSectionedAdapter.sectionedPositionToPosition(i);
+        final String action = mAdapter.getItem(actual);
 
         if (action.equals(getString(R.string.action_join_channel))) {
             showChannelDialog();
@@ -121,21 +130,6 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         }
 
         mCallbacks.closeDrawer();
-    }
-
-    private void showDCCFragment() {
-        final DCCPendingFragment fragment = new DCCPendingFragment();
-        fragment.show(getFragmentManager(), "dialog");
-    }
-
-    private void showNickDialog() {
-        final NickDialogBuilder nickDialog = new ChannelNickDialogBuilder();
-        nickDialog.show();
-    }
-
-    private void showChannelDialog() {
-        final ChannelDialogBuilder builder = new ChannelDialogBuilder();
-        builder.show();
     }
 
     public interface Callbacks {

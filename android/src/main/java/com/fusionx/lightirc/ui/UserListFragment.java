@@ -115,8 +115,6 @@ public class UserListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         mRecyclerView = (RecyclerView) view.findViewById(android.R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         updateAdapter(mChannel);
     }
 
