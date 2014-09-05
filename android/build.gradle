@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'me.tatarka:gradle-retrolambda:2.2.1'
+        classpath 'me.tatarka:gradle-retrolambda:2.2.3'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
         classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.+'
     }

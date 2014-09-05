@@ -27,15 +27,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/relative_layout_text"
-        android:clipToPadding="false"
-        android:divider="@null"
         android:dividerHeight="0dp"
         android:paddingBottom="8dip"
         android:paddingLeft="16dip"
         android:paddingRight="16dip"
-        android:paddingTop="8dip"
-        android:scrollbarStyle="outsideOverlay"
-        android:transcriptMode="normal" />
+        android:paddingTop="8dip" />
 
     <RelativeLayout
         android:id="@+id/relative_layout_text"

@@ -28,14 +28,10 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/fragment_irc_message_box"
         android:clipToPadding="false"
-        android:divider="@null"
-        android:dividerHeight="0dp"
         android:paddingBottom="8dip"
         android:paddingLeft="16dip"
         android:paddingRight="16dip"
-        android:paddingTop="8dip"
-        android:scrollbarStyle="outsideOverlay"
-        android:transcriptMode="normal" />
+        android:paddingTop="8dip" />
 
     <EditText
         android:id="@+id/fragment_irc_message_box"

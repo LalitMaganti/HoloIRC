@@ -77,11 +77,11 @@ public final class ServiceEventInterceptor {
             }
         });
 
-        server.getServerEventBus().register(this, EVENT_PRIORITY);
+        server.getEventBus().register(this, EVENT_PRIORITY);
     }
 
     public void unregister() {
-        mServer.getServerEventBus().unregister(this);
+        mServer.getEventBus().unregister(this);
     }
 
     public MessagePriority getSubMessagePriority(final Conversation title) {

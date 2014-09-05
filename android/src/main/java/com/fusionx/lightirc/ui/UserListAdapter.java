@@ -1,24 +1,3 @@
-/*
-HoloIRC - an IRC client for Android
-
-Copyright 2013 Lalit Maganti
-
-This file is part of HoloIRC.
-
-HoloIRC is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-HoloIRC is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
@@ -26,82 +5,194 @@ import com.fusionx.lightirc.misc.NickCache;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.constants.UserLevel;
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
-public class UserListAdapter extends BaseCollectionAdapter<ChannelUser> implements
-        StickyListHeadersAdapter {
+public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
+
+    private final Context mContext;
 
     private final LayoutInflater mInflater;
 
-    private Channel mChannel;
+    private final Channel mChannel;
 
-    public UserListAdapter(Context context, Set<ChannelUser> objects) {
-        super(context, R.layout.default_listview_textview, objects);
+    private final List<Pair<Nick, UserLevel>> mUsers;
 
+    private final UserListComparator mComparator;
+
+    public UserListAdapter(final Context context, final Channel channel) {
+        mContext = context;
         mInflater = LayoutInflater.from(context);
+
+        mChannel = channel;
+        mUsers = new ArrayList<>();
+
+        mComparator = new UserListComparator();
+        for (final ChannelUser user : channel.getUsers()) {
+            mUsers.add(new Pair<>(user.getNick(), user.getChannelPrivileges(channel)));
+        }
+        Collections.sort(mUsers, mComparator);
+    }
+
+    public Pair<Nick, UserLevel> getItem(final int position) {
+        return mUsers.get(position);
     }
 
     @Override
-    public View getView(final int position, final View convertView, final ViewGroup parent) {
-        TextView view = (TextView) convertView;
-        if (view == null) {
-            view = (TextView) mInflater.inflate(R.layout.default_listview_textview, parent, false);
-            UIUtils.setRobotoLight(getContext(), view);
-        }
-        final ChannelUser user = getItem(position);
-        final UserLevel level = user.getChannelPrivileges(mChannel);
+    public UserViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+        final View view = mInflater.inflate(R.layout.default_listview_textview, parent, false);
+        final UserViewHolder userViewHolder = new UserViewHolder(view);
+        UIUtils.setRobotoLight(mContext, userViewHolder.textView);
+        return userViewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(final UserViewHolder holder, final int position) {
+        final Pair<Nick, UserLevel> user = getItem(position);
+        final UserLevel level = user.second;
         final char prefix = level == null ? '\0' : level.getPrefix();
         final SpannableStringBuilder builder = new SpannableStringBuilder(
-                prefix + user.getNick().getNickAsString());
+                prefix + user.first.getNickAsString());
         final ForegroundColorSpan span = new ForegroundColorSpan(
-                NickCache.getNickCache().get(user.getNick()).getColour());
+                NickCache.getNickCache().get(user.first).getColour());
         builder.setSpan(span, 0, builder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        view.setText(builder);
-        return view;
+        holder.textView.setText(builder);
     }
 
     @Override
-    public View getHeaderView(int i, View convertView, ViewGroup viewGroup) {
-        TextView view = (TextView) convertView;
-        if (convertView == null) {
-            view = (TextView) mInflater.inflate(R.layout.sliding_menu_header, viewGroup, false);
-        }
-
-        final UserLevel levelEnum = getItem(i).getChannelPrivileges(mChannel);
-        view.setText(mChannel.getNumberOfUsersType(levelEnum) + " " + levelEnum.getName());
-        return view;
+    public int getItemCount() {
+        return mUsers.size();
     }
 
-    @Override
-    public long getHeaderId(int position) {
-        final ChannelUser user = getItem(position);
-        return user.getChannelPrivileges(mChannel).getPrefix();
+    public void addUser(final ChannelUser user) {
+        if (user == null) {
+            return;
+        }
+
+        final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(),
+                user.getChannelPrivileges(mChannel));
+        addPair(pair);
     }
 
-    public void setInternalSet(final TreeSet<ChannelUser> set) {
-        synchronized (mLock) {
-            mObjects = set;
+    public void removeUser(final ChannelUser user) {
+        if (user == null) {
+            return;
         }
-        if (mNotifyOnChange) {
-            notifyDataSetChanged();
+
+        final Pair<Nick, UserLevel> pair = new Pair<>(user.getNick(),
+                user.getChannelPrivileges(mChannel));
+        removePair(pair);
+    }
+
+    public void changeNick(final ChannelUser user, final Nick oldNick, final Nick newNick) {
+        if (user == null) {
+            return;
+        }
+
+        final UserLevel level = user.getChannelPrivileges(mChannel);
+
+        final Pair<Nick, UserLevel> oldPair = new Pair<>(oldNick, level);
+        removePair(oldPair);
+
+        final Pair<Nick, UserLevel> newPair = new Pair<>(newNick, level);
+        addPair(newPair);
+    }
+
+    public void changeMode(final ChannelUser user, final UserLevel oldLevel,
+            final UserLevel newLevel) {
+        if (user == null) {
+            return;
+        }
+
+        final Nick nick = user.getNick();
+
+        final Pair<Nick, UserLevel> oldPair = new Pair<>(nick, oldLevel);
+        removePair(oldPair);
+
+        final Pair<Nick, UserLevel> newPair = new Pair<>(nick, newLevel);
+        addPair(newPair);
+    }
+
+    private void addPair(final Pair<Nick, UserLevel> pair) {
+        final int index = Collections.binarySearch(mUsers, pair, mComparator);
+        if (index < 0) {
+            final int actual = ~index;
+            mUsers.add(actual, pair);
+            notifyItemInserted(actual);
+        } else {
+            // TODO - this is invalid
+            Log.e("HoloIRC", "Invalid");
         }
     }
 
-    public void setChannel(final Channel channel) {
-        mChannel = channel;
+    private void removePair(final Pair<Nick, UserLevel> pair) {
+        final int index = Collections.binarySearch(mUsers, pair, mComparator);
+        if (index < 0) {
+            // TODO - this is invalid
+            Log.e("HoloIRC", "Invalid");
+        } else {
+            mUsers.remove(index);
+            notifyItemRemoved(index);
+        }
+    }
+
+    public static class UserViewHolder extends RecyclerView.ViewHolder {
+
+        private final TextView textView;
+
+        public UserViewHolder(final View itemView) {
+            super(itemView);
+
+            textView = (TextView) itemView;
+        }
+    }
+
+    private class UserListComparator implements Comparator<Pair<Nick, UserLevel>> {
+
+        @Override
+        public int compare(final Pair<Nick, UserLevel> lhs, final Pair<Nick, UserLevel> rhs) {
+            final UserLevel firstUserMode = lhs.second;
+            final UserLevel secondUserMode = rhs.second;
+
+            /**
+             * Code for compatibility with objects being removed
+             */
+            if (firstUserMode == null && secondUserMode == null) {
+                return 0;
+            } else if (firstUserMode == null) {
+                return -1;
+            } else if (secondUserMode == null) {
+                return 1;
+            }
+
+            if (firstUserMode.equals(secondUserMode)) {
+                final String firstRemoved = lhs.first.getNickAsString();
+                final String secondRemoved = rhs.first.getNickAsString();
+
+                return firstRemoved.compareToIgnoreCase(secondRemoved);
+            } else if (firstUserMode.ordinal() > secondUserMode.ordinal()) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }
     }
 }

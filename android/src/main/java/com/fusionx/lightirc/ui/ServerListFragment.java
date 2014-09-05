@@ -527,11 +527,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         public void register() {
-            mServer.getServerEventBus().register(this, 50);
+            mServer.getEventBus().register(this, 50);
         }
 
         public void unregister() {
-            mServer.getServerEventBus().unregister(this);
+            mServer.getEventBus().unregister(this);
         }
     }
 

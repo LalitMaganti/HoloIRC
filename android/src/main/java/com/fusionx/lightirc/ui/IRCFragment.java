@@ -84,7 +84,6 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
         mRecyclerView = (RecyclerView) view.findViewById(android.R.id.list);
         mLayoutManager = new LinearLayoutManager(getActivity());
-        mLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         ViewCompat.setOverScrollMode(mRecyclerView, ViewCompat.OVER_SCROLL_NEVER);
 
@@ -102,7 +101,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
         onResetBuffer(() -> {
         });
-        mConversation.getServer().getServerEventBus().register(this);
+        mConversation.getServer().getEventBus().register(this);
     }
 
     @Override
@@ -110,7 +109,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         super.onDestroyView();
 
         getBus().unregister(mEventListener);
-        mConversation.getServer().getServerEventBus().unregister(this);
+        mConversation.getServer().getEventBus().unregister(this);
     }
 
     @Override

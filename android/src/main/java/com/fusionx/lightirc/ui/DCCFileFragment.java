@@ -60,14 +60,14 @@ public class DCCFileFragment extends BaseIRCFragment {
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
 
-        mConversation.getServer().getServerEventBus().register(mEventHandler);
+        mConversation.getServer().getEventBus().register(mEventHandler);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        mConversation.getServer().getServerEventBus().unregister(mEventHandler);
+        mConversation.getServer().getEventBus().unregister(mEventHandler);
     }
 
     @Override
