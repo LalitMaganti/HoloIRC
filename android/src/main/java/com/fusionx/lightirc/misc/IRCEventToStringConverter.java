@@ -383,13 +383,13 @@ public class IRCEventToStringConverter {
             final String response = mContext.getString(R.string.parser_user_kicked_channel);
 
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.channelName,
+                final String formattedResponse = String.format(response, event.channel.getName(),
                         event.kickingNick);
                 return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
                         event.kickingNick);
             } else {
                 final FormattedString[] formattedStrings = {
-                        new FormattedString(event.channelName),
+                        new FormattedString(event.channel.getName()),
                         getFormattedStringForNick(event.kickingNick),
                 };
                 return setupEvent(

@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.ui;
 
+import com.google.common.collect.FluentIterable;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.NickCache;
 import com.fusionx.lightirc.util.UIUtils;
@@ -25,6 +27,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.constants.UserLevel;
+import co.fusionx.relay.function.FluentIterables;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
 
@@ -43,12 +46,13 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
         mInflater = LayoutInflater.from(context);
 
         mChannel = channel;
-        mUsers = new ArrayList<>();
 
         mComparator = new UserListComparator();
-        for (final ChannelUser user : channel.getUsers()) {
-            mUsers.add(new Pair<>(user.getNick(), user.getChannelPrivileges(channel)));
-        }
+        mUsers = new ArrayList<>();
+
+        FluentIterable.from(channel.getUsers())
+                .transform(u -> new Pair<>(u.getNick(), u.getChannelPrivileges(channel)))
+                .copyInto(mUsers);
         Collections.sort(mUsers, mComparator);
     }
 

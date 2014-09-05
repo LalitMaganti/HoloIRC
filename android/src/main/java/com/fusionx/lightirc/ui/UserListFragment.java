@@ -42,6 +42,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
@@ -66,7 +67,7 @@ public class UserListFragment extends Fragment {
             // If it's null then remove the old conversation
             if (conversationChanged.fragmentType != FragmentType.CHANNEL) {
                 if (mChannel != null) {
-                    mChannel.getServer().getServerWideBus().unregister(UserListFragment.this);
+                    mChannel.getBus().unregister(UserListFragment.this);
                 }
                 mChannel = null;
 
@@ -76,11 +77,11 @@ public class UserListFragment extends Fragment {
                 return;
             }
             if (mChannel != null) {
-                mChannel.getServer().getServerWideBus().unregister(UserListFragment.this);
+                mChannel.getBus().unregister(UserListFragment.this);
             }
 
             mChannel = (Channel) conversationChanged.conversation;
-            mChannel.getServer().getServerWideBus().register(UserListFragment.this);
+            mChannel.getBus().register(UserListFragment.this);
 
             updateAdapter(mChannel);
             onUserListChanged();
@@ -137,7 +138,7 @@ public class UserListFragment extends Fragment {
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
         if (mChannel != null) {
-            mChannel.getServer().getServerWideBus().unregister(this);
+            mChannel.getBus().unregister(this);
         }
         // Don't keep a track of this channel - we will deal with this when we return
         mChannel = null;
@@ -155,84 +156,66 @@ public class UserListFragment extends Fragment {
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldJoinEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.addUser(event.user);
-            onUserListChanged();
-        }
+        mAdapter.addUser(event.user);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldKickEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.removeUser(event.user, event.level);
-            onUserListChanged();
-        }
+        mAdapter.removeUser(event.user, event.level);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldLevelChangeEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
-            onUserListChanged();
-        }
+        mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldNickChangeEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.changeNick(event.user, event.oldNick, event.userNick);
-            onUserListChanged();
-        }
+        mAdapter.changeNick(event.user, event.oldNick, event.userNick);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldPartEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.removeUser(event.user, event.level);
-            onUserListChanged();
-        }
+        mAdapter.removeUser(event.user, event.level);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldQuitEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.removeUser(event.user, event.level);
-            onUserListChanged();
-        }
+        mAdapter.removeUser(event.user, event.level);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelNickChangeEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.changeNick(event.relayUser, event.oldNick, event.newNick);
-            onUserListChanged();
-        }
+        mAdapter.changeNick(event.relayUser, event.oldNick, event.newNick);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelUserLevelChangeEvent event) {
-        if (event.channel.equals(mChannel)) {
-            mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
-            onUserListChanged();
-        }
+        mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelNameEvent event) {
-        if (event.channel.equals(mChannel)) {
-            updateAdapter(mChannel);
-            onUserListChanged();
-        }
+        updateAdapter(mChannel);
+        onUserListChanged();
     }
     // End of subscribed events
 
-    boolean isNickOtherUsers(final String nick) {
-        return !mChannel.getServer().getUser().getNick().getNickAsString().equals(nick);
+    boolean isNickOtherUsers(final Nick nick) {
+        return !mChannel.getServer().getUser().getNick().equals(nick);
     }
 
-    private void onPrivateMessageUser(final String nick) {
+    private void onPrivateMessageUser(final Nick nick) {
         if (isNickOtherUsers(nick)) {
-            mChannel.getServer().sendQuery(nick, null);
+            mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
         } else {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());

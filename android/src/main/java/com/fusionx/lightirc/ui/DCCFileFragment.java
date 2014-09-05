@@ -60,14 +60,14 @@ public class DCCFileFragment extends BaseIRCFragment {
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
 
-        mConversation.getServer().getServerWideBus().register(mEventHandler);
+        mConversation.getBus().register(mEventHandler);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        mConversation.getServer().getServerWideBus().unregister(mEventHandler);
+        mConversation.getBus().unregister(mEventHandler);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DCCFileFragment extends BaseIRCFragment {
 
     @Override
     public boolean isValid() {
-        return true;
+        return mConversation.isValid();
     }
 
     public DCCFileConversation getFileConversation() {

@@ -101,7 +101,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
         onResetBuffer(() -> {
         });
-        mConversation.getServer().getServerWideBus().register(this);
+        mConversation.getBus().register(this);
     }
 
     @Override
@@ -109,7 +109,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         super.onDestroyView();
 
         getBus().unregister(mEventListener);
-        mConversation.getServer().getServerWideBus().unregister(this);
+        mConversation.getBus().unregister(this);
     }
 
     @Override
@@ -135,6 +135,11 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         return list;
     }
 
+    @Override
+    public boolean isValid() {
+        return mConversation.isValid();
+    }
+
     // Getters and setters
     public String getTitle() {
         return mTitle;
@@ -145,9 +150,9 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         return new IRCAdapter<>(getActivity(), callback.getEventCache(mConversation), true);
     }
 
+    // Abstract methods
     protected abstract List<? extends T> getAdapterData();
 
-    // Abstract methods
     protected abstract void onSendMessage(final String message);
 
     public interface Callback {

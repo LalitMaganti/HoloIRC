@@ -40,9 +40,6 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final QueryEvent event) {
-        if (!event.user.equals(getQueryUser())) {
-            return;
-        }
         final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
         if (position == mMessageAdapter.getItemCount() - 2) {
@@ -53,11 +50,6 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseUserMessage(getQueryUser(), message);
-    }
-
-    @Override
-    public boolean isValid() {
-        return mConversation != null && mConversation.isValid();
     }
 
     @Override

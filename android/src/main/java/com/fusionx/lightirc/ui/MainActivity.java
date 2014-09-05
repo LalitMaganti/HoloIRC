@@ -255,25 +255,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onPart(final String serverName, final PartEvent event) {
-        if (mConversation == null) {
-            return;
-        }
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName) &&
-                mConversation.getId().equals(event.channelName);
-
-        if (isCurrent) {
+        if (event.channel.equals(mConversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
 
     @Override
     public boolean onKick(final Server server, final KickEvent event) {
-        if (mConversation == null) {
-            return false;
-        }
-        final boolean isCurrent = mConversation.getServer().equals(server)
-                && mConversation.getId().equals(event.channelName);
-
+        final boolean isCurrent = event.channel.equals(mConversation);
         if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
         }
@@ -282,11 +271,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onPrivateMessageClosed(final QueryUser queryUser) {
-        if (mConversation == null) {
-            return;
-        }
-        final boolean isCurrent = mConversation.equals(queryUser);
-        if (isCurrent) {
+        if (queryUser.equals(mConversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }

@@ -50,11 +50,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
-    public boolean isValid() {
-        return mConversation.isValid();
-    }
-
-    @Override
     public FragmentType getType() {
         return FragmentType.SERVER;
     }
@@ -70,7 +65,7 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
-    protected List<ServerEvent> getAdapterData() {
-        return (List<ServerEvent>) mConversation.getServer().getBuffer();
+    protected List<? extends ServerEvent> getAdapterData() {
+        return mConversation.getServer().getBuffer();
     }
 }

@@ -23,14 +23,13 @@ package com.fusionx.lightirc.ui;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
-
-import org.apache.commons.lang3.StringUtils;
 
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
@@ -43,21 +42,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelEvent;
+import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.misc.IRCUserComparator;
 import co.fusionx.relay.parser.user.UserInputParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.Utils;
 
 import static com.fusionx.lightirc.util.UIUtils.findById;
+import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent>
         implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
@@ -115,10 +114,6 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final ChannelEvent event) {
-        if (event.channel == null || !event.channel.getName().equals(mTitle)) {
-            return;
-        }
-
         final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
         if (position == mMessageAdapter.getItemCount() - 2) {
@@ -131,43 +126,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
         super.onViewCreated(view, savedInstanceState);
 
         mAutoButton = findById(view, R.id.auto_complete_button);
-        mAutoButton.setOnClickListener(v -> {
-            if (mIsPopupShown) {
-                mPopupMenu.dismiss();
-            } else {
-                // TODO - this needs to be synchronized properly
-                final Collection<? extends ChannelUser> users = getChannel().getUsers();
-                final List<ChannelUser> sortedList = new ArrayList<>(users.size());
-                final String message = mMessageBox.getText().toString();
-                final String finalWord = Iterables.getLast(IRCUtils.splitRawLine(message, false));
-                FluentIterable.from(users)
-                        .filter(user -> StringUtils.startsWithIgnoreCase(user.getNick()
-                                .getNickAsString(), finalWord))
-                        .copyInto(sortedList);
-
-                if (sortedList.size() == 1) {
-                    changeLastWord(Iterables.getLast(sortedList).getNick().getNickAsString());
-                } else if (sortedList.size() > 1) {
-                    if (mPopupMenu == null) {
-                        mPopupMenu = new PopupMenu(getActivity(), mAutoButton);
-                        mPopupMenu.setOnDismissListener(ChannelFragment.this);
-                        mPopupMenu.setOnMenuItemClickListener(ChannelFragment.this);
-                    }
-                    final Menu innerMenu = mPopupMenu.getMenu();
-                    innerMenu.clear();
-
-                    Collections.sort(sortedList, new IRCUserComparator(getChannel()));
-
-                    final List<String> list = FluentIterable.from(sortedList)
-                            .transform(ChannelUser::getNick).transform(Nick::getNickAsString)
-                            .toList();
-                    for (final String string : list) {
-                        innerMenu.add(string);
-                    }
-                    mPopupMenu.show();
-                }
-            }
-        });
+        mAutoButton.setOnClickListener(new QuickUserMentionListener());
 
         mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
@@ -203,5 +162,43 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
         list.set(list.size() - 1, newWord);
         mMessageBox.setText("");
         mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
+    }
+
+    private class QuickUserMentionListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View v) {
+            if (mIsPopupShown) {
+                mPopupMenu.dismiss();
+                return;
+            }
+
+            // TODO - this needs to be synchronized properly
+            final Collection<? extends ChannelUser> users = getChannel().getUsers();
+            final String message = mMessageBox.getText().toString();
+            final String finalWord = Iterables
+                    .getLast(IRCUtils.splitRawLine(message, false));
+            final ImmutableList<? extends ChannelUser> sortedList = FluentIterable.from(users)
+                    .filter(user -> startsWithIgnoreCase(user.getNick().getNickAsString(),
+                            finalWord))
+                    .toSortedList(new IRCUserComparator(getChannel()));
+
+            if (sortedList.size() == 1) {
+                changeLastWord(Iterables.getLast(sortedList).getNick().getNickAsString());
+            } else if (sortedList.size() > 1) {
+                if (mPopupMenu == null) {
+                    mPopupMenu = new PopupMenu(getActivity(), mAutoButton);
+                    mPopupMenu.setOnDismissListener(ChannelFragment.this);
+                    mPopupMenu.setOnMenuItemClickListener(ChannelFragment.this);
+                }
+                final Menu innerMenu = mPopupMenu.getMenu();
+                innerMenu.clear();
+
+                FluentIterables.forEach(FluentIterable.from(sortedList)
+                        .transform(ChannelUser::getNick)
+                        .transform(Nick::getNickAsString), innerMenu::add);
+                mPopupMenu.show();
+            }
+        }
     }
 }

@@ -448,7 +448,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mServerConversationContainer.removeConversation(event.channelName);
+            mServerConversationContainer.removeConversation(event.channel);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -457,7 +457,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) throws InterruptedException {
-            mServerConversationContainer.removeConversation(event.channelName);
+            mServerConversationContainer.removeConversation(event.channel);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
