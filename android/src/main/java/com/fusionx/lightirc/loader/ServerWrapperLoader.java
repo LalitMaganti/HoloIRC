@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.loader;
 
 import com.fusionx.lightirc.model.ServerConversationContainer;
-import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.service.IRCService;
 
 import android.content.Context;
@@ -16,7 +16,7 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerConversa
 
     private final IRCService mService;
 
-    public ServerWrapperLoader(Context context, final IRCService service) {
+    public ServerWrapperLoader(final Context context, final IRCService service) {
         super(context);
 
         mService = service;
@@ -25,17 +25,14 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerConversa
     @Override
     public ArrayList<ServerConversationContainer> loadInBackground() {
         final ArrayList<ServerConversationContainer> listItems = new ArrayList<>();
-        final BuilderDatabaseSource source = new BuilderDatabaseSource(getContext());
-
-        source.open();
+        final ServerDatabase source = ServerDatabase.getInstance(getContext());
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
             final Server server = mService.getServerIfExists(builder);
             final Collection<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
-            final ServerConversationContainer wrapper = new ServerConversationContainer(builder, ignoreList, server);
+            final ServerConversationContainer wrapper = new ServerConversationContainer(builder,
+                    ignoreList, server);
             listItems.add(wrapper);
         }
-        source.close();
-
         return listItems;
     }
 }

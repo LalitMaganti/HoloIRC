@@ -64,24 +64,16 @@ public class UserListFragment extends Fragment {
     private final Object mEventHandler = new Object() {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
-            // If it's null then remove the old conversation
-            if (conversationChanged.fragmentType != FragmentType.CHANNEL) {
-                if (mChannel != null) {
-                    mChannel.getBus().unregister(UserListFragment.this);
-                }
-                mChannel = null;
-
-                updateAdapter(null);
-                onUserListChanged();
-
-                return;
-            }
             if (mChannel != null) {
                 mChannel.getBus().unregister(UserListFragment.this);
             }
 
-            mChannel = (Channel) conversationChanged.conversation;
-            mChannel.getBus().register(UserListFragment.this);
+            if (conversationChanged.fragmentType == FragmentType.CHANNEL) {
+                mChannel = (Channel) conversationChanged.conversation;
+                mChannel.getBus().register(UserListFragment.this);
+            } else {
+                mChannel = null;
+            }
 
             updateAdapter(mChannel);
             onUserListChanged();

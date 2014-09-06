@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
-import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
@@ -53,11 +53,58 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private PreferenceScreen mScreen;
 
-    private BuilderDatabaseSource mSource;
+    private ServerDatabase mDatabase;
 
     private ContentValues mContentValues;
 
     private boolean mNewServer;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        setTheme(UIUtils.getThemeInt());
+        super.onCreate(savedInstanceState);
+
+        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
+        mCanSaveChanges = !mNewServer;
+
+        mDatabase = ServerDatabase.getInstance(this);
+
+        ServerConfiguration.Builder builder;
+        if (mNewServer) {
+            builder = SharedPreferencesUtils.getDefaultNewServer(this);
+            setResult(RESULT_CANCELED);
+        } else {
+            builder = getIntent().getParcelableExtra(SERVER);
+            setResult(RESULT_OK);
+        }
+        mContentValues = mDatabase.getContentValuesFromBuilder(builder, !mNewServer);
+        // If it's a new server, we can't allow ignore list to be null - just put an empty string
+        // in for now - TODO - fix this
+        if (mNewServer) {
+            mContentValues.put(COLUMN_IGNORE_LIST, "");
+        }
+
+        final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
+        getFragmentManager().beginTransaction().replace(android.R.id.content,
+                fragment).commit();
+    }
+
+    @Override
+    protected boolean isValidFragment(final String fragmentName) {
+        // TODO - this is a hack - fixit
+        return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
+                "tempUselessFile.xml");
+        if (folder.exists()) {
+            folder.delete();
+        }
+    }
 
     @Override
     public void setupPreferences(final PreferenceScreen screen, final Activity activity) {
@@ -76,7 +123,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
             final Intent intent = new Intent(ServerPreferenceActivity.this,
                     ChannelListActivity.class);
             if (mNewServer) {
-                mSource.addServer(mContentValues);
+                mDatabase.addServer(mContentValues);
                 mNewServer = false;
             }
             intent.putExtra("contentValues", mContentValues);
@@ -112,55 +159,6 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
-        super.onCreate(savedInstanceState);
-
-        mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
-        mCanSaveChanges = !mNewServer;
-
-        mSource = new BuilderDatabaseSource(this);
-        mSource.open();
-
-        ServerConfiguration.Builder builder;
-        if (mNewServer) {
-            builder = SharedPreferencesUtils.getDefaultNewServer(this);
-            setResult(RESULT_CANCELED);
-        } else {
-            builder = getIntent().getParcelableExtra(SERVER);
-            setResult(RESULT_OK);
-        }
-        mContentValues = mSource.getContentValuesFromBuilder(builder, !mNewServer);
-        // If it's a new server, we can't allow ignore list to be null - just put an empty string
-        // in for now - TODO - fix this
-        if (mNewServer) {
-            mContentValues.put(COLUMN_IGNORE_LIST, "");
-        }
-
-        final ServerPreferenceFragment fragment = new ServerPreferenceFragment();
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
-                fragment).commit();
-    }
-
-    @Override
-    protected boolean isValidFragment(final String fragmentName) {
-        // TODO - this is a hack - fixit
-        return true;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        final File folder = new File(SharedPreferencesUtils.getSharedPreferencesPath(this) +
-                "tempUselessFile.xml");
-        if (folder.exists()) {
-            folder.delete();
-        }
-        mSource.close();
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -177,10 +175,10 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
         if (mCanSaveChanges) {
             if (mNewServer) {
-                mSource.addServer(mContentValues);
+                mDatabase.addServer(mContentValues);
                 mNewServer = false;
             } else {
-                mSource.updateServer(mContentValues);
+                mDatabase.updateServer(mContentValues);
             }
             mNewServer = false;
         }

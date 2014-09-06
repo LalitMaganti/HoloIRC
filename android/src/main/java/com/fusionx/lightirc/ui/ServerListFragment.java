@@ -9,7 +9,7 @@ import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.ServerConversationContainer;
-import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.EventUtils;
@@ -312,12 +312,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     private void deleteServer(final List<Integer> checkedPositions) {
         final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
 
-            private BuilderDatabaseSource source;
+            private ServerDatabase source;
 
             @Override
             protected void onPreExecute() {
-                source = new BuilderDatabaseSource(getActivity());
-                source.open();
+                source = ServerDatabase.getInstance(getActivity());
             }
 
             @Override
@@ -334,7 +333,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                source.close();
                 refreshServers();
             }
         };

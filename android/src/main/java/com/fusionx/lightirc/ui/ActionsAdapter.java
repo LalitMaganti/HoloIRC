@@ -97,17 +97,15 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
         }
 
         final int serverCount = mActions.size();
-        final String sectionTitle;
+        String sectionTitle = null;
         if (isConnected()) {
-            sectionTitle = null;
-        } else if (mFragmentType == FragmentType.CHANNEL) {
-            sectionTitle = "Channel";
-            mActions.addAll(mChannelActions);
-        } else if (mFragmentType == FragmentType.USER) {
-            sectionTitle = "User";
-            mActions.addAll(mUserActions);
-        } else {
-            sectionTitle = null;
+            if (mFragmentType == FragmentType.CHANNEL) {
+                sectionTitle = "Channel";
+                mActions.addAll(mChannelActions);
+            } else if (mFragmentType == FragmentType.USER) {
+                sectionTitle = "User";
+                mActions.addAll(mUserActions);
+            }
         }
 
         if (sectionTitle != null) {

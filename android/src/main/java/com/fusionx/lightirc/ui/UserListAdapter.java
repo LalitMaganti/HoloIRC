@@ -102,7 +102,9 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
 
     @Override
     public UserViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        final View view = mInflater.inflate(R.layout.default_listview_textview, parent, false);
+        final View view = mInflater.inflate(viewType == 0
+                ? R.layout.sliding_menu_header
+                : R.layout.default_listview_textview, parent, false);
         final UserViewHolder userViewHolder = new UserViewHolder(view);
         UIUtils.setRobotoLight(mContext, userViewHolder.textView);
         return userViewHolder;
@@ -231,6 +233,10 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
         }
     }
 
+    private Section getLastSection() {
+        return mSections.valueAt(mSections.size() - 1);
+    }
+
     public int positionToSectionedPosition(int position) {
         int offset = 0;
         for (int i = 0; i < mSections.size(); i++) {
@@ -259,10 +265,6 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
 
     public boolean isSectionHeaderPosition(int position) {
         return mSections.get(position) != null;
-    }
-
-    public Section getLastSection() {
-        return mSections.valueAt(mSections.size() - 1);
     }
 
     protected static class UserViewHolder extends RecyclerView.ViewHolder {
