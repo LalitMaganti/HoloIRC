@@ -9,7 +9,6 @@ import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,7 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import co.fusionx.relay.base.Channel;
@@ -37,29 +36,13 @@ public class NavigationDrawerFragment extends Fragment implements
         ActionsFragment.Callbacks, UserListFragment.Callback, InviteFragment.Callbacks,
         DCCPendingFragment.Callbacks {
 
+    private final EventHandler mEventHandler = new EventHandler();
+
     private ConnectionStatus mStatus;
 
     private FragmentType mFragmentType;
 
     private Conversation mConversation;
-
-    private final Object mEventHandler = new Object() {
-        @Subscribe
-        public void onEvent(final OnConversationChanged conversationChanged) {
-            mConversation = conversationChanged.conversation;
-            mFragmentType = conversationChanged.fragmentType;
-            if (conversationChanged.conversation != null) {
-                mStatus = conversationChanged.conversation.getServer().getStatus();
-            }
-            updateUserListVisibility();
-        }
-
-        @Subscribe
-        public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
-            mStatus = statusChanged.status;
-            updateUserListVisibility();
-        }
-    };
 
     private TextView mUserListTextView;
 
@@ -67,11 +50,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private Callback mCallback;
 
-    private Fragment mCurrentFragment;
-
-    private ActionsFragment mActionsFragment;
-
-    private InviteFragment mInviteFragment;
+    private ServiceEventInterceptor mEventInterceptor;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -101,8 +80,7 @@ public class NavigationDrawerFragment extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mSlidingUpPanelLayout = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_up_panel);
-
-        mUserListTextView = (TextView) getView().findViewById(R.id.user_text_view);
+        mUserListTextView = (TextView) view.findViewById(R.id.user_text_view);
 
         getBus().registerSticky(mEventHandler);
 
@@ -116,25 +94,13 @@ public class NavigationDrawerFragment extends Fragment implements
         });
 
         if (savedInstanceState == null) {
-            mActionsFragment = new ActionsFragment();
+            final ActionsFragment actionsFragment = new ActionsFragment();
             final UserListFragment userListFragment = new UserListFragment();
 
-            mCurrentFragment = mActionsFragment;
             final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.add(R.id.actions_list_layout, mActionsFragment, "Actions");
+            transaction.add(R.id.actions_list_layout, actionsFragment, "Actions");
             transaction.replace(R.id.user_list_frame_layout, userListFragment);
             transaction.commit();
-        } else {
-            mCurrentFragment = getChildFragmentManager().findFragmentById(R.id.actions_list_layout);
-
-            mActionsFragment = (ActionsFragment) getChildFragmentManager()
-                    .findFragmentByTag("Actions");
-            mInviteFragment = (InviteFragment) getChildFragmentManager()
-                    .findFragmentByTag("Invite");
-        }
-
-        if (mInviteFragment == null) {
-            mInviteFragment = new InviteFragment();
         }
         updateUserListVisibility();
     }
@@ -172,35 +138,6 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void switchToInviteFragment() {
-        mCurrentFragment = mInviteFragment;
-        final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.actions_list_layout, mInviteFragment, "Invite").commit();
-
-        updateActionBarForLists();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    void switchToActionFragment() {
-        mCurrentFragment = mActionsFragment;
-        getChildFragmentManager().popBackStackImmediate();
-
-        revertActionBarToNormal();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    public void onDrawerClosed() {
-        if (isInviteFragmentVisible()) {
-            switchToActionFragment();
-        }
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_navigation_drawer_ab, menu);
     }
@@ -208,11 +145,10 @@ public class NavigationDrawerFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(item.isVisible() && isActionsFragmentVisible());
+        item.setVisible(item.isVisible());
 
         final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
-        users.setVisible(item.isVisible() && mFragmentType == FragmentType.CHANNEL
-                && isActionsFragmentVisible());
+        users.setVisible(item.isVisible() && mFragmentType == FragmentType.CHANNEL);
     }
 
     @Override
@@ -228,19 +164,10 @@ public class NavigationDrawerFragment extends Fragment implements
         return false;
     }
 
-    public boolean onBackPressed() {
-        if (isActionsFragmentVisible()) {
-            return false;
-        }
-        switchToActionFragment();
-        return true;
-    }
-
     @Override
     public void updateUserListVisibility() {
         final boolean visibility = mStatus == ConnectionStatus.CONNECTED
-                && mFragmentType == FragmentType.CHANNEL
-                && isActionsFragmentVisible();
+                && mFragmentType == FragmentType.CHANNEL;
 
         if (visibility) {
             // TODO - change this from casting
@@ -259,18 +186,18 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
-        getEventInterceptor().acceptInviteEvents(inviteEvents);
+    public void acceptInviteEvents(final InviteEvent event) {
+        getEventInterceptor().acceptInviteEvents(Collections.singletonList(event));
     }
 
     @Override
-    public void declineInviteEvents(final Collection<InviteEvent> inviteEvents) {
-        getEventInterceptor().declineInviteEvents(inviteEvents);
+    public void declineInviteEvents(final InviteEvent event) {
+        getEventInterceptor().declineInviteEvents(Collections.singletonList(event));
     }
 
     @Override
     public ServiceEventInterceptor getEventInterceptor() {
-        return mCallback.getService().getEventHelper(mConversation.getServer());
+        return mEventInterceptor;
     }
 
     private void handleUserList() {
@@ -284,41 +211,6 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private void setUserTextViewText(final CharSequence text) {
         mUserListTextView.setText(text);
-    }
-
-    private void updateActionBarForLists() {
-        final LayoutInflater inflater = (LayoutInflater) getActivity().getActionBar()
-                .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        final View customActionBarView = inflater
-                .inflate(R.layout.actionbar_custom_view_done, null);
-        customActionBarView.findViewById(R.id.actionbar_done).setOnClickListener(v -> {
-            switchToActionFragment();
-        });
-        final ActionBar actionBar = getActivity().getActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
-                ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
-                        | ActionBar.DISPLAY_SHOW_TITLE
-        );
-        actionBar.setCustomView(customActionBarView);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-    }
-
-    private void revertActionBarToNormal() {
-        final ActionBar actionBar = getActivity().getActionBar();
-        actionBar.setDisplayOptions(
-                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE,
-                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE |
-                        ActionBar.DISPLAY_SHOW_CUSTOM
-        );
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    private boolean isActionsFragmentVisible() {
-        return mActionsFragment == mCurrentFragment;
-    }
-
-    private boolean isInviteFragmentVisible() {
-        return mInviteFragment == mCurrentFragment;
     }
 
     public interface Callback {
@@ -336,5 +228,29 @@ public class NavigationDrawerFragment extends Fragment implements
         public void onMentionMultipleUsers(List<ChannelUser> users);
 
         public void reconnectToServer();
+    }
+
+    private class EventHandler {
+
+        @Subscribe
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+            mFragmentType = conversationChanged.fragmentType;
+            if (conversationChanged.conversation != null) {
+                mStatus = conversationChanged.conversation.getServer().getStatus();
+
+                mEventInterceptor = mCallback.getService()
+                        .getEventHelper(mConversation.getServer());
+            } else {
+                mEventInterceptor = null;
+            }
+            updateUserListVisibility();
+        }
+
+        @Subscribe
+        public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
+            mStatus = statusChanged.status;
+            updateUserListVisibility();
+        }
     }
 }

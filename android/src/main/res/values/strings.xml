@@ -194,5 +194,6 @@
     <string name="close">Close</string>
     <string name="dcc_pending_title">Pending DCC Connections</string>
     <string name="dcc_progress_complete">%1$d%% complete</string>
+    <string name="invite_headers">Invites</string>
 
 </resources>

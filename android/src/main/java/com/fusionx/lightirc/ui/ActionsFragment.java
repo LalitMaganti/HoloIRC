@@ -7,7 +7,6 @@ import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 
-import org.lucasr.twowayview.ItemClickSupport;
 import org.lucasr.twowayview.TwoWayView;
 
 import android.app.Activity;
@@ -81,11 +80,6 @@ public class ActionsFragment extends Fragment {
         getBus().unregister(mEventHandler);
     }
 
-    private void showDCCFragment() {
-        final DCCPendingFragment fragment = new DCCPendingFragment();
-        fragment.show(getFragmentManager(), "dialog");
-    }
-
     private void showNickDialog() {
         final NickDialogBuilder nickDialog = new ChannelNickDialogBuilder();
         nickDialog.show();
@@ -96,9 +90,19 @@ public class ActionsFragment extends Fragment {
         builder.show();
     }
 
-    private void showIgnoreList() {
+    private void showIgnoreUserFragment() {
         final IgnoredUsersFragment fragment = IgnoredUsersFragment.createInstance();
         fragment.show(getFragmentManager(), "ignoreFragment");
+    }
+
+    private void showInviteFragment() {
+        final InviteFragment fragment = InviteFragment.createInstance();
+        fragment.show(getFragmentManager(), "inviteFragment");
+    }
+
+    private void showPendingDCCFragment() {
+        final DCCPendingFragment fragment = DCCPendingFragment.createInstance();
+        fragment.show(getFragmentManager(), "dialog");
     }
 
     public interface Callbacks {
@@ -110,8 +114,6 @@ public class ActionsFragment extends Fragment {
         public void disconnectFromServer();
 
         public void reconnectToServer();
-
-        public void switchToInviteFragment();
     }
 
     public class ChannelDialogBuilder extends DialogBuilder {
@@ -137,23 +139,18 @@ public class ActionsFragment extends Fragment {
         public void onClick(final View v) {
             final int position = mTwoWayView.getChildPosition(v);
             final int actual = mSectionedAdapter.sectionedPositionToPosition(position);
-            if (actual == RecyclerView.NO_POSITION) {
-                // This is a header so ignore the click
-                return;
-            }
+
             final String action = mAdapter.getItem(actual);
             if (action.equals(getString(R.string.action_join_channel))) {
                 showChannelDialog();
             } else if (action.equals(getString(R.string.action_change_nick))) {
                 showNickDialog();
             } else if (action.equals(getString(R.string.action_ignore_list))) {
-                showIgnoreList();
+                showIgnoreUserFragment();
             } else if (action.equals(getString(R.string.action_pending_dcc))) {
-                showDCCFragment();
-                return;
+                showPendingDCCFragment();
             } else if (action.equals(getString(R.string.action_pending_invites))) {
-                mCallbacks.switchToInviteFragment();
-                return;
+                showInviteFragment();
             } else if (action.equals(getString(R.string.action_disconnect))) {
                 mCallbacks.disconnectFromServer();
             } else if (action.equals(getString(R.string.action_close_server))) {
@@ -165,7 +162,6 @@ public class ActionsFragment extends Fragment {
             } else if (action.equals(getString(R.string.action_close_pm))) {
                 mCallbacks.removeCurrentFragment();
             }
-
             mCallbacks.closeDrawer();
         }
     }

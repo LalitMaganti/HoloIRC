@@ -29,34 +29,19 @@
         android:src="@drawable/ic_check" />
 
     <TextView
-        android:id="@+id/dcc_pending_list_item_title"
+        android:id="@+id/invite_list_item_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_toLeftOf="@id/accept_list_item"
         android:layout_toStartOf="@id/accept_list_item"
         android:gravity="center_vertical"
-        android:padding="4dp"
+        android:padding="8dp"
         android:text="@android:string/ok"
-        android:textAppearance="?android:attr/textAppearance" />
-
-    <TextView
-        android:id="@+id/dcc_pending_list_item_content"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/dcc_pending_list_item_title"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_toLeftOf="@id/accept_list_item"
-        android:layout_toStartOf="@id/accept_list_item"
-        android:gravity="center_vertical"
-        android:padding="4dp"
-        android:text="@android:string/ok"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 </RelativeLayout>

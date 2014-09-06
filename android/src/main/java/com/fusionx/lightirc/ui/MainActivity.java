@@ -308,9 +308,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onBackPressed() {
-        if (mNavigationDrawerFragment.onBackPressed()) {
-            return;
-        } else if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+        if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
             mDrawerLayout.closeDrawer(mNavigationDrawerView);
             return;
         } else if (!mSlidingPane.isOpen()) {
@@ -666,7 +664,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         @Override
         public void onDrawerClosed(final View drawerView) {
-            mNavigationDrawerFragment.onDrawerClosed();
             mSlidingPane.setSlideable(true);
         }
 

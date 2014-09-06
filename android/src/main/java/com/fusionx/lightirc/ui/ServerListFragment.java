@@ -106,7 +106,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         mListView = (ExpandableListView) view.findViewById(R.id.server_list);
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        mListView.setEmptyView((View) view.findViewById(android.R.id.empty));
+        mListView.setEmptyView(view.findViewById(android.R.id.empty));
 
         mListView.setMultiChoiceModeListener(this);
 
