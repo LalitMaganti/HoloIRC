@@ -44,7 +44,7 @@ public class IgnoredUsersFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         mDatabaseSource = ServerDatabase.getInstance(getActivity());
-        mAdapter = new IgnoredUsersAdapter(getActivity());
+        mAdapter = new IgnoredUsersAdapter(getActivity(), new DeclineListener());
 
         setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_DeviceDefault_Dialog);
     }
@@ -118,6 +118,15 @@ public class IgnoredUsersFragment extends DialogFragment {
         public void onClick(final View v) {
             final IgnoreListDialogBuilder builder = new IgnoreListDialogBuilder();
             builder.show();
+        }
+    }
+
+    private class DeclineListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View v) {
+            final String string = (String) v.getTag();
+            mAdapter.remove(string);
         }
     }
 }
