@@ -53,6 +53,7 @@ import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.misc.IRCUserComparator;
 import co.fusionx.relay.parser.user.UserInputParser;
 import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.util.ParseUtils;
 import co.fusionx.relay.util.Utils;
 
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
@@ -157,7 +158,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
 
     private void changeLastWord(final String newWord) {
         final String message = mMessageBox.getText().toString();
-        final List<String> list = IRCUtils.splitRawLine(message, false);
+        final List<String> list = ParseUtils.splitRawLine(message, false);
         list.set(list.size() - 1, newWord);
         mMessageBox.setText("");
         mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
@@ -176,7 +177,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
             final Collection<? extends ChannelUser> users = getChannel().getUsers();
             final String message = mMessageBox.getText().toString();
             final String finalWord = Iterables
-                    .getLast(IRCUtils.splitRawLine(message, false));
+                    .getLast(ParseUtils.splitRawLine(message, false));
             final ImmutableList<? extends ChannelUser> sortedList = FluentIterable.from(users)
                     .filter(user -> startsWithIgnoreCase(user.getNick().getNickAsString(),
                             finalWord))
