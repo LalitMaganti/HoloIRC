@@ -10,9 +10,4 @@
         android:id="@+id/activity_main_ab_actions"
         android:title="@string/actions"
         holoirc:showAsAction="always|withText" />
-    <item
-        android:id="@+id/ignore_list_cab_add"
-        android:icon="@drawable/ic_add_light"
-        android:title="@string/add"
-        holoirc:showAsAction="withText|ifRoom" />
 </menu>

@@ -21,9 +21,8 @@ import android.view.ViewGroup;
 import co.fusionx.relay.base.Conversation;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.UIUtils.findById;
 
-public class ActionsFragment extends Fragment implements ItemClickSupport.OnItemClickListener {
+public class ActionsFragment extends Fragment {
 
     private Conversation mConversation;
 
@@ -40,6 +39,8 @@ public class ActionsFragment extends Fragment implements ItemClickSupport.OnItem
 
     private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
 
+    private TwoWayView mTwoWayView;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -51,7 +52,7 @@ public class ActionsFragment extends Fragment implements ItemClickSupport.OnItem
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAdapter = new ActionsAdapter(getActivity());
+        mAdapter = new ActionsAdapter(getActivity(), new ActionClickListner());
         mSectionedAdapter = new SimpleSectionedRecyclerViewAdapter(getActivity(),
                 R.layout.sliding_menu_header, R.id.sliding_menu_heading_textview, mAdapter);
         mAdapter.setSectionedAdapter(mSectionedAdapter);
@@ -69,11 +70,8 @@ public class ActionsFragment extends Fragment implements ItemClickSupport.OnItem
 
         getBus().registerSticky(mEventHandler);
 
-        final TwoWayView twoWayView = findById(view, android.R.id.list);
-        twoWayView.setAdapter(mSectionedAdapter);
-
-        final ItemClickSupport support = ItemClickSupport.addTo(twoWayView);
-        support.setOnItemClickListener(this);
+        mTwoWayView = (TwoWayView) view.findViewById(android.R.id.list);
+        mTwoWayView.setAdapter(mSectionedAdapter);
     }
 
     @Override
@@ -98,38 +96,9 @@ public class ActionsFragment extends Fragment implements ItemClickSupport.OnItem
         builder.show();
     }
 
-    @Override
-    public void onItemClick(final RecyclerView recyclerView, final View view, final int i,
-            final long l) {
-        final int actual = mSectionedAdapter.sectionedPositionToPosition(i);
-        final String action = mAdapter.getItem(actual);
-
-        if (action.equals(getString(R.string.action_join_channel))) {
-            showChannelDialog();
-        } else if (action.equals(getString(R.string.action_change_nick))) {
-            showNickDialog();
-        } else if (action.equals(getString(R.string.action_ignore_list))) {
-            mCallbacks.switchToIgnoreFragment();
-            return;
-        } else if (action.equals(getString(R.string.action_pending_dcc))) {
-            showDCCFragment();
-            return;
-        } else if (action.equals(getString(R.string.action_pending_invites))) {
-            mCallbacks.switchToInviteFragment();
-            return;
-        } else if (action.equals(getString(R.string.action_disconnect))) {
-            mCallbacks.disconnectFromServer();
-        } else if (action.equals(getString(R.string.action_close_server))) {
-            mCallbacks.disconnectFromServer();
-        } else if (action.equals(getString(R.string.action_reconnect))) {
-            mCallbacks.reconnectToServer();
-        } else if (action.equals(getString(R.string.action_part_channel))) {
-            mCallbacks.removeCurrentFragment();
-        } else if (action.equals(getString(R.string.action_close_pm))) {
-            mCallbacks.removeCurrentFragment();
-        }
-
-        mCallbacks.closeDrawer();
+    private void showIgnoreList() {
+        final IgnoredUsersFragment fragment = IgnoredUsersFragment.createInstance();
+        fragment.show(getFragmentManager(), "ignoreFragment");
     }
 
     public interface Callbacks {
@@ -141,8 +110,6 @@ public class ActionsFragment extends Fragment implements ItemClickSupport.OnItem
         public void disconnectFromServer();
 
         public void reconnectToServer();
-
-        public void switchToIgnoreFragment();
 
         public void switchToInviteFragment();
     }
@@ -161,6 +128,45 @@ public class ActionsFragment extends Fragment implements ItemClickSupport.OnItem
                 return;
             }
             mConversation.getServer().sendJoin(channelName);
+        }
+    }
+
+    private class ActionClickListner implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View v) {
+            final int position = mTwoWayView.getChildPosition(v);
+            final int actual = mSectionedAdapter.sectionedPositionToPosition(position);
+            if (actual == RecyclerView.NO_POSITION) {
+                // This is a header so ignore the click
+                return;
+            }
+            final String action = mAdapter.getItem(actual);
+            if (action.equals(getString(R.string.action_join_channel))) {
+                showChannelDialog();
+            } else if (action.equals(getString(R.string.action_change_nick))) {
+                showNickDialog();
+            } else if (action.equals(getString(R.string.action_ignore_list))) {
+                showIgnoreList();
+            } else if (action.equals(getString(R.string.action_pending_dcc))) {
+                showDCCFragment();
+                return;
+            } else if (action.equals(getString(R.string.action_pending_invites))) {
+                mCallbacks.switchToInviteFragment();
+                return;
+            } else if (action.equals(getString(R.string.action_disconnect))) {
+                mCallbacks.disconnectFromServer();
+            } else if (action.equals(getString(R.string.action_close_server))) {
+                mCallbacks.disconnectFromServer();
+            } else if (action.equals(getString(R.string.action_reconnect))) {
+                mCallbacks.reconnectToServer();
+            } else if (action.equals(getString(R.string.action_part_channel))) {
+                mCallbacks.removeCurrentFragment();
+            } else if (action.equals(getString(R.string.action_close_pm))) {
+                mCallbacks.removeCurrentFragment();
+            }
+
+            mCallbacks.closeDrawer();
         }
     }
 

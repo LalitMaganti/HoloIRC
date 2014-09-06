@@ -41,6 +41,8 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
 
     private final Context mContext;
 
+    private final View.OnClickListener mClickListener;
+
     private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
 
     private FragmentType mFragmentType = FragmentType.SERVER;
@@ -49,9 +51,11 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
 
     private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
 
-    public ActionsAdapter(final Context context) {
+    public ActionsAdapter(final Context context, final View.OnClickListener clickListener) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
+
+        mClickListener = clickListener;
 
         mActions = new ArrayList<>();
 
@@ -106,6 +110,8 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
                 sectionTitle = "User";
                 mActions.addAll(mUserActions);
             }
+        } else {
+            sectionTitle = null;
         }
 
         if (sectionTitle != null) {
@@ -132,7 +138,7 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
 
     @Override
     public ActionViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        final View view = mInflater.inflate(R.layout.default_listview_textview, parent, false);
+        final View view = mInflater.inflate(R.layout.action_recycler_item, parent, false);
         final ActionViewHolder holder = new ActionViewHolder(view);
         UIUtils.setRobotoLight(mContext, holder.textView);
         return holder;
@@ -140,6 +146,8 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
 
     @Override
     public void onBindViewHolder(final ActionViewHolder holder, final int position) {
+        holder.itemView.setOnClickListener(mClickListener);
+
         holder.textView.setText(getItem(position));
     }
 

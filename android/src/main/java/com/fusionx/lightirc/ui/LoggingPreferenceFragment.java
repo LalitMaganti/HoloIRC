@@ -16,8 +16,6 @@ import android.widget.Switch;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.fusionx.lightirc.util.UIUtils.findById;
-
 public class LoggingPreferenceFragment extends PreferenceFragment {
 
     private List<Preference> mPreferenceList;
@@ -50,7 +48,7 @@ public class LoggingPreferenceFragment extends PreferenceFragment {
         final boolean logging = preferences.getBoolean(PreferenceConstants.PREF_LOGGING, false);
 
         final View actionView = menu.findItem(R.id.logging_switch).getActionView();
-        final Switch logSwitch = findById(actionView, R.id.logging_switch_view);
+        final Switch logSwitch = (Switch) actionView.findViewById(R.id.logging_switch_view);
 
         logSwitch.setChecked(logging);
         logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {

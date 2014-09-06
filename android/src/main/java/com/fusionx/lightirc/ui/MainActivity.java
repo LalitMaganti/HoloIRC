@@ -53,7 +53,6 @@ import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.MiscUtils.getStatusString;
-import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
 /**
@@ -172,16 +171,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSnackbar = (Snackbar) findViewById(R.id.snackbar);
         mSnackbar.post(mSnackbar::hide);
 
-        mDrawerLayout = findById(this, R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerListener(new DrawerListener());
         mDrawerLayout.setFocusableInTouchMode(false);
 
-        mSlidingPane = findById(this, R.id.sliding_pane_layout);
+        mSlidingPane = (ProgrammableSlidingPaneLayout) findViewById(R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
         mSlidingPane.setPanelSlideListener(mPanelSlideListener);
         mSlidingPane.setSliderFadeColor(0);
 
-        mNavigationDrawerView = findById(this, R.id.right_drawer);
+        mNavigationDrawerView = findViewById(R.id.right_drawer);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -210,8 +209,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
             if (mCurrentFragment == null) {
-                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
-                        (View.VISIBLE);
+                findViewById(R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
             } else if (event != null) {
                 mConversation = event.conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss

@@ -31,8 +31,6 @@ import java.util.Set;
 
 import co.fusionx.relay.event.server.InviteEvent;
 
-import static com.fusionx.lightirc.util.UIUtils.findById;
-
 public class InviteFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
         AdapterView.OnItemClickListener {
 
@@ -52,7 +50,7 @@ public class InviteFragment extends ListFragment implements AbsListView.MultiCho
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.default_list_view, container, false);
-        final ListView listView = findById(view, android.R.id.list);
+        final ListView listView = (ListView) view.findViewById(android.R.id.list);
 
         final TextView otherHeader = (TextView) inflater.inflate(R.layout.sliding_menu_header,
                 null, false);

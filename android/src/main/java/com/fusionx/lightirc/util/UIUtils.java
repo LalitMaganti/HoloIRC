@@ -107,10 +107,6 @@ public class UIUtils {
         return new ForegroundColorSpan(color);
     }
 
-    public static <T extends View> T findById(final View view, final int id) {
-        return (T) view.findViewById(id);
-    }
-
     public static <T extends View> T findById(final Activity activity, final int id) {
         return (T) activity.findViewById(id);
     }

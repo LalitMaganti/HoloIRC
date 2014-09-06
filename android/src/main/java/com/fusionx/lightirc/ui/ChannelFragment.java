@@ -55,7 +55,6 @@ import co.fusionx.relay.parser.user.UserInputParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.Utils;
 
-import static com.fusionx.lightirc.util.UIUtils.findById;
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
 public final class ChannelFragment extends IRCFragment<ChannelEvent>
@@ -125,7 +124,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mAutoButton = findById(view, R.id.auto_complete_button);
+        mAutoButton = (ImageButton) view.findViewById(R.id.auto_complete_button);
         mAutoButton.setOnClickListener(new QuickUserMentionListener());
 
         mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));

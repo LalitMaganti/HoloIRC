@@ -27,7 +27,6 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,7 +89,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
         mConversation = event.conversation;
 
-        mMessageBox = UIUtils.findById(view, R.id.fragment_irc_message_box);
+        mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
         mMessageBox.setOnEditorActionListener(this);
 
         mTitle = getArguments().getString("title");

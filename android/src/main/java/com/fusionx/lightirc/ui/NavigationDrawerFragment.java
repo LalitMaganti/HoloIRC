@@ -32,7 +32,6 @@ import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class NavigationDrawerFragment extends Fragment implements
         ActionsFragment.Callbacks, UserListFragment.Callback, InviteFragment.Callbacks,
@@ -72,8 +71,6 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private ActionsFragment mActionsFragment;
 
-    private IgnoreListFragment mIgnoreListFragment;
-
     private InviteFragment mInviteFragment;
 
     @Override
@@ -103,9 +100,9 @@ public class NavigationDrawerFragment extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
+        mSlidingUpPanelLayout = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_up_panel);
 
-        mUserListTextView = findById(getView(), R.id.user_text_view);
+        mUserListTextView = (TextView) getView().findViewById(R.id.user_text_view);
 
         getBus().registerSticky(mEventHandler);
 
@@ -132,15 +129,10 @@ public class NavigationDrawerFragment extends Fragment implements
 
             mActionsFragment = (ActionsFragment) getChildFragmentManager()
                     .findFragmentByTag("Actions");
-            mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager()
-                    .findFragmentByTag("Ignore");
             mInviteFragment = (InviteFragment) getChildFragmentManager()
                     .findFragmentByTag("Invite");
         }
 
-        if (mIgnoreListFragment == null) {
-            mIgnoreListFragment = new IgnoreListFragment();
-        }
         if (mInviteFragment == null) {
             mInviteFragment = new InviteFragment();
         }
@@ -180,20 +172,6 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void switchToIgnoreFragment() {
-        mCurrentFragment = mIgnoreListFragment;
-        final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.actions_list_layout, mIgnoreListFragment, "Ignore").commit();
-
-        updateActionBarForLists();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    @Override
     public void switchToInviteFragment() {
         mCurrentFragment = mInviteFragment;
         final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
@@ -217,10 +195,7 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     public void onDrawerClosed() {
-        if (isIgnoreFragmentVisible()) {
-            mIgnoreListFragment.saveIgnoreList();
-            switchToActionFragment();
-        } else if (isInviteFragmentVisible()) {
+        if (isInviteFragmentVisible()) {
             switchToActionFragment();
         }
     }
@@ -238,9 +213,6 @@ public class NavigationDrawerFragment extends Fragment implements
         final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
         users.setVisible(item.isVisible() && mFragmentType == FragmentType.CHANNEL
                 && isActionsFragmentVisible());
-
-        final MenuItem add = menu.findItem(R.id.ignore_list_cab_add);
-        add.setVisible(isIgnoreFragmentVisible());
     }
 
     @Override
@@ -252,9 +224,6 @@ public class NavigationDrawerFragment extends Fragment implements
             case R.id.activity_main_ab_users:
                 handleUserList();
                 return true;
-            case R.id.ignore_list_cab_add:
-                mIgnoreListFragment.addIgnoredUser();
-                return true;
         }
         return false;
     }
@@ -262,9 +231,6 @@ public class NavigationDrawerFragment extends Fragment implements
     public boolean onBackPressed() {
         if (isActionsFragmentVisible()) {
             return false;
-        }
-        if (isIgnoreFragmentVisible()) {
-            mIgnoreListFragment.saveIgnoreList();
         }
         switchToActionFragment();
         return true;
@@ -325,10 +291,7 @@ public class NavigationDrawerFragment extends Fragment implements
                 .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         final View customActionBarView = inflater
                 .inflate(R.layout.actionbar_custom_view_done, null);
-        findById(customActionBarView, R.id.actionbar_done).setOnClickListener(v -> {
-            if (isIgnoreFragmentVisible()) {
-                mIgnoreListFragment.saveIgnoreList();
-            }
+        customActionBarView.findViewById(R.id.actionbar_done).setOnClickListener(v -> {
             switchToActionFragment();
         });
         final ActionBar actionBar = getActivity().getActionBar();
@@ -352,10 +315,6 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private boolean isActionsFragmentVisible() {
         return mActionsFragment == mCurrentFragment;
-    }
-
-    private boolean isIgnoreFragmentVisible() {
-        return mIgnoreListFragment == mCurrentFragment;
     }
 
     private boolean isInviteFragmentVisible() {

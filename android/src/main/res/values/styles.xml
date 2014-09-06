@@ -8,7 +8,7 @@
         <item name="default_text_colour">@android:color/black</item>
         <item name="default_inverted_text_colour">@android:color/white</item>
         <item name="overflow_menu_drawable">@drawable/ic_action_overflow_dark</item>
-        <item name="activatableItemBackground">@drawable/activatable_item_background</item>
+        <item name="activatableItemBackground">@drawable/activatable_selector_light</item>
         <item name="expand_close_menu_drawable">@drawable/ic_expand_less</item>
         <item name="expand_open_menu_drawable">@drawable/ic_expand_more</item>
         <item name="action_divider_colour">@color/off_white</item>
