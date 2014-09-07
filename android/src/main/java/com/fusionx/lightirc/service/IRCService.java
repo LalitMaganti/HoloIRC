@@ -23,11 +23,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Pair;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +33,7 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionManager;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.base.relay.RelayConnectionManager;
+import co.fusionx.relay.internal.base.RelayConnectionManager;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
