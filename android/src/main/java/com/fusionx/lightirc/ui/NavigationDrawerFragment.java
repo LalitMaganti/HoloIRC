@@ -28,6 +28,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -50,7 +51,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private Callback mCallback;
 
-    private ServiceEventInterceptor mEventInterceptor;
+    private ServiceEventInterceptor mEventHelper;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -187,17 +188,17 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void acceptInviteEvents(final InviteEvent event) {
-        getEventInterceptor().acceptInviteEvents(Collections.singletonList(event));
+        getEventHelper().acceptInviteEvents(Collections.singletonList(event));
     }
 
     @Override
     public void declineInviteEvents(final InviteEvent event) {
-        getEventInterceptor().declineInviteEvents(Collections.singletonList(event));
+        getEventHelper().declineInviteEvents(Collections.singletonList(event));
     }
 
     @Override
-    public ServiceEventInterceptor getEventInterceptor() {
-        return mEventInterceptor;
+    public ServiceEventInterceptor getEventHelper() {
+        return mEventHelper;
     }
 
     private void handleUserList() {
@@ -236,13 +237,12 @@ public class NavigationDrawerFragment extends Fragment implements
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
             mFragmentType = conversationChanged.fragmentType;
-            if (conversationChanged.conversation != null) {
-                mStatus = conversationChanged.conversation.getServer().getStatus();
-
-                mEventInterceptor = mCallback.getService()
-                        .getEventHelper(mConversation.getServer());
+            if (conversationChanged.conversation == null) {
+                mEventHelper = null;
             } else {
-                mEventInterceptor = null;
+                final Server server = conversationChanged.conversation.getServer();
+                mStatus = server.getStatus();
+                mEventHelper = mCallback.getService().getEventHelper(server);
             }
             updateUserListVisibility();
         }
