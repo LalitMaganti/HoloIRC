@@ -88,7 +88,7 @@ public class DCCPendingFragment extends DialogFragment {
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
 
-        mInterceptor.getServer().getServerWideBus().register(this);
+        mInterceptor.getIRCConnection().getSuperBus().register(this);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class DCCPendingFragment extends DialogFragment {
         super.onDestroyView();
 
         final ServiceEventInterceptor interceptor = mCallbacks.getEventHelper();
-        interceptor.getServer().getServerWideBus().unregister(this);
+        interceptor.getIRCConnection().getSuperBus().unregister(this);
     }
 
     @Subscribe(threadType = ThreadType.MAIN)

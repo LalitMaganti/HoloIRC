@@ -45,12 +45,15 @@ import android.widget.TextView;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         implements TextView.OnEditorActionListener {
+
+    IRCConnection mConnection;
 
     Conversation mConversation;
 
@@ -87,6 +90,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         ViewCompat.setOverScrollMode(mRecyclerView, ViewCompat.OVER_SCROLL_NEVER);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
+        mConnection = event.connection;
         mConversation = event.conversation;
 
         mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
@@ -146,7 +150,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
     protected IRCAdapter<T> getNewAdapter() {
         final Callback callback = FragmentUtils.getParent(this, Callback.class);
-        return new IRCAdapter<>(getActivity(), callback.getEventCache(mConversation), true);
+        return new IRCAdapter<>(getActivity(), callback.getEventCache(mConnection), true);
     }
 
     // Abstract methods
@@ -156,6 +160,6 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
     public interface Callback {
 
-        public EventCache getEventCache(final Conversation conversation);
+        public EventCache getEventCache(final IRCConnection connection);
     }
 }

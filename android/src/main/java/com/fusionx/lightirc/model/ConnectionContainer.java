@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.model;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
 import java.util.Collection;
@@ -9,11 +10,11 @@ import java.util.Set;
 
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.IRCConnection;
 
 import static co.fusionx.relay.base.ServerConfiguration.Builder;
 
-public class ServerConversationContainer {
+public class ConnectionContainer {
 
     private final Builder mBuilder;
 
@@ -21,42 +22,43 @@ public class ServerConversationContainer {
 
     private final Collection<String> mIgnoreList;
 
-    private Server mServer;
+    private IRCConnection mConnection;
 
-    public ServerConversationContainer(final Builder builder, final Collection<String> ignoreList,
-            final Server server) {
+    public ConnectionContainer(final Builder builder, final Collection<String> ignoreList,
+            final Optional<IRCConnection> connection) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
         mConversations = new LinkedHashSet<>();
 
-        setServer(server);
+        setConnection(connection.orNull());
     }
 
     public boolean isServerAvailable() {
-        return mServer != null && (mServer.getStatus() == ConnectionStatus.CONNECTED
-                || mServer.getStatus() == ConnectionStatus.RECONNECTING);
+        return mConnection != null && (mConnection.getStatus() == ConnectionStatus.CONNECTED
+                || mConnection.getStatus() == ConnectionStatus.RECONNECTING);
     }
 
     public String getTitle() {
         return mBuilder.getTitle();
     }
 
-    public Server getServer() {
-        return mServer;
+    public IRCConnection getConnection() {
+        return mConnection;
     }
 
-    public void setServer(final Server server) {
-        mServer = server;
+    public void setConnection(final IRCConnection connection) {
+        mConnection = connection;
 
-        if (server == null) {
+        if (connection == null) {
             return;
         }
-        FluentIterable.from(server.getUser().getChannels()).copyInto(mConversations);
-        FluentIterable.from(server.getUserChannelInterface().getQueryUsers())
+        FluentIterable.from(connection.getUserChannelDao().getUser().getChannels())
                 .copyInto(mConversations);
-        FluentIterable.from(server.getDCCManager().getChatConversations())
+        FluentIterable.from(connection.getUserChannelDao().getUser().getQueryUsers())
                 .copyInto(mConversations);
-        FluentIterable.from(server.getDCCManager().getFileConversations())
+        FluentIterable.from(connection.getServer().getDCCManager().getChatConversations())
+                .copyInto(mConversations);
+        FluentIterable.from(connection.getServer().getDCCManager().getFileConversations())
                 .copyInto(mConversations);
     }
 
@@ -90,7 +92,7 @@ public class ServerConversationContainer {
 
     public void refreshConversations() {
         removeAll();
-        setServer(mServer);
+        setConnection(mConnection);
     }
 
     public void removeAll() {

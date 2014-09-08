@@ -2,9 +2,9 @@ package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.model.ConnectionContainer;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.MessagePriority;
-import com.fusionx.lightirc.model.ServerConversationContainer;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.MiscUtils;
@@ -27,6 +27,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 
@@ -38,39 +39,39 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
 
     private final Context mContext;
 
-    private final List<ServerConversationContainer> mServerListItems;
+    private final List<ConnectionContainer> mConnectionContainers;
 
     private final IRCService mIRCService;
 
     private ExpandableListView mListView;
 
-    public ExpandableServerListAdapter(final Context context, final ArrayList<ServerConversationContainer>
-            builders, final ExpandableListView listView, final IRCService service) {
+    public ExpandableServerListAdapter(final Context context, final ArrayList<ConnectionContainer>
+            connectionContainers, final ExpandableListView listView, final IRCService service) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
-        mServerListItems = builders;
+        mConnectionContainers = connectionContainers;
         mListView = listView;
         mIRCService = service;
     }
 
     @Override
     public int getGroupCount() {
-        return mServerListItems.size();
+        return mConnectionContainers.size();
     }
 
     @Override
     public int getChildrenCount(final int groupPos) {
-        return mServerListItems.get(groupPos).getConversationCount();
+        return mConnectionContainers.get(groupPos).getConversationCount();
     }
 
     @Override
-    public ServerConversationContainer getGroup(final int groupPos) {
-        return mServerListItems.get(groupPos);
+    public ConnectionContainer getGroup(final int groupPos) {
+        return mConnectionContainers.get(groupPos);
     }
 
     @Override
     public Conversation getChild(final int groupPos, final int childPos) {
-        return mServerListItems.get(groupPos).getConversation(childPos);
+        return mConnectionContainers.get(groupPos).getConversation(childPos);
     }
 
     @Override
@@ -96,8 +97,8 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_group, parent, false);
         }
 
-        final ServerConversationContainer listItem = getGroup(groupPos);
-        final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
+        final ConnectionContainer listItem = getGroup(groupPos);
+        final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getConnection());
 
         final TextView title = (TextView) convertView.findViewById(R.id.server_title);
         final SpannableStringBuilder builder = new SpannableStringBuilder(listItem.getTitle());
@@ -111,8 +112,8 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         title.setText(builder);
 
         final TextView status = ((TextView) convertView.findViewById(R.id.server_status));
-        status.setText(MiscUtils.getStatusString(mContext, listItem.getServer() != null
-                ? listItem.getServer().getStatus()
+        status.setText(MiscUtils.getStatusString(mContext, listItem.getConnection() != null
+                ? listItem.getConnection().getStatus()
                 : ConnectionStatus.DISCONNECTED));
 
         final View divider = convertView.findViewById(R.id.divider);
@@ -141,11 +142,11 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
             convertView = mInflater.inflate(R.layout.main_list_child, parent, false);
         }
 
-        final ServerConversationContainer listItem = getGroup(groupPos);
+        final ConnectionContainer listItem = getGroup(groupPos);
         final Conversation conversation = getChild(groupPos, childPos);
 
-        final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
-        final EventCache cache = IRCService.getEventCache(listItem.getServer());
+        final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getConnection());
+        final EventCache cache = IRCService.getEventCache(listItem.getConnection());
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
 
@@ -182,18 +183,18 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
     }
 
     public void refreshConversations() {
-        for (final ServerConversationContainer serverConversationContainer : mServerListItems) {
-            serverConversationContainer.refreshConversations();
+        for (final ConnectionContainer connectionContainer : mConnectionContainers) {
+            connectionContainer.refreshConversations();
         }
     }
 
-    public void removeServer(final Server server) {
-        for (final ServerConversationContainer serverConversationContainer : mServerListItems) {
-            if (!server.equals(serverConversationContainer.getServer())) {
+    public void removeServer(final IRCConnection server) {
+        for (final ConnectionContainer connectionContainer : mConnectionContainers) {
+            if (!server.equals(connectionContainer.getConnection())) {
                 continue;
             }
-            serverConversationContainer.setServer(null);
-            serverConversationContainer.removeAll();
+            connectionContainer.setConnection(null);
+            connectionContainer.removeAll();
         }
         notifyDataSetChanged();
     }

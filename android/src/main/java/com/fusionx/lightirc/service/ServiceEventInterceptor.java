@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
@@ -49,7 +50,7 @@ public final class ServiceEventInterceptor {
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private final Server mServer;
+    private final IRCConnection mIRCConnection;
 
     private final Map<Conversation, MessagePriority> mMessagePriorityMap;
 
@@ -63,8 +64,8 @@ public final class ServiceEventInterceptor {
 
     private MessagePriority mMessagePriority;
 
-    public ServiceEventInterceptor(final Server server) {
-        mServer = server;
+    public ServiceEventInterceptor(final IRCConnection connection) {
+        mIRCConnection = connection;
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
         mInviteEvents = new HashSet<>();
@@ -77,11 +78,11 @@ public final class ServiceEventInterceptor {
             }
         });
 
-        server.getServerWideBus().register(this, EVENT_PRIORITY);
+        connection.getSuperBus().register(this, EVENT_PRIORITY);
     }
 
     public void unregister() {
-        mServer.getServerWideBus().unregister(this);
+        mIRCConnection.getSuperBus().unregister(this);
     }
 
     public MessagePriority getSubMessagePriority(final Conversation title) {
@@ -126,7 +127,7 @@ public final class ServiceEventInterceptor {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
 
         // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
+        mHandler.post(() -> getBus().post(new OnQueryEvent(mIRCConnection, event.user)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
@@ -147,7 +148,8 @@ public final class ServiceEventInterceptor {
                     onIRCEvent(MessagePriority.HIGH, conversation, event);
 
                     // Forward the event UI side
-                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(event.channel)));
+                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(mIRCConnection,
+                            event.channel)));
                 } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
                         || event.getClass().equals(ChannelWorldActionEvent.class)) {
                     onIRCEvent(MessagePriority.MEDIUM, conversation, event);
@@ -169,7 +171,7 @@ public final class ServiceEventInterceptor {
             onIRCEvent(MessagePriority.HIGH, event.user, event);
 
             // Forward the event UI side
-            mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
+            mHandler.post(() -> getBus().post(new OnQueryEvent(mIRCConnection, event.user)));
         }
     }
 
@@ -203,7 +205,7 @@ public final class ServiceEventInterceptor {
 
     private void onIRCEvent(final MessagePriority priority, final Conversation conversation,
             final Event event) {
-        if (conversation.equals(conversation.getServer())) {
+        if (conversation instanceof Server) {
             if (!conversation.equals(mConversation)) {
                 setMessagePriority(priority);
             }
@@ -227,8 +229,8 @@ public final class ServiceEventInterceptor {
         mEventMap.put(conversation, event);
     }
 
-    public Server getServer() {
-        return mServer;
+    public IRCConnection getIRCConnection() {
+        return mIRCConnection;
     }
 
     public void acceptDCCConnection(final DCCRequestEvent event) {
@@ -252,7 +254,7 @@ public final class ServiceEventInterceptor {
 
     public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
         for (final InviteEvent event : inviteEvents) {
-            mServer.sendJoin(event.channelName);
+            mIRCConnection.getServer().sendJoin(event.channelName);
         }
         mInviteEvents.removeAll(inviteEvents);
     }

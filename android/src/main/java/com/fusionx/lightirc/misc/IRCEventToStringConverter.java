@@ -656,7 +656,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = event.chatConversation.getServer().getUser().getNick();
+            final Nick nick = event.mainUser.getNick();
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);
@@ -672,7 +672,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getActionMessage(final DCCChatSelfActionEvent event) {
             final String response = mContext.getString(R.string.parser_action);
-            final Nick nick = event.chatConversation.getServer().getUser().getNick();
+            final Nick nick = event.mainUser.getNick();
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.action);

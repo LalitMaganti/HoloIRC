@@ -12,12 +12,12 @@ import org.lucasr.twowayview.TwoWayView;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -25,9 +25,12 @@ public class ActionsFragment extends Fragment {
 
     private Conversation mConversation;
 
+    private IRCConnection mConnection;
+
     private final Object mEventHandler = new Object() {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
+            mConnection = conversationChanged.connection;
             mConversation = conversationChanged.conversation;
         }
     };
@@ -129,7 +132,7 @@ public class ActionsFragment extends Fragment {
             if (mConversation == null) {
                 return;
             }
-            mConversation.getServer().sendJoin(channelName);
+            mConnection.getServer().sendJoin(channelName);
         }
     }
 
@@ -169,16 +172,17 @@ public class ActionsFragment extends Fragment {
     private class ChannelNickDialogBuilder extends NickDialogBuilder {
 
         public ChannelNickDialogBuilder() {
-            super(getActivity(), mConversation.getServer().getUser().getNick().getNickAsString());
+            super(getActivity(), mConnection.getUserChannelDao().getUser()
+                    .getNick().getNickAsString());
         }
 
         @Override
         public void onOkClicked(final String nick) {
             // If the conversation is null (for some reason) then simply close the dialog
-            if (mConversation == null) {
+            if (mConnection == null || mConversation == null) {
                 return;
             }
-            mConversation.getServer().sendNick(nick);
+            mConnection.getServer().sendNick(nick);
         }
     }
 }

@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +42,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
@@ -48,6 +50,7 @@ import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
+import co.fusionx.relay.internal.function.Optionals;
 
 import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
@@ -100,12 +103,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private WorkerFragment mWorkerFragment;
 
     // IRC
-    private Conversation mConversation;
+    private OnConversationChanged mConversationEvent;
 
     private final Object mConversationChanged = new Object() {
         @Subscribe
         public void onConversationChanged(final OnConversationChanged event) {
-            mConversation = event.conversation;
+            mConversationEvent = event;
         }
     };
 
@@ -131,16 +134,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private final Object mMentionHelper = new Object() {
         @Subscribe(cancellable = true)
         public boolean onMentioned(final OnChannelMentionEvent event) {
-            if (!event.channel.equals(mConversation)) {
-                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.channel);
+            if (!event.channel.equals(mConversationEvent)) {
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.connection,
+                        event.channel);
             }
             return true;
         }
 
         @Subscribe(cancellable = true)
         public boolean onQueried(final OnQueryEvent event) {
-            if (!event.queryUser.equals(mConversation)) {
-                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.queryUser);
+            if (!event.queryUser.equals(mConversationEvent)) {
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.connection,
+                        event.queryUser);
             }
             return true;
         }
@@ -210,11 +215,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     .getStickyEvent(OnConversationChanged.class);
             if (mCurrentFragment == null) {
                 findViewById(R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
-            } else if (event != null) {
-                mConversation = event.conversation;
+            } else if (event != null && event.conversation != null) {
+                mConversationEvent = event;
+
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
-                mConversation.getServer().getServerWideBus().register(this);
+                mConversationEvent.conversation.getConnectionWideBus().register(this);
             } else {
                 onRemoveCurrentFragment();
             }
@@ -227,21 +233,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onServerClicked(final Server server) {
-        changeCurrentConversation(server, true);
+    public void onConversationClicked(final IRCConnection connection,
+            final Conversation conversation) {
+        changeCurrentConversation(connection, conversation, true);
     }
 
     @Override
-    public void onSubServerClicked(final Conversation object) {
-        changeCurrentConversation(object, true);
-    }
-
-    @Override
-    public void onServerStopped(final Server server) {
+    public void onServerStopped(final IRCConnection connection) {
         closeDrawer();
         supportInvalidateOptionsMenu();
 
-        if (mCurrentFragment != null && server.equals(mConversation.getServer())) {
+        if (mCurrentFragment != null && connection.equals(mConversationEvent.connection)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
@@ -252,15 +254,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onPart(final String serverName, final PartEvent event) {
-        if (event.channel.equals(mConversation)) {
+    public void onPart(final IRCConnection connection, final PartEvent event) {
+        if (event.channel.equals(mConversationEvent.conversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
 
     @Override
-    public boolean onKick(final Server server, final KickEvent event) {
-        final boolean isCurrent = event.channel.equals(mConversation);
+    public boolean onKick(final IRCConnection connection, final KickEvent event) {
+        final boolean isCurrent = event.channel.equals(mConversationEvent.conversation);
         if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
         }
@@ -269,7 +271,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onPrivateMessageClosed(final QueryUser queryUser) {
-        if (queryUser.equals(mConversation)) {
+        if (queryUser.equals(mConversationEvent.conversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
@@ -283,17 +285,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void removeCurrentFragment() {
         if (mCurrentFragment.getType() == CHANNEL) {
-            final Channel channel = (Channel) mConversation;
+            final Channel channel = (Channel) mConversationEvent.conversation;
             channel.sendPart(Optional.fromNullable(getAppPreferences().getPartReason()));
         } else if (mCurrentFragment.getType() == FragmentType.USER) {
-            final QueryUser user = (QueryUser) mConversation;
+            final QueryUser user = (QueryUser) mConversationEvent.conversation;
             user.close();
         }
     }
 
     @Override
     public void disconnectFromServer() {
-        getService().requestConnectionStoppage(mConversation.getServer());
+        getService().requestConnectionStoppage(mConversationEvent.connection);
     }
 
     @Override
@@ -326,7 +328,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void reconnectToServer() {
-        getService().requestReconnectionToServer(mConversation.getServer());
+        getService().requestReconnectionToServer(mConversationEvent.connection);
     }
 
     @Override
@@ -340,15 +342,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         final String channelName = getIntent().getStringExtra("channel_name");
         final String queryNick = getIntent().getStringExtra("query_nick");
 
+        final Optional<IRCConnection> connection;
         final Optional<? extends Conversation> optConversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
         if (fromRecents || serverName == null) {
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
-            optConversation = event == null
-                    ? Optional.absent()
-                    : Optional.fromNullable(event.conversation);
+            connection = Optional.fromNullable(event).transform(e -> event.connection);
+            optConversation = Optional.fromNullable(event).transform(e -> event.conversation);
         } else {
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
@@ -356,10 +358,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getIntent().removeExtra("channel_name");
             getIntent().removeExtra("query_nick");
 
-            final Server server = service.getServerIfExists(serverName);
-            optConversation = channelName == null
-                    ? server.getUserChannelInterface().getQueryUser(queryNick)
-                    : server.getUserChannelInterface().getChannel(channelName);
+            connection = service.getServerIfExists(serverName);
+            optConversation = Optionals.flatTransform(connection, c -> channelName == null
+                    ? c.getUserChannelDao().getUser().getQueryUser(queryNick)
+                    : c.getUserChannelDao().getChannel(channelName));
         }
 
         if (!fromRecents && clearCaches) {
@@ -369,7 +371,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             service.clearAllEventCaches();
         }
 
-        onExternalConversationUpdate(optConversation);
+        onExternalConversationChange(
+                optConversation.transform(c -> new Pair<>(connection.get(), c)));
     }
 
     // Subscribe events
@@ -380,7 +383,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (mCurrentFragment == null) {
             return;
         }
-        final ConnectionStatus status = mConversation.getServer().getStatus();
+        final ConnectionStatus status = mConversationEvent.connection.getStatus();
         if (mCurrentFragment.getType() == FragmentType.SERVER) {
             setActionBarSubtitle(getStatusString(this, status));
         }
@@ -396,7 +399,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final boolean navigationDrawerEnabled =
-                (!mSlidingPane.isSlideable() || !mSlidingPane.isOpen()) && mConversation != null;
+                (!mSlidingPane.isSlideable() || !mSlidingPane.isOpen())
+                        && mConversationEvent != null;
 
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
         item.setVisible(navigationDrawerEnabled);
@@ -441,8 +445,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public EventCache getEventCache(final Conversation conversation) {
-        return IRCService.getEventCache(conversation.getServer());
+    public EventCache getEventCache(final IRCConnection connection) {
+        return IRCService.getEventCache(connection);
     }
 
     @Override
@@ -467,8 +471,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mConversation != null) {
-            mConversation.getServer().getServerWideBus().unregister(this);
+        if (mConversationEvent != null && mConversationEvent.conversation != null) {
+            mConversationEvent.conversation.getConnectionWideBus().unregister(this);
         }
     }
 
@@ -490,11 +494,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Server server = getService().getServerIfExists(serverName);
-        final Optional<? extends Conversation> optConversation = channelName == null
-                ? server.getUserChannelInterface().getQueryUser(queryNick)
-                : server.getUserChannelInterface().getChannel(channelName);
-        onExternalConversationUpdate(optConversation);
+        final Optional<IRCConnection> connection = getService().getServerIfExists(serverName);
+        final Optional<? extends Conversation> optional = Optionals.flatTransform
+                (connection, c -> channelName == null
+                        ? c.getUserChannelDao().getUser().getQueryUser(queryNick)
+                        : c.getUserChannelDao().getChannel(channelName));
+        onExternalConversationChange(optional.transform(c -> new Pair<>(connection.get(), c)));
     }
 
     @Override
@@ -542,8 +547,9 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final Conversation object, final boolean delayChange) {
-        if (!object.equals(mConversation)) {
+    private void changeCurrentConversation(final IRCConnection connection,
+            final Conversation object, final boolean delayChange) {
+        if (!object.equals(mConversationEvent)) {
             final Bundle bundle = new Bundle();
             bundle.putString("title", object.getId());
 
@@ -564,19 +570,19 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             }
             fragment.setArguments(bundle);
 
-            if (mConversation == null) {
-                object.getServer().getServerWideBus().register(this);
-            } else if (mConversation.getServer() != object.getServer()) {
-                mConversation.getServer().getServerWideBus().unregister(this);
-                object.getServer().getServerWideBus().register(this);
+            if (mConversationEvent == null) {
+                object.getConnectionWideBus().register(this);
+            } else if (mConversationEvent.connection != connection) {
+                mConversationEvent.conversation.getConnectionWideBus().unregister(this);
+                object.getConnectionWideBus().register(this);
             }
 
             setActionBarTitle(object.getId());
             setActionBarSubtitle(isServer
-                    ? getStatusString(this, object.getServer().getStatus())
-                    : object.getServer().getTitle());
+                    ? getStatusString(this, connection.getStatus())
+                    : connection.getServer().getTitle());
 
-            getBus().postSticky(new OnConversationChanged(object, fragment.getType()));
+            getBus().postSticky(new OnConversationChanged(connection, object, fragment.getType()));
             changeCurrentFragment(fragment, delayChange);
         }
         mSlidingPane.closePane();
@@ -619,8 +625,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveCurrentFragment();
 
         // Don't listen for any more events from this server
-        mConversation.getServer().getServerWideBus().unregister(this);
-        getBus().postSticky(new OnConversationChanged(null, null));
+        mConversationEvent.conversation.getConnectionWideBus().unregister(this);
+        getBus().postSticky(new OnConversationChanged(null, null, null));
     }
 
     private void onRemoveCurrentFragment() {
@@ -640,10 +646,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         closeDrawer();
     }
 
-    private void onExternalConversationUpdate(final Optional<? extends Conversation>
-            optConversation) {
-        if (optConversation.isPresent()) {
-            mHandler.post(() -> changeCurrentConversation(optConversation.get(), false));
+    private void onExternalConversationChange(final Optional<Pair<IRCConnection,
+            Conversation>> optionalPair) {
+        if (optionalPair.isPresent()) {
+            final Pair<IRCConnection, Conversation> pair = optionalPair.get();
+            mHandler.post(() -> changeCurrentConversation(pair.first, pair.second, false));
             supportInvalidateOptionsMenu();
         } else {
             mSlidingPane.openPane();

@@ -1,11 +1,14 @@
 package com.fusionx.lightirc.service;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
+
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.ConnectionStopRequestedEvent;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
-import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
@@ -31,9 +34,10 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.ConnectionManager;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayConnectionManager;
+import co.fusionx.relay.internal.function.FluentIterables;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -42,7 +46,7 @@ import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
 
-    public static final Map<Server, EventCache> mEventCache = new HashMap<>();
+    public static final Map<IRCConnection, EventCache> mEventCache = new HashMap<>();
 
     private static final int SERVICE_PRIORITY = 50;
 
@@ -68,26 +72,25 @@ public class IRCService extends Service {
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFICATION_MENTION);
 
-            final Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
+            final Set<? extends IRCConnection> servers = mConnectionManager.getConnectionSet();
 
             mConnectionManager.requestDisconnectAll();
             stopForeground(true);
 
-            for (final Server server : servers) {
-                cleanupPostDisconnect(server);
-            }
+            FluentIterables.forEach(FluentIterable.from(servers),
+                    IRCService.this::cleanupPostDisconnect);
         }
     };
 
     private final Object mEventHelper = new Object() {
         @Subscribe
         public void onMentioned(final OnChannelMentionEvent event) {
-            notifyOutOfApp(IRCService.this, event.channel, true);
+            notifyOutOfApp(IRCService.this, event.connection, event.channel, true);
         }
 
         @Subscribe
         public void onQueried(final OnQueryEvent event) {
-            notifyOutOfApp(IRCService.this, event.queryUser, false);
+            notifyOutOfApp(IRCService.this, event.connection, event.queryUser, false);
         }
 
         @Subscribe
@@ -98,7 +101,7 @@ public class IRCService extends Service {
 
     private final IRCBinder mBinder = new IRCBinder();
 
-    private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
+    private final Map<IRCConnection, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
 
     private boolean mExternalStorageWriteable = false;
 
@@ -110,7 +113,7 @@ public class IRCService extends Service {
 
     private ConnectionManager mConnectionManager;
 
-    public static EventCache getEventCache(final Server server) {
+    public static EventCache getEventCache(final IRCConnection server) {
         return mEventCache.get(server);
     }
 
@@ -145,57 +148,59 @@ public class IRCService extends Service {
         return mBinder;
     }
 
-    public Server requestConnectionToServer(final ServerConfiguration.Builder builder) {
-        final Pair<Boolean, ? extends Server> pair
+    public IRCConnection requestConnectionToServer(final ServerConfiguration.Builder builder) {
+        final Pair<Boolean, ? extends IRCConnection> pair
                 = mConnectionManager.requestConnection(builder.build());
 
         final boolean exists = pair.first;
-        final Server server = pair.second;
+        final IRCConnection server = pair.second;
 
         if (!exists) {
             final ServiceEventInterceptor serviceEventInterceptor
                     = new ServiceEventInterceptor(server);
             mEventHelperMap.put(server, serviceEventInterceptor);
             mEventCache.put(server, new EventCache(this));
-            mLoggingManager.addServerToManager(server);
+            mLoggingManager.addConnectionToManager(server);
         }
         startForeground(SERVICE_ID, getNotification());
         return server;
     }
 
-    public Server getServerIfExists(final ServerConfiguration.Builder builder) {
+    public Optional<IRCConnection> getConnectionIfExists(final ServerConfiguration.Builder
+            builder) {
         return getServerIfExists(builder.getTitle());
     }
 
-    public Server getServerIfExists(final String title) {
-        return mConnectionManager.getServerIfExists(title);
+    public Optional<IRCConnection> getServerIfExists(final String title) {
+        return mConnectionManager.getConnectionIfExists(title);
     }
 
-    public void requestConnectionStoppage(final Server server) {
-        mEventHelperMap.get(server).unregister();
+    public void requestConnectionStoppage(final IRCConnection connection) {
+        mEventHelperMap.get(connection).unregister();
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_MENTION);
 
-        final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(server.getTitle());
+        final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(connection
+                .getServer().getTitle());
         if (finalServer) {
             stopForeground(true);
         } else {
             startForeground(SERVICE_ID, getNotification());
         }
-        cleanupPostDisconnect(server);
+        cleanupPostDisconnect(connection);
     }
 
-    private void cleanupPostDisconnect(final Server server) {
-        getBus().post(new ServerStopRequestedEvent(server));
+    private void cleanupPostDisconnect(final IRCConnection server) {
+        getBus().post(new ConnectionStopRequestedEvent(server));
 
-        mLoggingManager.removeServerFromManager(server);
+        mLoggingManager.removeConnectionFromManager(server);
         mEventCache.remove(server);
         mEventHelperMap.remove(server);
     }
 
-    public void requestReconnectionToServer(final Server server) {
+    public void requestReconnectionToServer(final IRCConnection server) {
         mConnectionManager.requestReconnection(server);
     }
 
@@ -205,8 +210,8 @@ public class IRCService extends Service {
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
-    public ServiceEventInterceptor getEventHelper(final Server server) {
-        return mEventHelperMap.get(server);
+    public ServiceEventInterceptor getEventHelper(final IRCConnection connection) {
+        return mEventHelperMap.get(connection);
     }
 
     private void onFirstStart() {

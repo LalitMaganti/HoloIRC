@@ -28,6 +28,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.InviteEvent;
 
@@ -240,9 +241,9 @@ public class NavigationDrawerFragment extends Fragment implements
             if (conversationChanged.conversation == null) {
                 mEventHelper = null;
             } else {
-                final Server server = conversationChanged.conversation.getServer();
-                mStatus = server.getStatus();
-                mEventHelper = mCallback.getService().getEventHelper(server);
+                final IRCConnection connection = conversationChanged.connection;
+                mStatus = connection.getStatus();
+                mEventHelper = mCallback.getService().getEventHelper(connection);
             }
             updateUserListVisibility();
         }

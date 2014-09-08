@@ -49,7 +49,7 @@ public class UserFragment extends IRCFragment<QueryEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(getQueryUser(), message);
+        UserInputParser.onParseUserMessage(mConnection.getServer(), getQueryUser(), message);
     }
 
     @Override

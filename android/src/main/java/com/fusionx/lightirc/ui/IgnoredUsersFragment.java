@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -34,6 +35,8 @@ public class IgnoredUsersFragment extends DialogFragment {
     private IgnoredUsersAdapter mAdapter;
 
     private TwoWayView mTwoWayView;
+
+    private IRCConnection mConnection;
 
     public static IgnoredUsersFragment createInstance() {
         return new IgnoredUsersFragment();
@@ -60,7 +63,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
         getBus().registerSticky(mEventHandler);
 
-        final String title = mConversation.getServer().getTitle();
+        final String title = mConnection.getServer().getTitle();
         final Collection<String> ignoreList = mDatabaseSource.getIgnoreListByName(title);
         final List<String> arrayList = new ArrayList<>(ignoreList);
         mAdapter.addAll(arrayList);
@@ -88,7 +91,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
     private void saveIgnoreList() {
         final List<String> list = mAdapter.getItems();
-        mDatabaseSource.updateIgnoreList(mConversation.getServer().getTitle(), list);
+        mDatabaseSource.updateIgnoreList(mConnection.getServer().getTitle(), list);
     }
 
     private class IgnoreListDialogBuilder extends DialogBuilder {
@@ -108,6 +111,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
         @Subscribe
         public void onConversationChanged(final OnConversationChanged conversationChanged) {
+            mConnection = conversationChanged.connection;
             mConversation = conversationChanged.conversation;
         }
     }

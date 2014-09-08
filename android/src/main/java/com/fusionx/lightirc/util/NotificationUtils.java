@@ -24,6 +24,7 @@ import android.support.v4.app.NotificationCompat;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.IRCConnection;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.media.RingtoneManager.TYPE_NOTIFICATION;
@@ -45,13 +46,13 @@ public class NotificationUtils {
     private static DeleteReceiver sDeleteReceiver;
 
     public static void notifyInApp(final Snackbar snackbar, final Activity activity,
-            final Conversation conversation) {
+            final IRCConnection connection, final Conversation conversation) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
             final String message = String.format("Mentioned in %s on %s", conversation.getId(),
-                    conversation.getServer().getTitle());
+                    connection.getServer().getTitle());
             snackbar.display(message);
 
             if (inApp.contains(activity.getString(R.string.notification_value_audio))) {
@@ -67,8 +68,8 @@ public class NotificationUtils {
         }
     }
 
-    public static void notifyOutOfApp(final Context context, final Conversation conversation,
-            final boolean channel) {
+    public static void notifyOutOfApp(final Context context, final IRCConnection connection,
+            final Conversation conversation, final boolean channel) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
         }
@@ -90,7 +91,7 @@ public class NotificationUtils {
         final String text;
         if (sNotificationCount == 0) {
             text = String.format("Mentioned in %s on %s", conversation.getId(),
-                    conversation.getServer().getId());
+                    connection.getServer().getId());
         } else {
             text = "You have been mentioned/queried multiple times";
         }
@@ -116,7 +117,7 @@ public class NotificationUtils {
         }
 
         final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
-        resultIntent.putExtra("server_name", conversation.getServer().getTitle());
+        resultIntent.putExtra("server_name", connection.getServer().getTitle());
         resultIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
 
         final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,

@@ -30,6 +30,7 @@ import android.view.View;
 
 import java.util.List;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.parser.UserInputParser;
 
@@ -46,7 +47,7 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseServerMessage(mConversation.getServer(), message);
+        UserInputParser.onParseServerMessage(getServer(), message);
     }
 
     @Override
@@ -66,6 +67,10 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
 
     @Override
     protected List<? extends ServerEvent> getAdapterData() {
-        return mConversation.getServer().getBuffer();
+        return mConversation.getBuffer();
+    }
+
+    public Server getServer() {
+        return (Server) mConversation;
     }
 }

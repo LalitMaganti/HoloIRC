@@ -32,7 +32,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +41,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.IRCConnection;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
@@ -61,6 +61,8 @@ public class UserListFragment extends Fragment {
 
     private Channel mChannel;
 
+    private IRCConnection mConnection;
+
     private final Object mEventHandler = new Object() {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
@@ -69,9 +71,11 @@ public class UserListFragment extends Fragment {
             }
 
             if (conversationChanged.fragmentType == FragmentType.CHANNEL) {
+                mConnection = conversationChanged.connection;
                 mChannel = (Channel) conversationChanged.conversation;
                 mChannel.getBus().register(UserListFragment.this);
             } else {
+                mConnection = null;
                 mChannel = null;
             }
 
@@ -130,7 +134,8 @@ public class UserListFragment extends Fragment {
         if (mChannel != null) {
             mChannel.getBus().unregister(this);
         }
-        // Don't keep a track of this channel - we will deal with this when we return
+        // Don't keep a track of this connection/channel - we will deal with this when we return
+        mConnection = null;
         mChannel = null;
     }
 
@@ -200,12 +205,12 @@ public class UserListFragment extends Fragment {
     // End of subscribed events
 
     boolean isNickOtherUsers(final Nick nick) {
-        return !mChannel.getServer().getUser().getNick().equals(nick);
+        return !mConnection.getUserChannelDao().getUser().getNick().equals(nick);
     }
 
     private void onPrivateMessageUser(final Nick nick) {
         if (isNickOtherUsers(nick)) {
-            mChannel.getServer().sendQuery(nick.getNickAsString(), null);
+            mConnection.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
         } else {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());

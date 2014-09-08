@@ -134,7 +134,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseChannelMessage(getChannel(), message);
+        UserInputParser.onParseChannelMessage(mConnection.getServer(), getChannel(), message);
     }
 
     @Override
