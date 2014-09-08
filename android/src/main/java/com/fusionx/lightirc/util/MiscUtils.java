@@ -28,7 +28,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 
 /**
  * Full of static utility methods
@@ -58,8 +58,8 @@ public class MiscUtils {
     }
 
     public static String getStatusString(final Context context,
-            final ConnectionStatus connectionStatus) {
-        switch (connectionStatus) {
+            final SessionStatus sessionStatus) {
+        switch (sessionStatus) {
             case CONNECTED:
                 return context.getString(R.string.status_connected);
             case RECONNECTING:

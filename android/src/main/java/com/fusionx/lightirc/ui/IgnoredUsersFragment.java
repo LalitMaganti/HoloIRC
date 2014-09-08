@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -36,7 +36,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
     private TwoWayView mTwoWayView;
 
-    private IRCConnection mConnection;
+    private IRCSession mConnection;
 
     public static IgnoredUsersFragment createInstance() {
         return new IgnoredUsersFragment();

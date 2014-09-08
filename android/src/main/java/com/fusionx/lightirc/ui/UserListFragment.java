@@ -41,7 +41,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
@@ -61,7 +61,7 @@ public class UserListFragment extends Fragment {
 
     private Channel mChannel;
 
-    private IRCConnection mConnection;
+    private IRCSession mConnection;
 
     private final Object mEventHandler = new Object() {
         @Subscribe

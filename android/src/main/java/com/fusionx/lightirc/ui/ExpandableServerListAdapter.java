@@ -25,10 +25,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCConnection;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.UIUtils.getSpanFromPriority;
@@ -114,7 +113,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final TextView status = ((TextView) convertView.findViewById(R.id.server_status));
         status.setText(MiscUtils.getStatusString(mContext, listItem.getConnection() != null
                 ? listItem.getConnection().getStatus()
-                : ConnectionStatus.DISCONNECTED));
+                : SessionStatus.DISCONNECTED));
 
         final View divider = convertView.findViewById(R.id.divider);
         final ImageView expandButton = (ImageView) convertView.findViewById(R.id.button_expand);
@@ -188,7 +187,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    public void removeServer(final IRCConnection server) {
+    public void removeServer(final IRCSession server) {
         for (final ConnectionContainer connectionContainer : mConnectionContainers) {
             if (!server.equals(connectionContainer.getConnection())) {
                 continue;

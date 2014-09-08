@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 
 import static com.fusionx.lightirc.ui.SimpleSectionedRecyclerViewAdapter.Section;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -43,7 +43,7 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
 
     private final View.OnClickListener mClickListener;
 
-    private ConnectionStatus mStatus = ConnectionStatus.DISCONNECTED;
+    private SessionStatus mStatus = SessionStatus.DISCONNECTED;
 
     private FragmentType mFragmentType = FragmentType.SERVER;
 
@@ -129,11 +129,11 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
     }
 
     boolean isConnected() {
-        return mStatus == ConnectionStatus.CONNECTED;
+        return mStatus == SessionStatus.CONNECTED;
     }
 
     boolean isDisconnected() {
-        return mStatus == ConnectionStatus.DISCONNECTED;
+        return mStatus == SessionStatus.DISCONNECTED;
     }
 
     @Override

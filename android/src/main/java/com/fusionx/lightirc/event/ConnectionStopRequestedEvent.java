@@ -1,12 +1,12 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 
 public class ConnectionStopRequestedEvent {
 
-    public final IRCConnection connection;
+    public final IRCSession connection;
 
-    public ConnectionStopRequestedEvent(final IRCConnection connection) {
+    public ConnectionStopRequestedEvent(final IRCSession connection) {
         this.connection = connection;
     }
 }

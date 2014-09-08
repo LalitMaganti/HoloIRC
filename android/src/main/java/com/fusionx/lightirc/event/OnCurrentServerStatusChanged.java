@@ -1,12 +1,12 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 
 public class OnCurrentServerStatusChanged {
 
-    public final ConnectionStatus status;
+    public final SessionStatus status;
 
-    public OnCurrentServerStatusChanged(ConnectionStatus status) {
+    public OnCurrentServerStatusChanged(SessionStatus status) {
         this.status = status;
     }
 }

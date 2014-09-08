@@ -26,10 +26,9 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCConnection;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -40,7 +39,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private final EventHandler mEventHandler = new EventHandler();
 
-    private ConnectionStatus mStatus;
+    private SessionStatus mStatus;
 
     private FragmentType mFragmentType;
 
@@ -168,7 +167,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void updateUserListVisibility() {
-        final boolean visibility = mStatus == ConnectionStatus.CONNECTED
+        final boolean visibility = mStatus == SessionStatus.CONNECTED
                 && mFragmentType == FragmentType.CHANNEL;
 
         if (visibility) {
@@ -241,7 +240,7 @@ public class NavigationDrawerFragment extends Fragment implements
             if (conversationChanged.conversation == null) {
                 mEventHelper = null;
             } else {
-                final IRCConnection connection = conversationChanged.connection;
+                final IRCSession connection = conversationChanged.connection;
                 mStatus = connection.getStatus();
                 mEventHelper = mCallback.getService().getEventHelper(connection);
             }

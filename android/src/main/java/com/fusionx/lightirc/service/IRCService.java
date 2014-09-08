@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.ConnectionManager;
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayConnectionManager;
 import co.fusionx.relay.internal.function.FluentIterables;
@@ -46,7 +46,7 @@ import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
 
-    public static final Map<IRCConnection, EventCache> mEventCache = new HashMap<>();
+    public static final Map<IRCSession, EventCache> mEventCache = new HashMap<>();
 
     private static final int SERVICE_PRIORITY = 50;
 
@@ -72,7 +72,7 @@ public class IRCService extends Service {
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFICATION_MENTION);
 
-            final Set<? extends IRCConnection> servers = mConnectionManager.getConnectionSet();
+            final Set<? extends IRCSession> servers = mConnectionManager.getConnectionSet();
 
             mConnectionManager.requestDisconnectAll();
             stopForeground(true);
@@ -101,7 +101,7 @@ public class IRCService extends Service {
 
     private final IRCBinder mBinder = new IRCBinder();
 
-    private final Map<IRCConnection, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
+    private final Map<IRCSession, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
 
     private boolean mExternalStorageWriteable = false;
 
@@ -113,7 +113,7 @@ public class IRCService extends Service {
 
     private ConnectionManager mConnectionManager;
 
-    public static EventCache getEventCache(final IRCConnection server) {
+    public static EventCache getEventCache(final IRCSession server) {
         return mEventCache.get(server);
     }
 
@@ -148,12 +148,12 @@ public class IRCService extends Service {
         return mBinder;
     }
 
-    public IRCConnection requestConnectionToServer(final ServerConfiguration.Builder builder) {
-        final Pair<Boolean, ? extends IRCConnection> pair
+    public IRCSession requestConnectionToServer(final ServerConfiguration.Builder builder) {
+        final Pair<Boolean, ? extends IRCSession> pair
                 = mConnectionManager.requestConnection(builder.build());
 
         final boolean exists = pair.first;
-        final IRCConnection server = pair.second;
+        final IRCSession server = pair.second;
 
         if (!exists) {
             final ServiceEventInterceptor serviceEventInterceptor
@@ -166,16 +166,16 @@ public class IRCService extends Service {
         return server;
     }
 
-    public Optional<IRCConnection> getConnectionIfExists(final ServerConfiguration.Builder
+    public Optional<IRCSession> getConnectionIfExists(final ServerConfiguration.Builder
             builder) {
         return getServerIfExists(builder.getTitle());
     }
 
-    public Optional<IRCConnection> getServerIfExists(final String title) {
+    public Optional<IRCSession> getServerIfExists(final String title) {
         return mConnectionManager.getConnectionIfExists(title);
     }
 
-    public void requestConnectionStoppage(final IRCConnection connection) {
+    public void requestConnectionStoppage(final IRCSession connection) {
         mEventHelperMap.get(connection).unregister();
 
         final NotificationManager notificationManager =
@@ -192,7 +192,7 @@ public class IRCService extends Service {
         cleanupPostDisconnect(connection);
     }
 
-    private void cleanupPostDisconnect(final IRCConnection server) {
+    private void cleanupPostDisconnect(final IRCSession server) {
         getBus().post(new ConnectionStopRequestedEvent(server));
 
         mLoggingManager.removeConnectionFromManager(server);
@@ -200,7 +200,7 @@ public class IRCService extends Service {
         mEventHelperMap.remove(server);
     }
 
-    public void requestReconnectionToServer(final IRCConnection server) {
+    public void requestReconnectionToServer(final IRCSession server) {
         mConnectionManager.requestReconnection(server);
     }
 
@@ -210,7 +210,7 @@ public class IRCService extends Service {
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
-    public ServiceEventInterceptor getEventHelper(final IRCConnection connection) {
+    public ServiceEventInterceptor getEventHelper(final IRCSession connection) {
         return mEventHelperMap.get(connection);
     }
 

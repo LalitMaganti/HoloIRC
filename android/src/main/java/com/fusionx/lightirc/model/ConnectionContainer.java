@@ -8,9 +8,9 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 
 import static co.fusionx.relay.base.ServerConfiguration.Builder;
 
@@ -22,10 +22,10 @@ public class ConnectionContainer {
 
     private final Collection<String> mIgnoreList;
 
-    private IRCConnection mConnection;
+    private IRCSession mConnection;
 
     public ConnectionContainer(final Builder builder, final Collection<String> ignoreList,
-            final Optional<IRCConnection> connection) {
+            final Optional<IRCSession> connection) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
         mConversations = new LinkedHashSet<>();
@@ -34,19 +34,19 @@ public class ConnectionContainer {
     }
 
     public boolean isServerAvailable() {
-        return mConnection != null && (mConnection.getStatus() == ConnectionStatus.CONNECTED
-                || mConnection.getStatus() == ConnectionStatus.RECONNECTING);
+        return mConnection != null && (mConnection.getStatus() == SessionStatus.CONNECTED
+                || mConnection.getStatus() == SessionStatus.RECONNECTING);
     }
 
     public String getTitle() {
         return mBuilder.getTitle();
     }
 
-    public IRCConnection getConnection() {
+    public IRCSession getConnection() {
         return mConnection;
     }
 
-    public void setConnection(final IRCConnection connection) {
+    public void setConnection(final IRCSession connection) {
         mConnection = connection;
 
         if (connection == null) {

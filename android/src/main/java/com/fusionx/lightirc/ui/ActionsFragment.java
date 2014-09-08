@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -25,7 +25,7 @@ public class ActionsFragment extends Fragment {
 
     private Conversation mConversation;
 
-    private IRCConnection mConnection;
+    private IRCSession mConnection;
 
     private final Object mEventHandler = new Object() {
         @Subscribe

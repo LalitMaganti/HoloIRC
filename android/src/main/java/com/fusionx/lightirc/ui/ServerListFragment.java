@@ -37,9 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCConnection;
+import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
@@ -62,7 +62,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private final EventHandler mEventHandler = new EventHandler();
 
-    private final Map<IRCConnection, ServerEventHandler> mEventHandlers = new HashMap<>();
+    private final Map<IRCSession, ServerEventHandler> mEventHandlers = new HashMap<>();
 
     // Callbacks
     private Callback mCallback;
@@ -396,16 +396,16 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     public interface Callback {
 
-        public void onConversationClicked(final IRCConnection connection,
+        public void onConversationClicked(final IRCSession connection,
                 final Conversation conversation);
 
-        public void onServerStopped(final IRCConnection server);
+        public void onServerStopped(final IRCSession server);
 
         public IRCService getService();
 
-        public void onPart(final IRCConnection connection, final PartEvent event);
+        public void onPart(final IRCSession connection, final PartEvent event);
 
-        public boolean onKick(final IRCConnection connection, final KickEvent event);
+        public boolean onKick(final IRCSession connection, final KickEvent event);
 
         public void onPrivateMessageClosed(final QueryUser queryUser);
     }
@@ -414,7 +414,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         private final int mServerIndex;
 
-        private final IRCConnection mConnection;
+        private final IRCSession mConnection;
 
         private final ConnectionContainer mConnectionContainer;
 
@@ -468,7 +468,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final ChannelEvent event) {
             if (EventUtils.shouldStoreEvent(event)
-                    && mConnection.getStatus() != ConnectionStatus.DISCONNECTED) {
+                    && mConnection.getStatus() != SessionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
             }
         }
@@ -484,7 +484,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryEvent event) {
-            if (mConnection.getStatus() != ConnectionStatus.DISCONNECTED) {
+            if (mConnection.getStatus() != SessionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
             }
         }
@@ -511,7 +511,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatEvent event) {
             if (EventUtils.shouldStoreEvent(event)
-                    && mConnection.getStatus() != ConnectionStatus.DISCONNECTED) {
+                    && mConnection.getStatus() != SessionStatus.DISCONNECTED) {
                 mListView.invalidateViews();
             }
         }
@@ -525,11 +525,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         public void register() {
-            mConnection.getSuperBus().register(this, 50);
+            mConnection.getSessionBus().register(this, 50);
         }
 
         public void unregister() {
-            mConnection.getSuperBus().unregister(this);
+            mConnection.getSessionBus().unregister(this);
         }
     }
 
