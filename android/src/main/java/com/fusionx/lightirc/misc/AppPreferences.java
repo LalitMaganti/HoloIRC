@@ -84,10 +84,11 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
         setPreferences(preferences);
     }
 
-    public static void setupAppPreferences(final Context context) {
+    public static AppPreferences setupAppPreferences(final Context context) {
         if (mAppPreferences == null) {
             mAppPreferences = new AppPreferences(context);
         }
+        return mAppPreferences;
     }
 
     public static AppPreferences getAppPreferences() {

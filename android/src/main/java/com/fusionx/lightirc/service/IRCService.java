@@ -33,10 +33,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.ConnectionManager;
 import co.fusionx.relay.base.IRCSession;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.internal.base.RelayConnectionManager;
+import co.fusionx.relay.base.SessionManager;
+import co.fusionx.relay.internal.base.RelaySessionManager;
 import co.fusionx.relay.internal.function.FluentIterables;
 
 import static android.support.v4.app.NotificationCompat.Builder;
@@ -72,9 +72,9 @@ public class IRCService extends Service {
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFICATION_MENTION);
 
-            final Set<? extends IRCSession> servers = mConnectionManager.getConnectionSet();
+            final Set<? extends IRCSession> servers = mSessionManager.getSessionSet();
 
-            mConnectionManager.requestDisconnectAll();
+            mSessionManager.requestDisconnectAll();
             stopForeground(true);
 
             FluentIterables.forEach(FluentIterable.from(servers),
@@ -111,7 +111,7 @@ public class IRCService extends Service {
 
     private boolean mFirstStart = true;
 
-    private ConnectionManager mConnectionManager;
+    private SessionManager mSessionManager;
 
     public static EventCache getEventCache(final IRCSession server) {
         return mEventCache.get(server);
@@ -120,7 +120,6 @@ public class IRCService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         onFirstStart();
-        mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
 
         return START_STICKY;
     }
@@ -144,13 +143,13 @@ public class IRCService extends Service {
     @Override
     public IBinder onBind(final Intent intent) {
         onFirstStart();
-        mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
+        mSessionManager = RelaySessionManager.createSessionManager(mAppPreferences);
         return mBinder;
     }
 
     public IRCSession requestConnectionToServer(final ServerConfiguration.Builder builder) {
         final Pair<Boolean, ? extends IRCSession> pair
-                = mConnectionManager.requestConnection(builder.build());
+                = mSessionManager.requestConnection(builder.build());
 
         final boolean exists = pair.first;
         final IRCSession server = pair.second;
@@ -172,7 +171,7 @@ public class IRCService extends Service {
     }
 
     public Optional<IRCSession> getServerIfExists(final String title) {
-        return mConnectionManager.getConnectionIfExists(title);
+        return mSessionManager.getConnectionIfExists(title);
     }
 
     public void requestConnectionStoppage(final IRCSession connection) {
@@ -182,7 +181,7 @@ public class IRCService extends Service {
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_MENTION);
 
-        final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(connection
+        final boolean finalServer = mSessionManager.requestStoppageAndRemoval(connection
                 .getServer().getTitle());
         if (finalServer) {
             stopForeground(true);
@@ -201,7 +200,7 @@ public class IRCService extends Service {
     }
 
     public void requestReconnectionToServer(final IRCSession server) {
-        mConnectionManager.requestReconnection(server);
+        mSessionManager.requestReconnection(server);
     }
 
     public PendingIntent getMainActivityIntent() {
@@ -216,10 +215,13 @@ public class IRCService extends Service {
 
     private void onFirstStart() {
         if (mFirstStart) {
-            AppPreferences.setupAppPreferences(this);
-            mAppPreferences = AppPreferences.getAppPreferences();
+            mAppPreferences = AppPreferences.setupAppPreferences(this);
+
             mLoggingManager = new IRCLoggingManager(mAppPreferences);
+            mSessionManager = RelaySessionManager.createSessionManager(mAppPreferences);
+
             startWatchingExternalStorage();
+
             getBus().register(mEventHelper, SERVICE_PRIORITY);
             registerReceiver(mDisconnectAllReceiver, new IntentFilter(DISCONNECT_ALL_INTENT));
 
@@ -263,7 +265,7 @@ public class IRCService extends Service {
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
         final String text = String.format("%d servers connected",
-                mConnectionManager.getServerCount());
+                mSessionManager.getSessionCount());
         builder.setContentText(text);
         builder.setTicker(text);
         builder.setSmallIcon(R.drawable.ic_notification_small);

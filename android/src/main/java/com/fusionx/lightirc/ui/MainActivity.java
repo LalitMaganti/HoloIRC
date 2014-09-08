@@ -220,7 +220,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
-                mConversationEvent.conversation.getConnectionWideBus().register(this);
+                mConversationEvent.conversation.getSessionBus().register(this);
             } else {
                 onRemoveCurrentFragment();
             }
@@ -472,7 +472,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         super.onDestroy();
 
         if (mConversationEvent != null && mConversationEvent.conversation != null) {
-            mConversationEvent.conversation.getConnectionWideBus().unregister(this);
+            mConversationEvent.conversation.getSessionBus().unregister(this);
         }
     }
 
@@ -571,10 +571,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             fragment.setArguments(bundle);
 
             if (mConversationEvent == null) {
-                object.getConnectionWideBus().register(this);
+                object.getSessionBus().register(this);
             } else if (mConversationEvent.connection != connection) {
-                mConversationEvent.conversation.getConnectionWideBus().unregister(this);
-                object.getConnectionWideBus().register(this);
+                mConversationEvent.conversation.getSessionBus().unregister(this);
+                object.getSessionBus().register(this);
             }
 
             setActionBarTitle(object.getId());
@@ -625,7 +625,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveCurrentFragment();
 
         // Don't listen for any more events from this server
-        mConversationEvent.conversation.getConnectionWideBus().unregister(this);
+        mConversationEvent.conversation.getSessionBus().unregister(this);
         getBus().postSticky(new OnConversationChanged(null, null, null));
     }
 
