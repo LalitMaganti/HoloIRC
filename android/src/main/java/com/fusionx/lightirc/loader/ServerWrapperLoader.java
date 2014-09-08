@@ -11,8 +11,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import co.fusionx.relay.base.IRCSession;
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.base.Session;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ConnectionContainer>> {
 
@@ -29,8 +29,8 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ConnectionCont
         final ArrayList<ConnectionContainer> listItems = new ArrayList<>();
         final ServerDatabase source = ServerDatabase.getInstance(getContext());
 
-        for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
-            final Optional<IRCSession> connection = mService.getConnectionIfExists(builder);
+        for (final ConnectionConfiguration.Builder builder : source.getAllBuilders()) {
+            final Optional<Session> connection = mService.getConnectionIfExists(builder);
             final Collection<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
 
             final ConnectionContainer container  = new ConnectionContainer(builder, ignoreList,

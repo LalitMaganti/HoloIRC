@@ -28,7 +28,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -240,7 +240,7 @@ public class NavigationDrawerFragment extends Fragment implements
             if (conversationChanged.conversation == null) {
                 mEventHelper = null;
             } else {
-                final IRCSession connection = conversationChanged.connection;
+                final Session connection = conversationChanged.connection;
                 mStatus = connection.getStatus();
                 mEventHelper = mCallback.getService().getEventHelper(connection);
             }

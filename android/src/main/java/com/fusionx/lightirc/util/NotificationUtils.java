@@ -24,7 +24,7 @@ import android.support.v4.app.NotificationCompat;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.media.RingtoneManager.TYPE_NOTIFICATION;
@@ -46,7 +46,7 @@ public class NotificationUtils {
     private static DeleteReceiver sDeleteReceiver;
 
     public static void notifyInApp(final Snackbar snackbar, final Activity activity,
-            final IRCSession connection, final Conversation conversation) {
+            final Session connection, final Conversation conversation) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
@@ -68,7 +68,7 @@ public class NotificationUtils {
         }
     }
 
-    public static void notifyOutOfApp(final Context context, final IRCSession connection,
+    public static void notifyOutOfApp(final Context context, final Session connection,
             final Conversation conversation, final boolean channel) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;

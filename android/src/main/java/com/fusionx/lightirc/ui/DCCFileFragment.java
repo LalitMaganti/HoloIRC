@@ -146,7 +146,7 @@ public class DCCFileFragment extends BaseIRCFragment {
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onNewFileConnection(final DCCFileGetStartedEvent event) {
-            mAdapter.replaceAll(event.fileConversation.getFileConnections());
+            mAdapter.replaceAll(event.conversation.getFileConnections());
         }
     }
 }

@@ -24,7 +24,7 @@ import android.preference.PreferenceScreen;
 import java.io.File;
 import java.util.ArrayList;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
@@ -69,7 +69,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
         mDatabase = ServerDatabase.getInstance(this);
 
-        ServerConfiguration.Builder builder;
+        ConnectionConfiguration.Builder builder;
         if (mNewServer) {
             builder = SharedPreferencesUtils.getDefaultNewServer(this);
             setResult(RESULT_CANCELED);

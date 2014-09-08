@@ -45,7 +45,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -53,7 +53,7 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         implements TextView.OnEditorActionListener {
 
-    IRCSession mConnection;
+    Session mConnection;
 
     Conversation mConversation;
 
@@ -160,6 +160,6 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
     public interface Callback {
 
-        public EventCache getEventCache(final IRCSession connection);
+        public EventCache getEventCache(final Session connection);
     }
 }

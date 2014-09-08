@@ -1,15 +1,15 @@
 package com.fusionx.lightirc.event;
 
 import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 
 public class OnChannelMentionEvent {
 
-    public final IRCSession connection;
+    public final Session connection;
 
     public final Channel channel;
 
-    public OnChannelMentionEvent(final IRCSession connection,final Channel channel) {
+    public OnChannelMentionEvent(final Session connection,final Channel channel) {
         this.connection = connection;
         this.channel = channel;
     }

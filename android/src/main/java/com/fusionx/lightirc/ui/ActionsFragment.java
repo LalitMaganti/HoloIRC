@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -25,7 +25,7 @@ public class ActionsFragment extends Fragment {
 
     private Conversation mConversation;
 
-    private IRCSession mConnection;
+    private Session mConnection;
 
     private final Object mEventHandler = new Object() {
         @Subscribe
@@ -172,7 +172,7 @@ public class ActionsFragment extends Fragment {
     private class ChannelNickDialogBuilder extends NickDialogBuilder {
 
         public ChannelNickDialogBuilder() {
-            super(getActivity(), mConnection.getUserChannelDao().getUser()
+            super(getActivity(), mConnection.getUserChannelManager().getUser()
                     .getNick().getNickAsString());
         }
 

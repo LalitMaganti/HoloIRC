@@ -469,12 +469,12 @@ public class IRCEventToStringConverter {
             final String response = mContext.getString(R.string.parser_message);
 
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.ourUser.getNick(),
+                final String formattedResponse = String.format(response, event.libraryUser.getNick(),
                         event.message);
-                return setupEvent(formattedResponse, event.ourUser.getNick());
+                return setupEvent(formattedResponse, event.libraryUser.getNick());
             } else {
                 final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
+                        getFormattedStringForNick(event.conversation.getNick()),
                         new FormattedString(event.message)
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
@@ -482,14 +482,15 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator getMessage(final QueryMessageWorldEvent event) {
+            final Nick nick = event.conversation.getNick();
+
             final String response = mContext.getString(R.string.parser_message);
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user.getNick(),
-                        event.message);
-                return setupEvent(formattedResponse, event.user.getNick());
+                final String formattedResponse = String.format(response, nick, event.message);
+                return setupEvent(formattedResponse, nick);
             } else {
                 final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
+                        getFormattedStringForNick(nick),
                         new FormattedString(event.message),
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
@@ -536,12 +537,12 @@ public class IRCEventToStringConverter {
         public EventDecorator getActionMessage(final QueryActionSelfEvent event) {
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.ourUser.getNick(),
+                final String formattedResponse = String.format(response, event.libraryUser.getNick(),
                         event.action);
-                return setupEvent(formattedResponse, event.ourUser.getNick(), true);
+                return setupEvent(formattedResponse, event.libraryUser.getNick(), true);
             } else {
                 final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.ourUser.getNick()),
+                        getFormattedStringForNick(event.libraryUser.getNick()),
                         new FormattedString(event.action),
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings), true);
@@ -549,14 +550,16 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator getActionMessage(final QueryActionWorldEvent event) {
+            final Nick nick = event.conversation.getNick();
+
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user.getNick(),
+                final String formattedResponse = String.format(response, nick,
                         event.action);
-                return setupEvent(formattedResponse, event.user.getNick());
+                return setupEvent(formattedResponse, nick);
             } else {
                 final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
+                        getFormattedStringForNick(nick),
                         new FormattedString(event.action),
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
@@ -688,7 +691,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getDCCChatEvent(final DCCChatWorldMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = new DCCNick(event.chatConversation.getId());
+            final Nick nick = new DCCNick(event.conversation.getId());
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);
@@ -704,7 +707,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getActionMessage(final DCCChatWorldActionEvent event) {
             final String response = mContext.getString(R.string.parser_action);
-            final Nick nick = new DCCNick(event.chatConversation.getId());
+            final Nick nick = new DCCNick(event.conversation.getId());
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.action);
@@ -719,7 +722,7 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator get(final DCCFileGetStartedEvent event) {
-            final int count = event.fileConversation.getFileConnections().size();
+            final int count = event.conversation.getFileConnections().size();
             return setupEvent(String.format(mContext.getString(R.string.parser_dcc_files_count),
                     count));
         }

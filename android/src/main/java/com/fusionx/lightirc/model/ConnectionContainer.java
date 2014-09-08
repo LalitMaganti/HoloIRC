@@ -10,9 +10,9 @@ import java.util.Set;
 
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 
-import static co.fusionx.relay.base.ServerConfiguration.Builder;
+import static co.fusionx.relay.base.ConnectionConfiguration.Builder;
 
 public class ConnectionContainer {
 
@@ -22,10 +22,10 @@ public class ConnectionContainer {
 
     private final Collection<String> mIgnoreList;
 
-    private IRCSession mConnection;
+    private Session mConnection;
 
     public ConnectionContainer(final Builder builder, final Collection<String> ignoreList,
-            final Optional<IRCSession> connection) {
+            final Optional<Session> connection) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
         mConversations = new LinkedHashSet<>();
@@ -42,23 +42,23 @@ public class ConnectionContainer {
         return mBuilder.getTitle();
     }
 
-    public IRCSession getConnection() {
+    public Session getConnection() {
         return mConnection;
     }
 
-    public void setConnection(final IRCSession connection) {
-        mConnection = connection;
+    public void setConnection(final Session session) {
+        mConnection = session;
 
-        if (connection == null) {
+        if (session == null) {
             return;
         }
-        FluentIterable.from(connection.getUserChannelDao().getUser().getChannels())
+        FluentIterable.from(session.getUserChannelManager().getUser().getChannels())
                 .copyInto(mConversations);
-        FluentIterable.from(connection.getUserChannelDao().getUser().getQueryUsers())
+        FluentIterable.from(session.getQueryManager().getQueryUsers())
                 .copyInto(mConversations);
-        FluentIterable.from(connection.getServer().getDCCManager().getChatConversations())
+        FluentIterable.from(session.getDCCManager().getChatConversations())
                 .copyInto(mConversations);
-        FluentIterable.from(connection.getServer().getDCCManager().getFileConversations())
+        FluentIterable.from(session.getDCCManager().getFileConversations())
                 .copyInto(mConversations);
     }
 

@@ -36,7 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -49,8 +49,8 @@ public class SharedPreferencesUtils {
     }
 
     // TODO - make these static somewhere
-    public static ServerConfiguration.Builder getDefaultNewServer(final Context context) {
-        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+    public static ConnectionConfiguration.Builder getDefaultNewServer(final Context context) {
+        final ConnectionConfiguration.Builder builder = new ConnectionConfiguration.Builder();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
         final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
@@ -113,7 +113,7 @@ public class SharedPreferencesUtils {
         for (final File file : array) {
             final String prefsName = file.getName().replace(".xml", "");
             // Get builder to transfer
-            final ServerConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
+            final ConnectionConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
             // Only transfer if the builder is not broken
             if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
                     .isNotEmpty(builder.getUrl())) {
@@ -132,27 +132,27 @@ public class SharedPreferencesUtils {
 
     private static void firstTimeServerSetup(final Context context) {
         final ServerDatabase source = ServerDatabase.getInstance(context);
-        final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
-        for (final ServerConfiguration.Builder builder : builders) {
+        final List<ConnectionConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
+        for (final ConnectionConfiguration.Builder builder : builders) {
             source.addServer(builder, new ArrayList<>());
         }
     }
 
     private static void firstDbSetup(final Context context) {
         final ServerDatabase source = ServerDatabase.getInstance(context);
-        final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
-        for (final ServerConfiguration.Builder builder : builders) {
+        final List<ConnectionConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
+        for (final ConnectionConfiguration.Builder builder : builders) {
             if (source.getBuilderByName(builder.getTitle()) == null) {
                 source.addServer(builder, new ArrayList<>());
             }
         }
     }
 
-    private static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
+    private static ConnectionConfiguration.Builder convertPrefsToBuilder(final Context context,
             final String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 MODE_PRIVATE);
-        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+        final ConnectionConfiguration.Builder builder = new ConnectionConfiguration.Builder();
 
         // Server connection
         builder.setTitle(serverSettings.getString(PreferenceConstants.PREF_TITLE, ""));

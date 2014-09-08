@@ -4,7 +4,7 @@ import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
 
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.logging.LoggingManager;
 import co.fusionx.relay.logging.LoggingPreferences;
@@ -16,7 +16,7 @@ public class IRCLoggingManager extends LoggingManager {
     }
 
     @Override
-    public CharSequence getMessageFromEvent(final IRCSession connection, final Event event) {
+    public CharSequence getMessageFromEvent(final Session connection, final Event event) {
         EventDecorator decorator = IRCService.getEventCache(connection).get(event);
         return decorator.getMessage();
     }

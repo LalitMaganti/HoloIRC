@@ -27,7 +27,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.UIUtils.getSpanFromPriority;
@@ -187,7 +187,7 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         }
     }
 
-    public void removeServer(final IRCSession server) {
+    public void removeServer(final Session server) {
         for (final ConnectionContainer connectionContainer : mConnectionContainers) {
             if (!server.equals(connectionContainer.getConnection())) {
                 continue;

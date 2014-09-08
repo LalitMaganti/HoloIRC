@@ -39,7 +39,7 @@ import java.util.Map;
 
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
@@ -62,7 +62,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     private final EventHandler mEventHandler = new EventHandler();
 
-    private final Map<IRCSession, ServerEventHandler> mEventHandlers = new HashMap<>();
+    private final Map<Session, ServerEventHandler> mEventHandlers = new HashMap<>();
 
     // Callbacks
     private Callback mCallback;
@@ -396,16 +396,16 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     public interface Callback {
 
-        public void onConversationClicked(final IRCSession connection,
+        public void onConversationClicked(final Session connection,
                 final Conversation conversation);
 
-        public void onServerStopped(final IRCSession server);
+        public void onServerStopped(final Session server);
 
         public IRCService getService();
 
-        public void onPart(final IRCSession connection, final PartEvent event);
+        public void onPart(final Session connection, final PartEvent event);
 
-        public boolean onKick(final IRCSession connection, final KickEvent event);
+        public boolean onKick(final Session connection, final KickEvent event);
 
         public void onPrivateMessageClosed(final QueryUser queryUser);
     }
@@ -414,7 +414,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         private final int mServerIndex;
 
-        private final IRCSession mConnection;
+        private final Session mConnection;
 
         private final ConnectionContainer mConnectionContainer;
 
@@ -446,7 +446,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mConnectionContainer.removeConversation(event.channel);
+            mConnectionContainer.removeConversation(event.conversation);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -475,11 +475,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryClosedEvent event) {
-            mConnectionContainer.removeConversation(event.user);
+            mConnectionContainer.removeConversation(event.conversation);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
-            mCallback.onPrivateMessageClosed(event.user);
+            mCallback.onPrivateMessageClosed(event.conversation);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
@@ -502,7 +502,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         // DCC Events
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatStartedEvent event) {
-            mConnectionContainer.addConversation(event.chatConversation);
+            mConnectionContainer.addConversation(event.conversation);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);
@@ -518,7 +518,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCFileConversationStartedEvent event) {
-            mConnectionContainer.addConversation(event.fileConversation);
+            mConnectionContainer.addConversation(event.conversation);
             mListView.setAdapter(mListAdapter);
 
             mListView.expandGroup(mServerIndex);

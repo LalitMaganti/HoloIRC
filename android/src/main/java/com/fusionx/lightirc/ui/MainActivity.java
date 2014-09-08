@@ -42,7 +42,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.SessionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
@@ -233,13 +233,13 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onConversationClicked(final IRCSession connection,
+    public void onConversationClicked(final Session connection,
             final Conversation conversation) {
         changeCurrentConversation(connection, conversation, true);
     }
 
     @Override
-    public void onServerStopped(final IRCSession connection) {
+    public void onServerStopped(final Session connection) {
         closeDrawer();
         supportInvalidateOptionsMenu();
 
@@ -254,14 +254,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onPart(final IRCSession connection, final PartEvent event) {
-        if (event.channel.equals(mConversationEvent.conversation)) {
+    public void onPart(final Session connection, final PartEvent event) {
+        if (event.conversation.equals(mConversationEvent.conversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
 
     @Override
-    public boolean onKick(final IRCSession connection, final KickEvent event) {
+    public boolean onKick(final Session connection, final KickEvent event) {
         final boolean isCurrent = event.channel.equals(mConversationEvent.conversation);
         if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
@@ -342,7 +342,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         final String channelName = getIntent().getStringExtra("channel_name");
         final String queryNick = getIntent().getStringExtra("query_nick");
 
-        final Optional<IRCSession> connection;
+        final Optional<Session> connection;
         final Optional<? extends Conversation> optConversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
@@ -360,8 +360,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
             connection = service.getServerIfExists(serverName);
             optConversation = Optionals.flatTransform(connection, c -> channelName == null
-                    ? c.getUserChannelDao().getUser().getQueryUser(queryNick)
-                    : c.getUserChannelDao().getChannel(channelName));
+                    ? c.getQueryManager().getQueryUser(queryNick)
+                    : c.getUserChannelManager().getChannel(channelName));
         }
 
         if (!fromRecents && clearCaches) {
@@ -445,7 +445,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public EventCache getEventCache(final IRCSession connection) {
+    public EventCache getEventCache(final Session connection) {
         return IRCService.getEventCache(connection);
     }
 
@@ -494,11 +494,11 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Optional<IRCSession> connection = getService().getServerIfExists(serverName);
+        final Optional<Session> connection = getService().getServerIfExists(serverName);
         final Optional<? extends Conversation> optional = Optionals.flatTransform
                 (connection, c -> channelName == null
-                        ? c.getUserChannelDao().getUser().getQueryUser(queryNick)
-                        : c.getUserChannelDao().getChannel(channelName));
+                        ? c.getQueryManager().getQueryUser(queryNick)
+                        : c.getUserChannelManager().getChannel(channelName));
         onExternalConversationChange(optional.transform(c -> new Pair<>(connection.get(), c)));
     }
 
@@ -547,7 +547,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final IRCSession connection,
+    private void changeCurrentConversation(final Session connection,
             final Conversation object, final boolean delayChange) {
         if (!object.equals(mConversationEvent)) {
             final Bundle bundle = new Bundle();
@@ -646,10 +646,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         closeDrawer();
     }
 
-    private void onExternalConversationChange(final Optional<Pair<IRCSession,
+    private void onExternalConversationChange(final Optional<Pair<Session,
             Conversation>> optionalPair) {
         if (optionalPair.isPresent()) {
-            final Pair<IRCSession, Conversation> pair = optionalPair.get();
+            final Pair<Session, Conversation> pair = optionalPair.get();
             mHandler.post(() -> changeCurrentConversation(pair.first, pair.second, false));
             supportInvalidateOptionsMenu();
         } else {

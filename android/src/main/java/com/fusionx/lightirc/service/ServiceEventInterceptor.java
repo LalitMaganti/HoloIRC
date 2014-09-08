@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
@@ -50,7 +50,7 @@ public final class ServiceEventInterceptor {
 
     private final Handler mHandler = new Handler(Looper.getMainLooper());
 
-    private final IRCSession mIRCSession;
+    private final Session mSession;
 
     private final Map<Conversation, MessagePriority> mMessagePriorityMap;
 
@@ -64,8 +64,8 @@ public final class ServiceEventInterceptor {
 
     private MessagePriority mMessagePriority;
 
-    public ServiceEventInterceptor(final IRCSession connection) {
-        mIRCSession = connection;
+    public ServiceEventInterceptor(final Session connection) {
+        mSession = connection;
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
         mInviteEvents = new HashSet<>();
@@ -82,7 +82,7 @@ public final class ServiceEventInterceptor {
     }
 
     public void unregister() {
-        mIRCSession.getSessionBus().unregister(this);
+        mSession.getSessionBus().unregister(this);
     }
 
     public MessagePriority getSubMessagePriority(final Conversation title) {
@@ -127,7 +127,7 @@ public final class ServiceEventInterceptor {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
 
         // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnQueryEvent(mIRCSession, event.user)));
+        mHandler.post(() -> getBus().post(new OnQueryEvent(mSession, event.user)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
@@ -140,7 +140,7 @@ public final class ServiceEventInterceptor {
     public void onEvent(final ChannelEvent event) {
         if (shouldStoreEvent(event)) {
             // TODO - fix this horrible code
-            final Conversation conversation = event.channel;
+            final Conversation conversation = event.conversation;
             if (event instanceof ChannelWorldUserEvent) {
                 final ChannelWorldUserEvent userEvent = (ChannelWorldUserEvent) event;
 
@@ -148,8 +148,8 @@ public final class ServiceEventInterceptor {
                     onIRCEvent(MessagePriority.HIGH, conversation, event);
 
                     // Forward the event UI side
-                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(mIRCSession,
-                            event.channel)));
+                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(mSession,
+                            event.conversation)));
                 } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
                         || event.getClass().equals(ChannelWorldActionEvent.class)) {
                     onIRCEvent(MessagePriority.MEDIUM, conversation, event);
@@ -168,10 +168,10 @@ public final class ServiceEventInterceptor {
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final QueryEvent event) {
         if (shouldStoreEvent(event)) {
-            onIRCEvent(MessagePriority.HIGH, event.user, event);
+            onIRCEvent(MessagePriority.HIGH, event.conversation, event);
 
             // Forward the event UI side
-            mHandler.post(() -> getBus().post(new OnQueryEvent(mIRCSession, event.user)));
+            mHandler.post(() -> getBus().post(new OnQueryEvent(mSession, event.conversation)));
         }
     }
 
@@ -188,16 +188,16 @@ public final class ServiceEventInterceptor {
     // DCC Events
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCChatEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.chatConversation, event);
+        onIRCEvent(MessagePriority.HIGH, event.conversation, event);
 
         // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.chatConversation)));
+        mHandler.post(() -> getBus().post(new OnDCCChatEvent(event.conversation)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCFileGetStartedEvent event) {
-        onIRCEvent(MessagePriority.HIGH, event.fileConversation,
-                getLastStorableEvent(event.fileConversation.getBuffer()));
+        onIRCEvent(MessagePriority.HIGH, event.conversation,
+                getLastStorableEvent(event.conversation.getBuffer()));
     }
     /*
      * Event interception ends here
@@ -229,8 +229,8 @@ public final class ServiceEventInterceptor {
         mEventMap.put(conversation, event);
     }
 
-    public IRCSession getIRCSession() {
-        return mIRCSession;
+    public Session getSession() {
+        return mSession;
     }
 
     public void acceptDCCConnection(final DCCRequestEvent event) {
@@ -254,7 +254,7 @@ public final class ServiceEventInterceptor {
 
     public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
         for (final InviteEvent event : inviteEvents) {
-            mIRCSession.getServer().sendJoin(event.channelName);
+            mSession.getServer().sendJoin(event.channelName);
         }
         mInviteEvents.removeAll(inviteEvents);
     }

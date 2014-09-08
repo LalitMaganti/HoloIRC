@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.base.ConnectionConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 import static android.provider.BaseColumns._ID;
@@ -64,8 +64,8 @@ public class ServerDatabase extends SQLiteOpenHelper {
         return sServerDatabase;
     }
 
-    private static ServerConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
-        final ServerConfiguration.Builder builder = new ServerConfiguration.Builder();
+    private static ConnectionConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
+        final ConnectionConfiguration.Builder builder = new ConnectionConfiguration.Builder();
 
         builder.setId(getIntByName(cursor, _ID));
 
@@ -126,7 +126,7 @@ public class ServerDatabase extends SQLiteOpenHelper {
         values.put(_ID, (int) id);
     }
 
-    public void addServer(final ServerConfiguration.Builder builder,
+    public void addServer(final ConnectionConfiguration.Builder builder,
             final List<String> ignoreList) {
         final ContentValues values = getContentValuesFromBuilder(builder, false);
 
@@ -140,14 +140,14 @@ public class ServerDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public List<ServerConfiguration.Builder> getAllBuilders() {
-        final List<ServerConfiguration.Builder> builders = new ArrayList<>();
+    public List<ConnectionConfiguration.Builder> getAllBuilders() {
+        final List<ConnectionConfiguration.Builder> builders = new ArrayList<>();
         final String selectQuery = "SELECT * FROM " + TABLE_NAME;
 
         final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                final ServerConfiguration.Builder builder = getBuilderFromCursor(cursor);
+                final ConnectionConfiguration.Builder builder = getBuilderFromCursor(cursor);
                 if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
                         .isNotEmpty(builder.getUrl())) {
                     builders.add(builder);
@@ -159,7 +159,7 @@ public class ServerDatabase extends SQLiteOpenHelper {
         return builders;
     }
 
-    public ServerConfiguration.Builder getBuilderByName(final String serverName) {
+    public ConnectionConfiguration.Builder getBuilderByName(final String serverName) {
         final Cursor cursor = mDatabase.query(TABLE_NAME, null,
                 String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
         return cursor.moveToFirst() ? getBuilderFromCursor(cursor) : null;
@@ -184,7 +184,7 @@ public class ServerDatabase extends SQLiteOpenHelper {
         mDatabase.update(TABLE_NAME, values, COLUMN_TITLE + "=?", new String[]{serverName});
     }
 
-    public ContentValues getContentValuesFromBuilder(final ServerConfiguration.Builder builder,
+    public ContentValues getContentValuesFromBuilder(final ConnectionConfiguration.Builder builder,
             final boolean id) {
         final ContentValues values = new ContentValues();
 

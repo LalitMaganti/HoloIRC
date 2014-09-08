@@ -41,7 +41,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.IRCSession;
+import co.fusionx.relay.base.Session;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
@@ -61,7 +61,7 @@ public class UserListFragment extends Fragment {
 
     private Channel mChannel;
 
-    private IRCSession mConnection;
+    private Session mConnection;
 
     private final Object mEventHandler = new Object() {
         @Subscribe
@@ -151,7 +151,7 @@ public class UserListFragment extends Fragment {
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldJoinEvent event) {
-        mAdapter.addUser(event.user, event.user.getChannelPrivileges(event.channel));
+        mAdapter.addUser(event.user, event.user.getChannelPrivileges(event.conversation));
         onUserListChanged();
     }
 
@@ -205,7 +205,7 @@ public class UserListFragment extends Fragment {
     // End of subscribed events
 
     boolean isNickOtherUsers(final Nick nick) {
-        return !mConnection.getUserChannelDao().getUser().getNick().equals(nick);
+        return !mConnection.getUserChannelManager().getUser().getNick().equals(nick);
     }
 
     private void onPrivateMessageUser(final Nick nick) {
