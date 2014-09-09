@@ -16,8 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 

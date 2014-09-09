@@ -28,7 +28,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
-import co.fusionx.relay.base.SessionStatus;
+import co.fusionx.relay.core.SessionStatus;
 
 /**
  * Full of static utility methods

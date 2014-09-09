@@ -39,10 +39,10 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Session;
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;

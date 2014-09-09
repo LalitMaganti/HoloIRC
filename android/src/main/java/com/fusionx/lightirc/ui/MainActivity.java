@@ -38,13 +38,13 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.SessionStatus;
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
-import co.fusionx.relay.base.QueryUser;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.conversation.QueryUser;
+import co.fusionx.relay.conversation.Server;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.file.DCCFileConversation;
 import co.fusionx.relay.event.channel.PartEvent;
@@ -570,7 +570,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             }
             fragment.setArguments(bundle);
 
-            if (mConversationEvent == null) {
+            if (mConversationEvent == null || mConversationEvent.conversation == null) {
                 object.getSessionBus().register(this);
             } else if (mConversationEvent.connection != connection) {
                 mConversationEvent.conversation.getSessionBus().unregister(this);

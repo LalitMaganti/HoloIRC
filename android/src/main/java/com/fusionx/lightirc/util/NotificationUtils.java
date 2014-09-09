@@ -23,8 +23,8 @@ import android.support.v4.app.NotificationCompat;
 
 import java.util.Set;
 
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.media.RingtoneManager.TYPE_NOTIFICATION;

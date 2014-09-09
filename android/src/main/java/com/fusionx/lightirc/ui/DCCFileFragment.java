@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.conversation.Conversation;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileProgressEvent;
 import co.fusionx.relay.dcc.file.DCCFileConnection;

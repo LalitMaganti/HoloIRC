@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.base.SessionStatus;
+import co.fusionx.relay.core.SessionStatus;
 
 public class OnCurrentServerStatusChanged {
 

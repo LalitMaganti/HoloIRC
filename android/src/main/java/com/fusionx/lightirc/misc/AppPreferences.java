@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.interfaces.RelayConfiguration;
 import co.fusionx.relay.logging.LoggingPreferences;
 

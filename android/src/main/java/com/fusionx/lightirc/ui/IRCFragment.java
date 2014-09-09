@@ -44,8 +44,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

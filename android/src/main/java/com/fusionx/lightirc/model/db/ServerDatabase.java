@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 import static android.provider.BaseColumns._ID;

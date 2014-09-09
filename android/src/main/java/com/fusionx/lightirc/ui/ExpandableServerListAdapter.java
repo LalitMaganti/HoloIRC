@@ -25,9 +25,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.base.SessionStatus;
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.core.SessionStatus;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.UIUtils.getSpanFromPriority;

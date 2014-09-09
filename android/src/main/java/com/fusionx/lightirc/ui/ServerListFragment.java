@@ -37,10 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import co.fusionx.relay.base.SessionStatus;
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
-import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.core.SessionStatus;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
+import co.fusionx.relay.conversation.QueryUser;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileConversationStartedEvent;

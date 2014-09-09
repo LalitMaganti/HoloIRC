@@ -8,11 +8,11 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import co.fusionx.relay.base.SessionStatus;
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.core.SessionStatus;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
 
-import static co.fusionx.relay.base.ConnectionConfiguration.Builder;
+import static co.fusionx.relay.core.ConnectionConfiguration.Builder;
 
 public class ConnectionContainer {
 

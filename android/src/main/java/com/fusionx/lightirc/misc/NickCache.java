@@ -6,7 +6,7 @@ import com.fusionx.lightirc.model.NickColour;
 
 import android.support.v4.util.LruCache;
 
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.core.Nick;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 

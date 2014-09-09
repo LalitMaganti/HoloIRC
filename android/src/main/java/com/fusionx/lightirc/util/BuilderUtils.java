@@ -3,7 +3,7 @@ package com.fusionx.lightirc.util;
 import java.util.Arrays;
 import java.util.List;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
+import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 class BuilderUtils {

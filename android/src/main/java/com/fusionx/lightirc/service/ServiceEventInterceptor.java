@@ -19,9 +19,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Session;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.Session;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;

@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.Session;
-import co.fusionx.relay.base.SessionManager;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionManager;
 import co.fusionx.relay.internal.base.RelaySessionManager;
 import co.fusionx.relay.internal.function.FluentIterables;
 

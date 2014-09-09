@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.core.Session;
 
 public class ConnectionStopRequestedEvent {
 

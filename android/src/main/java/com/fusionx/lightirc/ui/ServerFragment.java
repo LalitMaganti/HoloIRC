@@ -30,7 +30,7 @@ import android.view.View;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.parser.UserInputParser;
 

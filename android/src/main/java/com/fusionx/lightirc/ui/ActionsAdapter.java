@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import co.fusionx.relay.base.SessionStatus;
+import co.fusionx.relay.core.SessionStatus;
 
 import static com.fusionx.lightirc.ui.SimpleSectionedRecyclerViewAdapter.Section;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

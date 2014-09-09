@@ -45,9 +45,9 @@ import android.widget.ImageButton;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.conversation.Channel;
+import co.fusionx.relay.core.ChannelUser;
+import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.internal.function.FluentIterables;
 import co.fusionx.relay.misc.IRCUserComparator;

@@ -11,8 +11,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import co.fusionx.relay.base.ConnectionConfiguration;
-import co.fusionx.relay.base.Session;
+import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.core.Session;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ConnectionContainer>> {
 
