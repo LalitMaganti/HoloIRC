@@ -68,18 +68,6 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
         mChannelActions = Arrays.asList(context.getResources().getStringArray(R.array
                 .channel_actions));
         mUserActions = Arrays.asList(context.getResources().getStringArray(R.array.user_actions));
-
-        final EventHandler eventHandler = new EventHandler();
-        getBus().register(eventHandler);
-        final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
-        if (event == null) {
-            return;
-        }
-
-        mFragmentType = event.fragmentType;
-        if (event.conversation != null) {
-            mStatus = event.connection.getStatus();
-        }
     }
 
     private void updateActionsList() {
@@ -158,6 +146,9 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
 
     public void setSectionedAdapter(final SimpleSectionedRecyclerViewAdapter sectionedAdapter) {
         mSectionedAdapter = sectionedAdapter;
+
+        final EventHandler eventHandler = new EventHandler();
+        getBus().registerSticky(eventHandler);
     }
 
     public class ActionViewHolder extends RecyclerView.ViewHolder {
