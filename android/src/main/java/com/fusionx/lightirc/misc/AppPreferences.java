@@ -14,17 +14,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 import co.fusionx.relay.conversation.Server;
-import co.fusionx.relay.interfaces.RelayConfiguration;
+import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.logging.LoggingPreferences;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class AppPreferences implements RelayConfiguration, LoggingPreferences {
-
-    private static AppPreferences mAppPreferences;
+public class AppPreferences implements SettingsProvider, LoggingPreferences {
 
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
+
+    private static AppPreferences mAppPreferences;
 
     private final SharedPreferences.OnSharedPreferenceChangeListener sPrefsChangeListener;
 
@@ -111,6 +111,10 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
         return mHighlightLine;
     }
 
+    public boolean shouldDisplayMotd() {
+        return mMotdAllowed;
+    }
+
     // Notification settings
     public boolean isInAppNotification() {
         return mInAppNotification;
@@ -147,11 +151,6 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
      * Interface implementation starts here
      */
     @Override
-    public int getReconnectAttemptsCount() {
-        return mNumberOfReconnectEvents;
-    }
-
-    @Override
     public String getPartReason() {
         return mPartReason;
     }
@@ -161,32 +160,26 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
         return mQuitReason;
     }
 
-    // We always want to display the messages that the app user sends
     @Override
+    public void handleFatalError(final RuntimeException ex) {
+        HANDLER.post(() -> {
+            throw new RuntimeException(ex);
+        });
+    }
+
+    @Override
+    public int getReconnectAttempts() {
+        return mNumberOfReconnectEvents;
+    }
+
+    // We always want to display the messages that the app user sends
     public boolean isSelfEventHidden() {
         return false;
     }
 
     @Override
-    public boolean isMOTDShown() {
-        return mMotdAllowed;
-    }
-
-    @Override
-    public void logMissingData(final Server server) {
-        CrashUtils.logMissingData(server);
-    }
-
-    @Override
-    public void logServerLine(final String line) {
-        CrashUtils.logIssue(line);
-    }
-
-    @Override
-    public void handleException(final Exception ex) {
-        HANDLER.post(() -> {
-            throw new RuntimeException(ex);
-        });
+    public void logNonFatalError(final String nonFatalError) {
+        CrashUtils.logIssue(nonFatalError);
     }
 
     // Logging

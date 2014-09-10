@@ -31,7 +31,7 @@ import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.parser.UserInputParser;
 
-public class DCCChatFragment extends IRCFragment<DCCChatEvent> {
+public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
     public DCCChatConversation getChatConnection() {
         return (DCCChatConversation) mConversation;

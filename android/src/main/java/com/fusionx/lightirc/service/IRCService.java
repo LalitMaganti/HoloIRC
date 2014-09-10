@@ -35,6 +35,7 @@ import java.util.Set;
 
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SessionManager;
 import co.fusionx.relay.internal.base.RelaySessionManager;
 import co.fusionx.relay.internal.function.FluentIterables;
@@ -143,13 +144,16 @@ public class IRCService extends Service {
     @Override
     public IBinder onBind(final Intent intent) {
         onFirstStart();
-        mSessionManager = RelaySessionManager.createSessionManager(mAppPreferences);
+        mSessionManager = RelaySessionManager.createSessionManager();
         return mBinder;
     }
 
     public Session requestConnectionToServer(final ConnectionConfiguration.Builder builder) {
-        final Pair<Boolean, ? extends Session> pair
-                = mSessionManager.requestConnection(builder.build());
+        final SessionConfiguration.Builder session = new SessionConfiguration.Builder();
+        session.setConnectionConfiguration(builder.build());
+        session.setSettingsProvider(AppPreferences.getAppPreferences());
+
+        final Pair<Boolean, Session> pair = mSessionManager.requestConnection(session.build());
 
         final boolean exists = pair.first;
         final Session server = pair.second;
@@ -218,7 +222,7 @@ public class IRCService extends Service {
             mAppPreferences = AppPreferences.setupAppPreferences(this);
 
             mLoggingManager = new IRCLoggingManager(mAppPreferences);
-            mSessionManager = RelaySessionManager.createSessionManager(mAppPreferences);
+            mSessionManager = RelaySessionManager.createSessionManager();
 
             startWatchingExternalStorage();
 

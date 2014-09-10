@@ -36,7 +36,7 @@ import co.fusionx.relay.parser.UserInputParser;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 
-public class ServerFragment extends IRCFragment<ServerEvent> {
+public class ServerFragment extends ConversationFragment<ServerEvent> {
 
     @Override
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
 
     @Override
     protected List<? extends ServerEvent> getAdapterData() {
-        return mConversation.getBuffer();
+        return getServer().getBuffer();
     }
 
     public Server getServer() {

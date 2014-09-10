@@ -24,7 +24,7 @@ import java.util.List;
 
 import co.fusionx.relay.event.Event;
 
-public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter.IRCViewHolder>
+public class ConversationAdapter<T extends Event> extends RecyclerView.Adapter<ConversationAdapter.IRCViewHolder>
         implements Filterable {
 
     private final Object mLock = new Object();
@@ -41,7 +41,7 @@ public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter
 
     private EventCache mEventCache;
 
-    public IRCAdapter(final Context context, final EventCache cache, final boolean filter) {
+    public ConversationAdapter(final Context context, final EventCache cache, final boolean filter) {
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);

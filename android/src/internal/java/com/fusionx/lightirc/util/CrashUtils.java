@@ -5,8 +5,6 @@ import com.fusionx.lightirc.misc.AppPreferences;
 
 import android.content.Context;
 
-import co.fusionx.relay.conversation.Server;
-
 public class CrashUtils {
 
     public static void startCrashlyticsIfAppropriate(final Context context) {
@@ -14,13 +12,6 @@ public class CrashUtils {
         AppPreferences.setupAppPreferences(context);
 
         callbackIfReportingEnabled(() -> Crashlytics.start(context));
-    }
-
-    public static void logMissingData(final Server server) {
-        callbackIfReportingEnabled(() -> {
-            Crashlytics.log(server.getConfiguration().getUrl());
-            Crashlytics.logException(new IRCException("Missing data on server"));
-        });
     }
 
     public static void logIssue(final String data) {

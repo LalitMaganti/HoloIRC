@@ -31,7 +31,7 @@ import co.fusionx.relay.conversation.QueryUser;
 import co.fusionx.relay.event.query.QueryEvent;
 import co.fusionx.relay.parser.UserInputParser;
 
-public class UserFragment extends IRCFragment<QueryEvent> {
+public class QueryFragment extends ConversationFragment<QueryEvent> {
 
     public QueryUser getQueryUser() {
         return (QueryUser) mConversation;

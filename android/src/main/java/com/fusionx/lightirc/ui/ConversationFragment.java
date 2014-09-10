@@ -50,7 +50,7 @@ import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-abstract class IRCFragment<T extends Event> extends BaseIRCFragment
+abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
         implements TextView.OnEditorActionListener {
 
     Session mConnection;
@@ -61,7 +61,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
     String mTitle;
 
-    IRCAdapter<T> mMessageAdapter;
+    ConversationAdapter<T> mMessageAdapter;
 
     RecyclerView mRecyclerView;
 
@@ -148,9 +148,9 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         return mTitle;
     }
 
-    protected IRCAdapter<T> getNewAdapter() {
+    protected ConversationAdapter<T> getNewAdapter() {
         final Callback callback = FragmentUtils.getParent(this, Callback.class);
-        return new IRCAdapter<>(getActivity(), callback.getEventCache(mConnection), true);
+        return new ConversationAdapter<>(getActivity(), callback.getEventCache(mConnection), true);
     }
 
     // Abstract methods

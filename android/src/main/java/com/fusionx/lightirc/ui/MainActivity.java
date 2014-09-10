@@ -63,7 +63,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
  */
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback,
-        IRCFragment.Callback {
+        ConversationFragment.Callback {
 
     public static final int SERVER_SETTINGS = 1;
 
@@ -560,7 +560,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             } else if (Channel.class.isInstance(object)) {
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
-                fragment = new UserFragment();
+                fragment = new QueryFragment();
             } else if (DCCChatConversation.class.isInstance(object)) {
                 fragment = new DCCChatFragment();
             } else if (DCCFileConversation.class.isInstance(object)) {

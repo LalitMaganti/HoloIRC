@@ -31,6 +31,8 @@ import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
 
+import org.apache.commons.lang3.StringUtils;
+
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.text.Editable;
@@ -54,11 +56,10 @@ import co.fusionx.relay.misc.IRCUserComparator;
 import co.fusionx.relay.parser.UserInputParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
-import co.fusionx.relay.util.Utils;
 
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
 
-public final class ChannelFragment extends IRCFragment<ChannelEvent>
+public final class ChannelFragment extends ConversationFragment<ChannelEvent>
         implements PopupMenu.OnMenuItemClickListener, PopupMenu.OnDismissListener, TextWatcher {
 
     private ImageButton mAutoButton;
@@ -102,7 +103,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
 
     @Override
     public void afterTextChanged(final Editable s) {
-        mAutoButton.setEnabled(Utils.isNotEmpty(s));
+        mAutoButton.setEnabled(StringUtils.isNotEmpty(s));
     }
 
     @Override
@@ -128,7 +129,7 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
         mAutoButton = (ImageButton) view.findViewById(R.id.auto_complete_button);
         mAutoButton.setOnClickListener(new QuickUserMentionListener());
 
-        mAutoButton.setEnabled(Utils.isNotEmpty(mMessageBox.getText()));
+        mAutoButton.setEnabled(StringUtils.isNotEmpty(mMessageBox.getText()));
         mMessageBox.addTextChangedListener(this);
     }
 
@@ -148,8 +149,8 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
     }
 
     @Override
-    protected List<ChannelEvent> getAdapterData() {
-        return (List<ChannelEvent>) getChannel().getBuffer();
+    protected List<? extends ChannelEvent> getAdapterData() {
+        return getChannel().getBuffer();
     }
 
     private Channel getChannel() {

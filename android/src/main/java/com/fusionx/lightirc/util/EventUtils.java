@@ -14,6 +14,7 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
 import co.fusionx.relay.event.server.JoinEvent;
+import co.fusionx.relay.event.server.MotdEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
 import co.fusionx.relay.event.server.ServerEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
@@ -40,6 +41,9 @@ public class EventUtils {
             // TODO - readd ignore list functionality back in here
         } else if (event instanceof ServerEvent) {
             final ServerEvent serverEvent = (ServerEvent) event;
+            if (MotdEvent.class.equals(serverEvent.getClass())) {
+                return AppPreferences.getAppPreferences().shouldDisplayMotd();
+            }
             return !SERVER_IGNORE_EVENTS.contains(serverEvent.getClass());
         } else if (event instanceof ChannelEvent) {
             final ChannelEvent channelEvent = (ChannelEvent) event;
