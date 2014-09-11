@@ -111,7 +111,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
         @Subscribe
         public void onConversationChanged(final OnConversationChanged conversationChanged) {
-            mConnection = conversationChanged.connection;
+            mConnection = conversationChanged.session;
             mConversation = conversationChanged.conversation;
         }
     }

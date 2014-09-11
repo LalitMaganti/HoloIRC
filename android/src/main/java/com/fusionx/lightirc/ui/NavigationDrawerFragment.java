@@ -240,7 +240,7 @@ public class NavigationDrawerFragment extends Fragment implements
             if (conversationChanged.conversation == null) {
                 mEventHelper = null;
             } else {
-                final Session connection = conversationChanged.connection;
+                final Session connection = conversationChanged.session;
                 mStatus = connection.getStatus();
                 mEventHelper = mCallback.getService().getEventHelper(connection);
             }

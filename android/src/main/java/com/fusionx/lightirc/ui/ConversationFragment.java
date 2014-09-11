@@ -90,7 +90,7 @@ abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
         ViewCompat.setOverScrollMode(mRecyclerView, ViewCompat.OVER_SCROLL_NEVER);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
-        mConnection = event.connection;
+        mConnection = event.session;
         mConversation = event.conversation;
 
         mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
@@ -104,7 +104,7 @@ abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
 
         onResetBuffer(() -> {
         });
-        mConversation.getBus().register(this);
+        mConversation.registerForEvents(this);
     }
 
     @Override
@@ -112,7 +112,7 @@ abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
         super.onDestroyView();
 
         getBus().unregister(mEventListener);
-        mConversation.getBus().unregister(this);
+        mConversation.unregisterFromEvents(this);
     }
 
     @Override

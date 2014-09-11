@@ -7,15 +7,15 @@ import co.fusionx.relay.core.Session;
 
 public class OnConversationChanged {
 
-    public final Session connection;
+    public final Session session;
 
     public final Conversation conversation;
 
     public final FragmentType fragmentType;
 
-    public OnConversationChanged(final Session connection, final Conversation conversation,
+    public OnConversationChanged(final Session session, final Conversation conversation,
             final FragmentType fragmentType) {
-        this.connection = connection;
+        this.session = session;
         this.conversation = conversation;
         this.fragmentType = fragmentType;
     }

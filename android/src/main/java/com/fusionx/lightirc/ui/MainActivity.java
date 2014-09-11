@@ -220,7 +220,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
-                mConversationEvent.conversation.getSessionBus().register(this);
+                mConversationEvent.session.registerForEvents(this);
             } else {
                 onRemoveCurrentFragment();
             }
@@ -243,7 +243,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         closeDrawer();
         supportInvalidateOptionsMenu();
 
-        if (mCurrentFragment != null && connection.equals(mConversationEvent.connection)) {
+        if (mCurrentFragment != null && connection.equals(mConversationEvent.session)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
@@ -295,7 +295,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void disconnectFromServer() {
-        getService().requestConnectionStoppage(mConversationEvent.connection);
+        getService().requestConnectionStoppage(mConversationEvent.session);
     }
 
     @Override
@@ -328,7 +328,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void reconnectToServer() {
-        getService().requestReconnectionToServer(mConversationEvent.connection);
+        getService().requestReconnectionToServer(mConversationEvent.session);
     }
 
     @Override
@@ -349,7 +349,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (fromRecents || serverName == null) {
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
-            connection = Optional.fromNullable(event).transform(e -> event.connection);
+            connection = Optional.fromNullable(event).transform(e -> event.session);
             optConversation = Optional.fromNullable(event).transform(e -> event.conversation);
         } else {
             // Try to remove the extras from the intent - this probably won't work though if the
@@ -383,7 +383,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (mCurrentFragment == null) {
             return;
         }
-        final SessionStatus status = mConversationEvent.connection.getStatus();
+        final SessionStatus status = mConversationEvent.session.getStatus();
         if (mCurrentFragment.getType() == FragmentType.SERVER) {
             setActionBarSubtitle(getStatusString(this, status));
         }
@@ -471,8 +471,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mConversationEvent != null && mConversationEvent.conversation != null) {
-            mConversationEvent.conversation.getSessionBus().unregister(this);
+        if (mConversationEvent != null && mConversationEvent.session != null) {
+            mConversationEvent.session.unregisterFromEvents(this);
         }
     }
 
@@ -547,7 +547,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
-    private void changeCurrentConversation(final Session connection,
+    private void changeCurrentConversation(final Session session,
             final Conversation object, final boolean delayChange) {
         if (!object.equals(mConversationEvent)) {
             final Bundle bundle = new Bundle();
@@ -571,18 +571,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             fragment.setArguments(bundle);
 
             if (mConversationEvent == null || mConversationEvent.conversation == null) {
-                object.getSessionBus().register(this);
-            } else if (mConversationEvent.connection != connection) {
-                mConversationEvent.conversation.getSessionBus().unregister(this);
-                object.getSessionBus().register(this);
+                session.registerForEvents(this);
+            } else if (mConversationEvent.session != session) {
+                mConversationEvent.session.unregisterFromEvents(this);
+                session.registerForEvents(this);
             }
 
             setActionBarTitle(object.getId());
             setActionBarSubtitle(isServer
-                    ? getStatusString(this, connection.getStatus())
-                    : connection.getServer().getTitle());
+                    ? getStatusString(this, session.getStatus())
+                    : session.getServer().getTitle());
 
-            getBus().postSticky(new OnConversationChanged(connection, object, fragment.getType()));
+            getBus().postSticky(new OnConversationChanged(session, object, fragment.getType()));
             changeCurrentFragment(fragment, delayChange);
         }
         mSlidingPane.closePane();
@@ -625,7 +625,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveCurrentFragment();
 
         // Don't listen for any more events from this server
-        mConversationEvent.conversation.getSessionBus().unregister(this);
+        mConversationEvent.session.unregisterFromEvents(this);
         getBus().postSticky(new OnConversationChanged(null, null, null));
     }
 

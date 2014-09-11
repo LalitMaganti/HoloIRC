@@ -64,8 +64,8 @@ public final class ServiceEventInterceptor {
 
     private MessagePriority mMessagePriority;
 
-    public ServiceEventInterceptor(final Session connection) {
-        mSession = connection;
+    public ServiceEventInterceptor(final Session session) {
+        mSession = session;
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
         mInviteEvents = new HashSet<>();
@@ -78,11 +78,11 @@ public final class ServiceEventInterceptor {
             }
         });
 
-        connection.getSessionBus().register(this, EVENT_PRIORITY);
+        session.registerForEvents(this, EVENT_PRIORITY);
     }
 
     public void unregister() {
-        mSession.getSessionBus().unregister(this);
+        mSession.unregisterFromEvents(this);
     }
 
     public MessagePriority getSubMessagePriority(final Conversation title) {

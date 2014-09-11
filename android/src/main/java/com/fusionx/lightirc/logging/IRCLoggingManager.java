@@ -7,11 +7,11 @@ import com.fusionx.lightirc.util.EventUtils;
 import co.fusionx.relay.core.Session;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.logging.LoggingManager;
-import co.fusionx.relay.logging.LoggingPreferences;
+import co.fusionx.relay.logging.LoggingSettingsProvider;
 
 public class IRCLoggingManager extends LoggingManager {
 
-    public IRCLoggingManager(final LoggingPreferences preferences) {
+    public IRCLoggingManager(final LoggingSettingsProvider preferences) {
         super(preferences);
     }
 

@@ -67,13 +67,13 @@ public class UserListFragment extends Fragment {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             if (mChannel != null) {
-                mChannel.getBus().unregister(UserListFragment.this);
+                mChannel.unregisterFromEvents(UserListFragment.this);
             }
 
             if (conversationChanged.fragmentType == FragmentType.CHANNEL) {
-                mConnection = conversationChanged.connection;
+                mConnection = conversationChanged.session;
                 mChannel = (Channel) conversationChanged.conversation;
-                mChannel.getBus().register(UserListFragment.this);
+                mChannel.registerForEvents(UserListFragment.this);
             } else {
                 mConnection = null;
                 mChannel = null;
@@ -132,7 +132,7 @@ public class UserListFragment extends Fragment {
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
         if (mChannel != null) {
-            mChannel.getBus().unregister(this);
+            mChannel.unregisterFromEvents(this);
         }
         // Don't keep a track of this connection/channel - we will deal with this when we return
         mConnection = null;

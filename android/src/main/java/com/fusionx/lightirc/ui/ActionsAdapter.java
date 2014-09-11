@@ -167,8 +167,8 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
             mFragmentType = conversationChanged.fragmentType;
-            mStatus = conversationChanged.connection == null ? null
-                    : conversationChanged.connection.getStatus();
+            mStatus = conversationChanged.session == null ? null
+                    : conversationChanged.session.getStatus();
             updateActionsList();
         }
 

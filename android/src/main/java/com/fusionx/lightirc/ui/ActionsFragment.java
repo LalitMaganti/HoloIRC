@@ -30,7 +30,7 @@ public class ActionsFragment extends Fragment {
     private final Object mEventHandler = new Object() {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
-            mConnection = conversationChanged.connection;
+            mConnection = conversationChanged.session;
             mConversation = conversationChanged.conversation;
         }
     };

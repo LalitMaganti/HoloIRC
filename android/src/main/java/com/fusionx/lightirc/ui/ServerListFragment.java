@@ -525,11 +525,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         }
 
         public void register() {
-            mConnection.getSessionBus().register(this, 50);
+            mConnection.registerForEvents(this, 50);
         }
 
         public void unregister() {
-            mConnection.getSessionBus().unregister(this);
+            mConnection.unregisterFromEvents(this);
         }
     }
 
@@ -539,7 +539,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onConversationChanged(final OnConversationChanged event) {
             if (event.conversation != null) {
                 final ServiceEventInterceptor eventInterceptor = mService.getEventHelper(event
-                        .connection);
+                        .session);
                 if (event.fragmentType == FragmentType.SERVER) {
                     eventInterceptor.clearMessagePriority();
                 } else {

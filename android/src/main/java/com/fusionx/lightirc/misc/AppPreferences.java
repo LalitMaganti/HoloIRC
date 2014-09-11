@@ -13,14 +13,13 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.core.SettingsProvider;
-import co.fusionx.relay.logging.LoggingPreferences;
+import co.fusionx.relay.logging.LoggingSettingsProvider;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class AppPreferences implements SettingsProvider, LoggingPreferences {
+public class AppPreferences implements SettingsProvider, LoggingSettingsProvider {
 
     private static final Handler HANDLER = new Handler(Looper.getMainLooper());
 
