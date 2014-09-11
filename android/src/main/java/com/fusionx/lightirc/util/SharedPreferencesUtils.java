@@ -22,7 +22,7 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.misc.PreferenceConstants;
-import com.fusionx.lightirc.model.db.ServerDatabase;
+import com.fusionx.lightirc.model.db.BuilderDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -109,7 +109,7 @@ public class SharedPreferencesUtils {
     }
 
     private static void migrateToDatabase(final List<File> array, final Context context) {
-        final ServerDatabase source = ServerDatabase.getInstance(context);
+        final BuilderDatabase source = BuilderDatabase.getInstance(context);
         for (final File file : array) {
             final String prefsName = file.getName().replace(".xml", "");
             // Get builder to transfer
@@ -131,7 +131,7 @@ public class SharedPreferencesUtils {
     }
 
     private static void firstTimeServerSetup(final Context context) {
-        final ServerDatabase source = ServerDatabase.getInstance(context);
+        final BuilderDatabase source = BuilderDatabase.getInstance(context);
         final List<ConnectionConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
         for (final ConnectionConfiguration.Builder builder : builders) {
             source.addServer(builder, new ArrayList<>());
@@ -139,7 +139,7 @@ public class SharedPreferencesUtils {
     }
 
     private static void firstDbSetup(final Context context) {
-        final ServerDatabase source = ServerDatabase.getInstance(context);
+        final BuilderDatabase source = BuilderDatabase.getInstance(context);
         final List<ConnectionConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
         for (final ConnectionConfiguration.Builder builder : builders) {
             if (source.getBuilderByName(builder.getTitle()) == null) {

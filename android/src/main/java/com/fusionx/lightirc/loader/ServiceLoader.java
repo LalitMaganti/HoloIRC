@@ -14,7 +14,8 @@ public class ServiceLoader extends Loader<IRCService> {
     private final ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder binder) {
-            final IRCService service = ((IRCService.IRCBinder) binder).getService();
+            final IRCService.IRCBinder serviceBinder = (IRCService.IRCBinder) binder;
+            final IRCService service = serviceBinder.getService();
             deliverResult(service);
         }
 
@@ -29,8 +30,9 @@ public class ServiceLoader extends Loader<IRCService> {
 
     @Override
     protected void onStartLoading() {
-        final Intent service = new Intent(getContext(), IRCService.class);
-        getContext().startService(service);
-        getContext().bindService(service, mConnection, 0);
+        final Context context = getContext();
+        final Intent service = new Intent(context, IRCService.class);
+        context.startService(service);
+        context.bindService(service, mConnection, 0);
     }
 }

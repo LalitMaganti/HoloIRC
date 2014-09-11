@@ -11,7 +11,7 @@ import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.loader.SessionContainerLoader;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.model.SessionContainer;
-import com.fusionx.lightirc.model.db.ServerDatabase;
+import com.fusionx.lightirc.model.db.BuilderDatabase;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.EventUtils;
@@ -532,11 +532,11 @@ public class SessionOverviewFragment extends Fragment {
 
     private class DeleteAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private ServerDatabase source;
+        private BuilderDatabase source;
 
         @Override
         protected void onPreExecute() {
-            source = ServerDatabase.getInstance(getActivity());
+            source = BuilderDatabase.getInstance(getActivity());
         }
 
         @Override
@@ -546,7 +546,7 @@ public class SessionOverviewFragment extends Fragment {
                 final int group = ExpandableListView.getPackedPositionGroup(packed);
 
                 final ConnectionContainer listItem = mAdapter.getGroup(group);
-                source.removeServer(listItem.getBuilder().getId());
+                source.removeBuilder(listItem.getBuilder().getId());
             }*/
             return null;
         }

@@ -1,7 +1,7 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.interfaces.ServerSettingsCallbacks;
-import com.fusionx.lightirc.model.db.ServerDatabase;
+import com.fusionx.lightirc.model.db.BuilderDatabase;
 import com.fusionx.lightirc.ui.preferences.NickPreference;
 import com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference;
 import com.fusionx.lightirc.ui.preferences.ViewPreference;
@@ -53,7 +53,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
     private PreferenceScreen mScreen;
 
-    private ServerDatabase mDatabase;
+    private BuilderDatabase mDatabase;
 
     private ContentValues mContentValues;
 
@@ -67,7 +67,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         mNewServer = getIntent().getBooleanExtra(NEW_SERVER, false);
         mCanSaveChanges = !mNewServer;
 
-        mDatabase = ServerDatabase.getInstance(this);
+        mDatabase = BuilderDatabase.getInstance(this);
 
         ConnectionConfiguration.Builder builder;
         if (mNewServer) {

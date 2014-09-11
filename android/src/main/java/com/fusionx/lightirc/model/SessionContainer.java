@@ -23,22 +23,13 @@ public class SessionContainer {
 
     private final List<Conversation> mConversations;
 
-    private final Collection<String> mIgnoreList;
-
     private Session mSession;
 
-    public SessionContainer(final Builder builder, final Collection<String> ignoreList,
-            final Optional<Session> session) {
+    public SessionContainer(final Builder builder, final Optional<Session> session) {
         mBuilder = builder;
-        mIgnoreList = ignoreList;
         mConversations = new ArrayList<>();
 
         setSession(session);
-    }
-
-    public boolean isServerAvailable() {
-        return mSession != null && (mSession.getStatus() == SessionStatus.CONNECTED
-                || mSession.getStatus() == SessionStatus.RECONNECTING);
     }
 
     public String getTitle() {
@@ -64,10 +55,6 @@ public class SessionContainer {
                 .copyInto(mConversations);
         FluentIterable.from(session.getDCCManager().getFileConversations())
                 .copyInto(mConversations);
-    }
-
-    public Collection<String> getIgnoreList() {
-        return mIgnoreList;
     }
 
     public Builder getBuilder() {

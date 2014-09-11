@@ -3,7 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.model.db.ServerDatabase;
+import com.fusionx.lightirc.model.db.BuilderDatabase;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 
 import org.lucasr.twowayview.TwoWayView;
@@ -30,7 +30,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
     private Conversation mConversation;
 
-    private ServerDatabase mDatabaseSource;
+    private BuilderDatabase mDatabaseSource;
 
     private IgnoredUsersAdapter mAdapter;
 
@@ -46,7 +46,7 @@ public class IgnoredUsersFragment extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mDatabaseSource = ServerDatabase.getInstance(getActivity());
+        mDatabaseSource = BuilderDatabase.getInstance(getActivity());
         mAdapter = new IgnoredUsersAdapter(getActivity(), new DeclineListener());
 
         setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_DeviceDefault_Dialog);

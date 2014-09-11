@@ -39,7 +39,7 @@ import static com.fusionx.lightirc.util.DatabaseUtils.convertStringToArray;
 import static com.fusionx.lightirc.util.DatabaseUtils.getIntByName;
 import static com.fusionx.lightirc.util.DatabaseUtils.getStringByName;
 
-public class ServerDatabase extends SQLiteOpenHelper {
+public class BuilderDatabase extends SQLiteOpenHelper {
 
     // Database Name
     private static final String DATABASE_NAME = "HoloIRCDB";
@@ -47,21 +47,21 @@ public class ServerDatabase extends SQLiteOpenHelper {
     // Database Version
     private static final int DATABASE_VERSION = 1;
 
-    private static ServerDatabase sServerDatabase;
+    private static BuilderDatabase sBuilderDatabase;
 
     private final SQLiteDatabase mDatabase;
 
-    private ServerDatabase(final Context context) {
+    private BuilderDatabase(final Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
         mDatabase = getWritableDatabase();
     }
 
-    public static ServerDatabase getInstance(final Context context) {
-        if (sServerDatabase == null) {
-            sServerDatabase = new ServerDatabase(context);
+    public static BuilderDatabase getInstance(final Context context) {
+        if (sBuilderDatabase == null) {
+            sBuilderDatabase = new BuilderDatabase(context);
         }
-        return sServerDatabase;
+        return sBuilderDatabase;
     }
 
     private static ConnectionConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
@@ -152,7 +152,7 @@ public class ServerDatabase extends SQLiteOpenHelper {
                         .isNotEmpty(builder.getUrl())) {
                     builders.add(builder);
                 } else {
-                    removeServer(builder.getId());
+                    removeBuilder(builder.getId());
                 }
             } while (cursor.moveToNext());
         }
@@ -227,7 +227,7 @@ public class ServerDatabase extends SQLiteOpenHelper {
         return values;
     }
 
-    public void removeServer(final int id) {
+    public void removeBuilder(final int id) {
         mDatabase.delete(TABLE_NAME, _ID + "=" + id, null);
     }
 }
