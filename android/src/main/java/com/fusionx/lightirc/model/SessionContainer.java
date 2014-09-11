@@ -104,4 +104,12 @@ public class SessionContainer {
     public int indexOf(final Conversation conversation) {
         return mConversations.indexOf(conversation);
     }
+
+    public int removeSession() {
+        final int size = mConversations.size();
+        setSession(Optional.<Session>absent());
+        mConversations.clear();
+
+        return size;
+    }
 }

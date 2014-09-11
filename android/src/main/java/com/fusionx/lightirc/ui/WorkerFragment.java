@@ -16,8 +16,7 @@ import android.support.v4.content.Loader;
 /**
  * Class where all the IRC work is carried out
  */
-public class WorkerFragment extends Fragment implements LoaderManager
-        .LoaderCallbacks<IRCService> {
+public class WorkerFragment extends Fragment implements LoaderManager.LoaderCallbacks<IRCService> {
 
     private IRCService mService;
 

@@ -194,6 +194,25 @@ public class SessionOverviewAdapter extends
         notifyItemChanged(rawPosition);
     }
 
+    public void refreshConversations() {
+        for (final SessionContainer sessionContainer : mContainers) {
+            sessionContainer.refreshConversations();
+        }
+    }
+
+    public void removeSession(final int groupPosition) {
+        final boolean isExpanded = isGroupExpanded(groupPosition);
+        collapseGroup(groupPosition);
+
+        final int rawPosition = getRawPosition(groupPosition);
+        final SessionContainer container = mContainers.get(groupPosition);
+        final int size = container.removeSession();
+        if (isExpanded) {
+            notifyItemRangeRemoved(rawPosition + 1, size);
+        }
+        notifyItemChanged(rawPosition);
+    }
+
     public static class ServerGroupViewHolder
             extends ExpandableRecyclerViewAdapter.GroupViewHolder {
 

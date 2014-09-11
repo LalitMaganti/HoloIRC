@@ -22,7 +22,7 @@ public abstract class ExpandableRecyclerViewAdapter<G extends ExpandableRecycler
     }
 
     public void collapseGroup(final int groupPosition) {
-        mExpandedGroups.put(groupPosition, false);
+        mExpandedGroups.delete(groupPosition);
         final int rawPosition = getRawPosition(groupPosition);
         notifyItemRangeRemoved(rawPosition + 1, getChildCount(groupPosition));
     }
@@ -159,7 +159,7 @@ public abstract class ExpandableRecyclerViewAdapter<G extends ExpandableRecycler
 
     public void notifyChildChanged(final int groupPosition, final int childPosition) {
         if (isGroupExpanded(groupPosition)) {
-            notifyItemChanged(getRawPosition(groupPosition) + childPosition);
+            notifyItemChanged(getRawPosition(groupPosition) + childPosition + 1);
         }
     }
 

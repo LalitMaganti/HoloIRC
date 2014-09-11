@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +65,8 @@ public class SessionOverviewFragment extends Fragment {
     private SessionOverviewAdapter mAdapter;
 
     private IRCService mService;
+
+    private View mProgressBar;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -106,10 +107,9 @@ public class SessionOverviewFragment extends Fragment {
         mRecyclerView = (RecyclerView) view.findViewById(R.id.server_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mAdapter);
-        // mRecyclerView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        // mRecyclerView.setEmptyView(view.findViewById(android.R.id.empty));
 
-        // mRecyclerView.setMultiChoiceModeListener(this);
+        mProgressBar = view.findViewById(R.id.progress_bar_empty);
+        mProgressBar.setVisibility(View.VISIBLE);
 
         if (bundle == null) {
             return;
@@ -135,7 +135,7 @@ public class SessionOverviewFragment extends Fragment {
         if (mAdapter == null) {
             return;
         }
-        // mAdapter.refreshConversations();
+        mAdapter.refreshConversations();
         mAdapter.notifyDataSetChanged();
     }
 
@@ -192,15 +192,7 @@ public class SessionOverviewFragment extends Fragment {
         }
 
         return true;
-    }*/
-
-    public void onConversationClicked(final int groupPosition, final int childPosition) {
-        final SessionContainer container = mAdapter.getGroup(groupPosition);
-        final Conversation conversation = container.getConversation(childPosition);
-        mCallback.onConversationClicked(container.getSession(), conversation);
     }
-
-    /*
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
         /*if (!checked) {
@@ -313,33 +305,14 @@ public class SessionOverviewFragment extends Fragment {
         return true;
     }
 
+    public void onConversationClicked(final int groupPosition, final int childPosition) {
+        final SessionContainer container = mAdapter.getGroup(groupPosition);
+        final Conversation conversation = container.getConversation(childPosition);
+        mCallback.onConversationClicked(container.getSession(), conversation);
+    }
+
     private void deleteServer(final List<Integer> checkedPositions) {
-        final AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
-
-            private ServerDatabase source;
-
-            @Override
-            protected void onPreExecute() {
-                source = ServerDatabase.getInstance(getActivity());
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                /*for (final int checkedPosition : checkedPositions) {
-                    final long packed = mRecyclerView.getExpandableListPosition(checkedPosition);
-                    final int group = ExpandableListView.getPackedPositionGroup(packed);
-
-                    final ConnectionContainer listItem = mAdapter.getGroup(group);
-                    source.removeServer(listItem.getBuilder().getId());
-                }*/
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                refreshServers();
-            }
-        };
+        final AsyncTask<Void, Void, Void> asyncTask = new DeleteAsyncTask();
         asyncTask.execute();
     }
 
@@ -353,45 +326,7 @@ public class SessionOverviewFragment extends Fragment {
     }*/
 
     void refreshServers() {
-        final LoaderManager.LoaderCallbacks<ArrayList<SessionContainer>> callbacks
-                = new LoaderManager.LoaderCallbacks<ArrayList<SessionContainer>>() {
-            @Override
-            public Loader<ArrayList<SessionContainer>> onCreateLoader(int id,
-                    Bundle args) {
-                return new SessionContainerLoader(getActivity());
-            }
-
-            @Override
-            public void onLoadFinished(final Loader<ArrayList<SessionContainer>> loader,
-                    final ArrayList<SessionContainer> listItems) {
-                mAdapter.clear();
-                mAdapter.addAll(listItems);
-
-                final TextView textView = (TextView) getView().findViewById(R.id.empty_text_view);
-                textView.setText("No servers found :(\nClick + to add one");
-
-                getView().findViewById(R.id.progress_bar_empty).setVisibility(View.GONE);
-
-                for (final ServerEventHandler eventHandler : mEventHandlers.values()) {
-                    eventHandler.unregister();
-                }
-                mEventHandlers.clear();
-
-                for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
-                    SessionContainer wrapper = listItems.get(i);
-                    if (wrapper.getSession() != null) {
-                        mEventHandlers.put(wrapper.getSession(),
-                                new ServerEventHandler(wrapper, i));
-                    }
-                }
-            }
-
-            @Override
-            public void onLoaderReset(Loader<ArrayList<SessionContainer>> loader) {
-            }
-        };
-
-        getLoaderManager().restartLoader(21, null, callbacks);
+        getLoaderManager().restartLoader(21, null, new SessionLoaderCallbacks());
     }
 
     public interface Callback {
@@ -550,9 +485,75 @@ public class SessionOverviewFragment extends Fragment {
             eventHandler.unregister();
 
             final int groupPosition = eventHandler.getGroupPosition();
-            mAdapter.removeGroup(groupPosition);
+            mAdapter.removeSession(groupPosition);
 
             mCallback.onServerStopped(event.session);
+        }
+    }
+
+    private class SessionLoaderCallbacks
+            implements LoaderManager.LoaderCallbacks<List<SessionContainer>> {
+
+        @Override
+        public Loader<List<SessionContainer>> onCreateLoader(final int id, final Bundle args) {
+            return new SessionContainerLoader(getActivity());
+        }
+
+        @Override
+        public void onLoadFinished(final Loader<List<SessionContainer>> loader,
+                final List<SessionContainer> listItems) {
+            mAdapter.clear();
+            mAdapter.addAll(listItems);
+
+            final TextView textView = (TextView) getView().findViewById(R.id.empty_text_view);
+            textView.setText("No servers found :(\nClick + to add one");
+
+            mProgressBar.setVisibility(View.GONE);
+
+            for (final ServerEventHandler eventHandler : mEventHandlers.values()) {
+                eventHandler.unregister();
+            }
+            mEventHandlers.clear();
+
+            for (int group = 0, listItemsSize = listItems.size(); group < listItemsSize; group++) {
+                final SessionContainer container = listItems.get(group);
+                final Session session = container.getSession();
+
+                if (session != null) {
+                    mEventHandlers.put(session, new ServerEventHandler(container, group));
+                }
+            }
+        }
+
+        @Override
+        public void onLoaderReset(final Loader<List<SessionContainer>> loader) {
+        }
+    }
+
+    private class DeleteAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private ServerDatabase source;
+
+        @Override
+        protected void onPreExecute() {
+            source = ServerDatabase.getInstance(getActivity());
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            /*for (final int checkedPosition : checkedPositions) {
+                final long packed = mRecyclerView.getExpandableListPosition(checkedPosition);
+                final int group = ExpandableListView.getPackedPositionGroup(packed);
+
+                final ConnectionContainer listItem = mAdapter.getGroup(group);
+                source.removeServer(listItem.getBuilder().getId());
+            }*/
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            refreshServers();
         }
     }
 }
