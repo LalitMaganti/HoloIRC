@@ -7,6 +7,4 @@ import android.preference.PreferenceScreen;
 public interface ServerSettingsCallbacks {
 
     public void setupPreferences(final PreferenceScreen screen, final Activity activity);
-
-    public boolean onPreferenceChange(final Preference preference);
 }

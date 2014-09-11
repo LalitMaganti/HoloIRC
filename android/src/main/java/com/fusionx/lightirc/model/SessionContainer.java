@@ -3,55 +3,59 @@ package com.fusionx.lightirc.model;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
+import co.fusionx.relay.conversation.Channel;
 import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.conversation.Conversation;
 import co.fusionx.relay.core.Session;
 
 import static co.fusionx.relay.core.ConnectionConfiguration.Builder;
 
-public class ConnectionContainer {
+public class SessionContainer {
 
     private final Builder mBuilder;
 
-    private final Set<Conversation> mConversations;
+    private final List<Conversation> mConversations;
 
     private final Collection<String> mIgnoreList;
 
-    private Session mConnection;
+    private Session mSession;
 
-    public ConnectionContainer(final Builder builder, final Collection<String> ignoreList,
-            final Optional<Session> connection) {
+    public SessionContainer(final Builder builder, final Collection<String> ignoreList,
+            final Optional<Session> session) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
-        mConversations = new LinkedHashSet<>();
+        mConversations = new ArrayList<>();
 
-        setConnection(connection.orNull());
+        setSession(session);
     }
 
     public boolean isServerAvailable() {
-        return mConnection != null && (mConnection.getStatus() == SessionStatus.CONNECTED
-                || mConnection.getStatus() == SessionStatus.RECONNECTING);
+        return mSession != null && (mSession.getStatus() == SessionStatus.CONNECTED
+                || mSession.getStatus() == SessionStatus.RECONNECTING);
     }
 
     public String getTitle() {
         return mBuilder.getTitle();
     }
 
-    public Session getConnection() {
-        return mConnection;
+    public Session getSession() {
+        return mSession;
     }
 
-    public void setConnection(final Session session) {
-        mConnection = session;
+    public void setSession(final Optional<Session> optional) {
+        mSession = optional.orNull();
 
-        if (session == null) {
+        if (!optional.isPresent()) {
             return;
         }
+        final Session session = optional.get();
         FluentIterable.from(session.getUserChannelManager().getUser().getChannels())
                 .copyInto(mConversations);
         FluentIterable.from(session.getQueryManager().getQueryUsers())
@@ -74,8 +78,10 @@ public class ConnectionContainer {
         mConversations.add(conversation);
     }
 
-    public void removeConversation(final Conversation conversation) {
-        mConversations.remove(conversation);
+    public int removeConversation(final Conversation conversation) {
+        final int position = mConversations.indexOf(conversation);
+        mConversations.remove(position);
+        return position;
     }
 
     public int getConversationCount() {
@@ -83,19 +89,19 @@ public class ConnectionContainer {
     }
 
     public Conversation getConversation(int childPos) {
-        final Iterator<Conversation> iterator = mConversations.iterator();
-        for (int i = 0; i < childPos; i++) {
-            iterator.next();
-        }
-        return iterator.next();
+        return mConversations.get(childPos);
     }
 
     public void refreshConversations() {
         removeAll();
-        setConnection(mConnection);
+        setSession(Optional.fromNullable(mSession));
     }
 
     public void removeAll() {
         mConversations.clear();
+    }
+
+    public int indexOf(final Conversation conversation) {
+        return mConversations.indexOf(conversation);
     }
 }

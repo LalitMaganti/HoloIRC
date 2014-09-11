@@ -140,8 +140,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
         }
     }
 
-    @Override
-    public boolean onPreferenceChange(final Preference preference) {
+    private boolean onPreferenceChange(final Preference preference) {
         if (!mCanSaveChanges) {
             if (preference == mTitle && StringUtils.isEmpty(mUrl.getText())) {
                 mCompletePreference.setInitialText(mUrl.getTitle());

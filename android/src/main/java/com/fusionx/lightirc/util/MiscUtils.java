@@ -57,8 +57,7 @@ public class MiscUtils {
         return null;
     }
 
-    public static String getStatusString(final Context context,
-            final SessionStatus sessionStatus) {
+    public static String getStatusString(final Context context, final SessionStatus sessionStatus) {
         switch (sessionStatus) {
             case CONNECTED:
                 return context.getString(R.string.status_connected);
@@ -68,9 +67,8 @@ public class MiscUtils {
                 return context.getString(R.string.status_connecting);
             case DISCONNECTED:
                 return context.getString(R.string.status_disconnected);
-            default:
-                return null;
         }
+        return null;
     }
 
     public static Bus getBus() {

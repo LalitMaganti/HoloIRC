@@ -4,17 +4,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ExpandableListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/server_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/expandable_list_background"
         android:cacheColorHint="@android:color/transparent"
-        android:clipToPadding="false"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:groupIndicator="@null"
-        android:scrollbarStyle="outsideOverlay" />
+        android:clipToPadding="false" />
 
     <LinearLayout
         android:id="@android:id/empty"

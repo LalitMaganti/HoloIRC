@@ -61,7 +61,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 /**
  * Main activity which co-ordinates everything in the app
  */
-public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
+public class MainActivity extends ActionBarActivity implements SessionOverviewFragment.Callback,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback,
         ConversationFragment.Callback {
 
@@ -95,7 +95,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         public void onPanelClosed(final View view) {
             supportInvalidateOptionsMenu();
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            mServerListFragment.onPanelClosed();
+            // mSessionOverviewFragment.onPanelClosed();
         }
     };
 
@@ -116,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
 
-    private ServerListFragment mServerListFragment;
+    private SessionOverviewFragment mSessionOverviewFragment;
 
     // Views
     private ProgrammableSlidingPaneLayout mSlidingPane;
@@ -190,8 +190,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
-            mServerListFragment = new ServerListFragment();
-            transaction.replace(R.id.sliding_list_frame, mServerListFragment);
+            mSessionOverviewFragment = new SessionOverviewFragment();
+            transaction.replace(R.id.sliding_list_frame, mSessionOverviewFragment);
 
             mNavigationDrawerFragment = new NavigationDrawerFragment();
             transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
@@ -201,7 +201,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
             transaction.commit();
         } else {
-            mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
+            mSessionOverviewFragment = (SessionOverviewFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
             mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.right_drawer);
@@ -328,12 +328,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void reconnectToServer() {
-        getService().requestReconnectionToServer(mConversationEvent.session);
+        IRCService.requestReconnectionToServer(mConversationEvent.session);
     }
 
     @Override
     public void onServiceConnected(final IRCService service) {
-        mServerListFragment.onServiceConnected(service);
+        mSessionOverviewFragment.onServiceConnected(service);
 
         final boolean fromRecents = isAppFromRecentApps(getIntent().getFlags());
         final boolean clearCaches = getIntent().getBooleanExtra(CLEAR_CACHE, false);
@@ -358,7 +358,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getIntent().removeExtra("channel_name");
             getIntent().removeExtra("query_nick");
 
-            connection = service.getServerIfExists(serverName);
+            connection = IRCService.getServerIfExists(serverName);
             optConversation = Optionals.flatTransform(connection, c -> channelName == null
                     ? c.getQueryManager().getQueryUser(queryNick)
                     : c.getUserChannelManager().getChannel(channelName));
@@ -398,9 +398,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean onPrepareOptionsMenu(final Menu menu) {
-        final boolean navigationDrawerEnabled =
-                (!mSlidingPane.isSlideable() || !mSlidingPane.isOpen())
-                        && mConversationEvent != null;
+        final boolean navigationDrawerEnabled = !(mSlidingPane.isSlideable() && mSlidingPane
+                .isOpen()) && mConversationEvent != null;
 
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
         item.setVisible(navigationDrawerEnabled);
@@ -463,7 +462,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         super.onActivityResult(requestCode, resultCode, data);
 
         if (RESULT_OK == resultCode && requestCode == SERVER_SETTINGS) {
-            mServerListFragment.refreshServers();
+            mSessionOverviewFragment.refreshServers();
         }
     }
 
@@ -494,7 +493,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Optional<Session> connection = getService().getServerIfExists(serverName);
+        final Optional<Session> connection = IRCService.getServerIfExists(serverName);
         final Optional<? extends Conversation> optional = Optionals.flatTransform
                 (connection, c -> channelName == null
                         ? c.getQueryManager().getQueryUser(queryNick)

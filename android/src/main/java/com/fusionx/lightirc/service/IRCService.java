@@ -5,7 +5,7 @@ import com.google.common.collect.FluentIterable;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.ConnectionStopRequestedEvent;
+import com.fusionx.lightirc.event.SessionStopRequestedEvent;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
@@ -47,13 +47,19 @@ import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
 
-    public static final Map<Session, EventCache> mEventCache = new HashMap<>();
+    public static final Map<Session, EventCache> sEventCache = new HashMap<>();
 
     private static final int SERVICE_PRIORITY = 50;
 
     private static final int SERVICE_ID = 1;
 
     private static final String DISCONNECT_ALL_INTENT = "com.fusionx.lightirc.disconnect_all";
+
+    private static IRCLoggingManager sLoggingManager;
+
+    private static SessionManager sSessionManager;
+
+    private static Map<Session, ServiceEventInterceptor> sEventHelpers;
 
     private final BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
         @Override
@@ -65,7 +71,7 @@ public class IRCService extends Service {
     private final BroadcastReceiver mDisconnectAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for (final ServiceEventInterceptor interceptor : mEventHelperMap.values()) {
+            for (final ServiceEventInterceptor interceptor : sEventHelpers.values()) {
                 interceptor.unregister();
             }
 
@@ -73,13 +79,13 @@ public class IRCService extends Service {
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFICATION_MENTION);
 
-            final Set<? extends Session> servers = mSessionManager.sessions();
+            final Set<? extends Session> servers = sSessionManager.sessions();
 
-            mSessionManager.requestDisconnectAll();
+            sSessionManager.requestDisconnectAll();
             stopForeground(true);
 
             FluentIterables.forEach(FluentIterable.from(servers),
-                    IRCService.this::cleanupPostDisconnect);
+                    IRCService::cleanupPostDisconnect);
         }
     };
 
@@ -102,20 +108,60 @@ public class IRCService extends Service {
 
     private final IRCBinder mBinder = new IRCBinder();
 
-    private final Map<Session, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
-
     private boolean mExternalStorageWriteable = false;
-
-    private IRCLoggingManager mLoggingManager;
 
     private AppPreferences mAppPreferences;
 
     private boolean mFirstStart = true;
 
-    private SessionManager mSessionManager;
-
     public static EventCache getEventCache(final Session server) {
-        return mEventCache.get(server);
+        return sEventCache.get(server);
+    }
+
+    public static ServiceEventInterceptor getEventHelper(final Session connection) {
+        return sEventHelpers.get(connection);
+    }
+
+    public static Optional<Session> getConnectionIfExists(final ConnectionConfiguration.Builder
+            builder) {
+        return getServerIfExists(builder.getTitle());
+    }
+
+    public static Optional<Session> getServerIfExists(final String title) {
+        return sSessionManager.getConnectionIfExists(title);
+    }
+
+    private static void cleanupPostDisconnect(final Session server) {
+        getBus().post(new SessionStopRequestedEvent(server));
+
+        sLoggingManager.removeConnectionFromManager(server);
+        sEventCache.remove(server);
+        sEventHelpers.remove(server);
+    }
+
+    public static void requestReconnectionToServer(final Session server) {
+        sSessionManager.requestReconnection(server);
+    }
+
+    public Session requestConnectionToServer(final ConnectionConfiguration.Builder builder) {
+        final SessionConfiguration.Builder session = new SessionConfiguration.Builder();
+        session.setConnectionConfiguration(builder.build());
+        session.setSettingsProvider(AppPreferences.getAppPreferences());
+
+        final Pair<Boolean, Session> pair = sSessionManager.requestConnection(session.build());
+
+        final boolean exists = pair.first;
+        final Session server = pair.second;
+
+        if (!exists) {
+            final ServiceEventInterceptor serviceEventInterceptor
+                    = new ServiceEventInterceptor(server);
+            sEventHelpers.put(server, serviceEventInterceptor);
+            sEventCache.put(server, new EventCache(this));
+            sLoggingManager.addConnectionToManager(server);
+        }
+        startForeground(SERVICE_ID, getNotification());
+        return server;
     }
 
     @Override
@@ -126,7 +172,7 @@ public class IRCService extends Service {
     }
 
     public void clearAllEventCaches() {
-        for (final EventCache cache : mEventCache.values()) {
+        for (final EventCache cache : sEventCache.values()) {
             cache.evictAll();
         }
     }
@@ -144,48 +190,17 @@ public class IRCService extends Service {
     @Override
     public IBinder onBind(final Intent intent) {
         onFirstStart();
-        mSessionManager = RelaySessionManager.createSessionManager();
         return mBinder;
     }
 
-    public Session requestConnectionToServer(final ConnectionConfiguration.Builder builder) {
-        final SessionConfiguration.Builder session = new SessionConfiguration.Builder();
-        session.setConnectionConfiguration(builder.build());
-        session.setSettingsProvider(AppPreferences.getAppPreferences());
-
-        final Pair<Boolean, Session> pair = mSessionManager.requestConnection(session.build());
-
-        final boolean exists = pair.first;
-        final Session server = pair.second;
-
-        if (!exists) {
-            final ServiceEventInterceptor serviceEventInterceptor
-                    = new ServiceEventInterceptor(server);
-            mEventHelperMap.put(server, serviceEventInterceptor);
-            mEventCache.put(server, new EventCache(this));
-            mLoggingManager.addConnectionToManager(server);
-        }
-        startForeground(SERVICE_ID, getNotification());
-        return server;
-    }
-
-    public Optional<Session> getConnectionIfExists(final ConnectionConfiguration.Builder
-            builder) {
-        return getServerIfExists(builder.getTitle());
-    }
-
-    public Optional<Session> getServerIfExists(final String title) {
-        return mSessionManager.getConnectionIfExists(title);
-    }
-
     public void requestConnectionStoppage(final Session connection) {
-        mEventHelperMap.get(connection).unregister();
+        sEventHelpers.get(connection).unregister();
 
         final NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_MENTION);
 
-        final boolean finalServer = mSessionManager.requestStoppageAndRemoval(connection
+        final boolean finalServer = sSessionManager.requestStoppageAndRemoval(connection
                 .getServer().getTitle());
         if (finalServer) {
             stopForeground(true);
@@ -195,34 +210,19 @@ public class IRCService extends Service {
         cleanupPostDisconnect(connection);
     }
 
-    private void cleanupPostDisconnect(final Session server) {
-        getBus().post(new ConnectionStopRequestedEvent(server));
-
-        mLoggingManager.removeConnectionFromManager(server);
-        mEventCache.remove(server);
-        mEventHelperMap.remove(server);
-    }
-
-    public void requestReconnectionToServer(final Session server) {
-        mSessionManager.requestReconnection(server);
-    }
-
     public PendingIntent getMainActivityIntent() {
         final Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 
-    public ServiceEventInterceptor getEventHelper(final Session connection) {
-        return mEventHelperMap.get(connection);
-    }
-
     private void onFirstStart() {
         if (mFirstStart) {
             mAppPreferences = AppPreferences.setupAppPreferences(this);
 
-            mLoggingManager = new IRCLoggingManager(mAppPreferences);
-            mSessionManager = RelaySessionManager.createSessionManager();
+            sLoggingManager = new IRCLoggingManager(mAppPreferences);
+            sSessionManager = RelaySessionManager.createSessionManager();
+            sEventHelpers = new HashMap<>();
 
             startWatchingExternalStorage();
 
@@ -253,12 +253,12 @@ public class IRCService extends Service {
 
     private void updateLoggingState() {
         if (mExternalStorageWriteable && mAppPreferences.isLoggingEnabled()) {
-            if (!mLoggingManager.isStarted()) {
-                mLoggingManager.startLogging();
+            if (!sLoggingManager.isStarted()) {
+                sLoggingManager.startLogging();
             }
         } else {
-            if (mLoggingManager.isStarted()) {
-                mLoggingManager.stopLogging();
+            if (sLoggingManager.isStarted()) {
+                sLoggingManager.stopLogging();
             }
         }
     }
@@ -268,8 +268,7 @@ public class IRCService extends Service {
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
-        final String text = String.format("%d servers connected",
-                mSessionManager.size());
+        final String text = String.format("%d servers connected", sSessionManager.size());
         builder.setContentText(text);
         builder.setTicker(text);
         builder.setSmallIcon(R.drawable.ic_notification_small);

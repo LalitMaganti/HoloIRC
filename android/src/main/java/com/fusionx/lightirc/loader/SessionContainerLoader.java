@@ -2,7 +2,7 @@ package com.fusionx.lightirc.loader;
 
 import com.google.common.base.Optional;
 
-import com.fusionx.lightirc.model.ConnectionContainer;
+import com.fusionx.lightirc.model.SessionContainer;
 import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.service.IRCService;
 
@@ -14,26 +14,22 @@ import java.util.Collection;
 import co.fusionx.relay.core.ConnectionConfiguration;
 import co.fusionx.relay.core.Session;
 
-public class ServerWrapperLoader extends AbstractLoader<ArrayList<ConnectionContainer>> {
+public class SessionContainerLoader extends AbstractLoader<ArrayList<SessionContainer>> {
 
-    private final IRCService mService;
-
-    public ServerWrapperLoader(final Context context, final IRCService service) {
+    public SessionContainerLoader(final Context context) {
         super(context);
-
-        mService = service;
     }
 
     @Override
-    public ArrayList<ConnectionContainer> loadInBackground() {
-        final ArrayList<ConnectionContainer> listItems = new ArrayList<>();
+    public ArrayList<SessionContainer> loadInBackground() {
+        final ArrayList<SessionContainer> listItems = new ArrayList<>();
         final ServerDatabase source = ServerDatabase.getInstance(getContext());
 
         for (final ConnectionConfiguration.Builder builder : source.getAllBuilders()) {
-            final Optional<Session> connection = mService.getConnectionIfExists(builder);
+            final Optional<Session> connection = IRCService.getConnectionIfExists(builder);
             final Collection<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
 
-            final ConnectionContainer container  = new ConnectionContainer(builder, ignoreList,
+            final SessionContainer container  = new SessionContainer(builder, ignoreList,
                     connection);
             listItems.add(container);
         }

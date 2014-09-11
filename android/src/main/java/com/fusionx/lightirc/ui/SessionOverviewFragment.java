@@ -1,14 +1,16 @@
 package com.fusionx.lightirc.ui;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.ConnectionStopRequestedEvent;
+import com.fusionx.lightirc.event.SessionStopRequestedEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
-import com.fusionx.lightirc.loader.ServerWrapperLoader;
+import com.fusionx.lightirc.loader.SessionContainerLoader;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.model.ConnectionContainer;
+import com.fusionx.lightirc.model.SessionContainer;
 import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
@@ -21,15 +23,11 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ExpandableListView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -48,37 +46,26 @@ import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.query.QueryClosedEvent;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.event.server.ConnectEvent;
-import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
+import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.UIUtils.getCheckedPositions;
 
-public class ServerListFragment extends Fragment implements ExpandableListView.OnGroupClickListener,
-        ExpandableListView.OnChildClickListener, AbsListView.MultiChoiceModeListener {
+public class SessionOverviewFragment extends Fragment {
 
     private final EventHandler mEventHandler = new EventHandler();
 
     private final Map<Session, ServerEventHandler> mEventHandlers = new HashMap<>();
 
-    // Callbacks
     private Callback mCallback;
 
-    // IRC
+    private RecyclerView mRecyclerView;
+
+    private SessionOverviewAdapter mAdapter;
+
     private IRCService mService;
-
-    // Expandable ListView
-    private ExpandableListView mListView;
-
-    private ExpandableServerListAdapter mListAdapter;
-
-    // Action mode
-    private ActionMode mActionMode;
-
-    private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -91,6 +78,18 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mAdapter = new SessionOverviewAdapter(getActivity(), v -> {
+            final int position = mRecyclerView.getChildPosition(v);
+
+            int groupPosition = mAdapter.getGroupPosition(position);
+            onServerClick(groupPosition);
+        }, v -> {
+            final int position = mRecyclerView.getChildPosition(v);
+
+            int groupPosition = mAdapter.getGroupPosition(position);
+            int childPosition = mAdapter.getChildPosition(position, groupPosition);
+            onConversationClicked(groupPosition, childPosition);
+        });
         getBus().register(mEventHandler);
     }
 
@@ -104,14 +103,13 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     public void onViewCreated(final View view, final Bundle bundle) {
         super.onViewCreated(view, bundle);
 
-        mListView = (ExpandableListView) view.findViewById(R.id.server_list);
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        mListView.setEmptyView(view.findViewById(android.R.id.empty));
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.server_list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mAdapter);
+        // mRecyclerView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        // mRecyclerView.setEmptyView(view.findViewById(android.R.id.empty));
 
-        mListView.setMultiChoiceModeListener(this);
-
-        mListView.setOnGroupClickListener(this);
-        mListView.setOnChildClickListener(this);
+        // mRecyclerView.setMultiChoiceModeListener(this);
 
         if (bundle == null) {
             return;
@@ -134,11 +132,11 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         for (final ServerEventHandler handler : mEventHandlers.values()) {
             handler.register();
         }
-        if (mListAdapter == null) {
+        if (mAdapter == null) {
             return;
         }
-        mListAdapter.refreshConversations();
-        mListAdapter.notifyDataSetChanged();
+        // mAdapter.refreshConversations();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -157,22 +155,33 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         getBus().unregister(mEventHandler);
     }
 
+    /*
     @Override
     public boolean onGroupClick(final ExpandableListView parent, final View v,
             final int groupPosition, final long id) {
-        return onServerClick(groupPosition);
-    }
+                    /*if (mActionMode != null && mSelectionType == ExpandableListView
+                .PACKED_POSITION_TYPE_GROUP) {
+            int flatPosition = mRecyclerView.getFlatListPosition(ExpandableListView
+                    .getPackedPositionForGroup(groupPosition));
+            mRecyclerView.setItemChecked(flatPosition, !mRecyclerView.isItemChecked(flatPosition));
+            return true;
+        } else if (mActionMode != null) {
+            return true;
+        }
+
+}
 
     public void onPanelClosed() {
-        if (mActionMode != null) {
+        /*if (mActionMode != null) {
             mActionMode.finish();
         }
     }
-
+*/
+    /*
     @Override
     public boolean onChildClick(final ExpandableListView parent, final View v,
             final int groupPosition, final int childPosition, final long id) {
-        if (mActionMode != null && mSelectionType == ExpandableListView
+        /*if (mActionMode != null && mSelectionType == ExpandableListView
                 .PACKED_POSITION_TYPE_CHILD) {
             int flatPosition = parent.getFlatListPosition(ExpandableListView
                     .getPackedPositionForChild(groupPosition, childPosition));
@@ -182,23 +191,26 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
             return true;
         }
 
-        final ConnectionContainer container = mListAdapter.getGroup(groupPosition);
-        final Conversation conversation = container.getConversation(childPosition);
-        mCallback.onConversationClicked(container.getConnection(), conversation);
-
         return true;
+    }*/
+
+    public void onConversationClicked(final int groupPosition, final int childPosition) {
+        final SessionContainer container = mAdapter.getGroup(groupPosition);
+        final Conversation conversation = container.getConversation(childPosition);
+        mCallback.onConversationClicked(container.getSession(), conversation);
     }
 
+    /*
     @Override
     public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        if (!checked) {
-            mListView.getCheckedItemPositions().delete(position);
+        /*if (!checked) {
+            mRecyclerView.getCheckedItemPositions().delete(position);
         }
-        final int count = mListView.getCheckedItemCount();
+        final int count = mRecyclerView.getCheckedItemCount();
         final boolean singleItemChecked = count == 1;
 
         if (checked && singleItemChecked) {
-            mSelectionType = ExpandableListView.getPackedPositionType(mListView
+            mSelectionType = ExpandableListView.getPackedPositionType(mRecyclerView
                     .getExpandableListPosition(position));
         }
 
@@ -207,22 +219,22 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     @Override
     public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        mode.getMenuInflater().inflate(R.menu.activity_server_list_popup, menu);
+        /* mode.getMenuInflater().inflate(R.menu.activity_server_list_popup, menu);
         mActionMode = mode;
         return true;
     }
 
     @Override
     public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        if (mSelectionType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-            final int count = mListView.getCheckedItemCount();
+        /*if (mSelectionType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+            final int count = mRecyclerView.getCheckedItemCount();
             final boolean connected = count > 0 && getFirstCheckedItem().isServerAvailable();
 
             boolean allConnected = connected;
             boolean deleteEnabled = !connected;
             for (int i = 1; i < count && (deleteEnabled || allConnected); i++) {
-                final int pos = mListView.getCheckedItemPositions().keyAt(i);
-                final ConnectionContainer listItem = (ConnectionContainer) mListView
+                final int pos = mRecyclerView.getCheckedItemPositions().keyAt(i);
+                final ConnectionContainer listItem = (ConnectionContainer) mRecyclerView
                         .getItemAtPosition(pos);
                 final boolean available = listItem.isServerAvailable();
                 allConnected = allConnected && available;
@@ -245,14 +257,14 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        final ConnectionContainer listItem = getFirstCheckedItem();
+        /*final ConnectionContainer listItem = getFirstCheckedItem();
 
         switch (item.getItemId()) {
             case R.id.activity_server_list_popup_disconnect:
-                disconnectFromServer(getCheckedPositions(mListView));
+                disconnectFromServer(getCheckedPositions(mRecyclerView));
                 break;
             case R.id.activity_server_list_popup_delete:
-                deleteServer(getCheckedPositions(mListView));
+                deleteServer(getCheckedPositions(mRecyclerView));
                 break;
             case R.id.activity_server_list_popup_edit:
                 editServer(listItem);
@@ -262,18 +274,18 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
+    @Override
+    public void onDestroyActionMode(final ActionMode mode) {
+        // mActionMode = null;
+    }*/
+
     public void onServiceConnected(final IRCService service) {
         mService = service;
 
         refreshServers();
     }
 
-    @Override
-    public void onDestroyActionMode(final ActionMode mode) {
-        mActionMode = null;
-    }
-
-    void editServer(final ConnectionContainer builder) {
+    void editServer(final SessionContainer builder) {
         final Intent intent = new Intent(getActivity(), ServerPreferenceActivity.class);
         intent.putExtra(ServerPreferenceActivity.NEW_SERVER, false);
         intent.putExtra(ServerPreferenceActivity.SERVER, builder.getBuilder());
@@ -281,30 +293,22 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     }
 
     private void disconnectFromServer(final List<Integer> checkedPositions) {
-        for (final Integer checkedPosition : checkedPositions) {
-            final long packed = mListView.getExpandableListPosition(checkedPosition);
+        /*for (final Integer checkedPosition : checkedPositions) {
+            final long packed = mRecyclerView.getExpandableListPosition(checkedPosition);
             final int group = ExpandableListView.getPackedPositionGroup(packed);
-            mService.requestConnectionStoppage(mListAdapter.getGroup(group).getConnection());
-        }
+            mService.requestConnectionStoppage(mAdapter.getGroup(group).getConnection());
+        }*/
     }
 
     private boolean onServerClick(final int groupPosition) {
-        if (mActionMode != null && mSelectionType == ExpandableListView
-                .PACKED_POSITION_TYPE_GROUP) {
-            int flatPosition = mListView.getFlatListPosition(ExpandableListView
-                    .getPackedPositionForGroup(groupPosition));
-            mListView.setItemChecked(flatPosition, !mListView.isItemChecked(flatPosition));
-            return true;
-        } else if (mActionMode != null) {
-            return true;
-        }
+        final SessionContainer item = mAdapter.getGroup(groupPosition);
+        if (item.getSession() == null) {
+            final Session session = mService.requestConnectionToServer(item.getBuilder());
+            item.setSession(Optional.fromNullable(session));
 
-        final ConnectionContainer item = mListAdapter.getGroup(groupPosition);
-        if (item.getConnection() == null) {
-            item.setConnection(mService.requestConnectionToServer(item.getBuilder()));
-            mEventHandlers.put(item.getConnection(), new ServerEventHandler(item, groupPosition));
+            mEventHandlers.put(session, new ServerEventHandler(item, groupPosition));
         }
-        mCallback.onConversationClicked(item.getConnection(), item.getConnection().getServer());
+        mCallback.onConversationClicked(item.getSession(), item.getSession().getServer());
 
         return true;
     }
@@ -321,13 +325,13 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
             @Override
             protected Void doInBackground(Void... params) {
-                for (final int checkedPosition : checkedPositions) {
-                    final long packed = mListView.getExpandableListPosition(checkedPosition);
+                /*for (final int checkedPosition : checkedPositions) {
+                    final long packed = mRecyclerView.getExpandableListPosition(checkedPosition);
                     final int group = ExpandableListView.getPackedPositionGroup(packed);
 
-                    final ConnectionContainer listItem = mListAdapter.getGroup(group);
+                    final ConnectionContainer listItem = mAdapter.getGroup(group);
                     source.removeServer(listItem.getBuilder().getId());
-                }
+                }*/
                 return null;
             }
 
@@ -339,36 +343,34 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         asyncTask.execute();
     }
 
-    private ConnectionContainer getFirstCheckedItem() {
-        if (mListView.getCheckedItemCount() == 0) {
+    /*private ConnectionContainer getFirstCheckedItem() {
+        if (mRecyclerView.getCheckedItemCount() == 0) {
             return null;
         }
 
-        final int position = mListView.getCheckedItemPositions().keyAt(0);
-        return (ConnectionContainer) mListView.getItemAtPosition(position);
-    }
+        final int position = mRecyclerView.getCheckedItemPositions().keyAt(0);
+        return (ConnectionContainer) mRecyclerView.getItemAtPosition(position);
+    }*/
 
     void refreshServers() {
-        final LoaderManager.LoaderCallbacks<ArrayList<ConnectionContainer>> callbacks
-                = new LoaderManager
-                .LoaderCallbacks<ArrayList<ConnectionContainer>>() {
+        final LoaderManager.LoaderCallbacks<ArrayList<SessionContainer>> callbacks
+                = new LoaderManager.LoaderCallbacks<ArrayList<SessionContainer>>() {
             @Override
-            public Loader<ArrayList<ConnectionContainer>> onCreateLoader(int id,
+            public Loader<ArrayList<SessionContainer>> onCreateLoader(int id,
                     Bundle args) {
-                return new ServerWrapperLoader(getActivity(), mService);
+                return new SessionContainerLoader(getActivity());
             }
 
             @Override
-            public void onLoadFinished(final Loader<ArrayList<ConnectionContainer>> loader,
-                    final ArrayList<ConnectionContainer> listItems) {
-                mListAdapter = new ExpandableServerListAdapter(getActivity(), listItems,
-                        mListView, mService);
-                mListView.setAdapter(mListAdapter);
+            public void onLoadFinished(final Loader<ArrayList<SessionContainer>> loader,
+                    final ArrayList<SessionContainer> listItems) {
+                mAdapter.clear();
+                mAdapter.addAll(listItems);
 
                 final TextView textView = (TextView) getView().findViewById(R.id.empty_text_view);
                 textView.setText("No servers found :(\nClick + to add one");
 
-                ((View) getView().findViewById(R.id.progress_bar_empty)).setVisibility(View.GONE);
+                getView().findViewById(R.id.progress_bar_empty).setVisibility(View.GONE);
 
                 for (final ServerEventHandler eventHandler : mEventHandlers.values()) {
                     eventHandler.unregister();
@@ -376,18 +378,16 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 mEventHandlers.clear();
 
                 for (int i = 0, listItemsSize = listItems.size(); i < listItemsSize; i++) {
-                    ConnectionContainer wrapper = listItems.get(i);
-                    if (wrapper.getConnection() != null) {
-                        mEventHandlers
-                                .put(wrapper.getConnection(), new ServerEventHandler(wrapper, i));
+                    SessionContainer wrapper = listItems.get(i);
+                    if (wrapper.getSession() != null) {
+                        mEventHandlers.put(wrapper.getSession(),
+                                new ServerEventHandler(wrapper, i));
                     }
-                    // Expand all the groups - TODO - fix this properly
-                    mListView.expandGroup(i);
                 }
             }
 
             @Override
-            public void onLoaderReset(Loader<ArrayList<ConnectionContainer>> loader) {
+            public void onLoaderReset(Loader<ArrayList<SessionContainer>> loader) {
             }
         };
 
@@ -412,124 +412,108 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
     public class ServerEventHandler {
 
-        private final int mServerIndex;
+        private final int mGroupPosition;
 
-        private final Session mConnection;
+        private final Session mSession;
 
-        private final ConnectionContainer mConnectionContainer;
+        private final SessionContainer mSessionContainer;
 
-        public ServerEventHandler(final ConnectionContainer container,
-                final int serverIndex) {
-            mConnection = container.getConnection();
-            mServerIndex = serverIndex;
-            mConnectionContainer = container;
+        public ServerEventHandler(final SessionContainer container, final int groupPosition) {
+            mSession = container.getSession();
+            mGroupPosition = groupPosition;
+            mSessionContainer = container;
 
             register();
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final NewPrivateMessageEvent event)
-                throws InterruptedException {
-            mConnectionContainer.addConversation(event.user);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
+        public void onEventMainThread(final NewPrivateMessageEvent event) {
+            mAdapter.addChild(mGroupPosition, event.user);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final JoinEvent event) throws InterruptedException {
-            mConnectionContainer.addConversation(event.channel);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
+        public void onEventMainThread(final JoinEvent event) {
+            mAdapter.addChild(mGroupPosition, event.channel);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final PartEvent event) throws InterruptedException {
-            mConnectionContainer.removeConversation(event.conversation);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
-            mCallback.onPart(mConnection, event);
+        public void onEventMainThread(final PartEvent event) {
+            mAdapter.removeChild(mGroupPosition, event.conversation);
+            mCallback.onPart(mSession, event);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final KickEvent event) throws InterruptedException {
-            mConnectionContainer.removeConversation(event.channel);
-            mListView.setAdapter(mListAdapter);
+        public void onEventMainThread(final KickEvent event) {
+            mAdapter.removeChild(mGroupPosition, event.channel);
 
-            mListView.expandGroup(mServerIndex);
-            final boolean switchToServer = mCallback.onKick(mConnection, event);
+            final boolean switchToServer = mCallback.onKick(mSession, event);
             if (switchToServer) {
-                onServerClick(mServerIndex);
+                onServerClick(mGroupPosition);
             }
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final ChannelEvent event) {
             if (EventUtils.shouldStoreEvent(event)
-                    && mConnection.getStatus() != SessionStatus.DISCONNECTED) {
-                mListView.invalidateViews();
+                    && mSession.getStatus() != SessionStatus.DISCONNECTED) {
+                final int index = mSessionContainer.indexOf(event.conversation);
+                mAdapter.notifyChildChanged(mGroupPosition, index);
             }
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryClosedEvent event) {
-            mConnectionContainer.removeConversation(event.conversation);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
+            mAdapter.removeChild(mGroupPosition, event.conversation);
             mCallback.onPrivateMessageClosed(event.conversation);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryEvent event) {
-            if (mConnection.getStatus() != SessionStatus.DISCONNECTED) {
-                mListView.invalidateViews();
+            if (mSession.getStatus() != SessionStatus.DISCONNECTED) {
+                final int index = mSessionContainer.indexOf(event.conversation);
+                mAdapter.notifyChildChanged(mGroupPosition, index);
             }
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final ConnectEvent event) {
-            mListView.invalidateViews();
-        }
-
-        @Subscribe(threadType = ThreadType.MAIN)
-        public void onEventMainThread(final DisconnectEvent event) {
-            mListView.invalidateViews();
+        public void onEventMainThread(final StatusChangeEvent event) {
+            mAdapter.notifyItemChanged(mGroupPosition);
         }
 
         // DCC Events
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatStartedEvent event) {
-            mConnectionContainer.addConversation(event.conversation);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
+            mAdapter.addChild(mGroupPosition, event.conversation);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatEvent event) {
             if (EventUtils.shouldStoreEvent(event)
-                    && mConnection.getStatus() != SessionStatus.DISCONNECTED) {
-                mListView.invalidateViews();
+                    && mSession.getStatus() != SessionStatus.DISCONNECTED) {
+                final int index = mSessionContainer.indexOf(event.conversation);
+                mAdapter.notifyChildChanged(mGroupPosition, index);
             }
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCFileConversationStartedEvent event) {
-            mConnectionContainer.addConversation(event.conversation);
-            mListView.setAdapter(mListAdapter);
-
-            mListView.expandGroup(mServerIndex);
+            mAdapter.addChild(mGroupPosition, event.conversation);
         }
 
         public void register() {
-            mConnection.registerForEvents(this, 50);
+            mSession.registerForEvents(this, 50);
         }
 
         public void unregister() {
-            mConnection.unregisterFromEvents(this);
+            mSession.unregisterFromEvents(this);
+        }
+
+        public int getGroupPosition() {
+            return mGroupPosition;
+        }
+
+        public SessionContainer getSessionContainer() {
+            return mSessionContainer;
         }
     }
 
@@ -538,30 +522,37 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         @Subscribe
         public void onConversationChanged(final OnConversationChanged event) {
             if (event.conversation != null) {
-                final ServiceEventInterceptor eventInterceptor = mService.getEventHelper(event
-                        .session);
+                final ServiceEventInterceptor eventInterceptor = IRCService
+                        .getEventHelper(event.session);
                 if (event.fragmentType == FragmentType.SERVER) {
                     eventInterceptor.clearMessagePriority();
                 } else {
                     eventInterceptor.clearMessagePriority(event.conversation);
                 }
+
+                final ServerEventHandler eventHandler = mEventHandlers.get(event.session);
+                final int groupPosition = eventHandler.getGroupPosition();
+                final int childPosition = eventHandler.getSessionContainer()
+                        .indexOf(event.conversation);
+                mAdapter.notifyChildChanged(groupPosition, childPosition);
             }
-            mListView.invalidateViews();
         }
 
         // Make sure the events look up to date if the full line highlight pref is changed
         @Subscribe
         public void onPreferencesChanged(final OnPreferencesChangedEvent event) {
-            mListView.invalidateViews();
+            mAdapter.notifyDataSetChanged();
         }
 
         @Subscribe
-        public void onStopEvent(final ConnectionStopRequestedEvent event) {
-            mListAdapter.removeServer(event.connection);
-            mCallback.onServerStopped(event.connection);
-
-            final ServerEventHandler eventHandler = mEventHandlers.remove(event.connection);
+        public void onStopEvent(final SessionStopRequestedEvent event) {
+            final ServerEventHandler eventHandler = mEventHandlers.remove(event.session);
             eventHandler.unregister();
+
+            final int groupPosition = eventHandler.getGroupPosition();
+            mAdapter.removeGroup(groupPosition);
+
+            mCallback.onServerStopped(event.session);
         }
     }
 }
