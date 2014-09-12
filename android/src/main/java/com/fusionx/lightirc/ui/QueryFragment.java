@@ -29,7 +29,6 @@ import java.util.List;
 
 import co.fusionx.relay.conversation.QueryUser;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.parser.UserInputParser;
 
 public class QueryFragment extends ConversationFragment<QueryEvent> {
 
@@ -49,7 +48,7 @@ public class QueryFragment extends ConversationFragment<QueryEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseUserMessage(mConnection.getServer(), getQueryUser(), message);
+        mSession.getInputParser().parseQueryMessage(getQueryUser(), message);
     }
 
     @Override

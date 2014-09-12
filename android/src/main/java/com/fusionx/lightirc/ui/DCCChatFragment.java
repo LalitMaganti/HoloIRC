@@ -29,11 +29,10 @@ import java.util.List;
 
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
-import co.fusionx.relay.parser.UserInputParser;
 
 public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
-    public DCCChatConversation getChatConnection() {
+    public DCCChatConversation getChatConversation() {
         return (DCCChatConversation) mConversation;
     }
 
@@ -45,7 +44,7 @@ public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseDCCChatEvent(mConnection.getServer(), getChatConnection(), message);
+        mSession.getInputParser().parseDCCChatEvent(getChatConversation(), message);
     }
 
     @Override
@@ -55,6 +54,6 @@ public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
     @Override
     protected List<DCCChatEvent> getAdapterData() {
-        return getChatConnection().getBuffer();
+        return getChatConversation().getBuffer();
     }
 }

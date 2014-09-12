@@ -32,7 +32,6 @@ import java.util.List;
 
 import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.parser.UserInputParser;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 
@@ -47,7 +46,7 @@ public class ServerFragment extends ConversationFragment<ServerEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseServerMessage(getServer(), message);
+        mSession.getInputParser().parseServerMessage(message);
     }
 
     @Override

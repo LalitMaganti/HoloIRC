@@ -61,7 +61,7 @@ public class UserListFragment extends Fragment {
 
     private Channel mChannel;
 
-    private Session mConnection;
+    private Session mSession;
 
     private final Object mEventHandler = new Object() {
         @Subscribe
@@ -71,11 +71,11 @@ public class UserListFragment extends Fragment {
             }
 
             if (conversationChanged.fragmentType == FragmentType.CHANNEL) {
-                mConnection = conversationChanged.session;
+                mSession = conversationChanged.session;
                 mChannel = (Channel) conversationChanged.conversation;
                 mChannel.registerForEvents(UserListFragment.this);
             } else {
-                mConnection = null;
+                mSession = null;
                 mChannel = null;
             }
 
@@ -135,7 +135,7 @@ public class UserListFragment extends Fragment {
             mChannel.unregisterFromEvents(this);
         }
         // Don't keep a track of this connection/channel - we will deal with this when we return
-        mConnection = null;
+        mSession = null;
         mChannel = null;
     }
 
@@ -205,12 +205,12 @@ public class UserListFragment extends Fragment {
     // End of subscribed events
 
     boolean isNickOtherUsers(final Nick nick) {
-        return !mConnection.getUserChannelManager().getUser().getNick().equals(nick);
+        return !mSession.getUserChannelManager().getUser().getNick().equals(nick);
     }
 
     private void onPrivateMessageUser(final Nick nick) {
         if (isNickOtherUsers(nick)) {
-            mConnection.getServer().sendQuery(nick.getNickAsString(), null);
+            mSession.getQueryManager().getOrAddQueryUser(nick.getNickAsString());
             mCallback.closeDrawer();
         } else {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());

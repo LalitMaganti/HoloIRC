@@ -53,7 +53,6 @@ import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.internal.function.FluentIterables;
 import co.fusionx.relay.misc.IRCUserComparator;
-import co.fusionx.relay.parser.UserInputParser;
 import co.fusionx.relay.util.IRCUtils;
 import co.fusionx.relay.util.ParseUtils;
 
@@ -135,7 +134,7 @@ public final class ChannelFragment extends ConversationFragment<ChannelEvent>
 
     @Override
     public void onSendMessage(final String message) {
-        UserInputParser.onParseChannelMessage(mConnection.getServer(), getChannel(), message);
+        mSession.getInputParser().parseChannelMessage(getChannel(), message);
     }
 
     @Override

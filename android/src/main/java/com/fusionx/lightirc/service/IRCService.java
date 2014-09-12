@@ -114,12 +114,12 @@ public class IRCService extends Service {
 
     private boolean mFirstStart = true;
 
-    public static EventCache getEventCache(final Session server) {
-        return sEventCache.get(server);
+    public static EventCache getEventCache(final Session session) {
+        return sEventCache.get(session);
     }
 
-    public static ServiceEventInterceptor getEventHelper(final Session connection) {
-        return sEventHelpers.get(connection);
+    public static ServiceEventInterceptor getEventHelper(final Session session) {
+        return sEventHelpers.get(session);
     }
 
     public static Optional<Session> getConnectionIfExists(final ConnectionConfiguration.Builder
@@ -144,24 +144,25 @@ public class IRCService extends Service {
     }
 
     public Session requestConnectionToServer(final ConnectionConfiguration.Builder builder) {
-        final SessionConfiguration.Builder session = new SessionConfiguration.Builder();
-        session.setConnectionConfiguration(builder.build());
-        session.setSettingsProvider(AppPreferences.getAppPreferences());
+        final SessionConfiguration.Builder sessionBuilder = new SessionConfiguration.Builder();
+        sessionBuilder.setConnectionConfiguration(builder.build());
+        sessionBuilder.setSettingsProvider(mAppPreferences);
 
-        final Pair<Boolean, Session> pair = sSessionManager.requestConnection(session.build());
+        final Pair<Boolean, Session> pair = sSessionManager
+                .requestConnection(sessionBuilder.build());
 
         final boolean exists = pair.first;
-        final Session server = pair.second;
+        final Session session = pair.second;
 
         if (!exists) {
             final ServiceEventInterceptor serviceEventInterceptor
-                    = new ServiceEventInterceptor(server);
-            sEventHelpers.put(server, serviceEventInterceptor);
-            sEventCache.put(server, new EventCache(this));
-            sLoggingManager.addConnectionToManager(server);
+                    = new ServiceEventInterceptor(session);
+            sEventHelpers.put(session, serviceEventInterceptor);
+            sEventCache.put(session, new EventCache(this));
+            sLoggingManager.addConnectionToManager(session);
         }
         startForeground(SERVICE_ID, getNotification());
-        return server;
+        return session;
     }
 
     @Override

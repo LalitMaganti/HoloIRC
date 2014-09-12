@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.logging;
 
+import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
@@ -17,7 +18,8 @@ public class IRCLoggingManager extends LoggingManager {
 
     @Override
     public CharSequence getMessageFromEvent(final Session connection, final Event event) {
-        EventDecorator decorator = IRCService.getEventCache(connection).get(event);
+        final EventCache eventCache = IRCService.getEventCache(connection);
+        final EventDecorator decorator = eventCache.get(event);
         return decorator.getMessage();
     }
 

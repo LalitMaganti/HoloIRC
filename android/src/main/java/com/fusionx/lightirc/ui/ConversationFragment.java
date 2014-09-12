@@ -53,7 +53,7 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
         implements TextView.OnEditorActionListener {
 
-    Session mConnection;
+    Session mSession;
 
     Conversation mConversation;
 
@@ -90,7 +90,7 @@ abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
         ViewCompat.setOverScrollMode(mRecyclerView, ViewCompat.OVER_SCROLL_NEVER);
 
         final OnConversationChanged event = getBus().getStickyEvent(OnConversationChanged.class);
-        mConnection = event.session;
+        mSession = event.session;
         mConversation = event.conversation;
 
         mMessageBox = (EditText) view.findViewById(R.id.fragment_irc_message_box);
@@ -150,7 +150,7 @@ abstract class ConversationFragment<T extends Event> extends BaseIRCFragment
 
     protected ConversationAdapter<T> getNewAdapter() {
         final Callback callback = FragmentUtils.getParent(this, Callback.class);
-        return new ConversationAdapter<>(getActivity(), callback.getEventCache(mConnection), true);
+        return new ConversationAdapter<>(getActivity(), callback.getEventCache(mSession), true);
     }
 
     // Abstract methods
