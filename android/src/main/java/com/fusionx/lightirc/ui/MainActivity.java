@@ -45,8 +45,8 @@ import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Session;
 import co.fusionx.relay.core.SessionStatus;
-import co.fusionx.relay.dcc.chat.DCCChatConversation;
-import co.fusionx.relay.dcc.file.DCCFileConversation;
+import co.fusionx.relay.internal.dcc.base.RelayDCCChatConversation;
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
@@ -560,9 +560,9 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new QueryFragment();
-            } else if (DCCChatConversation.class.isInstance(object)) {
+            } else if (RelayDCCChatConversation.class.isInstance(object)) {
                 fragment = new DCCChatFragment();
-            } else if (DCCFileConversation.class.isInstance(object)) {
+            } else if (RelayDCCFileConversation.class.isInstance(object)) {
                 fragment = new DCCFileFragment();
             } else {
                 throw new IllegalArgumentException();

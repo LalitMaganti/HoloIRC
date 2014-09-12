@@ -20,10 +20,10 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConnection;
+import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileProgressEvent;
-import co.fusionx.relay.dcc.file.DCCFileConnection;
-import co.fusionx.relay.dcc.file.DCCFileConversation;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -80,17 +80,17 @@ public class DCCFileFragment extends BaseIRCFragment {
         return mConversation.isValid();
     }
 
-    public DCCFileConversation getFileConversation() {
-        return (DCCFileConversation) mConversation;
+    public RelayDCCFileConversation getFileConversation() {
+        return (RelayDCCFileConversation) mConversation;
     }
 
     public class DCCFileAdapter extends BaseAdapter {
 
         private final LayoutInflater mLayoutInflater;
 
-        private final List<DCCFileConnection> mConnectionList;
+        private final List<RelayDCCFileConnection> mConnectionList;
 
-        public DCCFileAdapter(final Context context, final Collection<DCCFileConnection>
+        public DCCFileAdapter(final Context context, final Collection<RelayDCCFileConnection>
                 dccConnectionList) {
             mLayoutInflater = LayoutInflater.from(context);
             mConnectionList = new ArrayList<>(dccConnectionList);
@@ -102,7 +102,7 @@ public class DCCFileFragment extends BaseIRCFragment {
         }
 
         @Override
-        public DCCFileConnection getItem(final int position) {
+        public RelayDCCFileConnection getItem(final int position) {
             return mConnectionList.get(position);
         }
 
@@ -116,7 +116,7 @@ public class DCCFileFragment extends BaseIRCFragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.dcc_file_list_item, parent, false);
             }
-            final DCCFileConnection connection = getItem(position);
+            final RelayDCCFileConnection connection = getItem(position);
 
             final TextView title = (TextView) convertView
                     .findViewById(R.id.dcc_file_list_item_name);
@@ -130,7 +130,7 @@ public class DCCFileFragment extends BaseIRCFragment {
             return convertView;
         }
 
-        public void replaceAll(final Collection<DCCFileConnection> fileConnections) {
+        public void replaceAll(final Collection<RelayDCCFileConnection> fileConnections) {
             mConnectionList.clear();
             mConnectionList.addAll(fileConnections);
             notifyDataSetChanged();

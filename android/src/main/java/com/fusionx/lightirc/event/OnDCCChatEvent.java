@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.dcc.core.DCCChatConversation;
 
 public class OnDCCChatEvent {
 

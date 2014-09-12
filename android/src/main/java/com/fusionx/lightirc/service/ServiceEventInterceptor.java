@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.conversation.Conversation;
-import co.fusionx.relay.core.Session;
 import co.fusionx.relay.conversation.Server;
+import co.fusionx.relay.core.Session;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;
@@ -58,6 +58,8 @@ public final class ServiceEventInterceptor {
 
     private final Set<InviteEvent> mInviteEvents;
 
+    private final AppPreferences mAppPreferences;
+
     private Set<DCCRequestEvent> mDCCRequests;
 
     private Conversation mConversation;
@@ -66,6 +68,9 @@ public final class ServiceEventInterceptor {
 
     public ServiceEventInterceptor(final Session session) {
         mSession = session;
+
+        mAppPreferences = AppPreferences.getAppPreferences();
+
         mMessagePriorityMap = new HashMap<>();
         mEventMap = new HashMap<>();
         mInviteEvents = new HashSet<>();
@@ -241,7 +246,7 @@ public final class ServiceEventInterceptor {
             chat.getPendingConnection().acceptConnection();
         } else if (event instanceof DCCSendRequestEvent) {
             final DCCSendRequestEvent file = (DCCSendRequestEvent) event;
-            final File output = new File(AppPreferences.getAppPreferences()
+            final File output = new File(mAppPreferences
                     .getDCCDownloadDirectory(), file.getPendingConnection().getArgument());
             file.getPendingConnection().acceptConnection(output);
         }
@@ -249,6 +254,7 @@ public final class ServiceEventInterceptor {
 
     public void declineDCCRequestEvent(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
+
         event.pendingConnection.declineConnection();
     }
 

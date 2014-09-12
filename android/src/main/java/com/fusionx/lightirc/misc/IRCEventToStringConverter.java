@@ -19,13 +19,12 @@ import java.util.Map;
 
 import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Nick;
-import co.fusionx.relay.dcc.chat.DCCChatWorldActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.dcc.event.chat.DCCChatWorldActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
 import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
-import co.fusionx.relay.dcc.pending.DCCPendingChatConnection;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
@@ -70,6 +69,7 @@ import co.fusionx.relay.event.server.ServerNickChangeEvent;
 import co.fusionx.relay.event.server.StopEvent;
 import co.fusionx.relay.event.server.WallopsEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
+import co.fusionx.relay.internal.dcc.base.RelayRelayDCCPendingChatConnection;
 
 /*
  * TODO - cleanup this entire class - it's a total mess
@@ -469,8 +469,9 @@ public class IRCEventToStringConverter {
             final String response = mContext.getString(R.string.parser_message);
 
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.libraryUser.getNick(),
-                        event.message);
+                final String formattedResponse = String
+                        .format(response, event.libraryUser.getNick(),
+                                event.message);
                 return setupEvent(formattedResponse, event.libraryUser.getNick());
             } else {
                 final FormattedString[] formattedStrings = {
@@ -537,8 +538,9 @@ public class IRCEventToStringConverter {
         public EventDecorator getActionMessage(final QueryActionSelfEvent event) {
             final String response = mContext.getString(R.string.parser_action);
             if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.libraryUser.getNick(),
-                        event.action);
+                final String formattedResponse = String
+                        .format(response, event.libraryUser.getNick(),
+                                event.action);
                 return setupEvent(formattedResponse, event.libraryUser.getNick(), true);
             } else {
                 final FormattedString[] formattedStrings = {
@@ -645,7 +647,7 @@ public class IRCEventToStringConverter {
 
         // DCC chat events start
         public EventDecorator getDCCChatRequestedEvent(final DCCChatRequestEvent event) {
-            final DCCPendingChatConnection connection = event.getPendingConnection();
+            final RelayRelayDCCPendingChatConnection connection = event.getPendingConnection();
             final String response = mContext.getString(R.string.parser_dcc_chat_requested);
             final String formattedResponse = String.format(response, connection.getDccRequestNick(),
                     connection.getIP(), connection.getPort());
@@ -659,7 +661,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event) {
             final String response = mContext.getString(R.string.parser_message);
-            final Nick nick = event.mainUser.getNick();
+            final Nick nick = event.user.getNick();
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.message);
@@ -675,7 +677,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getActionMessage(final DCCChatSelfActionEvent event) {
             final String response = mContext.getString(R.string.parser_action);
-            final Nick nick = event.mainUser.getNick();
+            final Nick nick = event.user.getNick();
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response,
                         nick, event.action);

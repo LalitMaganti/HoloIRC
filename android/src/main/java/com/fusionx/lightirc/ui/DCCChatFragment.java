@@ -27,13 +27,13 @@ import com.fusionx.lightirc.misc.FragmentType;
 
 import java.util.List;
 
-import co.fusionx.relay.dcc.chat.DCCChatConversation;
+import co.fusionx.relay.internal.dcc.base.RelayDCCChatConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
 
 public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
-    public DCCChatConversation getChatConversation() {
-        return (DCCChatConversation) mConversation;
+    public RelayDCCChatConversation getChatConversation() {
+        return (RelayDCCChatConversation) mConversation;
     }
 
     // Subscription methods

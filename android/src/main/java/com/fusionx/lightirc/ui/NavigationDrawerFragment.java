@@ -25,10 +25,10 @@ import java.util.Collections;
 import java.util.List;
 
 import co.fusionx.relay.conversation.Channel;
-import co.fusionx.relay.core.ChannelUser;
-import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.conversation.Conversation;
+import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Session;
+import co.fusionx.relay.core.SessionStatus;
 import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -51,7 +51,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private Callback mCallback;
 
-    private ServiceEventInterceptor mEventHelper;
+    private ServiceEventInterceptor mEventInterceptor;
 
     @Override
     public void onAttach(final Activity activity) {
@@ -167,8 +167,8 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void updateUserListVisibility() {
-        final boolean visibility = mStatus == SessionStatus.CONNECTED
-                && mFragmentType == FragmentType.CHANNEL;
+        final boolean visibility = mStatus == SessionStatus.CONNECTED &&
+                mFragmentType == FragmentType.CHANNEL;
 
         if (visibility) {
             // TODO - change this from casting
@@ -188,17 +188,17 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void acceptInviteEvents(final InviteEvent event) {
-        getEventHelper().acceptInviteEvents(Collections.singletonList(event));
+        mEventInterceptor.acceptInviteEvents(Collections.singletonList(event));
     }
 
     @Override
     public void declineInviteEvents(final InviteEvent event) {
-        getEventHelper().declineInviteEvents(Collections.singletonList(event));
+        mEventInterceptor.declineInviteEvents(Collections.singletonList(event));
     }
 
     @Override
-    public ServiceEventInterceptor getEventHelper() {
-        return mEventHelper;
+    public ServiceEventInterceptor getInterceptor() {
+        return mEventInterceptor;
     }
 
     private void handleUserList() {
@@ -237,12 +237,14 @@ public class NavigationDrawerFragment extends Fragment implements
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
             mFragmentType = conversationChanged.fragmentType;
+
             if (conversationChanged.conversation == null) {
-                mEventHelper = null;
+                mEventInterceptor = null;
+                mStatus = null;
             } else {
-                final Session connection = conversationChanged.session;
-                mStatus = connection.getStatus();
-                mEventHelper = mCallback.getService().getEventHelper(connection);
+                final Session session = conversationChanged.session;
+                mEventInterceptor = IRCService.getEventHelper(session);
+                mStatus = session.getStatus();
             }
             updateUserListVisibility();
         }
@@ -250,6 +252,7 @@ public class NavigationDrawerFragment extends Fragment implements
         @Subscribe
         public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
             mStatus = statusChanged.status;
+
             updateUserListVisibility();
         }
     }

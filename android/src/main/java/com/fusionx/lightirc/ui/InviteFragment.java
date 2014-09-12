@@ -58,7 +58,7 @@ public class InviteFragment extends DialogFragment {
     }
 
     private void updateAdapter() {
-        final Collection<InviteEvent> events = mCallbacks.getEventHelper().getInviteEvents();
+        final Collection<InviteEvent> events = mCallbacks.getInterceptor().getInviteEvents();
         mAdapter = new InviteAdapter(getActivity(), events, new AcceptListener(),
                 new DeclineListener());
         mTwoWayView.setAdapter(mAdapter);
@@ -70,7 +70,7 @@ public class InviteFragment extends DialogFragment {
 
         public void declineInviteEvents(final InviteEvent event);
 
-        public ServiceEventInterceptor getEventHelper();
+        public ServiceEventInterceptor getInterceptor();
     }
 
     private class AcceptListener implements View.OnClickListener {

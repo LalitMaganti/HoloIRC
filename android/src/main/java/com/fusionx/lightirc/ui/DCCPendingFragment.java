@@ -60,7 +60,7 @@ public class DCCPendingFragment extends DialogFragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mInterceptor = mCallbacks.getEventHelper();
+        mInterceptor = mCallbacks.getInterceptor();
 
         setStyle(STYLE_NO_FRAME, getAppPreferences().getTheme() == Theme.DARK
                 ? android.R.style.Theme_DeviceDefault_Dialog
@@ -95,19 +95,19 @@ public class DCCPendingFragment extends DialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
 
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventHelper();
+        final ServiceEventInterceptor interceptor = mCallbacks.getInterceptor();
         interceptor.getSession().unregisterFromEvents(this);
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final DCCRequestEvent requestEvent) {
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventHelper();
+        final ServiceEventInterceptor interceptor = mCallbacks.getInterceptor();
         mAdapter.replaceAll(interceptor.getDCCRequests());
     }
 
     public interface Callbacks {
 
-        public ServiceEventInterceptor getEventHelper();
+        public ServiceEventInterceptor getInterceptor();
     }
 
     private static class DCCAdapter extends BaseAdapter {
