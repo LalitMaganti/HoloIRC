@@ -3,13 +3,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/child_background">
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/child_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="40dip"
+        android:paddingLeft="32dip"
         android:paddingRight="@dimen/margin_small"
         android:paddingTop="@dimen/margin_small"
         android:text="Text"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/child_title"
         android:paddingBottom="@dimen/margin_small"
-        android:paddingLeft="40dip"
+        android:paddingLeft="32dip"
         android:paddingRight="@dimen/margin_medium"
         android:paddingTop="@dimen/margin_small"
         android:singleLine="true"
@@ -33,7 +33,7 @@
     <View
         android:id="@+id/divider"
         android:layout_width="fill_parent"
-        android:layout_height="1.2dp"
+        android:layout_height="1px"
         android:layout_below="@+id/child_event"
         android:background="?attr/action_divider_colour" />
 </RelativeLayout>

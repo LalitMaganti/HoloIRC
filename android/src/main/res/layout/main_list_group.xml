@@ -2,30 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/group_background">
-
-    <ImageView
-        android:id="@+id/button_expand"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_gravity="center_vertical"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:contentDescription="expander_status"
-        android:duplicateParentState="false"
-        android:padding="8dp"
-        android:scaleType="fitXY"
-        android:src="?expand_close_menu_drawable" />
+    android:background="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:id="@+id/group_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="40dip">
+        android:paddingLeft="24dip">
 
         <TextView
             android:id="@+id/server_title"
@@ -48,10 +32,24 @@
             android:textSize="12sp" />
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/button_expand"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:duplicateParentState="false"
+        android:padding="16dp"
+        android:src="?expand_close_menu_drawable" />
+
     <View
         android:id="@+id/divider"
         android:layout_width="fill_parent"
-        android:layout_height="1.2dp"
+        android:layout_height="1px"
         android:layout_below="@+id/group_content"
         android:background="?attr/action_divider_colour" />
 </RelativeLayout>
