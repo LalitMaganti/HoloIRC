@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.SessionStopRequestedEvent;
+import com.fusionx.lightirc.event.SessionStopCompleteEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.loader.SessionContainerLoader;
@@ -288,14 +288,14 @@ public class SessionOverviewFragment extends Fragment {
         /*for (final Integer checkedPosition : checkedPositions) {
             final long packed = mRecyclerView.getExpandableListPosition(checkedPosition);
             final int group = ExpandableListView.getPackedPositionGroup(packed);
-            mService.requestConnectionStoppage(mAdapter.getGroup(group).getConnection());
+            mService.requestConnectionStoppage(mAdapter.getSessionContainer(group).getConnection());
         }*/
     }
 
     private boolean onServerClick(final int groupPosition) {
-        final SessionContainer item = mAdapter.getGroup(groupPosition);
+        final SessionContainer item = mAdapter.getSessionContainer(groupPosition);
         if (item.getSession() == null) {
-            final Session session = mService.requestConnectionToServer(item.getBuilder());
+            final Session session = mService.requestConnection(item.getBuilder());
             item.setSession(Optional.fromNullable(session));
 
             mEventHandlers.put(session, new ServerEventHandler(item, groupPosition));
@@ -306,7 +306,7 @@ public class SessionOverviewFragment extends Fragment {
     }
 
     public void onConversationClicked(final int groupPosition, final int childPosition) {
-        final SessionContainer container = mAdapter.getGroup(groupPosition);
+        final SessionContainer container = mAdapter.getSessionContainer(groupPosition);
         final Conversation conversation = container.getConversation(childPosition);
         mCallback.onConversationClicked(container.getSession(), conversation);
     }
@@ -363,23 +363,23 @@ public class SessionOverviewFragment extends Fragment {
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final NewPrivateMessageEvent event) {
-            mAdapter.addChild(mGroupPosition, event.user);
+            mAdapter.addConversation(mGroupPosition, event.user);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final JoinEvent event) {
-            mAdapter.addChild(mGroupPosition, event.channel);
+            mAdapter.addConversation(mGroupPosition, event.channel);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final PartEvent event) {
-            mAdapter.removeChild(mGroupPosition, event.conversation);
+            mAdapter.removeConversation(mGroupPosition, event.conversation);
             mCallback.onPart(mSession, event);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final KickEvent event) {
-            mAdapter.removeChild(mGroupPosition, event.channel);
+            mAdapter.removeConversation(mGroupPosition, event.channel);
 
             final boolean switchToServer = mCallback.onKick(mSession, event);
             if (switchToServer) {
@@ -398,7 +398,7 @@ public class SessionOverviewFragment extends Fragment {
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final QueryClosedEvent event) {
-            mAdapter.removeChild(mGroupPosition, event.conversation);
+            mAdapter.removeConversation(mGroupPosition, event.conversation);
             mCallback.onPrivateMessageClosed(event.conversation);
         }
 
@@ -418,7 +418,7 @@ public class SessionOverviewFragment extends Fragment {
         // DCC Events
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCChatStartedEvent event) {
-            mAdapter.addChild(mGroupPosition, event.conversation);
+            mAdapter.addConversation(mGroupPosition, event.conversation);
         }
 
         @Subscribe(threadType = ThreadType.MAIN)
@@ -432,7 +432,7 @@ public class SessionOverviewFragment extends Fragment {
 
         @Subscribe(threadType = ThreadType.MAIN)
         public void onEventMainThread(final DCCFileConversationStartedEvent event) {
-            mAdapter.addChild(mGroupPosition, event.conversation);
+            mAdapter.addConversation(mGroupPosition, event.conversation);
         }
 
         public void register() {
@@ -480,12 +480,12 @@ public class SessionOverviewFragment extends Fragment {
         }
 
         @Subscribe
-        public void onStopEvent(final SessionStopRequestedEvent event) {
+        public void onStopEvent(final SessionStopCompleteEvent event) {
             final ServerEventHandler eventHandler = mEventHandlers.remove(event.session);
             eventHandler.unregister();
 
             final int groupPosition = eventHandler.getGroupPosition();
-            mAdapter.removeSession(groupPosition);
+            mAdapter.closeSession(groupPosition);
 
             mCallback.onServerStopped(event.session);
         }
@@ -545,7 +545,7 @@ public class SessionOverviewFragment extends Fragment {
                 final long packed = mRecyclerView.getExpandableListPosition(checkedPosition);
                 final int group = ExpandableListView.getPackedPositionGroup(packed);
 
-                final ConnectionContainer listItem = mAdapter.getGroup(group);
+                final ConnectionContainer listItem = mAdapter.getSessionContainer(group);
                 source.removeBuilder(listItem.getBuilder().getId());
             }*/
             return null;

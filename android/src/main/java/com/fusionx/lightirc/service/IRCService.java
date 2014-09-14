@@ -5,10 +5,10 @@ import com.google.common.collect.FluentIterable;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.SessionStopRequestedEvent;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.event.SessionStopCompleteEvent;
 import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
@@ -71,20 +71,19 @@ public class IRCService extends Service {
     private final BroadcastReceiver mDisconnectAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            for (final ServiceEventInterceptor interceptor : sEventHelpers.values()) {
-                interceptor.unregister();
-            }
+            FluentIterables.forEach(FluentIterable.from(sEventHelpers.values()),
+                    ServiceEventInterceptor::unregister);
 
             final NotificationManager notificationManager =
                     (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFICATION_MENTION);
 
-            final Set<? extends Session> servers = sSessionManager.sessions();
-
+            final Set<? extends Session> sessions = sSessionManager.sessionSet();
             sSessionManager.requestDisconnectAll();
+
             stopForeground(true);
 
-            FluentIterables.forEach(FluentIterable.from(servers),
+            FluentIterables.forEach(FluentIterable.from(sessions),
                     IRCService::cleanupPostDisconnect);
         }
     };
@@ -122,17 +121,17 @@ public class IRCService extends Service {
         return sEventHelpers.get(session);
     }
 
-    public static Optional<Session> getConnectionIfExists(final ConnectionConfiguration.Builder
+    public static Optional<Session> getSessionIfExists(final ConnectionConfiguration.Builder
             builder) {
-        return getServerIfExists(builder.getTitle());
+        return getSessionIfExists(builder.getTitle());
     }
 
-    public static Optional<Session> getServerIfExists(final String title) {
-        return sSessionManager.getConnectionIfExists(title);
+    public static Optional<Session> getSessionIfExists(final String title) {
+        return sSessionManager.getSessionIfExists(title);
     }
 
     private static void cleanupPostDisconnect(final Session server) {
-        getBus().post(new SessionStopRequestedEvent(server));
+        getBus().post(new SessionStopCompleteEvent(server));
 
         sLoggingManager.removeConnectionFromManager(server);
         sEventCache.remove(server);
@@ -143,7 +142,7 @@ public class IRCService extends Service {
         sSessionManager.requestReconnection(server);
     }
 
-    public Session requestConnectionToServer(final ConnectionConfiguration.Builder builder) {
+    public Session requestConnection(final ConnectionConfiguration.Builder builder) {
         final SessionConfiguration.Builder sessionBuilder = new SessionConfiguration.Builder();
         sessionBuilder.setConnectionConfiguration(builder.build());
         sessionBuilder.setSettingsProvider(mAppPreferences);
@@ -155,11 +154,10 @@ public class IRCService extends Service {
         final Session session = pair.second;
 
         if (!exists) {
-            final ServiceEventInterceptor serviceEventInterceptor
-                    = new ServiceEventInterceptor(session);
-            sEventHelpers.put(session, serviceEventInterceptor);
+            final ServiceEventInterceptor interceptor = new ServiceEventInterceptor(session);
+            sEventHelpers.put(session, interceptor);
             sEventCache.put(session, new EventCache(this));
-            sLoggingManager.addConnectionToManager(session);
+            sLoggingManager.addSessionToManager(session);
         }
         startForeground(SERVICE_ID, getNotification());
         return session;
@@ -265,11 +263,13 @@ public class IRCService extends Service {
     }
 
     private Notification getNotification() {
+        final String text = String.format("%d servers connected", sSessionManager.size());
         final Builder builder = new Builder(this);
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
+        final Bitmap icon = BitmapFactory.decodeResource(getResources(),
+                R.drawable.ic_notification);
+
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
-        final String text = String.format("%d servers connected", sSessionManager.size());
         builder.setContentText(text);
         builder.setTicker(text);
         builder.setSmallIcon(R.drawable.ic_notification_small);
@@ -277,7 +277,7 @@ public class IRCService extends Service {
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 199,
                 new Intent(DISCONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.addAction(R.drawable.ic_clear, "Disconnect all", intent);
+        builder.addAction(R.drawable.ic_clear_light, "Disconnect all", intent);
 
         return builder.build();
     }

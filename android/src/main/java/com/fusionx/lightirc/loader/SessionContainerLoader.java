@@ -26,7 +26,7 @@ public class SessionContainerLoader extends AbstractLoader<List<SessionContainer
         final BuilderDatabase source = BuilderDatabase.getInstance(getContext());
 
         for (final ConnectionConfiguration.Builder builder : source.getAllBuilders()) {
-            final Optional<Session> connection = IRCService.getConnectionIfExists(builder);
+            final Optional<Session> connection = IRCService.getSessionIfExists(builder);
             final SessionContainer container = new SessionContainer(builder, connection);
             listItems.add(container);
         }

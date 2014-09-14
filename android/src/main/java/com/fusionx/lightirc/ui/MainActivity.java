@@ -358,7 +358,7 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
             getIntent().removeExtra("channel_name");
             getIntent().removeExtra("query_nick");
 
-            connection = IRCService.getServerIfExists(serverName);
+            connection = IRCService.getSessionIfExists(serverName);
             optConversation = Optionals.flatTransform(connection, c -> channelName == null
                     ? c.getQueryManager().getQueryUser(queryNick)
                     : c.getUserChannelManager().getChannel(channelName));
@@ -435,6 +435,7 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
                 return false;
             case R.id.activity_main_ab_add:
                 addNewServer();
+                // mSessionOverviewFragment.addMultiple();
                 return true;
             case R.id.activity_main_ab_settings:
                 openAppSettings();
@@ -493,7 +494,7 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Optional<Session> connection = IRCService.getServerIfExists(serverName);
+        final Optional<Session> connection = IRCService.getSessionIfExists(serverName);
         final Optional<? extends Conversation> optional = Optionals.flatTransform
                 (connection, c -> channelName == null
                         ? c.getQueryManager().getQueryUser(queryNick)

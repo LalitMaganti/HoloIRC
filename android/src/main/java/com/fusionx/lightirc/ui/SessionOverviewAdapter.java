@@ -120,7 +120,8 @@ public class SessionOverviewAdapter extends
 
         final TextView textView = (TextView) holder.itemView.findViewById(R.id.child_title);
 
-        final MessagePriority priority = helper.getSubMessagePriority(conversation);
+        final MessagePriority priority = helper == null ? null
+                : helper.getSubMessagePriority(conversation);
         if (priority == null) {
             textView.setText(conversation.getId());
         } else {
@@ -130,7 +131,7 @@ public class SessionOverviewAdapter extends
             textView.setText(builder);
         }
 
-        final Event event = helper.getSubEvent(conversation);
+        final Event event = helper == null ? null : helper.getSubEvent(conversation);
         final TextView textEvent = (TextView) holder.itemView.findViewById(R.id.child_event);
 
         // Event might be null when the channel is first being established
@@ -168,28 +169,31 @@ public class SessionOverviewAdapter extends
         notifyItemRangeRemoved(0, size);
     }
 
-    public SessionContainer getGroup(final int groupPosition) {
+    public SessionContainer getSessionContainer(final int groupPosition) {
         return mContainers.get(groupPosition);
     }
 
-    public void addChild(final int groupPosition, final Conversation conversation) {
+    public void addConversation(final int groupPosition, final Conversation conversation) {
+        // Always show the new conversation
         final SessionContainer container = mContainers.get(groupPosition);
+        final int rawPosition = getRawPosition(groupPosition);
         container.addConversation(conversation);
 
-        final int rawPosition = getRawPosition(groupPosition);
+        final int conversationCount = container.getConversationCount();
         if (isGroupExpanded(groupPosition)) {
-            notifyItemInserted(rawPosition + container.getConversationCount());
+            notifyItemInserted(rawPosition +conversationCount);
+        } else {
+            notifyItemChanged(rawPosition);
         }
-        notifyItemChanged(rawPosition);
     }
 
-    public void removeChild(final int groupPosition, final Conversation conversation) {
+    public void removeConversation(final int groupPosition, final Conversation conversation) {
+        final int rawPosition = getRawPosition(groupPosition);
         final SessionContainer container = mContainers.get(groupPosition);
         final int position = container.removeConversation(conversation);
 
-        final int rawPosition = getRawPosition(groupPosition);
         if (isGroupExpanded(groupPosition)) {
-            notifyItemRemoved(rawPosition + position);
+            notifyItemRemoved(rawPosition + position + 1);
         }
         notifyItemChanged(rawPosition);
     }
@@ -198,9 +202,10 @@ public class SessionOverviewAdapter extends
         for (final SessionContainer sessionContainer : mContainers) {
             sessionContainer.refreshConversations();
         }
+        notifyDataSetChanged();
     }
 
-    public void removeSession(final int groupPosition) {
+    public void closeSession(final int groupPosition) {
         final boolean isExpanded = isGroupExpanded(groupPosition);
         collapseGroup(groupPosition);
 

@@ -1,7 +1,5 @@
 package com.fusionx.lightirc.misc;
 
-import com.fusionx.lightirc.model.SessionContainer;
-
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -28,9 +26,14 @@ public abstract class ExpandableRecyclerViewAdapter<G extends ExpandableRecycler
     }
 
     public void expandGroup(final int groupPosition) {
+        expandGroup(groupPosition, getRawPosition(groupPosition));
+    }
+
+    protected void expandGroup(final int groupPosition, final int rawPosition) {
         mExpandedGroups.put(groupPosition, true);
-        final int rawPosition = getRawPosition(groupPosition);
-        notifyItemRangeInserted(rawPosition + 1, getChildCount(groupPosition));
+        if (getChildCount(groupPosition) > 0) {
+            notifyItemRangeInserted(rawPosition + 1, getChildCount(groupPosition));
+        }
     }
 
     public int getRawPosition(final int groupPosition) {
@@ -130,11 +133,10 @@ public abstract class ExpandableRecyclerViewAdapter<G extends ExpandableRecycler
     @Override
     public final void onBindViewHolder(final ViewHolder holder, final int position) {
         int groupPosition = getGroupPosition(position);
-        if (isGroup(position)) {
+        if (holder instanceof GroupViewHolder) {
             final G groupViewHolder = (G) holder;
             groupViewHolder.expandView.setOnClickListener(v -> {
                 toggleGroup(groupPosition);
-
                 groupViewHolder.expandListener.onExpandButtonClicked(position);
             });
             onBindGroupViewHolder(groupViewHolder, groupPosition);
@@ -142,18 +144,6 @@ public abstract class ExpandableRecyclerViewAdapter<G extends ExpandableRecycler
             int childPosition = getChildPosition(position, groupPosition);
             final C childViewHolder = (C) holder;
             onBindChildViewHolder(childViewHolder, groupPosition, childPosition);
-        }
-    }
-
-    public void removeGroup(final int groupPosition) {
-        final int rawPosition = getRawPosition(groupPosition);
-        final boolean groupExpanded = isGroupExpanded(groupPosition);
-
-        mExpandedGroups.delete(groupPosition);
-        if (groupExpanded) {
-            notifyItemRangeRemoved(rawPosition, getChildCount(groupPosition) + 1);
-        } else {
-            notifyItemRemoved(rawPosition);
         }
     }
 
@@ -165,7 +155,8 @@ public abstract class ExpandableRecyclerViewAdapter<G extends ExpandableRecycler
 
     @Override
     public final int getItemViewType(final int position) {
-        return isGroup(position) ? VIEW_TYPE_GROUP : VIEW_TYPE_CHILD;
+        boolean group = isGroup(position);
+        return group ? VIEW_TYPE_GROUP : VIEW_TYPE_CHILD;
     }
 
     public abstract G onCreateGroupViewHolder(final ViewGroup parent);
