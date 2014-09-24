@@ -176,15 +176,16 @@ public class SessionOverviewAdapter extends
     public void addConversation(final int groupPosition, final Conversation conversation) {
         // Always show the new conversation
         final SessionContainer container = mContainers.get(groupPosition);
-        final int rawPosition = getRawPosition(groupPosition);
+        // final int rawPosition = getRawPosition(groupPosition);
         container.addConversation(conversation);
 
-        final int conversationCount = container.getConversationCount();
+        /*final int conversationCount = container.getConversationCount();
         if (isGroupExpanded(groupPosition)) {
-            notifyItemInserted(rawPosition +conversationCount);
+            notifyItemInserted(rawPosition + conversationCount);
         } else {
             notifyItemChanged(rawPosition);
-        }
+        }*/
+        notifyDataSetChanged();
     }
 
     public void removeConversation(final int groupPosition, final Conversation conversation) {
@@ -192,10 +193,11 @@ public class SessionOverviewAdapter extends
         final SessionContainer container = mContainers.get(groupPosition);
         final int position = container.removeConversation(conversation);
 
-        if (isGroupExpanded(groupPosition)) {
+        notifyDataSetChanged();
+        /*if (isGroupExpanded(groupPosition)) {
             notifyItemRemoved(rawPosition + position + 1);
         }
-        notifyItemChanged(rawPosition);
+        notifyItemChanged(rawPosition);*/
     }
 
     public void refreshConversations() {
@@ -206,16 +208,18 @@ public class SessionOverviewAdapter extends
     }
 
     public void closeSession(final int groupPosition) {
-        final boolean isExpanded = isGroupExpanded(groupPosition);
+        // final boolean isExpanded = isGroupExpanded(groupPosition);
         collapseGroup(groupPosition);
 
-        final int rawPosition = getRawPosition(groupPosition);
+        // final int rawPosition = getRawPosition(groupPosition);
         final SessionContainer container = mContainers.get(groupPosition);
         final int size = container.removeSession();
-        if (isExpanded) {
+
+        /*if (isExpanded) {
             notifyItemRangeRemoved(rawPosition + 1, size);
         }
-        notifyItemChanged(rawPosition);
+        notifyItemChanged(rawPosition);*/
+        notifyDataSetChanged();
     }
 
     public static class ServerGroupViewHolder
