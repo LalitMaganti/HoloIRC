@@ -128,7 +128,9 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
     public List<? extends T> onResetBuffer(final Runnable runnable) {
         final List<? extends T> list = getAdapterData();
         mMessageAdapter.setData(list, () -> {
-            runnable.run();
+            if (runnable != null) {
+                runnable.run();
+            }
             mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
         });
         return list;
