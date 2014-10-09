@@ -211,7 +211,6 @@ public class IRCService extends Service {
 
     private void onFirstStart() {
         if (mFirstStart) {
-            AppPreferences.setupAppPreferences(this);
             mAppPreferences = AppPreferences.getAppPreferences();
             mLoggingManager = new IRCLoggingManager(mAppPreferences);
             startWatchingExternalStorage();
