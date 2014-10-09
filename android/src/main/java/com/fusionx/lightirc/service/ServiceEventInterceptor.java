@@ -124,9 +124,6 @@ public final class ServiceEventInterceptor {
     @Subscribe(threadType = ThreadType.MAIN)
     public void onPrivateMessage(final NewPrivateMessageEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
-
-        // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
