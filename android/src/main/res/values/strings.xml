@@ -196,4 +196,10 @@
     <string name="dcc_progress_complete">%1$d%% complete</string>
     <string name="invite_headers">Invites</string>
 
+    <!-- Notification strings -->
+    <string name="notification_connected_title">%1$d servers connected</string>
+    <string name="notification_action_disconnect_all">Disconnect all</string>
+    <string name="notification_mentioned_title">Mentioned in %1$s on %2$s</string>
+    <string name="notification_mentioned_multi_title">You have been mentioned/queried multiple times</string>
+
 </resources>

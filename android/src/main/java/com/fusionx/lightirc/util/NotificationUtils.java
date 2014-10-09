@@ -50,8 +50,8 @@ public class NotificationUtils {
                 .getInAppNotificationSettings();
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
-            final String message = String.format("Mentioned in %s on %s", conversation.getId(),
-                    conversation.getServer().getTitle());
+            final String message = activity.getString(R.string.notification_mentioned_title,
+                    conversation.getId(), conversation.getServer().getTitle());
             snackbar.display(message);
 
             if (inApp.contains(activity.getString(R.string.notification_value_audio))) {
@@ -89,10 +89,10 @@ public class NotificationUtils {
         builder.setContentTitle(context.getString(R.string.app_name));
         final String text;
         if (sNotificationCount == 0) {
-            text = String.format("Mentioned in %s on %s", conversation.getId(),
-                    conversation.getServer().getId());
+            text = context.getString(R.string.notification_mentioned_title,
+                    conversation.getId(), conversation.getServer().getId());
         } else {
-            text = "You have been mentioned/queried multiple times";
+            text = context.getString(R.string.notification_mentioned_multi_title);
         }
         builder.setContentText(text);
         builder.setTicker(text);

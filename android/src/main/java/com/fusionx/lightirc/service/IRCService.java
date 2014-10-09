@@ -257,7 +257,7 @@ public class IRCService extends Service {
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
-        final String text = String.format("%d servers connected",
+        final String text = getString(R.string.notification_connected_title,
                 mConnectionManager.getServerCount());
         builder.setContentText(text);
         builder.setTicker(text);
@@ -266,7 +266,8 @@ public class IRCService extends Service {
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 199,
                 new Intent(DISCONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.addAction(R.drawable.ic_clear_light, "Disconnect all", intent);
+        builder.addAction(R.drawable.ic_clear_light,
+                getString(R.string.notification_action_disconnect_all), intent);
 
         return builder.build();
     }
