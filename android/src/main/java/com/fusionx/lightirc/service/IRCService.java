@@ -82,12 +82,13 @@ public class IRCService extends Service {
     private final Object mEventHelper = new Object() {
         @Subscribe
         public void onMentioned(final OnChannelMentionEvent event) {
-            notifyOutOfApp(IRCService.this, event.channel, true);
+            notifyOutOfApp(IRCService.this, event.message, event.user, event.channel, true);
         }
 
         @Subscribe
         public void onQueried(final OnQueryEvent event) {
-            notifyOutOfApp(IRCService.this, event.queryUser, false);
+            notifyOutOfApp(IRCService.this, event.message, event.queryUser.getNick(),
+                    event.queryUser, false);
         }
 
         @Subscribe
