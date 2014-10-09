@@ -253,12 +253,13 @@ public class IRCService extends Service {
     }
 
     private Notification getNotification() {
+        int connectionCount = mConnectionManager.getServerCount();
         final Builder builder = new Builder(this);
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
         final String text = getResources().getQuantityString(R.plurals.server_connection,
-                mConnectionManager.getServerCount(), mConnectionManager.getServerCount());
+                connectionCount, connectionCount);
         builder.setContentText(text);
         builder.setTicker(text);
         builder.setSmallIcon(R.drawable.ic_notification_small);
@@ -266,8 +267,10 @@ public class IRCService extends Service {
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 199,
                 new Intent(DISCONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.addAction(R.drawable.ic_clear_light,
-                getString(R.string.notification_action_disconnect_all), intent);
+        int disconnectActionResId = connectionCount > 1
+                ? R.string.notification_action_disconnect_all
+                : R.string.notification_action_disconnect;
+        builder.addAction(R.drawable.ic_clear_light, getString(disconnectActionResId), intent);
 
         return builder.build();
     }
