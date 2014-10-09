@@ -38,4 +38,9 @@
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.Base.ActionBar.Solid.Inverse">
         <item name="android:background">@color/action_bar_background_color</item>
     </style>
+
+    <style name="TextAppearance.StatusBar.EventContent.Emphasized" parent="@android:style/TextAppearance.StatusBar.EventContent">
+        <item name="android:textColor">#cccccc</item>
+    </style>
+
 </resources>
