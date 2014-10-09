@@ -126,6 +126,13 @@ public class NotificationUtils {
         notificationManager.notify(NOTIFICATION_MENTION, builder.build());
     }
 
+    public static void cancelMentionNotification(final Context context) {
+        final NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.cancel(NOTIFICATION_MENTION);
+    }
+
     private static void registerBroadcastReceivers(Context context) {
         if (sResultReceiver == null) {
             sResultReceiver = new ResultReceiver();

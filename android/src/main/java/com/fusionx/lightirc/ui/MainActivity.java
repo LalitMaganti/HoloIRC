@@ -510,6 +510,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        NotificationUtils.cancelMentionNotification(this);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
