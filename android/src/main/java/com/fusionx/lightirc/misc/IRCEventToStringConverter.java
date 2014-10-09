@@ -474,7 +474,7 @@ public class IRCEventToStringConverter {
                 return setupEvent(formattedResponse, event.ourUser.getNick());
             } else {
                 final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
+                        getFormattedStringForNick(event.ourUser.getNick()),
                         new FormattedString(event.message)
                 };
                 return setupEvent(formatTextWithStyle(response, formattedStrings));
