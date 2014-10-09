@@ -29,6 +29,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -149,10 +150,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
-        if (CompatUtils.hasKitKat()) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        }
+        setStatusBarTransparency(true);
         super.onCreate(savedInstanceState);
         CrashUtils.startCrashlyticsIfAppropriate(this);
 
@@ -223,6 +221,18 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (mSlidingPane.isSlideable()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public void onSupportActionModeStarted(ActionMode mode) {
+        super.onSupportActionModeStarted(mode);
+        setStatusBarTransparency(false);
+    }
+
+    @Override
+    public void onSupportActionModeFinished(ActionMode mode) {
+        super.onSupportActionModeFinished(mode);
+        setStatusBarTransparency(true);
     }
 
     @Override
@@ -545,6 +555,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     void setActionBarSubtitle(final String subtitle) {
         getSupportActionBar().setSubtitle(subtitle);
+    }
+
+    private void setStatusBarTransparency(boolean transparent) {
+        if (!CompatUtils.hasKitKat()) {
+            return;
+        }
+        getWindow().setFlags(transparent ? WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS : 0,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     }
 
     private void changeCurrentConversation(final Conversation object, final boolean delayChange) {
