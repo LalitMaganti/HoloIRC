@@ -15,6 +15,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Ringtone;
@@ -52,7 +53,8 @@ public class NotificationUtils {
 
     private static final int MAX_NOTIFICATION_LINES = 6;
 
-    private static int sNotificationCount = 0;
+    private static int sNotificationMentionCount = 0;
+    private static int sNotificationQueryCount = 0;
     private static List<Pair<String, CharSequence>> sNotificationMessages = new ArrayList<>();
 
     private static ResultReceiver sResultReceiver;
@@ -60,12 +62,14 @@ public class NotificationUtils {
     private static DeleteReceiver sDeleteReceiver;
 
     public static void notifyInApp(final Snackbar snackbar, final Activity activity,
-            final Conversation conversation) {
+            final Conversation conversation, boolean channel) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
-            final String message = activity.getString(R.string.notification_mentioned_title,
+            int messageResId = channel
+                    ? R.string.notification_mentioned_title : R.string.notification_queried_title;
+            final String message = activity.getString(messageResId,
                     conversation.getId(), conversation.getServer().getTitle());
             snackbar.display(message);
 
@@ -96,15 +100,11 @@ public class NotificationUtils {
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // If we're here, the activity has not picked it up - fire off a notification
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_notification);
-        builder.setLargeIcon(icon);
-        builder.setSmallIcon(R.drawable.ic_notification_small);
-        builder.setContentTitle(context.getString(R.string.app_name));
-        builder.setAutoCancel(true);
-        builder.setNumber(++sNotificationCount);
+        if (channel) {
+            sNotificationMentionCount++;
+        } else {
+            sNotificationQueryCount++;
+        }
 
         CharSequence message = getLatestMessageForConversation(context, conversation);
         if (message != null) {
@@ -114,10 +114,22 @@ public class NotificationUtils {
             sNotificationMessages.add(Pair.create(server.getId(), message));
         }
 
+        // If we're here, the activity has not picked it up - fire off a notification
+        int totalNotificationCount = sNotificationMentionCount + sNotificationQueryCount;
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                R.drawable.ic_notification);
+        builder.setLargeIcon(icon);
+        builder.setSmallIcon(R.drawable.ic_notification_small);
+        builder.setContentTitle(context.getString(R.string.app_name));
+        builder.setAutoCancel(true);
+        builder.setNumber(totalNotificationCount);
+
         final String text;
-        if (sNotificationCount == 1) {
-            text = context.getString(R.string.notification_mentioned_title,
-                    conversation.getId(), server.getId());
+        if (totalNotificationCount == 1) {
+            int titleResId = channel
+                    ? R.string.notification_mentioned_title : R.string.notification_queried_title;
+            text = context.getString(titleResId, conversation.getId(), server.getId());
             if (message != null) {
                 String title = context.getString(R.string.notification_mentioned_bigtext_title,
                         conversation.getId(), server.getId());
@@ -126,8 +138,21 @@ public class NotificationUtils {
                         .setBigContentTitle(title));
             }
         } else {
-            text = context.getString(R.string.notification_mentioned_multi_title,
-                    sNotificationCount);
+            if (sNotificationQueryCount > 0 && sNotificationMentionCount > 0) {
+                Resources res = context.getResources();
+                String mentions = res.getQuantityString(R.plurals.mention,
+                        sNotificationMentionCount, sNotificationMentionCount);
+                String queries = res.getQuantityString(R.plurals.query,
+                        sNotificationQueryCount, sNotificationQueryCount);
+                text = mentions + ", " + queries;
+            } else if (sNotificationMentionCount > 0) {
+                text = context.getString(R.string.notification_mentioned_multi_title,
+                        sNotificationMentionCount);
+            } else {
+                text = context.getString(R.string.notification_queried_multi_title,
+                        sNotificationQueryCount);
+            }
+
             if (!sNotificationMessages.isEmpty()) {
                 String serverId = sNotificationMessages.get(0).first;
                 for (Pair<String, CharSequence> entry : sNotificationMessages) {
@@ -235,12 +260,17 @@ public class NotificationUtils {
         }
     }
 
+    private static void resetNotificationState() {
+        sNotificationMentionCount = 0;
+        sNotificationQueryCount = 0;
+        sNotificationMessages.clear();
+    }
+
     public static class ResultReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            sNotificationCount = 0;
-            sNotificationMessages.clear();
+            resetNotificationState();
             final Intent activityIntent = new Intent(context, MainActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
                     | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -255,8 +285,7 @@ public class NotificationUtils {
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            sNotificationCount = 0;
-            sNotificationMessages.clear();
+            resetNotificationState();
             context.unregisterReceiver(this);
             sDeleteReceiver = null;
         }

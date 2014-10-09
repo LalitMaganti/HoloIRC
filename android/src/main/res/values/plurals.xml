@@ -35,6 +35,16 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item quantity="other">%d servers connected</item>
     </plurals>
 
+    <plurals name="mention">
+        <item quantity="one">1 mention</item>
+        <item quantity="other">%d mentions</item>
+    </plurals>
+
+    <plurals name="query">
+        <item quantity="one">1 query</item>
+        <item quantity="other">%d queries</item>
+    </plurals>
+
     <plurals name="user">
         <item quantity="one">1 user</item>
         <item quantity="other">%d users</item>

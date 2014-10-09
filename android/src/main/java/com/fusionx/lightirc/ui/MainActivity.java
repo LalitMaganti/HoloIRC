@@ -133,7 +133,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         @Subscribe(cancellable = true)
         public boolean onMentioned(final OnChannelMentionEvent event) {
             if (!event.channel.equals(mConversation)) {
-                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.channel);
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.channel, true);
             }
             return true;
         }
@@ -141,7 +141,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         @Subscribe(cancellable = true)
         public boolean onQueried(final OnQueryEvent event) {
             if (!event.queryUser.equals(mConversation)) {
-                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.queryUser);
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.queryUser, false);
             }
             return true;
         }
