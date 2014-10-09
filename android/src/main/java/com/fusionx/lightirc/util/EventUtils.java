@@ -51,7 +51,7 @@ public class EventUtils {
             return !CHANNEL_IGNORE_EVENTS.contains(channelEvent.getClass());
         } else if (event instanceof DCCFileEvent) {
             final DCCFileEvent fileEvent = (DCCFileEvent) event;
-            return DCC_FILE_IGNORE_EVENTS.contains(fileEvent.getClass());
+            return !DCC_FILE_IGNORE_EVENTS.contains(fileEvent.getClass());
         } else if (event instanceof QueryEvent) {
             final QueryEvent queryEvent = (QueryEvent) event;
             return !QUERY_IGNORE_EVENTS.contains(queryEvent.getClass());
