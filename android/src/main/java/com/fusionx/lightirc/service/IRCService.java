@@ -257,8 +257,8 @@ public class IRCService extends Service {
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
-        final String text = getString(R.string.notification_connected_title,
-                mConnectionManager.getServerCount());
+        final String text = getResources().getQuantityString(R.plurals.server_connection,
+                mConnectionManager.getServerCount(), mConnectionManager.getServerCount());
         builder.setContentText(text);
         builder.setTicker(text);
         builder.setSmallIcon(R.drawable.ic_notification_small);
