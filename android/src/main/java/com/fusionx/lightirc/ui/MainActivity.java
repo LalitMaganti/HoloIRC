@@ -148,7 +148,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        AppPreferences.setupAppPreferences(this);
         setTheme(UIUtils.getThemeInt());
         if (CompatUtils.hasKitKat()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,

@@ -10,9 +10,6 @@ import co.fusionx.relay.base.Server;
 public class CrashUtils {
 
     public static void startCrashlyticsIfAppropriate(final Context context) {
-        // Make sure app preferences are initialized
-        AppPreferences.setupAppPreferences(context);
-
         callbackIfReportingEnabled(() -> Crashlytics.start(context));
     }
 
