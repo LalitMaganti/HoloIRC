@@ -12,7 +12,6 @@
         android:paddingLeft="40dip"
         android:paddingRight="@dimen/margin_small"
         android:paddingTop="@dimen/margin_small"
-        android:text="Text"
         android:textAppearance="@android:style/TextAppearance.Small"
         android:textColor="?attr/expandable_list_text" />
 
@@ -26,7 +25,6 @@
         android:paddingRight="@dimen/margin_medium"
         android:paddingTop="@dimen/margin_small"
         android:singleLine="true"
-        android:text="Text"
         android:textColor="?attr/expandable_list_text"
         android:textSize="12sp" />
 

@@ -211,4 +211,7 @@
     <string name="user_level_voices">Voices</string>
     <string name="user_level_users">Users</string>
 
+    <string name="no_server_connected">Welcome to HoloIRC! Click a server on the left to connect :)</string>
+    <string name="server_list_empty">No servers found :(\nClick + to add one</string>
+    <string name="server_list_loading">Loading servers\u2026</string>
 </resources>
