@@ -2,8 +2,6 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
-import com.fusionx.lightirc.misc.EventCache;
-import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.view.Snackbar;
 
@@ -15,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.Ringtone;
@@ -22,10 +21,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
-import android.text.Spannable;
-import android.text.Spanned;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.TextAppearanceSpan;
 import android.util.Pair;
 
@@ -34,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
 
@@ -52,7 +50,8 @@ public class NotificationUtils {
 
     private static final int MAX_NOTIFICATION_LINES = 6;
 
-    private static int sNotificationCount = 0;
+    private static int sNotificationMentionCount = 0;
+    private static int sNotificationQueryCount = 0;
     private static List<Pair<String, CharSequence>> sNotificationMessages = new ArrayList<>();
 
     private static ResultReceiver sResultReceiver;
@@ -60,12 +59,14 @@ public class NotificationUtils {
     private static DeleteReceiver sDeleteReceiver;
 
     public static void notifyInApp(final Snackbar snackbar, final Activity activity,
-            final Conversation conversation) {
+            final Conversation conversation, boolean channel) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
                 .getInAppNotificationSettings();
 
         if (AppPreferences.getAppPreferences().isInAppNotification()) {
-            final String message = activity.getString(R.string.notification_mentioned_title,
+            int messageResId = channel
+                    ? R.string.notification_mentioned_title : R.string.notification_queried_title;
+            final String message = activity.getString(messageResId,
                     conversation.getId(), conversation.getServer().getTitle());
             snackbar.display(message);
 
@@ -82,8 +83,8 @@ public class NotificationUtils {
         }
     }
 
-    public static void notifyOutOfApp(final Context context,
-            final Conversation<? extends Event> conversation, final boolean channel) {
+    public static void notifyOutOfApp(final Context context, CharSequence message,
+            Nick user, final Conversation<? extends Event> conversation, final boolean channel) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
         }
@@ -96,7 +97,24 @@ public class NotificationUtils {
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        if (channel) {
+            sNotificationMentionCount++;
+        } else {
+            sNotificationQueryCount++;
+        }
+
+        if (message != null) {
+            if (user != null) {
+                message = prependHighlightedText(context, user.getNickAsString(), message);
+            }
+            if (sNotificationMessages.size() >= MAX_NOTIFICATION_LINES) {
+                sNotificationMessages.remove(0);
+            }
+            sNotificationMessages.add(Pair.create(server.getId(), message));
+        }
+
         // If we're here, the activity has not picked it up - fire off a notification
+        int totalNotificationCount = sNotificationMentionCount + sNotificationQueryCount;
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.ic_notification);
@@ -104,20 +122,13 @@ public class NotificationUtils {
         builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentTitle(context.getString(R.string.app_name));
         builder.setAutoCancel(true);
-        builder.setNumber(++sNotificationCount);
-
-        CharSequence message = getLatestMessageForConversation(context, conversation);
-        if (message != null) {
-            if (sNotificationMessages.size() >= MAX_NOTIFICATION_LINES) {
-                sNotificationMessages.remove(0);
-            }
-            sNotificationMessages.add(Pair.create(server.getId(), message));
-        }
+        builder.setNumber(totalNotificationCount);
 
         final String text;
-        if (sNotificationCount == 1) {
-            text = context.getString(R.string.notification_mentioned_title,
-                    conversation.getId(), server.getId());
+        if (totalNotificationCount == 1) {
+            int titleResId = channel
+                    ? R.string.notification_mentioned_title : R.string.notification_queried_title;
+            text = context.getString(titleResId, conversation.getId(), server.getId());
             if (message != null) {
                 String title = context.getString(R.string.notification_mentioned_bigtext_title,
                         conversation.getId(), server.getId());
@@ -126,8 +137,21 @@ public class NotificationUtils {
                         .setBigContentTitle(title));
             }
         } else {
-            text = context.getString(R.string.notification_mentioned_multi_title,
-                    sNotificationCount);
+            if (sNotificationQueryCount > 0 && sNotificationMentionCount > 0) {
+                Resources res = context.getResources();
+                String mentions = res.getQuantityString(R.plurals.mention,
+                        sNotificationMentionCount, sNotificationMentionCount);
+                String queries = res.getQuantityString(R.plurals.query,
+                        sNotificationQueryCount, sNotificationQueryCount);
+                text = mentions + ", " + queries;
+            } else if (sNotificationMentionCount > 0) {
+                text = context.getString(R.string.notification_mentioned_multi_title,
+                        sNotificationMentionCount);
+            } else {
+                text = context.getString(R.string.notification_queried_multi_title,
+                        sNotificationQueryCount);
+            }
+
             if (!sNotificationMessages.isEmpty()) {
                 String serverId = sNotificationMessages.get(0).first;
                 for (Pair<String, CharSequence> entry : sNotificationMessages) {
@@ -145,7 +169,7 @@ public class NotificationUtils {
                         style.addLine(entry.second);
                     } else {
                         // prepend server name
-                        style.addLine(String.format("[%s] %s", entry.first, entry.second));
+                        style.addLine(prependHighlightedText(context, entry.first, entry.second));
                     }
                 }
 
@@ -195,32 +219,22 @@ public class NotificationUtils {
         notificationManager.cancel(NOTIFICATION_MENTION);
     }
 
-    private static CharSequence getLatestMessageForConversation(
-            Context context, Conversation<? extends Event> conversation) {
-        List<? extends Event> events = conversation.getBuffer();
-        if (events == null || events.isEmpty()) {
-            return null;
-        }
-        EventCache cache = IRCService.getEventCache(conversation.getServer());
-        CharSequence message = cache.get(events.get(events.size() - 1)).getMessage();
-        if (message == null || !(message instanceof Spanned)) {
+    private static CharSequence prependHighlightedText(Context context,
+            String prefix, CharSequence message) {
+        if (message == null || prefix == null) {
             return message;
         }
 
-        // As not all colors look nice in the notification,
-        // replace them with a neutral color
-        Spannable spannable = (Spannable) message;
-        Object[] colorSpans = spannable.getSpans(0, spannable.length(),
-                ForegroundColorSpan.class);
-        for (Object span : colorSpans) {
-            int start = spannable.getSpanStart(span);
-            int end = spannable.getSpanEnd(span);
-            TextAppearanceSpan newSpan = new TextAppearanceSpan(context,
-                    R.style.TextAppearance_StatusBar_EventContent_Emphasized);
-            spannable.removeSpan(span);
-            spannable.setSpan(newSpan, start, end, 0);
-        }
-        return spannable;
+        TextAppearanceSpan highlightSpan = new TextAppearanceSpan(context,
+                R.style.TextAppearance_StatusBar_EventContent_Emphasized);
+
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(prefix);
+        builder.setSpan(highlightSpan, 0, builder.length(), 0);
+        builder.append(" ");
+        builder.append(message);
+
+        return builder;
     }
 
     private static void registerBroadcastReceivers(Context context) {
@@ -235,12 +249,17 @@ public class NotificationUtils {
         }
     }
 
+    private static void resetNotificationState() {
+        sNotificationMentionCount = 0;
+        sNotificationQueryCount = 0;
+        sNotificationMessages.clear();
+    }
+
     public static class ResultReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            sNotificationCount = 0;
-            sNotificationMessages.clear();
+            resetNotificationState();
             final Intent activityIntent = new Intent(context, MainActivity.class);
             activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
                     | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -255,8 +274,7 @@ public class NotificationUtils {
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            sNotificationCount = 0;
-            sNotificationMessages.clear();
+            resetNotificationState();
             context.unregisterReceiver(this);
             sDeleteReceiver = null;
         }

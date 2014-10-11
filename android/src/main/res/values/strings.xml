@@ -202,7 +202,9 @@
     <string name="notification_action_disconnect">Disconnect</string>
     <string name="notification_action_disconnect_all">Disconnect all</string>
     <string name="notification_mentioned_title">Mentioned in %1$s on %2$s</string>
-    <string name="notification_mentioned_multi_title">Mentioned/queried %1$d times</string>
+    <string name="notification_queried_title">Queried by %1$s on %2$s</string>
+    <string name="notification_mentioned_multi_title">Mentioned %1$d times</string>
+    <string name="notification_queried_multi_title">Queried %1$d times</string>
     <string name="notification_mentioned_bigtext_title">%1$s on %2$s</string>
 
     <!-- User levels -->
