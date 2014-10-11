@@ -32,7 +32,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/margin_medium"
-            android:text="Text"
             android:textAppearance="@android:style/TextAppearance.Medium"
             android:textColor="?attr/expandable_list_text" />
 
@@ -43,7 +42,6 @@
             android:paddingBottom="@dimen/margin_medium"
             android:paddingRight="@dimen/margin_small"
             android:paddingTop="@dimen/margin_small"
-            android:text="Disconnected"
             android:textColor="?attr/expandable_list_text"
             android:textSize="12sp" />
     </LinearLayout>

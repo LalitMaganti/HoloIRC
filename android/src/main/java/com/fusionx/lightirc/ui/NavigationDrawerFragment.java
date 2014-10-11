@@ -173,7 +173,8 @@ public class NavigationDrawerFragment extends Fragment implements
         if (visibility) {
             // TODO - change this from casting
             final Channel channel = (Channel) mConversation;
-            setUserTextViewText(String.format("%d users", channel.getUsers().size()));
+            setUserTextViewText(getResources().getQuantityString(R.plurals.user,
+                    channel.getUsers().size(), channel.getUsers().size()));
 
             mSlidingUpPanelLayout.showPanel();
         } else {

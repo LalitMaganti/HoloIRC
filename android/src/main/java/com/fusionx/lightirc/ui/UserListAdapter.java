@@ -16,6 +16,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,16 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
     private final List<Pair<Nick, UserLevel>> mUsers;
 
     private final UserListComparator mComparator;
+
+    private static final SparseIntArray LEVEL_RESOURCE_MAPPING = new SparseIntArray();
+    static {
+        LEVEL_RESOURCE_MAPPING.put(UserLevel.OWNER.ordinal(), R.string.user_level_owners);
+        LEVEL_RESOURCE_MAPPING.put(UserLevel.SUPEROP.ordinal(), R.string.user_level_superops);
+        LEVEL_RESOURCE_MAPPING.put(UserLevel.OP.ordinal(), R.string.user_level_ops);
+        LEVEL_RESOURCE_MAPPING.put(UserLevel.HALFOP.ordinal(), R.string.user_level_halfops);
+        LEVEL_RESOURCE_MAPPING.put(UserLevel.VOICE.ordinal(), R.string.user_level_voices);
+        LEVEL_RESOURCE_MAPPING.put(UserLevel.NONE.ordinal(), R.string.user_level_users);
+    }
 
     private SparseArray<Section> mSections = new SparseArray<>();
 
@@ -114,7 +125,8 @@ public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserView
     public void onBindViewHolder(final UserViewHolder holder, final int position) {
         if (isSectionHeaderPosition(position)) {
             final Section section = mSections.get(position);
-            holder.textView.setText("Prefix: " + section.level.getPrefix());
+            final int resId = LEVEL_RESOURCE_MAPPING.get(section.level.ordinal());
+            holder.textView.setText(mContext.getString(resId));
         } else {
             final Pair<Nick, UserLevel> user = getItem(sectionedPositionToPosition(position));
             final UserLevel level = user.second;

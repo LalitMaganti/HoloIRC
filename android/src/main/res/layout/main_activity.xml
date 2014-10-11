@@ -32,7 +32,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:gravity="center"
-                    android:text="Welcome to HoloIRC! Click a server on the left to connect :)"
+                    android:text="@string/no_server_connected"
                     android:textAppearance="@android:style/TextAppearance.Large"
                     android:textColor="@android:color/darker_gray"
                     android:visibility="gone" />
@@ -56,7 +56,6 @@
         android:layout_alignParentBottom="true"
         android:gravity="center_vertical"
         android:paddingLeft="24dp"
-        android:text="Test"
         android:textSize="14sp"
         android:visibility="gone" />
 </RelativeLayout>

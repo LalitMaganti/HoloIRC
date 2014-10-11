@@ -124,7 +124,7 @@ public class DCCFileFragment extends BaseIRCFragment {
 
             final TextView progress = (TextView) convertView
                     .findViewById(R.id.dcc_file_list_item_progress);
-            progress.setText(String.format(getActivity().getString(R.string.dcc_progress_complete),
+            progress.setText(getActivity().getString(R.string.dcc_progress_complete,
                     connection.getProgress()));
 
             return convertView;

@@ -122,8 +122,8 @@ public class IRCEventToStringConverter {
     private CharSequence appendReasonIfNeeded(final CharSequence response, final String reason) {
         return TextUtils.isEmpty(reason)
                 ? response
-                : new SpannableStringBuilder(response).append(" ").append(String.format(mContext
-                        .getString(R.string.parser_reason), reason));
+                : new SpannableStringBuilder(response).append(" ").append(
+                        mContext.getString(R.string.parser_reason, reason));
     }
 
     private EventDecorator setupEvent(final CharSequence message) {
@@ -212,8 +212,9 @@ public class IRCEventToStringConverter {
 
         // Messages
         public EventDecorator getInitialTopicMessage(final ChannelInitialTopicEvent event) {
-            final String response = mContext.getString(R.string.parser_new_topic);
-            return setupEvent(String.format(response, event.topic, event.setterNick));
+            final String response = mContext.getString(R.string.parser_new_topic,
+                    event.topic, event.setterNick);
+            return setupEvent(response);
         }
 
         public EventDecorator getOnWhoisMessage(final WhoisEvent event) {
@@ -226,8 +227,8 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator getOnConnectedMessage(final ConnectEvent event) {
-            final String response = mContext.getString(R.string.parser_connected);
-            return setupEvent(String.format(response, event.serverUrl));
+            final String response = mContext.getString(R.string.parser_connected, event.serverUrl);
+            return setupEvent(response);
         }
 
         public EventDecorator getOnConnectedMessage(final ChannelConnectEvent event) {
@@ -576,13 +577,15 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator getServerChangeMessage(final ServerNickChangeEvent event) {
-            final String response = mContext.getString(R.string.parser_appuser_nick_changed);
-            return setupEvent(String.format(response, event.oldNick, event.newNick));
+            final String response = mContext.getString(R.string.parser_appuser_nick_changed,
+                    event.oldNick, event.newNick);
+            return setupEvent(response);
         }
 
         public EventDecorator getPrivateNoticeMessage(final NoticeEvent event) {
-            final String response = mContext.getString(R.string.parser_message);
-            return setupEvent(String.format(response, event.sendingNick, event.message), true);
+            final String response = mContext.getString(R.string.parser_message,
+                    event.sendingNick, event.message);
+            return setupEvent(response, true);
         }
 
         public EventDecorator getDisconnectEvent(final DisconnectEvent event) {
@@ -609,8 +612,9 @@ public class IRCEventToStringConverter {
         }
 
         public EventDecorator getWallopsEvent(final WallopsEvent event) {
-            final String response = mContext.getString(R.string.parser_message);
-            return setupEvent(String.format(response, event.nick, event.message));
+            final String response = mContext.getString(R.string.parser_message,
+                    event.nick, event.message);
+            return setupEvent(response);
         }
 
         public EventDecorator getStopEvent(final StopEvent event) {
@@ -720,8 +724,7 @@ public class IRCEventToStringConverter {
 
         public EventDecorator get(final DCCFileGetStartedEvent event) {
             final int count = event.fileConversation.getFileConnections().size();
-            return setupEvent(String.format(mContext.getString(R.string.parser_dcc_files_count),
-                    count));
+            return setupEvent(mContext.getString(R.string.parser_dcc_files_count, count));
         }
         // DCC chat events end
     }

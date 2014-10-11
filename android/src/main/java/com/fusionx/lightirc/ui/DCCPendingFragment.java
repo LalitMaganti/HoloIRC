@@ -114,6 +114,8 @@ public class DCCPendingFragment extends DialogFragment {
 
         private final List<DCCRequestEvent> mRequestEventList;
 
+        private final Context mContext;
+
         private final LayoutInflater mLayoutInflater;
 
         private final View.OnClickListener mAcceptListener;
@@ -123,6 +125,7 @@ public class DCCPendingFragment extends DialogFragment {
         public DCCAdapter(final Context context, final Collection<DCCRequestEvent> dccRequests,
                 final View.OnClickListener acceptListener, final View.OnClickListener
                 declineListener) {
+            mContext = context;
             mLayoutInflater = LayoutInflater.from(context);
             mRequestEventList = new ArrayList<>(dccRequests);
             mAcceptListener = acceptListener;
@@ -159,13 +162,13 @@ public class DCCPendingFragment extends DialogFragment {
             } else if (requestEvent instanceof DCCSendRequestEvent) {
                 type = "SEND";
             }
-            final String titleText = String.format("%1$s requested by %2$s", type,
+            final String titleText = mContext.getString(R.string.dcc_requested, type,
                     requestEvent.getPendingConnection().getDccRequestNick());
             final TextView title = (TextView) convertView
                     .findViewById(R.id.dcc_pending_list_item_title);
             title.setText(titleText);
 
-            final String contentText = String.format("Suggested IP %1$s and port %2$d for %3$s",
+            final String contentText = mContext.getString(R.string.dcc_ip_port,
                     requestEvent.getPendingConnection().getIP(),
                     requestEvent.getPendingConnection().getPort(),
                     requestEvent.getPendingConnection().getArgument());
