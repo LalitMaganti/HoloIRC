@@ -54,12 +54,14 @@ public class UIUtils {
         }
     }
 
-    public static void toggleDrawerLayout(final DrawerLayout drawerLayout, final View drawer) {
-        if (drawerLayout.isDrawerOpen(drawer)) {
+    public static boolean toggleDrawerLayout(final DrawerLayout drawerLayout, final View drawer) {
+        boolean isOpen = drawerLayout.isDrawerOpen(drawer);
+        if (isOpen) {
             drawerLayout.closeDrawer(drawer);
         } else {
             drawerLayout.openDrawer(drawer);
         }
+        return !isOpen;
     }
 
     public static List<Integer> getCheckedPositions(final AbsListView listView) {
