@@ -195,6 +195,8 @@
     <string name="dcc_pending_title">Pending DCC Connections</string>
     <string name="dcc_progress_complete">%1$d%% complete</string>
     <string name="invite_headers">Invites</string>
+    <string name="dcc_requested">"%1$s requested by %2$s</string>
+    <string name="dcc_ip_port">Suggested IP %1$s and port %2$d for %3$s</string>
 
     <!-- Notification strings -->
     <string name="notification_action_disconnect">Disconnect</string>

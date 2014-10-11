@@ -34,4 +34,9 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item quantity="one">1 server connected</item>
         <item quantity="other">%d servers connected</item>
     </plurals>
+
+    <plurals name="user">
+        <item quantity="one">1 user</item>
+        <item quantity="other">%d users</item>
+    </plurals>
 </resources>
