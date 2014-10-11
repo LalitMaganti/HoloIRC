@@ -203,4 +203,12 @@
     <string name="notification_mentioned_multi_title">Mentioned/queried %1$d times</string>
     <string name="notification_mentioned_bigtext_title">%1$s on %2$s</string>
 
+    <!-- User levels -->
+    <string name="user_level_owners">Owners</string>
+    <string name="user_level_superops">Super-ops</string>
+    <string name="user_level_ops">Ops</string>
+    <string name="user_level_halfops">Half-ops</string>
+    <string name="user_level_voices">Voices</string>
+    <string name="user_level_users">Users</string>
+
 </resources>
