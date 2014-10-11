@@ -19,7 +19,7 @@
     </style>
 
     <style name="Dark" parent="@style/Theme.AppCompat">
-        <item name="android:actionBarStyle">@style/ActionBar</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Dark</item>
 
         <item name="holo_background">@drawable/background_holo_dark</item>
         <item name="default_text_colour">@android:color/white</item>
@@ -36,6 +36,10 @@
     </style>
 
     <style name="ActionBar" parent="@style/Widget.AppCompat.Light.Base.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/action_bar_background_color</item>
+    </style>
+
+    <style name="ActionBar.Dark" parent="@style/Widget.AppCompat.Base.ActionBar.Solid">
         <item name="android:background">@color/action_bar_background_color</item>
     </style>
 
