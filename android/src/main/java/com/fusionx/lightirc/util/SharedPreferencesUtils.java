@@ -23,6 +23,8 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.misc.PreferenceConstants;
 import com.fusionx.lightirc.model.db.BuilderDatabase;
+import com.fusionx.relay.configuration.ParcelableConnectionConfiguration;
+import com.fusionx.relay.core.ParcelableNickProvider;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -36,9 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
-import co.fusionx.relay.misc.NickStorage;
-
 import static android.content.Context.MODE_PRIVATE;
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_IGNORE_LIST;
 
@@ -49,8 +48,10 @@ public class SharedPreferencesUtils {
     }
 
     // TODO - make these static somewhere
-    public static ConnectionConfiguration.Builder getDefaultNewServer(final Context context) {
-        final ConnectionConfiguration.Builder builder = new ConnectionConfiguration.Builder();
+    public static ParcelableConnectionConfiguration.Builder getDefaultNewServer(
+            final Context context) {
+        final ParcelableConnectionConfiguration.Builder builder
+                = new ParcelableConnectionConfiguration.Builder();
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences
                 (context);
         final String firstNick = preferences.getString(PreferenceConstants.PREF_DEFAULT_FIRST_NICK,
@@ -59,7 +60,7 @@ public class SharedPreferencesUtils {
                 .getString(PreferenceConstants.PREF_DEFAULT_SECOND_NICK, "");
         final String thirdNick = preferences
                 .getString(PreferenceConstants.PREF_DEFAULT_THIRD_NICK, "");
-        builder.setNickStorage(new NickStorage(firstNick, secondNick, thirdNick));
+        builder.setNickStorage(new ParcelableNickProvider(firstNick, secondNick, thirdNick));
 
         final String realName = preferences.getString(PreferenceConstants.PREF_DEFAULT_REALNAME,
                 "HoloIRCUser");
@@ -113,7 +114,8 @@ public class SharedPreferencesUtils {
         for (final File file : array) {
             final String prefsName = file.getName().replace(".xml", "");
             // Get builder to transfer
-            final ConnectionConfiguration.Builder builder = convertPrefsToBuilder(context, prefsName);
+            final ParcelableConnectionConfiguration.Builder builder = convertPrefsToBuilder(context,
+                    prefsName);
             // Only transfer if the builder is not broken
             if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
                     .isNotEmpty(builder.getUrl())) {
@@ -132,27 +134,31 @@ public class SharedPreferencesUtils {
 
     private static void firstTimeServerSetup(final Context context) {
         final BuilderDatabase source = BuilderDatabase.getInstance(context);
-        final List<ConnectionConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
-        for (final ConnectionConfiguration.Builder builder : builders) {
+        final List<ParcelableConnectionConfiguration.Builder> builders = BuilderUtils
+                .getFirstTimeBuilderList();
+        for (final ParcelableConnectionConfiguration.Builder builder : builders) {
             source.addServer(builder, new ArrayList<>());
         }
     }
 
     private static void firstDbSetup(final Context context) {
         final BuilderDatabase source = BuilderDatabase.getInstance(context);
-        final List<ConnectionConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
-        for (final ConnectionConfiguration.Builder builder : builders) {
+        final List<ParcelableConnectionConfiguration.Builder> builders = BuilderUtils
+                .getFirstTimeBuilderList();
+        for (final ParcelableConnectionConfiguration.Builder builder : builders) {
             if (source.getBuilderByName(builder.getTitle()) == null) {
                 source.addServer(builder, new ArrayList<>());
             }
         }
     }
 
-    private static ConnectionConfiguration.Builder convertPrefsToBuilder(final Context context,
+    private static ParcelableConnectionConfiguration.Builder convertPrefsToBuilder(
+            final Context context,
             final String filename) {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 MODE_PRIVATE);
-        final ConnectionConfiguration.Builder builder = new ConnectionConfiguration.Builder();
+        final ParcelableConnectionConfiguration.Builder builder
+                = new ParcelableConnectionConfiguration.Builder();
 
         // Server connection
         builder.setTitle(serverSettings.getString(PreferenceConstants.PREF_TITLE, ""));
@@ -172,7 +178,8 @@ public class SharedPreferencesUtils {
                 .getString(PreferenceConstants.PREF_SECOND_NICK, "");
         final String thirdChoice = serverSettings
                 .getString(PreferenceConstants.PREF_THIRD_NICK, "");
-        final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice, thirdChoice);
+        final ParcelableNickProvider nickStorage = new ParcelableNickProvider(firstChoice,
+                secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
         builder.setRealName(serverSettings.getString(PreferenceConstants.PREF_REALNAME, "HoloIRC"));
         builder.setNickChangeable(serverSettings.getBoolean(PreferenceConstants.PREF_AUTO_NICK,

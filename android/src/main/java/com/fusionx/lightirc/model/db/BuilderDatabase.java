@@ -1,5 +1,8 @@
 package com.fusionx.lightirc.model.db;
 
+import com.fusionx.relay.configuration.ParcelableConnectionConfiguration;
+import com.fusionx.relay.core.ParcelableNickProvider;
+
 import org.apache.commons.lang3.StringUtils;
 
 import android.content.ContentValues;
@@ -12,8 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
-import co.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.provider.NickProvider;
 
 import static android.provider.BaseColumns._ID;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;
@@ -64,8 +66,10 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         return sBuilderDatabase;
     }
 
-    private static ConnectionConfiguration.Builder getBuilderFromCursor(final Cursor cursor) {
-        final ConnectionConfiguration.Builder builder = new ConnectionConfiguration.Builder();
+    private static ParcelableConnectionConfiguration.Builder getBuilderFromCursor(
+            final Cursor cursor) {
+        final ParcelableConnectionConfiguration.Builder builder
+                = new ParcelableConnectionConfiguration.Builder();
 
         builder.setId(getIntByName(cursor, _ID));
 
@@ -83,8 +87,8 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         final String firstChoice = getStringByName(cursor, COLUMN_NICK_ONE);
         final String secondChoice = getStringByName(cursor, COLUMN_NICK_TWO);
         final String thirdChoice = getStringByName(cursor, COLUMN_NICK_THREE);
-        final NickStorage nickStorage = new NickStorage(firstChoice, secondChoice,
-                thirdChoice);
+        final ParcelableNickProvider nickStorage = new ParcelableNickProvider(firstChoice,
+                secondChoice, thirdChoice);
         builder.setNickStorage(nickStorage);
         builder.setRealName(getStringByName(cursor, COLUMN_REAL_NAME));
         builder.setNickChangeable(getIntByName(cursor, COLUMN_NICK_CHANGEABLE) > 0);
@@ -126,7 +130,7 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         values.put(_ID, (int) id);
     }
 
-    public void addServer(final ConnectionConfiguration.Builder builder,
+    public void addServer(final ParcelableConnectionConfiguration.Builder builder,
             final List<String> ignoreList) {
         final ContentValues values = getContentValuesFromBuilder(builder, false);
 
@@ -140,14 +144,15 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public List<ConnectionConfiguration.Builder> getAllBuilders() {
-        final List<ConnectionConfiguration.Builder> builders = new ArrayList<>();
+    public List<ParcelableConnectionConfiguration.Builder> getAllBuilders() {
+        final List<ParcelableConnectionConfiguration.Builder> builders = new ArrayList<>();
         final String selectQuery = "SELECT * FROM " + TABLE_NAME;
 
         final Cursor cursor = mDatabase.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                final ConnectionConfiguration.Builder builder = getBuilderFromCursor(cursor);
+                final ParcelableConnectionConfiguration.Builder builder = getBuilderFromCursor(
+                        cursor);
                 if (StringUtils.isNotEmpty(builder.getTitle()) && StringUtils
                         .isNotEmpty(builder.getUrl())) {
                     builders.add(builder);
@@ -159,7 +164,7 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         return builders;
     }
 
-    public ConnectionConfiguration.Builder getBuilderByName(final String serverName) {
+    public ParcelableConnectionConfiguration.Builder getBuilderByName(final String serverName) {
         final Cursor cursor = mDatabase.query(TABLE_NAME, null,
                 String.format("%s=?", COLUMN_TITLE), new String[]{serverName}, null, null, null);
         return cursor.moveToFirst() ? getBuilderFromCursor(cursor) : null;
@@ -184,7 +189,8 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         mDatabase.update(TABLE_NAME, values, COLUMN_TITLE + "=?", new String[]{serverName});
     }
 
-    public ContentValues getContentValuesFromBuilder(final ConnectionConfiguration.Builder builder,
+    public ContentValues getContentValuesFromBuilder(
+            final ParcelableConnectionConfiguration.Builder builder,
             final boolean id) {
         final ContentValues values = new ContentValues();
 
@@ -202,7 +208,7 @@ public class BuilderDatabase extends SQLiteOpenHelper {
         values.put(COLUMN_SSL_ACCEPT_ALL, builder.isSslAcceptAllCertificates() ? 1 : 0);
 
         // User settings
-        final NickStorage storage = builder.getNickStorage();
+        final NickProvider storage = builder.getNickProvider();
         values.put(COLUMN_NICK_ONE, storage.getFirst());
         values.put(COLUMN_NICK_TWO, storage.getNickAtPosition(1));
         values.put(COLUMN_NICK_THREE, storage.getNickAtPosition(2));

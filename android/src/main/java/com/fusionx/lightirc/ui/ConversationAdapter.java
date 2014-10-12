@@ -9,6 +9,9 @@ import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.util.EventUtils;
 import com.fusionx.lightirc.util.UIUtils;
 
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.util.Linkify;
@@ -24,8 +27,12 @@ import java.util.List;
 
 import co.fusionx.relay.event.Event;
 
-public class ConversationAdapter<T extends Event> extends RecyclerView.Adapter<ConversationAdapter.IRCViewHolder>
+public class ConversationAdapter<T extends Event>
+        extends RecyclerView.Adapter<ConversationAdapter.IRCViewHolder>
         implements Filterable {
+
+    // Format for input
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm");
 
     private final Object mLock = new Object();
 
@@ -41,7 +48,8 @@ public class ConversationAdapter<T extends Event> extends RecyclerView.Adapter<C
 
     private EventCache mEventCache;
 
-    public ConversationAdapter(final Context context, final EventCache cache, final boolean filter) {
+    public ConversationAdapter(final Context context, final EventCache cache,
+            final boolean filter) {
         mContext = context;
         mObjects = new ArrayList<>();
         mInflater = LayoutInflater.from(mContext);
@@ -137,7 +145,7 @@ public class ConversationAdapter<T extends Event> extends RecyclerView.Adapter<C
     private void addTimestampIfRequired(IRCViewHolder holder, final Event event) {
         if (AppPreferences.getAppPreferences().shouldDisplayTimestamps()) {
             holder.timestamp.setVisibility(View.VISIBLE);
-            holder.timestamp.setText(event.timestamp.format("%H:%M"));
+            holder.timestamp.setText(TIME_FORMATTER.print(event.timestamp));
         } else {
             holder.timestamp.setVisibility(View.GONE);
         }

@@ -13,8 +13,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import co.fusionx.relay.core.SettingsProvider;
 import co.fusionx.relay.logging.LoggingSettingsProvider;
+import co.fusionx.relay.provider.SettingsProvider;
 
 import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;

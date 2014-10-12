@@ -3,29 +3,24 @@ package com.fusionx.lightirc.model;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import com.fusionx.relay.configuration.ParcelableConnectionConfiguration;
 
-import co.fusionx.relay.conversation.Channel;
-import co.fusionx.relay.core.SessionStatus;
+import java.util.ArrayList;
+import java.util.List;
+
 import co.fusionx.relay.conversation.Conversation;
 import co.fusionx.relay.core.Session;
 
-import static co.fusionx.relay.core.ConnectionConfiguration.Builder;
-
 public class SessionContainer {
 
-    private final Builder mBuilder;
+    private final ParcelableConnectionConfiguration.Builder mBuilder;
 
     private final List<Conversation> mConversations;
 
     private Session mSession;
 
-    public SessionContainer(final Builder builder, final Optional<Session> session) {
+    public SessionContainer(final ParcelableConnectionConfiguration.Builder builder,
+            final Optional<? extends Session> session) {
         mBuilder = builder;
         mConversations = new ArrayList<>();
 
@@ -40,7 +35,7 @@ public class SessionContainer {
         return mSession;
     }
 
-    public void setSession(final Optional<Session> optional) {
+    public void setSession(final Optional<? extends Session> optional) {
         mSession = optional.orNull();
 
         if (!optional.isPresent()) {
@@ -51,13 +46,13 @@ public class SessionContainer {
                 .copyInto(mConversations);
         FluentIterable.from(session.getQueryManager().getQueryUsers())
                 .copyInto(mConversations);
-        FluentIterable.from(session.getDCCManager().getChatConversations())
-                .copyInto(mConversations);
-        FluentIterable.from(session.getDCCManager().getFileConversations())
-                .copyInto(mConversations);
+        // FluentIterable.from(session.getDCCManager().getChatConversations())
+        //        .copyInto(mConversations);
+        //FluentIterable.from(session.getDCCManager().getFileConversations())
+        //        .copyInto(mConversations);
     }
 
-    public Builder getBuilder() {
+    public ParcelableConnectionConfiguration.Builder getBuilder() {
         return mBuilder;
     }
 

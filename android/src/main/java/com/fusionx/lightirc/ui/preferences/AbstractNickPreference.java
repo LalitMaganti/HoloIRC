@@ -1,6 +1,7 @@
 package com.fusionx.lightirc.ui.preferences;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.relay.core.ParcelableNickProvider;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,8 +14,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
-import co.fusionx.relay.misc.NickStorage;
 
 abstract class AbstractNickPreference extends DialogPreference implements TextWatcher {
 
@@ -106,7 +105,8 @@ abstract class AbstractNickPreference extends DialogPreference implements TextWa
         }
     }
 
-    private NickStorage getNickStorageFromText() {
-        return new NickStorage(getFirstNickText(), getSecondNickText(), getThirdNickText());
+    private ParcelableNickProvider getNickStorageFromText() {
+        return new ParcelableNickProvider(getFirstNickText(), getSecondNickText(),
+                getThirdNickText());
     }
 }

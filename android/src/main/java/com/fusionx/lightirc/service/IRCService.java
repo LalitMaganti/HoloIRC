@@ -14,6 +14,8 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -27,18 +29,17 @@ import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
-import android.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
+import co.fusionx.relay.configuration.ConnectionConfiguration;
+import co.fusionx.relay.configuration.SessionConfiguration;
 import co.fusionx.relay.core.Session;
-import co.fusionx.relay.core.SessionConfiguration;
 import co.fusionx.relay.core.SessionManager;
+import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.internal.base.RelaySessionManager;
-import co.fusionx.relay.internal.function.FluentIterables;
 
 import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
@@ -121,12 +122,12 @@ public class IRCService extends Service {
         return sEventHelpers.get(session);
     }
 
-    public static Optional<Session> getSessionIfExists(final ConnectionConfiguration.Builder
-            builder) {
+    public static Optional<? extends Session> getSessionIfExists(
+            final ConnectionConfiguration.Builder builder) {
         return getSessionIfExists(builder.getTitle());
     }
 
-    public static Optional<Session> getSessionIfExists(final String title) {
+    public static Optional<? extends Session> getSessionIfExists(final String title) {
         return sSessionManager.getSessionIfExists(title);
     }
 
@@ -147,11 +148,11 @@ public class IRCService extends Service {
         sessionBuilder.setConnectionConfiguration(builder.build());
         sessionBuilder.setSettingsProvider(mAppPreferences);
 
-        final Pair<Boolean, Session> pair = sSessionManager
+        final Pair<Boolean, ? extends Session> pair = sSessionManager
                 .requestConnection(sessionBuilder.build());
 
-        final boolean exists = pair.first;
-        final Session session = pair.second;
+        final boolean exists = pair.getKey();
+        final Session session = pair.getValue();
 
         if (!exists) {
             final ServiceEventInterceptor interceptor = new ServiceEventInterceptor(session);

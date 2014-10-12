@@ -1,28 +1,31 @@
 package com.fusionx.lightirc.util;
 
+import com.fusionx.relay.configuration.ParcelableConnectionConfiguration;
+import com.fusionx.relay.core.ParcelableNickProvider;
+
 import java.util.Arrays;
 import java.util.List;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
-import co.fusionx.relay.misc.NickStorage;
-
 class BuilderUtils {
 
-    public static List<ConnectionConfiguration.Builder> getFirstTimeBuilderList() {
-        final ConnectionConfiguration.Builder freenode = new ConnectionConfiguration.Builder();
+    public static List<ParcelableConnectionConfiguration.Builder> getFirstTimeBuilderList() {
+        final ParcelableConnectionConfiguration.Builder freenode
+                = new ParcelableConnectionConfiguration.Builder();
         freenode.setTitle("Freenode").setUrl("chat.freenode.net").setPort(6667).setSsl(false);
-        freenode.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
+        freenode.setNickStorage(new ParcelableNickProvider("HoloIRCUser", "", ""));
         freenode.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
-        final ConnectionConfiguration.Builder snoonet = new ConnectionConfiguration.Builder();
+        final ParcelableConnectionConfiguration.Builder snoonet
+                = new ParcelableConnectionConfiguration.Builder();
         snoonet.setTitle("Snoonet").setUrl("irc.snoonet.org").setPort(6667).setSsl(false);
-        snoonet.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
+        snoonet.setNickStorage(new ParcelableNickProvider("HoloIRCUser", "", ""));
         snoonet.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
-        final ConnectionConfiguration.Builder tmwirc = new ConnectionConfiguration.Builder();
+        final ParcelableConnectionConfiguration.Builder tmwirc
+                = new ParcelableConnectionConfiguration.Builder();
         tmwirc.setTitle("Techman's World IRC").setUrl("irc.techmansworld.com").setPort(6667)
                 .setSsl(false);
-        tmwirc.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
+        tmwirc.setNickStorage(new ParcelableNickProvider("HoloIRCUser", "", ""));
         tmwirc.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
         return Arrays.asList(freenode, snoonet, tmwirc);

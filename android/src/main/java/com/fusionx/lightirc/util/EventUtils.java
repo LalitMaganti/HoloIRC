@@ -7,12 +7,12 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import java.util.List;
 import java.util.Set;
 
-import co.fusionx.relay.dcc.event.file.DCCFileEvent;
-import co.fusionx.relay.dcc.event.file.DCCFileProgressEvent;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.event.file.DCCFileEvent;
+import co.fusionx.relay.event.file.DCCFileProgressEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.MotdEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;

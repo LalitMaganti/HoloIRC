@@ -45,12 +45,12 @@ import co.fusionx.relay.conversation.Server;
 import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Session;
 import co.fusionx.relay.core.SessionStatus;
-import co.fusionx.relay.internal.dcc.base.RelayDCCChatConversation;
-import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
 import co.fusionx.relay.event.channel.PartEvent;
 import co.fusionx.relay.event.server.KickEvent;
 import co.fusionx.relay.event.server.StatusChangeEvent;
-import co.fusionx.relay.internal.function.Optionals;
+import co.fusionx.relay.function.Optionals;
+import co.fusionx.relay.internal.base.RelayDCCChatConversation;
+import co.fusionx.relay.internal.base.RelayDCCFileConversation;
 
 import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
@@ -201,8 +201,9 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
 
             transaction.commit();
         } else {
-            mSessionOverviewFragment = (SessionOverviewFragment) getSupportFragmentManager().findFragmentById(
-                    R.id.sliding_list_frame);
+            mSessionOverviewFragment = (SessionOverviewFragment) getSupportFragmentManager()
+                    .findFragmentById(
+                            R.id.sliding_list_frame);
             mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.right_drawer);
             mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
@@ -342,7 +343,7 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
         final String channelName = getIntent().getStringExtra("channel_name");
         final String queryNick = getIntent().getStringExtra("query_nick");
 
-        final Optional<Session> connection;
+        final Optional<? extends Session> connection;
         final Optional<? extends Conversation> optConversation;
         // If we are launching from recents then we are definitely not coming from the
         // notification - ignore what's in the intent
@@ -494,12 +495,12 @@ public class MainActivity extends ActionBarActivity implements SessionOverviewFr
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Optional<Session> connection = IRCService.getSessionIfExists(serverName);
+        final Optional<? extends Session> session = IRCService.getSessionIfExists(serverName);
         final Optional<? extends Conversation> optional = Optionals.flatTransform
-                (connection, c -> channelName == null
+                (session, c -> channelName == null
                         ? c.getQueryManager().getQueryUser(queryNick)
                         : c.getUserChannelManager().getChannel(channelName));
-        onExternalConversationChange(optional.transform(c -> new Pair<>(connection.get(), c)));
+        onExternalConversationChange(optional.transform(c -> new Pair<>(session.get(), c)));
     }
 
     @Override

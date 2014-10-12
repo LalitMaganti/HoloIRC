@@ -89,7 +89,9 @@ dependencies {
     testCompile 'org.robolectric:robolectric:+'
     testCompile 'org.assertj:assertj-core:1.+'
 
-    compile project(':relay-library')
+    compile project(':relay-android')
+    compile project(':relay-core')
+    compile project(':relay-dcc')
     compile project(':bus-library')
 
     compile project(':libraries:cardview-v7')

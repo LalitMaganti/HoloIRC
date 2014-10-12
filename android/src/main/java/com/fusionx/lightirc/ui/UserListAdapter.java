@@ -26,10 +26,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import co.fusionx.relay.constant.UserLevel;
 import co.fusionx.relay.conversation.Channel;
 import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Nick;
-import co.fusionx.relay.constants.UserLevel;
 
 public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserViewHolder> {
 

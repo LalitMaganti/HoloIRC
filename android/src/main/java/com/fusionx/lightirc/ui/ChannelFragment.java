@@ -30,6 +30,7 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.IRCUserComparator;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,9 +52,7 @@ import co.fusionx.relay.conversation.Channel;
 import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Nick;
 import co.fusionx.relay.event.channel.ChannelEvent;
-import co.fusionx.relay.internal.function.FluentIterables;
-import co.fusionx.relay.misc.IRCUserComparator;
-import co.fusionx.relay.util.IRCUtils;
+import co.fusionx.relay.function.FluentIterables;
 import co.fusionx.relay.util.ParseUtils;
 
 import static org.apache.commons.lang3.StringUtils.startsWithIgnoreCase;
@@ -161,7 +160,7 @@ public final class ChannelFragment extends ConversationFragment<ChannelEvent>
         final List<String> list = ParseUtils.splitRawLine(message, false);
         list.set(list.size() - 1, newWord);
         mMessageBox.setText("");
-        mMessageBox.append(IRCUtils.concatenateStringList(list) + ": ");
+        mMessageBox.append(co.fusionx.relay.util.StringUtils.concatenateStringList(list) + ": ");
     }
 
     private class QuickUserMentionListener implements View.OnClickListener {

@@ -20,10 +20,10 @@ import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.conversation.Conversation;
-import co.fusionx.relay.internal.dcc.base.RelayDCCFileConnection;
-import co.fusionx.relay.internal.dcc.base.RelayDCCFileConversation;
-import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
-import co.fusionx.relay.dcc.event.file.DCCFileProgressEvent;
+import co.fusionx.relay.event.file.DCCFileGetStartedEvent;
+import co.fusionx.relay.event.file.DCCFileProgressEvent;
+import co.fusionx.relay.internal.base.RelayDCCFileConnection;
+import co.fusionx.relay.internal.base.RelayDCCFileConversation;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 

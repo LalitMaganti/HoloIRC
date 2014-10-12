@@ -27,8 +27,8 @@ import com.fusionx.lightirc.misc.FragmentType;
 
 import java.util.List;
 
-import co.fusionx.relay.internal.dcc.base.RelayDCCChatConversation;
-import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.event.chat.DCCChatEvent;
+import co.fusionx.relay.internal.base.RelayDCCChatConversation;
 
 public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
@@ -44,7 +44,7 @@ public class DCCChatFragment extends ConversationFragment<DCCChatEvent> {
 
     @Override
     public void onSendMessage(final String message) {
-        mSession.getInputParser().parseDCCChatEvent(getChatConversation(), message);
+        // mSession.getInputParser().parseDCCChatEvent(getChatConversation(), message);
     }
 
     @Override

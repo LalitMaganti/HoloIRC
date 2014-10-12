@@ -1,5 +1,7 @@
 package com.fusionx.lightirc.misc;
 
+import com.google.common.base.Optional;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.NickColour;
@@ -9,7 +11,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 
@@ -19,12 +20,6 @@ import java.util.Map;
 
 import co.fusionx.relay.core.ChannelUser;
 import co.fusionx.relay.core.Nick;
-import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatSelfMessageEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatStartedEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatWorldActionEvent;
-import co.fusionx.relay.dcc.event.chat.DCCChatWorldMessageEvent;
-import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelActionEvent;
 import co.fusionx.relay.event.channel.ChannelConnectEvent;
@@ -46,6 +41,12 @@ import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 import co.fusionx.relay.event.channel.PartEvent;
+import co.fusionx.relay.event.chat.DCCChatSelfActionEvent;
+import co.fusionx.relay.event.chat.DCCChatSelfMessageEvent;
+import co.fusionx.relay.event.chat.DCCChatStartedEvent;
+import co.fusionx.relay.event.chat.DCCChatWorldActionEvent;
+import co.fusionx.relay.event.chat.DCCChatWorldMessageEvent;
+import co.fusionx.relay.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryConnectEvent;
@@ -69,7 +70,8 @@ import co.fusionx.relay.event.server.ServerNickChangeEvent;
 import co.fusionx.relay.event.server.StopEvent;
 import co.fusionx.relay.event.server.WallopsEvent;
 import co.fusionx.relay.event.server.WhoisEvent;
-import co.fusionx.relay.internal.dcc.base.RelayRelayDCCPendingChatConnection;
+import co.fusionx.relay.internal.base.RelayDCCPendingChatConnection;
+import co.fusionx.relay.internal.base.RelayNick;
 
 /*
  * TODO - cleanup this entire class - it's a total mess
@@ -119,11 +121,14 @@ public class IRCEventToStringConverter {
         }
     }
 
-    private CharSequence appendReasonIfNeeded(final CharSequence response, final String reason) {
-        return TextUtils.isEmpty(reason)
-                ? response
-                : new SpannableStringBuilder(response).append(" ").append(String.format(mContext
-                        .getString(R.string.parser_reason), reason));
+    private CharSequence appendReasonIfNeeded(final CharSequence response,
+            final Optional<String> reason) {
+        return reason.transform(realReason -> {
+            @SuppressWarnings("UnnecessaryLocalVariable")
+            CharSequence append = new SpannableStringBuilder(response).append(" ")
+                    .append(mContext.getString(R.string.parser_reason, realReason));
+            return append;
+        }).or(response);
     }
 
     private EventDecorator setupEvent(final CharSequence message) {
@@ -360,17 +365,17 @@ public class IRCEventToStringConverter {
             final String response = mContext.getString(R.string.parser_kicked_channel);
 
             if (shouldHighlightLine()) {
-                final String formattedResponse = String
-                        .format(response, event.userNick, event.kickingNick == null ? event
-                                .userNickString : event.kickingNick);
+                final String formattedResponse = String.format(response, event.userNick,
+                        event.kickingUser.transform(ChannelUser::getNick)
+                                .transform(Nick::getNickAsString).or(event.kickingNickString));
                 return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
                         event.userNick);
             } else {
                 final FormattedString[] formattedStrings = {
                         getFormattedStringForNick(event.userNick),
-                        event.kickingNick == null
-                                ? new FormattedString(event.kickingNickString)
-                                : getFormattedStringForNick(event.kickingNick)
+                        event.kickingUser.transform(
+                                IRCEventToStringConverter.this::getFormattedStringForUser)
+                                .or(new FormattedString(event.kickingNickString))
                 };
                 return setupEvent(
                         appendReasonIfNeeded(formatTextWithStyle(response, formattedStrings),
@@ -384,13 +389,16 @@ public class IRCEventToStringConverter {
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.channel.getName(),
-                        event.kickingNick);
+                        event.optKickingUser);
                 return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
-                        event.kickingNick);
+                        event.optKickingUser.transform(ChannelUser::getNick).or(new RelayNick
+                                (event.kickingNickString)));
             } else {
                 final FormattedString[] formattedStrings = {
                         new FormattedString(event.channel.getName()),
-                        getFormattedStringForNick(event.kickingNick),
+                        getFormattedStringForNick(
+                                event.optKickingUser.transform(ChannelUser::getNick)
+                                        .or(new RelayNick(event.kickingNickString))),
                 };
                 return setupEvent(
                         appendReasonIfNeeded(formatTextWithStyle(response, formattedStrings),
@@ -404,11 +412,13 @@ public class IRCEventToStringConverter {
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.userNick);
-                return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
-                        event.userNick);
+                CharSequence message = appendReasonIfNeeded(formattedResponse,
+                        event.optionalReason);
+                return setupEvent(message, event.userNick);
             } else {
-                return setupEvent(appendReasonIfNeeded(formatTextWithStyle(response,
-                        getFormattedStringForNick(event.userNick)), event.reason));
+                CharSequence response1 = formatTextWithStyle(response,
+                        getFormattedStringForNick(event.userNick));
+                return setupEvent(appendReasonIfNeeded(response1, event.optionalReason));
             }
         }
 
@@ -647,7 +657,7 @@ public class IRCEventToStringConverter {
 
         // DCC chat events start
         public EventDecorator getDCCChatRequestedEvent(final DCCChatRequestEvent event) {
-            final RelayRelayDCCPendingChatConnection connection = event.getPendingConnection();
+            final RelayDCCPendingChatConnection connection = event.getPendingConnection();
             final String response = mContext.getString(R.string.parser_dcc_chat_requested);
             final String formattedResponse = String.format(response, connection.getDccRequestNick(),
                     connection.getIP(), connection.getPort());

@@ -8,6 +8,7 @@ import com.fusionx.lightirc.ui.preferences.ViewPreference;
 import com.fusionx.lightirc.util.PreferenceUtils;
 import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.relay.configuration.ParcelableConnectionConfiguration;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,8 +25,7 @@ import android.preference.PreferenceScreen;
 import java.io.File;
 import java.util.ArrayList;
 
-import co.fusionx.relay.core.ConnectionConfiguration;
-import co.fusionx.relay.misc.NickStorage;
+import co.fusionx.relay.provider.NickProvider;
 
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_TITLE;
 import static com.fusionx.lightirc.misc.PreferenceConstants.PREF_URL;
@@ -69,7 +69,7 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
 
         mDatabase = BuilderDatabase.getInstance(this);
 
-        ConnectionConfiguration.Builder builder;
+        ParcelableConnectionConfiguration.Builder builder;
         if (mNewServer) {
             builder = SharedPreferencesUtils.getDefaultNewServer(this);
             setResult(RESULT_CANCELED);
@@ -218,10 +218,10 @@ public class ServerPreferenceActivity extends PreferenceActivity implements
                         mContentValues.getAsString(COLUMN_NICK_THREE));
 
                 listener = (preference, newValue) -> {
-                    final NickStorage storage = (NickStorage) newValue;
-                    mContentValues.put(COLUMN_NICK_ONE, storage.getFirst());
-                    mContentValues.put(COLUMN_NICK_TWO, storage.getNickAtPosition(1));
-                    mContentValues.put(COLUMN_NICK_THREE, storage.getNickAtPosition(2));
+                    final NickProvider provider = (NickProvider) newValue;
+                    mContentValues.put(COLUMN_NICK_ONE, provider.getFirst());
+                    mContentValues.put(COLUMN_NICK_TWO, provider.getNickAtPosition(1));
+                    mContentValues.put(COLUMN_NICK_THREE, provider.getNickAtPosition(2));
                     return true;
                 };
             } else {
