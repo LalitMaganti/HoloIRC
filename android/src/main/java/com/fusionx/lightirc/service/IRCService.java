@@ -24,6 +24,7 @@ import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Pair;
 
 import java.util.HashMap;
@@ -35,7 +36,6 @@ import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayConnectionManager;
 
-import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
 import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
@@ -254,11 +254,25 @@ public class IRCService extends Service {
 
     private Notification getNotification() {
         int connectionCount = mConnectionManager.getServerCount();
-        final Builder builder = new Builder(this);
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
+
+        builder.setColor(getResources().getColor(R.color.colorPrimary));
         builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
+        builder.setSmallIcon(R.drawable.ic_notification_small);
+        builder.setContentIntent(getMainActivityIntent());
+        builder.setPriority(NotificationCompat.PRIORITY_MIN);
+        builder.setCategory(NotificationCompat.CATEGORY_SERVICE);
+        builder.setOngoing(true);
+        builder.setLocalOnly(true);
+        builder.setContentText(getResources().getQuantityString(
+                    R.plurals.server_connection, connectionCount, connectionCount));
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        Notification publicVersion = builder.build();
         final String text;
+
         if (connectionCount == 1) {
             String server = mConnectionManager.getImmutableServerSet().iterator().next().getId();
             text = getString(R.string.parser_connected, server);
@@ -268,8 +282,8 @@ public class IRCService extends Service {
         }
         builder.setContentText(text);
         builder.setTicker(text);
-        builder.setSmallIcon(R.drawable.ic_notification_small);
-        builder.setContentIntent(getMainActivityIntent());
+        builder.setPublicVersion(publicVersion);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 199,
                 new Intent(DISCONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
