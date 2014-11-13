@@ -4,7 +4,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.FragmentUtils;
 
-import org.lucasr.twowayview.TwoWayView;
+import org.lucasr.twowayview.widget.TwoWayView;
 
 import android.app.Activity;
 import android.os.Bundle;

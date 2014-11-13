@@ -6,7 +6,7 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.NickCache;
 import com.fusionx.lightirc.util.UIUtils;
 
-import org.lucasr.twowayview.TwoWayView;
+import org.lucasr.twowayview.widget.TwoWayView;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

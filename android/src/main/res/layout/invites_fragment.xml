@@ -20,7 +20,7 @@
             android:textColor="@android:color/white" />
     </RelativeLayout>
 
-    <org.lucasr.twowayview.TwoWayView
+    <org.lucasr.twowayview.widget.TwoWayView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -28,5 +28,5 @@
         android:background="?attr/holo_background"
         android:clipToPadding="false"
         android:scrollbarStyle="outsideOverlay"
-        app:layoutManager="ListLayoutManager" />
+        app:twowayview_layoutManager="ListLayoutManager" />
 </RelativeLayout>

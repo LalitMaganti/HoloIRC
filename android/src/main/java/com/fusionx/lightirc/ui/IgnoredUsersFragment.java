@@ -6,7 +6,7 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 
-import org.lucasr.twowayview.TwoWayView;
+import org.lucasr.twowayview.widget.TwoWayView;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
