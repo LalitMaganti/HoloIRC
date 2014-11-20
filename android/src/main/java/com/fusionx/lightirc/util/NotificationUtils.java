@@ -83,7 +83,7 @@ public class NotificationUtils {
         }
     }
 
-    public static void notifyOutOfApp(final Context context, CharSequence message,
+    public static void notifyOutOfApp(final Context context, final String message,
             Nick user, final Conversation<? extends Event> conversation, final boolean channel) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
@@ -103,14 +103,17 @@ public class NotificationUtils {
             sNotificationQueryCount++;
         }
 
-        if (message != null) {
+        CharSequence storedMessage = message;
+
+        if (storedMessage != null) {
             if (user != null) {
-                message = prependHighlightedText(context, user.getNickAsString(), message);
+                storedMessage = prependHighlightedText(context,
+                        user.getNickAsString(), storedMessage);
             }
             if (sNotificationMessages.size() >= MAX_NOTIFICATION_LINES) {
                 sNotificationMessages.remove(0);
             }
-            sNotificationMessages.add(Pair.create(server.getId(), message));
+            sNotificationMessages.add(Pair.create(server.getId(), storedMessage));
         }
 
         // If we're here, the activity has not picked it up - fire off a notification
@@ -123,34 +126,43 @@ public class NotificationUtils {
         builder.setContentTitle(context.getString(R.string.app_name));
         builder.setAutoCancel(true);
         builder.setNumber(totalNotificationCount);
+        builder.setColor(context.getResources().getColor(R.color.colorPrimary));
+        builder.setCategory(NotificationCompat.CATEGORY_EMAIL);
+        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+
+        final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
+        resultIntent.putExtra("server_name", conversation.getServer().getTitle());
+        resultIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
+
+        final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,
+                NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(resultPendingIntent);
+
+        // First build the public version...
+        builder.setContentText(buildNotificationContentTextWithCounts(context));
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        final Notification publicVersion = builder.build();
+
+        // ... and now the private one
+        builder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+        builder.setPublicVersion(publicVersion);
 
         final String text;
         if (totalNotificationCount == 1) {
             int titleResId = channel
                     ? R.string.notification_mentioned_title : R.string.notification_queried_title;
             text = context.getString(titleResId, conversation.getId(), server.getId());
+            // Use message, not storedMessage, to keep the user name out of the notification
             if (message != null) {
                 String title = context.getString(R.string.notification_mentioned_bigtext_title,
                         conversation.getId(), server.getId());
                 builder.setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(message)
+                        .bigText(ensureMinimumSize(message))
                         .setBigContentTitle(title));
             }
         } else {
-            if (sNotificationQueryCount > 0 && sNotificationMentionCount > 0) {
-                Resources res = context.getResources();
-                String mentions = res.getQuantityString(R.plurals.mention,
-                        sNotificationMentionCount, sNotificationMentionCount);
-                String queries = res.getQuantityString(R.plurals.query,
-                        sNotificationQueryCount, sNotificationQueryCount);
-                text = mentions + ", " + queries;
-            } else if (sNotificationMentionCount > 0) {
-                text = context.getString(R.string.notification_mentioned_multi_title,
-                        sNotificationMentionCount);
-            } else {
-                text = context.getString(R.string.notification_queried_multi_title,
-                        sNotificationQueryCount);
-            }
+            text = buildNotificationContentTextWithCounts(context);
 
             if (!sNotificationMessages.isEmpty()) {
                 String serverId = sNotificationMessages.get(0).first;
@@ -185,31 +197,49 @@ public class NotificationUtils {
         builder.setContentText(text);
         builder.setTicker(text);
 
+        int defaults = 0;
+        if (outApp.contains(context.getString(R.string.notification_value_audio))) {
+            defaults |= Notification.DEFAULT_SOUND;
+        }
+        if (outApp.contains(context.getString(R.string.notification_value_vibrate))) {
+            defaults |= Notification.DEFAULT_VIBRATE;
+        }
+        if (outApp.contains(context.getString(R.string.notification_value_lights))) {
+            defaults |= Notification.DEFAULT_LIGHTS;
+        }
+
+        builder.setDefaults(defaults);
+
         final Intent intent = new Intent(CANCEL_NOTIFICATION_ACTION);
         final PendingIntent deleteIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setDeleteIntent(deleteIntent);
 
-        if (outApp.contains(context.getString(R.string.notification_value_audio))) {
-            final Uri notification = RingtoneManager.getDefaultUri(TYPE_NOTIFICATION);
-            builder.setSound(notification);
-        }
-        if (outApp.contains(context.getString(R.string.notification_value_vibrate))) {
-            builder.setVibrate(new long[]{0, 500});
-        }
-        if (outApp.contains(context.getString(R.string.notification_value_lights))) {
-            builder.setDefaults(Notification.DEFAULT_LIGHTS);
-        }
-
-        final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
-        resultIntent.putExtra("server_name", conversation.getServer().getTitle());
-        resultIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
-
-        final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,
-                NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(resultPendingIntent);
-
         notificationManager.notify(NOTIFICATION_MENTION, builder.build());
+    }
+
+    private static String ensureMinimumSize(String message) {
+        if (message.length() < 50 && message.indexOf('\n') < 0) {
+            return message + "\n";
+        }
+        return message;
+    }
+
+    private static String buildNotificationContentTextWithCounts(Context context) {
+        if (sNotificationQueryCount > 0 && sNotificationMentionCount > 0) {
+            Resources res = context.getResources();
+            String mentions = res.getQuantityString(R.plurals.mention,
+                    sNotificationMentionCount, sNotificationMentionCount);
+            String queries = res.getQuantityString(R.plurals.query,
+                    sNotificationQueryCount, sNotificationQueryCount);
+            return mentions + ", " + queries;
+        } else if (sNotificationMentionCount > 0) {
+            return context.getString(R.string.notification_mentioned_multi_title,
+                    sNotificationMentionCount);
+        } else {
+            return context.getString(R.string.notification_queried_multi_title,
+                    sNotificationQueryCount);
+        }
     }
 
     public static void cancelMentionNotification(final Context context) {

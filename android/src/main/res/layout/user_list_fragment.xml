@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.lucasr.twowayview.TwoWayView
+<org.lucasr.twowayview.widget.TwoWayView
     android:id="@android:id/list"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,4 +8,4 @@
     android:background="?attr/holo_background"
     android:clipToPadding="false"
     android:scrollbarStyle="outsideOverlay"
-    app:layoutManager="ListLayoutManager" />
+    app:twowayview_layoutManager="ListLayoutManager" />
