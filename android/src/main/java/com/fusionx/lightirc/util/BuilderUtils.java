@@ -25,6 +25,6 @@ class BuilderUtils {
         techtronix.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
         techtronix.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
-        return Arrays.asList(freenode, snoonet, tmwirc);
+        return Arrays.asList(freenode, snoonet, techtronix);
     }
 }
