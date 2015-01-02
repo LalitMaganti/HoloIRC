@@ -349,6 +349,7 @@ public class IRCService extends Service {
         builder.setCategory(NotificationCompat.CATEGORY_SERVICE);
         builder.setOngoing(true);
         builder.setLocalOnly(true);
+        builder.setShowWhen(false);
         builder.setContentText(publicText);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
