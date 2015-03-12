@@ -7,6 +7,8 @@ branches:
 
 language: android
 
+jdk: oraclejdk8
+
 android:
   components:
     - platform-tools
@@ -22,4 +24,4 @@ before_install:
   - git clone https://github.com/tilal6991/Relay.git libraries/relay -b develop
   - git clone https://github.com/tilal6991/Bus.git libraries/bus -b develop
 
-script: jvm_switcher use oraclejdk8 && ./gradlew assembleSimpleDebug && ./gradlew testSimpleDebug
+script: ./gradlew assembleSimpleDebug && ./gradlew testSimpleDebug
