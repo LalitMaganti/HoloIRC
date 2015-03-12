@@ -35,6 +35,21 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item quantity="other">%d servers connected</item>
     </plurals>
 
+    <plurals name="server_disconnection">
+        <item quantity="one">1 server disconnected</item>
+        <item quantity="other">%d servers disconnected</item>
+    </plurals>
+
+    <plurals name="server_connecting">
+        <item quantity="one">1 server connecting</item>
+        <item quantity="other">%d servers connecting</item>
+    </plurals>
+
+    <plurals name="server_reconnection">
+        <item quantity="one">1 server reconnecting</item>
+        <item quantity="other">%d servers reconnecting</item>
+    </plurals>
+
     <plurals name="mention">
         <item quantity="one">1 mention</item>
         <item quantity="other">%d mentions</item>

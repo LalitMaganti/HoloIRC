@@ -201,11 +201,19 @@
     <!-- Notification strings -->
     <string name="notification_action_disconnect">Disconnect</string>
     <string name="notification_action_disconnect_all">Disconnect all</string>
+    <string name="notification_action_close">Close</string>
+    <string name="notification_action_close_all">Close all</string>
+    <string name="notification_action_reconnect">Reconnect</string>
+    <string name="notification_action_reconnect_all">Reconnect all</string>
     <string name="notification_mentioned_title">Mentioned in %1$s on %2$s</string>
     <string name="notification_queried_title">Queried by %1$s on %2$s</string>
     <string name="notification_mentioned_multi_title">Mentioned %1$d times</string>
     <string name="notification_queried_multi_title">Queried %1$d times</string>
     <string name="notification_mentioned_bigtext_title">%1$s on %2$s</string>
+    <string name="notification_connected_title">Connected to %1$s</string>
+    <string name="notification_connecting_title">Connecting to %1$s</string>
+    <string name="notification_disconnected_title">Disconnected from %1$s</string>
+    <string name="notification_reconnecting_title">Reconnecting to %1$s</string>
 
     <!-- User levels -->
     <string name="user_level_owners">Owners</string>

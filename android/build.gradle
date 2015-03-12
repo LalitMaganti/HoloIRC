@@ -1,13 +1,13 @@
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
         maven { url 'http://download.crashlytics.com/maven' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'me.tatarka:gradle-retrolambda:2.2.3'
+        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'me.tatarka:gradle-retrolambda:2.4.1'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
-        classpath 'com.github.jcandksolutions.gradle:android-unit-test:1.+'
+        classpath 'com.github.jcandksolutions.gradle:android-unit-test:2.1.1'
     }
 }
 
@@ -16,7 +16,7 @@ apply plugin: 'retrolambda'
 apply plugin: 'crashlytics'
 
 repositories {
-    mavenCentral()
+    jcenter()
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
@@ -26,8 +26,8 @@ repositories {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '20.0.0'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
         minSdkVersion 14
@@ -77,7 +77,7 @@ apply plugin: 'android-unit-test'
 dependencies {
     compile 'com.android.support:support-v4:19.+'
     compile 'com.android.support:appcompat-v7:19.+'
-    compile 'com.sothree.slidinguppanel:library:2.0.2'
+    compile 'com.sothree.slidinguppanel:library:2.0.4'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 
     compile 'org.lucasr.twowayview:core:1.0.0-SNAPSHOT@aar'
@@ -85,9 +85,9 @@ dependencies {
 
     compile 'com.crashlytics.android:crashlytics:1.+'
 
-    testCompile 'junit:junit:4.+'
-    testCompile 'org.robolectric:robolectric:+'
-    testCompile 'org.assertj:assertj-core:1.+'
+    testCompile 'junit:junit:4.12-beta-1'
+    testCompile 'org.robolectric:robolectric:2.3'
+    testCompile 'org.assertj:assertj-core:1.6.1'
 
     compile project(':relay-library')
     compile project(':bus-library')

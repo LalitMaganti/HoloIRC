@@ -6,6 +6,7 @@ import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnDCCChatEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
 
@@ -19,6 +20,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
@@ -37,6 +39,7 @@ import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
+import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
 import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;
@@ -60,6 +63,8 @@ public final class ServiceEventInterceptor {
     private final Set<InviteEvent> mInviteEvents;
 
     private Set<DCCRequestEvent> mDCCRequests;
+
+    private ConnectionStatus mLastStatus;
 
     private Conversation mConversation;
 
@@ -118,6 +123,10 @@ public final class ServiceEventInterceptor {
 
     public Set<DCCRequestEvent> getDCCRequests() {
         return mDCCRequests;
+    }
+
+    public ConnectionStatus getLastKnownStatus() {
+        return mLastStatus;
     }
 
     /*
@@ -181,6 +190,16 @@ public final class ServiceEventInterceptor {
                 onIRCEvent(MessagePriority.MEDIUM, event.user, event);
             }
         }
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final StatusChangeEvent event) {
+        ConnectionStatus newStatus = event.server.getStatus();
+        if (mLastStatus != newStatus) {
+            // forward the event UI side
+            mHandler.post(() -> getBus().post(new OnServerStatusChanged(event.server, newStatus)));
+        }
+        mLastStatus = newStatus;
     }
 
     @Subscribe(threadType = ThreadType.MAIN)

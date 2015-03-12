@@ -3,7 +3,7 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
 
@@ -182,7 +182,7 @@ public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionView
         }
 
         @Subscribe
-        public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
+        public void onEvent(final OnServerStatusChanged statusChanged) {
             mStatus = statusChanged.status;
             updateActionsList();
         }
