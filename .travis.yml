@@ -6,7 +6,7 @@ branches:
 language: android
 android:
   components:
-    - build-tools-20.0.0
+    - build-tools-22.0.0
 before_install:
   - export JAVA_HOME=/usr/lib/jvm/java-7-oracle
   - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
