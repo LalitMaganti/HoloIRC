@@ -1,15 +1,25 @@
 notifications:
   email: false
+
 branches:
   only:
     - develop
+
 language: android
+
 android:
   components:
+    - platform-tools
+    - tools
     - build-tools-22.0.0
+    - android-22
+    - extra-android-support
+    - extra-android-m2repository
+
 before_install:
   - export JAVA_HOME=/usr/lib/jvm/java-7-oracle
   - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
   - git clone https://github.com/tilal6991/Relay.git libraries/relay -b develop
   - git clone https://github.com/tilal6991/Bus.git libraries/bus -b develop
+
 script: ./gradlew assembleSimpleDebug && ./gradlew testSimpleDebug
