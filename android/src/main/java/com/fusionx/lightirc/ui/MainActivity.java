@@ -29,7 +29,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -224,18 +223,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public void onSupportActionModeStarted(ActionMode mode) {
-        super.onSupportActionModeStarted(mode);
-        setStatusBarTransparency(false);
-    }
-
-    @Override
-    public void onSupportActionModeFinished(ActionMode mode) {
-        super.onSupportActionModeFinished(mode);
-        setStatusBarTransparency(true);
-    }
-
-    @Override
     public void onServerClicked(final Server server) {
         changeCurrentConversation(server, true);
     }
@@ -285,7 +272,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     /**
      * Removes the current displayed fragment
-     *
+     * <p>
      * Pre: this method is only called when mCurrentFragment and mConversation are not null
      * Post: the current fragment is removed - either by parting or removing the PM
      */
@@ -664,7 +651,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     private void onExternalConversationUpdate(final Optional<? extends Conversation>
-            optConversation) {
+                                                      optConversation) {
         if (optConversation.isPresent()) {
             mHandler.post(() -> changeCurrentConversation(optConversation.get(), false));
             supportInvalidateOptionsMenu();

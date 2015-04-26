@@ -2,8 +2,9 @@
 <resources>
 
     <style name="Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/ActionBar</item>
-
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="holo_background">@drawable/background_holo_light</item>
         <item name="default_text_colour">@android:color/black</item>
         <item name="default_inverted_text_colour">@android:color/white</item>
@@ -19,8 +20,9 @@
     </style>
 
     <style name="Dark" parent="@style/Theme.AppCompat">
-        <item name="android:actionBarStyle">@style/ActionBar.Dark</item>
-
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccentDark</item>
         <item name="holo_background">@drawable/background_holo_dark</item>
         <item name="default_text_colour">@android:color/white</item>
         <item name="default_inverted_text_colour">@android:color/black</item>
@@ -33,14 +35,6 @@
         <item name="main_background">@android:color/transparent</item>
         <item name="expandable_list_background">@android:color/transparent</item>
         <item name="expandable_list_text">@android:color/white</item>
-    </style>
-
-    <style name="ActionBar" parent="@style/Widget.AppCompat.Light.Base.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/action_bar_background_color</item>
-    </style>
-
-    <style name="ActionBar.Dark" parent="@style/Widget.AppCompat.Base.ActionBar.Solid">
-        <item name="android:background">@color/action_bar_background_color</item>
     </style>
 
     <style name="TextAppearance.StatusBar.EventContent.Emphasized" parent="@android:style/TextAppearance.StatusBar.EventContent">

@@ -34,7 +34,7 @@ import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_THREE;
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_NICK_TWO;
 
-public class ServerPreferenceActivity extends PreferenceActivity implements
+public class ServerPreferenceActivity extends SettingsActivityBase implements
         ServerSettingsCallbacks {
 
     public static final String NEW_SERVER = "new";
