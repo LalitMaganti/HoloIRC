@@ -22,6 +22,7 @@ import com.fusionx.lightirc.view.Snackbar;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +33,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -60,7 +62,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
  */
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
         NavigationDrawerFragment.Callback, WorkerFragment.Callback,
-        IRCFragment.Callback {
+        IRCFragment.Callback, ViewTreeObserver.OnGlobalLayoutListener {
 
     public static final int SERVER_SETTINGS = 1;
 
@@ -79,19 +81,19 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         @Override
         public void onPanelSlide(final View view, final float v) {
-            // Empty
+            mPaneIndicator.onPanelSlide(view, v);
         }
 
         @Override
         public void onPanelOpened(final View view) {
             supportInvalidateOptionsMenu();
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            mPaneIndicator.onPanelOpened(view);
         }
 
         @Override
         public void onPanelClosed(final View view) {
             supportInvalidateOptionsMenu();
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            mPaneIndicator.onPanelClosed(view);
             mServerListFragment.onPanelClosed();
         }
     };
@@ -117,6 +119,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     // Views
     private ProgrammableSlidingPaneLayout mSlidingPane;
+    private SlidingPaneToggleArrow mPaneIndicator;
 
     private DrawerLayout mDrawerLayout;
 
@@ -176,6 +179,8 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSlidingPane.setPanelSlideListener(mPanelSlideListener);
         mSlidingPane.setSliderFadeColor(0);
 
+        mPaneIndicator = new SlidingPaneToggleArrow(this, mSlidingPane);
+
         mNavigationDrawerView = findViewById(R.id.right_drawer);
 
         if (savedInstanceState == null) {
@@ -217,9 +222,27 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             supportInvalidateOptionsMenu();
         }
 
+        getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(this);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onGlobalLayout() {
+        final ViewTreeObserver vto = getWindow().getDecorView().getViewTreeObserver();
+        if (Build.VERSION.SDK_INT >= 16) {
+            vto.removeOnGlobalLayoutListener(this);
+        } else {
+            vto.removeGlobalOnLayoutListener(this);
+        }
         if (mSlidingPane.isSlideable()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mPaneIndicator.syncState();
     }
 
     @Override
@@ -411,11 +434,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mPaneIndicator.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
-            case android.R.id.home:
-            case R.id.home:
-                UIUtils.toggleSlidingPane(mSlidingPane);
-                return true;
             case R.id.activity_main_ab_actions:
                 boolean nowOpen = UIUtils.toggleDrawerLayout(mDrawerLayout, mNavigationDrawerView);
                 // If the drawer is now closed then we don't need to pass on the event
