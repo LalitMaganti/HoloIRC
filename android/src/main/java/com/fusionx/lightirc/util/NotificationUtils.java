@@ -247,6 +247,7 @@ public class NotificationUtils {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.cancel(NOTIFICATION_MENTION);
+        resetNotificationState();
     }
 
     private static CharSequence prependHighlightedText(Context context,
