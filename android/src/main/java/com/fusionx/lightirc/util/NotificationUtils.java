@@ -119,9 +119,6 @@ public class NotificationUtils {
         // If we're here, the activity has not picked it up - fire off a notification
         int totalNotificationCount = sNotificationMentionCount + sNotificationQueryCount;
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.ic_notification);
-        builder.setLargeIcon(icon);
         builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentTitle(context.getString(R.string.app_name));
         builder.setAutoCancel(true);

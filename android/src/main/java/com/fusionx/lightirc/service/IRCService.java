@@ -337,10 +337,7 @@ public class IRCService extends Service {
         }
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
-
         builder.setColor(getResources().getColor(R.color.colorPrimary));
-        builder.setLargeIcon(icon);
         builder.setContentTitle(getString(R.string.app_name));
         builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentIntent(getMainActivityIntent());

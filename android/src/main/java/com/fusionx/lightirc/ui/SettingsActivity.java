@@ -8,7 +8,7 @@ import android.preference.PreferenceActivity;
 
 import java.util.List;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends SettingsActivityBase {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

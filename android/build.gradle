@@ -30,7 +30,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 21
         applicationId "com.fusionx.lightirc"
     }
 
@@ -73,8 +73,8 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.+'
-    compile 'com.android.support:appcompat-v7:19.+'
+    compile 'com.android.support:support-v4:22.1.+'
+    compile 'com.android.support:appcompat-v7:22.1.+'
     compile 'com.sothree.slidinguppanel:library:2.0.4'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 
