@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="LightBase" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorLink">@color/colorAccent</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="holo_background">@drawable/background_holo_light</item>
         <item name="default_text_colour">@android:color/black</item>
         <item name="default_inverted_text_colour">@android:color/white</item>
@@ -19,10 +21,14 @@
         <item name="expandable_list_text">@color/dark_gray</item>
     </style>
 
-    <style name="Dark" parent="@style/Theme.AppCompat">
+    <style name="Light" parent="LightBase" />
+
+    <style name="DarkBase" parent="@style/Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccentDark</item>
+        <item name="android:textColorLink">@color/colorAccentDark</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="holo_background">@drawable/background_holo_dark</item>
         <item name="default_text_colour">@android:color/white</item>
         <item name="default_inverted_text_colour">@android:color/black</item>
@@ -35,6 +41,13 @@
         <item name="main_background">@android:color/transparent</item>
         <item name="expandable_list_background">@android:color/transparent</item>
         <item name="expandable_list_text">@android:color/white</item>
+    </style>
+
+    <style name="Dark" parent="DarkBase" />
+
+    <style name="TextAppearance.Widget.ActionBar.Menu" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="TextAppearance.StatusBar.EventContent.Emphasized" parent="@android:style/TextAppearance.StatusBar.EventContent">
