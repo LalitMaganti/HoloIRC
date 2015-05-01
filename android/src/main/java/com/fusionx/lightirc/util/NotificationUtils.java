@@ -14,8 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -150,12 +148,15 @@ public class NotificationUtils {
             int titleResId = channel
                     ? R.string.notification_mentioned_title : R.string.notification_queried_title;
             text = context.getString(titleResId, conversation.getId(), server.getId());
-            // Use message, not storedMessage, to keep the user name out of the notification
-            if (message != null) {
+
+            // For PMs, make sure to not include the sender's name in the
+            // message (it's part of the title already)
+            final CharSequence bigTextMessage = channel ? storedMessage : message;
+            if (bigTextMessage != null) {
                 String title = context.getString(R.string.notification_mentioned_bigtext_title,
                         conversation.getId(), server.getId());
                 builder.setStyle(new NotificationCompat.BigTextStyle()
-                        .bigText(ensureMinimumSize(message))
+                        .bigText(ensureMinimumSize(bigTextMessage))
                         .setBigContentTitle(title));
             }
         } else {
@@ -215,11 +216,17 @@ public class NotificationUtils {
         notificationManager.notify(NOTIFICATION_MENTION, builder.build());
     }
 
-    private static String ensureMinimumSize(String message) {
-        if (message.length() < 50 && message.indexOf('\n') < 0) {
-            return message + "\n";
+    private static CharSequence ensureMinimumSize(CharSequence message) {
+        String messageString = message.toString();
+        if (messageString.length() >= 50 || messageString.indexOf('\n') >= 0) {
+            return message;
         }
-        return message;
+        if (message instanceof SpannableStringBuilder) {
+            SpannableStringBuilder builder = (SpannableStringBuilder) message;
+            builder.append("\n");
+            return builder;
+        }
+        return messageString + "\n";
     }
 
     private static String buildNotificationContentTextWithCounts(Context context) {
