@@ -17,4 +17,7 @@
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="TextAppearance.StatusBar.EventContent.Emphasized" parent="@android:style/TextAppearance.Material.Notification.Emphasis" />
+
 </resources>
