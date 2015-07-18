@@ -25,6 +25,7 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.util.FragmentUtils;
 
@@ -44,6 +45,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.event.Event;
 
@@ -68,6 +70,11 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         @Subscribe
         public void onEvent(final OnPreferencesChangedEvent event) {
             onResetBuffer(null);
+        }
+
+        @Subscribe
+        public void onEvent(final OnServerStatusChanged event) {
+            updateConnectedState();
         }
     };
 
@@ -101,6 +108,7 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         onResetBuffer(() -> {
         });
         mConversation.getBus().register(this);
+        updateConnectedState();
     }
 
     @Override
@@ -139,6 +147,13 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
     @Override
     public boolean isValid() {
         return mConversation.isValid();
+    }
+
+    private void updateConnectedState() {
+        if (mMessageBox != null) {
+            ConnectionStatus status = mConversation.getServer().getStatus();
+            mMessageBox.setEnabled(status == ConnectionStatus.CONNECTED);
+        }
     }
 
     // Getters and setters
