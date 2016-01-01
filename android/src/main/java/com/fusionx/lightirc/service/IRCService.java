@@ -11,9 +11,9 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.lightirc.util.NotificationUtils;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -37,7 +37,6 @@ import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayConnectionManager;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
 import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
@@ -65,9 +64,7 @@ public class IRCService extends Service {
                 interceptor.unregister();
             }
 
-            final NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.cancel(NOTIFICATION_MENTION);
+            NotificationUtils.cancelMentionNotification(context, null);
 
             final Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
 
@@ -198,9 +195,7 @@ public class IRCService extends Service {
     public void requestConnectionStoppage(final Server server) {
         mEventHelperMap.get(server).unregister();
 
-        final NotificationManager notificationManager =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_MENTION);
+        NotificationUtils.cancelMentionNotification(this, server);
 
         final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(server.getTitle());
         if (finalServer) {

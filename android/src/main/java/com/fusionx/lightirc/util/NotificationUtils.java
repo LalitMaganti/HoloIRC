@@ -22,10 +22,11 @@ import android.support.v4.app.NotificationCompat;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TextAppearanceSpan;
-import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import co.fusionx.relay.base.Conversation;
@@ -38,7 +39,8 @@ import static android.media.RingtoneManager.TYPE_NOTIFICATION;
 
 public class NotificationUtils {
 
-    public static final int NOTIFICATION_MENTION = 242;
+    private static final int NOTIFICATION_MENTION_BASE = 10000;
+    private static final int NOTIFICATION_MENTION_SERVER_OFFSET = 1000;
 
     private static final String CANCEL_NOTIFICATION_ACTION = "com.fusionx.lightirc"
             + ".CANCEL_NOTIFICATION";
@@ -46,11 +48,38 @@ public class NotificationUtils {
     private static final String RECEIVE_NOTIFICATION_ACTION = "com.fusionx.lightirc"
             + ".RECEIVE_NOTIFICATION";
 
-    private static final int MAX_NOTIFICATION_LINES = 6;
+    private static final int MAX_NOTIFICATIONS_PER_SERVER = NOTIFICATION_MENTION_SERVER_OFFSET - 2;
 
-    private static int sNotificationMentionCount = 0;
-    private static int sNotificationQueryCount = 0;
-    private static List<Pair<String, CharSequence>> sNotificationMessages = new ArrayList<>();
+    private static class NotificationMessageInfo {
+        final Nick user;
+        final Conversation<? extends Event> conversation;
+        final String message;
+        final CharSequence messageWithPrependedNick;
+        final boolean mention;
+        public NotificationMessageInfo(Context context, Nick user,
+                Conversation<? extends Event> conversation, String message, boolean mention) {
+            this.user = user;
+            this.conversation = conversation;
+            this.message = message;
+            this.mention = mention;
+            this.messageWithPrependedNick = user != null ?
+                    prependHighlightedText(context, user.getNickAsString(), message) : message;
+        }
+    }
+
+    private static class NotificationServerInfo {
+        int mentionCount;
+        int queryCount;
+        List<NotificationMessageInfo> messages;
+
+        public NotificationServerInfo() {
+            mentionCount = 0;
+            queryCount = 0;
+            messages = new ArrayList<>();
+        }
+    }
+
+    private static Map<String, NotificationServerInfo> sNotificationInfos = new HashMap<>();
 
     private static ResultReceiver sResultReceiver;
 
@@ -95,27 +124,40 @@ public class NotificationUtils {
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
+        NotificationServerInfo serverInfo = sNotificationInfos.get(server.getId());
+        if (serverInfo == null) {
+            serverInfo = new NotificationServerInfo();
+            sNotificationInfos.put(server.getId(), serverInfo);
+        }
+
         if (channel) {
-            sNotificationMentionCount++;
+            serverInfo.mentionCount++;
         } else {
-            sNotificationQueryCount++;
+            serverInfo.queryCount++;
         }
 
-        CharSequence storedMessage = message;
-
-        if (storedMessage != null) {
-            if (user != null) {
-                storedMessage = prependHighlightedText(context,
-                        user.getNickAsString(), storedMessage);
+        NotificationMessageInfo messageInfo = null;
+        if (message != null) {
+            if (serverInfo.messages.size() >= MAX_NOTIFICATIONS_PER_SERVER) {
+                serverInfo.messages.remove(0);
             }
-            if (sNotificationMessages.size() >= MAX_NOTIFICATION_LINES) {
-                sNotificationMessages.remove(0);
-            }
-            sNotificationMessages.add(Pair.create(server.getId(), storedMessage));
+            messageInfo = new NotificationMessageInfo(context,
+                    user, conversation, message, channel);
+            serverInfo.messages.add(messageInfo);
         }
 
-        // If we're here, the activity has not picked it up - fire off a notification
-        int totalNotificationCount = sNotificationMentionCount + sNotificationQueryCount;
+        int pos = 0;
+        for (String serverId : sNotificationInfos.keySet()) {
+            if (TextUtils.equals(serverId, server.getId())) {
+                break;
+            }
+            pos++;
+        }
+
+        final int notificationIdBase =
+                NOTIFICATION_MENTION_BASE + pos * NOTIFICATION_MENTION_SERVER_OFFSET;
+
+        int totalNotificationCount = serverInfo.mentionCount + serverInfo.queryCount;
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentTitle(context.getString(R.string.app_name));
@@ -130,11 +172,11 @@ public class NotificationUtils {
         resultIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
 
         final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,
-                NOTIFICATION_MENTION, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                notificationIdBase, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(resultPendingIntent);
 
         // First build the public version...
-        builder.setContentText(buildNotificationContentTextWithCounts(context));
+        builder.setContentText(buildNotificationContentTextWithCounts(context, serverInfo));
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         final Notification publicVersion = builder.build();
@@ -151,7 +193,8 @@ public class NotificationUtils {
 
             // For PMs, make sure to not include the sender's name in the
             // message (it's part of the title already)
-            final CharSequence bigTextMessage = channel ? storedMessage : message;
+            final CharSequence bigTextMessage = messageInfo != null && messageInfo.mention
+                    ? messageInfo.messageWithPrependedNick : message;
             if (bigTextMessage != null) {
                 String title = context.getString(R.string.notification_mentioned_bigtext_title,
                         conversation.getId(), server.getId());
@@ -160,35 +203,19 @@ public class NotificationUtils {
                         .setBigContentTitle(title));
             }
         } else {
-            text = buildNotificationContentTextWithCounts(context);
+            text = buildNotificationContentTextWithCounts(context, serverInfo);
 
-            if (!sNotificationMessages.isEmpty()) {
-                String serverId = sNotificationMessages.get(0).first;
-                for (Pair<String, CharSequence> entry : sNotificationMessages) {
-                    if (!TextUtils.equals(serverId, entry.first)) {
-                        serverId = null;
-                        break;
-                    }
-                }
-
+            if (!serverInfo.messages.isEmpty()) {
                 NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
                 style.setBigContentTitle(text);
-                for (Pair<String, CharSequence> entry : sNotificationMessages) {
-                    if (serverId != null) {
-                        // all messages are for the same server
-                        style.addLine(entry.second);
-                    } else {
-                        // prepend server name
-                        style.addLine(prependHighlightedText(context, entry.first, entry.second));
-                    }
+                for (NotificationMessageInfo entry : serverInfo.messages) {
+                    style.addLine(entry.messageWithPrependedNick);
                 }
 
-                if (serverId != null) {
-                    style.setSummaryText(serverId);
-                } else {
-                    style.setSummaryText(context.getString(R.string.app_name));
-                }
+                style.setSummaryText(server.getId());
                 builder.setStyle(style);
+                builder.setGroup(server.getId());
+                builder.setGroupSummary(true);
             }
         }
 
@@ -213,7 +240,31 @@ public class NotificationUtils {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setDeleteIntent(deleteIntent);
 
-        notificationManager.notify(NOTIFICATION_MENTION, builder.build());
+        notificationManager.notify(notificationIdBase, builder.build());
+        if (totalNotificationCount > 1) {
+            for (int i = 0; i < serverInfo.messages.size(); i++) {
+                NotificationMessageInfo info = serverInfo.messages.get(i);
+                final NotificationCompat.Builder stackBuilder =
+                        new NotificationCompat.Builder(context);
+                stackBuilder.setSmallIcon(R.drawable.ic_notification_small);
+                stackBuilder.setContentTitle(context.getString(R.string.app_name));
+                stackBuilder.setColor(context.getResources().getColor(R.color.colorPrimary));
+                stackBuilder.setCategory(NotificationCompat.CATEGORY_EMAIL);
+                stackBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+                stackBuilder.setGroup(server.getId());
+
+                stackBuilder.setContentTitle(context.getString(
+                        R.string.notification_mentioned_bigtext_title,
+                        info.conversation.getId(), server.getId()));
+
+                // For PMs, make sure to not include the sender's name in the
+                // message (it's part of the title already)
+                stackBuilder.setContentText(info.mention
+                        ? info.messageWithPrependedNick : info.message);
+
+                notificationManager.notify(notificationIdBase + i + 1, stackBuilder.build());
+            }
+        }
     }
 
     private static CharSequence ensureMinimumSize(CharSequence message) {
@@ -229,28 +280,40 @@ public class NotificationUtils {
         return messageString + "\n";
     }
 
-    private static String buildNotificationContentTextWithCounts(Context context) {
-        if (sNotificationQueryCount > 0 && sNotificationMentionCount > 0) {
+    private static String buildNotificationContentTextWithCounts(Context context,
+            NotificationServerInfo info) {
+        if (info.queryCount > 0 && info.mentionCount > 0) {
             Resources res = context.getResources();
             String mentions = res.getQuantityString(R.plurals.mention,
-                    sNotificationMentionCount, sNotificationMentionCount);
+                    info.mentionCount, info.mentionCount);
             String queries = res.getQuantityString(R.plurals.query,
-                    sNotificationQueryCount, sNotificationQueryCount);
+                    info.queryCount, info.queryCount);
             return mentions + ", " + queries;
-        } else if (sNotificationMentionCount > 0) {
+        } else if (info.mentionCount > 0) {
             return context.getString(R.string.notification_mentioned_multi_title,
-                    sNotificationMentionCount);
+                    info.mentionCount);
         } else {
             return context.getString(R.string.notification_queried_multi_title,
-                    sNotificationQueryCount);
+                    info.queryCount);
         }
     }
 
-    public static void cancelMentionNotification(final Context context) {
+    public static void cancelMentionNotification(final Context context, final Server server) {
         final NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.cancel(NOTIFICATION_MENTION);
+        int index = 0;
+        for (Map.Entry<String, NotificationServerInfo> entry : sNotificationInfos.entrySet()) {
+            if (server == null || server.getId().equals(entry.getKey())) {
+                int baseId = NOTIFICATION_MENTION_BASE + index * NOTIFICATION_MENTION_SERVER_OFFSET;
+                NotificationServerInfo info = entry.getValue();
+                notificationManager.cancel(baseId);
+                for (int i = 0; i < info.messages.size(); i++) {
+                    notificationManager.cancel(baseId + i + 1);
+                }
+            }
+            index++;
+        }
         resetNotificationState();
     }
 
@@ -285,9 +348,7 @@ public class NotificationUtils {
     }
 
     private static void resetNotificationState() {
-        sNotificationMentionCount = 0;
-        sNotificationQueryCount = 0;
-        sNotificationMessages.clear();
+        sNotificationInfos.clear();
     }
 
     public static class ResultReceiver extends BroadcastReceiver {
