@@ -24,9 +24,13 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 import android.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +50,7 @@ public class IRCService extends Service {
     private static final int SERVICE_PRIORITY = 50;
 
     private static final int SERVICE_ID = 1;
+    private static final int WEARABLE_STATUS_ID = 2;
 
     private static final String DISCONNECT_ALL_INTENT = "com.fusionx.lightirc.disconnect_all";
     private static final String RECONNECT_ALL_INTENT = "com.fusionx.lightirc.reconnect_all";
@@ -102,8 +107,7 @@ public class IRCService extends Service {
         @Subscribe
         public void onServerStatusChanged(final OnServerStatusChanged event) {
             if (mNotification != null) {
-                mNotification = getNotification();
-                startForeground(SERVICE_ID, mNotification);
+                updateNotification();
             }
         }
 
@@ -179,8 +183,7 @@ public class IRCService extends Service {
             mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);
         }
-        mNotification = getNotification();
-        startForeground(SERVICE_ID, mNotification);
+        updateNotification();
         return server;
     }
 
@@ -201,9 +204,11 @@ public class IRCService extends Service {
         if (finalServer) {
             stopForeground(true);
             mNotification = null;
+
+            NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+            nm.cancel(WEARABLE_STATUS_ID);
         } else {
-            mNotification = getNotification();
-            startForeground(SERVICE_ID, mNotification);
+            updateNotification();
         }
         cleanupPostDisconnect(server);
     }
@@ -273,8 +278,9 @@ public class IRCService extends Service {
         }
     }
 
-    private Notification getNotification() {
+    private void updateNotification() {
         Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
+        List<String> disconnectedServerNames = new ArrayList<>();
         int connectedCount = 0, disconnectedCount = 0;
         int connectingCount = 0, reconnectingCount = 0;
 
@@ -282,6 +288,7 @@ public class IRCService extends Service {
             switch (server.getStatus()) {
                 case DISCONNECTED:
                     if (mEventHelperMap.get(server).getLastKnownStatus() != null) {
+                        disconnectedServerNames.add(server.getTitle());
                         disconnectedCount++;
                     }
                     break;
@@ -342,6 +349,10 @@ public class IRCService extends Service {
         builder.setShowWhen(false);
         builder.setContentText(publicText);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        if (disconnectedCount > 0) {
+            builder.setGroup("serverstatus");
+            builder.setGroupSummary(true);
+        }
 
         Notification publicVersion = builder.build();
         final String text;
@@ -367,14 +378,18 @@ public class IRCService extends Service {
         builder.setPublicVersion(publicVersion);
         builder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
 
+        NotificationCompat.Action reconnectAction = null;
+
         if (disconnectedCount > 0) {
             final PendingIntent reconnectIntent = PendingIntent.getBroadcast(this, 0,
                     new Intent(RECONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
             int reconnectActionResId = disconnectedCount > 1
                     ? R.string.notification_action_reconnect_all
                     : R.string.notification_action_reconnect;
-            builder.addAction(R.drawable.ic_refresh_light, getString(reconnectActionResId),
-                    reconnectIntent);
+            reconnectAction = new NotificationCompat.Action(
+                    R.drawable.ic_refresh_light,
+                    getString(reconnectActionResId), reconnectIntent);
+            builder.addAction(reconnectAction);
         }
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 0,
@@ -390,7 +405,33 @@ public class IRCService extends Service {
         }
         builder.addAction(R.drawable.ic_clear_light, getString(disconnectActionResId), intent);
 
-        return builder.build();
+        mNotification = builder.build();
+        startForeground(SERVICE_ID, mNotification);
+
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+
+        if (reconnectAction != null) {
+            NotificationCompat.Builder wearableStatusBuilder = new NotificationCompat.Builder(this);
+            wearableStatusBuilder.setColor(getResources().getColor(R.color.colorPrimary));
+            wearableStatusBuilder.setContentTitle(
+                    getString(R.string.notification_reconnect_wear_title));
+            wearableStatusBuilder.setContentText(getString(
+                    R.string.notification_reconnect_wear_content,
+                    TextUtils.join(", ", disconnectedServerNames)));
+            wearableStatusBuilder.setSmallIcon(R.drawable.ic_notification_small);
+            wearableStatusBuilder.setGroup("serverstatus");
+
+            reconnectAction.icon = R.drawable.ic_refresh_action_wear;
+            new NotificationCompat.WearableExtender()
+                    .addAction(reconnectAction)
+                    .setContentAction(0)
+                    .setHintHideIcon(true)
+                    .extend(wearableStatusBuilder);
+
+            nm.notify(WEARABLE_STATUS_ID, wearableStatusBuilder.build());
+        } else {
+            nm.cancel(WEARABLE_STATUS_ID);
+        }
     }
 
     // Binder which returns this service
