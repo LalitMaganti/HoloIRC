@@ -159,7 +159,7 @@ public final class ServiceEventInterceptor {
                             ? ((ChannelWorldMessageEvent) event).message
                             : ((ChannelWorldActionEvent) event).action;
                     OnChannelMentionEvent uiEvent = new OnChannelMentionEvent(event.channel,
-                            userEvent.userNick, message);
+                            userEvent.userNick, message, event.timestamp.toMillis(false));
                     mHandler.post(() -> getBus().post(uiEvent));
                 } else {
                     onIRCEvent(MessagePriority.MEDIUM, conversation, event);
@@ -185,7 +185,8 @@ public final class ServiceEventInterceptor {
                         : ((QueryActionWorldEvent) event).action;
 
                 // Forward the event UI side
-                mHandler.post(() -> getBus().post(new OnQueryEvent(event.user, message)));
+                mHandler.post(() -> getBus().post(new OnQueryEvent(event.user,
+                        message, event.timestamp.toMillis(false))));
             } else {
                 onIRCEvent(MessagePriority.MEDIUM, event.user, event);
             }

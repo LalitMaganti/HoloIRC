@@ -2,6 +2,8 @@ package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.AppPreferences;
+import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.view.Snackbar;
 
@@ -21,9 +23,11 @@ import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.style.TextAppearanceSpan;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,10 @@ import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
+import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
+import co.fusionx.relay.event.query.QueryActionWorldEvent;
+import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 import static android.media.RingtoneManager.TYPE_NOTIFICATION;
@@ -56,14 +64,30 @@ public class NotificationUtils {
         final String message;
         final CharSequence messageWithPrependedNick;
         final boolean mention;
+        final long timestamp;
+        final int conversationBufferIndex;
         public NotificationMessageInfo(Context context, Nick user,
-                Conversation<? extends Event> conversation, String message, boolean mention) {
+                Conversation<? extends Event> conversation, String message,
+                boolean mention, long timestamp) {
             this.user = user;
             this.conversation = conversation;
             this.message = message;
             this.mention = mention;
+            this.timestamp = timestamp;
             this.messageWithPrependedNick = user != null ?
                     prependHighlightedText(context, user.getNickAsString(), message) : message;
+
+            int index;
+            for (index = conversation.getBuffer().size() - 1; index >= 0; index--) {
+                Event e = conversation.getBuffer().get(index);
+                boolean eventMatches = mention
+                        ? (e instanceof ChannelWorldMessageEvent || e instanceof ChannelWorldActionEvent)
+                        : (e instanceof QueryMessageWorldEvent || e instanceof QueryActionWorldEvent);
+                if (eventMatches && e.timestamp.toMillis(false) == timestamp) {
+                    break;
+                }
+            }
+            this.conversationBufferIndex = index;
         }
     }
 
@@ -118,7 +142,8 @@ public class NotificationUtils {
     }
 
     public static void notifyOutOfApp(final Context context, final String message,
-            Nick user, final Conversation<? extends Event> conversation, final boolean channel) {
+            Nick user, final Conversation<? extends Event> conversation,
+            final boolean channel, final long timestamp) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
         }
@@ -149,7 +174,7 @@ public class NotificationUtils {
                 serverInfo.messages.remove(0);
             }
             messageInfo = new NotificationMessageInfo(context,
-                    user, conversation, message, channel);
+                    user, conversation, message, channel, timestamp);
             serverInfo.messages.add(messageInfo);
         }
 
@@ -173,6 +198,8 @@ public class NotificationUtils {
         builder.setColor(context.getResources().getColor(R.color.colorPrimary));
         builder.setCategory(NotificationCompat.CATEGORY_EMAIL);
         builder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        builder.setGroup(server.getId());
+        builder.setGroupSummary(true);
 
         final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
         resultIntent.putExtra("server_name", conversation.getServer().getTitle());
@@ -221,8 +248,6 @@ public class NotificationUtils {
 
                 style.setSummaryText(server.getId());
                 builder.setStyle(style);
-                builder.setGroup(server.getId());
-                builder.setGroupSummary(true);
             }
         }
 
@@ -248,38 +273,112 @@ public class NotificationUtils {
         builder.setDeleteIntent(deleteIntent);
 
         notificationManager.notify(notificationIdBase, builder.build());
-        if (totalNotificationCount > 1) {
-            Integer subNotifId = serverInfo.subNotificationIds.get(conversation);
-            if (subNotifId == null) {
-                subNotifId = serverInfo.getNextSubNotificationId();
-                serverInfo.subNotificationIds.put(conversation, subNotifId);
-            }
 
-            SpannableStringBuilder convText = new SpannableStringBuilder();
-            for (NotificationMessageInfo info : serverInfo.messages) {
-                if (info.conversation == conversation) {
-                    if (convText.length() == 0) {
-                        convText.append("\n");
-                    }
-                    convText.append(info.mention
-                            ? info.messageWithPrependedNick : info.message);
+        Integer subNotifId = serverInfo.subNotificationIds.get(conversation);
+        if (subNotifId == null) {
+            subNotifId = serverInfo.getNextSubNotificationId();
+            serverInfo.subNotificationIds.put(conversation, subNotifId);
+        }
+
+        SpannableStringBuilder convText = new SpannableStringBuilder();
+        List<NotificationMessageInfo> convInfos = new ArrayList<>();
+        for (NotificationMessageInfo info : serverInfo.messages) {
+            if (info.conversation == conversation) {
+                if (convText.length() == 0) {
+                    convText.append("\n");
+                }
+                convText.append(info.mention
+                        ? info.messageWithPrependedNick : info.message);
+                convInfos.add(info);
+            }
+        }
+
+        NotificationCompat.Builder convLogBuilder = new NotificationCompat.Builder(context);
+        convLogBuilder.setStyle(new NotificationCompat.BigTextStyle(convLogBuilder)
+                .bigText(buildConversationLogForWear(context, conversation, convInfos)));
+        convLogBuilder.extend(new NotificationCompat.WearableExtender()
+                .setStartScrollBottom(true));
+
+        final NotificationCompat.Builder stackBuilder =
+                new NotificationCompat.Builder(context);
+        stackBuilder.setSmallIcon(R.drawable.ic_notification_small);
+        stackBuilder.setContentTitle(context.getString(
+                R.string.notification_mentioned_bigtext_title,
+                conversation.getId(), server.getId()));
+        stackBuilder.setContentText(convText);
+        stackBuilder.setColor(context.getResources().getColor(R.color.colorPrimary));
+        stackBuilder.setCategory(NotificationCompat.CATEGORY_EMAIL);
+        stackBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+        stackBuilder.setGroup(server.getId());
+        stackBuilder.extend(new NotificationCompat.WearableExtender()
+                .addPage(convLogBuilder.build()));
+
+        notificationManager.notify(notificationIdBase + subNotifId, stackBuilder.build());
+    }
+
+    private static boolean shouldIncludeEventInConversationLog(Event e) {
+        return e instanceof ChannelWorldMessageEvent
+                || e instanceof ChannelWorldActionEvent
+                || e instanceof QueryMessageWorldEvent
+                || e instanceof QueryActionWorldEvent;
+    }
+
+    private static CharSequence buildConversationLogForWear(Context context,
+            Conversation<? extends Event> conversation,
+            List<NotificationMessageInfo> infos) {
+        List<Event> loggedEvents = new ArrayList<>();
+        List<? extends Event> buffer = conversation.getBuffer();
+
+        for (int i = 0; i < infos.size(); i++) {
+            NotificationMessageInfo info = infos.get(i);
+            int lastBufferIndex = i == 0 ? -1 : infos.get(i - 1).conversationBufferIndex;
+            int nextBufferIndex = i == (infos.size() - 1)
+                    ? buffer.size() : infos.get(i + 1).conversationBufferIndex;
+
+            loggedEvents.add(null);
+            // TODO: indicate gaps between previous chunk and this one
+            int insertPos = loggedEvents.size();
+
+            // go back up to 20 messages
+            for (int index = info.conversationBufferIndex - 1, remaining = 20;
+                    index > lastBufferIndex && remaining > 0; index--) {
+                Event e = buffer.get(index);
+                if (shouldIncludeEventInConversationLog(e)) {
+                    loggedEvents.add(insertPos, e);
+                    remaining--;
                 }
             }
 
-            final NotificationCompat.Builder stackBuilder =
-                    new NotificationCompat.Builder(context);
-            stackBuilder.setSmallIcon(R.drawable.ic_notification_small);
-            stackBuilder.setContentTitle(context.getString(
-                    R.string.notification_mentioned_bigtext_title,
-                    conversation.getId(), server.getId()));
-            stackBuilder.setContentText(convText);
-            stackBuilder.setColor(context.getResources().getColor(R.color.colorPrimary));
-            stackBuilder.setCategory(NotificationCompat.CATEGORY_EMAIL);
-            stackBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-            stackBuilder.setGroup(server.getId());
-
-            notificationManager.notify(notificationIdBase + subNotifId, stackBuilder.build());
+            // go forward up to 20 messages
+            for (int index = info.conversationBufferIndex, remaining = 20;
+                 index < nextBufferIndex && remaining > 0; index++) {
+                Event e = buffer.get(index);
+                if (shouldIncludeEventInConversationLog(e)) {
+                    loggedEvents.add(e);
+                    remaining--;
+                }
+            }
         }
+
+        EventCache cache = IRCService.getEventCache(conversation.getServer());
+        SpannableStringBuilder convLog = new SpannableStringBuilder();
+        java.text.DateFormat format = DateFormat.getTimeFormat(context);
+        boolean logTimestamp = false;
+        for (Event e : loggedEvents) {
+            if (e == null) {
+                logTimestamp = true;
+                continue;
+            }
+            if (logTimestamp) {
+                convLog.append(format.format(new Date(e.timestamp.toMillis(false))));
+                convLog.append("\n");
+                logTimestamp = false;
+            }
+            convLog.append(cache.get(e).getMessage());
+            convLog.append("\n");
+        }
+
+        return convLog;
     }
 
     private static CharSequence ensureMinimumSize(CharSequence message) {
