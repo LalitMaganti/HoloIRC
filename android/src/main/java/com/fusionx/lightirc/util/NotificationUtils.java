@@ -71,11 +71,18 @@ public class NotificationUtils {
         int mentionCount;
         int queryCount;
         List<NotificationMessageInfo> messages;
+        Map<Conversation, Integer> subNotificationIds;
+        int nextSubNotificationId;
 
         public NotificationServerInfo() {
             mentionCount = 0;
             queryCount = 0;
             messages = new ArrayList<>();
+            subNotificationIds = new HashMap<>();
+            nextSubNotificationId = 1;
+        }
+        public int getNextSubNotificationId() {
+            return nextSubNotificationId++;
         }
     }
 
@@ -242,28 +249,36 @@ public class NotificationUtils {
 
         notificationManager.notify(notificationIdBase, builder.build());
         if (totalNotificationCount > 1) {
-            for (int i = 0; i < serverInfo.messages.size(); i++) {
-                NotificationMessageInfo info = serverInfo.messages.get(i);
-                final NotificationCompat.Builder stackBuilder =
-                        new NotificationCompat.Builder(context);
-                stackBuilder.setSmallIcon(R.drawable.ic_notification_small);
-                stackBuilder.setContentTitle(context.getString(R.string.app_name));
-                stackBuilder.setColor(context.getResources().getColor(R.color.colorPrimary));
-                stackBuilder.setCategory(NotificationCompat.CATEGORY_EMAIL);
-                stackBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-                stackBuilder.setGroup(server.getId());
-
-                stackBuilder.setContentTitle(context.getString(
-                        R.string.notification_mentioned_bigtext_title,
-                        info.conversation.getId(), server.getId()));
-
-                // For PMs, make sure to not include the sender's name in the
-                // message (it's part of the title already)
-                stackBuilder.setContentText(info.mention
-                        ? info.messageWithPrependedNick : info.message);
-
-                notificationManager.notify(notificationIdBase + i + 1, stackBuilder.build());
+            Integer subNotifId = serverInfo.subNotificationIds.get(conversation);
+            if (subNotifId == null) {
+                subNotifId = serverInfo.getNextSubNotificationId();
+                serverInfo.subNotificationIds.put(conversation, subNotifId);
             }
+
+            SpannableStringBuilder convText = new SpannableStringBuilder();
+            for (NotificationMessageInfo info : serverInfo.messages) {
+                if (info.conversation == conversation) {
+                    if (convText.length() == 0) {
+                        convText.append("\n");
+                    }
+                    convText.append(info.mention
+                            ? info.messageWithPrependedNick : info.message);
+                }
+            }
+
+            final NotificationCompat.Builder stackBuilder =
+                    new NotificationCompat.Builder(context);
+            stackBuilder.setSmallIcon(R.drawable.ic_notification_small);
+            stackBuilder.setContentTitle(context.getString(
+                    R.string.notification_mentioned_bigtext_title,
+                    conversation.getId(), server.getId()));
+            stackBuilder.setContentText(convText);
+            stackBuilder.setColor(context.getResources().getColor(R.color.colorPrimary));
+            stackBuilder.setCategory(NotificationCompat.CATEGORY_EMAIL);
+            stackBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
+            stackBuilder.setGroup(server.getId());
+
+            notificationManager.notify(notificationIdBase + subNotifId, stackBuilder.build());
         }
     }
 
@@ -308,8 +323,8 @@ public class NotificationUtils {
                 int baseId = NOTIFICATION_MENTION_BASE + index * NOTIFICATION_MENTION_SERVER_OFFSET;
                 NotificationServerInfo info = entry.getValue();
                 notificationManager.cancel(baseId);
-                for (int i = 0; i < info.messages.size(); i++) {
-                    notificationManager.cancel(baseId + i + 1);
+                for (Integer subNotifId : info.subNotificationIds.values()) {
+                    notificationManager.cancel(baseId + subNotifId);
                 }
             }
             index++;
