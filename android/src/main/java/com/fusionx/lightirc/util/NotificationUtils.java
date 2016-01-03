@@ -16,18 +16,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,14 +59,15 @@ public class NotificationUtils {
             + ".RECEIVE_NOTIFICATION";
 
     private static final int MAX_NOTIFICATIONS_PER_SERVER = NOTIFICATION_MENTION_SERVER_OFFSET - 2;
+    private static final int CONV_LOG_CONTEXT_ENTRIES = 10;
 
     private static class NotificationMessageInfo {
         final Nick user;
         final Conversation<? extends Event> conversation;
         final String message;
-        final CharSequence messageWithPrependedNick;
         final boolean mention;
         final long timestamp;
+        final Context context;
         final int conversationBufferIndex;
         public NotificationMessageInfo(Context context, Nick user,
                 Conversation<? extends Event> conversation, String message,
@@ -74,8 +77,7 @@ public class NotificationUtils {
             this.message = message;
             this.mention = mention;
             this.timestamp = timestamp;
-            this.messageWithPrependedNick = user != null ?
-                    prependHighlightedText(context, user.getNickAsString(), message) : message;
+            this.context = context.getApplicationContext();
 
             int index;
             for (index = conversation.getBuffer().size() - 1; index >= 0; index--) {
@@ -88,6 +90,12 @@ public class NotificationUtils {
                 }
             }
             this.conversationBufferIndex = index;
+        }
+        public CharSequence messageWithPrependedNick() {
+            if (user != null) {
+                return prependHighlightedText(context, user.getNickAsString(), message);
+            }
+            return message;
         }
     }
 
@@ -228,7 +236,7 @@ public class NotificationUtils {
             // For PMs, make sure to not include the sender's name in the
             // message (it's part of the title already)
             final CharSequence bigTextMessage = messageInfo != null && messageInfo.mention
-                    ? messageInfo.messageWithPrependedNick : message;
+                    ? messageInfo.messageWithPrependedNick() : message;
             if (bigTextMessage != null) {
                 String title = context.getString(R.string.notification_mentioned_bigtext_title,
                         conversation.getId(), server.getId());
@@ -243,7 +251,7 @@ public class NotificationUtils {
                 NotificationCompat.InboxStyle style = new NotificationCompat.InboxStyle();
                 style.setBigContentTitle(text);
                 for (NotificationMessageInfo entry : serverInfo.messages) {
-                    style.addLine(entry.messageWithPrependedNick);
+                    style.addLine(entry.messageWithPrependedNick());
                 }
 
                 style.setSummaryText(server.getId());
@@ -284,11 +292,17 @@ public class NotificationUtils {
         List<NotificationMessageInfo> convInfos = new ArrayList<>();
         for (NotificationMessageInfo info : serverInfo.messages) {
             if (info.conversation == conversation) {
-                if (convText.length() == 0) {
+                if (convText.length() != 0) {
                     convText.append("\n");
                 }
-                convText.append(info.mention
-                        ? info.messageWithPrependedNick : info.message);
+                if (info.mention) {
+                    int currentPos = convText.length();
+                    convText.append(info.user.getNickAsString());
+                    convText.setSpan(new StyleSpan(Typeface.ITALIC), currentPos, convText.length(),
+                            Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    convText.append(" ");
+                }
+                convText.append(info.message);
                 convInfos.add(info);
             }
         }
@@ -326,8 +340,9 @@ public class NotificationUtils {
     private static CharSequence buildConversationLogForWear(Context context,
             Conversation<? extends Event> conversation,
             List<NotificationMessageInfo> infos) {
-        List<Event> loggedEvents = new ArrayList<>();
+        List<Object> logEntries = new ArrayList<>();
         List<? extends Event> buffer = conversation.getBuffer();
+        int lastLoggedIndex = -1;
 
         for (int i = 0; i < infos.size(); i++) {
             NotificationMessageInfo info = infos.get(i);
@@ -335,26 +350,35 @@ public class NotificationUtils {
             int nextBufferIndex = i == (infos.size() - 1)
                     ? buffer.size() : infos.get(i + 1).conversationBufferIndex;
 
-            loggedEvents.add(null);
             // TODO: indicate gaps between previous chunk and this one
-            int insertPos = loggedEvents.size();
+            int insertPos = logEntries.size();
+            int skipped = 0;
 
-            // go back up to 20 messages
-            for (int index = info.conversationBufferIndex - 1, remaining = 20;
-                    index > lastBufferIndex && remaining > 0; index--) {
+            // go back
+            for (int index = info.conversationBufferIndex - 1, remaining = CONV_LOG_CONTEXT_ENTRIES;
+                    index > lastBufferIndex && index > lastLoggedIndex; index--) {
                 Event e = buffer.get(index);
                 if (shouldIncludeEventInConversationLog(e)) {
-                    loggedEvents.add(insertPos, e);
-                    remaining--;
+                    if (remaining > 0) {
+                        logEntries.add(insertPos, e);
+                        remaining--;
+                    } else {
+                        skipped++;
+                    }
                 }
             }
 
-            // go forward up to 20 messages
-            for (int index = info.conversationBufferIndex, remaining = 20;
+            if (skipped > 0) {
+                logEntries.add(insertPos, new Integer(skipped));
+            }
+
+            // go forward
+            for (int index = info.conversationBufferIndex, remaining = CONV_LOG_CONTEXT_ENTRIES;
                  index < nextBufferIndex && remaining > 0; index++) {
                 Event e = buffer.get(index);
                 if (shouldIncludeEventInConversationLog(e)) {
-                    loggedEvents.add(e);
+                    logEntries.add(e);
+                    lastLoggedIndex = index;
                     remaining--;
                 }
             }
@@ -362,19 +386,22 @@ public class NotificationUtils {
 
         EventCache cache = IRCService.getEventCache(conversation.getServer());
         SpannableStringBuilder convLog = new SpannableStringBuilder();
-        java.text.DateFormat format = DateFormat.getTimeFormat(context);
-        boolean logTimestamp = false;
-        for (Event e : loggedEvents) {
-            if (e == null) {
-                logTimestamp = true;
-                continue;
+        int skippedColor = context.getResources().getColor(R.color.light_grey);
+
+        for (Object o : logEntries) {
+            if (o instanceof Integer) {
+                int skippedCount = (Integer) o;
+                int startPos = convLog.length();
+                convLog.append(context.getResources().getQuantityString(
+                        R.plurals.skipped_entry_count, skippedCount, skippedCount));
+                convLog.setSpan(new StyleSpan(Typeface.ITALIC), startPos, convLog.length(),
+                        Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                convLog.setSpan(new ForegroundColorSpan(skippedColor), startPos, convLog.length(),
+                        Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            } else {
+                Event e = (Event) o;
+                convLog.append(cache.get(e).getMessage());
             }
-            if (logTimestamp) {
-                convLog.append(format.format(new Date(e.timestamp.toMillis(false))));
-                convLog.append("\n");
-                logTimestamp = false;
-            }
-            convLog.append(cache.get(e).getMessage());
             convLog.append("\n");
         }
 
@@ -387,7 +414,7 @@ public class NotificationUtils {
             return message;
         }
         if (message instanceof SpannableStringBuilder) {
-            SpannableStringBuilder builder = (SpannableStringBuilder) message;
+            SpannableStringBuilder builder = new SpannableStringBuilder(message);
             builder.append("\n");
             return builder;
         }

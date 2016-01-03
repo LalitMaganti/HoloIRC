@@ -64,4 +64,10 @@ along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
         <item quantity="one">1 user</item>
         <item quantity="other">%d users</item>
     </plurals>
+
+    <plurals name="skipped_entry_count">
+        <item quantity="one">\u2026 skipped 1 entry\u2026</item>
+        <item quantity="other">\u2026 skipped %d entries\u2026</item>
+    </plurals>
+
 </resources>
