@@ -9,12 +9,12 @@ import com.fusionx.lightirc.view.Snackbar;
 
 import android.app.Activity;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.media.Ringtone;
@@ -22,9 +22,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
@@ -55,20 +55,19 @@ public class NotificationUtils {
     private static final String CANCEL_NOTIFICATION_ACTION = "com.fusionx.lightirc"
             + ".CANCEL_NOTIFICATION";
 
-    private static final String RECEIVE_NOTIFICATION_ACTION = "com.fusionx.lightirc"
-            + ".RECEIVE_NOTIFICATION";
-
     private static final int MAX_NOTIFICATIONS_PER_SERVER = NOTIFICATION_MENTION_SERVER_OFFSET - 2;
     private static final int CONV_LOG_CONTEXT_ENTRIES = 10;
 
     private static class NotificationMessageInfo {
+        final Context context;
         final Nick user;
         final Conversation<? extends Event> conversation;
         final String message;
+
         final boolean mention;
         final long timestamp;
-        final Context context;
         final int conversationBufferIndex;
+
         public NotificationMessageInfo(Context context, Nick user,
                 Conversation<? extends Event> conversation, String message,
                 boolean mention, long timestamp) {
@@ -79,17 +78,19 @@ public class NotificationUtils {
             this.timestamp = timestamp;
             this.context = context.getApplicationContext();
 
-            int index;
-            for (index = conversation.getBuffer().size() - 1; index >= 0; index--) {
+            this.conversationBufferIndex = determineConversationBufferIndex();
+        }
+        private int determineConversationBufferIndex() {
+            for (int index = conversation.getBuffer().size() - 1; index >= 0; index--) {
                 Event e = conversation.getBuffer().get(index);
                 boolean eventMatches = mention
                         ? (e instanceof ChannelWorldMessageEvent || e instanceof ChannelWorldActionEvent)
                         : (e instanceof QueryMessageWorldEvent || e instanceof QueryActionWorldEvent);
                 if (eventMatches && e.timestamp.toMillis(false) == timestamp) {
-                    break;
+                    return index;
                 }
             }
-            this.conversationBufferIndex = index;
+            return 0;
         }
         public CharSequence messageWithPrependedNick() {
             if (user != null) {
@@ -102,14 +103,17 @@ public class NotificationUtils {
     private static class NotificationServerInfo {
         int mentionCount;
         int queryCount;
-        List<NotificationMessageInfo> messages;
-        Map<Conversation, Integer> subNotificationIds;
+        final List<NotificationMessageInfo> messages;
+        final Map<Conversation, Integer> subNotificationIds;
+        final int notificationIdBase;
         int nextSubNotificationId;
 
-        public NotificationServerInfo() {
+        public NotificationServerInfo(int index) {
             mentionCount = 0;
             queryCount = 0;
             messages = new ArrayList<>();
+            notificationIdBase =
+                    NOTIFICATION_MENTION_BASE + index * NOTIFICATION_MENTION_SERVER_OFFSET;
             subNotificationIds = new HashMap<>();
             nextSubNotificationId = 1;
         }
@@ -119,8 +123,7 @@ public class NotificationUtils {
     }
 
     private static Map<String, NotificationServerInfo> sNotificationInfos = new HashMap<>();
-
-    private static ResultReceiver sResultReceiver;
+    private static int sNextServerInfoIndex = 0;
 
     private static DeleteReceiver sDeleteReceiver;
 
@@ -156,17 +159,19 @@ public class NotificationUtils {
             return;
         }
 
-        registerBroadcastReceivers(context);
+        if (sDeleteReceiver == null) {
+            sDeleteReceiver = new DeleteReceiver();
+            context.registerReceiver(sDeleteReceiver, new IntentFilter(CANCEL_NOTIFICATION_ACTION));
+        }
 
         final Server server = conversation.getServer();
         final Set<String> outApp = AppPreferences.getAppPreferences()
                 .getOutOfAppNotificationSettings();
-        final NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationManagerCompat nm = NotificationManagerCompat.from(context);
 
         NotificationServerInfo serverInfo = sNotificationInfos.get(server.getId());
         if (serverInfo == null) {
-            serverInfo = new NotificationServerInfo();
+            serverInfo = new NotificationServerInfo(sNextServerInfoIndex++);
             sNotificationInfos.put(server.getId(), serverInfo);
         }
 
@@ -186,36 +191,27 @@ public class NotificationUtils {
             serverInfo.messages.add(messageInfo);
         }
 
-        int pos = 0;
-        for (String serverId : sNotificationInfos.keySet()) {
-            if (TextUtils.equals(serverId, server.getId())) {
-                break;
-            }
-            pos++;
-        }
-
-        final int notificationIdBase =
-                NOTIFICATION_MENTION_BASE + pos * NOTIFICATION_MENTION_SERVER_OFFSET;
-
         int totalNotificationCount = serverInfo.mentionCount + serverInfo.queryCount;
-        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_notification_small);
-        builder.setContentTitle(context.getString(R.string.app_name));
-        builder.setAutoCancel(true);
-        builder.setNumber(totalNotificationCount);
-        builder.setColor(context.getResources().getColor(R.color.colorPrimary));
-        builder.setCategory(NotificationCompat.CATEGORY_EMAIL);
-        builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        builder.setGroup(server.getId());
-        builder.setGroupSummary(true);
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_notification_small)
+                .setContentTitle(context.getString(R.string.app_name))
+                .setAutoCancel(true)
+                .setNumber(totalNotificationCount)
+                .setColor(context.getResources().getColor(R.color.colorPrimary))
+                .setCategory(NotificationCompat.CATEGORY_EMAIL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setGroup(server.getId())
+                .setGroupSummary(true);
 
-        final Intent resultIntent = new Intent(RECEIVE_NOTIFICATION_ACTION);
-        resultIntent.putExtra("server_name", conversation.getServer().getTitle());
-        resultIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
+        final Intent contentIntent = new Intent(context, MainActivity.class);
+        contentIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        contentIntent.putExtra("server_name", conversation.getServer().getTitle());
+        contentIntent.putExtra(channel ? "channel_name" : "query_nick", conversation.getId());
 
-        final PendingIntent resultPendingIntent = PendingIntent.getBroadcast(context,
-                notificationIdBase, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(resultPendingIntent);
+        final PendingIntent contentPendingIntent = PendingIntent.getActivity(context,
+                serverInfo.notificationIdBase, contentIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentPendingIntent);
 
         // First build the public version...
         builder.setContentText(buildNotificationContentTextWithCounts(context, serverInfo));
@@ -276,22 +272,26 @@ public class NotificationUtils {
         builder.setDefaults(defaults);
 
         final Intent intent = new Intent(CANCEL_NOTIFICATION_ACTION);
-        final PendingIntent deleteIntent = PendingIntent.getBroadcast(context, 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.putExtra("server_id", server.getId());
+        final PendingIntent deleteIntent = PendingIntent.getBroadcast(context,
+                serverInfo.notificationIdBase, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setDeleteIntent(deleteIntent);
 
-        notificationManager.notify(notificationIdBase, builder.build());
+        nm.notify(serverInfo.notificationIdBase, builder.build());
 
-        Integer subNotifId = serverInfo.subNotificationIds.get(conversation);
-        if (subNotifId == null) {
-            subNotifId = serverInfo.getNextSubNotificationId();
-            serverInfo.subNotificationIds.put(conversation, subNotifId);
-        }
+        if (isWearAppInstalled(context)) {
+            Integer subNotifId = serverInfo.subNotificationIds.get(conversation);
+            if (subNotifId == null) {
+                subNotifId = serverInfo.getNextSubNotificationId();
+                serverInfo.subNotificationIds.put(conversation, subNotifId);
+            }
 
-        SpannableStringBuilder convText = new SpannableStringBuilder();
-        List<NotificationMessageInfo> convInfos = new ArrayList<>();
-        for (NotificationMessageInfo info : serverInfo.messages) {
-            if (info.conversation == conversation) {
+            SpannableStringBuilder convText = new SpannableStringBuilder();
+            List<NotificationMessageInfo> convInfos = new ArrayList<>();
+            for (NotificationMessageInfo info : serverInfo.messages) {
+                if (info.conversation != conversation) {
+                    continue;
+                }
                 if (convText.length() != 0) {
                     convText.append("\n");
                 }
@@ -305,29 +305,28 @@ public class NotificationUtils {
                 convText.append(info.message);
                 convInfos.add(info);
             }
+
+            CharSequence conversationLog = buildConversationLogForWear(context,
+                    conversation, convInfos);
+            final Notification convLogPage = new NotificationCompat.Builder(context)
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(conversationLog))
+                    .extend(new NotificationCompat.WearableExtender().setStartScrollBottom(true))
+                    .build();
+
+            final NotificationCompat.Builder stackBuilder = new NotificationCompat.Builder(context)
+                    .setSmallIcon(R.drawable.ic_notification_small)
+                    .setContentTitle(context.getString(
+                            R.string.notification_mentioned_bigtext_title,
+                            conversation.getId(), server.getId()))
+                    .setContentText(convText)
+                    .setColor(context.getResources().getColor(R.color.colorPrimary))
+                    .setCategory(NotificationCompat.CATEGORY_EMAIL)
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setGroup(server.getId())
+                    .extend(new NotificationCompat.WearableExtender().addPage(convLogPage));
+
+            nm.notify(serverInfo.notificationIdBase + subNotifId, stackBuilder.build());
         }
-
-        NotificationCompat.Builder convLogBuilder = new NotificationCompat.Builder(context);
-        convLogBuilder.setStyle(new NotificationCompat.BigTextStyle(convLogBuilder)
-                .bigText(buildConversationLogForWear(context, conversation, convInfos)));
-        convLogBuilder.extend(new NotificationCompat.WearableExtender()
-                .setStartScrollBottom(true));
-
-        final NotificationCompat.Builder stackBuilder =
-                new NotificationCompat.Builder(context);
-        stackBuilder.setSmallIcon(R.drawable.ic_notification_small);
-        stackBuilder.setContentTitle(context.getString(
-                R.string.notification_mentioned_bigtext_title,
-                conversation.getId(), server.getId()));
-        stackBuilder.setContentText(convText);
-        stackBuilder.setColor(context.getResources().getColor(R.color.colorPrimary));
-        stackBuilder.setCategory(NotificationCompat.CATEGORY_EMAIL);
-        stackBuilder.setPriority(NotificationCompat.PRIORITY_HIGH);
-        stackBuilder.setGroup(server.getId());
-        stackBuilder.extend(new NotificationCompat.WearableExtender()
-                .addPage(convLogBuilder.build()));
-
-        notificationManager.notify(notificationIdBase + subNotifId, stackBuilder.build());
     }
 
     private static boolean shouldIncludeEventInConversationLog(Event e) {
@@ -350,7 +349,6 @@ public class NotificationUtils {
             int nextBufferIndex = i == (infos.size() - 1)
                     ? buffer.size() : infos.get(i + 1).conversationBufferIndex;
 
-            // TODO: indicate gaps between previous chunk and this one
             int insertPos = logEntries.size();
             int skipped = 0;
 
@@ -440,22 +438,22 @@ public class NotificationUtils {
     }
 
     public static void cancelMentionNotification(final Context context, final Server server) {
-        final NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationManagerCompat nm = NotificationManagerCompat.from(context);
 
-        int index = 0;
         for (Map.Entry<String, NotificationServerInfo> entry : sNotificationInfos.entrySet()) {
             if (server == null || server.getId().equals(entry.getKey())) {
-                int baseId = NOTIFICATION_MENTION_BASE + index * NOTIFICATION_MENTION_SERVER_OFFSET;
                 NotificationServerInfo info = entry.getValue();
-                notificationManager.cancel(baseId);
+                nm.cancel(info.notificationIdBase);
                 for (Integer subNotifId : info.subNotificationIds.values()) {
-                    notificationManager.cancel(baseId + subNotifId);
+                    nm.cancel(info.notificationIdBase + subNotifId);
                 }
             }
-            index++;
         }
-        resetNotificationState();
+        if (server != null) {
+            sNotificationInfos.remove(server.getId());
+        } else {
+            sNotificationInfos.clear();
+        }
     }
 
     private static CharSequence prependHighlightedText(Context context,
@@ -476,34 +474,12 @@ public class NotificationUtils {
         return builder;
     }
 
-    private static void registerBroadcastReceivers(Context context) {
-        if (sResultReceiver == null) {
-            sResultReceiver = new ResultReceiver();
-            context.registerReceiver(sResultReceiver,
-                    new IntentFilter(RECEIVE_NOTIFICATION_ACTION));
-        }
-        if (sDeleteReceiver == null) {
-            sDeleteReceiver = new DeleteReceiver();
-            context.registerReceiver(sDeleteReceiver, new IntentFilter(CANCEL_NOTIFICATION_ACTION));
-        }
-    }
-
-    private static void resetNotificationState() {
-        sNotificationInfos.clear();
-    }
-
-    public static class ResultReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(final Context context, final Intent intent) {
-            resetNotificationState();
-            final Intent activityIntent = new Intent(context, MainActivity.class);
-            activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            activityIntent.putExtra("server_name", intent.getStringExtra("server_name"));
-            activityIntent.putExtra("channel_name", intent.getStringExtra("channel_name"));
-            activityIntent.putExtra("query_nick", intent.getStringExtra("query_nick"));
-            context.startActivity(activityIntent);
+    private static boolean isWearAppInstalled(Context context) {
+        try {
+            context.getPackageManager().getPackageInfo("com.google.android.wearable.app", 0);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            return false;
         }
     }
 
@@ -511,9 +487,12 @@ public class NotificationUtils {
 
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            resetNotificationState();
-            context.unregisterReceiver(this);
-            sDeleteReceiver = null;
+            String serverId = intent.getStringExtra("server_id");
+            sNotificationInfos.remove(serverId);
+            if (sNotificationInfos.isEmpty()) {
+                context.unregisterReceiver(this);
+                sDeleteReceiver = null;
+            }
         }
     }
 }
