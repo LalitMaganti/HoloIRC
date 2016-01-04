@@ -12,6 +12,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.util.NotificationUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
 import com.google.common.base.Optional;
 
 import android.app.Notification;
@@ -84,11 +85,10 @@ public class IRCService extends Service {
             final Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
 
             mConnectionManager.requestDisconnectAll();
-            stopForeground(true);
-
             for (final Server server : servers) {
                 cleanupPostDisconnect(server);
             }
+            stop();
         }
     };
     private final BroadcastReceiver mReconnectAllReceiver = new BroadcastReceiver() {
@@ -139,8 +139,6 @@ public class IRCService extends Service {
 
     private AppPreferences mAppPreferences;
 
-    private boolean mFirstStart = true;
-
     private ConnectionManager mConnectionManager;
     private Notification mNotification;
 
@@ -149,17 +147,38 @@ public class IRCService extends Service {
     }
 
     @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        onFirstStart();
+    public void onCreate() {
+        super.onCreate();
+
+        if (SharedPreferencesUtils.isInitialDatabaseRun(this)) {
+            SharedPreferencesUtils.onInitialSetup(this);
+        }
+
+        mAppPreferences = AppPreferences.getAppPreferences();
+        mLoggingManager = new IRCLoggingManager(mAppPreferences);
         mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
 
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
+        registerReceiver(mExternalStorageReceiver, filter);
+        updateExternalStorageState();
+
+        getBus().register(mEventHelper, SERVICE_PRIORITY);
+        registerReceiver(mDisconnectAllReceiver, new IntentFilter(DISCONNECT_ALL_INTENT));
+        registerReceiver(mReconnectAllReceiver, new IntentFilter(RECONNECT_ALL_INTENT));
+    }
+
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (intent != null && ADD_MESSAGE_INTENT.equals(intent.getAction())) {
             String serverName = intent.getStringExtra(EXTRA_SERVER_NAME);
             String channelName = intent.getStringExtra(EXTRA_CHANNEL_NAME);
             String queryNick = intent.getStringExtra(EXTRA_QUERY_NICK);
             Server server = mConnectionManager.getServerIfExists(serverName);
             CharSequence message = intent.getStringExtra(EXTRA_MESSAGE);
-            if (server != null && message != null) {
+            if (server != null && server.getStatus() == ConnectionStatus.CONNECTED
+                    && message != null) {
                 if (channelName != null) {
                     Optional<? extends Channel> channel =
                             server.getUserChannelInterface().getChannel(channelName);
@@ -176,7 +195,7 @@ public class IRCService extends Service {
             }
         }
 
-        return START_STICKY;
+        return mNotification != null ? START_STICKY : START_NOT_STICKY;
     }
 
     public void clearAllEventCaches() {
@@ -189,17 +208,14 @@ public class IRCService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        // Unregister observer status
-        stopWatchingExternalStorage();
         getBus().unregister(mEventHelper);
         unregisterReceiver(mDisconnectAllReceiver);
         unregisterReceiver(mReconnectAllReceiver);
+        unregisterReceiver(mExternalStorageReceiver);
     }
 
     @Override
     public IBinder onBind(final Intent intent) {
-        onFirstStart();
-        mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
         return mBinder;
     }
 
@@ -218,6 +234,7 @@ public class IRCService extends Service {
             mLoggingManager.addServerToManager(server);
         }
         updateNotification();
+
         return server;
     }
 
@@ -234,17 +251,23 @@ public class IRCService extends Service {
 
         NotificationUtils.cancelMentionNotification(this, server);
 
-        final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(server.getTitle());
-        if (finalServer) {
-            stopForeground(true);
-            mNotification = null;
-
-            NotificationManagerCompat nm = NotificationManagerCompat.from(this);
-            nm.cancel(WEARABLE_STATUS_ID);
-        } else {
-            updateNotification();
-        }
+        mConnectionManager.requestStoppageAndRemoval(server.getTitle());
         cleanupPostDisconnect(server);
+
+        if (mConnectionManager.getServerCount() > 0) {
+            updateNotification();
+        } else {
+            stop();
+        }
+    }
+
+    private void stop() {
+        mNotification = null;
+        stopForeground(true);
+        stopSelf();
+
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.cancel(WEARABLE_STATUS_ID);
     }
 
     private void cleanupPostDisconnect(final Server server) {
@@ -267,31 +290,6 @@ public class IRCService extends Service {
 
     public ServiceEventInterceptor getEventHelper(final Server server) {
         return mEventHelperMap.get(server);
-    }
-
-    private void onFirstStart() {
-        if (mFirstStart) {
-            mAppPreferences = AppPreferences.getAppPreferences();
-            mLoggingManager = new IRCLoggingManager(mAppPreferences);
-            startWatchingExternalStorage();
-            getBus().register(mEventHelper, SERVICE_PRIORITY);
-            registerReceiver(mDisconnectAllReceiver, new IntentFilter(DISCONNECT_ALL_INTENT));
-            registerReceiver(mReconnectAllReceiver, new IntentFilter(RECONNECT_ALL_INTENT));
-
-            mFirstStart = false;
-        }
-    }
-
-    private void startWatchingExternalStorage() {
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
-        registerReceiver(mExternalStorageReceiver, filter);
-        updateExternalStorageState();
-    }
-
-    private void stopWatchingExternalStorage() {
-        unregisterReceiver(mExternalStorageReceiver);
     }
 
     private void updateExternalStorageState() {
@@ -440,6 +438,8 @@ public class IRCService extends Service {
         builder.addAction(R.drawable.ic_clear_light, getString(disconnectActionResId), intent);
 
         mNotification = builder.build();
+        // make ourself persistent
+        startService(new Intent(this, IRCService.class));
         startForeground(SERVICE_ID, mNotification);
 
         NotificationManagerCompat nm = NotificationManagerCompat.from(this);
