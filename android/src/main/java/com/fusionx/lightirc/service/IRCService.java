@@ -30,6 +30,8 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -217,6 +219,35 @@ public class IRCService extends Service {
     @Override
     public IBinder onBind(final Intent intent) {
         return mBinder;
+    }
+
+    @Override
+    protected void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        writer.println("Known servers:");
+        for (Server server : mConnectionManager.getImmutableServerSet()) {
+            writer.print("  ");
+            writer.print(server.getTitle());
+            writer.print(" (");
+            writer.print(server.getId());
+            writer.print(") - ");
+            writer.println(server.getStatus());
+        }
+        writer.println();
+        writer.println("Event caches:");
+        for (Map.Entry<Server, EventCache> entry : mEventCache.entrySet()) {
+            EventCache cache = entry.getValue();
+            writer.print("  ");
+            writer.print(entry.getKey().getId());
+            writer.print(": ");
+            writer.print(cache.toString());
+            writer.print(", size=");
+            writer.println(cache.size());
+        }
+        writer.println("Logging:");
+        writer.print("  started=");
+        writer.println(mLoggingManager.isStarted());
+        writer.print("  mExternalStorageWriteable=");
+        writer.println(mExternalStorageWriteable);
     }
 
     public Server requestConnectionToServer(final ServerConfiguration.Builder builder) {
