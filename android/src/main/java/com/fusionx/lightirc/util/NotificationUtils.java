@@ -20,9 +20,11 @@ import android.graphics.Typeface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.RemoteInput;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -52,8 +54,10 @@ public class NotificationUtils {
     private static final int NOTIFICATION_MENTION_BASE = 10000;
     private static final int NOTIFICATION_MENTION_SERVER_OFFSET = 1000;
 
-    private static final String CANCEL_NOTIFICATION_ACTION = "com.fusionx.lightirc"
-            + ".CANCEL_NOTIFICATION";
+    private static final String CANCEL_NOTIFICATION_ACTION =
+            "com.fusionx.lightirc.CANCEL_NOTIFICATION";
+    private static final String VOICE_REPLY_NOTIFICATION_ACTION =
+            "com.fusionx.lightirc.VOICE_REPLY";
 
     private static final int MAX_NOTIFICATIONS_PER_SERVER = NOTIFICATION_MENTION_SERVER_OFFSET - 2;
     private static final int CONV_LOG_CONTEXT_ENTRIES = 10;
@@ -125,8 +129,6 @@ public class NotificationUtils {
     private static Map<String, NotificationServerInfo> sNotificationInfos = new HashMap<>();
     private static int sNextServerInfoIndex = 0;
 
-    private static DeleteReceiver sDeleteReceiver;
-
     public static void notifyInApp(final Snackbar snackbar, final Activity activity,
             final Conversation conversation, boolean channel) {
         final Set<String> inApp = AppPreferences.getAppPreferences()
@@ -157,11 +159,6 @@ public class NotificationUtils {
             final boolean channel, final long timestamp) {
         if (!AppPreferences.getAppPreferences().isOutOfAppNotification()) {
             return;
-        }
-
-        if (sDeleteReceiver == null) {
-            sDeleteReceiver = new DeleteReceiver();
-            context.registerReceiver(sDeleteReceiver, new IntentFilter(CANCEL_NOTIFICATION_ACTION));
         }
 
         final Server server = conversation.getServer();
@@ -271,7 +268,8 @@ public class NotificationUtils {
 
         builder.setDefaults(defaults);
 
-        final Intent intent = new Intent(CANCEL_NOTIFICATION_ACTION);
+        final Intent intent = new Intent(context, NotificationEventReceiver.class);
+        intent.setAction(CANCEL_NOTIFICATION_ACTION);
         intent.putExtra("server_id", server.getId());
         final PendingIntent deleteIntent = PendingIntent.getBroadcast(context,
                 serverInfo.notificationIdBase, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -313,6 +311,27 @@ public class NotificationUtils {
                     .extend(new NotificationCompat.WearableExtender().setStartScrollBottom(true))
                     .build();
 
+            final String replyLabel = context.getString(R.string.notification_reply_wear_title,
+                    conversation.getId());
+            final RemoteInput remoteInput = new RemoteInput.Builder("reply")
+                    .setLabel(replyLabel)
+                    .build();
+            final Intent replyIntent = new Intent(context, NotificationEventReceiver.class);
+            replyIntent.setAction(VOICE_REPLY_NOTIFICATION_ACTION);
+            replyIntent.putExtra("server_name", server.getTitle());
+            replyIntent.putExtra("channel", channel);
+            replyIntent.putExtra("conversation_id", conversation.getId());
+
+            final PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context,
+                    serverInfo.notificationIdBase + subNotifId, replyIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+            final NotificationCompat.Action replyAction = new NotificationCompat.Action.Builder(
+                    R.drawable.ic_reply,
+                    context.getString(R.string.notification_action_reply),
+                    replyPendingIntent)
+                    .addRemoteInput(remoteInput)
+                    .build();
+
             final NotificationCompat.Builder stackBuilder = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_notification_small)
                     .setContentTitle(context.getString(
@@ -323,7 +342,9 @@ public class NotificationUtils {
                     .setCategory(NotificationCompat.CATEGORY_EMAIL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
                     .setGroup(server.getId())
-                    .extend(new NotificationCompat.WearableExtender().addPage(convLogPage));
+                    .extend(new NotificationCompat.WearableExtender()
+                            .addPage(convLogPage)
+                            .addAction(replyAction));
 
             nm.notify(serverInfo.notificationIdBase + subNotifId, stackBuilder.build());
         }
@@ -483,15 +504,29 @@ public class NotificationUtils {
         }
     }
 
-    public static class DeleteReceiver extends BroadcastReceiver {
-
+    public static class NotificationEventReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            String serverId = intent.getStringExtra("server_id");
-            sNotificationInfos.remove(serverId);
-            if (sNotificationInfos.isEmpty()) {
-                context.unregisterReceiver(this);
-                sDeleteReceiver = null;
+            String action = intent.getAction();
+
+            if (CANCEL_NOTIFICATION_ACTION.equals(action)) {
+                String serverId = intent.getStringExtra("server_id");
+                sNotificationInfos.remove(serverId);
+            } else if (VOICE_REPLY_NOTIFICATION_ACTION.equals(action)) {
+                Bundle remoteInput = RemoteInput.getResultsFromIntent(intent);
+                if (remoteInput != null) {
+                    boolean channel = intent.getBooleanExtra("channel", false);
+                    Intent serviceIntent = new Intent(context, IRCService.class);
+                    serviceIntent.setAction(IRCService.ADD_MESSAGE_INTENT);
+                    serviceIntent.putExtra(IRCService.EXTRA_SERVER_NAME,
+                            intent.getStringExtra("server_name"));
+                    serviceIntent.putExtra(
+                            channel ? IRCService.EXTRA_CHANNEL_NAME : IRCService.EXTRA_QUERY_NICK,
+                            intent.getStringExtra("conversation_id"));
+                    serviceIntent.putExtra(IRCService.EXTRA_MESSAGE,
+                            remoteInput.getCharSequence("reply"));
+                    context.startService(serviceIntent);
+                }
             }
         }
     }

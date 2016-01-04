@@ -12,6 +12,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
 import com.fusionx.lightirc.util.NotificationUtils;
+import com.google.common.base.Optional;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -34,11 +35,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ConnectionManager;
 import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayConnectionManager;
+import co.fusionx.relay.parser.UserInputParser;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
@@ -51,6 +55,12 @@ public class IRCService extends Service {
 
     private static final int SERVICE_ID = 1;
     private static final int WEARABLE_STATUS_ID = 2;
+
+    public static final String ADD_MESSAGE_INTENT = "com.fusionx.lightirc.add_message";
+    public static final String EXTRA_SERVER_NAME = "server_name";
+    public static final String EXTRA_CHANNEL_NAME = "channel_name";
+    public static final String EXTRA_QUERY_NICK = "query_nick";
+    public static final String EXTRA_MESSAGE = "message";
 
     private static final String DISCONNECT_ALL_INTENT = "com.fusionx.lightirc.disconnect_all";
     private static final String RECONNECT_ALL_INTENT = "com.fusionx.lightirc.reconnect_all";
@@ -142,6 +152,29 @@ public class IRCService extends Service {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         onFirstStart();
         mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
+
+        if (intent != null && ADD_MESSAGE_INTENT.equals(intent.getAction())) {
+            String serverName = intent.getStringExtra(EXTRA_SERVER_NAME);
+            String channelName = intent.getStringExtra(EXTRA_CHANNEL_NAME);
+            String queryNick = intent.getStringExtra(EXTRA_QUERY_NICK);
+            Server server = mConnectionManager.getServerIfExists(serverName);
+            CharSequence message = intent.getStringExtra(EXTRA_MESSAGE);
+            if (server != null && message != null) {
+                if (channelName != null) {
+                    Optional<? extends Channel> channel =
+                            server.getUserChannelInterface().getChannel(channelName);
+                    if (channel.isPresent()) {
+                        UserInputParser.onParseChannelMessage(channel.get(), message.toString());
+                    }
+                } else if (queryNick != null) {
+                    Optional<? extends QueryUser> user =
+                            server.getUserChannelInterface().getQueryUser(queryNick);
+                    if (user.isPresent()) {
+                        UserInputParser.onParseUserMessage(user.get(), message.toString());
+                    }
+                }
+            }
+        }
 
         return START_STICKY;
     }
