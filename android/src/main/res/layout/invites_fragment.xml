@@ -20,13 +20,12 @@
             android:textColor="@android:color/white" />
     </RelativeLayout>
 
-    <org.lucasr.twowayview.widget.TwoWayView
+    <android.support.v7.widget.RecyclerView
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/invite_fragment_header"
         android:background="?attr/holo_background"
         android:clipToPadding="false"
-        android:scrollbarStyle="outsideOverlay"
-        app:twowayview_layoutManager="ListLayoutManager" />
+        android:scrollbarStyle="outsideOverlay" />
 </RelativeLayout>

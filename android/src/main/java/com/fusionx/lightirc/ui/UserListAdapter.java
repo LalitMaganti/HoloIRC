@@ -6,8 +6,6 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.misc.NickCache;
 import com.fusionx.lightirc.util.UIUtils;
 
-import org.lucasr.twowayview.widget.TwoWayView;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -32,7 +30,7 @@ import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.constants.UserLevel;
 
-public class UserListAdapter extends TwoWayView.Adapter<UserListAdapter.UserViewHolder> {
+public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
 
     private final Context mContext;
 
