@@ -41,9 +41,13 @@ import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.Event;
+import co.fusionx.relay.event.channel.ChannelActionEvent;
+import co.fusionx.relay.event.channel.ChannelMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
+import co.fusionx.relay.event.query.QueryActionSelfEvent;
 import co.fusionx.relay.event.query.QueryActionWorldEvent;
+import co.fusionx.relay.event.query.QueryMessageSelfEvent;
 import co.fusionx.relay.event.query.QueryMessageWorldEvent;
 
 import static android.content.Context.VIBRATOR_SERVICE;
@@ -352,9 +356,13 @@ public class NotificationUtils {
 
     private static boolean shouldIncludeEventInConversationLog(Event e) {
         return e instanceof ChannelWorldMessageEvent
+                || e instanceof ChannelMessageEvent
                 || e instanceof ChannelWorldActionEvent
+                || e instanceof ChannelActionEvent
                 || e instanceof QueryMessageWorldEvent
-                || e instanceof QueryActionWorldEvent;
+                || e instanceof QueryMessageSelfEvent
+                || e instanceof QueryActionWorldEvent
+                || e instanceof QueryActionSelfEvent;
     }
 
     private static CharSequence buildConversationLogForWear(Context context,
