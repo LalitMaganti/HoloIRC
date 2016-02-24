@@ -86,8 +86,10 @@ public class SharedPreferencesUtils {
 
         if (firstRun) {
             firstTimeServerSetup(context);
-            globalSettings.edit().putBoolean("firstrun", false).apply();
-            globalSettings.edit().putBoolean("firstDbRun", false).apply();
+            globalSettings.edit()
+                    .putBoolean("firstrun", false)
+                    .putBoolean("firstDbRun", false)
+                    .apply();
         } else if (firstDbRun) {
             final List<File> fileList = SharedPreferencesUtils.getOldServers(context);
             migrateToDatabase(fileList, context);
