@@ -50,5 +50,12 @@
         </activity>
 
         <service android:name=".service.IRCService" />
+
+        <receiver android:name=".util.NotificationUtils$NotificationEventReceiver">
+            <intent-filter>
+                <action android:name="com.fusionx.lightirc.CANCEL_NOTIFICATION" />
+                <action android:name="com.fusionx.lightirc.VOICE_REPLY" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

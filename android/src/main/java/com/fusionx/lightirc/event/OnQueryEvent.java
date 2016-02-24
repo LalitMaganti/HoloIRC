@@ -6,9 +6,11 @@ public class OnQueryEvent {
 
     public final QueryUser queryUser;
     public final String message;
+    public final long timestamp;
 
-    public OnQueryEvent(final QueryUser queryUser, final String message) {
+    public OnQueryEvent(final QueryUser queryUser, final String message, final long timestamp) {
         this.queryUser = queryUser;
         this.message = message;
+        this.timestamp = timestamp;
     }
 }

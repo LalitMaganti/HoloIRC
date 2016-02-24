@@ -134,7 +134,7 @@ public class IRCEventToStringConverter {
         final SpannableStringBuilder builder = new SpannableStringBuilder(message);
         if (boldText) {
             builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(),
-                    Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
         return setupEvent(builder);
     }
@@ -143,7 +143,7 @@ public class IRCEventToStringConverter {
         final SpannableStringBuilder builder = new SpannableStringBuilder(message);
         final NickColour colour = NickCache.getNickCache().get(defaultNick);
         builder.setSpan(new ForegroundColorSpan(colour.getColour()), 0, message.length(),
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         return setupEvent(builder);
     }
 
@@ -152,7 +152,7 @@ public class IRCEventToStringConverter {
         final SpannableStringBuilder builder = new SpannableStringBuilder(message);
         final NickColour colour = NickCache.getNickCache().get(defaultNick);
         builder.setSpan(new ForegroundColorSpan(colour.getColour()), 0, message.length(),
-                Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         return setupEvent(builder, boldText);
     }
 

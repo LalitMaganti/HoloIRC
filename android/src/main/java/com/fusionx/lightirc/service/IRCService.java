@@ -11,9 +11,10 @@ import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.lightirc.util.NotificationUtils;
+import com.google.common.base.Optional;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -24,20 +25,26 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 import android.util.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ConnectionManager;
 import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
 import co.fusionx.relay.internal.base.RelayConnectionManager;
+import co.fusionx.relay.parser.UserInputParser;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
 import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
@@ -47,6 +54,13 @@ public class IRCService extends Service {
     private static final int SERVICE_PRIORITY = 50;
 
     private static final int SERVICE_ID = 1;
+    private static final int WEARABLE_STATUS_ID = 2;
+
+    public static final String ADD_MESSAGE_INTENT = "com.fusionx.lightirc.add_message";
+    public static final String EXTRA_SERVER_NAME = "server_name";
+    public static final String EXTRA_CHANNEL_NAME = "channel_name";
+    public static final String EXTRA_QUERY_NICK = "query_nick";
+    public static final String EXTRA_MESSAGE = "message";
 
     private static final String DISCONNECT_ALL_INTENT = "com.fusionx.lightirc.disconnect_all";
     private static final String RECONNECT_ALL_INTENT = "com.fusionx.lightirc.reconnect_all";
@@ -65,9 +79,7 @@ public class IRCService extends Service {
                 interceptor.unregister();
             }
 
-            final NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.cancel(NOTIFICATION_MENTION);
+            NotificationUtils.cancelMentionNotification(context, null);
 
             final Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
 
@@ -93,20 +105,20 @@ public class IRCService extends Service {
     private final Object mEventHelper = new Object() {
         @Subscribe
         public void onMentioned(final OnChannelMentionEvent event) {
-            notifyOutOfApp(IRCService.this, event.message, event.user, event.channel, true);
+            notifyOutOfApp(IRCService.this, event.message, event.user,
+                    event.channel, true, event.timestamp);
         }
 
         @Subscribe
         public void onQueried(final OnQueryEvent event) {
             notifyOutOfApp(IRCService.this, event.message, event.queryUser.getNick(),
-                    event.queryUser, false);
+                    event.queryUser, false, event.timestamp);
         }
 
         @Subscribe
         public void onServerStatusChanged(final OnServerStatusChanged event) {
             if (mNotification != null) {
-                mNotification = getNotification();
-                startForeground(SERVICE_ID, mNotification);
+                updateNotification();
             }
         }
 
@@ -140,6 +152,29 @@ public class IRCService extends Service {
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         onFirstStart();
         mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
+
+        if (intent != null && ADD_MESSAGE_INTENT.equals(intent.getAction())) {
+            String serverName = intent.getStringExtra(EXTRA_SERVER_NAME);
+            String channelName = intent.getStringExtra(EXTRA_CHANNEL_NAME);
+            String queryNick = intent.getStringExtra(EXTRA_QUERY_NICK);
+            Server server = mConnectionManager.getServerIfExists(serverName);
+            CharSequence message = intent.getStringExtra(EXTRA_MESSAGE);
+            if (server != null && message != null) {
+                if (channelName != null) {
+                    Optional<? extends Channel> channel =
+                            server.getUserChannelInterface().getChannel(channelName);
+                    if (channel.isPresent()) {
+                        UserInputParser.onParseChannelMessage(channel.get(), message.toString());
+                    }
+                } else if (queryNick != null) {
+                    Optional<? extends QueryUser> user =
+                            server.getUserChannelInterface().getQueryUser(queryNick);
+                    if (user.isPresent()) {
+                        UserInputParser.onParseUserMessage(user.get(), message.toString());
+                    }
+                }
+            }
+        }
 
         return START_STICKY;
     }
@@ -182,8 +217,7 @@ public class IRCService extends Service {
             mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);
         }
-        mNotification = getNotification();
-        startForeground(SERVICE_ID, mNotification);
+        updateNotification();
         return server;
     }
 
@@ -198,17 +232,17 @@ public class IRCService extends Service {
     public void requestConnectionStoppage(final Server server) {
         mEventHelperMap.get(server).unregister();
 
-        final NotificationManager notificationManager =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_MENTION);
+        NotificationUtils.cancelMentionNotification(this, server);
 
         final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(server.getTitle());
         if (finalServer) {
             stopForeground(true);
             mNotification = null;
+
+            NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+            nm.cancel(WEARABLE_STATUS_ID);
         } else {
-            mNotification = getNotification();
-            startForeground(SERVICE_ID, mNotification);
+            updateNotification();
         }
         cleanupPostDisconnect(server);
     }
@@ -278,8 +312,9 @@ public class IRCService extends Service {
         }
     }
 
-    private Notification getNotification() {
+    private void updateNotification() {
         Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
+        List<String> disconnectedServerNames = new ArrayList<>();
         int connectedCount = 0, disconnectedCount = 0;
         int connectingCount = 0, reconnectingCount = 0;
 
@@ -287,6 +322,7 @@ public class IRCService extends Service {
             switch (server.getStatus()) {
                 case DISCONNECTED:
                     if (mEventHelperMap.get(server).getLastKnownStatus() != null) {
+                        disconnectedServerNames.add(server.getTitle());
                         disconnectedCount++;
                     }
                     break;
@@ -347,6 +383,10 @@ public class IRCService extends Service {
         builder.setShowWhen(false);
         builder.setContentText(publicText);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        if (disconnectedCount > 0) {
+            builder.setGroup("serverstatus");
+            builder.setGroupSummary(true);
+        }
 
         Notification publicVersion = builder.build();
         final String text;
@@ -372,14 +412,18 @@ public class IRCService extends Service {
         builder.setPublicVersion(publicVersion);
         builder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
 
+        NotificationCompat.Action reconnectAction = null;
+
         if (disconnectedCount > 0) {
             final PendingIntent reconnectIntent = PendingIntent.getBroadcast(this, 0,
                     new Intent(RECONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
             int reconnectActionResId = disconnectedCount > 1
                     ? R.string.notification_action_reconnect_all
                     : R.string.notification_action_reconnect;
-            builder.addAction(R.drawable.ic_refresh_light, getString(reconnectActionResId),
-                    reconnectIntent);
+            reconnectAction = new NotificationCompat.Action(
+                    R.drawable.ic_refresh_light,
+                    getString(reconnectActionResId), reconnectIntent);
+            builder.addAction(reconnectAction);
         }
 
         final PendingIntent intent = PendingIntent.getBroadcast(this, 0,
@@ -395,7 +439,33 @@ public class IRCService extends Service {
         }
         builder.addAction(R.drawable.ic_clear_light, getString(disconnectActionResId), intent);
 
-        return builder.build();
+        mNotification = builder.build();
+        startForeground(SERVICE_ID, mNotification);
+
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+
+        if (reconnectAction != null) {
+            NotificationCompat.Builder wearableStatusBuilder = new NotificationCompat.Builder(this);
+            wearableStatusBuilder.setColor(getResources().getColor(R.color.colorPrimary));
+            wearableStatusBuilder.setContentTitle(
+                    getString(R.string.notification_reconnect_wear_title));
+            wearableStatusBuilder.setContentText(getString(
+                    R.string.notification_reconnect_wear_content,
+                    TextUtils.join(", ", disconnectedServerNames)));
+            wearableStatusBuilder.setSmallIcon(R.drawable.ic_notification_small);
+            wearableStatusBuilder.setGroup("serverstatus");
+
+            reconnectAction.icon = R.drawable.ic_refresh_action_wear;
+            new NotificationCompat.WearableExtender()
+                    .addAction(reconnectAction)
+                    .setContentAction(0)
+                    .setHintHideIcon(true)
+                    .extend(wearableStatusBuilder);
+
+            nm.notify(WEARABLE_STATUS_ID, wearableStatusBuilder.build());
+        } else {
+            nm.cancel(WEARABLE_STATUS_ID);
+        }
     }
 
     // Binder which returns this service

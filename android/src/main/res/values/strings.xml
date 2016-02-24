@@ -205,6 +205,10 @@
     <string name="notification_action_close_all">Close all</string>
     <string name="notification_action_reconnect">Reconnect</string>
     <string name="notification_action_reconnect_all">Reconnect all</string>
+    <string name="notification_action_reply">Reply</string>
+    <string name="notification_reconnect_wear_title">IRC disconnected</string>
+    <string name="notification_reconnect_wear_content">Disconnected from %1$s. Touch to reconnect.</string>
+    <string name="notification_reply_wear_title">Reply to %1$s</string>
     <string name="notification_mentioned_title">Mentioned in %1$s on %2$s</string>
     <string name="notification_queried_title">Queried by %1$s on %2$s</string>
     <string name="notification_mentioned_multi_title">Mentioned %1$d times</string>
