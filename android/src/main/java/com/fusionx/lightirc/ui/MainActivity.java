@@ -20,13 +20,10 @@ import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -63,12 +60,14 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
  * Main activity which co-ordinates everything in the app
  */
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
-        NavigationDrawerFragment.Callback, IRCFragment.Callback,
-        ViewTreeObserver.OnGlobalLayoutListener {
+        NavigationDrawerFragment.Callback, WorkerFragment.Callback,
+        IRCFragment.Callback, ViewTreeObserver.OnGlobalLayoutListener {
 
     public static final int SERVER_SETTINGS = 1;
 
     public static final String CLEAR_CACHE = "clear_event_cache";
+
+    private static final String WORKER_FRAGMENT = "WorkerFragment";
 
     private static final String ACTION_BAR_TITLE = "action_bar_title";
 
@@ -98,8 +97,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     };
 
+    // Fragments
+    private WorkerFragment mWorkerFragment;
+
     // IRC
-    private IRCService mService;
     private Conversation mConversation;
 
     private final Object mConversationChanged = new Object() {
@@ -147,21 +148,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         }
     };
 
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(final ComponentName name, final IBinder binder) {
-            mService = ((IRCService.IRCBinder) binder).getService();
-            mServerListFragment.onServiceConnected(mService);
-            MainActivity.this.onServiceConnected();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-            mServerListFragment.onServiceDisconnected();
-        }
-    };
-
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
@@ -205,12 +191,17 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mNavigationDrawerFragment = new NavigationDrawerFragment();
             transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
 
+            mWorkerFragment = new WorkerFragment();
+            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
+
             transaction.commit();
         } else {
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
             mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.right_drawer);
+            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
+                    .findFragmentByTag(WORKER_FRAGMENT);
             mCurrentFragment = (BaseIRCFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.content_frame);
 
@@ -275,7 +266,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public IRCService getService() {
-        return mService;
+        return mWorkerFragment.getService();
     }
 
     @Override
@@ -356,7 +347,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getService().requestReconnectionToServer(mConversation.getServer());
     }
 
-    private void onServiceConnected() {
+    @Override
+    public void onServiceConnected(final IRCService service) {
+        mServerListFragment.onServiceConnected(service);
+
         final boolean fromRecents = isAppFromRecentApps(getIntent().getFlags());
         final boolean clearCaches = getIntent().getBooleanExtra(CLEAR_CACHE, false);
 
@@ -380,7 +374,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getIntent().removeExtra("channel_name");
             getIntent().removeExtra("query_nick");
 
-            final Server server = mService.getServerIfExists(serverName);
+            final Server server = service.getServerIfExists(serverName);
             optConversation = channelName == null
                     ? server.getUserChannelInterface().getQueryUser(queryNick)
                     : server.getUserChannelInterface().getChannel(channelName);
@@ -390,7 +384,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra(CLEAR_CACHE);
-            mService.clearAllEventCaches();
+            service.clearAllEventCaches();
         }
 
         onExternalConversationUpdate(optConversation);
@@ -535,15 +529,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     @Override
     protected void onStart() {
         super.onStart();
-        bindService(new Intent(this, IRCService.class), mServiceConnection,
-                BIND_AUTO_CREATE | BIND_ADJUST_WITH_ACTIVITY);
         NotificationUtils.cancelMentionNotification(this, null);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService(mServiceConnection);
     }
 
     @Override
