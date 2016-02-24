@@ -1,5 +1,4 @@
 include ':android', ':bus-library', ':relay-library'
-include ':libraries:cardview-v7', ':libraries:recyclerview-v7'
 
 project(':bus-library').projectDir = new File('libraries/bus/library')
 project(':relay-library').projectDir = new File('libraries/relay/library')
