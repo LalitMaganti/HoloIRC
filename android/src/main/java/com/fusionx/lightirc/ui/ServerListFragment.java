@@ -267,6 +267,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         refreshServers();
     }
 
+    public void onServiceDisconnected() {
+        mService = null;
+    }
+
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
         mActionMode = null;
