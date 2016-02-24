@@ -8,6 +8,7 @@ import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -40,7 +41,7 @@ public class ActionsFragment extends Fragment {
     private RecyclerView mRecyclerView;
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
 
         mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
@@ -59,10 +60,7 @@ public class ActionsFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.user_list_fragment, container, false);
-        mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        return v;
+        return inflater.inflate(R.layout.user_list_fragment, container, false);
     }
 
     @Override
@@ -71,6 +69,8 @@ public class ActionsFragment extends Fragment {
 
         getBus().registerSticky(mEventHandler);
 
+        mRecyclerView = (RecyclerView) view.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setAdapter(mSectionedAdapter);
     }
 
@@ -108,13 +108,13 @@ public class ActionsFragment extends Fragment {
 
     public interface Callbacks {
 
-        public void removeCurrentFragment();
+        void removeCurrentFragment();
 
-        public void closeDrawer();
+        void closeDrawer();
 
-        public void disconnectFromServer();
+        void disconnectFromServer();
 
-        public void reconnectToServer();
+        void reconnectToServer();
     }
 
     public class ChannelDialogBuilder extends DialogBuilder {

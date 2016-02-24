@@ -10,6 +10,7 @@ import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -54,11 +55,11 @@ public class NavigationDrawerFragment extends Fragment implements
     private ServiceEventInterceptor mEventHelper;
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
 
         try {
-            mCallback = (Callback) activity;
+            mCallback = (Callback) context;
         } catch (final ClassCastException ex) {
             ex.printStackTrace();
         }
@@ -217,19 +218,19 @@ public class NavigationDrawerFragment extends Fragment implements
 
     public interface Callback {
 
-        public void removeCurrentFragment();
+        void removeCurrentFragment();
 
-        public void disconnectFromServer();
+        void disconnectFromServer();
 
-        public boolean isDrawerOpen();
+        boolean isDrawerOpen();
 
-        public void closeDrawer();
+        void closeDrawer();
 
-        public IRCService getService();
+        IRCService getService();
 
-        public void onMentionMultipleUsers(List<ChannelUser> users);
+        void onMentionMultipleUsers(List<ChannelUser> users);
 
-        public void reconnectToServer();
+        void reconnectToServer();
     }
 
     private class EventHandler {

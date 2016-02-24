@@ -156,6 +156,9 @@ public class ActionsAdapter extends RecyclerView.Adapter<ActionsAdapter.ActionVi
 
     public void setSectionedAdapter(final SimpleSectionedRecyclerViewAdapter sectionedAdapter) {
         mSectionedAdapter = sectionedAdapter;
+
+        // Now we have the child adapter, we can update the list.
+        updateActionsList();
     }
 
     public class ActionViewHolder extends RecyclerView.ViewHolder {
