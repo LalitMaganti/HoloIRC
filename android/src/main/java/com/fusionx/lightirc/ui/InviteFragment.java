@@ -4,11 +4,11 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.FragmentUtils;
 
-import org.lucasr.twowayview.widget.TwoWayView;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +21,7 @@ public class InviteFragment extends DialogFragment {
 
     private Callbacks mCallbacks;
 
-    private TwoWayView mTwoWayView;
+    private RecyclerView mRecyclerView;
 
     private InviteAdapter mAdapter;
 
@@ -46,14 +46,15 @@ public class InviteFragment extends DialogFragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle bundle) {
-        return inflater.inflate(R.layout.invites_fragment, container, false);
+        View v = inflater.inflate(R.layout.invites_fragment, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return v;
     }
 
     @Override
     public void onViewCreated(final View view, final Bundle bundle) {
         super.onViewCreated(view, bundle);
-
-        mTwoWayView = (TwoWayView) view.findViewById(android.R.id.list);
         updateAdapter();
     }
 
@@ -61,7 +62,7 @@ public class InviteFragment extends DialogFragment {
         final Collection<InviteEvent> events = mCallbacks.getEventHelper().getInviteEvents();
         mAdapter = new InviteAdapter(getActivity(), events, new AcceptListener(),
                 new DeclineListener());
-        mTwoWayView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     public interface Callbacks {

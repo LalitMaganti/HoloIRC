@@ -7,8 +7,6 @@ import com.fusionx.lightirc.event.OnServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.UIUtils;
 
-import org.lucasr.twowayview.widget.TwoWayView;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,7 +23,7 @@ import co.fusionx.relay.base.ConnectionStatus;
 import static com.fusionx.lightirc.ui.SimpleSectionedRecyclerViewAdapter.Section;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class ActionsAdapter extends TwoWayView.Adapter<ActionsAdapter.ActionViewHolder> {
+public class ActionsAdapter extends RecyclerView.Adapter<ActionsAdapter.ActionViewHolder> {
 
     private final LayoutInflater mInflater;
 

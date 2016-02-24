@@ -7,11 +7,11 @@ import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 
-import org.lucasr.twowayview.widget.TwoWayView;
-
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +37,7 @@ public class ActionsFragment extends Fragment {
 
     private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
 
-    private TwoWayView mTwoWayView;
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onAttach(Activity activity) {
@@ -59,7 +59,10 @@ public class ActionsFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.user_list_fragment, container, false);
+        View v = inflater.inflate(R.layout.user_list_fragment, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return v;
     }
 
     @Override
@@ -68,8 +71,7 @@ public class ActionsFragment extends Fragment {
 
         getBus().registerSticky(mEventHandler);
 
-        mTwoWayView = (TwoWayView) view.findViewById(android.R.id.list);
-        mTwoWayView.setAdapter(mSectionedAdapter);
+        mRecyclerView.setAdapter(mSectionedAdapter);
     }
 
     @Override
@@ -136,7 +138,7 @@ public class ActionsFragment extends Fragment {
 
         @Override
         public void onClick(final View v) {
-            final int position = mTwoWayView.getChildPosition(v);
+            final int position = mRecyclerView.getChildPosition(v);
             final int actual = mSectionedAdapter.sectionedPositionToPosition(position);
 
             final String action = mAdapter.getItem(actual);

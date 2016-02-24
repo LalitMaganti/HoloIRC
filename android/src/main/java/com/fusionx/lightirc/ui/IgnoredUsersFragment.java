@@ -6,10 +6,10 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 
-import org.lucasr.twowayview.widget.TwoWayView;
-
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +33,7 @@ public class IgnoredUsersFragment extends DialogFragment {
 
     private IgnoredUsersAdapter mAdapter;
 
-    private TwoWayView mTwoWayView;
+    private RecyclerView mRecyclerView;
 
     public static IgnoredUsersFragment createInstance() {
         return new IgnoredUsersFragment();
@@ -51,7 +51,10 @@ public class IgnoredUsersFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
-        return inflater.inflate(R.layout.ignored_users_fragment, container, false);
+        View v = inflater.inflate(R.layout.ignored_users_fragment, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return v;
     }
 
     @Override
@@ -64,9 +67,7 @@ public class IgnoredUsersFragment extends DialogFragment {
         final Collection<String> ignoreList = mDatabaseSource.getIgnoreListByName(title);
         final List<String> arrayList = new ArrayList<>(ignoreList);
         mAdapter.addAll(arrayList);
-
-        mTwoWayView = (TwoWayView) view.findViewById(android.R.id.list);
-        mTwoWayView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter(mAdapter);
 
         final ImageButton button = (ImageButton) view.findViewById(R.id.ignored_users_add);
         button.setOnClickListener(new AddClickListener());

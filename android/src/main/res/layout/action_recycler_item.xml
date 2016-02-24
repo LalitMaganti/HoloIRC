@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
     android:gravity="center_vertical"
-    android:minHeight="?android:listPreferredItemHeight"
+    android:minHeight="?android:listPreferredItemHeightSmall"
     android:paddingLeft="8dip"
     android:paddingRight="8dip"
-    android:textAppearance="@android:style/TextAppearance.Medium"
+    android:textAppearance="?attr/textAppearanceListItem"
     android:textIsSelectable="false" />
