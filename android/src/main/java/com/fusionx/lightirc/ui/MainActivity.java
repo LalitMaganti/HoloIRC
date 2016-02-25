@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.google.common.base.Optional;
 
 import com.fusionx.bus.Subscribe;
@@ -151,14 +152,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         @Override
         public void onServiceConnected(final ComponentName name, final IBinder binder) {
             mService = ((IRCService.IRCBinder) binder).getService();
-            mServerListFragment.onServiceConnected(mService);
             MainActivity.this.onServiceConnected();
+            getBus().postSticky(new OnServiceConnectionStateChanged(mService));
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mService = null;
-            mServerListFragment.onServiceDisconnected();
+            getBus().postSticky(new OnServiceConnectionStateChanged(mService));
         }
     };
 
@@ -274,11 +275,6 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public IRCService getService() {
-        return mService;
-    }
-
-    @Override
     public void onPart(final String serverName, final PartEvent event) {
         if (event.channel.equals(mConversation)) {
             onRemoveCurrentFragmentAndConversation();
@@ -320,7 +316,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void disconnectFromServer() {
-        getService().requestConnectionStoppage(mConversation.getServer());
+        mService.requestConnectionStoppage(mConversation.getServer());
     }
 
     @Override
@@ -353,7 +349,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void reconnectToServer() {
-        getService().requestReconnectionToServer(mConversation.getServer());
+        mService.requestReconnectionToServer(mConversation.getServer());
     }
 
     private void onServiceConnected() {
@@ -513,7 +509,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Server server = getService().getServerIfExists(serverName);
+        final Server server = mService.getServerIfExists(serverName);
         final Optional<? extends Conversation> optConversation = channelName == null
                 ? server.getUserChannelInterface().getQueryUser(queryNick)
                 : server.getUserChannelInterface().getChannel(channelName);

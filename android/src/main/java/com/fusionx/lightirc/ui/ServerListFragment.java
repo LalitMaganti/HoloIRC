@@ -5,6 +5,7 @@ import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.loader.ServerWrapperLoader;
 import com.fusionx.lightirc.misc.FragmentType;
@@ -113,17 +114,8 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         mListView.setOnGroupClickListener(this);
         mListView.setOnChildClickListener(this);
 
-        if (bundle == null) {
-            return;
-        }
-        // If we are restoring a savedInstanceSate then a ServiceConnection is already present -
-        // ask for that to be returned
-        final IRCService service = mCallback.getService();
-        // The service could be null if the rotation was done so quickly after start that a
-        // connection to the service has not been established - in that case our callback is
-        // still to come
-        if (service != null) {
-            onServiceConnected(service);
+        if (mService != null) {
+            refreshServers();
         }
     }
 
@@ -261,16 +253,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
-    public void onServiceConnected(final IRCService service) {
-        mService = service;
-
-        refreshServers();
-    }
-
-    public void onServiceDisconnected() {
-        mService = null;
-    }
-
     @Override
     public void onDestroyActionMode(final ActionMode mode) {
         mActionMode = null;
@@ -403,8 +385,6 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         public void onSubServerClicked(final Conversation object);
 
         public void onServerStopped(final Server server);
-
-        public IRCService getService();
 
         public void onPart(final String serverName, final PartEvent event);
 
@@ -565,6 +545,14 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
             final ServerEventHandler eventHandler = mEventHandlers.remove(event.server);
             eventHandler.unregister();
+        }
+
+        @Subscribe
+        public void onServiceEvent(final OnServiceConnectionStateChanged event) {
+            mService = event.getService();
+            if (mService != null && mListView != null) {
+                refreshServers();
+            }
         }
     }
 }

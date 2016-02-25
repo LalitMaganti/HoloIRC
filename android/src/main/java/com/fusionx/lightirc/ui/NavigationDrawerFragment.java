@@ -4,6 +4,7 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnServerStatusChanged;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
@@ -40,7 +41,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private final EventHandler mEventHandler = new EventHandler();
 
-    private ConnectionStatus mStatus;
+    private IRCService mService;
 
     private FragmentType mFragmentType;
 
@@ -51,8 +52,6 @@ public class NavigationDrawerFragment extends Fragment implements
     private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
     private Callback mCallback;
-
-    private ServiceEventInterceptor mEventHelper;
 
     @Override
     public void onAttach(final Context context) {
@@ -168,7 +167,8 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public void updateUserListVisibility() {
-        final boolean visibility = mStatus == ConnectionStatus.CONNECTED
+        final boolean visibility = mConversation != null
+                && mConversation.getServer().getStatus() == ConnectionStatus.CONNECTED
                 && mFragmentType == FragmentType.CHANNEL;
 
         if (visibility) {
@@ -200,7 +200,10 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public ServiceEventInterceptor getEventHelper() {
-        return mEventHelper;
+        if (mService == null || mConversation == null) {
+            return null;
+        }
+        return mService.getEventHelper(mConversation.getServer());
     }
 
     private void handleUserList() {
@@ -226,8 +229,6 @@ public class NavigationDrawerFragment extends Fragment implements
 
         void closeDrawer();
 
-        IRCService getService();
-
         void onMentionMultipleUsers(List<ChannelUser> users);
 
         void reconnectToServer();
@@ -239,20 +240,17 @@ public class NavigationDrawerFragment extends Fragment implements
         public void onEvent(final OnConversationChanged conversationChanged) {
             mConversation = conversationChanged.conversation;
             mFragmentType = conversationChanged.fragmentType;
-            if (conversationChanged.conversation == null) {
-                mEventHelper = null;
-            } else {
-                final Server server = conversationChanged.conversation.getServer();
-                mStatus = server.getStatus();
-                mEventHelper = mCallback.getService().getEventHelper(server);
-            }
             updateUserListVisibility();
         }
 
         @Subscribe
         public void onEvent(final OnServerStatusChanged statusChanged) {
-            mStatus = statusChanged.status;
             updateUserListVisibility();
+        }
+
+        @Subscribe
+        public void onEvent(final OnServiceConnectionStateChanged serviceChanged) {
+            mService = serviceChanged.getService();
         }
     }
 }
