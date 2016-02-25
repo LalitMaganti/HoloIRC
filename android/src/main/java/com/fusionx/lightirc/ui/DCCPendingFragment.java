@@ -4,11 +4,11 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.fusionx.lightirc.misc.Theme;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
-import com.fusionx.lightirc.util.FragmentUtils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
@@ -36,8 +37,6 @@ import static com.fusionx.lightirc.util.MiscUtils.getBus;
 public class DCCPendingFragment extends DialogFragment {
 
     private final EventHandler mEventHandler = new EventHandler();
-
-    private Callbacks mCallbacks;
 
     private ListView mListView;
 
@@ -50,17 +49,8 @@ public class DCCPendingFragment extends DialogFragment {
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-
-        mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
-    }
-
-    @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mInterceptor = mCallbacks.getEventHelper();
 
         setStyle(STYLE_NO_FRAME, getAppPreferences().getTheme() == Theme.DARK
                 ? android.R.style.Theme_DeviceDefault_Dialog
@@ -82,32 +72,43 @@ public class DCCPendingFragment extends DialogFragment {
         final Button button = (Button) view.findViewById(R.id.dcc_pending_ok);
         button.setOnClickListener(v -> dismiss());
 
-        mAdapter = new DCCAdapter(getActivity(), mInterceptor.getDCCRequests(),
-                new AcceptListener(), new DeclineListener());
+        mAdapter = new DCCAdapter(getActivity(), new AcceptListener(), new DeclineListener());
+        if (mInterceptor != null) {
+            mAdapter.replaceAll(mInterceptor.getDCCRequests());
+        }
 
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
-
-        mInterceptor.getServer().getServerWideBus().register(this);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventHelper();
-        interceptor.getServer().getServerWideBus().unregister(this);
+        getBus().unregister(mEventHandler);
+        updateInterceptor(null);
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final DCCRequestEvent requestEvent) {
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventHelper();
-        mAdapter.replaceAll(interceptor.getDCCRequests());
+        mAdapter.replaceAll(mInterceptor.getDCCRequests());
     }
 
-    public interface Callbacks {
-
-        public ServiceEventInterceptor getEventHelper();
+    private void updateInterceptor(ServiceEventInterceptor interceptor) {
+        final Collection<DCCRequestEvent> events = new ArrayList<>();
+        if (mInterceptor != null && interceptor == null) {
+            mInterceptor.getServer().getServerWideBus().unregister(this);
+            if (mAdapter != null) {
+                mAdapter.replaceAll(null);
+            }
+            mInterceptor = null;
+        } else if (mInterceptor == null && interceptor != null) {
+            mInterceptor = interceptor;
+            mInterceptor.getServer().getServerWideBus().register(this);
+            if (mAdapter != null) {
+                mAdapter.replaceAll(mInterceptor.getDCCRequests());
+            }
+        }
     }
 
     private static class DCCAdapter extends BaseAdapter {
@@ -122,12 +123,11 @@ public class DCCPendingFragment extends DialogFragment {
 
         private final View.OnClickListener mDeclineListener;
 
-        public DCCAdapter(final Context context, final Collection<DCCRequestEvent> dccRequests,
-                final View.OnClickListener acceptListener, final View.OnClickListener
-                declineListener) {
+        public DCCAdapter(final Context context, final View.OnClickListener acceptListener,
+                final View.OnClickListener declineListener) {
             mContext = context;
             mLayoutInflater = LayoutInflater.from(context);
-            mRequestEventList = new ArrayList<>(dccRequests);
+            mRequestEventList = new ArrayList<>();
             mAcceptListener = acceptListener;
             mDeclineListener = declineListener;
         }
@@ -189,7 +189,9 @@ public class DCCPendingFragment extends DialogFragment {
 
         public void replaceAll(final Set<DCCRequestEvent> dccRequests) {
             mRequestEventList.clear();
-            mRequestEventList.addAll(dccRequests);
+            if (dccRequests != null) {
+                mRequestEventList.addAll(dccRequests);
+            }
             notifyDataSetChanged();
         }
     }
@@ -217,10 +219,25 @@ public class DCCPendingFragment extends DialogFragment {
     }
 
     private class EventHandler {
+        private Server mServer;
+        private IRCService mService;
 
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
+            mServer = conversationChanged.conversation != null
+                    ? conversationChanged.conversation.getServer() : null;
+            updateInterceptor(getInterceptor());
+        }
 
+        @Subscribe
+        public void onEvent(final OnServiceConnectionStateChanged serviceChanged) {
+            mService = serviceChanged.getService();
+            updateInterceptor(getInterceptor());
+        }
+
+        private ServiceEventInterceptor getInterceptor() {
+            return mServer != null && mService != null
+                    ? mService.getEventHelper(mServer) : null;
         }
     }
 }
