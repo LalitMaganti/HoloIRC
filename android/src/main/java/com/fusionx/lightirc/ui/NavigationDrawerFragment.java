@@ -4,13 +4,9 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnServerStatusChanged;
-import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -23,25 +19,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collections;
 import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class NavigationDrawerFragment extends Fragment implements
-        ActionsFragment.Callbacks, UserListFragment.Callback, InviteFragment.Callbacks,
-        DCCPendingFragment.Callbacks {
+        ActionsFragment.Callbacks, UserListFragment.Callback {
 
     private final EventHandler mEventHandler = new EventHandler();
-
-    private IRCService mService;
 
     private FragmentType mFragmentType;
 
@@ -188,24 +178,6 @@ public class NavigationDrawerFragment extends Fragment implements
         getActivity().supportInvalidateOptionsMenu();
     }
 
-    @Override
-    public void acceptInviteEvents(final InviteEvent event) {
-        getEventHelper().acceptInviteEvents(Collections.singletonList(event));
-    }
-
-    @Override
-    public void declineInviteEvents(final InviteEvent event) {
-        getEventHelper().declineInviteEvents(Collections.singletonList(event));
-    }
-
-    @Override
-    public ServiceEventInterceptor getEventHelper() {
-        if (mService == null || mConversation == null) {
-            return null;
-        }
-        return mService.getEventHelper(mConversation.getServer());
-    }
-
     private void handleUserList() {
         final boolean userListVisible = mSlidingUpPanelLayout.isPanelExpanded();
         if (mCallback.isDrawerOpen() && userListVisible) {
@@ -246,11 +218,6 @@ public class NavigationDrawerFragment extends Fragment implements
         @Subscribe
         public void onEvent(final OnServerStatusChanged statusChanged) {
             updateUserListVisibility();
-        }
-
-        @Subscribe
-        public void onEvent(final OnServiceConnectionStateChanged serviceChanged) {
-            mService = serviceChanged.getService();
         }
     }
 }
