@@ -23,11 +23,11 @@
 
     <item
             android:id="@+id/activity_server_settings_cab_edit"
-            android:icon="@drawable/ic_menu_edit"
+            android:icon="@drawable/ic_edit_light"
             android:title="@string/edit"/>
     <item
             android:id="@+id/activity_server_settings_cab_delete"
-            android:icon="@drawable/ic_menu_delete"
+            android:icon="@drawable/ic_delete_light"
             android:title="@string/delete"/>
 
 </menu>

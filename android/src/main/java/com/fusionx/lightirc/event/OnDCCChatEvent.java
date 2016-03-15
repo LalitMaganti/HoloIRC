@@ -1,12 +1,12 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.dcc.DCCConversation;
+import co.fusionx.relay.dcc.chat.DCCChatConversation;
 
 public class OnDCCChatEvent {
 
-    public final DCCConversation connection;
+    public final DCCChatConversation chatConversation;
 
-    public OnDCCChatEvent(final DCCConversation connection) {
-        this.connection = connection;
+    public OnDCCChatEvent(final DCCChatConversation chatConversation) {
+        this.chatConversation = chatConversation;
     }
 }

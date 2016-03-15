@@ -29,7 +29,7 @@ import java.util.List;
 
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
 import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
-import co.fusionx.relay.parser.user.UserInputParser;
+import co.fusionx.relay.parser.UserInputParser;
 
 public class DCCChatFragment extends IRCFragment<DCCChatEvent> {
 
@@ -40,19 +40,12 @@ public class DCCChatFragment extends IRCFragment<DCCChatEvent> {
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final DCCChatEvent event) {
-        if (event.chatConversation.equals(getChatConnection())) {
-            mMessageAdapter.add(event);
-        }
+        mMessageAdapter.add(event);
     }
 
     @Override
     public void onSendMessage(final String message) {
         UserInputParser.onParseDCCChatEvent(getChatConnection(), message);
-    }
-
-    @Override
-    public boolean isValid() {
-        return mConversation.isValid();
     }
 
     @Override

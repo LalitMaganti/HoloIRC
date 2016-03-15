@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     LightIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
@@ -19,28 +18,25 @@
     You should have received a copy of the GNU General Public License
     along with LightIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/timestamp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingRight="8dp"
+        android:textColor="?default_text_colour"
+        android:textIsSelectable="true"
+        android:textSize="14sp" />
 
     <TextView
-            android:id="@+id/timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:paddingRight="6dip"
-            android:textColor="?default_text_colour"
-            android:text="Testing"
-            android:textIsSelectable="true"/>
-
-    <TextView
-            android:id="@+id/message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="14sp"
-            android:textColor="?default_text_colour"
-            android:text="Testing"
-            android:textIsSelectable="true"
-            android:layout_toRightOf="@+id/timestamp"/>
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/timestamp"
+        android:textColor="?default_text_colour"
+        android:textIsSelectable="true"
+        android:textSize="14sp" />
 </RelativeLayout>

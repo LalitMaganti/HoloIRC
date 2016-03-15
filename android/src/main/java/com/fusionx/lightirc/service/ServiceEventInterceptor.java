@@ -4,30 +4,42 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnDCCChatEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.model.MessagePriority;
 
 import android.os.Handler;
 import android.os.Looper;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.Server;
+import co.fusionx.relay.dcc.event.chat.DCCChatEvent;
+import co.fusionx.relay.dcc.event.file.DCCFileGetStartedEvent;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.event.channel.ChannelEvent;
 import co.fusionx.relay.event.channel.ChannelWorldActionEvent;
 import co.fusionx.relay.event.channel.ChannelWorldMessageEvent;
 import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
+import co.fusionx.relay.event.query.QueryActionWorldEvent;
 import co.fusionx.relay.event.query.QueryEvent;
+import co.fusionx.relay.event.query.QueryMessageWorldEvent;
+import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
+import co.fusionx.relay.event.server.DCCSendRequestEvent;
 import co.fusionx.relay.event.server.InviteEvent;
 import co.fusionx.relay.event.server.JoinEvent;
 import co.fusionx.relay.event.server.NewPrivateMessageEvent;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
+import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import static com.fusionx.lightirc.util.EventUtils.getLastStorableEvent;
 import static com.fusionx.lightirc.util.EventUtils.shouldStoreEvent;
@@ -52,16 +64,18 @@ public final class ServiceEventInterceptor {
 
     private Set<DCCRequestEvent> mDCCRequests;
 
+    private ConnectionStatus mLastStatus;
+
     private Conversation mConversation;
 
     private MessagePriority mMessagePriority;
 
     public ServiceEventInterceptor(final Server server) {
         mServer = server;
-        mMessagePriorityMap = new THashMap<>();
-        mEventMap = new THashMap<>();
-        mInviteEvents = new THashSet<>();
-        mDCCRequests = new THashSet<>();
+        mMessagePriorityMap = new HashMap<>();
+        mEventMap = new HashMap<>();
+        mInviteEvents = new HashSet<>();
+        mDCCRequests = new HashSet<>();
 
         getBus().registerSticky(new Object() {
             @Subscribe
@@ -70,11 +84,11 @@ public final class ServiceEventInterceptor {
             }
         });
 
-        server.getServerEventBus().register(this, EVENT_PRIORITY);
+        server.getServerWideBus().register(this, EVENT_PRIORITY);
     }
 
     public void unregister() {
-        mServer.getServerEventBus().unregister(this);
+        mServer.getServerWideBus().unregister(this);
     }
 
     public MessagePriority getSubMessagePriority(final Conversation title) {
@@ -111,15 +125,16 @@ public final class ServiceEventInterceptor {
         return mDCCRequests;
     }
 
+    public ConnectionStatus getLastKnownStatus() {
+        return mLastStatus;
+    }
+
     /*
      * Event interception start here
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onPrivateMessage(final NewPrivateMessageEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.user, getLastStorableEvent(event.user.getBuffer()));
-
-        // Forward the event UI side
-        mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
@@ -133,19 +148,21 @@ public final class ServiceEventInterceptor {
         if (shouldStoreEvent(event)) {
             // TODO - fix this horrible code
             final Conversation conversation = event.channel;
-            if (event instanceof ChannelWorldUserEvent) {
+            if (event instanceof ChannelWorldMessageEvent
+                    || event instanceof ChannelWorldActionEvent) {
                 final ChannelWorldUserEvent userEvent = (ChannelWorldUserEvent) event;
-
                 if (userEvent.userMentioned) {
                     onIRCEvent(MessagePriority.HIGH, conversation, event);
 
                     // Forward the event UI side
-                    mHandler.post(() -> getBus().post(new OnChannelMentionEvent(event.channel)));
-                } else if (event.getClass().equals(ChannelWorldMessageEvent.class)
-                        || event.getClass().equals(ChannelWorldActionEvent.class)) {
-                    onIRCEvent(MessagePriority.MEDIUM, conversation, event);
+                    String message = event instanceof ChannelWorldMessageEvent
+                            ? ((ChannelWorldMessageEvent) event).message
+                            : ((ChannelWorldActionEvent) event).action;
+                    OnChannelMentionEvent uiEvent = new OnChannelMentionEvent(event.channel,
+                            userEvent.userNick, message, event.timestamp.toMillis(false));
+                    mHandler.post(() -> getBus().post(uiEvent));
                 } else {
-                    onIRCEvent(MessagePriority.LOW, conversation, event);
+                    onIRCEvent(MessagePriority.MEDIUM, conversation, event);
                 }
             } else if (conversation == null) {
                 // Either a part or a kick
@@ -159,11 +176,31 @@ public final class ServiceEventInterceptor {
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final QueryEvent event) {
         if (shouldStoreEvent(event)) {
-            onIRCEvent(MessagePriority.HIGH, event.user, event);
+            if (event instanceof QueryMessageWorldEvent
+                    || event instanceof QueryActionWorldEvent) {
+                onIRCEvent(MessagePriority.HIGH, event.user, event);
 
-            // Forward the event UI side
-            mHandler.post(() -> getBus().post(new OnQueryEvent(event.user)));
+                final String message = event instanceof QueryMessageWorldEvent
+                        ? ((QueryMessageWorldEvent) event).message
+                        : ((QueryActionWorldEvent) event).action;
+
+                // Forward the event UI side
+                mHandler.post(() -> getBus().post(new OnQueryEvent(event.user,
+                        message, event.timestamp.toMillis(false))));
+            } else {
+                onIRCEvent(MessagePriority.MEDIUM, event.user, event);
+            }
         }
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEvent(final StatusChangeEvent event) {
+        ConnectionStatus newStatus = event.server.getStatus();
+        if (mLastStatus != newStatus) {
+            // forward the event UI side
+            mHandler.post(() -> getBus().post(new OnServerStatusChanged(event.server, newStatus)));
+        }
+        mLastStatus = newStatus;
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
@@ -171,12 +208,12 @@ public final class ServiceEventInterceptor {
         mInviteEvents.add(event);
     }
 
-    // DCC Events
-    /*@Subscribe(threadType = ThreadType.MAIN)
+    @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final DCCRequestEvent event) {
         mDCCRequests.add(event);
     }
 
+    // DCC Events
     @Subscribe(threadType = ThreadType.MAIN)
     public void onChatEvent(final DCCChatEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.chatConversation, event);
@@ -189,7 +226,7 @@ public final class ServiceEventInterceptor {
     public void onChatEvent(final DCCFileGetStartedEvent event) {
         onIRCEvent(MessagePriority.HIGH, event.fileConversation,
                 getLastStorableEvent(event.fileConversation.getBuffer()));
-    }*/
+    }
     /*
      * Event interception ends here
      */
@@ -224,7 +261,7 @@ public final class ServiceEventInterceptor {
         return mServer;
     }
 
-    /*public void acceptDCCConnection(final DCCRequestEvent event) {
+    public void acceptDCCConnection(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
 
         if (event instanceof DCCChatRequestEvent) {
@@ -241,7 +278,7 @@ public final class ServiceEventInterceptor {
     public void declineDCCRequestEvent(final DCCRequestEvent event) {
         mDCCRequests.remove(event);
         event.pendingConnection.declineConnection();
-    }*/
+    }
 
     public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
         for (final InviteEvent event : inviteEvents) {

@@ -1,6 +1,5 @@
 package com.fusionx.lightirc.model;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 
 import java.util.Collection;
@@ -11,7 +10,6 @@ import java.util.Set;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
 import co.fusionx.relay.base.Server;
-import co.fusionx.relay.function.Optionals;
 
 import static co.fusionx.relay.base.ServerConfiguration.Builder;
 
@@ -56,10 +54,10 @@ public class ServerConversationContainer {
         FluentIterable.from(server.getUser().getChannels()).copyInto(mConversations);
         FluentIterable.from(server.getUserChannelInterface().getQueryUsers())
                 .copyInto(mConversations);
-        // FluentIterable.from(server.getDCCManager().getChatConversations())
-        //         .copyInto(mConversations);
-        // FluentIterable.from(server.getDCCManager().getFileConversations())
-        //        .copyInto(mConversations);
+        FluentIterable.from(server.getDCCManager().getChatConversations())
+                .copyInto(mConversations);
+        FluentIterable.from(server.getDCCManager().getFileConversations())
+                .copyInto(mConversations);
     }
 
     public Collection<String> getIgnoreList() {
@@ -72,14 +70,6 @@ public class ServerConversationContainer {
 
     public void addConversation(final Conversation conversation) {
         mConversations.add(conversation);
-    }
-
-    public void removeConversation(final String id) {
-        final Optional<Conversation> conversation =
-                FluentIterable.from(mConversations)
-                        .filter(c -> id.equals(c.getId()))
-                        .first();
-        Optionals.ifPresent(conversation, mConversations::remove);
     }
 
     public void removeConversation(final Conversation conversation) {

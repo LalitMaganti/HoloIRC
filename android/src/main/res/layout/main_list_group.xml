@@ -1,57 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:background="@drawable/group_background"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/group_background">
 
-    <com.fusionx.lightirc.view.NoParentPressImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button_expand"
-            android:contentDescription="expander_status"
-            android:scaleType="center"
-            android:clickable="true"
-            android:background="@drawable/overflow_selector"
-            android:layout_gravity="center_vertical"
-            android:src="?expand_close_menu_drawable"
-            android:layout_centerVertical="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:paddingLeft="8dip"
-            android:paddingTop="16dip"
-            android:paddingBottom="16dip"/>
+    <ImageView
+        android:id="@+id/button_expand"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="expander_status"
+        android:duplicateParentState="false"
+        android:padding="8dp"
+        android:scaleType="fitXY"
+        android:src="?expand_close_menu_drawable" />
 
     <LinearLayout
-            android:paddingLeft="40dip"
-            android:id="@+id/group_content"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        android:id="@+id/group_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="40dip">
+
         <TextView
-                android:textColor="?attr/expandable_list_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/server_title"
-                android:textAppearance="@android:style/TextAppearance.Medium"
-                android:paddingTop="@dimen/margin_medium"
-                android:text="Text"/>
+            android:id="@+id/server_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/margin_medium"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:textColor="?attr/expandable_list_text" />
+
         <TextView
-                android:textColor="?attr/expandable_list_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:id="@+id/server_status"
-                android:paddingRight="@dimen/margin_small"
-                android:paddingTop="@dimen/margin_small"
-                android:paddingBottom="@dimen/margin_medium"
-                android:text="Disconnected"/>
+            android:id="@+id/server_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/margin_medium"
+            android:paddingRight="@dimen/margin_small"
+            android:paddingTop="@dimen/margin_small"
+            android:textColor="?attr/expandable_list_text"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <View
-            android:id="@+id/divider"
-            android:background="?attr/action_divider_colour"
-            android:layout_width="fill_parent"
-            android:layout_height="1.2dp"
-            android:layout_below="@+id/group_content"/>
+        android:id="@+id/divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1.2dp"
+        android:layout_below="@+id/group_content"
+        android:background="?attr/action_divider_colour" />
 </RelativeLayout>

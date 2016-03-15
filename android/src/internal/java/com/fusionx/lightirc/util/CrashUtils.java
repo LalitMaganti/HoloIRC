@@ -1,19 +1,17 @@
 package com.fusionx.lightirc.util;
 
+import android.content.Context;
+
 import com.crashlytics.android.Crashlytics;
 import com.fusionx.lightirc.misc.AppPreferences;
 
-import android.content.Context;
-
 import co.fusionx.relay.base.Server;
+import io.fabric.sdk.android.Fabric;
 
 public class CrashUtils {
 
     public static void startCrashlyticsIfAppropriate(final Context context) {
-        // Make sure app preferences are initialized
-        AppPreferences.setupAppPreferences(context);
-
-        callbackIfReportingEnabled(() -> Crashlytics.start(context));
+        callbackIfReportingEnabled(() -> Fabric.with(context, new Crashlytics()));
     }
 
     public static void logMissingData(final Server server) {

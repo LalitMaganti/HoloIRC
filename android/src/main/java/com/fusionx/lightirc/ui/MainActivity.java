@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.google.common.base.Optional;
 
 import com.fusionx.bus.Subscribe;
@@ -9,19 +10,24 @@ import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
-import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.CompatUtils;
 import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -30,6 +36,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.util.List;
@@ -50,21 +58,18 @@ import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.MiscUtils.getStatusString;
-import static com.fusionx.lightirc.util.UIUtils.findById;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 
 /**
  * Main activity which co-ordinates everything in the app
  */
 public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
-        DrawerLayout.DrawerListener, NavigationDrawerFragment.Callback, WorkerFragment.Callback,
-        IRCFragment.Callback {
+        NavigationDrawerFragment.Callback, IRCFragment.Callback,
+        ViewTreeObserver.OnGlobalLayoutListener {
 
     public static final int SERVER_SETTINGS = 1;
 
     public static final String CLEAR_CACHE = "clear_event_cache";
-
-    private static final String WORKER_FRAGMENT = "WorkerFragment";
 
     private static final String ACTION_BAR_TITLE = "action_bar_title";
 
@@ -75,42 +80,27 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private final SlidingPaneLayout.PanelSlideListener mPanelSlideListener
             = new SlidingPaneLayout.PanelSlideListener() {
 
-        // private CharSequence mTitle;
-
-        // private CharSequence mSubtitle;
-
         @Override
         public void onPanelSlide(final View view, final float v) {
-            // Empty
+            mPaneIndicator.onPanelSlide(view, v);
         }
 
         @Override
         public void onPanelOpened(final View view) {
-            // mTitle = getSupportActionBar().getTitle();
-            // mSubtitle = getSupportActionBar().getSubtitle();
-
             supportInvalidateOptionsMenu();
-            // TODO - write the opposing code in onPanelClosed so this is done
-            // getSupportActionBar().setTitle(R.string.app_name);
-            // getSupportActionBar().setSubtitle(null);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            mPaneIndicator.onPanelOpened(view);
         }
 
         @Override
         public void onPanelClosed(final View view) {
-            // getSupportActionBar().setTitle(mTitle);
-            // getSupportActionBar().setSubtitle(mSubtitle);
-
             supportInvalidateOptionsMenu();
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            mPaneIndicator.onPanelClosed(view);
             mServerListFragment.onPanelClosed();
         }
     };
 
-    // Fragments
-    private WorkerFragment mWorkerFragment;
-
     // IRC
+    private IRCService mService;
     private Conversation mConversation;
 
     private final Object mConversationChanged = new Object() {
@@ -128,6 +118,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     // Views
     private ProgrammableSlidingPaneLayout mSlidingPane;
+    private SlidingPaneToggleArrow mPaneIndicator;
 
     private DrawerLayout mDrawerLayout;
 
@@ -143,7 +134,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         @Subscribe(cancellable = true)
         public boolean onMentioned(final OnChannelMentionEvent event) {
             if (!event.channel.equals(mConversation)) {
-                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.channel);
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.channel, true);
             }
             return true;
         }
@@ -151,37 +142,60 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         @Subscribe(cancellable = true)
         public boolean onQueried(final OnQueryEvent event) {
             if (!event.queryUser.equals(mConversation)) {
-                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.queryUser);
+                NotificationUtils.notifyInApp(mSnackbar, MainActivity.this, event.queryUser, false);
             }
             return true;
         }
     };
 
+    private final ServiceConnection mServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(final ComponentName name, final IBinder binder) {
+            mService = ((IRCService.IRCBinder) binder).getService();
+            MainActivity.this.onServiceConnected();
+            getBus().postSticky(new OnServiceConnectionStateChanged(mService));
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+            getBus().postSticky(new OnServiceConnectionStateChanged(mService));
+        }
+    };
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        AppPreferences.setupAppPreferences(this);
         setTheme(UIUtils.getThemeInt());
-
+        setStatusBarTransparency(true);
         super.onCreate(savedInstanceState);
         CrashUtils.startCrashlyticsIfAppropriate(this);
 
         setContentView(R.layout.main_activity);
+
+        // create our manager instance after the content view is set
+        final SystemBarTintManager tintManager = new SystemBarTintManager(this);
+        // enable status bar tint
+        tintManager.setStatusBarTintEnabled(true);
+        // set a custom tint color for all system bars
+        tintManager.setTintColor(getResources().getColor(R.color.action_bar_background_color));
 
         mEmptyView = (TextView) findViewById(R.id.content_frame_empty_textview);
 
         mSnackbar = (Snackbar) findViewById(R.id.snackbar);
         mSnackbar.post(mSnackbar::hide);
 
-        mDrawerLayout = findById(this, R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(this);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerListener(new DrawerListener());
         mDrawerLayout.setFocusableInTouchMode(false);
 
-        mSlidingPane = findById(this, R.id.sliding_pane_layout);
+        mSlidingPane = (ProgrammableSlidingPaneLayout) findViewById(R.id.sliding_pane_layout);
         mSlidingPane.setParallaxDistance(100);
         mSlidingPane.setPanelSlideListener(mPanelSlideListener);
         mSlidingPane.setSliderFadeColor(0);
 
-        mNavigationDrawerView = findById(this, R.id.right_drawer);
+        mPaneIndicator = new SlidingPaneToggleArrow(this, mSlidingPane);
+
+        mNavigationDrawerView = findViewById(R.id.right_drawer);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -192,17 +206,12 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             mNavigationDrawerFragment = new NavigationDrawerFragment();
             transaction.add(R.id.right_drawer, mNavigationDrawerFragment);
 
-            mWorkerFragment = new WorkerFragment();
-            transaction.add(mWorkerFragment, WORKER_FRAGMENT);
-
             transaction.commit();
         } else {
             mServerListFragment = (ServerListFragment) getSupportFragmentManager().findFragmentById(
                     R.id.sliding_list_frame);
             mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.right_drawer);
-            mWorkerFragment = (WorkerFragment) getSupportFragmentManager()
-                    .findFragmentByTag(WORKER_FRAGMENT);
             mCurrentFragment = (BaseIRCFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.content_frame);
 
@@ -210,22 +219,39 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
             if (mCurrentFragment == null) {
-                findById(MainActivity.this, R.id.content_frame_empty_textview).setVisibility
-                        (View.VISIBLE);
+                findViewById(R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
             } else if (event != null) {
                 mConversation = event.conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
-                mConversation.getServer().getServerEventBus().register(this);
+                mConversation.getServer().getServerWideBus().register(this);
             } else {
                 onRemoveCurrentFragment();
             }
             supportInvalidateOptionsMenu();
         }
 
+        getWindow().getDecorView().getViewTreeObserver().addOnGlobalLayoutListener(this);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onGlobalLayout() {
+        final ViewTreeObserver vto = getWindow().getDecorView().getViewTreeObserver();
+        if (Build.VERSION.SDK_INT >= 16) {
+            vto.removeOnGlobalLayoutListener(this);
+        } else {
+            vto.removeGlobalOnLayoutListener(this);
+        }
         if (mSlidingPane.isSlideable()) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mPaneIndicator.syncState();
     }
 
     @Override
@@ -249,31 +275,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     @Override
-    public IRCService getService() {
-        return mWorkerFragment.getService();
-    }
-
-    @Override
     public void onPart(final String serverName, final PartEvent event) {
-        if (mConversation == null) {
-            return;
-        }
-        final boolean isCurrent = mConversation.getServer().getTitle().equals(serverName) &&
-                mConversation.getId().equals(event.channelName);
-
-        if (isCurrent) {
+        if (event.channel.equals(mConversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
 
     @Override
     public boolean onKick(final Server server, final KickEvent event) {
-        if (mConversation == null) {
-            return false;
-        }
-        final boolean isCurrent = mConversation.getServer().equals(server)
-                && mConversation.getId().equals(event.channelName);
-
+        final boolean isCurrent = event.channel.equals(mConversation);
         if (isCurrent) {
             onRemoveCurrentFragmentAndConversation();
         }
@@ -282,18 +292,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onPrivateMessageClosed(final QueryUser queryUser) {
-        if (mConversation == null) {
-            return;
-        }
-        final boolean isCurrent = mConversation.equals(queryUser);
-        if (isCurrent) {
+        if (queryUser.equals(mConversation)) {
             onRemoveCurrentFragmentAndConversation();
         }
     }
 
     /**
      * Removes the current displayed fragment
-     *
+     * <p>
      * Pre: this method is only called when mCurrentFragment and mConversation are not null
      * Post: the current fragment is removed - either by parting or removing the PM
      */
@@ -310,7 +316,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void disconnectFromServer() {
-        mWorkerFragment.disconnectFromServer(mConversation.getServer());
+        mService.requestConnectionStoppage(mConversation.getServer());
     }
 
     @Override
@@ -325,9 +331,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void onBackPressed() {
-        if (mNavigationDrawerFragment.onBackPressed()) {
-            return;
-        } else if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
+        if (mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
             mDrawerLayout.closeDrawer(mNavigationDrawerView);
             return;
         } else if (!mSlidingPane.isOpen()) {
@@ -345,32 +349,10 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public void reconnectToServer() {
-        mWorkerFragment.reconnectToServer(mConversation.getServer());
+        mService.requestReconnectionToServer(mConversation.getServer());
     }
 
-    @Override
-    public void onDrawerSlide(final View drawerView, final float slideOffset) {
-    }
-
-    @Override
-    public void onDrawerOpened(final View drawerView) {
-        mSlidingPane.setSlideable(false);
-    }
-
-    @Override
-    public void onDrawerClosed(final View drawerView) {
-        mNavigationDrawerFragment.onDrawerClosed();
-        mSlidingPane.setSlideable(true);
-    }
-
-    @Override
-    public void onDrawerStateChanged(final int newState) {
-    }
-
-    @Override
-    public void onServiceConnected(final IRCService service) {
-        mServerListFragment.onServiceConnected(service);
-
+    private void onServiceConnected() {
         final boolean fromRecents = isAppFromRecentApps(getIntent().getFlags());
         final boolean clearCaches = getIntent().getBooleanExtra(CLEAR_CACHE, false);
 
@@ -394,7 +376,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             getIntent().removeExtra("channel_name");
             getIntent().removeExtra("query_nick");
 
-            final Server server = service.getServerIfExists(serverName);
+            final Server server = mService.getServerIfExists(serverName);
             optConversation = channelName == null
                     ? server.getUserChannelInterface().getQueryUser(queryNick)
                     : server.getUserChannelInterface().getChannel(channelName);
@@ -404,7 +386,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
             // Try to remove the extras from the intent - this probably won't work though if the
             // activity finishes which is why we have the recents check
             getIntent().removeExtra(CLEAR_CACHE);
-            service.clearAllEventCaches();
+            mService.clearAllEventCaches();
         }
 
         onExternalConversationUpdate(optConversation);
@@ -440,7 +422,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         item.setVisible(navigationDrawerEnabled);
 
         final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
-        users.setVisible(navigationDrawerEnabled && mCurrentFragment.getType() == CHANNEL);
+        users.setVisible(navigationDrawerEnabled);
 
         final MenuItem addServer = menu.findItem(R.id.activity_main_ab_add);
         addServer.setVisible(mSlidingPane.isOpen());
@@ -453,15 +435,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mPaneIndicator.onOptionsItemSelected(item)) {
+            return true;
+        }
         switch (item.getItemId()) {
-            case android.R.id.home:
-            case R.id.home:
-                UIUtils.toggleSlidingPane(mSlidingPane);
-                return true;
             case R.id.activity_main_ab_actions:
-                UIUtils.toggleDrawerLayout(mDrawerLayout, mNavigationDrawerView);
+                boolean nowOpen = UIUtils.toggleDrawerLayout(mDrawerLayout, mNavigationDrawerView);
                 // If the drawer is now closed then we don't need to pass on the event
-                return !mDrawerLayout.isDrawerOpen(mNavigationDrawerView);
+                return !nowOpen;
             case R.id.activity_main_ab_users:
                 if (!mDrawerLayout.isDrawerOpen(mNavigationDrawerView)) {
                     mDrawerLayout.openDrawer(mNavigationDrawerView);
@@ -506,7 +487,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         super.onDestroy();
 
         if (mConversation != null) {
-            mConversation.getServer().getServerEventBus().unregister(this);
+            mConversation.getServer().getServerWideBus().unregister(this);
         }
     }
 
@@ -528,7 +509,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getIntent().removeExtra("channel_name");
         getIntent().removeExtra("query_nick");
 
-        final Server server = getService().getServerIfExists(serverName);
+        final Server server = mService.getServerIfExists(serverName);
         final Optional<? extends Conversation> optConversation = channelName == null
                 ? server.getUserChannelInterface().getQueryUser(queryNick)
                 : server.getUserChannelInterface().getChannel(channelName);
@@ -545,6 +526,20 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         if (getSupportActionBar().getSubtitle() != null) {
             outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle().toString());
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(new Intent(this, IRCService.class), mServiceConnection,
+                BIND_AUTO_CREATE | BIND_ADJUST_WITH_ACTIVITY);
+        NotificationUtils.cancelMentionNotification(this, null);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(mServiceConnection);
     }
 
     @Override
@@ -580,6 +575,14 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         getSupportActionBar().setSubtitle(subtitle);
     }
 
+    private void setStatusBarTransparency(boolean transparent) {
+        if (!CompatUtils.hasKitKat()) {
+            return;
+        }
+        getWindow().setFlags(transparent ? WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS : 0,
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+    }
+
     private void changeCurrentConversation(final Conversation object, final boolean delayChange) {
         if (!object.equals(mConversation)) {
             final Bundle bundle = new Bundle();
@@ -593,20 +596,20 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                 fragment = new ChannelFragment();
             } else if (QueryUser.class.isInstance(object)) {
                 fragment = new UserFragment();
-            /*} else if (DCCChatConversation.class.isInstance(object)) {
+            } else if (DCCChatConversation.class.isInstance(object)) {
                 fragment = new DCCChatFragment();
             } else if (DCCFileConversation.class.isInstance(object)) {
-                fragment = new DCCFileFragment();*/
+                fragment = new DCCFileFragment();
             } else {
                 throw new IllegalArgumentException();
             }
             fragment.setArguments(bundle);
 
             if (mConversation == null) {
-                object.getServer().getServerEventBus().register(this);
+                object.getServer().getServerWideBus().register(this);
             } else if (mConversation.getServer() != object.getServer()) {
-                mConversation.getServer().getServerEventBus().unregister(this);
-                object.getServer().getServerEventBus().register(this);
+                mConversation.getServer().getServerWideBus().unregister(this);
+                object.getServer().getServerWideBus().register(this);
             }
 
             setActionBarTitle(object.getId());
@@ -657,7 +660,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         onRemoveCurrentFragment();
 
         // Don't listen for any more events from this server
-        mConversation.getServer().getServerEventBus().unregister(this);
+        mConversation.getServer().getServerWideBus().unregister(this);
         getBus().postSticky(new OnConversationChanged(null, null));
     }
 
@@ -679,13 +682,34 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     }
 
     private void onExternalConversationUpdate(final Optional<? extends Conversation>
-            optConversation) {
+                                                      optConversation) {
         if (optConversation.isPresent()) {
             mHandler.post(() -> changeCurrentConversation(optConversation.get(), false));
             supportInvalidateOptionsMenu();
         } else {
             mSlidingPane.openPane();
             mEmptyView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class DrawerListener implements DrawerLayout.DrawerListener {
+
+        @Override
+        public void onDrawerSlide(final View drawerView, final float slideOffset) {
+        }
+
+        @Override
+        public void onDrawerOpened(final View drawerView) {
+            mSlidingPane.setSlideable(false);
+        }
+
+        @Override
+        public void onDrawerClosed(final View drawerView) {
+            mSlidingPane.setSlideable(true);
+        }
+
+        @Override
+        public void onDrawerStateChanged(final int newState) {
         }
     }
 }

@@ -32,35 +32,30 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
-import co.fusionx.relay.event.channel.ChannelWorldUserEvent;
-import co.fusionx.relay.misc.IRCUserComparator;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
+import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
+import co.fusionx.relay.event.channel.ChannelWorldJoinEvent;
+import co.fusionx.relay.event.channel.ChannelWorldKickEvent;
+import co.fusionx.relay.event.channel.ChannelWorldLevelChangeEvent;
+import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
+import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
+import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class UserListFragment extends Fragment implements AbsListView.MultiChoiceModeListener,
-        AdapterView.OnItemClickListener {
-
-    private ActionMode mActionMode;
+public class UserListFragment extends Fragment {
 
     private Callback mCallback;
 
@@ -69,30 +64,30 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     private final Object mEventHandler = new Object() {
         @Subscribe
         public void onEvent(final OnConversationChanged conversationChanged) {
-            // If it's null then remove the old conversation
-            if (conversationChanged.conversation == null
-                    || conversationChanged.fragmentType != FragmentType.CHANNEL) {
-                if (mChannel != null) {
-                    mChannel.getServer().getServerEventBus().unregister(UserListFragment.this);
-                }
-                mChannel = null;
-                return;
-            }
             if (mChannel != null) {
-                mChannel.getServer().getServerEventBus().unregister(UserListFragment.this);
+                mChannel.getBus().unregister(UserListFragment.this);
             }
 
-            mChannel = (Channel) conversationChanged.conversation;
-            mChannel.getServer().getServerEventBus().register(UserListFragment.this);
-            onUpdateUserList();
+            if (conversationChanged.fragmentType == FragmentType.CHANNEL) {
+                mChannel = (Channel) conversationChanged.conversation;
+                mChannel.getBus().register(UserListFragment.this);
+            } else {
+                mChannel = null;
+            }
+
+            updateAdapter(mChannel);
+            onUserListChanged();
         }
     };
 
     private UserListAdapter mAdapter;
 
-    private TreeSet<ChannelUser> mChannelUsers;
+    private RecyclerView mRecyclerView;
 
-    private StickyListHeadersListView mStickyListView;
+    private void updateAdapter(final Channel channel) {
+        mAdapter = channel == null ? null : new UserListAdapter(getActivity(), channel);
+        mRecyclerView.setAdapter(mAdapter);
+    }
 
     @Override
     public void onAttach(final Activity activity) {
@@ -104,20 +99,16 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.default_stickylist_view, container, false);
+        View v = inflater.inflate(R.layout.user_list_fragment, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return v;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        mStickyListView = (StickyListHeadersListView) view.findViewById(android.R.id.list);
-        mAdapter = new UserListAdapter(view.getContext(), mChannelUsers);
-
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        getListView().getWrappedList().setMultiChoiceModeListener(this);
-        getListView().setOnItemClickListener(this);
-        getListView().setFastScrollEnabled(true);
+        updateAdapter(mChannel);
     }
 
     @Override
@@ -138,27 +129,14 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
         // On a pause, it could lead to a stop in which case we don't actually know what's going
         // on in the background - stop observation and restart when we return
         if (mChannel != null) {
-            mChannel.getServer().getServerEventBus().unregister(this);
+            mChannel.getBus().unregister(this);
         }
         // Don't keep a track of this channel - we will deal with this when we return
         mChannel = null;
     }
 
-    public void onUpdateUserList() {
+    public void onUserListChanged() {
         mCallback.updateUserListVisibility();
-
-        final Collection<? extends ChannelUser> userList = mChannel.getUsers();
-
-        getListView().setAdapter(null);
-        mAdapter.setChannel(mChannel);
-        mChannelUsers = new TreeSet<>(new IRCUserComparator(mChannel));
-        mChannelUsers.addAll(userList);
-        mAdapter.setInternalSet(mChannelUsers);
-        getListView().setAdapter(mAdapter);
-
-        if (mActionMode != null) {
-            mActionMode.finish();
-        }
     }
 
     /*
@@ -168,116 +146,68 @@ public class UserListFragment extends Fragment implements AbsListView.MultiChoic
      * event is referring to
      */
     @Subscribe(threadType = ThreadType.MAIN)
-    public void onEventMainThread(final ChannelWorldUserEvent event) {
-        if (event.channel.equals(mChannel) && event.isUserListChangeEvent()) {
-            onUpdateUserList();
-        }
+    public void onEventMainThread(final ChannelWorldJoinEvent event) {
+        mAdapter.addUser(event.user, event.user.getChannelPrivileges(event.channel));
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelWorldKickEvent event) {
+        mAdapter.removeUser(event.user, event.level);
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelWorldLevelChangeEvent event) {
+        mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelWorldNickChangeEvent event) {
+        mAdapter.changeNick(event.user, event.oldNick, event.userNick);
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelWorldPartEvent event) {
+        mAdapter.removeUser(event.user, event.level);
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelWorldQuitEvent event) {
+        mAdapter.removeUser(event.user, event.level);
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelNickChangeEvent event) {
+        mAdapter.changeNick(event.relayUser, event.oldNick, event.newNick);
+        onUserListChanged();
+    }
+
+    @Subscribe(threadType = ThreadType.MAIN)
+    public void onEventMainThread(final ChannelUserLevelChangeEvent event) {
+        mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
+        onUserListChanged();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelNameEvent event) {
-        if (event.channel.equals(mChannel)) {
-            onUpdateUserList();
-        }
+        updateAdapter(mChannel);
+        onUserListChanged();
     }
     // End of subscribed events
 
-    public StickyListHeadersListView getListView() {
-        return mStickyListView;
+    boolean isNickOtherUsers(final Nick nick) {
+        return !mChannel.getServer().getUser().getNick().equals(nick);
     }
 
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-            boolean checked) {
-        int selectedItemCount = getCheckedItems().size();
-
-        if (selectedItemCount != 0) {
-            final String quantityString = getResources()
-                    .getQuantityString(R.plurals.user_selection,
-                            selectedItemCount, selectedItemCount);
-            mode.setTitle(quantityString);
-
-            mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
-            mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
-        }
-    }
-
-    @Override
-    public boolean onCreateActionMode(final ActionMode mode, final Menu menu) {
-        mActionMode = mode;
-
-        final MenuInflater inflater = mode.getMenuInflater();
-        inflater.inflate(R.menu.fragment_userlist_cab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final List<ChannelUser> selectedItems = getCheckedItems();
-        final String nick = selectedItems.get(0).getNick().getNickAsString();
-        switch (item.getItemId()) {
-            case R.id.fragment_userlist_cab_mention:
-                mCallback.onMentionMultipleUsers(selectedItems);
-                mode.finish();
-                mCallback.closeDrawer();
-                return true;
-            case R.id.fragment_userlist_cab_pm: {
-                onPrivateMessageUser(nick);
-                return true;
-            }
-            case R.id.fragment_userlist_cab_whois:
-                mChannel.getServer().sendWhois(nick);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        mActionMode = null;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        final boolean checked = getListView().getCheckedItemPositions().get(position);
-        getListView().setItemChecked(position, !checked);
-
-        if (mActionMode == null) {
-            getActivity().startActionMode(this);
-        }
-    }
-
-    protected List<ChannelUser> getCheckedItems() {
-        final List<ChannelUser> checkedSessionPositions = new ArrayList<>();
-        if (mStickyListView == null) {
-            return checkedSessionPositions;
-        }
-
-        final SparseBooleanArray checkedPositionsBool = mStickyListView.getCheckedItemPositions();
-        for (int i = 0; i < checkedPositionsBool.size(); i++) {
-            if (checkedPositionsBool.valueAt(i)) {
-                checkedSessionPositions.add(mAdapter.getItem(checkedPositionsBool.keyAt(i)));
-            }
-        }
-
-        return checkedSessionPositions;
-    }
-
-    boolean isNickOtherUsers(final String nick) {
-        return !mChannel.getServer().getUser().getNick().getNickAsString().equals(nick);
-    }
-
-    private void onPrivateMessageUser(final String nick) {
+    private void onPrivateMessageUser(final Nick nick) {
         if (isNickOtherUsers(nick)) {
-            mChannel.getServer().sendQuery(nick, null);
+            mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
-            mActionMode.finish();
         } else {
             final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
             build.setTitle(getActivity().getString(R.string.user_list_not_possible))

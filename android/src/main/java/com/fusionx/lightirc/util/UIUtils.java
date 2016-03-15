@@ -54,12 +54,14 @@ public class UIUtils {
         }
     }
 
-    public static void toggleDrawerLayout(final DrawerLayout drawerLayout, final View drawer) {
-        if (drawerLayout.isDrawerOpen(drawer)) {
+    public static boolean toggleDrawerLayout(final DrawerLayout drawerLayout, final View drawer) {
+        boolean isOpen = drawerLayout.isDrawerOpen(drawer);
+        if (isOpen) {
             drawerLayout.closeDrawer(drawer);
         } else {
             drawerLayout.openDrawer(drawer);
         }
+        return !isOpen;
     }
 
     public static List<Integer> getCheckedPositions(final AbsListView listView) {
@@ -105,10 +107,6 @@ public class UIUtils {
                 break;
         }
         return new ForegroundColorSpan(color);
-    }
-
-    public static <T extends View> T findById(final View view, final int id) {
-        return (T) view.findViewById(id);
     }
 
     public static <T extends View> T findById(final Activity activity, final int id) {

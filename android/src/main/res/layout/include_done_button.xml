@@ -13,21 +13,22 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   -->
+<FrameLayout
+    android:id="@+id/actionbar_done"
+    style="?android:actionButtonStyle"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             style="?android:actionButtonStyle"
-             android:id="@+id/actionbar_done"
-             android:layout_width="0dp"
-             android:layout_height="match_parent"
-             android:layout_weight="1">
-
-    <TextView style="?android:actionBarTabTextStyle"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center"
-              android:paddingRight="20dp"
-              android:drawableLeft="@drawable/ic_check_light"
-              android:drawablePadding="8dp"
-              android:gravity="center_vertical"
-              android:text="@string/done" />
+    <TextView
+        style="?android:actionBarTabTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawableLeft="@drawable/ic_check_light"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:paddingRight="20dp"
+        android:text="@string/done" />
 </FrameLayout>

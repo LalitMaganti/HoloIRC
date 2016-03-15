@@ -60,14 +60,14 @@ public class DCCFileFragment extends BaseIRCFragment {
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
 
-        mConversation.getServer().getServerEventBus().register(mEventHandler);
+        mConversation.getBus().register(mEventHandler);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        mConversation.getServer().getServerEventBus().unregister(mEventHandler);
+        mConversation.getBus().unregister(mEventHandler);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class DCCFileFragment extends BaseIRCFragment {
 
     @Override
     public boolean isValid() {
-        return true;
+        return mConversation.isValid();
     }
 
     public DCCFileConversation getFileConversation() {
@@ -124,7 +124,7 @@ public class DCCFileFragment extends BaseIRCFragment {
 
             final TextView progress = (TextView) convertView
                     .findViewById(R.id.dcc_file_list_item_progress);
-            progress.setText(String.format(getActivity().getString(R.string.dcc_progress_complete),
+            progress.setText(getActivity().getString(R.string.dcc_progress_complete,
                     connection.getProgress()));
 
             return convertView;

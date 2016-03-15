@@ -1,167 +1,129 @@
 package com.fusionx.lightirc.ui;
 
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
-
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
-import com.fusionx.lightirc.util.FragmentUtils;
-import com.fusionx.lightirc.util.UIUtils;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
-import android.view.ActionMode;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.Collection;
-import java.util.Set;
+import java.util.Collections;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.InviteEvent;
 
-import static com.fusionx.lightirc.util.UIUtils.findById;
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class InviteFragment extends ListFragment implements AbsListView.MultiChoiceModeListener,
-        AdapterView.OnItemClickListener {
+public class InviteFragment extends DialogFragment {
+    private EventHandler mEventHandler = new EventHandler();
 
-    private InviteAdapter mInviteAdapter;
+    private ServiceEventInterceptor mInterceptor;
 
-    private Callbacks mCallbacks;
+    private RecyclerView mRecyclerView;
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    private InviteAdapter mAdapter;
 
-        mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
-    }
-
-    @SuppressLint("InflateParams")
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.default_list_view, container, false);
-        final ListView listView = findById(view, android.R.id.list);
-
-        final TextView otherHeader = (TextView) inflater.inflate(R.layout.sliding_menu_header,
-                null, false);
-        otherHeader.setText("Invites");
-        listView.addHeaderView(otherHeader);
-
-        return view;
+    public static InviteFragment createInstance() {
+        return new InviteFragment();
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        setStyle(STYLE_NO_FRAME, android.R.style.Theme_DeviceDefault_Dialog);
+    }
+
+    @Override
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
+            final Bundle bundle) {
+        View v = inflater.inflate(R.layout.invites_fragment, container, false);
+        mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        return v;
+    }
+
+    @Override
+    public void onViewCreated(final View view, final Bundle bundle) {
+        super.onViewCreated(view, bundle);
+        getBus().registerSticky(mEventHandler);
+
+        mAdapter = new InviteAdapter(getActivity(), new AcceptListener(),
+                new DeclineListener());
+        mRecyclerView.setAdapter(mAdapter);
         updateAdapter();
-
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
-        getListView().setMultiChoiceModeListener(this);
-        getListView().setOnItemClickListener(this);
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-            boolean checked) {
-        mode.invalidate();
-    }
+    public void onDestroyView() {
+        super.onDestroyView();
 
-    @Override
-    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        // Inflate a menu resource providing context menu items
-        final MenuInflater inflater = actionMode.getMenuInflater();
-        inflater.inflate(R.menu.fragment_invite_cab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(final ActionMode mode, final Menu menu) {
-        final int checkedItemCount = getListView().getCheckedItemPositions().size();
-        mode.setTitle(checkedItemCount + getActivity().getString(R.string.items_checked));
-        mode.getMenu().getItem(0).setVisible(checkedItemCount > 0);
-
-        return true;
-    }
-
-    @Override
-    public boolean onActionItemClicked(final ActionMode mode, final MenuItem item) {
-        final Collection<InviteEvent> events = getInviteEventsFromPositions();
-        switch (item.getItemId()) {
-            case R.id.fragment_invite_cab_accept:
-                mCallbacks.acceptInviteEvents(events);
-                break;
-            case R.id.fragment_invite_cab_clear:
-                mCallbacks.declineInviteEvents(events);
-                break;
-        }
-        updateAdapter();
-        mode.finish();
-        return false;
+        getBus().unregister(mEventHandler);
     }
 
     private void updateAdapter() {
-        mInviteAdapter = new InviteAdapter(getActivity(),
-                mCallbacks.getEventInterceptor().getInviteEvents());
-        setListAdapter(mInviteAdapter);
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        final boolean checked = getListView().getCheckedItemPositions().get(position);
-        getListView().setItemChecked(position, !checked);
-    }
-
-    // Index needs to be decreased by one because the header is counted as an item
-    private Collection<InviteEvent> getInviteEventsFromPositions() {
-        final Collection<Integer> positions = UIUtils.getCheckedPositions(getListView());
-        return FluentIterable.from(positions)
-                .transform(pos -> mInviteAdapter.getItem(pos - 1))
-                .toList();
-    }
-
-    public interface Callbacks {
-
-        public void acceptInviteEvents(Collection<InviteEvent> inviteEventsFromPositions);
-
-        public ServiceEventInterceptor getEventInterceptor();
-
-        public void declineInviteEvents(Collection<InviteEvent> inviteEventsFromPositions);
-    }
-
-    private static class InviteAdapter extends ArrayAdapter<InviteEvent> {
-
-        private final LayoutInflater mLayoutInflater;
-
-        public InviteAdapter(final Context context, final Set<InviteEvent> objects) {
-            super(context, R.layout.default_listview_textview, ImmutableList.copyOf(objects));
-
-            mLayoutInflater = LayoutInflater.from(context);
+        if (mAdapter == null) {
+            return;
         }
+        final Collection<InviteEvent> events = mInterceptor != null
+                ? mInterceptor.getInviteEvents() : null;
+        mAdapter.setItems(events);
+    }
+
+    private class AcceptListener implements View.OnClickListener {
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            final TextView view = (TextView) (convertView != null
-                    ? convertView : mLayoutInflater.inflate(R.layout.default_listview_textview,
-                    parent, false));
-            view.setText(getItem(position).channelName);
-            return view;
+        public void onClick(final View v) {
+            final InviteEvent event = (InviteEvent) v.getTag();
+            mInterceptor.acceptInviteEvents(Collections.singletonList(event));
+            mAdapter.remove(event);
         }
     }
+
+    private class DeclineListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View v) {
+            final InviteEvent event = (InviteEvent) v.getTag();
+            mInterceptor.declineInviteEvents(Collections.singletonList(event));
+            mAdapter.remove(event);
+        }
+    }
+
+    private class EventHandler {
+        private Server mServer;
+        private IRCService mService;
+
+        @Subscribe
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mServer = conversationChanged.conversation != null
+                    ? conversationChanged.conversation.getServer() : null;
+            updateInterceptor();
+        }
+
+        @Subscribe
+        public void onEvent(final OnServiceConnectionStateChanged serviceChanged) {
+            mService = serviceChanged.getService();
+            updateInterceptor();
+        }
+
+        private void updateInterceptor() {
+            ServiceEventInterceptor interceptor = mServer != null && mService != null
+                    ? mService.getEventHelper(mServer) : null;
+            if (interceptor != mInterceptor) {
+                mInterceptor = interceptor;
+                updateAdapter();
+            }
+        }
+    }
+
 }

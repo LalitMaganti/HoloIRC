@@ -3,11 +3,12 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.fusionx.lightirc.misc.Theme;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
-import com.fusionx.lightirc.util.FragmentUtils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -25,25 +26,26 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
 
 import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class DCCPendingFragment extends DialogFragment {
 
-    private Callbacks mCallbacks;
+    private final EventHandler mEventHandler = new EventHandler();
 
     private ListView mListView;
 
     private DCCAdapter mAdapter;
 
-    @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    private ServiceEventInterceptor mInterceptor;
 
-        mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
+    public static DCCPendingFragment createInstance() {
+        return new DCCPendingFragment();
     }
 
     @Override
@@ -65,52 +67,55 @@ public class DCCPendingFragment extends DialogFragment {
     public void onViewCreated(final View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        getBus().registerSticky(mEventHandler);
+
         final Button button = (Button) view.findViewById(R.id.dcc_pending_ok);
         button.setOnClickListener(v -> dismiss());
 
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventInterceptor();
-        mAdapter = new DCCAdapter(getActivity(), interceptor.getDCCRequests(),
-                a -> {
-                    final int position = (int) a.getTag();
-                    final DCCRequestEvent event = mAdapter.getItem(position);
-                    // interceptor.acceptDCCConnection(event);
-                    mAdapter.replaceAll(interceptor.getDCCRequests());
-                },
-                d -> {
-                    final int position = (int) d.getTag();
-                    final DCCRequestEvent event = mAdapter.getItem(position);
-                    // interceptor.declineDCCRequestEvent(event);
-                    mAdapter.replaceAll(interceptor.getDCCRequests());
-                });
+        mAdapter = new DCCAdapter(getActivity(), new AcceptListener(), new DeclineListener());
+        if (mInterceptor != null) {
+            mAdapter.replaceAll(mInterceptor.getDCCRequests());
+        }
 
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
-
-        interceptor.getServer().getServerEventBus().register(this);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventInterceptor();
-        interceptor.getServer().getServerEventBus().unregister(this);
+        getBus().unregister(mEventHandler);
+        updateInterceptor(null);
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final DCCRequestEvent requestEvent) {
-        final ServiceEventInterceptor interceptor = mCallbacks.getEventInterceptor();
-        mAdapter.replaceAll(interceptor.getDCCRequests());
+        mAdapter.replaceAll(mInterceptor.getDCCRequests());
     }
 
-    public interface Callbacks {
-
-        public ServiceEventInterceptor getEventInterceptor();
+    private void updateInterceptor(ServiceEventInterceptor interceptor) {
+        final Collection<DCCRequestEvent> events = new ArrayList<>();
+        if (mInterceptor != null && interceptor == null) {
+            mInterceptor.getServer().getServerWideBus().unregister(this);
+            if (mAdapter != null) {
+                mAdapter.replaceAll(null);
+            }
+            mInterceptor = null;
+        } else if (mInterceptor == null && interceptor != null) {
+            mInterceptor = interceptor;
+            mInterceptor.getServer().getServerWideBus().register(this);
+            if (mAdapter != null) {
+                mAdapter.replaceAll(mInterceptor.getDCCRequests());
+            }
+        }
     }
 
     private static class DCCAdapter extends BaseAdapter {
 
         private final List<DCCRequestEvent> mRequestEventList;
+
+        private final Context mContext;
 
         private final LayoutInflater mLayoutInflater;
 
@@ -118,11 +123,11 @@ public class DCCPendingFragment extends DialogFragment {
 
         private final View.OnClickListener mDeclineListener;
 
-        public DCCAdapter(final Context context, final Collection<DCCRequestEvent> dccRequests,
-                final View.OnClickListener acceptListener, final View.OnClickListener
-                declineListener) {
+        public DCCAdapter(final Context context, final View.OnClickListener acceptListener,
+                final View.OnClickListener declineListener) {
+            mContext = context;
             mLayoutInflater = LayoutInflater.from(context);
-            mRequestEventList = new ArrayList<>(dccRequests);
+            mRequestEventList = new ArrayList<>();
             mAcceptListener = acceptListener;
             mDeclineListener = declineListener;
         }
@@ -157,13 +162,13 @@ public class DCCPendingFragment extends DialogFragment {
             } else if (requestEvent instanceof DCCSendRequestEvent) {
                 type = "SEND";
             }
-            final String titleText = String.format("%1$s requested by %2$s", type,
+            final String titleText = mContext.getString(R.string.dcc_requested, type,
                     requestEvent.getPendingConnection().getDccRequestNick());
             final TextView title = (TextView) convertView
                     .findViewById(R.id.dcc_pending_list_item_title);
             title.setText(titleText);
 
-            final String contentText = String.format("Suggested IP %1$s and port %2$d for %3$s",
+            final String contentText = mContext.getString(R.string.dcc_ip_port,
                     requestEvent.getPendingConnection().getIP(),
                     requestEvent.getPendingConnection().getPort(),
                     requestEvent.getPendingConnection().getArgument());
@@ -171,13 +176,11 @@ public class DCCPendingFragment extends DialogFragment {
                     .findViewById(R.id.dcc_pending_list_item_content);
             content.setText(contentText);
 
-            final ImageView accept = (ImageView) convertView
-                    .findViewById(R.id.dcc_pending_list_item_accept);
+            final ImageView accept = (ImageView) convertView.findViewById(R.id.accept_list_item);
             accept.setOnClickListener(mAcceptListener);
             accept.setTag(position);
 
-            final ImageView decline = (ImageView) convertView
-                    .findViewById(R.id.dcc_pending_list_item_decline);
+            final ImageView decline = (ImageView) convertView.findViewById(R.id.decline_list_item);
             decline.setOnClickListener(mDeclineListener);
             decline.setTag(position);
 
@@ -186,8 +189,55 @@ public class DCCPendingFragment extends DialogFragment {
 
         public void replaceAll(final Set<DCCRequestEvent> dccRequests) {
             mRequestEventList.clear();
-            mRequestEventList.addAll(dccRequests);
+            if (dccRequests != null) {
+                mRequestEventList.addAll(dccRequests);
+            }
             notifyDataSetChanged();
+        }
+    }
+
+    private class AcceptListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View a) {
+            final int position = (int) a.getTag();
+            final DCCRequestEvent event = mAdapter.getItem(position);
+            mInterceptor.acceptDCCConnection(event);
+            mAdapter.replaceAll(mInterceptor.getDCCRequests());
+        }
+    }
+
+    private class DeclineListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View d) {
+            final int position = (int) d.getTag();
+            final DCCRequestEvent event = mAdapter.getItem(position);
+            mInterceptor.declineDCCRequestEvent(event);
+            mAdapter.replaceAll(mInterceptor.getDCCRequests());
+        }
+    }
+
+    private class EventHandler {
+        private Server mServer;
+        private IRCService mService;
+
+        @Subscribe
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mServer = conversationChanged.conversation != null
+                    ? conversationChanged.conversation.getServer() : null;
+            updateInterceptor(getInterceptor());
+        }
+
+        @Subscribe
+        public void onEvent(final OnServiceConnectionStateChanged serviceChanged) {
+            mService = serviceChanged.getService();
+            updateInterceptor(getInterceptor());
+        }
+
+        private ServiceEventInterceptor getInterceptor() {
+            return mServer != null && mService != null
+                    ? mService.getEventHelper(mServer) : null;
         }
     }
 }

@@ -22,7 +22,7 @@
 package com.fusionx.lightirc.util;
 
 import com.fusionx.lightirc.misc.PreferenceConstants;
-import com.fusionx.lightirc.model.db.BuilderDatabaseSource;
+import com.fusionx.lightirc.model.db.ServerDatabase;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -86,8 +86,10 @@ public class SharedPreferencesUtils {
 
         if (firstRun) {
             firstTimeServerSetup(context);
-            globalSettings.edit().putBoolean("firstrun", false).apply();
-            globalSettings.edit().putBoolean("firstDbRun", false).apply();
+            globalSettings.edit()
+                    .putBoolean("firstrun", false)
+                    .putBoolean("firstDbRun", false)
+                    .apply();
         } else if (firstDbRun) {
             final List<File> fileList = SharedPreferencesUtils.getOldServers(context);
             migrateToDatabase(fileList, context);
@@ -109,8 +111,7 @@ public class SharedPreferencesUtils {
     }
 
     private static void migrateToDatabase(final List<File> array, final Context context) {
-        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
-        source.open();
+        final ServerDatabase source = ServerDatabase.getInstance(context);
         for (final File file : array) {
             final String prefsName = file.getName().replace(".xml", "");
             // Get builder to transfer
@@ -124,7 +125,6 @@ public class SharedPreferencesUtils {
             }
             file.delete();
         }
-        source.close();
     }
 
     private static boolean isExcludedString(final String fileName) {
@@ -133,27 +133,21 @@ public class SharedPreferencesUtils {
     }
 
     private static void firstTimeServerSetup(final Context context) {
-        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
-        source.open();
-
+        final ServerDatabase source = ServerDatabase.getInstance(context);
         final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
         for (final ServerConfiguration.Builder builder : builders) {
             source.addServer(builder, new ArrayList<>());
         }
-        source.close();
     }
 
     private static void firstDbSetup(final Context context) {
-        final BuilderDatabaseSource source = new BuilderDatabaseSource(context);
-        source.open();
-
+        final ServerDatabase source = ServerDatabase.getInstance(context);
         final List<ServerConfiguration.Builder> builders = BuilderUtils.getFirstTimeBuilderList();
         for (final ServerConfiguration.Builder builder : builders) {
             if (source.getBuilderByName(builder.getTitle()) == null) {
                 source.addServer(builder, new ArrayList<>());
             }
         }
-        source.close();
     }
 
     private static ServerConfiguration.Builder convertPrefsToBuilder(final Context context,
@@ -215,7 +209,7 @@ public class SharedPreferencesUtils {
         final SharedPreferences serverSettings = context.getSharedPreferences(filename,
                 MODE_PRIVATE);
         final Set<String> ignoreSet = serverSettings.getStringSet(PREF_IGNORE_LIST,
-                new HashSet<String>());
+                new HashSet<>());
         return new ArrayList<>(ignoreSet);
     }
 }

@@ -1,16 +1,32 @@
 notifications:
   email: false
+
 branches:
   only:
     - develop
+
 language: android
+
+jdk: oraclejdk8
+
 android:
   components:
-    - build-tools-20.0.0
+    - platform-tools
+    - tools
+    - build-tools-23.0.2
+    - android-23
+    - extra-android-m2repository
+
+env:
+- TERM=dumb
+
 before_install:
-  - export JAVA_HOME=/usr/lib/jvm/java-7-oracle
-  - export JAVA8_HOME=/usr/lib/jvm/java-8-oracle
-  - mkdir libraries
+  - export JAVA7_HOME=/usr/lib/jvm/java-7-oracle
+  - export JAVA_HOME=/usr/lib/jvm/java-8-oracle
   - git clone https://github.com/tilal6991/Relay.git libraries/relay -b develop
   - git clone https://github.com/tilal6991/Bus.git libraries/bus -b develop
+
+
 script: ./gradlew assembleSimpleDebug && ./gradlew testSimpleDebug
+after_success:
+- ./gradlew jacocoTestReport coveralls

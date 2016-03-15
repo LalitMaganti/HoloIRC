@@ -3,14 +3,11 @@ package com.fusionx.lightirc.ui;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import android.app.ActionBar;
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -22,45 +19,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collection;
 import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.event.server.InviteEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.UIUtils.findById;
 
 public class NavigationDrawerFragment extends Fragment implements
-        ActionsFragment.Callbacks, UserListFragment.Callback, InviteFragment.Callbacks,
-        DCCPendingFragment.Callbacks {
+        ActionsFragment.Callbacks, UserListFragment.Callback {
 
-    private ConnectionStatus mStatus;
+    private final EventHandler mEventHandler = new EventHandler();
 
     private FragmentType mFragmentType;
 
     private Conversation mConversation;
-
-    private final Object mEventHandler = new Object() {
-        @Subscribe
-        public void onEvent(final OnConversationChanged conversationChanged) {
-            mConversation = conversationChanged.conversation;
-            mFragmentType = conversationChanged.fragmentType;
-            if (conversationChanged.conversation != null) {
-                mStatus = conversationChanged.conversation.getServer().getStatus();
-            }
-            updateUserListVisibility();
-        }
-
-        @Subscribe
-        public void onEvent(final OnCurrentServerStatusChanged statusChanged) {
-            mStatus = statusChanged.status;
-            updateUserListVisibility();
-        }
-    };
 
     private TextView mUserListTextView;
 
@@ -68,20 +43,12 @@ public class NavigationDrawerFragment extends Fragment implements
 
     private Callback mCallback;
 
-    private Fragment mCurrentFragment;
-
-    private ActionsFragment mActionsFragment;
-
-    private IgnoreListFragment mIgnoreListFragment;
-
-    private InviteFragment mInviteFragment;
-
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
 
         try {
-            mCallback = (Callback) activity;
+            mCallback = (Callback) context;
         } catch (final ClassCastException ex) {
             ex.printStackTrace();
         }
@@ -103,9 +70,8 @@ public class NavigationDrawerFragment extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSlidingUpPanelLayout = findById(view, R.id.sliding_up_panel);
-
-        mUserListTextView = findById(getView(), R.id.user_text_view);
+        mSlidingUpPanelLayout = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_up_panel);
+        mUserListTextView = (TextView) view.findViewById(R.id.user_text_view);
 
         getBus().registerSticky(mEventHandler);
 
@@ -119,30 +85,13 @@ public class NavigationDrawerFragment extends Fragment implements
         });
 
         if (savedInstanceState == null) {
-            mActionsFragment = new ActionsFragment();
+            final ActionsFragment actionsFragment = new ActionsFragment();
             final UserListFragment userListFragment = new UserListFragment();
 
-            mCurrentFragment = mActionsFragment;
             final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.add(R.id.actions_list_layout, mActionsFragment, "Actions");
+            transaction.add(R.id.actions_list_layout, actionsFragment, "Actions");
             transaction.replace(R.id.user_list_frame_layout, userListFragment);
             transaction.commit();
-        } else {
-            mCurrentFragment = getChildFragmentManager().findFragmentById(R.id.actions_list_layout);
-
-            mActionsFragment = (ActionsFragment) getChildFragmentManager()
-                    .findFragmentByTag("Actions");
-            mIgnoreListFragment = (IgnoreListFragment) getChildFragmentManager()
-                    .findFragmentByTag("Ignore");
-            mInviteFragment = (InviteFragment) getChildFragmentManager()
-                    .findFragmentByTag("Invite");
-        }
-
-        if (mIgnoreListFragment == null) {
-            mIgnoreListFragment = new IgnoreListFragment();
-        }
-        if (mInviteFragment == null) {
-            mInviteFragment = new InviteFragment();
         }
         updateUserListVisibility();
     }
@@ -180,52 +129,6 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void switchToIgnoreFragment() {
-        mCurrentFragment = mIgnoreListFragment;
-        final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.actions_list_layout, mIgnoreListFragment, "Ignore").commit();
-
-        updateActionBarForLists();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    @Override
-    public void switchToInviteFragment() {
-        mCurrentFragment = mInviteFragment;
-        final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,
-                R.anim.slide_in_left, R.anim.slide_out_right);
-        transaction.addToBackStack(null);
-        transaction.replace(R.id.actions_list_layout, mInviteFragment, "Invite").commit();
-
-        updateActionBarForLists();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    void switchToActionFragment() {
-        mCurrentFragment = mActionsFragment;
-        getChildFragmentManager().popBackStackImmediate();
-
-        revertActionBarToNormal();
-        updateUserListVisibility();
-        getActivity().supportInvalidateOptionsMenu();
-    }
-
-    public void onDrawerClosed() {
-        if (isIgnoreFragmentVisible()) {
-            mIgnoreListFragment.saveIgnoreList();
-            switchToActionFragment();
-        } else if (isInviteFragmentVisible()) {
-            switchToActionFragment();
-        }
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_navigation_drawer_ab, menu);
     }
@@ -233,10 +136,10 @@ public class NavigationDrawerFragment extends Fragment implements
     @Override
     public void onPrepareOptionsMenu(final Menu menu) {
         final MenuItem item = menu.findItem(R.id.activity_main_ab_actions);
-        item.setVisible(item.isVisible() && isActionsFragmentVisible());
+        item.setVisible(item.isVisible());
 
-        final MenuItem add = menu.findItem(R.id.ignore_list_cab_add);
-        add.setVisible(isIgnoreFragmentVisible());
+        final MenuItem users = menu.findItem(R.id.activity_main_ab_users);
+        users.setVisible(item.isVisible() && mFragmentType == FragmentType.CHANNEL);
     }
 
     @Override
@@ -248,33 +151,21 @@ public class NavigationDrawerFragment extends Fragment implements
             case R.id.activity_main_ab_users:
                 handleUserList();
                 return true;
-            case R.id.ignore_list_cab_add:
-                mIgnoreListFragment.addIgnoredUser();
-                return true;
         }
         return false;
     }
 
-    public boolean onBackPressed() {
-        if (!isActionsFragmentVisible()) {
-            if (isIgnoreFragmentVisible()) {
-                mIgnoreListFragment.saveIgnoreList();
-            }
-            switchToActionFragment();
-        }
-        return !isActionsFragmentVisible();
-    }
-
     @Override
     public void updateUserListVisibility() {
-        final boolean visibility = mStatus == ConnectionStatus.CONNECTED
-                && mFragmentType == FragmentType.CHANNEL
-                && isActionsFragmentVisible();
+        final boolean visibility = mConversation != null
+                && mConversation.getServer().getStatus() == ConnectionStatus.CONNECTED
+                && mFragmentType == FragmentType.CHANNEL;
 
         if (visibility) {
             // TODO - change this from casting
             final Channel channel = (Channel) mConversation;
-            setUserTextViewText(String.format("%d users", channel.getUsers().size()));
+            setUserTextViewText(getResources().getQuantityString(R.plurals.user,
+                    channel.getUsers().size(), channel.getUsers().size()));
 
             mSlidingUpPanelLayout.showPanel();
         } else {
@@ -285,21 +176,6 @@ public class NavigationDrawerFragment extends Fragment implements
             mSlidingUpPanelLayout.hidePanel();
         }
         getActivity().supportInvalidateOptionsMenu();
-    }
-
-    @Override
-    public void acceptInviteEvents(final Collection<InviteEvent> inviteEvents) {
-        getEventInterceptor().acceptInviteEvents(inviteEvents);
-    }
-
-    @Override
-    public void declineInviteEvents(final Collection<InviteEvent> inviteEvents) {
-        getEventInterceptor().declineInviteEvents(inviteEvents);
-    }
-
-    @Override
-    public ServiceEventInterceptor getEventInterceptor() {
-        return mCallback.getService().getEventHelper(mConversation.getServer());
     }
 
     private void handleUserList() {
@@ -315,62 +191,33 @@ public class NavigationDrawerFragment extends Fragment implements
         mUserListTextView.setText(text);
     }
 
-    private void updateActionBarForLists() {
-        final LayoutInflater inflater = (LayoutInflater) getActivity().getActionBar()
-                .getThemedContext().getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        final View customActionBarView = inflater
-                .inflate(R.layout.actionbar_custom_view_done, null);
-        findById(customActionBarView, R.id.actionbar_done).setOnClickListener(v -> {
-            if (isIgnoreFragmentVisible()) {
-                mIgnoreListFragment.saveIgnoreList();
-            }
-            switchToActionFragment();
-        });
-        final ActionBar actionBar = getActivity().getActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
-                ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME
-                        | ActionBar.DISPLAY_SHOW_TITLE
-        );
-        actionBar.setCustomView(customActionBarView);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-    }
-
-    private void revertActionBarToNormal() {
-        final ActionBar actionBar = getActivity().getActionBar();
-        actionBar.setDisplayOptions(
-                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE,
-                ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_SHOW_TITLE |
-                        ActionBar.DISPLAY_SHOW_CUSTOM
-        );
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
-
-    private boolean isActionsFragmentVisible() {
-        return mActionsFragment == mCurrentFragment;
-    }
-
-    private boolean isIgnoreFragmentVisible() {
-        return mIgnoreListFragment == mCurrentFragment;
-    }
-
-    private boolean isInviteFragmentVisible() {
-        return mInviteFragment == mCurrentFragment;
-    }
-
     public interface Callback {
 
-        public void removeCurrentFragment();
+        void removeCurrentFragment();
 
-        public void disconnectFromServer();
+        void disconnectFromServer();
 
-        public boolean isDrawerOpen();
+        boolean isDrawerOpen();
 
-        public void closeDrawer();
+        void closeDrawer();
 
-        public IRCService getService();
+        void onMentionMultipleUsers(List<ChannelUser> users);
 
-        public void onMentionMultipleUsers(List<ChannelUser> users);
+        void reconnectToServer();
+    }
 
-        public void reconnectToServer();
+    private class EventHandler {
+
+        @Subscribe
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mConversation = conversationChanged.conversation;
+            mFragmentType = conversationChanged.fragmentType;
+            updateUserListVisibility();
+        }
+
+        @Subscribe
+        public void onEvent(final OnServerStatusChanged statusChanged) {
+            updateUserListVisibility();
+        }
     }
 }

@@ -4,11 +4,10 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 
 import java.util.List;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends SettingsActivityBase {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

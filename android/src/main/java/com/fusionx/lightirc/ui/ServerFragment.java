@@ -31,7 +31,7 @@ import android.view.View;
 import java.util.List;
 
 import co.fusionx.relay.event.server.ServerEvent;
-import co.fusionx.relay.parser.user.UserInputParser;
+import co.fusionx.relay.parser.UserInputParser;
 
 import static android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN;
 
@@ -50,11 +50,6 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     }
 
     @Override
-    public boolean isValid() {
-        return mConversation.isValid();
-    }
-
-    @Override
     public FragmentType getType() {
         return FragmentType.SERVER;
     }
@@ -62,11 +57,15 @@ public class ServerFragment extends IRCFragment<ServerEvent> {
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEvent(final ServerEvent event) {
+        final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
+        if (position == mMessageAdapter.getItemCount() - 2) {
+            mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        }
     }
 
     @Override
-    protected List<ServerEvent> getAdapterData() {
-        return (List<ServerEvent>) mConversation.getServer().getBuffer();
+    protected List<? extends ServerEvent> getAdapterData() {
+        return mConversation.getServer().getBuffer();
     }
 }

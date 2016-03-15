@@ -29,7 +29,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.event.query.QueryEvent;
-import co.fusionx.relay.parser.user.UserInputParser;
+import co.fusionx.relay.parser.UserInputParser;
 
 public class UserFragment extends IRCFragment<QueryEvent> {
 
@@ -40,10 +40,11 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     // Subscription methods
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final QueryEvent event) {
-        if (!event.user.equals(getQueryUser())) {
-            return;
-        }
+        final int position = mLayoutManager.findLastCompletelyVisibleItemPosition();
         mMessageAdapter.add(event);
+        if (position == mMessageAdapter.getItemCount() - 2) {
+            mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1);
+        }
     }
 
     @Override
@@ -52,17 +53,12 @@ public class UserFragment extends IRCFragment<QueryEvent> {
     }
 
     @Override
-    public boolean isValid() {
-        return mConversation != null && mConversation.isValid();
-    }
-
-    @Override
     public FragmentType getType() {
         return FragmentType.USER;
     }
 
     @Override
-    protected List<QueryEvent> getAdapterData() {
+    protected List<? extends QueryEvent> getAdapterData() {
         return getQueryUser().getBuffer();
     }
 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
     HoloIRC - an IRC client for Android
 
     Copyright 2013 Lalit Maganti
@@ -19,11 +18,11 @@
     You should have received a copy of the GNU General Public License
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu xmlns:holoirc="http://schemas.android.com/apk/res-auto"
-      xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:holoirc="http://schemas.android.com/apk/res-auto">
     <item
-            android:id="@+id/activity_server_channel_ab_users"
-            holoirc:showAsAction="withText|ifRoom"
-            android:icon="@drawable/ic_menu_cc"
-            android:title="@string/users"/>
+        android:id="@+id/activity_server_channel_ab_users"
+        android:icon="@drawable/ic_people_light"
+        android:title="@string/users"
+        holoirc:showAsAction="withText|ifRoom" />
 </menu>

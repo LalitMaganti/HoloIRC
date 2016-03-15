@@ -1,24 +1,3 @@
-/*
-    HoloIRC - an IRC client for Android
-
-    Copyright 2013 Lalit Maganti
-
-    This file is part of HoloIRC.
-
-    HoloIRC is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    HoloIRC is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.bus.Subscribe;
@@ -29,20 +8,20 @@ import com.fusionx.lightirc.ui.dialogbuilder.NickDialogBuilder;
 import com.fusionx.lightirc.util.FragmentUtils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import co.fusionx.relay.base.Conversation;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.UIUtils.findById;
 
-public class ActionsFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class ActionsFragment extends Fragment {
 
     private Conversation mConversation;
 
@@ -57,17 +36,31 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
     private ActionsAdapter mAdapter;
 
+    private SimpleSectionedRecyclerViewAdapter mSectionedAdapter;
+
+    private RecyclerView mRecyclerView;
+
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
 
         mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
     }
 
     @Override
+    public void onCreate(final Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mAdapter = new ActionsAdapter(getActivity(), new ActionClickListner());
+        mSectionedAdapter = new SimpleSectionedRecyclerViewAdapter(getActivity(),
+                R.layout.sliding_menu_header, R.id.sliding_menu_heading_textview, mAdapter);
+        mAdapter.setSectionedAdapter(mSectionedAdapter);
+    }
+
+    @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
             final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.default_stickylist_view, container, false);
+        return inflater.inflate(R.layout.user_list_fragment, container, false);
     }
 
     @Override
@@ -76,11 +69,9 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
 
         getBus().registerSticky(mEventHandler);
 
-        mAdapter = new ActionsAdapter(getActivity());
-        final StickyListHeadersListView listView = findById(view, android.R.id.list);
-        listView.setAdapter(mAdapter);
-
-        listView.setOnItemClickListener(this);
+        mRecyclerView = (RecyclerView) view.findViewById(android.R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mSectionedAdapter);
     }
 
     @Override
@@ -88,44 +79,6 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         super.onDestroyView();
 
         getBus().unregister(mEventHandler);
-    }
-
-    @Override
-    public void onItemClick(final AdapterView<?> adapterView, final View view, final int i,
-            final long l) {
-        final String action = mAdapter.getItem(i);
-
-        if (action.equals(getString(R.string.action_join_channel))) {
-            showChannelDialog();
-        } else if (action.equals(getString(R.string.action_change_nick))) {
-            showNickDialog();
-        } else if (action.equals(getString(R.string.action_ignore_list))) {
-            mCallbacks.switchToIgnoreFragment();
-            return;
-        } else if (action.equals(getString(R.string.action_pending_dcc))) {
-            showDCCFragment();
-            return;
-        } else if (action.equals(getString(R.string.action_pending_invites))) {
-            mCallbacks.switchToInviteFragment();
-            return;
-        } else if (action.equals(getString(R.string.action_disconnect))) {
-            mCallbacks.disconnectFromServer();
-        } else if (action.equals(getString(R.string.action_close_server))) {
-            mCallbacks.disconnectFromServer();
-        } else if (action.equals(getString(R.string.action_reconnect))) {
-            mCallbacks.reconnectToServer();
-        } else if (action.equals(getString(R.string.action_part_channel))) {
-            mCallbacks.removeCurrentFragment();
-        } else if (action.equals(getString(R.string.action_close_pm))) {
-            mCallbacks.removeCurrentFragment();
-        }
-
-        mCallbacks.closeDrawer();
-    }
-
-    private void showDCCFragment() {
-        final DCCPendingFragment fragment = new DCCPendingFragment();
-        fragment.show(getFragmentManager(), "dialog");
     }
 
     private void showNickDialog() {
@@ -138,19 +91,30 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
         builder.show();
     }
 
+    private void showIgnoreUserFragment() {
+        final IgnoredUsersFragment fragment = IgnoredUsersFragment.createInstance();
+        fragment.show(getFragmentManager(), "ignoreFragment");
+    }
+
+    private void showInviteFragment() {
+        final InviteFragment fragment = InviteFragment.createInstance();
+        fragment.show(getFragmentManager(), "inviteFragment");
+    }
+
+    private void showPendingDCCFragment() {
+        final DCCPendingFragment fragment = DCCPendingFragment.createInstance();
+        fragment.show(getFragmentManager(), "dialog");
+    }
+
     public interface Callbacks {
 
-        public void removeCurrentFragment();
+        void removeCurrentFragment();
 
-        public void closeDrawer();
+        void closeDrawer();
 
-        public void disconnectFromServer();
+        void disconnectFromServer();
 
-        public void reconnectToServer();
-
-        public void switchToIgnoreFragment();
-
-        public void switchToInviteFragment();
+        void reconnectToServer();
     }
 
     public class ChannelDialogBuilder extends DialogBuilder {
@@ -167,6 +131,39 @@ public class ActionsFragment extends Fragment implements AdapterView.OnItemClick
                 return;
             }
             mConversation.getServer().sendJoin(channelName);
+        }
+    }
+
+    private class ActionClickListner implements View.OnClickListener {
+
+        @Override
+        public void onClick(final View v) {
+            final int position = mRecyclerView.getChildPosition(v);
+            final int actual = mSectionedAdapter.sectionedPositionToPosition(position);
+
+            final String action = mAdapter.getItem(actual);
+            if (action.equals(getString(R.string.action_join_channel))) {
+                showChannelDialog();
+            } else if (action.equals(getString(R.string.action_change_nick))) {
+                showNickDialog();
+            } else if (action.equals(getString(R.string.action_ignore_list))) {
+                showIgnoreUserFragment();
+            } else if (action.equals(getString(R.string.action_pending_dcc))) {
+                showPendingDCCFragment();
+            } else if (action.equals(getString(R.string.action_pending_invites))) {
+                showInviteFragment();
+            } else if (action.equals(getString(R.string.action_disconnect))) {
+                mCallbacks.disconnectFromServer();
+            } else if (action.equals(getString(R.string.action_close_server))) {
+                mCallbacks.disconnectFromServer();
+            } else if (action.equals(getString(R.string.action_reconnect))) {
+                mCallbacks.reconnectToServer();
+            } else if (action.equals(getString(R.string.action_part_channel))) {
+                mCallbacks.removeCurrentFragment();
+            } else if (action.equals(getString(R.string.action_close_pm))) {
+                mCallbacks.removeCurrentFragment();
+            }
+            mCallbacks.closeDrawer();
         }
     }
 

@@ -194,5 +194,40 @@
     <string name="close">Close</string>
     <string name="dcc_pending_title">Pending DCC Connections</string>
     <string name="dcc_progress_complete">%1$d%% complete</string>
+    <string name="invite_headers">Invites</string>
+    <string name="dcc_requested">"%1$s requested by %2$s</string>
+    <string name="dcc_ip_port">Suggested IP %1$s and port %2$d for %3$s</string>
 
+    <!-- Notification strings -->
+    <string name="notification_action_disconnect">Disconnect</string>
+    <string name="notification_action_disconnect_all">Disconnect all</string>
+    <string name="notification_action_close">Close</string>
+    <string name="notification_action_close_all">Close all</string>
+    <string name="notification_action_reconnect">Reconnect</string>
+    <string name="notification_action_reconnect_all">Reconnect all</string>
+    <string name="notification_action_reply">Reply</string>
+    <string name="notification_reconnect_wear_title">IRC disconnected</string>
+    <string name="notification_reconnect_wear_content">Disconnected from %1$s. Touch to reconnect.</string>
+    <string name="notification_reply_wear_title">Reply to %1$s</string>
+    <string name="notification_mentioned_title">Mentioned in %1$s on %2$s</string>
+    <string name="notification_queried_title">Queried by %1$s on %2$s</string>
+    <string name="notification_mentioned_multi_title">Mentioned %1$d times</string>
+    <string name="notification_queried_multi_title">Queried %1$d times</string>
+    <string name="notification_mentioned_bigtext_title">%1$s on %2$s</string>
+    <string name="notification_connected_title">Connected to %1$s</string>
+    <string name="notification_connecting_title">Connecting to %1$s</string>
+    <string name="notification_disconnected_title">Disconnected from %1$s</string>
+    <string name="notification_reconnecting_title">Reconnecting to %1$s</string>
+
+    <!-- User levels -->
+    <string name="user_level_owners">Owners</string>
+    <string name="user_level_superops">Super-ops</string>
+    <string name="user_level_ops">Ops</string>
+    <string name="user_level_halfops">Half-ops</string>
+    <string name="user_level_voices">Voices</string>
+    <string name="user_level_users">Users</string>
+
+    <string name="no_server_connected">Welcome to HoloIRC! Click a server on the left to connect :)</string>
+    <string name="server_list_empty">No servers found :(\nClick + to add one</string>
+    <string name="server_list_loading">Loading servers\u2026</string>
 </resources>

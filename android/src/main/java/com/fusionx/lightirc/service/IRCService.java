@@ -5,42 +5,49 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnChannelMentionEvent;
 import com.fusionx.lightirc.event.OnPreferencesChangedEvent;
 import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
 import com.fusionx.lightirc.event.ServerStopRequestedEvent;
 import com.fusionx.lightirc.logging.IRCLoggingManager;
 import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.ui.MainActivity;
+import com.fusionx.lightirc.util.NotificationUtils;
+import com.fusionx.lightirc.util.SharedPreferencesUtils;
+import com.google.common.base.Optional;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.Environment;
-import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.text.TextUtils;
 import android.util.Pair;
 
-import java.util.Collection;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ConnectionManager;
+import co.fusionx.relay.base.ConnectionStatus;
+import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.base.relay.RelayConnectionManager;
-import gnu.trove.map.hash.THashMap;
+import co.fusionx.relay.internal.base.RelayConnectionManager;
+import co.fusionx.relay.parser.UserInputParser;
 
-import static android.support.v4.app.NotificationCompat.Builder;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
-import static com.fusionx.lightirc.util.NotificationUtils.NOTIFICATION_MENTION;
 import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
@@ -50,8 +57,16 @@ public class IRCService extends Service {
     private static final int SERVICE_PRIORITY = 50;
 
     private static final int SERVICE_ID = 1;
+    private static final int WEARABLE_STATUS_ID = 2;
+
+    public static final String ADD_MESSAGE_INTENT = "com.fusionx.lightirc.add_message";
+    public static final String EXTRA_SERVER_NAME = "server_name";
+    public static final String EXTRA_CHANNEL_NAME = "channel_name";
+    public static final String EXTRA_QUERY_NICK = "query_nick";
+    public static final String EXTRA_MESSAGE = "message";
 
     private static final String DISCONNECT_ALL_INTENT = "com.fusionx.lightirc.disconnect_all";
+    private static final String RECONNECT_ALL_INTENT = "com.fusionx.lightirc.reconnect_all";
 
     private final BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
         @Override
@@ -67,17 +82,24 @@ public class IRCService extends Service {
                 interceptor.unregister();
             }
 
-            final NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            notificationManager.cancel(NOTIFICATION_MENTION);
+            NotificationUtils.cancelMentionNotification(context, null);
 
             final Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
 
             mConnectionManager.requestDisconnectAll();
-            stopForeground(true);
-
             for (final Server server : servers) {
                 cleanupPostDisconnect(server);
+            }
+            stop();
+        }
+    };
+    private final BroadcastReceiver mReconnectAllReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            for (final Server server : mConnectionManager.getImmutableServerSet()) {
+                if (server.getStatus() == ConnectionStatus.DISCONNECTED) {
+                    mConnectionManager.requestReconnection(server);
+                }
             }
         }
     };
@@ -85,13 +107,23 @@ public class IRCService extends Service {
     private final Object mEventHelper = new Object() {
         @Subscribe
         public void onMentioned(final OnChannelMentionEvent event) {
-            notifyOutOfApp(IRCService.this, event.channel, true);
+            notifyOutOfApp(IRCService.this, event.message, event.user,
+                    event.channel, true, event.timestamp);
         }
 
         @Subscribe
         public void onQueried(final OnQueryEvent event) {
-            notifyOutOfApp(IRCService.this, event.queryUser, false);
+            notifyOutOfApp(IRCService.this, event.message, event.queryUser.getNick(),
+                    event.queryUser, false, event.timestamp);
         }
+
+        @Subscribe
+        public void onServerStatusChanged(final OnServerStatusChanged event) {
+            if (mNotification != null) {
+                updateNotification();
+            }
+        }
+
 
         @Subscribe
         public void onPrefsChanged(final OnPreferencesChangedEvent event) {
@@ -99,11 +131,9 @@ public class IRCService extends Service {
         }
     };
 
-    private final Handler mHandler = new Handler();
-
     private final IRCBinder mBinder = new IRCBinder();
 
-    private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new THashMap<>();
+    private final Map<Server, ServiceEventInterceptor> mEventHelperMap = new HashMap<>();
 
     private boolean mExternalStorageWriteable = false;
 
@@ -111,20 +141,63 @@ public class IRCService extends Service {
 
     private AppPreferences mAppPreferences;
 
-    private boolean mFirstStart = true;
-
     private ConnectionManager mConnectionManager;
+    private Notification mNotification;
 
     public static EventCache getEventCache(final Server server) {
         return mEventCache.get(server);
     }
 
     @Override
-    public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        onFirstStart();
+    public void onCreate() {
+        super.onCreate();
+
+        if (SharedPreferencesUtils.isInitialDatabaseRun(this)) {
+            SharedPreferencesUtils.onInitialSetup(this);
+        }
+
+        mAppPreferences = AppPreferences.getAppPreferences();
+        mLoggingManager = new IRCLoggingManager(mAppPreferences);
         mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
 
-        return START_STICKY;
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
+        registerReceiver(mExternalStorageReceiver, filter);
+        updateExternalStorageState();
+
+        getBus().register(mEventHelper, SERVICE_PRIORITY);
+        registerReceiver(mDisconnectAllReceiver, new IntentFilter(DISCONNECT_ALL_INTENT));
+        registerReceiver(mReconnectAllReceiver, new IntentFilter(RECONNECT_ALL_INTENT));
+    }
+
+    @Override
+    public int onStartCommand(final Intent intent, final int flags, final int startId) {
+        if (intent != null && ADD_MESSAGE_INTENT.equals(intent.getAction())) {
+            String serverName = intent.getStringExtra(EXTRA_SERVER_NAME);
+            String channelName = intent.getStringExtra(EXTRA_CHANNEL_NAME);
+            String queryNick = intent.getStringExtra(EXTRA_QUERY_NICK);
+            Server server = mConnectionManager.getServerIfExists(serverName);
+            CharSequence message = intent.getStringExtra(EXTRA_MESSAGE);
+            if (server != null && server.getStatus() == ConnectionStatus.CONNECTED
+                    && message != null) {
+                if (channelName != null) {
+                    Optional<? extends Channel> channel =
+                            server.getUserChannelInterface().getChannel(channelName);
+                    if (channel.isPresent()) {
+                        UserInputParser.onParseChannelMessage(channel.get(), message.toString());
+                    }
+                } else if (queryNick != null) {
+                    Optional<? extends QueryUser> user =
+                            server.getUserChannelInterface().getQueryUser(queryNick);
+                    if (user.isPresent()) {
+                        UserInputParser.onParseUserMessage(user.get(), message.toString());
+                    }
+                }
+            }
+        }
+
+        return mNotification != null ? START_STICKY : START_NOT_STICKY;
     }
 
     public void clearAllEventCaches() {
@@ -137,23 +210,49 @@ public class IRCService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        // Unregister observer status
-        stopWatchingExternalStorage();
         getBus().unregister(mEventHelper);
         unregisterReceiver(mDisconnectAllReceiver);
+        unregisterReceiver(mReconnectAllReceiver);
+        unregisterReceiver(mExternalStorageReceiver);
     }
 
     @Override
     public IBinder onBind(final Intent intent) {
-        onFirstStart();
-        mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
         return mBinder;
     }
 
-    public Server requestConnectionToServer(final ServerConfiguration.Builder builder,
-            final Collection<String> ignoreList) {
+    @Override
+    protected void dump(FileDescriptor fd, PrintWriter writer, String[] args) {
+        writer.println("Known servers:");
+        for (Server server : mConnectionManager.getImmutableServerSet()) {
+            writer.print("  ");
+            writer.print(server.getTitle());
+            writer.print(" (");
+            writer.print(server.getId());
+            writer.print(") - ");
+            writer.println(server.getStatus());
+        }
+        writer.println();
+        writer.println("Event caches:");
+        for (Map.Entry<Server, EventCache> entry : mEventCache.entrySet()) {
+            EventCache cache = entry.getValue();
+            writer.print("  ");
+            writer.print(entry.getKey().getId());
+            writer.print(": ");
+            writer.print(cache.toString());
+            writer.print(", size=");
+            writer.println(cache.size());
+        }
+        writer.println("Logging:");
+        writer.print("  started=");
+        writer.println(mLoggingManager.isStarted());
+        writer.print("  mExternalStorageWriteable=");
+        writer.println(mExternalStorageWriteable);
+    }
+
+    public Server requestConnectionToServer(final ServerConfiguration.Builder builder) {
         final Pair<Boolean, ? extends Server> pair
-                = mConnectionManager.requestConnection(builder.build(), ignoreList, mHandler);
+                = mConnectionManager.requestConnection(builder.build());
 
         final boolean exists = pair.first;
         final Server server = pair.second;
@@ -165,7 +264,8 @@ public class IRCService extends Service {
             mEventCache.put(server, new EventCache(this));
             mLoggingManager.addServerToManager(server);
         }
-        startForeground(SERVICE_ID, getNotification());
+        updateNotification();
+
         return server;
     }
 
@@ -180,17 +280,25 @@ public class IRCService extends Service {
     public void requestConnectionStoppage(final Server server) {
         mEventHelperMap.get(server).unregister();
 
-        final NotificationManager notificationManager =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_MENTION);
+        NotificationUtils.cancelMentionNotification(this, server);
 
-        final boolean finalServer = mConnectionManager.requestStoppageAndRemoval(server.getTitle());
-        if (finalServer) {
-            stopForeground(true);
-        } else {
-            startForeground(SERVICE_ID, getNotification());
-        }
+        mConnectionManager.requestStoppageAndRemoval(server.getTitle());
         cleanupPostDisconnect(server);
+
+        if (mConnectionManager.getServerCount() > 0) {
+            updateNotification();
+        } else {
+            stop();
+        }
+    }
+
+    private void stop() {
+        mNotification = null;
+        stopForeground(true);
+        stopSelf();
+
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+        nm.cancel(WEARABLE_STATUS_ID);
     }
 
     private void cleanupPostDisconnect(final Server server) {
@@ -215,31 +323,6 @@ public class IRCService extends Service {
         return mEventHelperMap.get(server);
     }
 
-    private void onFirstStart() {
-        if (mFirstStart) {
-            AppPreferences.setupAppPreferences(this);
-            mAppPreferences = AppPreferences.getAppPreferences();
-            mLoggingManager = new IRCLoggingManager(mAppPreferences);
-            startWatchingExternalStorage();
-            getBus().register(mEventHelper, SERVICE_PRIORITY);
-            registerReceiver(mDisconnectAllReceiver, new IntentFilter(DISCONNECT_ALL_INTENT));
-
-            mFirstStart = false;
-        }
-    }
-
-    private void startWatchingExternalStorage() {
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
-        filter.addAction(Intent.ACTION_MEDIA_REMOVED);
-        registerReceiver(mExternalStorageReceiver, filter);
-        updateExternalStorageState();
-    }
-
-    private void stopWatchingExternalStorage() {
-        unregisterReceiver(mExternalStorageReceiver);
-    }
-
     private void updateExternalStorageState() {
         final String state = Environment.getExternalStorageState();
         mExternalStorageWriteable = state.equals(Environment.MEDIA_MOUNTED);
@@ -258,23 +341,162 @@ public class IRCService extends Service {
         }
     }
 
-    private Notification getNotification() {
-        final Builder builder = new Builder(this);
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification);
-        builder.setLargeIcon(icon);
+    private void updateNotification() {
+        Set<? extends Server> servers = mConnectionManager.getImmutableServerSet();
+        List<String> disconnectedServerNames = new ArrayList<>();
+        int connectedCount = 0, disconnectedCount = 0;
+        int connectingCount = 0, reconnectingCount = 0;
+
+        for (Server server : servers) {
+            switch (server.getStatus()) {
+                case DISCONNECTED:
+                    if (mEventHelperMap.get(server).getLastKnownStatus() != null) {
+                        disconnectedServerNames.add(server.getTitle());
+                        disconnectedCount++;
+                    }
+                    break;
+                case CONNECTING:
+                    connectingCount++;
+                    break;
+                case CONNECTED:
+                    connectedCount++;
+                    break;
+                case RECONNECTING:
+                    reconnectingCount++;
+                    break;
+            }
+        }
+
+        final int totalCount = disconnectedCount + connectedCount
+                + connectingCount + reconnectingCount;
+        final StringBuilder publicText = new StringBuilder();
+
+        if (connectedCount > 0) {
+            publicText.append(getResources().getQuantityString(
+                    R.plurals.server_connection, connectedCount, connectedCount));
+        }
+        if (connectingCount > 0) {
+            if (publicText.length() > 0) {
+                publicText.append(", ");
+            }
+            publicText.append(getResources().getQuantityString(
+                    R.plurals.server_connecting, connectingCount, connectingCount));
+
+        }
+        if (reconnectingCount > 0) {
+            if (publicText.length() > 0) {
+                publicText.append(", ");
+            }
+            publicText.append(getResources().getQuantityString(
+                    R.plurals.server_reconnection, reconnectingCount, reconnectingCount));
+        }
+        if (disconnectedCount > 0) {
+            if (publicText.length() > 0) {
+                publicText.append(", ");
+            }
+            publicText.append(getResources().getQuantityString(
+                    R.plurals.server_disconnection, disconnectedCount, disconnectedCount));
+
+        }
+
+        final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        builder.setColor(getResources().getColor(R.color.colorPrimary));
         builder.setContentTitle(getString(R.string.app_name));
-        final String text = String.format("%d servers connected",
-                mConnectionManager.getServerCount());
-        builder.setContentText(text);
-        builder.setTicker(text);
         builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentIntent(getMainActivityIntent());
+        builder.setPriority(disconnectedCount > 0
+                ? NotificationCompat.PRIORITY_DEFAULT : NotificationCompat.PRIORITY_MIN);
+        builder.setCategory(NotificationCompat.CATEGORY_SERVICE);
+        builder.setOngoing(true);
+        builder.setLocalOnly(true);
+        builder.setShowWhen(false);
+        builder.setContentText(publicText);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        if (disconnectedCount > 0) {
+            builder.setGroup("serverstatus");
+            builder.setGroupSummary(true);
+        }
 
-        final PendingIntent intent = PendingIntent.getBroadcast(this, 199,
+        Notification publicVersion = builder.build();
+        final String text;
+
+        if (totalCount == 1) {
+            final int formatResId;
+            if (connectedCount > 0) {
+                formatResId = R.string.notification_connected_title;
+            } else if (connectingCount > 0) {
+                formatResId = R.string.notification_connecting_title;
+            } else if (reconnectingCount > 0) {
+                formatResId = R.string.notification_reconnecting_title;
+            } else {
+                formatResId = R.string.notification_disconnected_title;
+            }
+            text = getString(formatResId, servers.iterator().next().getId());
+        } else {
+            text = publicText.toString();
+        }
+
+        builder.setContentText(text);
+        builder.setTicker(text);
+        builder.setPublicVersion(publicVersion);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+
+        NotificationCompat.Action reconnectAction = null;
+
+        if (disconnectedCount > 0) {
+            final PendingIntent reconnectIntent = PendingIntent.getBroadcast(this, 0,
+                    new Intent(RECONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
+            int reconnectActionResId = disconnectedCount > 1
+                    ? R.string.notification_action_reconnect_all
+                    : R.string.notification_action_reconnect;
+            reconnectAction = new NotificationCompat.Action(
+                    R.drawable.ic_refresh_light,
+                    getString(reconnectActionResId), reconnectIntent);
+            builder.addAction(reconnectAction);
+        }
+
+        final PendingIntent intent = PendingIntent.getBroadcast(this, 0,
                 new Intent(DISCONNECT_ALL_INTENT), PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.addAction(R.drawable.ic_clear, "Disconnect all", intent);
+        final int disconnectActionResId;
+        if (connectedCount == 0 && connectingCount == 0) {
+            disconnectActionResId = totalCount > 1
+                    ? R.string.notification_action_close_all : R.string.notification_action_close;
+        } else {
+            disconnectActionResId = totalCount > 1
+                    ? R.string.notification_action_disconnect_all
+                    : R.string.notification_action_disconnect;
+        }
+        builder.addAction(R.drawable.ic_clear_light, getString(disconnectActionResId), intent);
 
-        return builder.build();
+        mNotification = builder.build();
+        // make ourself persistent
+        startService(new Intent(this, IRCService.class));
+        startForeground(SERVICE_ID, mNotification);
+
+        NotificationManagerCompat nm = NotificationManagerCompat.from(this);
+
+        if (reconnectAction != null) {
+            NotificationCompat.Builder wearableStatusBuilder = new NotificationCompat.Builder(this);
+            wearableStatusBuilder.setColor(getResources().getColor(R.color.colorPrimary));
+            wearableStatusBuilder.setContentTitle(
+                    getString(R.string.notification_reconnect_wear_title));
+            wearableStatusBuilder.setContentText(getString(
+                    R.string.notification_reconnect_wear_content,
+                    TextUtils.join(", ", disconnectedServerNames)));
+            wearableStatusBuilder.setSmallIcon(R.drawable.ic_notification_small);
+            wearableStatusBuilder.setGroup("serverstatus");
+
+            reconnectAction.icon = R.drawable.ic_refresh_action_wear;
+            new NotificationCompat.WearableExtender()
+                    .addAction(reconnectAction)
+                    .setContentAction(0)
+                    .setHintHideIcon(true)
+                    .extend(wearableStatusBuilder);
+
+            nm.notify(WEARABLE_STATUS_ID, wearableStatusBuilder.build());
+        } else {
+            nm.cancel(WEARABLE_STATUS_ID);
+        }
     }
 
     // Binder which returns this service

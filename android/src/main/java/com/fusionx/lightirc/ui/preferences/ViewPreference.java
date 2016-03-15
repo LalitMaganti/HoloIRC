@@ -43,7 +43,7 @@ public class ViewPreference extends Preference {
     }
 
     public void setInitialText(final CharSequence text) {
-        mText = String.format(getContext().getString(R.string.server_settings_non_empty), text);
+        mText = getContext().getString(R.string.server_settings_non_empty, text);
         if (mTextView != null) {
             mTextView.setText(mText);
         }

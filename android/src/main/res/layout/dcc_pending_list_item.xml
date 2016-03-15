@@ -5,26 +5,28 @@
     android:background="?android:attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/dcc_pending_list_item_decline"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:id="@+id/decline_list_item"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
         android:background="?android:attr/selectableItemBackground"
+        android:padding="8dp"
         android:src="@drawable/ic_clear" />
 
     <ImageView
-        android:id="@+id/dcc_pending_list_item_accept"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:id="@+id/accept_list_item"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
-        android:layout_toLeftOf="@id/dcc_pending_list_item_decline"
-        android:layout_toStartOf="@id/dcc_pending_list_item_decline"
+        android:layout_toLeftOf="@id/decline_list_item"
+        android:layout_toStartOf="@id/decline_list_item"
         android:background="?android:attr/selectableItemBackground"
-        android:src="@drawable/ic_check_light" />
+        android:padding="8dp"
+        android:src="@drawable/ic_check" />
 
     <TextView
         android:id="@+id/dcc_pending_list_item_title"
@@ -35,8 +37,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_toLeftOf="@id/dcc_pending_list_item_accept"
-        android:layout_toStartOf="@id/dcc_pending_list_item_accept"
+        android:layout_toLeftOf="@id/accept_list_item"
+        android:layout_toStartOf="@id/accept_list_item"
         android:gravity="center_vertical"
         android:padding="4dp"
         android:text="@android:string/ok"
@@ -51,8 +53,8 @@
         android:layout_below="@+id/dcc_pending_list_item_title"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_toLeftOf="@id/dcc_pending_list_item_accept"
-        android:layout_toStartOf="@id/dcc_pending_list_item_accept"
+        android:layout_toLeftOf="@id/accept_list_item"
+        android:layout_toStartOf="@id/accept_list_item"
         android:gravity="center_vertical"
         android:padding="4dp"
         android:text="@android:string/ok"
