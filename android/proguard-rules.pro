@@ -2,8 +2,19 @@
 -keepattributes SourceFile,LineNumberTable,*Annotation*
 -keep public class * extends java.lang.Exception
 
+# Support
+-keep class android.support.*
+
 # Proguard
 -dontwarn java.lang.invoke.*
+
+# Bus
+-keep class co.fusionx.*
+-keep class com.fusionx.*
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @com.fusionx.bus.Subscribe public *;
+}
 
 # Okio
 -dontwarn java.nio.file.Files
