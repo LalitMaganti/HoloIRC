@@ -5,7 +5,7 @@ import com.fusionx.lightirc.misc.Theme;
 
 import android.graphics.Color;
 
-import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.Nick;
 
 public class NickColour {
 

@@ -5,7 +5,7 @@ import com.fusionx.lightirc.misc.AppPreferences;
 
 import android.content.Context;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.Server;
 
 public class CrashUtils {
 

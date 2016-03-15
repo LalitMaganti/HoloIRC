@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.ServerConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 import static com.fusionx.lightirc.model.db.DatabaseContract.ServerTable.COLUMN_AUTOJOIN;

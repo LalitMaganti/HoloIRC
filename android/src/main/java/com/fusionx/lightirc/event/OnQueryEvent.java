@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.base.QueryUser;
+import co.fusionx.relay.QueryUser;
 
 public class OnQueryEvent {
 

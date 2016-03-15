@@ -36,7 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.ServerConfiguration;
 import co.fusionx.relay.misc.NickStorage;
 
 import static android.content.Context.MODE_PRIVATE;

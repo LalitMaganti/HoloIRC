@@ -26,7 +26,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.Conversation;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.UIUtils.findById;

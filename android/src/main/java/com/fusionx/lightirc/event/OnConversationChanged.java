@@ -2,7 +2,7 @@ package com.fusionx.lightirc.event;
 
 import com.fusionx.lightirc.misc.FragmentType;
 
-import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.Conversation;
 
 public class OnConversationChanged {
 

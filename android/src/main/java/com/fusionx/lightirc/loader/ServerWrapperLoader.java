@@ -9,8 +9,8 @@ import android.content.Context;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.base.ServerConfiguration;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerConversationContainer>> {
 

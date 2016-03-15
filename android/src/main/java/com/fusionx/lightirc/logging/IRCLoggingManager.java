@@ -4,7 +4,7 @@ import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.EventUtils;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.Server;
 import co.fusionx.relay.event.Event;
 import co.fusionx.relay.logging.LoggingManager;
 import co.fusionx.relay.logging.LoggingPreferences;

@@ -1,6 +1,6 @@
 package com.fusionx.lightirc.event;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.Server;
 
 public class ServerStopRequestedEvent {
 

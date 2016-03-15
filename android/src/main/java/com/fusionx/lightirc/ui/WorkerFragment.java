@@ -13,7 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.Server;
 
 /**
  * Class where all the IRC work is carried out

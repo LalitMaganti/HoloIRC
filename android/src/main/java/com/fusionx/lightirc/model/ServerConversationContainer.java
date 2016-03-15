@@ -8,12 +8,12 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import co.fusionx.relay.base.ConnectionStatus;
-import co.fusionx.relay.base.Conversation;
-import co.fusionx.relay.base.Server;
+import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.Conversation;
+import co.fusionx.relay.Server;
 import co.fusionx.relay.function.Optionals;
 
-import static co.fusionx.relay.base.ServerConfiguration.Builder;
+import static co.fusionx.relay.ServerConfiguration.Builder;
 
 public class ServerConversationContainer {
 

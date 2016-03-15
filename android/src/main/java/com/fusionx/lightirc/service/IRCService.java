@@ -32,10 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import co.fusionx.relay.base.ConnectionManager;
-import co.fusionx.relay.base.Server;
-import co.fusionx.relay.base.ServerConfiguration;
-import co.fusionx.relay.base.relay.RelayConnectionManager;
+import co.fusionx.relay.ConnectionManager;
+import co.fusionx.relay.Server;
+import co.fusionx.relay.ServerConfiguration;
 import gnu.trove.map.hash.THashMap;
 
 import static android.support.v4.app.NotificationCompat.Builder;
@@ -122,7 +121,7 @@ public class IRCService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         onFirstStart();
-        mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
 
         return START_STICKY;
     }
@@ -146,7 +145,7 @@ public class IRCService extends Service {
     @Override
     public IBinder onBind(final Intent intent) {
         onFirstStart();
-        mConnectionManager = RelayConnectionManager.getConnectionManager(mAppPreferences);
+        mConnectionManager = ConnectionManager.getConnectionManager(mAppPreferences);
         return mBinder;
     }
 

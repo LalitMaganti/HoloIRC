@@ -43,7 +43,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.Conversation;
 import co.fusionx.relay.event.Event;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
