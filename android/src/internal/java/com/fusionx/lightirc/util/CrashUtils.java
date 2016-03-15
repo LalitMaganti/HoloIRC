@@ -35,8 +35,11 @@ public class CrashUtils {
         }
     }
 
-    private static class IRCException extends Exception {
+    public static void handleException(Exception ex) {
+        callbackIfReportingEnabled(() -> Crashlytics.logException(ex));
+    }
 
+    private static class IRCException extends Exception {
         public IRCException(final String data) {
             super(data);
         }

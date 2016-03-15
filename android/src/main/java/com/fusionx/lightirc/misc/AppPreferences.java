@@ -184,7 +184,7 @@ public class AppPreferences implements RelayConfiguration, LoggingPreferences {
     @Override
     public void handleException(final Exception ex) {
         HANDLER.post(() -> {
-            throw new RuntimeException(ex);
+            CrashUtils.handleException(ex);
         });
     }
 

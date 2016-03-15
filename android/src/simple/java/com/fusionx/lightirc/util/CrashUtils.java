@@ -17,4 +17,9 @@ public class CrashUtils {
     public static void logIssue(final String data) {
         // Don't do anything since we are building simple flavour
     }
+
+    public static void handleException(Exception ex) {
+        // Simply throw the exception to warn the user.
+        throw new RuntimeException(ex);
+    }
 }
