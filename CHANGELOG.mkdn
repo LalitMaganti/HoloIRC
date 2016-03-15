@@ -1,16 +1,85 @@
 Changelog for HoloIRC
 ======
+v4.0.1:
+    Minor crash fixes
+
+v4.0.0:
+    New Materialish Design
+    Rewrites of several core components for better stability
+
+v3.3.7:
+    Even more crash fixes
+    Misc bug fixes
+
+v3.3.6:
+    More crash fixes
+    Fix constant disconnections on some servers
+
+v3.3.5:
+    Disconnect/disconnect all crash fixes
+
+v3.3.4:
+    Fix crash issues and misc bugs
+    Improve in-app notification system
+
+v3.3.3:
+    Fix more crash issues
+    Switch some internal libraries
+    Fix other misc bugs
+
+v3.3.2:
+    Fix a few reported crash issues
+
+v3.3.1:
+    Fix major issue which caused crashes when sending messages
+    Fix issue where user list was not shown
+
+v3.3.0:
+    Add advanced crash reporting - can be disabled in settings
+    Cleanup code from previous version
+    Fix up issues from v3.2.0
+
+v3.2.0:
+    Rewritten many core parts of the app to improve code readability
+    Fix all the bugs reported through the Play Store system
+    Fix other spotted crashes
+    Multiple misc. bug fixes
+    New mention UI within app.
+
+v3.3.2:
+    Fix a few reported crash issues
+
+v3.3.1:
+    Fix major issue which caused crashes when sending messages
+    Fix issue where user list was not shown
+
+v3.1.2:
+    Fix a couple of crash bugs
+    Fix other minor issues
+
+v3.1.1:
+    Fix bugs and crashes from alpha version
+    Make some animations less jarring
+
+v3.1.0:
+    Add settings for notification - can now control how you want to be notified
+    Add ability to log messages from the server - these are stored on the external storage
+    Numerous bugfixes
+    Some usability changes
+
 v3.0.2:
-Fix a few bugs from the beta
-Some tablet compatibility updates 
+    Fix a few bugs from the beta
+    Some tablet compatibility updates
+
 v3.0.1:
-Fix multiple bugs which popped up in the alpha
-Some theming improvements
+    Fix multiple bugs which popped up in the alpha
+    Some theming improvements
+
 v3.0.0:
-Remove support for below 4.0 - may return in a later version
-Complete rewrite of the front end for improved tablet support and prettier UI
-Fix many bugs and crashes reported through Play Store
-Lay base for many new features including more customization and settings
+    Remove support for below 4.0 - may return in a later version
+    Complete rewrite of the front end for improved tablet support and prettier UI
+    Fix many bugs and crashes reported through Play Store
+    Lay base for many new features including more customization and settings
 
 Version 2.9.0:
     Major stability improvements
