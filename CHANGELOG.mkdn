@@ -1,45 +1,56 @@
 Changelog for HoloIRC
 ======
 v4.0.1:
+
     Minor crash fixes
 
 v4.0.0:
+
     New Materialish Design
     Rewrites of several core components for better stability
 
 v3.3.7:
+
     Even more crash fixes
     Misc bug fixes
 
 v3.3.6:
+
     More crash fixes
     Fix constant disconnections on some servers
 
 v3.3.5:
+
     Disconnect/disconnect all crash fixes
 
 v3.3.4:
+
     Fix crash issues and misc bugs
     Improve in-app notification system
 
 v3.3.3:
+
     Fix more crash issues
     Switch some internal libraries
     Fix other misc bugs
 
 v3.3.2:
+
     Fix a few reported crash issues
 
 v3.3.1:
+
     Fix major issue which caused crashes when sending messages
     Fix issue where user list was not shown
 
 v3.3.0:
+
     Add advanced crash reporting - can be disabled in settings
     Cleanup code from previous version
     Fix up issues from v3.2.0
 
 v3.2.0:
+
     Rewritten many core parts of the app to improve code readability
     Fix all the bugs reported through the Play Store system
     Fix other spotted crashes
@@ -47,91 +58,112 @@ v3.2.0:
     New mention UI within app.
 
 v3.3.2:
+
     Fix a few reported crash issues
 
 v3.3.1:
+
     Fix major issue which caused crashes when sending messages
     Fix issue where user list was not shown
 
 v3.1.2:
+
     Fix a couple of crash bugs
     Fix other minor issues
 
 v3.1.1:
+
     Fix bugs and crashes from alpha version
     Make some animations less jarring
 
 v3.1.0:
+
     Add settings for notification - can now control how you want to be notified
     Add ability to log messages from the server - these are stored on the external storage
     Numerous bugfixes
     Some usability changes
 
 v3.0.2:
+
     Fix a few bugs from the beta
     Some tablet compatibility updates
+
 
 v3.0.1:
     Fix multiple bugs which popped up in the alpha
     Some theming improvements
 
 v3.0.0:
+
     Remove support for below 4.0 - may return in a later version
     Complete rewrite of the front end for improved tablet support and prettier UI
     Fix many bugs and crashes reported through Play Store
     Lay base for many new features including more customization and settings
 
 Version 2.9.0:
+
     Major stability improvements
     Multiple memory and performance optimzations
     Many bug fixes
     Overhaul base IRC code for all round improved performance
 
 Version 2.8.7:
+
     Fix a major tablet-specific crash issue
 
 Version 2.8.6:
+
     Fix more crashes which were reported
     Some other bugfixes
 
 Version 2.8.5:
+
     Fix a lot more crashes which were reported
     Some other misc. bugfixes
 
 Version 2.8.4:
+
     Fix some major crashes
 
 Version 2.8.3:
+
     Small bug-fixes
     Fix mentioning of users with short nicknames
 
 Version 2.8.2:
+
     Fix connecting to some servers
     Fix PMs
     Fix bold tags on notices and actions
     Fix crashes reported through Play Store
 
 Version 2.8.1:
+
     Much more stable when putting the app to the background
     Overhauled disconnect code - should be much better
     New icon - a huge thanks to michael` from the #holoirc channel for making it
 
 Version 2.8.0:
+
     Lots of bug-fixes
     Stores the last channel you were in
     Stability improvements
 
 Version 2.7.0:
+
     ????
 
 Version 2.6.2
+
     After a long time (due to myself being extremely busy with life) a new release!
     Fixes many of the bugs reported to me through the Play Store crash system
 
 Version 2.6.1
+
     some more bug fixes
 
 Version 2.6.0
+
     add a tablet specific layout for the IRC screen
     allow servers with unsigned SSL certificates to be connected to
     improve GB support
@@ -139,15 +171,19 @@ Version 2.6.0
     loads of bug fixes and code cleanups
 
 Version 2.5.0:
+
     ??????
 
 Version 2.4.0:
+
     ??????
 
 Version 2.3.1:
+
     Minor bugfixes
 
 Version 2.3.0:
+
     Animations everywhere!
     Much better handling of disconnects
     App will now try to reconnect automatically if the connection is dropped
@@ -158,6 +194,7 @@ Version 2.3.0:
     Many bug fixes and cleanups as well.
 
 Version 2.2.6:
+
     Fix a crash in Server/Channel Settings
     Trim spaces from sever URL
     Some other misc fixes
@@ -170,15 +207,18 @@ Version 2.2.5:
     Stop actions from sometimes showing irrelevant things
 
 Version 2.2.0:
+
     Completely rework PMs to fix many bugs
     Deal with unexpected disconnects better
     Readd mentioning notifications - better than ever
     Fix NickServ password not being sent to the server
 
 Version 2.1.1:
+
     fix a crash on disconnect
 
 Version 2.1.0:
+
     allow multiple nicks to be chosen
     fix SSL support
     add snoonet to list of initial servers
@@ -190,6 +230,7 @@ Version 2.1.0:
     improve the look of the server settings screen
 
 Version 2.0.0:
+
     Complete rewrite of the backend of the app to break dependency on third party project (PircBotX) and start using custom written IRC backend. What this means:
     * Faster messaging - less delay between server and client
     * No missed/delayed messages
@@ -198,6 +239,7 @@ Version 2.0.0:
     Loads of bug fixes and tweaks
 
 Version 1.4.5:
+
     Add support for real names
     Hopefully fix the crashes that were reported from the last version - I have been unable to duplicate these
     Fix many other small bugs
@@ -205,9 +247,11 @@ Version 1.4.5:
     Other misc improvements
 
 Version 1.4.1:
+
     Fix a bug where it was impossible to connect to multiple servers
 
 Version 1.4.0:
+
     Add support for SSL
     Add support for hiding messages from channels (like quits and parts)
     Add support for hiding MOTD
@@ -218,6 +262,7 @@ Version 1.4.0:
     Cleanup old code
 
 Version 1.3.0:
+
     Big range of bug fixes including in the dark theme, mentioning of your name by other users and scrolling of the screen to the bottom
     Start parsing links in channels/PMs
     Start switching to a new channel/PM when joined/created
@@ -225,6 +270,7 @@ Version 1.3.0:
     Other misc improvements including in performance and code cleanups
 
 Version 1.2.0:
+
     Add an options side menu which contains common actions when viewing channels etc.
     Hopefully improve performance massively by destroying fragments when not being viewed directly
     Cleanup code a lot
@@ -232,20 +278,25 @@ Version 1.2.0:
     Fix private message actions
 
 Version 1.1.0:
+
     Fixes the dark theme in various places
     Fixes some settings bugs
 
 Version 1.0.1:
+
     Fix a minor bug which caused a startup crash
 
 Version 1.0.0:
+
     Fix bug where autojoin channels would open a blank settings screen
     Remove card swipability on main screen
 
 Version 0.7.5:
+
     Initial Play Store release
 
 Version 0.7.0:
+
     Multi-server support
     Add setting for connecting to non default ports
     Completely rewrite the way server settings are handled - much more intuitve and straightforward
@@ -255,4 +306,5 @@ Version 0.7.0:
     Switching back to app now resumes the last opened server instead of opening the list
 
 Version 0.5.0:
+
     Initial release
