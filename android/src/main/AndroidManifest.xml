@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="com.fusionx.lightirc"
+<manifest package="com.fusionx.lightirc"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:versionCode="53"
     android:versionName="3.3.7">
 
