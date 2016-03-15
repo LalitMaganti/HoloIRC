@@ -18,7 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import co.fusionx.relay.ConnectionStatus;
+import co.fusionx.relay.base.ConnectionStatus;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
