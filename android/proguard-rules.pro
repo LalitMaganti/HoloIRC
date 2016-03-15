@@ -9,11 +9,11 @@
 -dontwarn java.lang.invoke.*
 
 # Bus
--keep class co.fusionx.*
--keep class com.fusionx.*
+-keep class co.fusionx.** { *; }
+-keep class com.fusionx.** { *; }
 -keepattributes *Annotation*
--keepclassmembers class ** {
-    @com.fusionx.bus.Subscribe public *;
+-keepclassmembers class * {
+    @com.fusionx.bus.Subscribe *;
 }
 
 # Okio
