@@ -1,10 +1,12 @@
 package com.fusionx.lightirc.ui;
 
+import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
+import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
-import com.fusionx.lightirc.util.FragmentUtils;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,12 +16,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.Collection;
+import java.util.Collections;
 
+import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.InviteEvent;
 
-public class InviteFragment extends DialogFragment {
+import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-    private Callbacks mCallbacks;
+public class InviteFragment extends DialogFragment {
+    private EventHandler mEventHandler = new EventHandler();
+
+    private ServiceEventInterceptor mInterceptor;
 
     private RecyclerView mRecyclerView;
 
@@ -27,13 +34,6 @@ public class InviteFragment extends DialogFragment {
 
     public static InviteFragment createInstance() {
         return new InviteFragment();
-    }
-
-    @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
-
-        mCallbacks = FragmentUtils.getParent(this, Callbacks.class);
     }
 
     @Override
@@ -55,23 +55,28 @@ public class InviteFragment extends DialogFragment {
     @Override
     public void onViewCreated(final View view, final Bundle bundle) {
         super.onViewCreated(view, bundle);
+        getBus().registerSticky(mEventHandler);
+
+        mAdapter = new InviteAdapter(getActivity(), new AcceptListener(),
+                new DeclineListener());
+        mRecyclerView.setAdapter(mAdapter);
         updateAdapter();
     }
 
-    private void updateAdapter() {
-        final Collection<InviteEvent> events = mCallbacks.getEventHelper().getInviteEvents();
-        mAdapter = new InviteAdapter(getActivity(), events, new AcceptListener(),
-                new DeclineListener());
-        mRecyclerView.setAdapter(mAdapter);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        getBus().unregister(mEventHandler);
     }
 
-    public interface Callbacks {
-
-        public void acceptInviteEvents(final InviteEvent event);
-
-        public void declineInviteEvents(final InviteEvent event);
-
-        public ServiceEventInterceptor getEventHelper();
+    private void updateAdapter() {
+        if (mAdapter == null) {
+            return;
+        }
+        final Collection<InviteEvent> events = mInterceptor != null
+                ? mInterceptor.getInviteEvents() : null;
+        mAdapter.setItems(events);
     }
 
     private class AcceptListener implements View.OnClickListener {
@@ -79,7 +84,7 @@ public class InviteFragment extends DialogFragment {
         @Override
         public void onClick(final View v) {
             final InviteEvent event = (InviteEvent) v.getTag();
-            mCallbacks.acceptInviteEvents(event);
+            mInterceptor.acceptInviteEvents(Collections.singletonList(event));
             mAdapter.remove(event);
         }
     }
@@ -89,8 +94,36 @@ public class InviteFragment extends DialogFragment {
         @Override
         public void onClick(final View v) {
             final InviteEvent event = (InviteEvent) v.getTag();
-            mCallbacks.declineInviteEvents(event);
+            mInterceptor.declineInviteEvents(Collections.singletonList(event));
             mAdapter.remove(event);
         }
     }
+
+    private class EventHandler {
+        private Server mServer;
+        private IRCService mService;
+
+        @Subscribe
+        public void onEvent(final OnConversationChanged conversationChanged) {
+            mServer = conversationChanged.conversation != null
+                    ? conversationChanged.conversation.getServer() : null;
+            updateInterceptor();
+        }
+
+        @Subscribe
+        public void onEvent(final OnServiceConnectionStateChanged serviceChanged) {
+            mService = serviceChanged.getService();
+            updateInterceptor();
+        }
+
+        private void updateInterceptor() {
+            ServiceEventInterceptor interceptor = mServer != null && mService != null
+                    ? mService.getEventHelper(mServer) : null;
+            if (interceptor != mInterceptor) {
+                mInterceptor = interceptor;
+                updateAdapter();
+            }
+        }
+    }
+
 }

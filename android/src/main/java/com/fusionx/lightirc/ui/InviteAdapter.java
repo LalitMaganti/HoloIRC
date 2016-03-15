@@ -26,12 +26,12 @@ class InviteAdapter extends RecyclerView.Adapter<InviteAdapter.InviteViewHolder>
 
     private final View.OnClickListener mDeclineListener;
 
-    public InviteAdapter(final Context context, final Collection<InviteEvent> objects,
+    public InviteAdapter(final Context context,
             final View.OnClickListener acceptListener,
             final View.OnClickListener declineListener) {
         mLayoutInflater = LayoutInflater.from(context);
 
-        mInviteEvents = new ArrayList<>(objects);
+        mInviteEvents = new ArrayList<>();
         mAcceptListener = acceptListener;
         mDeclineListener = declineListener;
     }
@@ -53,6 +53,14 @@ class InviteAdapter extends RecyclerView.Adapter<InviteAdapter.InviteViewHolder>
         holder.declineButton.setTag(event);
 
         holder.textView.setText(getItem(position).channelName);
+    }
+
+    public void setItems(Collection<InviteEvent> items) {
+        mInviteEvents.clear();
+        if (items != null) {
+            mInviteEvents.addAll(items);
+        }
+        notifyDataSetChanged();
     }
 
     public InviteEvent getItem(final int position) {
