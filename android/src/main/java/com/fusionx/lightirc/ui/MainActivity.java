@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -185,7 +186,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
         mSnackbar.post(mSnackbar::hide);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerLayout.setDrawerListener(new DrawerListener());
+        mDrawerLayout.addDrawerListener(new DrawerListener());
         mDrawerLayout.setFocusableInTouchMode(false);
 
         mSlidingPane = (ProgrammableSlidingPaneLayout) findViewById(R.id.sliding_pane_layout);
@@ -220,7 +221,7 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
                     .getStickyEvent(OnConversationChanged.class);
             if (mCurrentFragment == null) {
                 findViewById(R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
-            } else if (event != null) {
+            } else if (event != null && event.conversation != null) {
                 mConversation = event.conversation;
                 // Make sure we re-register to the event bus on rotation - otherwise we miss
                 // important status updates
