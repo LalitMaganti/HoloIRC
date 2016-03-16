@@ -628,17 +628,15 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
     private void changeCurrentFragment(final BaseIRCFragment fragment, boolean delayChange) {
         mCurrentFragment = fragment;
 
-        final Runnable runnable = () -> {
-            getSupportFragmentManager().executePendingTransactions();
-        };
+        final Runnable runnable = () -> getSupportFragmentManager().executePendingTransactions();
+
+        final FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+        transaction.replace(R.id.content_frame, fragment).commit();
+        mEmptyView.setVisibility(View.GONE);
 
         if (delayChange) {
-            final FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction();
-            transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
-            transaction.replace(R.id.content_frame, fragment).commit();
-            mEmptyView.setVisibility(View.GONE);
-
             mHandler.postDelayed(runnable, 300);
         } else {
             mHandler.post(runnable);
