@@ -21,7 +21,6 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -37,7 +36,6 @@ import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.util.FragmentUtils;
 
 import java.util.List;
@@ -55,7 +53,6 @@ import co.fusionx.relay.event.channel.ChannelWorldNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelWorldPartEvent;
 import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 
-import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class UserListFragment extends Fragment {
@@ -207,23 +204,19 @@ public class UserListFragment extends Fragment {
         return !mChannel.getServer().getUser().getNick().equals(nick);
     }
 
-    @SuppressLint("PrivateResource")
     private void onPrivateMessageUser(final Nick nick) {
         if (isNickOtherUsers(nick)) {
             mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
         } else {
-            final AlertDialog.Builder build = new AlertDialog.Builder(getActivity(),
-                    getAppPreferences().getTheme() == Theme.DARK
-                            ? android.support.v7.appcompat.R.style.Theme_AppCompat_Dialog_Alert
-                            : android.support.v7.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert);
-            build.setTitle(getActivity().getString(R.string.user_list_not_possible))
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getActivity().getString(R.string.user_list_not_possible))
                     .setMessage(getActivity()
                             .getString(R.string.user_list_pm_self_not_possible))
                     .setPositiveButton(getActivity().getString(R.string.ok),
                             (dialogInterface, i) -> dialogInterface.dismiss()
-                    );
-            build.show();
+                    )
+                    .show();
         }
     }
 

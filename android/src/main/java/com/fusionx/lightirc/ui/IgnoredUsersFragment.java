@@ -1,8 +1,6 @@
 package com.fusionx.lightirc.ui;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,7 +12,6 @@ import android.widget.ImageButton;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.model.db.ServerDatabase;
 import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 
@@ -24,7 +21,6 @@ import java.util.List;
 
 import co.fusionx.relay.base.Conversation;
 
-import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class IgnoredUsersFragment extends AppCompatDialogFragment {
@@ -43,7 +39,6 @@ public class IgnoredUsersFragment extends AppCompatDialogFragment {
         return new IgnoredUsersFragment();
     }
 
-    @SuppressLint("PrivateResource")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +46,7 @@ public class IgnoredUsersFragment extends AppCompatDialogFragment {
         mDatabaseSource = ServerDatabase.getInstance(getActivity());
         mAdapter = new IgnoredUsersAdapter(getActivity(), new DeclineListener());
 
-        setStyle(DialogFragment.STYLE_NO_FRAME, getAppPreferences().getTheme() == Theme.DARK
-                ? android.support.v7.appcompat.R.style.Theme_AppCompat_Dialog
-                : android.support.v7.appcompat.R.style.Theme_AppCompat_Light_Dialog);
+        setStyle(STYLE_NO_TITLE, 0);
     }
 
     @Override

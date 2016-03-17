@@ -12,7 +12,6 @@ import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
-import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 
@@ -22,7 +21,6 @@ import java.util.Collections;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.event.server.InviteEvent;
 
-import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class InviteFragment extends AppCompatDialogFragment {
@@ -42,9 +40,7 @@ public class InviteFragment extends AppCompatDialogFragment {
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setStyle(STYLE_NO_FRAME, getAppPreferences().getTheme() == Theme.DARK
-                ? android.support.v7.appcompat.R.style.Theme_AppCompat_Dialog
-                : android.support.v7.appcompat.R.style.Theme_AppCompat_Light_Dialog);
+        setStyle(STYLE_NO_TITLE, 0);
     }
 
     @Override

@@ -5,14 +5,11 @@ import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
-import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.service.ServiceEventInterceptor;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +30,6 @@ import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DCCRequestEvent;
 import co.fusionx.relay.event.server.DCCSendRequestEvent;
 
-import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
 public class DCCPendingFragment extends AppCompatDialogFragment {
@@ -50,14 +46,11 @@ public class DCCPendingFragment extends AppCompatDialogFragment {
         return new DCCPendingFragment();
     }
 
-    @SuppressLint("PrivateResource")
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setStyle(STYLE_NO_FRAME, getAppPreferences().getTheme() == Theme.DARK
-                ? android.support.v7.appcompat.R.style.Theme_AppCompat_Dialog
-                : android.support.v7.appcompat.R.style.Theme_AppCompat_Light_Dialog);
+        setStyle(STYLE_NO_TITLE, 0);
     }
 
     @Override
