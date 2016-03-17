@@ -1,19 +1,19 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.bus.Subscribe;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.model.db.ServerDatabase;
-import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
-
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+
+import com.fusionx.bus.Subscribe;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.model.db.ServerDatabase;
+import com.fusionx.lightirc.ui.dialogbuilder.DialogBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,7 @@ import co.fusionx.relay.base.Conversation;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class IgnoredUsersFragment extends DialogFragment {
+public class IgnoredUsersFragment extends AppCompatDialogFragment {
 
     private final EventHandler mEventHandler = new EventHandler();
 
@@ -46,7 +46,7 @@ public class IgnoredUsersFragment extends DialogFragment {
         mDatabaseSource = ServerDatabase.getInstance(getActivity());
         mAdapter = new IgnoredUsersAdapter(getActivity(), new DeclineListener());
 
-        setStyle(DialogFragment.STYLE_NO_FRAME, android.R.style.Theme_DeviceDefault_Dialog);
+        setStyle(STYLE_NO_TITLE, 0);
     }
 
     @Override

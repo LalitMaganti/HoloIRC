@@ -1,13 +1,13 @@
 package com.fusionx.lightirc.ui.helper;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.ui.MainActivity;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.preference.Preference;
+import android.support.v7.app.AlertDialog;
+
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.ui.MainActivity;
 
 public class RestartAppPreferenceListener implements Preference.OnPreferenceChangeListener {
 
@@ -19,7 +19,6 @@ public class RestartAppPreferenceListener implements Preference.OnPreferenceChan
 
     @Override
     public boolean onPreferenceChange(final Preference preference, final Object o) {
-        final AlertDialog.Builder build = new AlertDialog.Builder(mContext);
         final DialogInterface.OnClickListener listener = (dialogInterface, i) -> {
             final Intent intent = new Intent(mContext, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -27,7 +26,8 @@ public class RestartAppPreferenceListener implements Preference.OnPreferenceChan
             mContext.startActivity(intent);
         };
 
-        build.setMessage(mContext.getString(R.string.appearance_settings_requires_restart))
+        new AlertDialog.Builder(mContext)
+                .setMessage(mContext.getString(R.string.appearance_settings_requires_restart))
                 .setPositiveButton(mContext.getString(R.string.restart), listener)
                 .show();
         return true;

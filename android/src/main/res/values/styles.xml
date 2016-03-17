@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="LightBase" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+    <style name="Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -15,15 +15,22 @@
         <item name="expand_close_menu_drawable">@drawable/ic_expand_less</item>
         <item name="expand_open_menu_drawable">@drawable/ic_expand_more</item>
         <item name="action_divider_colour">@color/off_white</item>
+        <item name="alertDialogTheme">@style/LightAlertDialogTheme</item>
+        <item name="dialogTheme">@style/LightDialogTheme</item>
 
         <item name="main_background">@android:color/white</item>
         <item name="expandable_list_background">@color/very_light_grey</item>
         <item name="expandable_list_text">@color/dark_gray</item>
     </style>
 
-    <style name="Light" parent="LightBase" />
+    <style name="LightDialogTheme" parent="Theme.AppCompat.Light.Dialog" />
 
-    <style name="DarkBase" parent="@style/Theme.AppCompat">
+    <style name="LightAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="Dark" parent="@style/Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccentDark</item>
@@ -37,13 +44,20 @@
         <item name="expand_close_menu_drawable">@drawable/ic_expand_less_light</item>
         <item name="expand_open_menu_drawable">@drawable/ic_expand_more_light</item>
         <item name="action_divider_colour">@color/dark_gray</item>
+        <item name="alertDialogTheme">@style/DarkAlertDialogTheme</item>
+        <item name="dialogTheme">@style/DarkDialogTheme</item>
 
         <item name="main_background">@android:color/transparent</item>
         <item name="expandable_list_background">@android:color/transparent</item>
         <item name="expandable_list_text">@android:color/white</item>
     </style>
 
-    <style name="Dark" parent="DarkBase" />
+    <style name="DarkDialogTheme" parent="Theme.AppCompat.Dialog" />
+
+    <style name="DarkAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorAccent">@color/colorAccentDark</item>
+    </style>
 
     <style name="TextAppearance.Widget.ActionBar.Menu" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
         <item name="android:textSize">12sp</item>

@@ -21,17 +21,17 @@
 
 package com.fusionx.lightirc.ui.dialogbuilder;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.util.UIUtils;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.util.UIUtils;
 
 public abstract class DialogBuilder extends AlertDialog.Builder implements DialogInterface
         .OnClickListener, TextWatcher {
@@ -41,7 +41,7 @@ public abstract class DialogBuilder extends AlertDialog.Builder implements Dialo
     private AlertDialog dialog = null;
 
     public DialogBuilder(final Context context, final String title, final String hint,
-            final String defaultText) {
+                         final String defaultText) {
         super(context);
 
         setTitle(title);

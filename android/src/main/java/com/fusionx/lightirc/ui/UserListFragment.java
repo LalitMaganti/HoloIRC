@@ -21,22 +21,22 @@
 
 package com.fusionx.lightirc.ui;
 
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.List;
 
@@ -98,7 +98,7 @@ public class UserListFragment extends Fragment {
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.user_list_fragment, container, false);
         mRecyclerView = (RecyclerView) v.findViewById(android.R.id.list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -209,14 +209,14 @@ public class UserListFragment extends Fragment {
             mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
         } else {
-            final AlertDialog.Builder build = new AlertDialog.Builder(getActivity());
-            build.setTitle(getActivity().getString(R.string.user_list_not_possible))
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(getActivity().getString(R.string.user_list_not_possible))
                     .setMessage(getActivity()
                             .getString(R.string.user_list_pm_self_not_possible))
                     .setPositiveButton(getActivity().getString(R.string.ok),
                             (dialogInterface, i) -> dialogInterface.dismiss()
-                    );
-            build.show();
+                    )
+                    .show();
         }
     }
 
