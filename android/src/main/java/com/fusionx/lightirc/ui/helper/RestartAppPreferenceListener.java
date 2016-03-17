@@ -1,13 +1,17 @@
 package com.fusionx.lightirc.ui.helper;
 
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.ui.MainActivity;
-
-import android.app.AlertDialog;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.preference.Preference;
+import android.support.v7.app.AlertDialog;
+
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.Theme;
+import com.fusionx.lightirc.ui.MainActivity;
+
+import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 
 public class RestartAppPreferenceListener implements Preference.OnPreferenceChangeListener {
 
@@ -17,9 +21,13 @@ public class RestartAppPreferenceListener implements Preference.OnPreferenceChan
         mContext = context;
     }
 
+    @SuppressLint("PrivateResource")
     @Override
     public boolean onPreferenceChange(final Preference preference, final Object o) {
-        final AlertDialog.Builder build = new AlertDialog.Builder(mContext);
+        final AlertDialog.Builder build = new AlertDialog.Builder(mContext,
+                getAppPreferences().getTheme() == Theme.DARK
+                        ? android.support.v7.appcompat.R.style.Theme_AppCompat_Dialog_Alert
+                        : android.support.v7.appcompat.R.style.Theme_AppCompat_Light_Dialog_Alert);
         final DialogInterface.OnClickListener listener = (dialogInterface, i) -> {
             final Intent intent = new Intent(mContext, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
