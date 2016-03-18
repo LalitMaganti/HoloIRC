@@ -356,6 +356,7 @@ public class IRCService extends Service {
                     }
                     break;
                 case CONNECTING:
+                case REGISTERING:
                     connectingCount++;
                     break;
                 case CONNECTED:

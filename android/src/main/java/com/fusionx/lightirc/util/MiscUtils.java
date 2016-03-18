@@ -63,9 +63,11 @@ public class MiscUtils {
             case CONNECTED:
                 return context.getString(R.string.status_connected);
             case RECONNECTING:
-                return context.getString(R.string.reconnecting);
+                return context.getString(R.string.status_reconnecting);
             case CONNECTING:
                 return context.getString(R.string.status_connecting);
+            case REGISTERING:
+                return context.getString(R.string.status_registering);
             case DISCONNECTED:
                 return context.getString(R.string.status_disconnected);
             default:

@@ -152,7 +152,8 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
     private void updateConnectedState() {
         if (mMessageBox != null) {
             ConnectionStatus status = mConversation.getServer().getStatus();
-            mMessageBox.setEnabled(status == ConnectionStatus.CONNECTED);
+            mMessageBox.setEnabled(
+                    status == ConnectionStatus.REGISTERING || status == ConnectionStatus.CONNECTED);
         }
     }
 
