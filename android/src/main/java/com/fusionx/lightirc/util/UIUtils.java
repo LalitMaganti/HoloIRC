@@ -28,30 +28,21 @@ public class UIUtils {
 
     private static Typeface sRobotoLightTypeface = null;
 
-    private static Typeface sRobotoThinTypeface = null;
-
-    public static boolean isLandscape(final Context context) {
-        return context.getResources().getConfiguration().orientation == Configuration
-                .ORIENTATION_LANDSCAPE;
-    }
-
     public static void setRobotoLight(final Context context, final TextView textView) {
         final Typeface font = getRobotoLight(context);
         textView.setTypeface(font);
+    }
+
+    public static int getNoActionBarThemeInt() {
+        return AppPreferences.getAppPreferences().getTheme() == Theme.DARK
+                ? R.style.Dark_NoActionBar
+                : R.style.Light_NoActionBar;
     }
 
     public static int getThemeInt() {
         return AppPreferences.getAppPreferences().getTheme() == Theme.DARK
                 ? R.style.Dark
                 : R.style.Light;
-    }
-
-    public static void toggleSlidingPane(final SlidingPaneLayout slidingPaneLayout) {
-        if (slidingPaneLayout.isOpen()) {
-            slidingPaneLayout.closePane();
-        } else {
-            slidingPaneLayout.openPane();
-        }
     }
 
     public static boolean toggleDrawerLayout(final DrawerLayout drawerLayout, final View drawer) {
@@ -109,27 +100,14 @@ public class UIUtils {
         return new ForegroundColorSpan(color);
     }
 
-    public static <T extends View> T findById(final Activity activity, final int id) {
-        return (T) activity.findViewById(id);
-    }
-
     public static int resolveResourceIdFromAttr(final Context context, final int attrResource) {
         final TypedValue typedvalueattr = new TypedValue();
         context.getTheme().resolveAttribute(attrResource, typedvalueattr, true);
         return typedvalueattr.resourceId;
     }
 
-    public static int getColourFromResource(final Context context, final int resourceId) {
-        return context.getResources().getColor(resourceId);
-    }
-
     public static boolean isAppFromRecentApps(final int flags) {
         return (flags & Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0;
-    }
-
-    private static boolean isTablet(final Context context) {
-        return (context.getResources().getConfiguration().screenLayout & Configuration
-                .SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     private static Typeface getRobotoLight(final Context context) {

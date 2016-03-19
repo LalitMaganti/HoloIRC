@@ -16,6 +16,7 @@ import com.fusionx.lightirc.service.ServiceEventInterceptor;
 import com.fusionx.lightirc.util.EventUtils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -82,10 +83,10 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
     private int mSelectionType = ExpandableListView.PACKED_POSITION_TYPE_NULL;
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
 
-        mCallback = (Callback) activity;
+        mCallback = (Callback) context;
     }
 
     @Override
@@ -299,17 +300,22 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
 
             private ServerDatabase source;
 
+            private final List<Integer> groups = new ArrayList<>(checkedPositions.size());
+
             @Override
             protected void onPreExecute() {
                 source = ServerDatabase.getInstance(getActivity());
+
+                for (final int checkedPosition : checkedPositions) {
+                    final long packed = mListView.getExpandableListPosition(checkedPosition);
+                    final int group = ExpandableListView.getPackedPositionGroup(packed);
+                    groups.add(group);
+                }
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-                for (final int checkedPosition : checkedPositions) {
-                    final long packed = mListView.getExpandableListPosition(checkedPosition);
-                    final int group = ExpandableListView.getPackedPositionGroup(packed);
-
+                for (final int group : groups) {
                     final ServerConversationContainer listItem = mListAdapter.getGroup(group);
                     source.removeServer(listItem.getBuilder().getId());
                 }
@@ -353,7 +359,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
                 final TextView textView = (TextView) getView().findViewById(R.id.empty_text_view);
                 textView.setText("No servers found :(\nClick + to add one");
 
-                ((View) getView().findViewById(R.id.progress_bar_empty)).setVisibility(View.GONE);
+                getView().findViewById(R.id.progress_bar_empty).setVisibility(View.GONE);
 
                 for (final ServerEventHandler eventHandler : mEventHandlers.values()) {
                     eventHandler.unregister();

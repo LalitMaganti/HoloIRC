@@ -12,7 +12,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -131,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     private Snackbar mSnackbar;
 
+    private MaterialCab mMaterialCab;
+
     // Fields
     // Mention helper
     private final Object mMentionHelper = new Object() {
@@ -168,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getThemeInt());
+        setTheme(UIUtils.getNoActionBarThemeInt());
         setStatusBarTransparency(true);
         super.onCreate(savedInstanceState);
         CrashUtils.startCrashlyticsIfAppropriate(this);
@@ -203,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         mPaneIndicator = new SlidingPaneToggleArrow(this, mSlidingPane);
 
         mNavigationDrawerView = findViewById(R.id.right_drawer);
+        mMaterialCab = new MaterialCab(this, R.id.cab_stub);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -357,6 +359,11 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
     @Override
     public void reconnectToServer() {
         mService.requestReconnectionToServer(mConversation.getServer());
+    }
+
+    @Override
+    public MaterialCab getCab() {
+        return mMaterialCab;
     }
 
     private void onServiceConnected() {
@@ -533,6 +540,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         if (getSupportActionBar().getSubtitle() != null) {
             outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle().toString());
         }
+        mMaterialCab.saveState(outState);
     }
 
     @Override

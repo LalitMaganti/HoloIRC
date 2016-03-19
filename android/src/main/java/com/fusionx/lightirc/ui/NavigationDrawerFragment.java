@@ -80,8 +80,17 @@ public class NavigationDrawerFragment extends Fragment implements
         dragView.setOnClickListener(v -> {
             if (mSlidingUpPanelLayout.isPanelExpanded()) {
                 mSlidingUpPanelLayout.collapsePanel();
+                onUserPanelCollapsed();
             } else {
                 mSlidingUpPanelLayout.expandPanel();
+            }
+        });
+
+
+        mSlidingUpPanelLayout.setPanelSlideListener(new SlidingUpPanelLayout.SimplePanelSlideListener() {
+            @Override
+            public void onPanelCollapsed(View view) {
+                onUserPanelCollapsed();
             }
         });
 
@@ -95,6 +104,10 @@ public class NavigationDrawerFragment extends Fragment implements
             transaction.commit();
         }
         updateUserListVisibility();
+    }
+
+    private void onUserPanelCollapsed() {
+        getCab().finish();
     }
 
     @Override
@@ -112,6 +125,11 @@ public class NavigationDrawerFragment extends Fragment implements
     @Override
     public void closeDrawer() {
         mCallback.closeDrawer();
+    }
+
+    @Override
+    public MaterialCab getCab() {
+        return mCallback.getCab();
     }
 
     @Override
@@ -148,6 +166,7 @@ public class NavigationDrawerFragment extends Fragment implements
         switch (item.getItemId()) {
             case R.id.activity_main_ab_actions:
                 mSlidingUpPanelLayout.collapsePanel();
+                onUserPanelCollapsed();
                 return true;
             case R.id.activity_main_ab_users:
                 handleUserList();
@@ -170,10 +189,8 @@ public class NavigationDrawerFragment extends Fragment implements
 
             mSlidingUpPanelLayout.showPanel();
         } else {
-            if (mSlidingUpPanelLayout.isPanelExpanded()) {
-                // Collapse Pane
-                mSlidingUpPanelLayout.collapsePanel();
-            }
+            mSlidingUpPanelLayout.collapsePanel();
+            onUserPanelCollapsed();
             mSlidingUpPanelLayout.hidePanel();
         }
         getActivity().supportInvalidateOptionsMenu();
@@ -183,6 +200,7 @@ public class NavigationDrawerFragment extends Fragment implements
         final boolean userListVisible = mSlidingUpPanelLayout.isPanelExpanded();
         if (mCallback.isDrawerOpen() && userListVisible) {
             mSlidingUpPanelLayout.collapsePanel();
+            onUserPanelCollapsed();
         } else if (!userListVisible) {
             mSlidingUpPanelLayout.expandPanel();
         }
@@ -205,6 +223,8 @@ public class NavigationDrawerFragment extends Fragment implements
         void onMentionMultipleUsers(List<ChannelUser> users);
 
         void reconnectToServer();
+
+        MaterialCab getCab();
     }
 
     private class EventHandler {

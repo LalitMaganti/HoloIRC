@@ -102,7 +102,6 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
                 v -> {
                     if (!mMaterialCab.isActive() || mCheckedView == null) {
                         mMaterialCab.finish();
-                        mCheckedView = null;
                         return;
                     }
 
@@ -114,7 +113,8 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
                     mCheckedView = v;
                     mCheckedView.setActivated(true);
                     if (!mMaterialCab.isActive()) {
-                        mMaterialCab.start(this);
+                        mMaterialCab.setMenu(R.menu.fragment_userlist_cab)
+                                .start(this);
                     }
                     return true;
                 });
@@ -141,14 +141,7 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (savedInstanceState == null) {
-            mMaterialCab = new MaterialCab((AppCompatActivity) getActivity(), R.id.cab_stub)
-                    .setMenu(R.menu.fragment_userlist_cab);
-        } else {
-            mMaterialCab = MaterialCab.restoreState(
-                    savedInstanceState, (AppCompatActivity) getActivity(), this);
-        }
-
+        mMaterialCab = mCallback.getCab();
         updateAdapter(mChannel);
     }
 
@@ -176,20 +169,9 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
         mChannel = null;
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        if (mMaterialCab != null) {
-            mMaterialCab.saveState(outState);
-        }
-    }
-
     public void onUserListChanged() {
         mCallback.updateUserListVisibility();
-        if (mMaterialCab.isActive()) {
-            mMaterialCab.finish();
-        }
+        mMaterialCab.finish();
     }
 
     /*
@@ -318,8 +300,6 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
         }
         mMaterialCab.finish();
         mCallback.closeDrawer();
-        mCheckedView.setActivated(false);
-        mCheckedView = null;
         return false;
     }
 
@@ -339,5 +319,7 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
         public void updateUserListVisibility();
 
         public void closeDrawer();
+
+        public MaterialCab getCab();
     }
 }
