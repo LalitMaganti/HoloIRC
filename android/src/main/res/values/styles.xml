@@ -50,8 +50,6 @@
         <item name="main_background">@android:color/transparent</item>
         <item name="expandable_list_background">@android:color/transparent</item>
         <item name="expandable_list_text">@android:color/white</item>
-
-        <item name="windowActionBar">false</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.Dialog" />

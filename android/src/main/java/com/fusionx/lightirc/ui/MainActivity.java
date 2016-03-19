@@ -13,7 +13,6 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.afollestad.materialcab.MaterialCab;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
