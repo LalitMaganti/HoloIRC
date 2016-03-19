@@ -1,26 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
-import com.google.common.base.Optional;
-
-import com.fusionx.bus.Subscribe;
-import com.fusionx.bus.ThreadType;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.OnChannelMentionEvent;
-import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
-import com.fusionx.lightirc.event.OnQueryEvent;
-import com.fusionx.lightirc.misc.EventCache;
-import com.fusionx.lightirc.misc.FragmentType;
-import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.util.CompatUtils;
-import com.fusionx.lightirc.util.CrashUtils;
-import com.fusionx.lightirc.util.NotificationUtils;
-import com.fusionx.lightirc.util.UIUtils;
-import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
-import com.fusionx.lightirc.view.Snackbar;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
-
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -30,16 +9,39 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import com.afollestad.materialcab.MaterialCab;
+import com.fusionx.bus.Subscribe;
+import com.fusionx.bus.ThreadType;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnChannelMentionEvent;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
+import com.fusionx.lightirc.event.OnQueryEvent;
+import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
+import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.service.IRCService;
+import com.fusionx.lightirc.util.CompatUtils;
+import com.fusionx.lightirc.util.CrashUtils;
+import com.fusionx.lightirc.util.NotificationUtils;
+import com.fusionx.lightirc.util.UIUtils;
+import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
+import com.fusionx.lightirc.view.Snackbar;
+import com.google.common.base.Optional;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.util.List;
 
@@ -64,7 +66,7 @@ import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
 /**
  * Main activity which co-ordinates everything in the app
  */
-public class MainActivity extends ActionBarActivity implements ServerListFragment.Callback,
+public class MainActivity extends AppCompatActivity implements ServerListFragment.Callback,
         NavigationDrawerFragment.Callback, IRCFragment.Callback,
         ViewTreeObserver.OnGlobalLayoutListener {
 
@@ -173,12 +175,16 @@ public class MainActivity extends ActionBarActivity implements ServerListFragmen
 
         setContentView(R.layout.main_activity);
 
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+
         // create our manager instance after the content view is set
         final SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // enable status bar tint
         tintManager.setStatusBarTintEnabled(true);
         // set a custom tint color for all system bars
-        tintManager.setTintColor(getResources().getColor(R.color.action_bar_background_color));
+        tintManager.setTintColor(ResourcesCompat.getColor(
+                getResources(), R.color.action_bar_background_color, null));
 
         mEmptyView = (TextView) findViewById(R.id.content_frame_empty_textview);
 

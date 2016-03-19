@@ -60,6 +60,10 @@ public class EventUtils {
     }
 
     public static <T extends Event> T getLastStorableEvent(final List<T> eventList) {
+        if (eventList.isEmpty()) {
+            return null;
+        }
+
         for (int i = eventList.size() - 1; i >= 0; i--) {
             final T event = eventList.get(i);
             if (shouldStoreEvent(event)) {

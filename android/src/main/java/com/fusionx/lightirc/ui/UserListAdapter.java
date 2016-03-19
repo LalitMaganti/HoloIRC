@@ -42,6 +42,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     private final UserListComparator mComparator;
 
+    private final View.OnClickListener mListener;
+
+    private final View.OnLongClickListener mLongListener;
+
     private static final SparseIntArray LEVEL_RESOURCE_MAPPING = new SparseIntArray();
     static {
         LEVEL_RESOURCE_MAPPING.put(UserLevel.OWNER.ordinal(), R.string.user_level_owners);
@@ -54,7 +58,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     private SparseArray<Section> mSections = new SparseArray<>();
 
-    public UserListAdapter(final Context context, final Channel channel) {
+    public UserListAdapter(final Context context, final Channel channel,
+                           final View.OnClickListener listener,
+                           final View.OnLongClickListener longClickListener) {
         mContext = context;
         mInflater = LayoutInflater.from(context);
 
@@ -62,6 +68,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
         mComparator = new UserListComparator();
         mUsers = new ArrayList<>();
+
+        mListener = listener;
+        mLongListener = longClickListener;
 
         FluentIterable.from(channel.getUsers())
                 .transform(u -> new Pair<>(u.getNick(), u.getChannelPrivileges(channel)))
@@ -135,6 +144,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
                     NickCache.getNickCache().get(user.first).getColour());
             builder.setSpan(span, 0, builder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             holder.textView.setText(builder);
+
+            holder.itemView.setTag(user.first);
+            holder.itemView.setOnClickListener(mListener);
+            holder.itemView.setOnLongClickListener(mLongListener);
         }
     }
 

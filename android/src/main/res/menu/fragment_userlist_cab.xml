@@ -18,14 +18,18 @@
     You should have received a copy of the GNU General Public License
     along with HoloIRC. If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/fragment_userlist_cab_mention"
-        android:title="@string/mention" />
+        android:title="@string/mention"
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/fragment_userlist_cab_pm"
-        android:title="@string/private_message_short_form" />
+        android:title="@string/private_message_short_form"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/fragment_userlist_cab_whois"
-        android:title="@string/whois" />
+        android:title="@string/whois"
+        app:showAsAction="ifRoom" />
 </menu>

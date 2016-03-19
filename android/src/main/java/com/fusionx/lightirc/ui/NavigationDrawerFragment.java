@@ -1,5 +1,6 @@
 package com.fusionx.lightirc.ui;
 
+import com.afollestad.materialcab.MaterialCab;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;

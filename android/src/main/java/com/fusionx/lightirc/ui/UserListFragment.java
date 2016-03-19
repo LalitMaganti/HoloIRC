@@ -21,24 +21,33 @@
 
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.afollestad.materialcab.MaterialCab;
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 
+import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
@@ -55,11 +64,17 @@ import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class UserListFragment extends Fragment {
+public class UserListFragment extends Fragment implements MaterialCab.Callback {
 
     private Callback mCallback;
 
     private Channel mChannel;
+
+    private MaterialCab mMaterialCab;
+
+    private UserListAdapter mAdapter;
+
+    private RecyclerView mRecyclerView;
 
     private final Object mEventHandler = new Object() {
         @Subscribe
@@ -80,18 +95,35 @@ public class UserListFragment extends Fragment {
         }
     };
 
-    private UserListAdapter mAdapter;
-
-    private RecyclerView mRecyclerView;
+    private View mCheckedView;
 
     private void updateAdapter(final Channel channel) {
-        mAdapter = channel == null ? null : new UserListAdapter(getActivity(), channel);
+        mAdapter = channel == null ? null : new UserListAdapter(getActivity(), channel,
+                v -> {
+                    if (!mMaterialCab.isActive() || mCheckedView == null) {
+                        mMaterialCab.finish();
+                        mCheckedView = null;
+                        return;
+                    }
+
+                    mCheckedView.setActivated(false);
+                    mCheckedView = v;
+                    mCheckedView.setActivated(true);
+                },
+                v -> {
+                    mCheckedView = v;
+                    mCheckedView.setActivated(true);
+                    if (!mMaterialCab.isActive()) {
+                        mMaterialCab.start(this);
+                    }
+                    return true;
+                });
         mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
-    public void onAttach(final Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(final Context context) {
+        super.onAttach(context);
 
         mCallback = FragmentUtils.getParent(this, Callback.class);
     }
@@ -108,6 +140,15 @@ public class UserListFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState == null) {
+            mMaterialCab = new MaterialCab((AppCompatActivity) getActivity(), R.id.cab_stub)
+                    .setMenu(R.menu.fragment_userlist_cab);
+        } else {
+            mMaterialCab = MaterialCab.restoreState(
+                    savedInstanceState, (AppCompatActivity) getActivity(), this);
+        }
+
         updateAdapter(mChannel);
     }
 
@@ -135,8 +176,20 @@ public class UserListFragment extends Fragment {
         mChannel = null;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mMaterialCab != null) {
+            mMaterialCab.saveState(outState);
+        }
+    }
+
     public void onUserListChanged() {
         mCallback.updateUserListVisibility();
+        if (mMaterialCab.isActive()) {
+            mMaterialCab.finish();
+        }
     }
 
     /*
@@ -208,6 +261,7 @@ public class UserListFragment extends Fragment {
         if (isNickOtherUsers(nick)) {
             mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
+            mMaterialCab.finish();
         } else {
             new AlertDialog.Builder(getActivity())
                     .setTitle(getActivity().getString(R.string.user_list_not_possible))
@@ -218,6 +272,64 @@ public class UserListFragment extends Fragment {
                     )
                     .show();
         }
+    }
+
+    @Override
+    public boolean onCabCreated(MaterialCab materialCab, Menu menu) {
+        return true;
+    }
+
+    @Override
+    public boolean onCabItemClicked(MenuItem item) {
+        final Optional<ChannelUser> user = Optional.fromNullable(mCheckedView)
+                .transform(new Function<View, Nick>() {
+                    @Nullable
+                    @Override
+                    public Nick apply(View input) {
+                        return (Nick) input.getTag();
+                    }
+                }).transform(new Function<Nick, ChannelUser>() {
+                    @Nullable
+                    @Override
+                    public ChannelUser apply(Nick input) {
+                        final Optional<? extends ChannelUser> user =
+                                mChannel.getServer().getUserChannelInterface().getUser(
+                                        input.getNickAsString());
+                        return user.isPresent() ? user.get() : null;
+                    }
+                });
+        if (!user.isPresent()) {
+            mMaterialCab.finish();
+            return true;
+        }
+
+        switch (item.getItemId()) {
+            case R.id.fragment_userlist_cab_mention:
+                mCallback.onMentionMultipleUsers(Collections.singletonList(user.get()));
+                break;
+            case R.id.fragment_userlist_cab_pm:
+                onPrivateMessageUser(user.get().getNick());
+                break;
+            case R.id.fragment_userlist_cab_whois:
+                mChannel.getServer().sendWhois(user.get().getNick().getNickAsString());
+                break;
+            default:
+                return false;
+        }
+        mMaterialCab.finish();
+        mCallback.closeDrawer();
+        mCheckedView.setActivated(false);
+        mCheckedView = null;
+        return false;
+    }
+
+    @Override
+    public boolean onCabFinished(MaterialCab materialCab) {
+        if (mCheckedView != null) {
+            mCheckedView.setActivated(false);
+            mCheckedView = null;
+        }
+        return true;
     }
 
     public interface Callback {
