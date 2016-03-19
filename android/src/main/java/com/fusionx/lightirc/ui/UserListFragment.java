@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -64,13 +65,13 @@ import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class UserListFragment extends Fragment implements MaterialCab.Callback {
+public class UserListFragment extends Fragment implements ActionMode.Callback {
 
     private Callback mCallback;
 
     private Channel mChannel;
 
-    private MaterialCab mMaterialCab;
+    private ActionMode mActionMode;
 
     private UserListAdapter mAdapter;
 
@@ -100,8 +101,10 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
     private void updateAdapter(final Channel channel) {
         mAdapter = channel == null ? null : new UserListAdapter(getActivity(), channel,
                 v -> {
-                    if (!mMaterialCab.isActive() || mCheckedView == null) {
-                        mMaterialCab.finish();
+                    if (mActionMode == null) {
+                        return;
+                    } else if (mCheckedView == null) {
+                        mActionMode.finish();
                         return;
                     }
 
@@ -112,9 +115,8 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
                 v -> {
                     mCheckedView = v;
                     mCheckedView.setActivated(true);
-                    if (!mMaterialCab.isActive()) {
-                        mMaterialCab.setMenu(R.menu.fragment_userlist_cab)
-                                .start(this);
+                    if (mActionMode == null) {
+                        mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(this);
                     }
                     return true;
                 });
@@ -141,7 +143,6 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mMaterialCab = mCallback.getCab();
         updateAdapter(mChannel);
     }
 
@@ -171,7 +172,9 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
 
     public void onUserListChanged() {
         mCallback.updateUserListVisibility();
-        mMaterialCab.finish();
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
     }
 
     /*
@@ -243,7 +246,9 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
         if (isNickOtherUsers(nick)) {
             mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
-            mMaterialCab.finish();
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
         } else {
             new AlertDialog.Builder(getActivity())
                     .setTitle(getActivity().getString(R.string.user_list_not_possible))
@@ -257,12 +262,18 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
     }
 
     @Override
-    public boolean onCabCreated(MaterialCab materialCab, Menu menu) {
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mode.getMenuInflater().inflate(R.menu.fragment_userlist_cab, menu);
         return true;
     }
 
     @Override
-    public boolean onCabItemClicked(MenuItem item) {
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return true;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         final Optional<ChannelUser> user = Optional.fromNullable(mCheckedView)
                 .transform(new Function<View, Nick>() {
                     @Nullable
@@ -281,7 +292,7 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
                     }
                 });
         if (!user.isPresent()) {
-            mMaterialCab.finish();
+            mode.finish();
             return true;
         }
 
@@ -298,18 +309,24 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
             default:
                 return false;
         }
-        mMaterialCab.finish();
+        mode.finish();
         mCallback.closeDrawer();
-        return false;
+        return true;
     }
 
     @Override
-    public boolean onCabFinished(MaterialCab materialCab) {
+    public void onDestroyActionMode(ActionMode mode) {
         if (mCheckedView != null) {
             mCheckedView.setActivated(false);
             mCheckedView = null;
         }
-        return true;
+        mActionMode = null;
+    }
+
+    public void finishCab() {
+        if (mActionMode != null) {
+            mActionMode.finish();
+        }
     }
 
     public interface Callback {
@@ -319,7 +336,5 @@ public class UserListFragment extends Fragment implements MaterialCab.Callback {
         public void updateUserListVisibility();
 
         public void closeDrawer();
-
-        public MaterialCab getCab();
     }
 }

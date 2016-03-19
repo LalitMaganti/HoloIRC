@@ -33,12 +33,6 @@ public class UIUtils {
         textView.setTypeface(font);
     }
 
-    public static int getNoActionBarThemeInt() {
-        return AppPreferences.getAppPreferences().getTheme() == Theme.DARK
-                ? R.style.Dark_NoActionBar
-                : R.style.Light_NoActionBar;
-    }
-
     public static int getThemeInt() {
         return AppPreferences.getAppPreferences().getTheme() == Theme.DARK
                 ? R.style.Dark

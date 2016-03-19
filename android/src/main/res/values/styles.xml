@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Light" parent="@style/Theme.AppCompat.Light">
+    <style name="Light" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -21,11 +21,6 @@
         <item name="main_background">@android:color/white</item>
         <item name="expandable_list_background">@color/very_light_grey</item>
         <item name="expandable_list_text">@color/dark_gray</item>
-    </style>
-
-    <style name="Light.NoActionBar" parent="Light">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="LightDialogTheme" parent="Theme.AppCompat.Light.Dialog" />
@@ -55,11 +50,8 @@
         <item name="main_background">@android:color/transparent</item>
         <item name="expandable_list_background">@android:color/transparent</item>
         <item name="expandable_list_text">@android:color/white</item>
-    </style>
 
-    <style name="Dark.NoActionBar" parent="Dark">
         <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.Dialog" />

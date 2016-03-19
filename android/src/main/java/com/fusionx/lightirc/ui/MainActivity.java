@@ -33,7 +33,6 @@ import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.service.IRCService;
-import com.fusionx.lightirc.util.CompatUtils;
 import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
 import com.fusionx.lightirc.util.UIUtils;
@@ -130,8 +129,6 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     private Snackbar mSnackbar;
 
-    private MaterialCab mMaterialCab;
-
     // Fields
     // Mention helper
     private final Object mMentionHelper = new Object() {
@@ -169,15 +166,12 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
-        setTheme(UIUtils.getNoActionBarThemeInt());
+        setTheme(UIUtils.getThemeInt());
         setStatusBarTransparency(true);
         super.onCreate(savedInstanceState);
         CrashUtils.startCrashlyticsIfAppropriate(this);
 
         setContentView(R.layout.main_activity);
-
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        setSupportActionBar(toolbar);
 
         // create our manager instance after the content view is set
         final SystemBarTintManager tintManager = new SystemBarTintManager(this);
@@ -185,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         tintManager.setStatusBarTintEnabled(true);
         // set a custom tint color for all system bars
         tintManager.setTintColor(ResourcesCompat.getColor(
-                getResources(), R.color.action_bar_background_color, null));
+                getResources(), R.color.colorPrimaryDark, null));
 
         mEmptyView = (TextView) findViewById(R.id.content_frame_empty_textview);
 
@@ -204,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         mPaneIndicator = new SlidingPaneToggleArrow(this, mSlidingPane);
 
         mNavigationDrawerView = findViewById(R.id.right_drawer);
-        mMaterialCab = new MaterialCab(this, R.id.cab_stub);
 
         if (savedInstanceState == null) {
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -359,11 +352,6 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
     @Override
     public void reconnectToServer() {
         mService.requestReconnectionToServer(mConversation.getServer());
-    }
-
-    @Override
-    public MaterialCab getCab() {
-        return mMaterialCab;
     }
 
     private void onServiceConnected() {
@@ -540,7 +528,6 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         if (getSupportActionBar().getSubtitle() != null) {
             outState.putString(ACTION_BAR_SUBTITLE, getSupportActionBar().getSubtitle().toString());
         }
-        mMaterialCab.saveState(outState);
     }
 
     @Override
@@ -591,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
     }
 
     private void setStatusBarTransparency(boolean transparent) {
-        if (!CompatUtils.hasKitKat()) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             return;
         }
         getWindow().setFlags(transparent ? WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS : 0,
@@ -719,6 +706,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         @Override
         public void onDrawerClosed(final View drawerView) {
             mSlidingPane.setSlideable(true);
+            mNavigationDrawerFragment.onUserPanelNotVisible();
         }
 
         @Override

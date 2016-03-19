@@ -83,9 +83,6 @@ dependencies {
 
     compile 'com.sothree.slidinguppanel:library:2.0.4'
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
-    compile('com.afollestad:material-cab:0.1.9@aar') {
-        transitive = true
-    }
 
     internalCompile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true

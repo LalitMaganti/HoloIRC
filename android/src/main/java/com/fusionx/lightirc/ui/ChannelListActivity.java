@@ -1,11 +1,11 @@
 package com.fusionx.lightirc.ui;
 
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+
 import com.fusionx.lightirc.util.UIUtils;
 
-import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-
-public class ChannelListActivity extends ActionBarActivity {
+public class ChannelListActivity extends AppCompatActivity {
 
     private ChannelListFragment mChannelListFragment;
 
@@ -19,7 +19,6 @@ public class ChannelListActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(UIUtils.getThemeInt());
-
         super.onCreate(savedInstanceState);
 
         mChannelListFragment = new ChannelListFragment();
