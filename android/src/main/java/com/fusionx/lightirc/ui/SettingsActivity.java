@@ -1,9 +1,9 @@
 package com.fusionx.lightirc.ui;
 
+import android.os.Bundle;
+
 import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.util.UIUtils;
-
-import android.os.Bundle;
 
 import java.util.List;
 

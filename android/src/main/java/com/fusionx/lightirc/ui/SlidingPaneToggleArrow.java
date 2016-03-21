@@ -15,30 +15,18 @@
  */
 package com.fusionx.lightirc.ui;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.view.MenuItem;
 import android.view.View;
-import android.support.v7.appcompat.R;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 
 public class SlidingPaneToggleArrow implements SlidingPaneLayout.PanelSlideListener {
-    private final ActionBarActivity mActivity;
+    private final AppCompatActivity mActivity;
     private final SlidingPaneLayout mPaneLayout;
     private DrawerArrowDrawable mSlider;
 
-    public SlidingPaneToggleArrow(ActionBarActivity activity, SlidingPaneLayout paneLayout) {
+    public SlidingPaneToggleArrow(AppCompatActivity activity, SlidingPaneLayout paneLayout) {
         mActivity = activity;
         mPaneLayout = paneLayout;
         mSlider = new DrawerArrowDrawable(activity.getSupportActionBar().getThemedContext());

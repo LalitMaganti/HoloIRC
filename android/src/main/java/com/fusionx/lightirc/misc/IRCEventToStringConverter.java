@@ -57,6 +57,7 @@ import co.fusionx.relay.event.query.QueryOpenedEvent;
 import co.fusionx.relay.event.query.QueryStopEvent;
 import co.fusionx.relay.event.server.ConnectEvent;
 import co.fusionx.relay.event.server.ConnectingEvent;
+import co.fusionx.relay.event.server.RegisteringEvent;
 import co.fusionx.relay.event.server.DCCChatRequestEvent;
 import co.fusionx.relay.event.server.DisconnectEvent;
 import co.fusionx.relay.event.server.ErrorEvent;
@@ -223,6 +224,11 @@ public class IRCEventToStringConverter {
 
         public EventDecorator getOnConnectingMessage(final ConnectingEvent event) {
             final String response = mContext.getString(R.string.parser_connecting);
+            return setupEvent(response);
+        }
+
+        public EventDecorator getOnRegisteringMessage(final RegisteringEvent event) {
+            final String response = mContext.getString(R.string.parser_registering);
             return setupEvent(response);
         }
 

@@ -67,10 +67,9 @@ public final class ChannelFragment extends IRCFragment<ChannelEvent>
 
     private boolean mIsPopupShown;
 
-    public void onMentionMultipleUsers(final List<ChannelUser> users) {
+    public void onMentionMultipleUsers(final List<Nick> users) {
         final String text = String.valueOf(mMessageBox.getText());
         final String total = FluentIterable.from(users)
-                .transform(ChannelUser::getNick)
                 .transform(Nick::getNickAsString)
                 .join(Joiner.on(": ")) + ": " + text;
 

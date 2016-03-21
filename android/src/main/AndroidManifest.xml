@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.fusionx.lightirc"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="62"
-    android:versionName="4.0.2">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.fusionx.lightirc"
+    android:versionCode="65"
+    android:versionName="4.0.5">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".IRCApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:name=".IRCApplication"
         android:theme="@style/Light">
         <activity
             android:name=".ui.MainActivity"

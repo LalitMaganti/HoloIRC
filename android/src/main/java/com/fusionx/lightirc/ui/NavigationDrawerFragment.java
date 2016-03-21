@@ -1,12 +1,5 @@
 package com.fusionx.lightirc.ui;
 
-import com.fusionx.bus.Subscribe;
-import com.fusionx.lightirc.R;
-import com.fusionx.lightirc.event.OnConversationChanged;
-import com.fusionx.lightirc.event.OnServerStatusChanged;
-import com.fusionx.lightirc.misc.FragmentType;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,12 +12,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fusionx.bus.Subscribe;
+import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.event.OnConversationChanged;
+import com.fusionx.lightirc.event.OnServerStatusChanged;
+import com.fusionx.lightirc.misc.FragmentType;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+
 import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Nick;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -42,6 +43,8 @@ public class NavigationDrawerFragment extends Fragment implements
     private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
     private Callback mCallback;
+
+    private UserListFragment mUserListFragment;
 
     @Override
     public void onAttach(final Context context) {
@@ -62,13 +65,26 @@ public class NavigationDrawerFragment extends Fragment implements
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-            final Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         return inflater.inflate(R.layout.navigation_drawer_layout, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState == null) {
+            final ActionsFragment actionsFragment = new ActionsFragment();
+            mUserListFragment = new UserListFragment();
+
+            final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.add(R.id.actions_list_layout, actionsFragment, "Actions");
+            transaction.replace(R.id.user_list_frame_layout, mUserListFragment);
+            transaction.commit();
+        } else {
+            mUserListFragment = (UserListFragment) getChildFragmentManager()
+                    .findFragmentById(R.id.user_list_frame_layout);
+        }
 
         mSlidingUpPanelLayout = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_up_panel);
         mUserListTextView = (TextView) view.findViewById(R.id.user_text_view);
@@ -79,21 +95,23 @@ public class NavigationDrawerFragment extends Fragment implements
         dragView.setOnClickListener(v -> {
             if (mSlidingUpPanelLayout.isPanelExpanded()) {
                 mSlidingUpPanelLayout.collapsePanel();
+                onUserPanelNotVisible();
             } else {
                 mSlidingUpPanelLayout.expandPanel();
             }
         });
 
-        if (savedInstanceState == null) {
-            final ActionsFragment actionsFragment = new ActionsFragment();
-            final UserListFragment userListFragment = new UserListFragment();
-
-            final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.add(R.id.actions_list_layout, actionsFragment, "Actions");
-            transaction.replace(R.id.user_list_frame_layout, userListFragment);
-            transaction.commit();
-        }
+        mSlidingUpPanelLayout.setPanelSlideListener(new SlidingUpPanelLayout.SimplePanelSlideListener() {
+            @Override
+            public void onPanelCollapsed(View view) {
+                onUserPanelNotVisible();
+            }
+        });
         updateUserListVisibility();
+    }
+
+    public void onUserPanelNotVisible() {
+        mUserListFragment.finishCab();
     }
 
     @Override
@@ -124,7 +142,7 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void onMentionMultipleUsers(final List<ChannelUser> users) {
+    public void onMentionMultipleUsers(final List<Nick> users) {
         mCallback.onMentionMultipleUsers(users);
     }
 
@@ -147,6 +165,7 @@ public class NavigationDrawerFragment extends Fragment implements
         switch (item.getItemId()) {
             case R.id.activity_main_ab_actions:
                 mSlidingUpPanelLayout.collapsePanel();
+                onUserPanelNotVisible();
                 return true;
             case R.id.activity_main_ab_users:
                 handleUserList();
@@ -169,10 +188,8 @@ public class NavigationDrawerFragment extends Fragment implements
 
             mSlidingUpPanelLayout.showPanel();
         } else {
-            if (mSlidingUpPanelLayout.isPanelExpanded()) {
-                // Collapse Pane
-                mSlidingUpPanelLayout.collapsePanel();
-            }
+            mSlidingUpPanelLayout.collapsePanel();
+            onUserPanelNotVisible();
             mSlidingUpPanelLayout.hidePanel();
         }
         getActivity().supportInvalidateOptionsMenu();
@@ -182,6 +199,7 @@ public class NavigationDrawerFragment extends Fragment implements
         final boolean userListVisible = mSlidingUpPanelLayout.isPanelExpanded();
         if (mCallback.isDrawerOpen() && userListVisible) {
             mSlidingUpPanelLayout.collapsePanel();
+            onUserPanelNotVisible();
         } else if (!userListVisible) {
             mSlidingUpPanelLayout.expandPanel();
         }
@@ -201,7 +219,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
         void closeDrawer();
 
-        void onMentionMultipleUsers(List<ChannelUser> users);
+        void onMentionMultipleUsers(List<Nick> users);
 
         void reconnectToServer();
     }

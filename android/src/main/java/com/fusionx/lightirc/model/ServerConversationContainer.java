@@ -24,7 +24,7 @@ public class ServerConversationContainer {
     private Server mServer;
 
     public ServerConversationContainer(final Builder builder, final Collection<String> ignoreList,
-            final Server server) {
+                                       final Server server) {
         mBuilder = builder;
         mIgnoreList = ignoreList;
         mConversations = new LinkedHashSet<>();
@@ -33,8 +33,7 @@ public class ServerConversationContainer {
     }
 
     public boolean isServerAvailable() {
-        return mServer != null && (mServer.getStatus() == ConnectionStatus.CONNECTED
-                || mServer.getStatus() == ConnectionStatus.RECONNECTING);
+        return mServer != null && mServer.getStatus() != ConnectionStatus.STOPPED;
     }
 
     public String getTitle() {
