@@ -41,16 +41,11 @@ import com.fusionx.lightirc.R;
 import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.misc.FragmentType;
 import com.fusionx.lightirc.util.FragmentUtils;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 import co.fusionx.relay.base.Channel;
-import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
@@ -64,17 +59,19 @@ import co.fusionx.relay.event.channel.ChannelWorldQuitEvent;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
-public class UserListFragment extends Fragment implements ActionMode.Callback {
+public class UserListFragment extends Fragment {
 
     private Callback mCallback;
 
     private Channel mChannel;
 
-    private ActionMode mActionMode;
-
     private UserListAdapter mAdapter;
 
     private RecyclerView mRecyclerView;
+
+    private final List<Integer> mCheckedPositions = new ArrayList<>();
+
+    private final ActionModeHandler mActionModeHandler = new ActionModeHandler(mCheckedPositions);
 
     private final Object mEventHandler = new Object() {
         @Subscribe
@@ -95,30 +92,13 @@ public class UserListFragment extends Fragment implements ActionMode.Callback {
         }
     };
 
-    private View mCheckedView;
-
     private void updateAdapter(final Channel channel) {
-        mAdapter = channel == null ? null : new UserListAdapter(getActivity(), channel,
-                v -> {
-                    if (mActionMode == null) {
-                        return;
-                    } else if (mCheckedView == null) {
-                        mActionMode.finish();
-                        return;
-                    }
-
-                    mCheckedView.setActivated(false);
-                    mCheckedView = v;
-                    mCheckedView.setActivated(true);
-                },
-                v -> {
-                    mCheckedView = v;
-                    mCheckedView.setActivated(true);
-                    if (mActionMode == null) {
-                        mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(this);
-                    }
-                    return true;
-                });
+        mAdapter = channel == null ? null : new UserListAdapter(
+                getActivity(),
+                channel,
+                mCheckedPositions,
+                mActionModeHandler,
+                mActionModeHandler);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -171,9 +151,7 @@ public class UserListFragment extends Fragment implements ActionMode.Callback {
 
     public void onUserListChanged() {
         mCallback.updateUserListVisibility();
-        if (mActionMode != null) {
-            mActionMode.finish();
-        }
+        mActionModeHandler.finish();
     }
 
     /*
@@ -245,9 +223,7 @@ public class UserListFragment extends Fragment implements ActionMode.Callback {
         if (isNickOtherUsers(nick)) {
             mChannel.getServer().sendQuery(nick.getNickAsString(), null);
             mCallback.closeDrawer();
-            if (mActionMode != null) {
-                mActionMode.finish();
-            }
+            mActionModeHandler.finish();
         } else {
             new AlertDialog.Builder(getActivity())
                     .setTitle(getActivity().getString(R.string.user_list_not_possible))
@@ -260,80 +236,126 @@ public class UserListFragment extends Fragment implements ActionMode.Callback {
         }
     }
 
-    @Override
-    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-        mode.getMenuInflater().inflate(R.menu.fragment_userlist_cab, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return true;
-    }
-
-    @Override
-    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        final Optional<ChannelUser> user = Optional.fromNullable(mCheckedView)
-                .transform(new Function<View, Nick>() {
-                    @Nullable
-                    @Override
-                    public Nick apply(View input) {
-                        return (Nick) input.getTag();
-                    }
-                }).transform(new Function<Nick, ChannelUser>() {
-                    @Nullable
-                    @Override
-                    public ChannelUser apply(Nick input) {
-                        final Optional<? extends ChannelUser> user =
-                                mChannel.getServer().getUserChannelInterface().getUser(
-                                        input.getNickAsString());
-                        return user.isPresent() ? user.get() : null;
-                    }
-                });
-        if (!user.isPresent()) {
-            mode.finish();
-            return true;
-        }
-
-        switch (item.getItemId()) {
-            case R.id.fragment_userlist_cab_mention:
-                mCallback.onMentionMultipleUsers(Collections.singletonList(user.get()));
-                break;
-            case R.id.fragment_userlist_cab_pm:
-                onPrivateMessageUser(user.get().getNick());
-                break;
-            case R.id.fragment_userlist_cab_whois:
-                mChannel.getServer().sendWhois(user.get().getNick().getNickAsString());
-                break;
-            default:
-                return false;
-        }
-        mode.finish();
-        mCallback.closeDrawer();
-        return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-        if (mCheckedView != null) {
-            mCheckedView.setActivated(false);
-            mCheckedView = null;
-        }
-        mActionMode = null;
-    }
-
     public void finishCab() {
-        if (mActionMode != null) {
-            mActionMode.finish();
-        }
+        mActionModeHandler.finish();
     }
 
     public interface Callback {
 
-        public void onMentionMultipleUsers(final List<ChannelUser> users);
+        void onMentionMultipleUsers(final List<Nick> users);
 
-        public void updateUserListVisibility();
+        void updateUserListVisibility();
 
-        public void closeDrawer();
+        void closeDrawer();
+    }
+
+    private class ActionModeHandler implements View.OnClickListener, View.OnLongClickListener,
+            ActionMode.Callback {
+
+        private final List<Integer> mCheckedPositions;
+
+        private ActionMode mActionMode;
+
+        public ActionModeHandler(List<Integer> checkedPositions) {
+            mCheckedPositions = checkedPositions;
+        }
+
+        @Override
+        public void onClick(View v) {
+            onViewSelected(v, (Integer) v.getTag());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            onViewSelected(v, (Integer) v.getTag());
+            return true;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.fragment_userlist_cab, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            int selectedItemCount = mCheckedPositions.size();
+            if (selectedItemCount != 0) {
+                final String quantityString = getResources()
+                        .getQuantityString(R.plurals.user_selection,
+                                selectedItemCount, selectedItemCount);
+                mode.setTitle(quantityString);
+
+                mode.getMenu().getItem(1).setVisible(selectedItemCount == 1);
+                mode.getMenu().getItem(2).setVisible(selectedItemCount == 1);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.fragment_userlist_cab_mention:
+                    mCallback.onMentionMultipleUsers(getAllNicks());
+                    break;
+                case R.id.fragment_userlist_cab_pm:
+                    onPrivateMessageUser(getFirstCheckedNick());
+                    break;
+                case R.id.fragment_userlist_cab_whois:
+                    mChannel.getServer().sendWhois(getFirstCheckedNick().getNickAsString());
+                    break;
+                default:
+                    return false;
+            }
+
+            mode.finish();
+            mCallback.closeDrawer();
+            return true;
+        }
+
+        private Nick getFirstCheckedNick() {
+            return mAdapter.getItem(mCheckedPositions.get(0)).first;
+        }
+
+        private List<Nick> getAllNicks() {
+            final List<Nick> nicks = new ArrayList<>();
+            for (Integer i : mCheckedPositions) {
+                nicks.add(mAdapter.getItem(i).first);
+            }
+            return nicks;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mCheckedPositions.clear();
+            mAdapter.notifyDataSetChanged();
+            mActionMode = null;
+        }
+
+        public void finish() {
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+        }
+
+        private void onViewSelected(View view, Integer position) {
+            boolean remove = mCheckedPositions.contains(position);
+            if (remove) {
+                mCheckedPositions.remove(position);
+                if (mCheckedPositions.isEmpty()) {
+                    finish();
+                } else {
+                    mActionMode.invalidate();
+                }
+            } else {
+                mCheckedPositions.add(position);
+                if (mActionMode == null) {
+                    mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(this);
+                } else {
+                    mActionMode.invalidate();
+                }
+            }
+            view.setActivated(!remove);
+        }
     }
 }

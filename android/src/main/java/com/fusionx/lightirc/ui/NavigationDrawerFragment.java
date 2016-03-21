@@ -25,6 +25,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Nick;
 
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 
@@ -72,6 +73,19 @@ public class NavigationDrawerFragment extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if (savedInstanceState == null) {
+            final ActionsFragment actionsFragment = new ActionsFragment();
+            mUserListFragment = new UserListFragment();
+
+            final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+            transaction.add(R.id.actions_list_layout, actionsFragment, "Actions");
+            transaction.replace(R.id.user_list_frame_layout, mUserListFragment);
+            transaction.commit();
+        } else {
+            mUserListFragment = (UserListFragment) getChildFragmentManager()
+                    .findFragmentById(R.id.user_list_frame_layout);
+        }
+
         mSlidingUpPanelLayout = (SlidingUpPanelLayout) view.findViewById(R.id.sliding_up_panel);
         mUserListTextView = (TextView) view.findViewById(R.id.user_text_view);
 
@@ -93,19 +107,6 @@ public class NavigationDrawerFragment extends Fragment implements
                 onUserPanelNotVisible();
             }
         });
-
-        if (savedInstanceState == null) {
-            final ActionsFragment actionsFragment = new ActionsFragment();
-            mUserListFragment = new UserListFragment();
-
-            final FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-            transaction.add(R.id.actions_list_layout, actionsFragment, "Actions");
-            transaction.replace(R.id.user_list_frame_layout, mUserListFragment);
-            transaction.commit();
-        } else {
-            mUserListFragment = (UserListFragment) getChildFragmentManager()
-                    .findFragmentById(R.id.user_list_frame_layout);
-        }
         updateUserListVisibility();
     }
 
@@ -141,7 +142,7 @@ public class NavigationDrawerFragment extends Fragment implements
     }
 
     @Override
-    public void onMentionMultipleUsers(final List<ChannelUser> users) {
+    public void onMentionMultipleUsers(final List<Nick> users) {
         mCallback.onMentionMultipleUsers(users);
     }
 
@@ -218,7 +219,7 @@ public class NavigationDrawerFragment extends Fragment implements
 
         void closeDrawer();
 
-        void onMentionMultipleUsers(List<ChannelUser> users);
+        void onMentionMultipleUsers(List<Nick> users);
 
         void reconnectToServer();
     }

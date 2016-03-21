@@ -45,6 +45,7 @@ import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
 import co.fusionx.relay.base.ConnectionStatus;
 import co.fusionx.relay.base.Conversation;
+import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.base.QueryUser;
 import co.fusionx.relay.base.Server;
 import co.fusionx.relay.dcc.chat.DCCChatConversation;
@@ -343,7 +344,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     // TODO - fix this hack
     @Override
-    public void onMentionMultipleUsers(final List<ChannelUser> users) {
+    public void onMentionMultipleUsers(final List<Nick> users) {
         ((ChannelFragment) mCurrentFragment).onMentionMultipleUsers(users);
     }
 
