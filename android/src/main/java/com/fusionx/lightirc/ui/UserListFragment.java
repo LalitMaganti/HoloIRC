@@ -351,9 +351,8 @@ public class UserListFragment extends Fragment {
                 mCheckedPositions.add(position);
                 if (mActionMode == null) {
                     mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(this);
-                } else {
-                    mActionMode.invalidate();
                 }
+                mActionMode.invalidate();
             }
             view.setActivated(!remove);
         }
