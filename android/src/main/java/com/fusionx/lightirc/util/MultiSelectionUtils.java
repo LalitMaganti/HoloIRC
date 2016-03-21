@@ -19,6 +19,7 @@ package com.fusionx.lightirc.util;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.util.Pair;
 import android.util.SparseBooleanArray;
@@ -34,13 +35,13 @@ import java.util.HashSet;
 /**
  * Utilities for handling multiple selection in list views. Contains functionality similar to
  * {@link
- * AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link ActionBarActivity} and
+ * AbsListView#CHOICE_MODE_MULTIPLE_MODAL} but that works with {@link AppCompatActivity} and
  * backward-compatible action bars.
  */
 public class MultiSelectionUtils {
 
     public static Controller attachMultiSelectionController(final AbsListView listView,
-            final ActionBarActivity activity,
+            final AppCompatActivity activity,
             final MultiChoiceModeListener listener,
             boolean startModeOnClick) {
         return Controller.attach(listView, activity, listener, startModeOnClick);
@@ -77,7 +78,7 @@ public class MultiSelectionUtils {
 
         private AbsListView mListView = null;
 
-        private ActionBarActivity mActivity = null;
+        private AppCompatActivity mActivity = null;
 
         private MultiChoiceModeListener mListener = null;
 
@@ -90,7 +91,7 @@ public class MultiSelectionUtils {
         private Controller() {
         }
 
-        public static Controller attach(AbsListView listView, ActionBarActivity activity,
+        public static Controller attach(AbsListView listView, AppCompatActivity activity,
                 MultiChoiceModeListener listener,
                 boolean startModeOnClick) {
             Controller controller = new Controller();

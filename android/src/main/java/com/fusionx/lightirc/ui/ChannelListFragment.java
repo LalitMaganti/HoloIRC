@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
@@ -80,7 +81,7 @@ public class ChannelListFragment extends ListFragment {
         @Override
         protected void attachSelectionController() {
             mMultiSelectionController = MultiSelectionUtils.attachMultiSelectionController(
-                    getListView(), (ActionBarActivity) getActivity(), this, true);
+                    getListView(), (AppCompatActivity) getActivity(), this, true);
         }
 
         @Override
