@@ -1,7 +1,9 @@
 package com.fusionx.lightirc.ui;
 
 import com.fusionx.lightirc.R;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
+import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.model.EventDecorator;
 import com.fusionx.lightirc.model.MessagePriority;
 import com.fusionx.lightirc.model.ServerConversationContainer;
@@ -145,7 +147,8 @@ public class ExpandableServerListAdapter extends BaseExpandableListAdapter {
         final Conversation conversation = getChild(groupPos, childPos);
 
         final ServiceEventInterceptor helper = mIRCService.getEventHelper(listItem.getServer());
-        final EventCache cache = IRCService.getEventCache(listItem.getServer());
+        final EventCache cache = IRCService.getEventCache(listItem.getServer(),
+                AppPreferences.getAppPreferences().getTheme() == Theme.DARK);
 
         final TextView textView = (TextView) convertView.findViewById(R.id.child_title);
 

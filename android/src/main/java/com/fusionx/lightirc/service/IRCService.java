@@ -52,7 +52,7 @@ import static com.fusionx.lightirc.util.NotificationUtils.notifyOutOfApp;
 
 public class IRCService extends Service {
 
-    public static final Map<Server, EventCache> mEventCache = new HashMap<>();
+    public static final Map<Server, EventCache[]> mEventCache = new HashMap<>();
 
     private static final int SERVICE_PRIORITY = 50;
 
@@ -144,8 +144,12 @@ public class IRCService extends Service {
     private ConnectionManager mConnectionManager;
     private Notification mNotification;
 
-    public static EventCache getEventCache(final Server server) {
-        return mEventCache.get(server);
+    public static EventCache getEventCache(final Server server, boolean darkBackground) {
+        EventCache[] cache = mEventCache.get(server);
+        if (cache == null) {
+            return null;
+        }
+        return cache[darkBackground ? 1 : 0];
     }
 
     @Override
@@ -201,8 +205,9 @@ public class IRCService extends Service {
     }
 
     public void clearAllEventCaches() {
-        for (final EventCache cache : mEventCache.values()) {
-            cache.evictAll();
+        for (final EventCache[] cache : mEventCache.values()) {
+            cache[0].evictAll();
+            cache[1].evictAll();
         }
     }
 
@@ -234,14 +239,19 @@ public class IRCService extends Service {
         }
         writer.println();
         writer.println("Event caches:");
-        for (Map.Entry<Server, EventCache> entry : mEventCache.entrySet()) {
-            EventCache cache = entry.getValue();
+        for (Map.Entry<Server, EventCache[]> entry : mEventCache.entrySet()) {
+            EventCache[] caches = entry.getValue();
             writer.print("  ");
             writer.print(entry.getKey().getId());
-            writer.print(": ");
-            writer.print(cache.toString());
+            writer.print(": light {");
+            writer.print(caches[0].toString());
             writer.print(", size=");
-            writer.println(cache.size());
+            writer.print(caches[0].size());
+            writer.print("}. dark {");
+            writer.print(caches[1].toString());
+            writer.print(", size=");
+            writer.print(caches[1].size());
+            writer.println("}");
         }
         writer.println("Logging:");
         writer.print("  started=");
@@ -261,7 +271,9 @@ public class IRCService extends Service {
             final ServiceEventInterceptor serviceEventInterceptor
                     = new ServiceEventInterceptor(server);
             mEventHelperMap.put(server, serviceEventInterceptor);
-            mEventCache.put(server, new EventCache(this));
+            mEventCache.put(server, new EventCache[]{
+                new EventCache(this, false), new EventCache(this, true)
+            });
             mLoggingManager.addServerToManager(server);
         }
         updateNotification();

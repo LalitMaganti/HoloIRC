@@ -16,11 +16,13 @@ public class EventCache extends LruCache<Event, EventDecorator> {
     public static final int EVENT_CACHE_MAX_SIZE = 300;
 
     private final IRCEventToStringConverter mConverter;
+    private final boolean mForDarkBackground;
 
-    public EventCache(final Context context) {
+    public EventCache(final Context context, final boolean darkBackground) {
         super(EVENT_CACHE_MAX_SIZE);
 
         mConverter = IRCEventToStringConverter.getConverter(context);
+        mForDarkBackground = darkBackground;
 
         // If the preferences change then clear the cache
         getBus().register(new Object() {
@@ -34,7 +36,7 @@ public class EventCache extends LruCache<Event, EventDecorator> {
     @Override
     protected EventDecorator create(final Event key) {
         synchronized (mConverter) {
-            return mConverter.getEventDecorator(key);
+            return mConverter.getEventDecorator(key, mForDarkBackground);
         }
     }
 }

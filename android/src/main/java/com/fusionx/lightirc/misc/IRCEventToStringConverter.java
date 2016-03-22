@@ -10,14 +10,18 @@ import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import co.fusionx.relay.base.ChannelUser;
+import co.fusionx.relay.base.FormatSpanInfo;
 import co.fusionx.relay.base.Nick;
 import co.fusionx.relay.dcc.chat.DCCChatWorldActionEvent;
 import co.fusionx.relay.dcc.event.chat.DCCChatSelfActionEvent;
@@ -82,6 +86,8 @@ public class IRCEventToStringConverter {
     private final EventConverter mEventConverter = new EventConverter();
 
     private final Map<Class, Method> mClassMethodMap = new HashMap<>();
+    private final int[] mDarkColors;
+    private final int[] mLightColors;
 
     private final Context mContext;
 
@@ -89,6 +95,8 @@ public class IRCEventToStringConverter {
         mContext = context.getApplicationContext();
 
         buildReflectionCache();
+        mDarkColors = mContext.getResources().getIntArray(R.array.irc_colors_dark);
+        mLightColors = mContext.getResources().getIntArray(R.array.irc_colors_light);
     }
 
     public static IRCEventToStringConverter getConverter(final Context context) {
@@ -109,10 +117,19 @@ public class IRCEventToStringConverter {
         return f.format(format, args).getFormattedString();
     }
 
-    public EventDecorator getEventDecorator(final Event event) {
+    public CharSequence formatTextWithStyleAndNickHighlight(final Nick nick, final String format,
+            final FormattedString... args) {
+        final Formatter f = new Formatter();
+        if (nick != null && shouldHighlightLine()) {
+            f.addGlobalSpan(getColourForUser(nick));
+        }
+        return f.format(format, args).getFormattedString();
+    }
+
+    public EventDecorator getEventDecorator(final Event event, final boolean forDarkBackground) {
         try {
             final Object result = mClassMethodMap.get(event.getClass()).invoke(mEventConverter,
-                    event);
+                    event, forDarkBackground ? mDarkColors : mLightColors);
             return (EventDecorator) result;
         } catch (Exception e) {
             CrashUtils.logIssue("Dead event of type " + event.getClass() + " received");
@@ -120,11 +137,17 @@ public class IRCEventToStringConverter {
         }
     }
 
-    private CharSequence appendReasonIfNeeded(final CharSequence response, final String reason) {
-        return TextUtils.isEmpty(reason)
-                ? response
-                : new SpannableStringBuilder(response).append(" ").append(
-                        mContext.getString(R.string.parser_reason, reason));
+    private CharSequence appendReasonIfNeeded(final CharSequence response, final String reason,
+            final List<FormatSpanInfo> formats, final int[] colorPalette) {
+        if (TextUtils.isEmpty(reason)) {
+            return response;
+        }
+
+        FormattedString formattedReason = formatMessage(reason, formats, colorPalette);
+        SpannableStringBuilder builder = new SpannableStringBuilder(response).append(" ");
+        builder.append(formatTextWithStyle(mContext.getString(R.string.parser_reason),
+                formattedReason));
+        return builder;
     }
 
     private EventDecorator setupEvent(final CharSequence message) {
@@ -148,15 +171,6 @@ public class IRCEventToStringConverter {
         return setupEvent(builder);
     }
 
-    private EventDecorator setupEvent(final CharSequence message, final Nick defaultNick,
-            final boolean boldText) {
-        final SpannableStringBuilder builder = new SpannableStringBuilder(message);
-        final NickColour colour = NickCache.getNickCache().get(defaultNick);
-        builder.setSpan(new ForegroundColorSpan(colour.getColour()), 0, message.length(),
-                Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-        return setupEvent(builder, boldText);
-    }
-
     private boolean shouldHighlightLine() {
         return AppPreferences.getAppPreferences().shouldHighlightLine();
     }
@@ -171,6 +185,72 @@ public class IRCEventToStringConverter {
 
     private FormattedString getFormattedStringForNick(final Nick nick) {
         return new FormattedString(nick.getNickAsString(), getColourForUser(nick));
+    }
+
+    private int formatColorToColor(FormatSpanInfo.Color color, int[] palette) {
+        if (color != null) {
+            switch (color) {
+                case WHITE: return palette[0];
+                case BLACK: return palette[1];
+                case BLUE: return palette[2];
+                case GREEN: return palette[3];
+                case RED: return palette[4];
+                case BROWN: return palette[5];
+                case PURPLE: return palette[6];
+                case ORANGE: return palette[7];
+                case YELLOW: return palette[8];
+                case LIGHT_GREEN: return palette[9];
+                case TEAL: return palette[10];
+                case LIGHT_CYAN: return palette[11];
+                case LIGHT_BLUE: return palette[12];
+                case PINK: return palette[13];
+                case GREY: return palette[14];
+                case LIGHT_GREY: return palette[15];
+            }
+        }
+        return 0;
+    }
+
+    private FormattedString formatNick(Nick nick, String nickString) {
+        if (nick == null) {
+            return new FormattedString(nickString);
+        }
+        return getFormattedStringForNick(nick);
+    }
+
+    private FormattedString formatMessage(String message,
+            List<FormatSpanInfo> formats, int[] colorPalette) {
+        FormattedString formattedMessage = new FormattedString(message);
+
+        int formatCount = formats == null ? 0 : formats.size();
+        for (int i = 0; i < formatCount; i++) {
+            FormatSpanInfo span = formats.get(i);
+            final int start = span.start, end = span.end;
+            switch (span.format) {
+                case BOLD:
+                    formattedMessage.addSpan(new StyleSpan(Typeface.BOLD), start, end);
+                    break;
+                case ITALIC:
+                    formattedMessage.addSpan(new StyleSpan(Typeface.ITALIC), start, end);
+                    break;
+                case UNDERLINED:
+                    formattedMessage.addSpan(new UnderlineSpan(), start, end);
+                    break;
+                case COLOR: {
+                    int fg = formatColorToColor(span.fgColor, colorPalette);
+                    if (fg != 0) {
+                        formattedMessage.addSpan(new ForegroundColorSpan(fg), start, end);
+                    }
+                    int bg = formatColorToColor(span.bgColor, colorPalette);
+                    if (bg != 0) {
+                        formattedMessage.addSpan(new BackgroundColorSpan(bg), start, end);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return formattedMessage;
     }
 
     // Simple class for storing DCC nicks
@@ -212,42 +292,48 @@ public class IRCEventToStringConverter {
     private class EventConverter {
 
         // Messages
-        public EventDecorator getInitialTopicMessage(final ChannelInitialTopicEvent event) {
+        public EventDecorator getInitialTopicMessage(final ChannelInitialTopicEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_new_topic,
                     event.topic, event.setterNick);
             return setupEvent(response);
         }
 
-        public EventDecorator getOnWhoisMessage(final WhoisEvent event) {
+        public EventDecorator getOnWhoisMessage(final WhoisEvent event, int[] colorPalette) {
             return setupEvent(event.whoisMessage);
         }
 
-        public EventDecorator getOnConnectingMessage(final ConnectingEvent event) {
+        public EventDecorator getOnConnectingMessage(final ConnectingEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_connecting);
             return setupEvent(response);
         }
 
-        public EventDecorator getOnRegisteringMessage(final RegisteringEvent event) {
+        public EventDecorator getOnRegisteringMessage(final RegisteringEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_registering);
             return setupEvent(response);
         }
 
-        public EventDecorator getOnConnectedMessage(final ConnectEvent event) {
+        public EventDecorator getOnConnectedMessage(final ConnectEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_connected, event.serverUrl);
             return setupEvent(response);
         }
 
-        public EventDecorator getOnConnectedMessage(final ChannelConnectEvent event) {
+        public EventDecorator getOnConnectedMessage(final ChannelConnectEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_connected_generic);
             return setupEvent(response);
         }
 
-        public EventDecorator getOnConnectedMessage(final QueryConnectEvent event) {
+        public EventDecorator getOnConnectedMessage(final QueryConnectEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_connected_generic);
             return setupEvent(response);
         }
 
-        public EventDecorator getJoinMessage(final ChannelWorldJoinEvent event) {
+        public EventDecorator getJoinMessage(final ChannelWorldJoinEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_joined_channel);
             if (shouldHighlightLine()) {
                 return setupEvent(String.format(response, event.userNick), event.userNick);
@@ -257,7 +343,8 @@ public class IRCEventToStringConverter {
             }
         }
 
-        public EventDecorator getModeChangedMessage(final ChannelUserLevelChangeEvent event) {
+        public EventDecorator getModeChangedMessage(final ChannelUserLevelChangeEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
                 final String nick = event.changingNick;
@@ -277,7 +364,8 @@ public class IRCEventToStringConverter {
             }
         }
 
-        public EventDecorator getModeChangedMessage(final ChannelWorldLevelChangeEvent event) {
+        public EventDecorator getModeChangedMessage(final ChannelWorldLevelChangeEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
                 final String nick = event.changingNick;
@@ -297,7 +385,7 @@ public class IRCEventToStringConverter {
             }
         }
 
-        public EventDecorator getModeMessage(final ChannelModeEvent event) {
+        public EventDecorator getModeMessage(final ChannelModeEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_mode_changed);
             if (shouldHighlightLine()) {
                 final String nick = event.sendingNick;
@@ -318,7 +406,8 @@ public class IRCEventToStringConverter {
         }
 
 
-        public EventDecorator getNickChangedMessage(final ChannelWorldNickChangeEvent event) {
+        public EventDecorator getNickChangedMessage(final ChannelWorldNickChangeEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_other_user_nick_change);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.oldNick,
@@ -333,7 +422,8 @@ public class IRCEventToStringConverter {
             }
         }
 
-        public EventDecorator getNickChaneMessage(final ChannelNickChangeEvent event) {
+        public EventDecorator getNickChaneMessage(final ChannelNickChangeEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_appuser_nick_changed);
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.oldNick,
@@ -348,29 +438,27 @@ public class IRCEventToStringConverter {
             }
         }
 
-        public EventDecorator getTopicChangedMessage(final ChannelTopicEvent event) {
+        public EventDecorator getTopicChangedMessage(final ChannelTopicEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_topic_changed);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.topic,
-                        event.topicSetter.getNick());
-                return setupEvent(formattedResponse, event.topicSetter.getNick());
-            } else {
-                final FormattedString[] formattedStrings = {
-                        new FormattedString(event.topic),
-                        getFormattedStringForUser(event.topicSetter),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString nick = formatNick(event.topicSetter.getNick(), null);
+            final FormattedString topic = formatMessage(event.topic,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.topicSetter.getNick(),
+                    response, topic, nick));
         }
 
-        public EventDecorator getUserKickedMessage(final ChannelWorldKickEvent event) {
+        public EventDecorator getUserKickedMessage(final ChannelWorldKickEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_kicked_channel);
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String
                         .format(response, event.userNick, event.kickingNick == null ? event
                                 .userNickString : event.kickingNick);
-                return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
+                return setupEvent(
+                        appendReasonIfNeeded(formattedResponse, event.reason, null, colorPalette),
                         event.userNick);
             } else {
                 final FormattedString[] formattedStrings = {
@@ -381,18 +469,19 @@ public class IRCEventToStringConverter {
                 };
                 return setupEvent(
                         appendReasonIfNeeded(formatTextWithStyle(response, formattedStrings),
-                                event.reason)
+                                event.reason, null, colorPalette)
                 );
             }
         }
 
-        public EventDecorator getServerKickEvent(final KickEvent event) {
+        public EventDecorator getServerKickEvent(final KickEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_user_kicked_channel);
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.channel.getName(),
                         event.kickingNick);
-                return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
+                return setupEvent(
+                        appendReasonIfNeeded(formattedResponse, event.reason, null, colorPalette),
                         event.kickingNick);
             } else {
                 final FormattedString[] formattedStrings = {
@@ -401,249 +490,215 @@ public class IRCEventToStringConverter {
                 };
                 return setupEvent(
                         appendReasonIfNeeded(formatTextWithStyle(response, formattedStrings),
-                                event.reason)
+                                event.reason, null, colorPalette)
                 );
             }
         }
 
-        public EventDecorator getPartMessage(final ChannelWorldPartEvent event) {
+        public EventDecorator getPartMessage(final ChannelWorldPartEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_user_parted_channel);
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.userNick);
-                return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
+                return setupEvent(
+                        appendReasonIfNeeded(formattedResponse, event.reason,
+                                event.formats, colorPalette),
                         event.userNick);
             } else {
                 return setupEvent(appendReasonIfNeeded(formatTextWithStyle(response,
-                        getFormattedStringForNick(event.userNick)), event.reason));
+                        getFormattedStringForNick(event.userNick)),
+                        event.reason, event.formats, colorPalette));
             }
         }
 
-        public EventDecorator getQuitMessage(final ChannelWorldQuitEvent event) {
+        public EventDecorator getQuitMessage(final ChannelWorldQuitEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_quit_server);
 
             if (shouldHighlightLine()) {
                 final String formattedResponse = String.format(response, event.userNick);
-                return setupEvent(appendReasonIfNeeded(formattedResponse, event.reason),
+                return setupEvent(
+                        appendReasonIfNeeded(formattedResponse, event.reason,
+                                event.formats, colorPalette),
                         event.userNick);
             } else {
                 return setupEvent(appendReasonIfNeeded(formatTextWithStyle(response,
-                        getFormattedStringForNick(event.userNick)), event.reason));
+                        getFormattedStringForNick(event.userNick)),
+                        event.reason, event.formats, colorPalette));
             }
         }
 
-        public EventDecorator getMessage(final ChannelWorldMessageEvent event) {
+        public EventDecorator getMessage(final ChannelWorldMessageEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
+            final FormattedString formattedNickString =
+                    formatNick(event.userNick, event.userNickString);
+            final FormattedString formattedMessage = formatMessage(event.message,
+                    event.formats, colorPalette);
 
-            // Get out clause for message events from ZNCs for example
-            if (event.userNick == null) {
-                final String formattedResponse = String.format(response, event.userNickString,
-                        event.message);
-                return setupEvent(formattedResponse, event.userMentioned);
-            }
-
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.userNick,
-                        event.message);
-                return setupEvent(formattedResponse, event.userNick, event.userMentioned);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.userNick),
-                        new FormattedString(event.message)
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings),
-                        event.userMentioned);
-            }
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.userNick,
+                    response, formattedNickString, formattedMessage), event.userMentioned);
         }
 
-        public EventDecorator getMessage(final ChannelMessageEvent event) {
+        public EventDecorator getMessage(final ChannelMessageEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
+            final FormattedString nick = formatNick(event.user.getNick(), null);
+            final FormattedString message = formatMessage(event.message,
+                    event.formats, colorPalette);
 
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user.getNick(),
-                        event.message);
-                return setupEvent(formattedResponse, event.user.getNick());
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
-                        new FormattedString(event.message)
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.user.getNick(),
+                    response, nick, message));
         }
 
-        public EventDecorator getMessage(final QueryMessageSelfEvent event) {
+        public EventDecorator getMessage(final QueryMessageSelfEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
+            final FormattedString nick = formatNick(event.ourUser.getNick(), null);
+            final FormattedString message = formatMessage(event.message,
+                    event.formats, colorPalette);
 
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.ourUser.getNick(),
-                        event.message);
-                return setupEvent(formattedResponse, event.ourUser.getNick());
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.ourUser.getNick()),
-                        new FormattedString(event.message)
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.ourUser.getNick(),
+                    response, nick, message));
         }
 
-        public EventDecorator getMessage(final QueryMessageWorldEvent event) {
+        public EventDecorator getMessage(final QueryMessageWorldEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user.getNick(),
-                        event.message);
-                return setupEvent(formattedResponse, event.user.getNick());
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
-                        new FormattedString(event.message),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString nick = formatNick(event.user.getNick(), null);
+            final FormattedString message = formatMessage(event.message,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.user.getNick(),
+                    response, nick, message));
         }
 
-        public EventDecorator getNoticeMessage(final ChannelNoticeEvent event) {
+        public EventDecorator getNoticeMessage(final ChannelNoticeEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
-            final String formattedResponse = String.format(response, event.originNick,
-                    event.notice);
-            return setupEvent(formattedResponse, true);
+            final FormattedString nick = new FormattedString(event.originNick);
+            final FormattedString notice = formatMessage(event.notice, event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyle(response, nick, notice), true);
         }
 
-        public EventDecorator getActionMessage(final ChannelActionEvent event) {
+        public EventDecorator getActionMessage(final ChannelActionEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_action);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user.getNick(),
-                        event.action);
-                return setupEvent(formattedResponse, event.user.getNick());
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
-                        new FormattedString(event.action),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString nick = formatNick(event.user.getNick(), null);
+            final FormattedString action = formatMessage(event.action, event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.user.getNick(),
+                    response, nick, action));
         }
 
-        public EventDecorator getActionMessage(final ChannelWorldActionEvent event) {
+        public EventDecorator getActionMessage(final ChannelWorldActionEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_action);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.userNick,
-                        event.action);
-                return setupEvent(formattedResponse, event.userNick, true);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
-                        new FormattedString(event.action),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings), true);
-            }
+            final FormattedString nick = formatNick(event.userNick, event.userNickString);
+            final FormattedString action = formatMessage(event.action, event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.userNick,
+                    response, nick, action), true);
         }
 
-        public EventDecorator getActionMessage(final QueryActionSelfEvent event) {
+        public EventDecorator getActionMessage(final QueryActionSelfEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_action);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.ourUser.getNick(),
-                        event.action);
-                return setupEvent(formattedResponse, event.ourUser.getNick(), true);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.ourUser.getNick()),
-                        new FormattedString(event.action),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings), true);
-            }
+            final FormattedString nick = formatNick(event.ourUser.getNick(), null);
+            final FormattedString action = formatMessage(event.action, event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.ourUser.getNick(),
+                    response, nick, action), true);
         }
 
-        public EventDecorator getActionMessage(final QueryActionWorldEvent event) {
+        public EventDecorator getActionMessage(final QueryActionWorldEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_action);
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response, event.user.getNick(),
-                        event.action);
-                return setupEvent(formattedResponse, event.user.getNick());
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(event.user.getNick()),
-                        new FormattedString(event.action),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString nick = formatNick(event.user.getNick(), null);
+            final FormattedString action = formatMessage(event.action, event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(event.user.getNick(),
+                    response, nick, action));
         }
 
-        public EventDecorator getGenericServerMessage(final GenericServerEvent event) {
+        public EventDecorator getGenericServerMessage(final GenericServerEvent event,
+                int[] colorPalette) {
             return setupEvent(event.message);
         }
 
-        public EventDecorator getMotdLine(final MotdEvent event) {
+        public EventDecorator getMotdLine(final MotdEvent event, int[] colorPalette) {
             return setupEvent(event.motdLine);
         }
 
-        public EventDecorator getErrorMessage(final ErrorEvent errorEvent) {
+        public EventDecorator getErrorMessage(final ErrorEvent errorEvent, int[] colorPalette) {
             return setupEvent(errorEvent.line);
         }
 
-        public EventDecorator getServerChangeMessage(final ServerNickChangeEvent event) {
+        public EventDecorator getServerChangeMessage(final ServerNickChangeEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_appuser_nick_changed,
                     event.oldNick, event.newNick);
             return setupEvent(response);
         }
 
-        public EventDecorator getPrivateNoticeMessage(final NoticeEvent event) {
+        public EventDecorator getPrivateNoticeMessage(final NoticeEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message,
                     event.sendingNick, event.message);
             return setupEvent(response, true);
         }
 
-        public EventDecorator getDisconnectEvent(final DisconnectEvent event) {
+        public EventDecorator getDisconnectEvent(final DisconnectEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.disconnected_from_server);
             return setupEvent(String.format("%s (%s)", response, event.serverMessage));
         }
 
-        public EventDecorator getDisconnectEvent(final ChannelDisconnectEvent event) {
+        public EventDecorator getDisconnectEvent(final ChannelDisconnectEvent event,
+                int[] colorPalette) {
             return setupEvent(event.message);
         }
 
-        public EventDecorator getDisconnectEvent(final QueryDisconnectEvent event) {
+        public EventDecorator getDisconnectEvent(final QueryDisconnectEvent event,
+                int[] colorPalette) {
             return setupEvent(event.message);
         }
 
-        public EventDecorator getReconnectEvent(final ReconnectEvent event) {
+        public EventDecorator getReconnectEvent(final ReconnectEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_reconnect);
             return setupEvent(response);
         }
 
-        public EventDecorator getNewPrivateMessageEvent(final QueryOpenedEvent event) {
+        public EventDecorator getNewPrivateMessageEvent(final QueryOpenedEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_pm_opened);
             return setupEvent(response);
         }
 
-        public EventDecorator getWallopsEvent(final WallopsEvent event) {
-            final String response = mContext.getString(R.string.parser_message,
-                    event.nick, event.message);
-            return setupEvent(response);
+        public EventDecorator getWallopsEvent(final WallopsEvent event, int[] colorPalette) {
+            final String response = mContext.getString(R.string.parser_message);
+            final FormattedString nick = new FormattedString(event.nick);
+            final FormattedString message = formatMessage(event.message,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyle(response, nick, message));
         }
 
-        public EventDecorator getStopEvent(final StopEvent event) {
+        public EventDecorator getStopEvent(final StopEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.disconnected_from_server);
             return setupEvent(response);
         }
 
-        public EventDecorator getStopEvent(final ChannelStopEvent event) {
+        public EventDecorator getStopEvent(final ChannelStopEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.disconnected_from_server);
             return setupEvent(response);
         }
 
-        public EventDecorator getStopEvent(final QueryStopEvent event) {
+        public EventDecorator getStopEvent(final QueryStopEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.disconnected_from_server);
             return setupEvent(response);
         }
 
-        public EventDecorator getChannelPartEvent(final PartEvent event) {
+        public EventDecorator getChannelPartEvent(final PartEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_parted_channel);
             return setupEvent(response);
         }
 
-        public EventDecorator getInviteEvent(final InviteEvent event) {
+        public EventDecorator getInviteEvent(final InviteEvent event, int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_invited);
             final String formattedResponse = String.format(response, event.channelName,
                     event.invitingUser);
@@ -651,7 +706,8 @@ public class IRCEventToStringConverter {
         }
 
         // DCC chat events start
-        public EventDecorator getDCCChatRequestedEvent(final DCCChatRequestEvent event) {
+        public EventDecorator getDCCChatRequestedEvent(final DCCChatRequestEvent event,
+                int[] colorPalette) {
             final DCCPendingChatConnection connection = event.getPendingConnection();
             final String response = mContext.getString(R.string.parser_dcc_chat_requested);
             final String formattedResponse = String.format(response, connection.getDccRequestNick(),
@@ -659,76 +715,61 @@ public class IRCEventToStringConverter {
             return setupEvent(formattedResponse, true);
         }
 
-        public EventDecorator getDCCChatStartedEvent(final DCCChatStartedEvent event) {
+        public EventDecorator getDCCChatStartedEvent(final DCCChatStartedEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_dcc_chat_opened);
             return setupEvent(response);
         }
 
-        public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event) {
+        public EventDecorator getDCCChatEvent(final DCCChatSelfMessageEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
             final Nick nick = event.chatConversation.getServer().getUser().getNick();
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response,
-                        nick, event.message);
-                return setupEvent(formattedResponse, nick);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(nick),
-                        new FormattedString(event.message),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString formattedNick = formatNick(nick, null);
+            final FormattedString formattedMessage = formatMessage(event.message,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(nick,
+                    response, formattedNick, formattedMessage));
         }
 
-        public EventDecorator getActionMessage(final DCCChatSelfActionEvent event) {
+        public EventDecorator getActionMessage(final DCCChatSelfActionEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_action);
             final Nick nick = event.chatConversation.getServer().getUser().getNick();
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response,
-                        nick, event.action);
-                return setupEvent(formattedResponse, nick);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(nick),
-                        new FormattedString(event.action),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString formattedNick = formatNick(nick, null);
+            final FormattedString formattedAction = formatMessage(event.action,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(nick,
+                    response, formattedNick, formattedAction));
         }
 
-        public EventDecorator getDCCChatEvent(final DCCChatWorldMessageEvent event) {
+        public EventDecorator getDCCChatEvent(final DCCChatWorldMessageEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_message);
             final Nick nick = new DCCNick(event.chatConversation.getId());
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response,
-                        nick, event.message);
-                return setupEvent(formattedResponse, nick);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(nick),
-                        new FormattedString(event.message),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString formattedNick = formatNick(nick, null);
+            final FormattedString formattedMessage = formatMessage(event.message,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(nick,
+                    response, formattedNick, formattedMessage));
         }
 
-        public EventDecorator getActionMessage(final DCCChatWorldActionEvent event) {
+        public EventDecorator getActionMessage(final DCCChatWorldActionEvent event,
+                int[] colorPalette) {
             final String response = mContext.getString(R.string.parser_action);
             final Nick nick = new DCCNick(event.chatConversation.getId());
-            if (shouldHighlightLine()) {
-                final String formattedResponse = String.format(response,
-                        nick, event.action);
-                return setupEvent(formattedResponse, nick);
-            } else {
-                final FormattedString[] formattedStrings = {
-                        getFormattedStringForNick(nick),
-                        new FormattedString(event.action),
-                };
-                return setupEvent(formatTextWithStyle(response, formattedStrings));
-            }
+            final FormattedString formattedNick = formatNick(nick, null);
+            final FormattedString formattedMessage = formatMessage(event.action,
+                    event.formats, colorPalette);
+
+            return setupEvent(formatTextWithStyleAndNickHighlight(nick,
+                    response, formattedNick, formattedMessage));
         }
 
-        public EventDecorator get(final DCCFileGetStartedEvent event) {
+        public EventDecorator get(final DCCFileGetStartedEvent event, int[] colorPalette) {
             final int count = event.fileConversation.getFileConnections().size();
             return setupEvent(mContext.getString(R.string.parser_dcc_files_count, count));
         }

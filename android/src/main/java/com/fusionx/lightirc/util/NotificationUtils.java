@@ -411,7 +411,7 @@ public class NotificationUtils {
             }
         }
 
-        EventCache cache = IRCService.getEventCache(conversation.getServer());
+        EventCache cache = IRCService.getEventCache(conversation.getServer(), false);
         SpannableStringBuilder convLog = new SpannableStringBuilder();
         int skippedColor = context.getResources().getColor(R.color.light_grey);
 
