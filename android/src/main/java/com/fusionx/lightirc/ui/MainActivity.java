@@ -28,8 +28,10 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
@@ -462,7 +464,8 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     @Override
     public EventCache getEventCache(final Conversation conversation) {
-        return IRCService.getEventCache(conversation.getServer());
+        return IRCService.getEventCache(conversation.getServer(),
+                AppPreferences.getAppPreferences().getTheme() == Theme.DARK);
     }
 
     @Override

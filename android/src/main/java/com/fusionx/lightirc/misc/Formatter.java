@@ -22,6 +22,10 @@ public final class Formatter {
         locale = Locale.getDefault();
     }
 
+    public void addGlobalSpan(CharacterStyle span) {
+        out.setSpan(span, 0, 0, SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE);
+    }
+
     /**
      * Returns the output destination of the {@code Formatter}.
      *
@@ -182,11 +186,12 @@ public final class Formatter {
                     if (argument == null) {
                         return "null";
                     } else {
-                        final CharacterStyle style = argument.getCharacterStyle();
                         final SpannableStringBuilder builder = new SpannableStringBuilder
                                 (argument.getString());
-                        builder.setSpan(style, 0, argument.getString().length(),
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        for (FormattedString.Span span : argument.getSpans()) {
+                            builder.setSpan(span.style, span.start, span.end,
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
                         return builder;
                     }
             }

@@ -17,7 +17,7 @@ public class IRCLoggingManager extends LoggingManager {
 
     @Override
     public CharSequence getMessageFromEvent(final Server server, final Event event) {
-        EventDecorator decorator = IRCService.getEventCache(server).get(event);
+        EventDecorator decorator = IRCService.getEventCache(server, false).get(event);
         return decorator.getMessage();
     }
 
