@@ -31,10 +31,6 @@ public class FormattedString {
         mSpans.add(new Span(0, string.length(), characterStyle));
     }
 
-    public void addSpan(final CharacterStyle style) {
-        mSpans.add(new Span(0, mString.length(), style));
-    }
-
     public void addSpan(final CharacterStyle style, int start, int end) {
         mSpans.add(new Span(start, end, style));
     }
@@ -45,5 +41,10 @@ public class FormattedString {
 
     public List<Span> getSpans() {
         return mSpans;
+    }
+
+    @Override
+    public String toString() {
+        return mString;
     }
 }

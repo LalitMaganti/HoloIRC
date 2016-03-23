@@ -112,17 +112,29 @@ public class IRCEventToStringConverter {
     }
 
     public CharSequence formatTextWithStyle(final String format, final FormattedString... args) {
-        final Formatter f = new Formatter();
-        return f.format(format, args).getFormattedString();
+        return formatTextWithStyleAndNickHighlight(null, format, args);
     }
 
     public CharSequence formatTextWithStyleAndNickHighlight(final Nick nick, final String format,
             final FormattedString... args) {
-        final Formatter f = new Formatter();
-        if (nick != null && AppPreferences.getAppPreferences().shouldHighlightLine()) {
-            f.addGlobalSpan(getColourForUser(nick));
+        boolean needLineHighlight = nick != null
+                && AppPreferences.getAppPreferences().shouldHighlightLine();
+        boolean needFormatter = needLineHighlight;
+
+        for (int i = 0; i < args.length && !needFormatter; i++) {
+            needFormatter |= args[i].getSpans().size() > 0;
         }
-        return f.format(format, args).getFormattedString();
+
+        // Don't bother with our custom formatter if we don't need it
+        if (needFormatter) {
+            final Formatter f = new Formatter();
+            if (needLineHighlight) {
+                f.addGlobalSpan(getColourForUser(nick));
+            }
+            return f.format(format, args).getFormattedString();
+        } else {
+            return String.format(format, (Object[]) args);
+        }
     }
 
     public EventDecorator getEventDecorator(final Event event, final boolean forDarkBackground) {
