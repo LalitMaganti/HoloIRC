@@ -8,12 +8,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v4.view.MenuCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SwitchCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.Switch;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,7 @@ public class LoggingPreferenceFragment extends PreferenceFragment {
         final boolean logging = preferences.getBoolean(PreferenceConstants.PREF_LOGGING, false);
 
         final View actionView = MenuItemCompat.getActionView(menu.findItem(R.id.logging_switch));
-        final Switch logSwitch = (Switch) actionView.findViewById(R.id.logging_switch_view);
+        final SwitchCompat logSwitch = (SwitchCompat) actionView.findViewById(R.id.logging_switch_view);
 
         logSwitch.setChecked(logging);
         logSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
