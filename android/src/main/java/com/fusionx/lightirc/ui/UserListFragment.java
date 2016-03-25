@@ -29,6 +29,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +48,7 @@ import java.util.List;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.Nick;
+import co.fusionx.relay.constants.UserLevel;
 import co.fusionx.relay.event.channel.ChannelNameEvent;
 import co.fusionx.relay.event.channel.ChannelNickChangeEvent;
 import co.fusionx.relay.event.channel.ChannelUserLevelChangeEvent;
@@ -69,7 +71,7 @@ public class UserListFragment extends Fragment {
 
     private RecyclerView mRecyclerView;
 
-    private final List<Integer> mCheckedPositions = new ArrayList<>();
+    private final List<Pair<Nick, UserLevel>> mCheckedPositions = new ArrayList<>();
 
     private final ActionModeHandler mActionModeHandler = new ActionModeHandler(mCheckedPositions);
 
@@ -256,22 +258,24 @@ public class UserListFragment extends Fragment {
     private class ActionModeHandler implements View.OnClickListener, View.OnLongClickListener,
             ActionMode.Callback {
 
-        private final List<Integer> mCheckedPositions;
+        private final List<Pair<Nick, UserLevel>> mCheckedPositions;
 
         private ActionMode mActionMode;
 
-        public ActionModeHandler(List<Integer> checkedPositions) {
+        public ActionModeHandler(List<Pair<Nick, UserLevel>> checkedPositions) {
             mCheckedPositions = checkedPositions;
         }
 
         @Override
         public void onClick(View v) {
-            onViewSelected(v, (Integer) v.getTag());
+            Pair<Nick, UserLevel> user = (Pair<Nick, UserLevel>) v.getTag();
+            onViewSelected(v, user);
         }
 
         @Override
         public boolean onLongClick(View v) {
-            onViewSelected(v, (Integer) v.getTag());
+            Pair<Nick, UserLevel> user = (Pair<Nick, UserLevel>) v.getTag();
+            onViewSelected(v, user);
             return true;
         }
 
@@ -318,13 +322,13 @@ public class UserListFragment extends Fragment {
         }
 
         private Nick getFirstCheckedNick() {
-            return mAdapter.getItem(mCheckedPositions.get(0)).first;
+            return mCheckedPositions.get(0).first;
         }
 
         private List<Nick> getAllNicks() {
             final List<Nick> nicks = new ArrayList<>();
-            for (Integer i : mCheckedPositions) {
-                nicks.add(mAdapter.getItem(i).first);
+            for (Pair<Nick, UserLevel> i : mCheckedPositions) {
+                nicks.add(i.first);
             }
             return nicks;
         }
@@ -342,7 +346,7 @@ public class UserListFragment extends Fragment {
             }
         }
 
-        private void onViewSelected(View view, Integer position) {
+        private void onViewSelected(View view, Pair<Nick, UserLevel> position) {
             boolean remove = mCheckedPositions.contains(position);
             if (remove) {
                 mCheckedPositions.remove(position);
