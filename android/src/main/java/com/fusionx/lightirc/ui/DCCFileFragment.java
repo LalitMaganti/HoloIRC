@@ -80,6 +80,11 @@ public class DCCFileFragment extends BaseIRCFragment {
         return mConversation.isValid();
     }
 
+    @Override
+    public Conversation getConversation() {
+        return mConversation;
+    }
+
     public DCCFileConversation getFileConversation() {
         return (DCCFileConversation) mConversation;
     }

@@ -145,6 +145,11 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
     }
 
     @Override
+    public Conversation getConversation() {
+        return mConversation;
+    }
+
+    @Override
     public boolean isValid() {
         return mConversation.isValid();
     }
