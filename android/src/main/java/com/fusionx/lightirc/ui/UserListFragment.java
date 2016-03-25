@@ -88,7 +88,7 @@ public class UserListFragment extends Fragment {
             }
 
             updateAdapter(mChannel);
-            onUserListChanged();
+            mCallback.updateUserListVisibility();
         }
     };
 
@@ -149,11 +149,6 @@ public class UserListFragment extends Fragment {
         mChannel = null;
     }
 
-    public void onUserListChanged() {
-        mCallback.updateUserListVisibility();
-        mActionModeHandler.finish();
-    }
-
     /*
      * Subscribed events
      *
@@ -162,56 +157,65 @@ public class UserListFragment extends Fragment {
      */
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldJoinEvent event) {
+        mActionModeHandler.finish();
         mAdapter.addUser(event.user, event.user.getChannelPrivileges(event.channel));
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldKickEvent event) {
+        mActionModeHandler.finish();
         mAdapter.removeUser(event.user, event.level);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldLevelChangeEvent event) {
+        mActionModeHandler.finish();
         mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldNickChangeEvent event) {
+        mActionModeHandler.finish();
         mAdapter.changeNick(event.user, event.oldNick, event.userNick);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldPartEvent event) {
+        mActionModeHandler.finish();
         mAdapter.removeUser(event.user, event.level);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelWorldQuitEvent event) {
+        mActionModeHandler.finish();
         mAdapter.removeUser(event.user, event.level);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelNickChangeEvent event) {
+        mActionModeHandler.finish();
         mAdapter.changeNick(event.relayUser, event.oldNick, event.newNick);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelUserLevelChangeEvent event) {
+        mActionModeHandler.finish();
         mAdapter.changeMode(event.user, event.oldLevel, event.newLevel);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
 
     @Subscribe(threadType = ThreadType.MAIN)
     public void onEventMainThread(final ChannelNameEvent event) {
+        mActionModeHandler.finish();
         updateAdapter(mChannel);
-        onUserListChanged();
+        mCallback.updateUserListVisibility();
     }
     // End of subscribed events
 
