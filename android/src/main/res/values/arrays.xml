@@ -111,4 +111,43 @@
 
     <string-array name="empty_array"/>
     <string name="action_pending_dcc">DCC Requests</string>
+
+    <array name="irc_colors_dark">
+        <item>@android:color/white</item>
+        <item>@android:color/black</item>
+        <item>#9fa8da</item> <!-- indigo 200 -->
+        <item>#a5d6a7</item> <!-- green 200 -->
+        <item>#ef9a9a</item> <!-- red 200 -->
+        <item>#bcaaa4</item> <!-- brown 200 -->
+        <item>#ce93d8</item> <!-- purple 200 -->
+        <item>#ffcc80</item> <!-- orange 200 -->
+        <item>#fff59d</item> <!-- yellow 200 -->
+        <item>#e6ee9c</item> <!-- lime 200 -->
+        <item>#80cbc4</item> <!-- teal 200 -->
+        <item>#80deea</item> <!-- cyan 200 -->
+        <item>#81d4fa</item> <!-- light blue 200 -->
+        <item>#f48fb1</item> <!-- pink 200 -->
+        <item>#bdbdbd</item> <!-- grey 400 as dark grey -->
+        <item>#eeeeee</item> <!-- grey 200 as light grey -->
+    </array>
+
+    <array name="irc_colors_light">
+        <item>@android:color/white</item>
+        <item>@android:color/black</item>
+        <item>#283593</item> <!-- indigo 800 -->
+        <item>#2e7d32</item> <!-- green 800 -->
+        <item>#c62828</item> <!-- red 800 -->
+        <item>#4e342e</item> <!-- brown 800 -->
+        <item>#6a1b9a</item> <!-- purple 800 -->
+        <item>#ef6c00</item> <!-- orange 800 -->
+        <item>#f94825</item> <!-- yellow 800 -->
+        <item>#9e9d24</item> <!-- lime 800 -->
+        <item>#00695c</item> <!-- teal 800 -->
+        <item>#00838f</item> <!-- cyan 800 -->
+        <item>#0277bd</item> <!-- light blue 800 -->
+        <item>#ad1457</item> <!-- pink 800 -->
+        <item>#212121</item> <!-- grey 900 as dark grey -->
+        <item>#9e9e9e</item> <!-- grey 500 as light grey -->
+    </array>
+
 </resources>

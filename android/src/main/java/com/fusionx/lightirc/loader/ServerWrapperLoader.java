@@ -27,7 +27,7 @@ public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerConversa
         final ArrayList<ServerConversationContainer> listItems = new ArrayList<>();
         final ServerDatabase source = ServerDatabase.getInstance(getContext());
         for (final ServerConfiguration.Builder builder : source.getAllBuilders()) {
-            final Server server = mService.getServerIfExists(builder);
+             final Server server = mService.getServerIfExists(builder);
             final Collection<String> ignoreList = source.getIgnoreListByName(builder.getTitle());
             final ServerConversationContainer wrapper = new ServerConversationContainer(builder,
                     ignoreList, server);

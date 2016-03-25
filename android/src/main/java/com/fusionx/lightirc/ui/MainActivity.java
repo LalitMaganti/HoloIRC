@@ -10,9 +10,11 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.util.ArrayMap;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.ArraySet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,8 +30,10 @@ import com.fusionx.lightirc.event.OnConversationChanged;
 import com.fusionx.lightirc.event.OnCurrentServerStatusChanged;
 import com.fusionx.lightirc.event.OnQueryEvent;
 import com.fusionx.lightirc.event.OnServiceConnectionStateChanged;
+import com.fusionx.lightirc.misc.AppPreferences;
 import com.fusionx.lightirc.misc.EventCache;
 import com.fusionx.lightirc.misc.FragmentType;
+import com.fusionx.lightirc.misc.Theme;
 import com.fusionx.lightirc.service.IRCService;
 import com.fusionx.lightirc.util.CrashUtils;
 import com.fusionx.lightirc.util.NotificationUtils;
@@ -37,9 +41,14 @@ import com.fusionx.lightirc.util.UIUtils;
 import com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout;
 import com.fusionx.lightirc.view.Snackbar;
 import com.google.common.base.Optional;
+import com.google.common.collect.Sets;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import co.fusionx.relay.base.Channel;
 import co.fusionx.relay.base.ChannelUser;
@@ -56,6 +65,10 @@ import co.fusionx.relay.event.server.StatusChangeEvent;
 
 import static com.fusionx.lightirc.misc.AppPreferences.getAppPreferences;
 import static com.fusionx.lightirc.misc.FragmentType.CHANNEL;
+import static com.fusionx.lightirc.misc.FragmentType.DCCCHAT;
+import static com.fusionx.lightirc.misc.FragmentType.DCCFILE;
+import static com.fusionx.lightirc.misc.FragmentType.SERVER;
+import static com.fusionx.lightirc.misc.FragmentType.USER;
 import static com.fusionx.lightirc.util.MiscUtils.getBus;
 import static com.fusionx.lightirc.util.MiscUtils.getStatusString;
 import static com.fusionx.lightirc.util.UIUtils.isAppFromRecentApps;
@@ -219,13 +232,16 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
             // If the current fragment is not null then retrieve the matching convo
             final OnConversationChanged event = getBus()
                     .getStickyEvent(OnConversationChanged.class);
-            if (mCurrentFragment == null) {
-                findViewById(R.id.content_frame_empty_textview).setVisibility(View.VISIBLE);
-            } else if (event != null && event.conversation != null) {
-                mConversation = event.conversation;
-                // Make sure we re-register to the event bus on rotation - otherwise we miss
-                // important status updates
-                mConversation.getServer().getServerWideBus().register(this);
+            if (event != null && event.conversation != null) {
+                if (mCurrentFragment == null ||
+                        conversationToFragmentType(event.conversation) != mCurrentFragment.getType()) {
+                    onRemoveCurrentFragment();
+                } else {
+                    mConversation = event.conversation;
+                    // Make sure we re-register to the event bus on rotation - otherwise we miss
+                    // important status updates
+                    mConversation.getServer().getServerWideBus().register(this);
+                }
             } else {
                 onRemoveCurrentFragment();
             }
@@ -462,7 +478,8 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
 
     @Override
     public EventCache getEventCache(final Conversation conversation) {
-        return IRCService.getEventCache(conversation.getServer());
+        return IRCService.getEventCache(conversation.getServer(),
+                AppPreferences.getAppPreferences().getTheme() == Theme.DARK);
     }
 
     @Override
@@ -664,6 +681,11 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
     }
 
     private void onRemoveCurrentFragment() {
+        if (mCurrentFragment == null) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            return;
+        }
+
         final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
         transaction.remove(mCurrentFragment).commit();
@@ -680,8 +702,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         closeDrawer();
     }
 
-    private void onExternalConversationUpdate(final Optional<? extends Conversation>
-                                                      optConversation) {
+    private void onExternalConversationUpdate(final Optional<? extends Conversation> optConversation) {
         if (optConversation.isPresent()) {
             mHandler.post(() -> changeCurrentConversation(optConversation.get(), false));
             supportInvalidateOptionsMenu();
@@ -689,6 +710,23 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
             mSlidingPane.openPane();
             mEmptyView.setVisibility(View.VISIBLE);
         }
+    }
+
+    private static FragmentType conversationToFragmentType(Conversation conversation) {
+        Set<Class<?>> interfaces = Collections.newSetFromMap(new ArrayMap<>());
+        interfaces.addAll(Arrays.asList(conversation.getClass().getInterfaces()));
+        if (interfaces.contains(Server.class)) {
+            return SERVER;
+        } else if (interfaces.contains(Channel.class)) {
+            return CHANNEL;
+        } else if (interfaces.contains(QueryUser.class)) {
+            return USER;
+        } else if (interfaces.contains(DCCChatConversation.class)) {
+            return DCCCHAT;
+        } else if (interfaces.contains(DCCFileConversation.class)) {
+            return DCCFILE;
+        }
+        return CHANNEL;
     }
 
     private class DrawerListener implements DrawerLayout.DrawerListener {

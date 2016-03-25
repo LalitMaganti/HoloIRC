@@ -38,7 +38,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     private final Channel mChannel;
 
-    private final List<Integer> mCheckedPositions;
+    private final List<Pair<Nick, UserLevel>> mCheckedPositions;
 
     private final List<Pair<Nick, UserLevel>> mUsers;
 
@@ -61,7 +61,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
     private SparseArray<Section> mSections = new SparseArray<>();
 
     public UserListAdapter(final Context context, final Channel channel,
-                           final List<Integer> checkedPositions,
+                           final List<Pair<Nick, UserLevel>> checkedPositions,
                            final View.OnClickListener listener,
                            final View.OnLongClickListener longClickListener) {
         mContext = context;
@@ -149,9 +149,9 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
             builder.setSpan(span, 0, builder.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             holder.textView.setText(builder);
 
-            holder.itemView.setActivated(mCheckedPositions.contains(position));
+            holder.itemView.setActivated(mCheckedPositions.contains(user));
 
-            holder.itemView.setTag(position);
+            holder.itemView.setTag(user);
             holder.itemView.setOnClickListener(mListener);
             holder.itemView.setOnLongClickListener(mLongListener);
         }
