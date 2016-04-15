@@ -78,6 +78,32 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
         }
     };
 
+    private class BottomPinningLayoutEventListener
+            extends RecyclerView.OnScrollListener
+            implements View.OnLayoutChangeListener {
+        private boolean mIsScrolledToBottom = true;
+
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+
+            mIsScrolledToBottom = mLayoutManager.findLastCompletelyVisibleItemPosition()
+                    == mMessageAdapter.getItemCount() - 1;
+        }
+
+        @Override
+        public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+                                   int oldTop, int oldRight, int oldBottom) {
+            if ((bottom < oldBottom) && mIsScrolledToBottom) {
+                mRecyclerView.post(
+                        () -> mRecyclerView.scrollToPosition(mMessageAdapter.getItemCount() - 1));
+            }
+        }
+    }
+
+    private BottomPinningLayoutEventListener mBottomPinningLayoutEventListener =
+            new BottomPinningLayoutEventListener();
+
     @Override
     public View onCreateView(final LayoutInflater inflate, final ViewGroup container,
             final Bundle savedInstanceState) {
@@ -90,6 +116,8 @@ abstract class IRCFragment<T extends Event> extends BaseIRCFragment
 
         mRecyclerView = (RecyclerView) view.findViewById(android.R.id.list);
         mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.addOnLayoutChangeListener(mBottomPinningLayoutEventListener);
+        mRecyclerView.addOnScrollListener(mBottomPinningLayoutEventListener);
         mRecyclerView.setLayoutManager(mLayoutManager);
         ViewCompat.setOverScrollMode(mRecyclerView, ViewCompat.OVER_SCROLL_NEVER);
 
