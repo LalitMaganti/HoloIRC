@@ -70,6 +70,11 @@ public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter
     }
 
     @Override
+    public void onViewAttachedToWindow(IRCViewHolder holder) {
+        holder.message.setText(holder.message.getText());
+    }
+
+    @Override
     public int getItemCount() {
         synchronized (mLock) {
             return mObjects.size();
