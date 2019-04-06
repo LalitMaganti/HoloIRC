@@ -1,0 +1,6 @@
+[submodule "libraries/Relay"]
+	path = libraries/Relay
+	url = https://github.com/holoirc/Relay
+[submodule "libraries/Bus"]
+	path = libraries/Bus
+	url = https://github.com/holoirc/Bus
