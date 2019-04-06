@@ -1,4 +1,4 @@
 include ':app', ':bus-library', ':relay-library'
 
-project(':bus-library').projectDir = new File('libraries/bus/library')
-project(':relay-library').projectDir = new File('libraries/relay/library')
+project(':bus-library').projectDir = new File('libraries/Bus/library')
+project(':relay-library').projectDir = new File('libraries/Relay/library')
