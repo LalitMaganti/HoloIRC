@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fusionx.lightirc"
-    android:versionCode="70"
-    android:versionName="4.1.0">
+    package="app.holoirc">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -51,8 +49,8 @@
 
         <receiver android:name=".util.NotificationUtils$NotificationEventReceiver">
             <intent-filter>
-                <action android:name="com.fusionx.lightirc.CANCEL_NOTIFICATION" />
-                <action android:name="com.fusionx.lightirc.VOICE_REPLY" />
+                <action android:name="app.holoirc.CANCEL_NOTIFICATION" />
+                <action android:name="app.holoirc.VOICE_REPLY" />
             </intent-filter>
         </receiver>
     </application>

@@ -22,24 +22,24 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent">
-    <com.fusionx.lightirc.ui.preferences.ViewPreference
+    <app.holoirc.ui.preferences.ViewPreference
             android:key="must_be_complete"/>
 
     <PreferenceCategory android:title="Connection">
-        <com.fusionx.lightirc.ui.preferences.ServerTitleEditTextPreference
+        <app.holoirc.ui.preferences.ServerTitleEditTextPreference
                 android:key="pref_title"
                 android:defaultValue=""
                 android:singleLine="true"
                 android:lines="1"
                 android:title="@string/server_settings_server_title"/>
-        <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
+        <app.holoirc.ui.preferences.NonEmptyEditTextPreference
                 android:key="pref_url"
                 android:defaultValue=""
                 android:singleLine="true"
                 android:lines="1"
                 android:inputType="textNoSuggestions"
                 android:title="@string/server_settings_url_title"/>
-        <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
+        <app.holoirc.ui.preferences.NonEmptyEditTextPreference
                 android:key="pref_port"
                 android:title="@string/server_settings_port_title"
                 android:inputType="number"
@@ -64,11 +64,11 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="User">
-        <com.fusionx.lightirc.ui.preferences.NickPreference
+        <app.holoirc.ui.preferences.NickPreference
                 android:key="pref_nick_storage"
                 android:title="@string/server_settings_nick_storage_title"
                 android:summary="@string/server_settings_nick_storage_summary"/>
-        <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
+        <app.holoirc.ui.preferences.NonEmptyEditTextPreference
                 android:defaultValue="HoloIRCUser"
                 android:key="pref_realname"
                 android:title="Real Name"
@@ -88,13 +88,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="Server Credentials">
-        <com.fusionx.lightirc.ui.preferences.NonEmptyEditTextPreference
+        <app.holoirc.ui.preferences.NonEmptyEditTextPreference
                 android:defaultValue="holoirc"
                 android:key="pref_login_username"
                 android:title="@string/username"
                 android:singleLine="true"
                 android:lines="1"/>
-        <com.fusionx.lightirc.ui.preferences.PasswordSummaryEditTextPreference
+        <app.holoirc.ui.preferences.PasswordSummaryEditTextPreference
                 android:defaultValue=""
                 android:inputType="textPassword"
                 android:key="pref_login_password"
@@ -104,13 +104,13 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="SASL Credentials - if supported">
-        <com.fusionx.lightirc.ui.preferences.SaslUsernameEditTextPreference
+        <app.holoirc.ui.preferences.SaslUsernameEditTextPreference
                 android:defaultValue=""
                 android:key="pref_sasl_username"
                 android:title="SASL Username"
                 android:singleLine="true"
                 android:lines="1"/>
-        <com.fusionx.lightirc.ui.preferences.PasswordSummaryEditTextPreference
+        <app.holoirc.ui.preferences.PasswordSummaryEditTextPreference
                 android:defaultValue=""
                 android:inputType="textPassword"
                 android:key="pref_sasl_password"
@@ -120,7 +120,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory android:title="NickServ Credentials - if supported">
-        <com.fusionx.lightirc.ui.preferences.PasswordSummaryEditTextPreference
+        <app.holoirc.ui.preferences.PasswordSummaryEditTextPreference
                 android:defaultValue=""
                 android:key="pref_nickserv_password"
                 android:title="@string/server_settings_server_password_title"

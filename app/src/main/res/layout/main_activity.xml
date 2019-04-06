@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout
+    <app.holoirc.view.ProgrammableSlidingPaneLayout
         android:id="@+id/sliding_pane_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -47,9 +47,9 @@
                 android:divider="@android:color/transparent" />
         </android.support.v4.widget.DrawerLayout>
 
-    </com.fusionx.lightirc.view.ProgrammableSlidingPaneLayout>
+    </app.holoirc.view.ProgrammableSlidingPaneLayout>
 
-    <com.fusionx.lightirc.view.Snackbar
+    <app.holoirc.view.Snackbar
         android:id="@+id/snackbar"
         android:layout_width="match_parent"
         android:layout_height="56dp"

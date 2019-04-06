@@ -6,7 +6,7 @@
                   android:layout_height="match_parent">
 
     <PreferenceCategory android:title="Server Settings">
-        <com.fusionx.lightirc.ui.preferences.NumberPickerPreference
+        <app.holoirc.ui.preferences.NumberPickerPreference
                 android:key="pref_reconnect_tries"
                 android:dialogMessage="The number of times the app should try to reconnect to the server"
                 android:title="Reconnect attempts"
@@ -23,7 +23,7 @@
                 android:defaultValue="false"
                 android:title="Show timestamps"
                 android:summary="Show when a message when was received"/>
-        <com.fusionx.lightirc.ui.preferences.SummaryEditTextPreference
+        <app.holoirc.ui.preferences.SummaryEditTextPreference
                 android:key="pref_quit_reason"
                 android:defaultValue=""
                 android:title="Reason for quitting server"
@@ -36,7 +36,7 @@
                 android:defaultValue="false"
                 android:title="@string/server_channel_settings_hide_messages_title"
                 android:summary="@string/server_channel_settings_hide_messages_summary"/>
-        <com.fusionx.lightirc.ui.preferences.SummaryEditTextPreference
+        <app.holoirc.ui.preferences.SummaryEditTextPreference
                 android:key="pref_part_reason"
                 android:defaultValue=""
                 android:title="Reason for parting channel"
