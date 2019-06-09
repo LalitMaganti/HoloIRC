@@ -29,4 +29,7 @@
         android:fragment="app.holoirc.ui.AboutPreferenceFragment"
         android:summary="@string/settings_about_fragment_summary"
         android:title="@string/about" />
+    <header
+        android:fragment="app.holoirc.ui.LegalPreferenceFragment"
+        android:title="@string/legal" />
 </preference-headers>

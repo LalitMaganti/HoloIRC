@@ -53,7 +53,7 @@ public class AboutPreferenceFragment extends PreferenceFragment {
         if (source != null) {
             source.setOnPreferenceClickListener(preference -> {
                 final Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://github.com/tilal6991/HoloIRC"));
+                        Uri.parse("https://github.com/HoloIRC/HoloIRC"));
                 context.startActivity(browserIntent);
                 return true;
             });

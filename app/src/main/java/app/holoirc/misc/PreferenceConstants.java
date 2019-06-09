@@ -120,4 +120,7 @@ public class PreferenceConstants {
 
     // Bug reporting settings
     public static final String PREF_BUG_REPORTING = "pref_bug_reporting";
+
+    // About legal
+    public static final String PREF_LEGAL_PRIVACY = "pref_legal_privacy";
 }

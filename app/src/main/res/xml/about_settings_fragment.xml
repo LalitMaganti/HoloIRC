@@ -8,10 +8,10 @@
         <Preference
                 android:key="pref_author"
                 android:title="Author"
-                android:summary="Lalit Maganti (tilal6991)"/>
+                android:summary="XAOS Interactive"/>
         <Preference
                 android:key="pref_source"
                 android:title="Source"
-                android:summary="HoloIRC is an open source project - http://github.com/tilal6991/HoloIRC"/>
+                android:summary="HoloIRC is an open source project - http://github.com/HoloIRC/HoloIRC"/>
     </PreferenceCategory>
 </PreferenceScreen>
