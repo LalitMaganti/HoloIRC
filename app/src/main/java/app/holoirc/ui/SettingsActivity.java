@@ -22,6 +22,6 @@ public class SettingsActivity extends SettingsActivityBase {
 
     @Override
     protected boolean isValidFragment(final String fragmentName) {
-        return true;
+        return SettingsActivity.class.getName().equals(fragmentName);
     }
 }

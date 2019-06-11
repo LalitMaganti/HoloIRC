@@ -90,8 +90,7 @@ public class ServerPreferenceActivity extends SettingsActivityBase implements
 
     @Override
     protected boolean isValidFragment(final String fragmentName) {
-        // TODO - this is a hack - fixit
-        return true;
+        return ServerPreferenceActivity.class.getName().equals(fragmentName);
     }
 
     @Override
