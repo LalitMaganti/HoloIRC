@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.preference.Preference;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 
 import app.holoirc.R;
 import app.holoirc.ui.MainActivity;

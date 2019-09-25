@@ -1,7 +1,7 @@
 package app.holoirc.loader;
 
 import android.content.Context;
-import android.support.v4.content.AsyncTaskLoader;
+import androidx.loader.content.AsyncTaskLoader;
 
 abstract class AbstractLoader<T> extends AsyncTaskLoader<T> {
 

@@ -15,9 +15,9 @@
  */
 package app.holoirc.ui;
 
-import android.support.v4.widget.SlidingPaneLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import androidx.slidingpanelayout.widget.SlidingPaneLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import android.view.MenuItem;
 import android.view.View;
 

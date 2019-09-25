@@ -4,7 +4,7 @@ import com.fusionx.bus.Subscribe;
 import app.holoirc.event.OnPreferencesChangedEvent;
 import app.holoirc.model.NickColour;
 
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 
 import app.holoirc.util.MiscUtils;
 import co.fusionx.relay.base.Nick;

@@ -21,9 +21,9 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.RemoteInput;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.RemoteInput;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
@@ -93,7 +93,7 @@ public class NotificationUtils {
                 boolean eventMatches = mention
                         ? (e instanceof ChannelWorldMessageEvent || e instanceof ChannelWorldActionEvent)
                         : (e instanceof QueryMessageWorldEvent || e instanceof QueryActionWorldEvent);
-                if (eventMatches && e.timestamp.toMillis(false) == timestamp) {
+                if (eventMatches && e.timestamp.getTime() == timestamp) {
                     return index;
                 }
             }

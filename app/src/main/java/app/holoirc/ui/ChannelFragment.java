@@ -32,7 +32,7 @@ import app.holoirc.R;
 import app.holoirc.misc.FragmentType;
 
 import android.os.Bundle;
-import android.support.v7.widget.PopupMenu;
+import androidx.appcompat.widget.PopupMenu;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;

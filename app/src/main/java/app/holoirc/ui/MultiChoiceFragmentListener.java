@@ -3,7 +3,7 @@ package app.holoirc.ui;
 import app.holoirc.util.MultiSelectionUtils;
 
 import android.os.Bundle;
-import android.support.v7.view.ActionMode;
+import androidx.appcompat.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.View;
@@ -54,12 +54,10 @@ abstract class MultiChoiceFragmentListener<T> implements MultiSelectionUtils
         }
     }
 
-    @Override
     public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         return true;
     }
 
-    @Override
     public void onDestroyActionMode(ActionMode arg0) {
     }
 

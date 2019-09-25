@@ -1,7 +1,7 @@
 package app.holoirc.util;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 public class FragmentUtils {
 

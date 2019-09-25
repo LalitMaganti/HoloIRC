@@ -14,7 +14,7 @@ import co.fusionx.relay.base.ServerConfiguration;
 
 public class ServerWrapperLoader extends AbstractLoader<ArrayList<ServerConversationContainer>> {
 
-    private final IRCService mService;
+    protected final IRCService mService;
 
     public ServerWrapperLoader(final Context context, final IRCService service) {
         super(context);

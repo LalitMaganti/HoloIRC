@@ -10,7 +10,7 @@ import app.holoirc.util.EventUtils;
 import app.holoirc.util.UIUtils;
 
 import android.content.Context;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,8 +19,10 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import co.fusionx.relay.event.Event;
 
@@ -140,9 +142,10 @@ public class IRCAdapter<T extends Event> extends RecyclerView.Adapter<IRCAdapter
     }
 
     private void addTimestampIfRequired(IRCViewHolder holder, final Event event) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("H:M", Locale.US);
         if (AppPreferences.getAppPreferences().shouldDisplayTimestamps()) {
             holder.timestamp.setVisibility(View.VISIBLE);
-            holder.timestamp.setText(event.timestamp.format("%H:%M"));
+            holder.timestamp.setText(dateFormat.format(event.timestamp));
         } else {
             holder.timestamp.setVisibility(View.GONE);
         }

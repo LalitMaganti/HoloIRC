@@ -1,7 +1,7 @@
 package app.holoirc.ui;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import app.holoirc.util.UIUtils;
 
