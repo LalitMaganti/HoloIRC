@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
 import androidx.core.app.NotificationCompat;
@@ -483,8 +484,13 @@ public class IRCService extends Service {
         builder.addAction(R.drawable.ic_clear_light, getString(disconnectActionResId), intent);
 
         mNotification = builder.build();
+
         // make ourself persistent
-        startService(new Intent(this, IRCService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(this, IRCService.class));
+        } else {
+            startService(new Intent(this, IRCService.class));
+        }
         startForeground(SERVICE_ID, mNotification);
 
         NotificationManagerCompat nm = NotificationManagerCompat.from(this);

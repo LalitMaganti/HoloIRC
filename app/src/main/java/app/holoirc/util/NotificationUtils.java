@@ -19,6 +19,7 @@ import android.graphics.Typeface;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import androidx.core.app.NotificationCompat;
@@ -532,7 +533,13 @@ public class NotificationUtils {
                             intent.getStringExtra("conversation_id"));
                     serviceIntent.putExtra(IRCService.EXTRA_MESSAGE,
                             remoteInput.getCharSequence("reply"));
-                    context.startService(serviceIntent);
+
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        context.startForegroundService(serviceIntent);
+                    } else {
+                        context.startService(serviceIntent);
+                    }
                 }
             }
         }

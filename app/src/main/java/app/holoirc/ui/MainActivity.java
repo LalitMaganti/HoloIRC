@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+
 import androidx.fragment.app.FragmentTransaction;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.collection.ArrayMap;
@@ -745,4 +746,7 @@ public class MainActivity extends AppCompatActivity implements ServerListFragmen
         public void onDrawerStateChanged(final int newState) {
         }
     }
+
+
+
 }
