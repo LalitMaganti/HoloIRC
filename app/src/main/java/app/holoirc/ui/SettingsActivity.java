@@ -22,6 +22,15 @@ public class SettingsActivity extends SettingsActivityBase {
 
     @Override
     protected boolean isValidFragment(final String fragmentName) {
-        return SettingsActivity.class.getName().equals(fragmentName);
+        return SettingsActivity.class.getName().equals(fragmentName) ||
+                AboutPreferenceFragment.class.getName().equals(fragmentName) ||
+                AppearancePreferenceFragment.class.getName().equals(fragmentName) ||
+                BugReportingPreferenceFragment.class.getName().equals(fragmentName) ||
+                DefaultUserPreferenceFragment.class.getName().equals(fragmentName) ||
+                LegalPreferenceFragment.class.getName().equals(fragmentName) ||
+                NotificationPreferenceFragment.class.getName().equals(fragmentName) ||
+                ServerChannelPreferenceFragment.class.getName().equals(fragmentName) ||
+                ServerPreferenceFragment.class.getName().equals(fragmentName) ||
+                LoggingPreferenceFragment.class.getName().equals(fragmentName);
     }
 }
