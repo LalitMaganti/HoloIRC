@@ -17,7 +17,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
         applicationId "app.holoirc"
-        versionCode 10002
+        versionCode 100002
         versionName "1.0.0"
     }
 
