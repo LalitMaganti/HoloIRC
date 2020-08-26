@@ -21,6 +21,7 @@
         <item name="main_background">@android:color/white</item>
         <item name="expandable_list_background">@color/very_light_grey</item>
         <item name="expandable_list_text">@color/dark_gray</item>
+        <item name="textAppearanceListItem">@color/textBlack</item>
     </style>
 
     <style name="LightDialogTheme" parent="Theme.AppCompat.Light.Dialog" />
@@ -50,6 +51,7 @@
         <item name="main_background">@android:color/transparent</item>
         <item name="expandable_list_background">@android:color/transparent</item>
         <item name="expandable_list_text">@android:color/white</item>
+        <item name="textAppearanceListItem">@color/textWhite</item>
     </style>
 
     <style name="DarkDialogTheme" parent="Theme.AppCompat.Dialog" />

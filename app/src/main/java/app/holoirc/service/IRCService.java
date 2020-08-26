@@ -415,7 +415,7 @@ public class IRCService extends Service {
         }
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationChannels.NOTIFICATION_STATUS_UPDATE);
-        builder.setColor(getResources().getColor(R.color.colorPrimary));
+        builder.setColor(getResources().getColor(R.color.colorPrimary)); // todo: fix me
         builder.setContentTitle(getString(R.string.app_name));
         builder.setSmallIcon(R.drawable.ic_notification_small);
         builder.setContentIntent(getMainActivityIntent());
@@ -497,7 +497,7 @@ public class IRCService extends Service {
 
         if (reconnectAction != null) {
             NotificationCompat.Builder wearableStatusBuilder = new NotificationCompat.Builder(this, NotificationChannels.NOTIFICATION_RECONNECT);
-            wearableStatusBuilder.setColor(getResources().getColor(R.color.colorPrimary));
+            wearableStatusBuilder.setColor(getResources().getColor(R.color.colorPrimary)); //todo: fix me
             wearableStatusBuilder.setContentTitle(
                     getString(R.string.notification_reconnect_wear_title));
             wearableStatusBuilder.setContentText(getString(
@@ -521,7 +521,6 @@ public class IRCService extends Service {
 
     // Binder which returns this service
     public class IRCBinder extends Binder {
-
         public IRCService getService() {
             return IRCService.this;
         }

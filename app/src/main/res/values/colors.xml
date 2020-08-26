@@ -18,6 +18,9 @@
     <color name="colorAccent">#2870b4</color>
     <color name="colorAccentDark">#ffffff</color>
 
+    <color name="textWhite">#ffffff</color>
+    <color name="textBlack">#000000</color>
+
     <color name="snackbar">@color/colorPrimaryDark</color>
 
     <color name="list_header_color">@color/colorPrimaryDark</color>
