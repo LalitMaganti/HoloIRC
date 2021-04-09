@@ -91,6 +91,11 @@ dependencies {
     def commonsLangVersion = "3.8"
     implementation 'org.apache.commons:commons-lang3:3.6'
 
+    // work libraries
+    def work_version = "2.5.0"
+    implementation "androidx.work:work-runtime:$work_version"
+    implementation "androidx.work:work-multiprocess:$work_version"
+
     // compile libraries
     implementation project(':relay-library')
     implementation project(':bus-library')

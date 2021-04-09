@@ -2,10 +2,15 @@ package app.holoirc;
 
 import android.app.Application;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import app.holoirc.handlers.NotificationsHandler;
 import app.holoirc.misc.AppPreferences;
 
 public class IRCApplication extends Application {
+
+    public static ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     @Override
     public void onCreate() {

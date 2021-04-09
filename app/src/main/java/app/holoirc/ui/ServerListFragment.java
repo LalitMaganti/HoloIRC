@@ -2,6 +2,8 @@ package app.holoirc.ui;
 
 import com.fusionx.bus.Subscribe;
 import com.fusionx.bus.ThreadType;
+import com.google.common.primitives.Ints;
+
 import app.holoirc.R;
 import app.holoirc.event.OnConversationChanged;
 import app.holoirc.event.OnPreferencesChangedEvent;
@@ -15,6 +17,7 @@ import app.holoirc.service.IRCService;
 import app.holoirc.service.ServiceEventInterceptor;
 import app.holoirc.util.EventUtils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -22,6 +25,8 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.work.Data;
+
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -234,6 +239,7 @@ public class ServerListFragment extends Fragment implements ExpandableListView.O
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         final ServerConversationContainer listItem = getFirstCheckedItem();
