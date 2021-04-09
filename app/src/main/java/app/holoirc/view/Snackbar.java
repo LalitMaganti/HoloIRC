@@ -7,13 +7,13 @@ import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.TextView;
-
+import androidx.appcompat.widget.AppCompatTextView;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Snackbar extends TextView {
+
+public class Snackbar extends AppCompatTextView {
 
     private final Queue<String> mMessages = new ArrayDeque<>();
 

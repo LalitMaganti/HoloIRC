@@ -1,36 +1,33 @@
 package app.holoirc.util;
 
 import co.fusionx.relay.base.Server;
-
 import android.content.Context;
-
-import com.crashlytics.android.Crashlytics;
-
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import app.holoirc.misc.AppPreferences;
-import io.fabric.sdk.android.Fabric;
 
 public class CrashUtils {
+    public static String TAG = "CrashUtils";
 
     public static void startCrashlyticsIfAppropriate(final Context context) {
-        callbackIfReportingEnabled(() -> Fabric.with(context, new Crashlytics()));
+        callbackIfReportingEnabled(() -> FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true));
     }
 
     public static void logMissingData(final Server server) {
         callbackIfReportingEnabled(() -> {
-            Crashlytics.log(server.getConfiguration().getUrl());
-            Crashlytics.logException(new IRCException("Missing data on server"));
+            FirebaseCrashlytics.getInstance().log(server.getConfiguration().getUrl());
+            FirebaseCrashlytics.getInstance().recordException(new IRCException("Missing data on server"));
         });
     }
 
     public static void logIssue(final String data) {
         callbackIfReportingEnabled(() -> {
-            Crashlytics.log(data);
-            Crashlytics.logException(new IRCException(data));
+            FirebaseCrashlytics.getInstance().log(data);
+            FirebaseCrashlytics.getInstance().recordException(new IRCException(data));
         });
     }
 
     public static void handleException(Exception ex) {
-        callbackIfReportingEnabled(() -> Crashlytics.logException(ex));
+        callbackIfReportingEnabled(() -> FirebaseCrashlytics.getInstance().recordException(ex));
     }
 
     private static void callbackIfReportingEnabled(final Runnable runnable) {

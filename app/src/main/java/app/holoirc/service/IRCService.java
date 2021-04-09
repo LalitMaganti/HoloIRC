@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import co.fusionx.relay.base.Channel;
@@ -292,7 +293,7 @@ public class IRCService extends Service {
     }
 
     public void requestConnectionStoppage(final Server server) {
-        mEventHelperMap.get(server).unregister();
+        Objects.requireNonNull(mEventHelperMap.get(server)).unregister();
 
         NotificationUtils.cancelMentionNotification(this, server);
 
