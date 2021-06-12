@@ -9,10 +9,10 @@ import co.fusionx.relay.misc.NickStorage;
 class BuilderUtils {
 
     public static List<ServerConfiguration.Builder> getFirstTimeBuilderList() {
-        final ServerConfiguration.Builder freenode = new ServerConfiguration.Builder();
-        freenode.setTitle("Freenode").setUrl("chat.freenode.net").setPort(6667).setSsl(false);
-        freenode.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
-        freenode.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
+        final ServerConfiguration.Builder libera = new ServerConfiguration.Builder();
+        libera.setTitle("Libera.Chat").setUrl("irc.libera.chat").setPort(6667).setSsl(false);
+        libera.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
+        libera.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
         final ServerConfiguration.Builder snoonet = new ServerConfiguration.Builder();
         snoonet.setTitle("Snoonet").setUrl("irc.snoonet.org").setPort(6667).setSsl(false);
@@ -25,6 +25,6 @@ class BuilderUtils {
         techtronix.setNickStorage(new NickStorage("HoloIRCUser", "", ""));
         techtronix.setRealName("HoloIRCUser").setNickChangeable(true).setServerUserName("holoirc");
 
-        return Arrays.asList(freenode, snoonet, techtronix);
+        return Arrays.asList(libera, snoonet, techtronix);
     }
 }
