@@ -11,11 +11,11 @@ repositories {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 28
+        targetSdkVersion 29
         applicationId "app.holoirc"
         versionCode 100005
         versionName "1.0.0"
