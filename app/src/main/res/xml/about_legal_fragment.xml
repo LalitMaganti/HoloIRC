@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/legal">
+        <Preference
+            android:key="pref_legal_privacy"
+            android:title="@string/legal_privacy"/>
+    </PreferenceCategory>
+</PreferenceScreen>

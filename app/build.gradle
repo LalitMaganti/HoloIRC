@@ -1,0 +1,104 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
+
+repositories {
+    mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url "https://jitpack.io" }
+}
+
+android {
+    compileSdkVersion 29
+
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 29
+        applicationId "app.holoirc"
+        versionCode 100005
+        versionName "1.0.0"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    flavorDimensions "version"
+
+    productFlavors {
+        beta {
+            dimension "version"
+            versionNameSuffix "-beta" + "-build" + getDate()
+        }
+        stable {
+            dimension "version"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0'
+    implementation 'androidx.slidingpanelayout:slidingpanelayout:1.1.0'
+    implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:26.8.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
+
+    implementation 'com.sothree.slidinguppanel:library:2.0.4'
+
+    implementation 'com.readystatesoftware.systembartint:systembartint:1.0.4'
+
+    implementation 'com.google.guava:guava:28.0-android'
+
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.robolectric:robolectric:3.0'
+    testImplementation 'org.assertj:assertj-core:3.3.0'
+
+    // apache commons
+    def commonsNetVersion = "3.6"
+    implementation "commons-net:commons-net:$commonsNetVersion"
+
+    def commonsLangVersion = "3.8"
+    implementation 'org.apache.commons:commons-lang3:3.6'
+
+    // work libraries
+    def work_version = "2.5.0"
+    implementation "androidx.work:work-runtime:$work_version"
+    implementation "androidx.work:work-multiprocess:$work_version"
+
+    // compile libraries
+    implementation project(':relay-library')
+    implementation project(':bus-library')
+}
+
+def getDate() {
+    return new Date().format('yyyyMMddHHmmss')
+}

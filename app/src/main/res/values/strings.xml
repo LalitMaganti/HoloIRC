@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_name" translatable="false">HoloIRC</string>
+
+    <!-- Status -->
+    <string name="status_connecting">Connecting</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_disconnected">Disconnected</string>
+
+    <!-- Server settings -->
+    <string name="server_settings_title">Server Settings</string>
+    <string name="server_settings_auto_nick_summary">If someone else is using your preferred nick
+        another will automatically be used
+    </string>
+    <string name="server_settings_auto_nick_title">Auto-change nick name</string>
+    <string name="server_settings_server_password_title">NickServ password</string>
+    <string name="server_settings_auto_join_title">Auto-join channels</string>
+    <string name="server_settings_ssl_title">Use SSL</string>
+    <string name="server_settings_ssl_summary">Use SSL to connect to the server - the port will be
+        different to normal
+    </string>
+    <string name="server_settings_port_title">Server Port</string>
+    <string name="server_settings_url_title">Server URL</string>
+    <string name="server_settings_server_title">Server title</string>
+    <string name="server_settings_nick_storage_title">Nick Names</string>
+    <string name="server_settings_nick_storage_summary">Choose first, second and third choice nick
+        names
+    </string>
+
+    <!-- App settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_appearance_summary">Settings to control the way the app looks</string>
+    <string name="server_channel_settings_title">Server/Channel</string>
+    <string name="server_channel_settings_summary">Common settings for all servers in the app
+    </string>
+    <string name="settings_about_fragment_summary">Find out about the author and the app :)</string>
+    <string name="about_settings_app_version">App Version</string>
+
+    <!-- Appearance settings -->
+    <string name="pref_highlight_whole_line_title">Nick line colours</string>
+    <string name="pref_highlight_whole_line_summary">Make the whole line colourful when associated
+        with a nick
+    </string>
+
+    <string name="appearance_settings_requires_restart">This requires a full restart of the app
+    </string>
+
+    <string name="appearance_font">Font</string>
+    <string name="appearance_font_size">Font size</string>
+    <string name="appearance_small_font_size">Small (12 sp)</string>
+    <string name="appearance_medium_font_size">Medium (14 sp)</string>
+    <string name="appearance_large_font_size">Large (16 sp)</string>
+
+    <!-- Server/channel settings -->
+    <string name="server_channel_settings_motd_title">Display MOTD</string>
+    <string name="server_channel_settings_motd_description">Display Message of the Day from the
+        server
+    </string>
+    <string name="server_channel_settings_hide_messages_summary">For example join, part and quit
+        messages
+    </string>
+    <string name="server_channel_settings_hide_messages_title">Hide messages from channels</string>
+
+    <!-- Output for events -->
+    <string name="parser_user_kicked_channel">You were kicked from %1$s by %2$s</string>
+    <string name="parser_message" translatable="false">%1$s: %2$s</string>
+    <string name="parser_connected_generic">Connected to server</string>
+    <string name="parser_connected">Connected to %1$s</string>
+    <string name="parser_joined_channel">%1$s joined the channel</string>
+    <string name="parser_parted_channel">You parted from the channel</string>
+    <string name="parser_quit_server">%1$s quit the server</string>
+    <string name="parser_user_parted_channel">%1$s parted from the channel</string>
+    <string name="parser_kicked_channel">%1$s was kicked from the channel by %2$s</string>
+    <string name="parser_reason">(Reason: %1$s)</string>
+    <string name="parser_mode_changed">Mode %1$s on %2$s by %3$s</string>
+    <string name="parser_new_topic">The topic is %1$s as set forth by %2$s</string>
+    <string name="parser_topic_changed">
+        The topic for this channel has been changed to %1$s by %2$s
+    </string>
+    <string name="error_nick_in_use">Nickname is already in use.</string>
+    <string name="parser_appuser_nick_changed">You (%1$s) are now known as %2$s</string>
+    <string name="parser_other_user_nick_change">%1$s is now known as %2$s</string>
+    <string name="parser_slap_message">slaps %1$s with a trout</string>
+    <string name="parser_action">* %1$s %2$s</string>
+    <string name="parser_connecting">Connecting to server</string>
+    <string name="parser_registering">Registering with server</string>
+    <string name="parser_pm_opened">Private message opened</string>
+    <string name="parser_reconnect">Trying to reconnect to the server…</string>
+    <string name="parser_invited">You have been invited to %1$s by %2$s (see the actions
+        menu pane to accept invite)</string>
+
+    <!-- DCC Chat Events -->
+    <string name="parser_dcc_chat_opened">DCC Chat Opened</string>
+    <string name="parser_dcc_chat_requested">%1$s requested a DCC chat with you (Offered server %2$s and port %3$d)</string>
+    <string name="parser_dcc_files_count">%d files</string>
+
+    <!-- Prompt dialog -->
+    <string name="prompt_dialog_channel_name">Channel Name</string>
+    <string name="prompt_dialog_including_starting">Including the starting #</string>
+
+    <!-- User list fragment -->
+    <string name="user_list_not_possible">Not possible</string>
+    <string name="user_list_pm_self_not_possible">You can not PM yourself</string>
+
+    <!-- One word generics -->
+    <string name="edit">Edit</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
+    <string name="users">Users</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="description">Description</string>
+    <string name="overflow">Overflow</string>
+    <string name="title">Title</string>
+    <string name="mention">Mention</string>
+    <string name="appearance">Appearance</string>
+    <string name="theme">Theme</string>
+    <string name="private_message_short_form">PM</string>
+    <string name="cancel">Cancel</string>
+    <string name="restart">Restart</string>
+    <string name="nickname">Nickname</string>
+    <string name="new_nick">New nick</string>
+    <string name="ok">OK</string>
+    <string name="message">Message</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="about">About</string>
+    <string name="whois" translatable="false">WHOIS</string>
+    <string name="server">Server</string>
+    <string name="optional">Optional</string>
+    <string name="accept">Accept</string>
+    <string name="clear">Clear</string>
+    <string name="server_settings_non_empty">%1$s must not be empty</string>
+    <string name="server_settings_no_password">No password is set</string>
+    <string name="server_settings_password_set">Password is set</string>
+    <string name="channel">Channel</string>
+    <string name="user">User</string>
+    <string name="add_channel">Add channel</string>
+    <string name="server_settings_changes_discarded">Changes discarded</string>
+    <string name="remove">Remove</string>
+    <string name="nick_first_choice">First choice nick name</string>
+    <string name="nick_second_choice">Second choice nick name</string>
+    <string name="nick_third_choice">Third choice nick name</string>
+    <string name="no_event">No Event</string>
+
+    <string name="ignore_nick_title">Nick to ignore</string>
+    <string name="ignore_nick_description">Nickname of the user to be ignored</string>
+    <string name="ignore_list">Ignore List</string>
+    <string name="items_checked">items checked</string>
+    <string name="actions">Actions</string>
+    <string name="done">Done</string>
+    <string name="status_registering">Registering</string>
+    <string name="status_reconnecting">Reconnecting</string>
+    <string name="disconnected_from_server">Disconnected from the server</string>
+
+    <string name="default_user_settings_header">Default User</string>
+    <string name="default_user_settings_summary">The user settings that will be used as a base when
+        creating new servers
+    </string>
+
+    <!-- Actions -->
+    <string name="action_join_channel">Join new channel</string>
+    <string name="action_change_nick">Change nick</string>
+    <string name="action_ignore_list">Ignore List</string>
+    <string name="action_pending_invites">Invites</string>
+    <string name="action_disconnect">Disconnect</string>
+    <string name="action_close_server">Close</string>
+    <string name="action_reconnect">Reconnect</string>
+    <string name="action_part_channel">Part channel</string>
+    <string name="action_close_pm">Close PM</string>
+
+    <!-- Notification settings -->
+    <string name="notification_settings_title">Notifications</string>
+    <string name="notification_settings_summary">Control when you are notified by the app</string>
+    <string name="notification_entry_audio">Audio</string>
+    <string name="notification_entry_vibrate">Vibrate</string>
+    <string name="notification_entry_lights">Lights</string>
+    <string name="notification_value_audio">audio</string>
+    <string name="notification_value_vibrate">vibrate</string>
+    <string name="notification_value_lights">lights</string>
+
+    <!-- Logging settings -->
+    <string name="logging_settings_title">Logging</string>
+    <string name="logging_settings_summary">Control logging settings</string>
+
+    <!-- Crash reporting settings -->
+    <string name="bug_reporting_settings_title">Bug Reporting</string>
+    <string name="bug_reporting_summary">Control bug/crash reporting</string>
+    <string name="report_bugs_title">Bug/Crash reporting</string>
+    <string name="report_bugs_summary">
+        Report any issues to the developer to allow me to make
+        the app better. Turning this off will render me unable to fix any issues you have
+        with the app. Please consider carefully before you switch this off. No personal data is
+        included in these reports.
+    </string>
+    <string name="close">Close</string>
+    <string name="dcc_pending_title">Pending DCC Connections</string>
+    <string name="dcc_progress_complete">%1$d%% complete</string>
+    <string name="invite_headers">Invites</string>
+    <string name="dcc_requested">"%1$s requested by %2$s</string>
+    <string name="dcc_ip_port">Suggested IP %1$s and port %2$d for %3$s</string>
+
+    <!-- Notification strings -->
+    <string name="notification_action_disconnect">Disconnect</string>
+    <string name="notification_action_disconnect_all">Disconnect all</string>
+    <string name="notification_action_close">Close</string>
+    <string name="notification_action_close_all">Close all</string>
+    <string name="notification_action_reconnect">Reconnect</string>
+    <string name="notification_action_reconnect_all">Reconnect all</string>
+    <string name="notification_action_reply">Reply</string>
+    <string name="notification_reconnect_wear_title">IRC disconnected</string>
+    <string name="notification_reconnect_wear_content">Disconnected from %1$s. Touch to reconnect.</string>
+    <string name="notification_reply_wear_title">Reply to %1$s</string>
+    <string name="notification_mentioned_title">Mentioned in %1$s on %2$s</string>
+    <string name="notification_queried_title">Queried by %1$s on %2$s</string>
+    <string name="notification_mentioned_multi_title">Mentioned %1$d times</string>
+    <string name="notification_queried_multi_title" tools:ignore="PluralsCandidate">Queried %1$d times</string>
+    <string name="notification_mentioned_bigtext_title">%1$s on %2$s</string>
+    <string name="notification_connected_title">Connected to %1$s</string>
+    <string name="notification_connecting_title">Connecting to %1$s</string>
+    <string name="notification_disconnected_title">Disconnected from %1$s</string>
+    <string name="notification_reconnecting_title">Reconnecting to %1$s</string>
+
+    <!-- User levels -->
+    <string name="user_level_owners">Owners</string>
+    <string name="user_level_superops">Super-ops</string>
+    <string name="user_level_ops">Ops</string>
+    <string name="user_level_halfops">Half-ops</string>
+    <string name="user_level_voices">Voices</string>
+    <string name="user_level_users">Users</string>
+
+    <string name="no_server_connected">Welcome to HoloIRC! Click a server on the left to connect :)</string>
+    <string name="server_list_empty">No servers found :(\nClick + to add one</string>
+    <string name="server_list_loading">Loading servers\u2026</string>
+
+    <!-- Legal -->
+    <string name="legal">Legal</string>
+    <string name="legal_privacy">Privacy Policy</string>
+</resources>

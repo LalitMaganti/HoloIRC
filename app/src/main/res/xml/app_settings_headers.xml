@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+    <header
+        android:fragment="app.holoirc.ui.AppearancePreferenceFragment"
+        android:summary="@string/settings_appearance_summary"
+        android:title="@string/appearance" />
+    <header
+        android:fragment="app.holoirc.ui.ServerChannelPreferenceFragment"
+        android:summary="@string/server_channel_settings_summary"
+        android:title="@string/server_channel_settings_title" />
+    <header
+        android:fragment="app.holoirc.ui.DefaultUserPreferenceFragment"
+        android:summary="@string/default_user_settings_summary"
+        android:title="@string/default_user_settings_header" />
+    <header
+        android:fragment="app.holoirc.ui.NotificationPreferenceFragment"
+        android:summary="@string/notification_settings_summary"
+        android:title="@string/notification_settings_title" />
+    <header
+        android:fragment="app.holoirc.ui.LoggingPreferenceFragment"
+        android:summary="@string/logging_settings_summary"
+        android:title="@string/logging_settings_title" />
+    <header
+        android:fragment="app.holoirc.ui.BugReportingPreferenceFragment"
+        android:summary="@string/bug_reporting_summary"
+        android:title="@string/bug_reporting_settings_title" />
+    <header
+        android:fragment="app.holoirc.ui.AboutPreferenceFragment"
+        android:summary="@string/settings_about_fragment_summary"
+        android:title="@string/about" />
+    <header
+        android:fragment="app.holoirc.ui.LegalPreferenceFragment"
+        android:title="@string/legal" />
+</preference-headers>

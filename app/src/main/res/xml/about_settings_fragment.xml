@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/about">
+        <Preference
+                android:key="pref_app_version"
+                android:title="@string/about_settings_app_version"/>
+        <Preference
+                android:key="pref_author"
+                android:title="Author"
+                android:summary="XAOS Interactive"/>
+        <Preference
+                android:key="pref_source"
+                android:title="Source"
+                android:summary="HoloIRC is an open source project - http://github.com/HoloIRC/HoloIRC"/>
+    </PreferenceCategory>
+</PreferenceScreen>

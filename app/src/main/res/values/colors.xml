@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="server_card_background_light">#ffffffff</color>
+    <color name="server_card_background_dark">#202122</color>
+
+    <color name="holo_blue_light">#ff33b5e5</color>
+
+    <color name="very_light_grey">#f9f9f9</color>
+    <color name="light_grey">#a2a2a2</color>
+    <color name="medium_grey">#ff2f2f2f</color>
+    <color name="dark_gray">#cc222222</color>
+    <color name="snackbar_dark_gray">#ff323232</color>
+
+    <color name="off_white">#e2e2e2</color>
+
+    <color name="colorPrimary">#215C94</color>
+    <color name="colorPrimaryDark">#18436D</color>
+    <color name="colorAccent">#2870b4</color>
+    <color name="colorAccentDark">#ffffff</color>
+
+    <color name="textWhite">#ffffff</color>
+    <color name="textBlack">#000000</color>
+
+    <color name="snackbar">@color/colorPrimaryDark</color>
+
+    <color name="list_header_color">@color/colorPrimaryDark</color>
+
+    <color name="user_list_drag_up_background">@color/colorPrimaryDark</color>
+
+    <color name="action_bar_background_color">@color/colorPrimary</color>
+
+</resources>
